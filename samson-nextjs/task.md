@@ -24,8 +24,8 @@ Currently, we are focusing purely on the **Backend and Setup** aspects following
 ### Phase 2: Patients Domain (Backend)
 - [x] **DTOs:** Defined Zod validation schemas for patient inputs (`register-patient.dto.ts`).
 - [x] **Repositories (CQRS):** Implemented pre-emptively split repositories (`patient-profile.commands.ts`, `patient-profile.queries.ts`) inside `modules/patients/repositories/`.
-- [ ] **Use-Cases:** Implement pure business logic functions (e.g., `register-patient.use-case.ts`).
-- [ ] **Server Actions:** Wire the Next.js form handling/RPCs in `modules/patients/actions/patient.actions.ts` (Controllers that validate DTOs, execute Use-Cases, and return results/errors).
+- [x] **Use-Cases:** Implement pure business logic functions (e.g., `register-patient.use-case.ts`).
+- [x] **Server Actions:** Wire the Next.js form handling/RPCs in `modules/patients/actions/` (Controllers that validate DTOs, execute Use-Cases, and return results/errors).
 - [ ] **Facade Config:** Export stable public APIs (if any) via `modules/patients/index.ts`.
 
 ### Phase 3: Staff Domain (Backend)
