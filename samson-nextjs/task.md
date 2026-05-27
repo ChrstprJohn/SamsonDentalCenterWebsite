@@ -22,8 +22,8 @@ Currently, we are focusing purely on the **Backend and Setup** aspects following
 - [x] **Testing:** Vitest unit tests implemented and passing for all shared kernel modules.
 
 ### Phase 2: Patients Domain (Backend)
-- [ ] **DTOs:** Define Zod validation schemas for patient inputs (e.g., `register-patient.dto.ts`).
-- [ ] **Repositories (CQRS):** Implement `patient.commands.ts` (create/update) and `patient.queries.ts` (fetch profile) inside `modules/patients/repositories/`.
+- [x] **DTOs:** Defined Zod validation schemas for patient inputs (`register-patient.dto.ts`).
+- [x] **Repositories (CQRS):** Implemented pre-emptively split repositories (`patient-profile.commands.ts`, `patient-profile.queries.ts`) inside `modules/patients/repositories/`.
 - [ ] **Use-Cases:** Implement pure business logic functions (e.g., `register-patient.use-case.ts`).
 - [ ] **Server Actions:** Wire the Next.js form handling/RPCs in `modules/patients/actions/patient.actions.ts` (Controllers that validate DTOs, execute Use-Cases, and return results/errors).
 - [ ] **Facade Config:** Export stable public APIs (if any) via `modules/patients/index.ts`.

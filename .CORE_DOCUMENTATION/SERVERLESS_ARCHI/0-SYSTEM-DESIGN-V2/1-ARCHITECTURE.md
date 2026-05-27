@@ -100,11 +100,23 @@ In a Modulith architecture, files can become bloated as business logic grows. Fo
   * Each business action gets its own file: `approve-appointment.use-case.ts`, `reschedule-appointment.use-case.ts`.
   * **Why?** It ensures single responsibility, restricts imports to only what that specific action needs, and makes unit testing much easier.
 
-### D. When Repositories Overload (Complex Data Access)
-* **Trigger**: A repository file mixes massive aggregations, full-text searches, and standard CRUD.
-* **Solution**: Apply **CQRS (Command Query Responsibility Segregation)** at the file level:
-  * `appointments.commands.ts` -> Handles mutations (`create`, `update`, `delete`).
-  * `appointments.queries.ts` -> Handles reads (`findByDate`, `exportMonthlyReport`).
+### D. Pre-emptive Repository Segregation (No God Classes)
+* **Rule**: Never create a catch-all generic repository like `patient.commands.ts`. Break them down immediately upon creation by sub-resource or actor to prevent technical debt.
+* **Execution**: Apply **CQRS (Command/Query Responsibility Segregation)** combined with specific context splitting right out of the gate:
+  **1. Splitting by Resource Sub-type**
+  * `patient-profile.commands.ts` (Updates to name, email, etc.)
+  * `patient-insurance.commands.ts` (Handles insurance billing details)
+  * `patient-medical-history.commands.ts` (Handles sensitive health records)
+
+  **2. Splitting by Actor (The "Samson Dental" way)**
+  If rules for Admins vs. Patients dictate entirely different data checks:
+  * `admin-patient.commands.ts`
+  * `self-service-patient.commands.ts`
+
+* **Why this prevents technical debt**:
+  * **Dependencies remain light:** You only inject the specific repository needed for a Use-Case.
+  * **Testability stays high:** You only need to mock 3-5 methods instead of 50.
+  * **Conflict reduction:** Multiple developers can work on different command files without creating massive git merge conflicts.
 
 ### E. Managing Utilities (Local vs. Global)
 * **Trigger**: Unsure where to place a helper function.
