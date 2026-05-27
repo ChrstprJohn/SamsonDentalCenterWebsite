@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { createStaffAction } from './admin-staff.actions';
 import { authorizeRole } from '@/shared/auth/auth.util';
-
+import { UnauthorizedError } from '@/shared/errors/unauthorized.error'; // Import at top
 // 1. Mocks
 vi.mock('server-only', () => ({}));
 vi.mock('@/shared/auth/auth.util');
@@ -48,7 +48,7 @@ describe('createStaffAction (Unit Test)', () => {
 
     it('should return failure if user is not authenticated', async () => {
         // 1. Arrange: Simulate auth service failure
-        vi.mocked(authorizeRole).mockRejectedValue(new Error('Unauthorized'));
+        vi.mocked(authorizeRole).mockRejectedValue(new UnauthorizedError('Unauthorized'));
 
         // 2. Act
         const result = await createStaffAction(mockStaffData);
