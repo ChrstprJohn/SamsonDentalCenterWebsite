@@ -1,0 +1,2 @@
+export function isError(err: unknown): err is Error { return err instanceof Error; }
+export function getErrorMessage(err: unknown): string { if (isError(err)) return err.message; if (typeof err === "string") return err; return "Unknown error"; }
