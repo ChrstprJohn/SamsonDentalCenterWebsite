@@ -23,7 +23,7 @@ export class PatientProfileCommands {
       .single();
 
     if (error || !patient) {
-      throw new DomainError("Database Error: ", 'DATABASE_ERROR');
+      throw new DomainError(`Failed to register patient: ${error?.message || 'Unknown database error'}`, 'DATABASE_ERROR');
     }
     
     return patient; 
