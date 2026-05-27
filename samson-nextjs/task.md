@@ -28,11 +28,13 @@ Currently, we are focusing purely on the **Backend and Setup** aspects following
 - [x] **Server Actions:** Wire the Next.js form handling/RPCs in `modules/patients/actions/` (Controllers that validate DTOs, execute Use-Cases, and return results/errors).
 - [x] **Facade Config:** Export stable public APIs (if any) via `modules/patients/index.ts`.
 
-### Phase 3: Staff Domain (Backend)
-- [ ] **DTOs:** Define schemas for staff and schedules.
-- [ ] **Repositories:** Implement `staff.commands.ts` and `staff.queries.ts`.
-- [ ] **Use-Cases:** Write business logic for creating staff, terminating employment, or updating clinic hours (`use-cases/create-staff.use-case.ts`, etc.).
-- [ ] **Server Actions (Segmented):** Create segmented action files inside `actions/` (e.g., `admin-staff.actions.ts`, `doctor-schedule.actions.ts`, `profile.actions.ts`) to avoid God classes.
+### 🚧 Phase 3: Staff Domain (Backend) - IN PROGRESS
+- [ ] **DTOs:** Define schemas for staff and schedules. *(Staff profile DTO complete, still need schedule DTOs)*
+- [x] **Repositories (Queries):** Implemented `staff-profile.queries.ts` with `getStaffProfile()` query inside `modules/staff/repositories/`. Tests passing via `staff-profile.queries.spec.ts`.
+- [ ] **Repositories (Commands):** Implement `staff-profile.commands.ts` for write operations (create, update, terminate). *(Create command complete, missing update/terminate)*
+- [ ] **Use-Cases:** Write business logic for creating staff, terminating employment, or updating clinic hours (`use-cases/create-staff.use-case.ts`, etc.). *(Create use-case complete)*
+- [ ] **Server Actions (Segmented):** Create segmented action files inside `actions/` (e.g., `admin-staff.actions.ts`, `doctor-schedule.actions.ts`, `profile.actions.ts`) to avoid God classes. *(Create action complete)*
+- [x] **Facade Config:** Export stable public APIs via `modules/staff/index.ts`.
 
 ### Phase 4: Appointments Domain (Backend)
 - [ ] **DTOs:** Define schemas for creating and updating appointments.

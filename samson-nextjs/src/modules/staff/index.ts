@@ -1,4 +1,4 @@
-// src/modules/patients/index.ts
+// src/modules/staff/index.ts
 
 // Export Data Transfer Objects & Types
 export * from './dtos/create-staff.dto';

@@ -2,7 +2,7 @@
 
 import { z } from 'zod';
 import { createClient } from '@/shared/database/server';
-import { getAuthenticatedUser } from '@/shared/auth/auth.util';
+import { authorizeRole } from '@/shared/auth/auth.util';
 import { DomainError } from '@/shared/errors';
 import { createStaffSchema, CreateStaffDto } from '../dtos/create-staff.dto';
 import { StaffProfileCommands } from '../repositories/staff-profile.commands';
@@ -13,8 +13,8 @@ export async function createStaffAction(formData: CreateStaffDto) {
         // 1. Zod Validation or Form Validation
         const validData = createStaffSchema.parse(formData);
 
-        // 2. Auth Validation
-        const user = await getAuthenticatedUser();
+        // 2. Auth Validation (Role-based access)
+        const user = await authorizeRole('ADMIN');
 
         // 3. Instantiate Repositories and Use-Cases (inject dependencies)
         const supabase = await createClient();
