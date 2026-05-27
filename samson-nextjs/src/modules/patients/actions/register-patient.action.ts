@@ -10,26 +10,25 @@ import { RegisterPatientUseCase } from '../use-cases/register-patient.use-case';
 
 export async function registerPatientAction(formData: RegisterPatientDto) {
   try {
-    // 1. Zod Validation (Never trust the UI layer)
+    // 1. Zod Validation or Form Validation
     const validData = registerPatientSchema.parse(formData);
 
-    // 2. Auth Context (who is making this request?)
+    // 2. Auth Validation 
     const user = await getAuthenticatedUser();
 
-    // 3. Dependency Injection (Wire up the DB -> Repo -> UseCase)
+    // 3. Instantiate Repositories and Use-Cases (inject dependencies)
     const supabase = await createClient();
-    const commandsRepo = new PatientProfileCommands(supabase);
-    const useCase = new RegisterPatientUseCase(commandsRepo);
+    const patientRepository = new PatientProfileCommands(supabase);
+    const registerPatientUseCase = new RegisterPatientUseCase(patientRepository);
 
     // 4. Execution
-    const newPatient = await useCase.execute(user.id, validData);
+    const newPatient = await registerPatientUseCase.execute(user.id, validData);
 
-    // 5. Output mapping (never throw raw errors back to the client UI)
+    // 5. Output mapping 
     return { success: true, data: newPatient };
 
   } catch (error) {
      if (error instanceof z.ZodError) {
-     // Use .issues for better compatibility or cast the error
      const zodError = error as z.ZodError;
      return { 
      success: false, 
@@ -38,7 +37,6 @@ export async function registerPatientAction(formData: RegisterPatientDto) {
 }
     
     if (error instanceof DomainError) {
-      // Safely pass Business logic errors to UI (e.g. "Database Error")
       return { success: false, error: error.message };
     }
 
