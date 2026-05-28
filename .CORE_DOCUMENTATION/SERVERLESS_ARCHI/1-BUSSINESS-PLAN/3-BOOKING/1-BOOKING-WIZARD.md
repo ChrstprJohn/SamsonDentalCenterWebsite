@@ -31,12 +31,21 @@ Progress is displayed as a breadcrumb trail: **Service → Schedule → Details 
 - User selects the service they want to book.
 - Selected service determines available time slot durations and doctor assignment logic.
 
----
+--- 
 
 ### Step 2 — Schedule Selection (`DateTimeStep`)
 
-- Fetches dynamic calendar availability for the selected service.
-- User picks a date and then a time slot from available options.
+- **Doctor Selection:** Displays a dropdown / cards selection for Doctor preference.
+  - **Default:** "Any Doctor" (System automatically aggregates the schedules of all active doctors).
+  - **Specific:** User selects a preferred doctor (e.g., Dr. Smith).
+- **Dynamic Calendar Availability:**
+  - The calendar enables/disables days dynamically:
+    - If "Any Doctor", days are enabled if *at least one* doctor works that day.
+    - If a specific doctor is picked, only their working days are enabled.
+- **Dynamic Timeslots:**
+  - When a date is selected, the system calculates free ranges and mathematically slices them based exactly on the **Service Duration** (e.g., a 30-minute service creates slots at 8:00, 8:30, 9:00).
+  - If "Any Doctor" is used and multiple doctors are free at the same time, the system will *implicitly* assign the least busy doctor to that timeslot behind the scenes.
+- **Selection Data:** User picks a slot. The `startTime` is set, and the `endTime` is precisely `startTime + serviceDuration`. This metadata, along with the assigned doctor ID, carries over to the next step.
 - Note: Slot holding is intentionally omitted to optimize booking speed. Validation happens purely upon final submission.
 
 ---
@@ -60,7 +69,7 @@ The patient specifies who the appointment is for via a single, unified flow:
 - On submit, the wizard calls `POST /appointments/submit-wizard` to perform **Final Validation**.
   - **Final Validation:** The primary validation needed is checking for **double bookings**. The system checks if the time slot is still available. If someone else has already booked the slot, the booking is rejected, and the user is prompted to return to Step 2 and pick a new time.
   - *(Note: Other tentative validations like overlapping schedules or quotas may be added later, but double-booking prevention is the core requirement).*
-
+  
 ---
 
 ## Atomic Submission

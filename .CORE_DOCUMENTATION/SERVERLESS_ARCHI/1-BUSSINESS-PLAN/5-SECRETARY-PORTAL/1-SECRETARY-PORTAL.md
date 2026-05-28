@@ -12,7 +12,7 @@ The secretary portal is the private workspace for clinic staff responsible for r
 |---|---|
 | **Dashboard** | Prioritizes pending requests and upcoming appointments |
 | **Pending Appointments** | Queue of appointments awaiting review |
-| **Upcoming Appointments** | Approved appointments scheduled for future dates |
+| **Approved Appointments** | Approved appointments scheduled for future dates |
 | **Appointment History** | Past, completed, cancelled, and rejected appointments |
 | **Booking Requests (Grouped)** | Grouped view of batch family/dependent booking requests |
 | **Check-in / Check-out** | Track patient arrival and departure |

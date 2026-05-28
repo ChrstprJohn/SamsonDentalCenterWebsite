@@ -6,15 +6,28 @@
 |---|---|
 | **Pending** | Submitted request, awaiting staff review. Slot is disabled/unclickable for other users. |
 | **Approved** | Confirmed by clinic with an approval reason; synchronized to doctor calendar. |
+
 | **Rejected** | Declined by staff with a rejection reason (can issue warnings to user). |
-| **Cancelled** | An approved or pending appointment was cancelled by user or secretary; requires a reason. Recorded for credibility. |
+| **Cancelled** | An approved or pending appointment was cancelled by user or secretary; requires a reason. Recorded for credibility. 
+
+
+
 | **Reschedule Requested** | An approved appointment where the user has requested a single allowed reschedule. Must be re-approved by secretary. |
 | **Displaced** | Slot is no longer valid due to a system or secretary action (blocked date, time, removed service, doctor unavailability). |
+
 | **Checked-In** | Patient has arrived at the clinic for their appointment. |
 | **Completed** | Patient attended and checked out; system unlocks invoicing and dental history updates. |
 | **No-Show** | Patient failed to attend without cancelling. Recorded for credibility. |
 
 ---
+
+<!-- button
+checkin => checked in 
+<!-- invoice => consultation
+complete => -->
+<!-- consultation cleaning
+complete => form => sumbuit completed
+completed => view  --> -->
 
 ## Appointment Status Flow
 

@@ -121,3 +121,5 @@ Tracks actions performed by staff (Secretaries/Admins) for accountability.
 | `target_id` | `uuid` | Not Null | ID of the affected record (e.g., Appointment ID) |
 | `reason` | `text` | Nullable | |
 | `created_at` | `timestamptz` | Default: `now()` | |
+
+all of this are not final sql

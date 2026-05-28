@@ -37,10 +37,24 @@ Currently, we are focusing purely on the **Backend and Setup** aspects following
 - [x] **Facade Config:** Export stable public APIs via `modules/staff/index.ts`.
 
 ### Phase 4: Appointments Domain (Backend)
-- [ ] **DTOs:** Define schemas for creating and updating appointments.
-- [ ] **Repositories:** Implement commands and queries to check overlapping schedules, doctor availability, and write appointment states.
-- [ ] **Use-Cases:** Business logic for appointment scheduling (e.g., `book-appointment.use-case.ts`).
-- [ ] **Server Actions:** Secure Next.js endpoints (e.g., `patient-booking.actions.ts`, `admin-appointments.actions.ts`).
+- [x] **DTOs / Schemas:**
+  - [x] Define `GetAvailabilityDto` (date, service_id).
+  - [x] Define `SubmitBookingDto` (service_id, doctor_id, date, start_time, end_time, user_note, dependent fields).
+  - [x] Define schemas for status updates (e.g., `UpdateAppointmentStatusDto` with reason notes).
+- [x] **Repositories (Queries):**
+  - [x] Implement `appointment.queries.ts` to fetch appointments by user (patient portal) and by clinic (admin/secretary portal).
+  - [x] Implement slot-checking queries (fetch existing overlapping appointments, fetch doctor schedules).
+- [ ] **Repositories (Commands):**
+  - [ ] Implement `appointment.commands.ts` for strictly creating appointments (the atomic wizard submission).
+  - [ ] Implement command for status updates (`PENDING` -> `APPROVED`, `CANCELLED`, etc.) and reschedule counts.
+- [ ] **Use-Cases (Business Logic):**
+  - [ ] `get-availability.use-case.ts`: Calculate available slots (Doctor Schedules - Breaks - Existing Appointments).
+  - [ ] `submit-booking.use-case.ts`: Atomic execution to prevent double-booking and save the appointment.
+  - [ ] `update-appointment-status.use-case.ts`: Enforce status machine rules (e.g., only 1 Reschedule Request allowed, tracking credibility / no-shows).
+- [ ] **Server Actions (Endpoints for Frontend):**
+  - [ ] `booking-wizard.actions.ts`: Actions mapped directly to the frontend wizard (fetch availability, final submit).
+  - [ ] `patient-portal.actions.ts`: Actions for the patient dashboard (cancel appointment, request reschedule).
+  - [ ] `staff-appointments.actions.ts`: Actions for secretaries/admins to review, approve, reject, or complete appointments.
 
 ### Phase 5: Orchestrators & Events
 - [ ] **Cross-Domain Workflow:** Build orchestrators for multi-domain processes if required (e.g., `checkout.orchestrator.ts`).
