@@ -68,4 +68,58 @@ describe('StaffProfileCommands', () => {
         // 2 & 3. Act & Assert
         await expect(commands.createStaff('staff_123', validData)).rejects.toThrow(DomainError);
     });
+
+    describe('updateStaff', () => {
+        it('successfully updates a staff record', async () => {
+            const mockUpdatedRecord = { id: 'staff_123', email: 'new@email.com' };
+            const mockSupabase = {
+                from: vi.fn().mockReturnThis(),
+                update: vi.fn().mockReturnThis(),
+                eq: vi.fn().mockReturnThis(),
+                select: vi.fn().mockReturnThis(),
+                single: vi.fn().mockResolvedValue({ data: mockUpdatedRecord, error: null }),
+            };
+            const commands = new StaffProfileCommands(mockSupabase as any);
+
+            const result = await commands.updateStaff('staff_123', { email: 'new@email.com' });
+
+            expect(result).toEqual(mockUpdatedRecord);
+            expect(mockSupabase.update).toHaveBeenCalledWith({ email: 'new@email.com' });
+            expect(mockSupabase.eq).toHaveBeenCalledWith('id', 'staff_123');
+        });
+
+        it('throws DomainError on database error', async () => {
+            const mockSupabase = {
+                from: vi.fn().mockReturnThis(),
+                update: vi.fn().mockReturnThis(),
+                eq: vi.fn().mockReturnThis(),
+                select: vi.fn().mockReturnThis(),
+                single: vi
+                    .fn()
+                    .mockResolvedValue({ data: null, error: { message: 'Network error' } }),
+            };
+            const commands = new StaffProfileCommands(mockSupabase as any);
+
+            await expect(
+                commands.updateStaff('staff_123', { email: 'new@email.com' })
+            ).rejects.toThrow(DomainError);
+        });
+    });
+
+    describe('terminateStaff', () => {
+        it('successfully deletes a staff record', async () => {
+            const mockSupabase = {
+                from: vi.fn().mockReturnThis(),
+                delete: vi.fn().mockReturnThis(),
+                eq: vi.fn().mockResolvedValue({ error: null }),
+            };
+            const commands = new StaffProfileCommands(mockSupabase as any);
+
+            const result = await commands.terminateStaff('staff_123');
+
+            expect(result).toEqual({ success: true, id: 'staff_123' });
+            expect(mockSupabase.delete).toHaveBeenCalled();
+            expect(mockSupabase.eq).toHaveBeenCalledWith('id', 'staff_123');
+        });
+    });
 });
