@@ -44,9 +44,9 @@ Currently, we are focusing purely on the **Backend and Setup** aspects following
 - [x] **Repositories (Queries):**
   - [x] Implement `appointment.queries.ts` to fetch appointments by user (patient portal) and by clinic (admin/secretary portal).
   - [x] Implement slot-checking queries (fetch existing overlapping appointments, fetch doctor schedules).
-- [ ] **Repositories (Commands):**
-  - [ ] Implement `appointment.commands.ts` for strictly creating appointments (the atomic wizard submission).
-  - [ ] Implement command for status updates (`PENDING` -> `APPROVED`, `CANCELLED`, etc.) and reschedule counts.
+- [x] **Repositories (Commands):**
+  - [x] Implement `appointment-booking.commands.ts` for strictly creating appointments (the atomic wizard submission).
+  - [x] Implement `appointment-status.commands.ts` for status updates (`PENDING` -> `APPROVED`, `CANCELLED`, etc.) and metrics tracking.
 - [ ] **Use-Cases (Business Logic):**
   - [ ] `get-availability.use-case.ts`: Calculate available slots (Doctor Schedules - Breaks - Existing Appointments).
   - [ ] `submit-booking.use-case.ts`: Atomic execution to prevent double-booking and save the appointment.

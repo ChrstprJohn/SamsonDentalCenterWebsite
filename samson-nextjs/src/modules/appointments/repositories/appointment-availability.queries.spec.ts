@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { SupabaseClient } from '@supabase/supabase-js';
-import { AvailabilityQueries } from './availability.queries';
+import { AppointmentAvailabilityQueries } from './appointment-availability.queries';
 
-describe('AvailabilityQueries', () => {
-  let queries: AvailabilityQueries;
+describe('AppointmentAvailabilityQueries', () => {
+  let queries: AppointmentAvailabilityQueries;
   let mockSupabase: any;
 
   beforeEach(() => {
@@ -14,10 +14,9 @@ describe('AvailabilityQueries', () => {
       not: vi.fn().mockReturnThis(),
       then: vi.fn((resolve) => resolve({ data: [], error: null }))
     };
-    // Mock the chaining structure correctly for Promises
     mockSupabase.eq.mockReturnValue(mockSupabase);
     mockSupabase.not.mockReturnValue(mockSupabase);
-    queries = new AvailabilityQueries(mockSupabase as unknown as SupabaseClient);
+    queries = new AppointmentAvailabilityQueries(mockSupabase as unknown as SupabaseClient);
   });
 
   describe('getDoctorSchedules', () => {

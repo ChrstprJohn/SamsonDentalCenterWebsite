@@ -1,6 +1,6 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 
-export class AvailabilityQueries {
+export class AppointmentAvailabilityQueries {
   constructor(private readonly supabase: SupabaseClient) {}
 
   /**
@@ -12,10 +12,10 @@ export class AvailabilityQueries {
       .from('staff_schedules')
       .select('*')
       .eq('date', date)
-      .eq('is_working', true); // Assuming a boolean flag for working days
+      .eq('is_working', true);
 
     if (doctorId) {
-      query = query.eq('staff_id', doctorId); // Doctors are staff members
+      query = query.eq('staff_id', doctorId);
     }
 
     const { data: schedules, error } = await query;

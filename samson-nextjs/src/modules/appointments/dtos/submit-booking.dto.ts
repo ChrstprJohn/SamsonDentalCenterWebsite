@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 // Utility helper to intercept empty form fields and strip them down to undefined for Supabase NULL insertion
 const emptyStringToUndefined = z.literal('').transform(() => undefined);
-const cleanOptionalString = z.string().trim().optional().transform(val => val === '' ? undefined : val);
+const cleanOptionalString = z.string().trim().optional().transform(val => val === '' ? undefined : val).optional();
 
 export const submitBookingSchema = z
     .object({
@@ -21,7 +21,8 @@ export const submitBookingSchema = z
             .string()
             .uuid('Invalid Dependent ID format')
             .optional()
-            .or(emptyStringToUndefined),
+            .or(emptyStringToUndefined)
+            .optional(),
 
         // Required block options are trimmed first to secure against pure whitespace strings
         dependentFirstName: z.string().trim().optional(),
@@ -32,7 +33,8 @@ export const submitBookingSchema = z
             .string()
             .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format')
             .optional()
-            .or(emptyStringToUndefined),
+            .or(emptyStringToUndefined)
+            .optional(),
         dependentSex: z.enum(['MALE', 'FEMALE']).optional(),
         dependentRelationship: z.string().trim().optional(),
     })
