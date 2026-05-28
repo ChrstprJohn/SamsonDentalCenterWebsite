@@ -28,7 +28,7 @@ Currently, we are focusing purely on the **Backend and Setup** aspects following
 - [x] **Server Actions:** Wire the Next.js form handling/RPCs in `modules/patients/actions/` (Controllers that validate DTOs, execute Use-Cases, and return results/errors).
 - [x] **Facade Config:** Export stable public APIs (if any) via `modules/patients/index.ts`.
 
-### 🚧 Phase 3: Staff Domain (Backend) - IN PROGRESS
+### ✅ Phase 3: Staff Domain (Backend) - COMPLETED
 - [x] **DTOs:** Define schemas for staff and schedules.
 - [x] **Repositories (Queries):** Implemented `staff-profile.queries.ts` with `getStaffProfile()` query inside `modules/staff/repositories/`. Tests passing via `staff-profile.queries.spec.ts`.
 - [x] **Repositories (Commands):** Implement `staff-profile.commands.ts` for write operations (create, update, terminate).
