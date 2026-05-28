@@ -41,16 +41,17 @@ Currently, we are focusing purely on the **Backend and Setup** aspects following
   - [x] Define `GetAvailabilityDto` (date, service_id).
   - [x] Define `SubmitBookingDto` (service_id, doctor_id, date, start_time, end_time, user_note, dependent fields).
   - [x] Define schemas for status updates (e.g., `UpdateAppointmentStatusDto` with reason notes).
+  - [x] Define `GetClinicAppointmentsDto` for clinic portal query filtering.
 - [x] **Repositories (Queries):**
   - [x] Implement `appointment.queries.ts` to fetch appointments by user (patient portal) and by clinic (admin/secretary portal).
   - [x] Implement slot-checking queries (fetch existing overlapping appointments, fetch doctor schedules).
 - [x] **Repositories (Commands):**
   - [x] Implement `appointment-booking.commands.ts` for strictly creating appointments (the atomic wizard submission).
   - [x] Implement `appointment-status.commands.ts` for status updates (`PENDING` -> `APPROVED`, `CANCELLED`, etc.) and metrics tracking.
-- [ ] **Use-Cases (Business Logic):**
-  - [ ] `get-availability.use-case.ts`: Calculate available slots (Doctor Schedules - Breaks - Existing Appointments).
-  - [ ] `submit-booking.use-case.ts`: Atomic execution to prevent double-booking and save the appointment.
-  - [ ] `update-appointment-status.use-case.ts`: Enforce status machine rules (e.g., only 1 Reschedule Request allowed, tracking credibility / no-shows).
+- [x] **Use-Cases (Business Logic):**
+  - [x] `get-availability.use-case.ts`: Calculate available slots (Doctor Schedules - Breaks - Existing Appointments).
+  - [x] `submit-booking.use-case.ts`: Atomic execution to prevent double-booking and save the appointment.
+  - [x] `update-appointment-status.use-case.ts`: Enforce status machine rules (e.g., only 1 Reschedule Request allowed, tracking credibility / no-shows).
 - [ ] **Server Actions (Endpoints for Frontend):**
   - [ ] `booking-wizard.actions.ts`: Actions mapped directly to the frontend wizard (fetch availability, final submit).
   - [ ] `patient-portal.actions.ts`: Actions for the patient dashboard (cancel appointment, request reschedule).

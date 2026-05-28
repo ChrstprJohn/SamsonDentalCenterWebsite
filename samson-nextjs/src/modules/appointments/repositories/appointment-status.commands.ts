@@ -17,7 +17,8 @@ export class AppointmentStatusCommands {
       startTime: string;
       endTime: string;
       doctorId: string;
-    }
+    },
+    rescheduleCount?: number
   ) {
     const payload: Record<string, any> = {
       status,
@@ -31,6 +32,10 @@ export class AppointmentStatusCommands {
       payload.start_time = rescheduleMetadata.startTime;
       payload.end_time = rescheduleMetadata.endTime;
       payload.doctor_id = rescheduleMetadata.doctorId;
+    }
+
+    if (rescheduleCount !== undefined) {
+      payload.reschedule_count = rescheduleCount;
     }
 
     const { data: appointment, error } = await this.supabase
