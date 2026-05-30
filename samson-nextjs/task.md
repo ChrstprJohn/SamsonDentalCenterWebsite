@@ -162,15 +162,15 @@ Currently, we are focusing purely on the **Backend and Setup** aspects following
     - [x] `modules/billing/dtos/index.ts`
 
 ### Phase 7.5: Clinical Treatment Domain (Doctor)
-- [ ] **Clinical Submission:** Implement the doctor's workflow for submitting actual services rendered, creating the draft invoice.
+- [x] **Clinical Submission:** Implement the doctor's workflow for submitting actual services rendered, creating the draft invoice.
   - **DTOs:**
-    - [ ] `modules/appointments/dtos/treatment/submit-treatment.dto.ts` (and `.spec.ts`) - Must contain appointmentId, an array of actualServiceIds, and clinicalNotes.
+    - [x] `modules/appointments/dtos/treatment/submit-treatment.dto.ts` (and `.spec.ts`) - Must contain appointmentId, an array of actualServiceIds, and clinicalNotes.
   - **Repositories:**
-    - [ ] `modules/appointments/repositories/treatment/treatment.commands.ts` (and `.spec.ts`)
+    - [x] `modules/appointments/repositories/treatment/treatment.commands.ts` (and `.spec.ts`)
   - **Use-Cases:**
-    - [ ] `modules/appointments/use-cases/treatment/submit-treatment.use-case.ts` (and `.spec.ts`)
+    - [x] `modules/appointments/use-cases/treatment/submit-treatment.use-case.ts` (and `.spec.ts`)
   - **Actions:**
-    - [ ] `modules/appointments/actions/treatment/submit-treatment.action.ts` (and `.spec.ts`)
+    - [x] `modules/appointments/actions/treatment/submit-treatment.action.ts` (and `.spec.ts`)
 
 ### Phase 8: Audit Logging Domain
 - [ ] **Audit Logging Domain:** Implement audit log mechanism to track staff actions (`get-audit-logs`, `create-audit-log`).

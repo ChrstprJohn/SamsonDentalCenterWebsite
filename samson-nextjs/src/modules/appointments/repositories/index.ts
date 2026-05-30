@@ -3,3 +3,5 @@ export * from './booking/appointment-booking.commands';
 export * from './status/appointment-status.commands';
 export * from './clinic/clinic-appointments.queries';
 export * from './patient/patient-appointments.queries';
+export * from './treatment/treatment.commands';
+
