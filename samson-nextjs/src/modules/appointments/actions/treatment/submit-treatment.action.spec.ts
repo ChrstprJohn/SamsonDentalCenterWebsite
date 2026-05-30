@@ -28,7 +28,7 @@ describe('submitTreatmentAction', () => {
 
     const payload = {
       appointmentId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd2',
-      actualServiceIds: ['da95a63c-333e-4b68-98e3-82bdf1a07bd3'],
+      actualServices: [{ serviceId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd3', comment: 'Scaling' }],
       clinicalNotes: 'Cleaned',
     };
 
@@ -42,7 +42,7 @@ describe('submitTreatmentAction', () => {
   it('returns validation error if validation fails', async () => {
     const payload = {
       appointmentId: 'invalid-uuid',
-      actualServiceIds: [],
+      actualServices: [],
     };
 
     const result = await submitTreatmentAction(payload as any);

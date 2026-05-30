@@ -24,8 +24,8 @@ describe('SubmitTreatmentUseCase', () => {
   it('submits treatment and generates draft invoice successfully', async () => {
     mockIn.mockResolvedValue({
       data: [
-        { id: 'svc-1', price: 500 },
-        { id: 'svc-2', price: 800 },
+        { id: 'svc-1', name: 'Consultation', price: 500 },
+        { id: 'svc-2', name: 'X-Ray', price: 800 },
       ],
       error: null,
     });
@@ -46,12 +46,22 @@ describe('SubmitTreatmentUseCase', () => {
 
     const result = await useCase.execute({
       appointmentId: 'appt-123',
-      actualServiceIds: ['svc-1', 'svc-2'],
+      actualServices: [
+        { serviceId: 'svc-1', comment: 'Routine' },
+        { serviceId: 'svc-2', comment: null },
+      ],
       clinicalNotes: 'Upper molar filling done',
     });
 
     expect(result).toBe(true);
-    expect(mockTreatmentCommands.submitTreatment).toHaveBeenCalledWith('appt-123', 'Upper molar filling done');
+    expect(mockTreatmentCommands.submitTreatment).toHaveBeenCalledWith(
+      'appt-123',
+      expect.stringContaining('Global Notes: Upper molar filling done')
+    );
+    expect(mockTreatmentCommands.submitTreatment).toHaveBeenCalledWith(
+      'appt-123',
+      expect.stringContaining('Consultation (Routine)')
+    );
     expect(mockInvoiceCommands.generateInvoice).toHaveBeenCalledWith({
       appointment_id: 'appt-123',
       amount: 1300,
@@ -74,8 +84,8 @@ describe('SubmitTreatmentUseCase', () => {
     await expect(
       useCase.execute({
         appointmentId: 'appt-123',
-        actualServiceIds: ['svc-1'],
+        actualServices: [{ serviceId: 'svc-1' }],
       })
-    ).rejects.toThrow('Failed to fetch service prices: Fetch failed');
+    ).rejects.toThrow('Failed to fetch service details: Fetch failed');
   });
 });
