@@ -9,6 +9,7 @@ This table maps our project-specific system design documents to the correspondin
 | System Design Doc | Description | Governed By Skill(s) |
 | :--- | :--- | :--- |
 | **[1. Architecture Blueprint](1-ARCHITECTURE.md)** | Core Modular Monolith structure and directory layout. | `spec-driven-development`, `incremental-implementation` |
+| **[1.5. Golden Coding Patterns](1.5-CODING-PATTERNS.md)** | Standard coding templates, mappers, DTOs, and layer blueprints. | `code-review-and-quality`, `code-simplification` |
 | **[2. Express & TypeScript](2-EXPRESS.md)** | Backend framework conventions, routing, and DTOs. | `api-and-interface-design`, `frontend-ui-engineering` |
 | **[3. Clean Code & Layers](3-CLEAN_CODE.md)** | Separation of concerns (Controllers vs Services). | `code-review-and-quality`, `code-simplification` |
 | **[4. Testing Guidelines](4-TESTING_GUIDELINES.md)** | Unit vs Integration testing strategy and mocks. | `test-driven-development` |
