@@ -12,7 +12,7 @@ The admin portal is the full-control management interface for clinic owners and 
 |---|---|
 | **Dashboard** | Overview analytics; prioritizes upcoming appointments and pending requests |
 | **Manage Services** | Create, edit, and delete clinic services |
-| **Manage Doctors** | Create, edit, delete, and assign doctor availability |
+| **Manage Doctors** | Create, edit, delete, assign availability, and create staff accounts |
 | **Manage Users** | View, edit, and deactivate patient accounts |
 | **Manage Secretaries** | Create, edit, deactivate, and assign secretary accounts |
 | **Clinic Config** | Edit system-wide clinic settings without code deployment |
@@ -49,8 +49,8 @@ The admin portal is the full-control management interface for clinic owners and 
 
 | Action | Details |
 |---|---|
-| Create | Add a new doctor profile |
-| Edit | Update doctor information |
+| Create | Add a new doctor profile and provision their portal login |
+| Edit | Update doctor information and specialties |
 | Delete | Remove a doctor profile (verify no active appointments linked) |
 | Assign Availability | Set working hours, breaks, and days off per doctor |
 
@@ -123,12 +123,13 @@ The clinic config panel allows system-wide settings to be changed **without depl
 | View and manage all services | ✅ |
 | View and manage all doctors | ✅ |
 | View and manage all users | ✅ |
-| Create and manage secretary accounts | ✅ |
+| Create and manage secretary and doctor accounts | ✅ |
 | Configure clinic settings | ✅ |
 | Toggle booking open/closed | ✅ |
 | Set maintenance message | ✅ |
 | View comprehensive dashboard analytics | ✅ |
 | View all audit logs | ✅ |
+| View financial invoices | ✅ (read-only final records) |
 | Reschedule appointments (unlimited) | ✅ |
 | Cancel appointments | ✅ (with reason) |
 | Approve / reject appointments | ✅ |

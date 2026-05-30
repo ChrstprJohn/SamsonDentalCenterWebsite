@@ -8,6 +8,7 @@
 | **Approved** | Active | Confirmed by clinic with an approval reason; synchronized to doctor calendar. |
 | **Reschedule Requested** | Active | An approved appointment where the user has requested a single allowed reschedule. Must be re-approved by secretary. |
 | **Checked-In** | Active | Patient has arrived at the clinic; appointment is currently ongoing. |
+| **Treatment Rendered** | Active | Doctor has submitted the performed services and generated a draft invoice; awaiting secretary checkout. |
 | **Rejected** | Terminal (Immutable) | Declined by staff with a rejection reason (can issue warnings to user). |
 | **Cancelled** | Terminal (Immutable) | An approved or pending appointment was cancelled by user or secretary; requires a reason. Slot is freed back to the availability pool. |
 | **Displaced** | Terminal (Immutable) | Slot is no longer valid due to a system or secretary action (blocked date, time, removed service, doctor unavailability). |
@@ -40,9 +41,11 @@ graph TD
     RescheduleReq --> Approved
     RescheduleReq --> Rejected
     
-    CheckedIn --> Completed
+    CheckedIn --> TreatmentRendered[Treatment Rendered]
     CheckedIn --> NoShow[No-Show]
     Approved --> NoShow
+
+    TreatmentRendered --> Completed
 ```
 
 ---
@@ -74,8 +77,9 @@ Every appointment stores notes and reasons for traceability:
 | **Cancelled** | Slot is freed back to availability pool |
 | **Reschedule Requested** | Approve, Reject |
 | **Displaced** | User is forced back to availability selection if a new slot is available |
-| **Checked-In** | Complete | 
-| **Completed** | Invoicing and dental history are unlocked |
+| **Checked-In** | Submit Treatment (Doctor) | 
+| **Treatment Rendered** | Complete (Checkout & Invoicing) |
+| **Completed** | Invoicing finalized and dental history updated |
 | **No-Show** | No further actions. Recorded as negative credibility. |
 
 ### User-Specific Rules
@@ -90,7 +94,9 @@ Every appointment stores notes and reasons for traceability:
 
 - Secretaries and admins can reschedule freely on behalf of users.
 - Secretaries process Reschedule Requests (approve or reject).
-- Secretaries manage Attendance (mark as Checked-In when patient arrives, Completed when they leave, or No-Show if they miss it).
+- Secretaries manage Attendance (mark as Checked-In when patient arrives, or No-Show if they miss it).
+- Doctors submit treatments (changing status to Treatment Rendered), creating a draft invoice.
+- Secretaries perform Check-out / Completion (finalizing the invoice).
 - All secretary actions (approve, reject, cancel, reschedule, check-in, complete, no-show) require a **confirmation popup** with reason selection before execution.
 
 ---
@@ -130,9 +136,8 @@ These counters are visible to secretaries on the approval page to help assess bo
 
 | Trigger | Behavior |
 |---|---|
-| Automatic | When appointment time passes, an invoice is generated as a **draft** |
-| Manual | Secretary/Admin clicks "Completed" (checkout) — generates/finalizes the invoice |
-| Draft invoices | Have a "Checkout" button so additional services can be added before finalization |
+| Clinical (Doctor) | Doctor submits treatment, creating a **Draft Invoice** with actual services rendered |
+| Manual (Secretary) | Secretary clicks "Check-out / Complete", reviews doctor's draft, adds prices/discounts/payment method, and **Finalizes** the invoice |
 | Purpose | Strictly formal digital record-keeping; **no online payment gateway** |
 
 ---

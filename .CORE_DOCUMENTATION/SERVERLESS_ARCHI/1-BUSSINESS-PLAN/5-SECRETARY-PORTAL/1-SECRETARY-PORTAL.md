@@ -51,7 +51,11 @@ The secretary portal is the private workspace for clinic staff responsible for r
 - Available actions:
   - **Reschedule** — requires a reason; opens confirmation popup.
   - **Cancel** — requires a reason; opens confirmation popup.
-  - **Mark Completed** — marks appointment as done; triggers invoice generation.
+
+### Treatment Rendered (Ready for Check-out)
+- Lists all appointments where the doctor has submitted treatment.
+- Available actions:
+  - **Check-out / Mark Completed** — reviews the draft invoice from the doctor, adds payment details, and finalizes it. Opens confirmation popup.
 
 ---
 
@@ -71,19 +75,19 @@ All of the following actions must be confirmed via a **confirmation popup** befo
 
 ## Check-in / Check-out Tracking
 
-- Each approved appointment has a **Check-in** and **Check-out** button.
-- Check-in records the patient arrival time.
-- Check-out records the departure time.
+- Each approved appointment has a **Check-in** button.
+- Check-in records the patient arrival time and changes status to `Checked-In`.
+- After the doctor submits treatment, the appointment moves to `Treatment Rendered`, and the **Check-out** button becomes available.
+- Check-out records the departure time, completes the invoicing, and changes status to `Completed`.
 - These records feed into audit logs and no-show detection logic.
 
 ---
 
 ## Invoice Management
 
-- Invoices are **auto-generated** when:
-  - The appointment time passes (invoice created as draft).
-  - Or when a secretary manually clicks "Mark Completed".
-- Draft invoices have a **"Checkout"** button to add additional services before finalization.
+- Invoices are handled collaboratively:
+  - **Draft Creation:** The doctor selects the services rendered during the session. This creates a Draft Invoice.
+  - **Finalization:** The secretary clicks "Check-out", reviews the draft, adds prices, applies discounts, and selects the payment method (Cash, Card, HMO, etc.).
 - Secretaries can view, review, and finalize invoices.
 - No online payment gateway — invoicing is for **formal digital record-keeping only**.
 

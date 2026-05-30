@@ -21,6 +21,8 @@ Build a dental appointment website with a public landing experience and role-bas
 | `4-USER-PORTAL/` | User dashboard, appointments, notifications |
 | `5-SECRETARY-PORTAL/` | Secretary dashboard and workflow |
 | `6-ADMIN-PORTAL/` | Admin dashboard, management, clinic config |
+| `7-BILLING/` | Invoice workflows and check-out process |
+| `8-DOCTOR-PORTAL/` | Doctor dashboard, schedules, and clinical workflows |
 
 ---
 
@@ -29,7 +31,8 @@ Build a dental appointment website with a public landing experience and role-bas
 | Role | Core Access |
 |---|---|
 | **User** | Browse services, book appointments, manage profile and history |
-| **Secretary** | Review and act on appointments, check-in/out, invoices, audit |
+| **Secretary** | Review and act on appointments, check-in/out, execute financial billing, audit |
+| **Doctor** | View assigned upcoming appointments, submit clinical treatments |
 | **Admin** | Manage everything — services, doctors, users, secretaries, clinic config |
 
 ---

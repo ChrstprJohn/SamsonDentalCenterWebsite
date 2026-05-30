@@ -57,8 +57,8 @@ All booking access requires a confirmed user account. Visitors must sign up or l
 
 ---
 
-## Secretary and Admin Accounts
+## Secretary and Doctor Accounts
 
-- Secretary accounts are **created by admins** from the admin portal — secretaries do not self-register.
-- Admin accounts are seeded or created through a controlled provisioning process.
+- Secretary and Doctor accounts are **created by admins** from the admin portal — staff members do not self-register.
+- Staff accounts are seeded or created through a controlled provisioning process.
 - OTP / email verification flow applies to user self-registration only.

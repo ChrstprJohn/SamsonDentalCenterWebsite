@@ -72,7 +72,29 @@ Currently, we are focusing purely on the **Backend and Setup** aspects following
 
 ### Phase 5: Services & Clinic Config Domain
 - [x] **Services Domain:** Implement CRUD for clinic services (`get-services`, `create-service`, `update-service`, `delete-service`).
+  - **DTOs:**
+    - [ ] `modules/services/dtos/management/create-service.dto.ts` (and `.spec.ts`)
+    - [ ] `modules/services/dtos/management/update-service.dto.ts` (and `.spec.ts`)
+    - [ ] `modules/services/dtos/management/service-response.dto.ts` (and `.spec.ts`)
+  - **Repositories:**
+    - [ ] `modules/services/repositories/management/service.commands.ts` (and `.spec.ts`)
+    - [ ] `modules/services/repositories/management/service.queries.ts` (and `.spec.ts`)
+  - **Use-Cases:**
+    - [ ] `modules/services/use-cases/management/create-service.use-case.ts` (and `.spec.ts`)
+    - [ ] `modules/services/use-cases/management/update-service.use-case.ts` (and `.spec.ts`)
+  - **Actions:**
+    - [ ] `modules/services/actions/management/create-service.action.ts` (and `.spec.ts`)
+    - [ ] `modules/services/actions/management/update-service.action.ts` (and `.spec.ts`)
 - [x] **Clinic Config Domain:** Implement clinic settings management (`get-clinic-config`, `update-clinic-config` for open/closed status, hours, etc.).
+  - **DTOs:**
+    - [ ] `modules/clinic-config/dtos/settings/update-clinic-config.dto.ts` (and `.spec.ts`)
+  - **Repositories:**
+    - [ ] `modules/clinic-config/repositories/settings/clinic-config.commands.ts` (and `.spec.ts`)
+    - [ ] `modules/clinic-config/repositories/settings/clinic-config.queries.ts` (and `.spec.ts`)
+  - **Use-Cases:**
+    - [ ] `modules/clinic-config/use-cases/settings/update-clinic-config.use-case.ts` (and `.spec.ts`)
+  - **Actions:**
+    - [ ] `modules/clinic-config/actions/settings/update-clinic-config.action.ts` (and `.spec.ts`)
 
 ### Phase 6: Dependents & Admin User Management Domain
 - [x] **Patients Domain (Dependents):** Implement adding and fetching family members/dependents for bookings (`create-dependent`, `get-user-dependents`).
@@ -103,12 +125,23 @@ Currently, we are focusing purely on the **Backend and Setup** aspects following
     - [x] `modules/staff/actions/management/get-all-users.action.ts` (and `.spec.ts`)
     - [x] `modules/staff/actions/management/deactivate-user.action.ts` (and `.spec.ts`)
 
+- [ ] **Doctor Service Mapping:** Allow admins/doctors to assign specialties/services to doctors.
+  - **DTOs:**
+    - [ ] `modules/staff/dtos/management/assign-doctor-services.dto.ts` (and `.spec.ts`)
+  - **Repositories:**
+    - [ ] `modules/staff/repositories/management/doctor-services.commands.ts` (and `.spec.ts`)
+  - **Use-Cases:**
+    - [ ] `modules/staff/use-cases/management/assign-doctor-services.use-case.ts` (and `.spec.ts`)
+  - **Actions:**
+    - [ ] `modules/staff/actions/management/assign-doctor-services.action.ts` (and `.spec.ts`)
+
 ### Phase 7: Billing & Invoicing Domain
 - [x] **Billing/Invoicing Domain:** Implement invoice generation when appointments are completed (`generate-invoice`, `get-invoices`, `update-invoice`).
   - **DTOs:**
     - [x] `modules/billing/dtos/invoicing/generate-invoice.dto.ts` (and `.spec.ts`)
     - [x] `modules/billing/dtos/invoicing/get-invoices.dto.ts` (and `.spec.ts`)
     - [x] `modules/billing/dtos/invoicing/update-invoice.dto.ts` (and `.spec.ts`)
+    - [ ] `modules/billing/dtos/invoicing/finalize-invoice.dto.ts` (and `.spec.ts`) <-- Added for Secretary Checkout
     - [x] `modules/billing/dtos/invoicing/invoice-response.dto.ts` (and `.spec.ts`)
   - **Repositories:**
     - [x] `modules/billing/repositories/invoicing/invoice.commands.ts` (and `.spec.ts`)
@@ -117,13 +150,26 @@ Currently, we are focusing purely on the **Backend and Setup** aspects following
     - [x] `modules/billing/use-cases/invoicing/generate-invoice.use-case.ts` (and `.spec.ts`)
     - [x] `modules/billing/use-cases/invoicing/get-invoices.use-case.ts` (and `.spec.ts`)
     - [x] `modules/billing/use-cases/invoicing/update-invoice.use-case.ts` (and `.spec.ts`)
+    - [ ] `modules/billing/use-cases/invoicing/finalize-invoice.use-case.ts` (and `.spec.ts`)
   - **Actions:**
     - [x] `modules/billing/actions/invoicing/generate-invoice.action.ts` (and `.spec.ts`)
     - [x] `modules/billing/actions/invoicing/get-invoices.action.ts` (and `.spec.ts`)
     - [x] `modules/billing/actions/invoicing/update-invoice.action.ts` (and `.spec.ts`)
+    - [ ] `modules/billing/actions/invoicing/finalize-invoice.action.ts` (and `.spec.ts`)
   - **Facade:**
     - [x] `modules/billing/index.ts`
     - [x] `modules/billing/dtos/index.ts`
+
+### Phase 7.5: Clinical Treatment Domain (Doctor)
+- [ ] **Clinical Submission:** Implement the doctor's workflow for submitting actual services rendered, creating the draft invoice.
+  - **DTOs:**
+    - [ ] `modules/appointments/dtos/treatment/submit-treatment.dto.ts` (and `.spec.ts`)
+  - **Repositories:**
+    - [ ] `modules/appointments/repositories/treatment/treatment.commands.ts` (and `.spec.ts`)
+  - **Use-Cases:**
+    - [ ] `modules/appointments/use-cases/treatment/submit-treatment.use-case.ts` (and `.spec.ts`)
+  - **Actions:**
+    - [ ] `modules/appointments/actions/treatment/submit-treatment.action.ts` (and `.spec.ts`)
 
 ### Phase 8: Audit Logging Domain
 - [ ] **Audit Logging Domain:** Implement audit log mechanism to track staff actions (`get-audit-logs`, `create-audit-log`).
@@ -145,7 +191,7 @@ Currently, we are focusing purely on the **Backend and Setup** aspects following
     - [ ] `modules/audit-logs/dtos/index.ts`
 
 ### Phase 9: Orchestrators & Events
-- [ ] **Cross-Domain Workflow:** Build orchestrators for multi-domain processes if required (e.g., `checkout.orchestrator.ts`).
+- [ ] **Cross-Domain Workflow:** Build orchestrators for multi-domain processes if required (e.g., `checkout.orchestrator.ts` connecting doctor treatment submission with billing).
 - [ ] **Background Tasks:** Setup background event subscribers (using Next.js `after()`) for emails or side-effects.
 
 ---

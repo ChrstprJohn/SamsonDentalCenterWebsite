@@ -71,7 +71,7 @@ The user portal is the private dashboard for authenticated and verified patients
 - Clicking the bell opens the notification panel or navigates to the Notifications page.
 
 ### Notification Types
-- Appointment status changes (Approved, Rejected, Cancelled, Rescheduled, Displaced, Completed).
+- Appointment status changes (Approved, Rejected, Cancelled, Rescheduled, Displaced, Treatment Rendered, Completed).
 - Appointment reminders (e.g., "Your appointment is tomorrow at 2:00 PM").
 - Messages from the clinic (e.g., schedule changes, announcements).
 
