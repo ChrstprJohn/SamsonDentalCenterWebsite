@@ -73,7 +73,7 @@ Currently, we are focusing purely on the **Backend and Setup** aspects following
 ### Phase 5: Services & Clinic Config Domain
 - [x] **Services Domain:** Implement CRUD for clinic services (`get-services`, `create-service`, `update-service`, `delete-service`).
   - **DTOs:**
-    - [ ] `modules/services/dtos/management/create-service.dto.ts` (and `.spec.ts`)
+    - [ ] `modules/services/dtos/management/create-service.dto.ts` (and `.spec.ts`) - Needs: name, description, durationMinutes (important for calendar blocks), and serviceType (General vs. Specialized).
     - [ ] `modules/services/dtos/management/update-service.dto.ts` (and `.spec.ts`)
     - [ ] `modules/services/dtos/management/service-response.dto.ts` (and `.spec.ts`)
   - **Repositories:**
@@ -87,7 +87,7 @@ Currently, we are focusing purely on the **Backend and Setup** aspects following
     - [ ] `modules/services/actions/management/update-service.action.ts` (and `.spec.ts`)
 - [x] **Clinic Config Domain:** Implement clinic settings management (`get-clinic-config`, `update-clinic-config` for open/closed status, hours, etc.).
   - **DTOs:**
-    - [ ] `modules/clinic-config/dtos/settings/update-clinic-config.dto.ts` (and `.spec.ts`)
+    - [ ] `modules/clinic-config/dtos/settings/update-clinic-config.dto.ts` (and `.spec.ts`) - Must capture: isBookingOpen (boolean), maintenanceMessage (string), maxReschedulesAllowed (number), clinicName, operatingHours, etc.
   - **Repositories:**
     - [ ] `modules/clinic-config/repositories/settings/clinic-config.commands.ts` (and `.spec.ts`)
     - [ ] `modules/clinic-config/repositories/settings/clinic-config.queries.ts` (and `.spec.ts`)
@@ -127,7 +127,7 @@ Currently, we are focusing purely on the **Backend and Setup** aspects following
 
 - [ ] **Doctor Service Mapping:** Allow admins/doctors to assign specialties/services to doctors.
   - **DTOs:**
-    - [ ] `modules/staff/dtos/management/assign-doctor-services.dto.ts` (and `.spec.ts`)
+    - [ ] `modules/staff/dtos/management/assign-doctor-services.dto.ts` (and `.spec.ts`) - An admin/doctor action to map a doctorId to an array of serviceIds they are qualified to perform.
   - **Repositories:**
     - [ ] `modules/staff/repositories/management/doctor-services.commands.ts` (and `.spec.ts`)
   - **Use-Cases:**
@@ -141,7 +141,7 @@ Currently, we are focusing purely on the **Backend and Setup** aspects following
     - [x] `modules/billing/dtos/invoicing/generate-invoice.dto.ts` (and `.spec.ts`)
     - [x] `modules/billing/dtos/invoicing/get-invoices.dto.ts` (and `.spec.ts`)
     - [x] `modules/billing/dtos/invoicing/update-invoice.dto.ts` (and `.spec.ts`)
-    - [ ] `modules/billing/dtos/invoicing/finalize-invoice.dto.ts` (and `.spec.ts`) <-- Added for Secretary Checkout
+    - [ ] `modules/billing/dtos/invoicing/finalize-invoice.dto.ts` (and `.spec.ts`) <-- Added for Secretary Checkout. Needs to capture paymentMethod (enum: Cash, Card, HMO), discountApplied, and line-item specific prices.
     - [x] `modules/billing/dtos/invoicing/invoice-response.dto.ts` (and `.spec.ts`)
   - **Repositories:**
     - [x] `modules/billing/repositories/invoicing/invoice.commands.ts` (and `.spec.ts`)
@@ -163,7 +163,7 @@ Currently, we are focusing purely on the **Backend and Setup** aspects following
 ### Phase 7.5: Clinical Treatment Domain (Doctor)
 - [ ] **Clinical Submission:** Implement the doctor's workflow for submitting actual services rendered, creating the draft invoice.
   - **DTOs:**
-    - [ ] `modules/appointments/dtos/treatment/submit-treatment.dto.ts` (and `.spec.ts`)
+    - [ ] `modules/appointments/dtos/treatment/submit-treatment.dto.ts` (and `.spec.ts`) - Must contain appointmentId, an array of actualServiceIds, and clinicalNotes.
   - **Repositories:**
     - [ ] `modules/appointments/repositories/treatment/treatment.commands.ts` (and `.spec.ts`)
   - **Use-Cases:**
