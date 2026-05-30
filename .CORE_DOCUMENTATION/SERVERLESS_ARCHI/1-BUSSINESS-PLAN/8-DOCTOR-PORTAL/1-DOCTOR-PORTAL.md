@@ -43,9 +43,9 @@ When a patient is `Checked-In`, the doctor can open the **Clinical Session** vie
 - Displays the user's booking notes (e.g., "Tooth aches on the right side").
 
 ### 2. Treatment Submission 
-- During or after the examination, the doctor selects the **Actual Services Performed**.
+- The doctor selects the **Actual Services Performed**.
   - Example: A patient requested a General Consultation. The doctor selects: Consultation + X-Ray + Amalgam Filling.
-- The doctor can write **Clinical Notes** (internal notes for the patient's dental history).
+- The doctor can write **Clinical Notes** (both global clinical notes, and optional **service-specific comments** for each individual service performed).
 - The doctor clicks **Submit Treatment**.
 - **System Action:** 
   1. The appointment status is changed to `Treatment Rendered`.

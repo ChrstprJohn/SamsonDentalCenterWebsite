@@ -19,8 +19,8 @@ Doctors dictate the clinical truth (what was done). Secretaries dictate the fina
 ### 2. Clinical Session & Treatment Submission (Doctor Action)
 - The doctor examines and treats the patient.
 - Once the procedure is finished, the doctor accesses their portal.
-- On the appointment view, the doctor selects the **Actual Services Performed**.
-  - Example: A patient was booked for a "Consultation", but the doctor ended up performing "Consultation", "X-Ray", and "Cavity Filling".
+- On the appointment view, the doctor selects the **Actual Services Performed** and optionally adds **service-specific comments** for each.
+  - Example: A patient was booked for a "Consultation", but the doctor ended up performing "Consultation" (normal), "X-Ray" (cavity suspected), and "Cavity Filling" (molar).
 - The doctor clicks **Submit Treatment**.
 - Appointment status updates to **Treatment Rendered**.
 - **System Action:** A **Draft Invoice** is automatically generated containing the services selected by the doctor.
