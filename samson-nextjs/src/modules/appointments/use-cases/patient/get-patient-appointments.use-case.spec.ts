@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { GetPatientAppointmentsUseCase } from './get-patient-appointments.use-case';
-import { PatientAppointmentsQueries } from '../repositories/patient-appointments.queries';
+import { PatientAppointmentsQueries } from '../../repositories/patient/patient-appointments.queries';
 
 describe('GetPatientAppointmentsUseCase', () => {
   let useCase: GetPatientAppointmentsUseCase;

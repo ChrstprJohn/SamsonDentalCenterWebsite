@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { RegisterPatientUseCase } from './register-patient.use-case';
-import { PatientProfileCommands } from '../repositories/patient-profile.commands';
-import { RegisterPatientDto } from '../dtos/register-patient.dto';
+import { PatientProfileCommands } from '../../repositories/profile/patient-profile.commands';
+import { RegisterPatientDto } from '../../dtos/profile/register-patient.dto';
 
 describe('RegisterPatientUseCase', () => {
   it('should successfully register a patient by delegating to the repository', async () => {

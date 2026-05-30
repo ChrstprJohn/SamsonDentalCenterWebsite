@@ -1,6 +1,6 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { DomainError } from '@/shared/errors';
-import { SubmitBookingDto } from '../dtos';
+import { SubmitBookingDto, AppointmentDto, mapAppointmentRecord } from '../../dtos';
 
 export class AppointmentBookingCommands {
   constructor(private readonly supabase: SupabaseClient) {}
@@ -9,7 +9,7 @@ export class AppointmentBookingCommands {
    * Strictly creates a new appointment request from the booking wizard.
    * Maps properties to snake_case database columns.
    */
-  async createAppointment(userId: string, data: SubmitBookingDto) {
+  async createAppointment(userId: string, data: SubmitBookingDto): Promise<AppointmentDto> {
     const { data: appointment, error } = await this.supabase
       .from('appointments')
       .insert({
@@ -43,6 +43,6 @@ export class AppointmentBookingCommands {
       );
     }
 
-    return appointment;
+    return mapAppointmentRecord(appointment as Record<string, unknown>);
   }
 }

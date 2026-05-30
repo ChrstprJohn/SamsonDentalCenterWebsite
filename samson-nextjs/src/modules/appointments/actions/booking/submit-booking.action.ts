@@ -24,7 +24,7 @@ export async function submitBookingAction(formData: SubmitBookingDto) {
     const supabase = await createClient();
 
     const availabilityQueries = new AppointmentAvailabilityQueries(supabase);
-    const availabilityUseCase = new GetAvailabilityUseCase(supabase, availabilityQueries);
+    const availabilityUseCase = new GetAvailabilityUseCase(availabilityQueries);
 
     const bookingCommands = new AppointmentBookingCommands(supabase);
     const useCase = new SubmitBookingUseCase(bookingCommands, availabilityUseCase);

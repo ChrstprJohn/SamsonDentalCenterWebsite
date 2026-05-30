@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { CreateStaffUseCase } from './create-staff.use-case';
-import { StaffProfileCommands } from '../repositories/staff-profile.commands';
-import { CreateStaffDto } from '../dtos/create-staff.dto';
+import { StaffProfileCommands } from '../../repositories/profile/staff-profile.commands';
+import { CreateStaffDto } from '../../dtos/profile/create-staff.dto';
 
 describe('CreateStaffUseCase (Unit Test)', () => {
     // 1. Arrange: Create a mock of the repository

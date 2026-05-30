@@ -1,5 +1,6 @@
-﻿import { SupabaseClient } from '@supabase/supabase-js';
+import { SupabaseClient } from '@supabase/supabase-js';
 import { NotFoundError } from '@/shared/errors';
+import { StaffProfileDto, mapStaffProfile } from '../../dtos';
 
 export class StaffProfileQueries {
   constructor(private readonly supabase: SupabaseClient) {}
@@ -7,9 +8,9 @@ export class StaffProfileQueries {
   /**
    * Fetches a staff profile by their ID.
    */
-  async getProfileById(staffId: string) {
+  async getProfileById(staffId: string): Promise<StaffProfileDto> {
     const { data: staff, error } = await this.supabase
-      .from('staff') // Ensure this points to the correct table
+      .from('staff')
       .select('*')
       .eq('id', staffId)
       .single();
@@ -18,6 +19,6 @@ export class StaffProfileQueries {
       throw new NotFoundError('Staff profile not found.');
     }
 
-    return staff;
+    return mapStaffProfile(staff as Record<string, unknown>);
   }
 }

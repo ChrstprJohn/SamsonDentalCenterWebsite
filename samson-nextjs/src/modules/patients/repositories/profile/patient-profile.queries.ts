@@ -1,5 +1,6 @@
-﻿import { SupabaseClient } from '@supabase/supabase-js';
+import { SupabaseClient } from '@supabase/supabase-js';
 import { NotFoundError } from '@/shared/errors';
+import { PatientProfileDto, mapPatientProfile } from '../../dtos';
 
 export class PatientProfileQueries {
   constructor(private readonly supabase: SupabaseClient) {}
@@ -7,7 +8,7 @@ export class PatientProfileQueries {
   /**
    * Fetches a patient profile by their ID.
    */
-  async getProfileById(patientId: string) {
+  async getProfileById(patientId: string): Promise<PatientProfileDto> {
     const { data: patient, error } = await this.supabase
       .from('patients')
       .select('*')
@@ -18,6 +19,6 @@ export class PatientProfileQueries {
       throw new NotFoundError('Patient profile not found.');
     }
 
-    return patient;
+    return mapPatientProfile(patient as Record<string, unknown>);
   }
 }

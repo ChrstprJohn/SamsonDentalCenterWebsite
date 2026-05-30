@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { UpdateStaffUseCase } from './update-staff.use-case';
-import { StaffProfileCommands } from '../repositories/staff-profile.commands';
+import { StaffProfileCommands } from '../../repositories/profile/staff-profile.commands';
 
 describe('UpdateStaffUseCase', () => {
     it('successfully calls repository to update staff', async () => {

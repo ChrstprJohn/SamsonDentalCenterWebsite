@@ -23,7 +23,7 @@ describe('ClinicAppointmentsQueries', () => {
       const result = await queries.getAppointmentsByClinic();
 
       expect(mockSupabase.from).toHaveBeenCalledWith('appointments');
-      expect(result).toEqual(mockData);
+      expect(result).toEqual([expect.objectContaining({ id: '1' })]);
     });
 
     it('should apply filters correctly', async () => {

@@ -21,7 +21,7 @@ export async function updateAppointmentStatusAction(formData: StaffUpdateAppoint
     const supabase = await createClient();
 
     const statusCommands = new AppointmentStatusCommands(supabase);
-    const useCase = new UpdateAppointmentStatusUseCase(supabase, statusCommands);
+    const useCase = new UpdateAppointmentStatusUseCase(statusCommands);
 
     // Format optional reschedule metadata
     const rescheduleMetadata =

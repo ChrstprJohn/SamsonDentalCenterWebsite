@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { StaffScheduleCommands } from './staff-schedule.commands';
 import { DomainError } from '@/shared/errors';
-import { DoctorScheduleDto } from '../dtos/doctor-schedule.dto';
+import { DoctorScheduleDto } from '../../dtos/schedule/doctor-schedule.dto';
 
 describe('StaffScheduleCommands', () => {
     const validData: DoctorScheduleDto = {

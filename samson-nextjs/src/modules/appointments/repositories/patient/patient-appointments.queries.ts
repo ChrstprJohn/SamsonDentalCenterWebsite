@@ -1,4 +1,5 @@
 import { SupabaseClient } from '@supabase/supabase-js';
+import { AppointmentDto, mapAppointmentRecords } from '../../dtos';
 
 export class PatientAppointmentsQueries {
   constructor(private readonly supabase: SupabaseClient) {}
@@ -7,14 +8,16 @@ export class PatientAppointmentsQueries {
    * Fetches all appointments for a specific user (Patient Portal).
    * Orders by start time descending (newest first).
    */
-  async getAppointmentsByUser(userId: string) {
+  async getAppointmentsByUser(userId: string): Promise<AppointmentDto[]> {
     const { data: appointments, error } = await this.supabase
       .from('appointments')
-      .select(`
+      .select(
+        `
         *,
         doctor:doctor_id (id, first_name, last_name, prefix, suffix),
         service:service_id (id, name, duration_minutes)
-      `)
+      `
+      )
       .eq('user_id', userId)
       .order('start_time', { ascending: false });
 
@@ -22,6 +25,6 @@ export class PatientAppointmentsQueries {
       throw new Error(`Failed to fetch user appointments: ${error.message}`);
     }
 
-    return appointments || [];
+    return mapAppointmentRecords((appointments || []) as Record<string, unknown>[]);
   }
 }

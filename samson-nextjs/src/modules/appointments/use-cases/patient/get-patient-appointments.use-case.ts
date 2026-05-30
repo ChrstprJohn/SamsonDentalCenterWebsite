@@ -1,4 +1,5 @@
 import { PatientAppointmentsQueries } from '../../repositories';
+import { AppointmentDto } from '../../dtos';
 
 export class GetPatientAppointmentsUseCase {
   constructor(
@@ -8,7 +9,7 @@ export class GetPatientAppointmentsUseCase {
   /**
    * Retrieves all appointments for a patient.
    */
-  async execute(userId: string) {
+  async execute(userId: string): Promise<AppointmentDto[]> {
     if (!userId) {
       throw new Error('User ID is required to fetch patient appointments.');
     }

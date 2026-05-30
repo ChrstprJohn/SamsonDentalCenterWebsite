@@ -1,8 +1,28 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { DomainError } from '@/shared/errors';
+import { AppointmentDto, mapAppointmentRecord } from '../../dtos';
+
+export type AppointmentStatusValue = AppointmentDto['status'];
 
 export class AppointmentStatusCommands {
   constructor(private readonly supabase: SupabaseClient) {}
+
+  async getAppointmentById(appointmentId: string): Promise<AppointmentDto> {
+    const { data: appointment, error } = await this.supabase
+      .from('appointments')
+      .select('*')
+      .eq('id', appointmentId)
+      .single();
+
+    if (error || !appointment) {
+      throw new DomainError(
+        `Failed to fetch appointment: ${error?.message || 'Unknown database error'}`,
+        'DATABASE_ERROR'
+      );
+    }
+
+    return mapAppointmentRecord(appointment as Record<string, unknown>);
+  }
 
   /**
    * Updates the status of an existing appointment with an audit trail reason.
@@ -10,7 +30,7 @@ export class AppointmentStatusCommands {
    */
   async updateStatus(
     appointmentId: string,
-    status: string,
+    status: AppointmentStatusValue,
     reason?: string,
     rescheduleMetadata?: {
       date: string;
@@ -19,14 +39,13 @@ export class AppointmentStatusCommands {
       doctorId: string;
     },
     rescheduleCount?: number
-  ) {
-    const payload: Record<string, any> = {
+  ): Promise<AppointmentDto> {
+    const payload: Record<string, string | number | null> = {
       status,
       status_reason: reason ?? null,
       updated_at: new Date().toISOString(),
     };
 
-    // If rescheduling, atomically overwrite the schedule columns
     if (rescheduleMetadata) {
       payload.date = rescheduleMetadata.date;
       payload.start_time = rescheduleMetadata.startTime;
@@ -52,7 +71,7 @@ export class AppointmentStatusCommands {
       );
     }
 
-    return appointment;
+    return mapAppointmentRecord(appointment as Record<string, unknown>);
   }
 
   /**
@@ -63,8 +82,6 @@ export class AppointmentStatusCommands {
     userId: string,
     metric: 'cancel_count' | 'no_show_count' | 'reschedule_count'
   ) {
-    // Supabase doesn't support atomic increment natively via the JS client,
-    // so we use an RPC call to a database function for atomicity.
     const { error } = await this.supabase.rpc('increment_credibility_metric', {
       p_user_id: userId,
       p_metric: metric,

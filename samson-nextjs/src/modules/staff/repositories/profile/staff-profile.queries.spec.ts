@@ -26,14 +26,31 @@ describe('StaffProfileQueries', () => {
 
   it('should return staff data if found', async () => {
     // 1. Arrange
-    const mockStaff = { id: '123', first_name: 'John' };
+    const mockStaff = {
+      id: '123',
+      email: 'john@samson.com',
+      first_name: 'John',
+      last_name: 'Smith',
+      role: 'SECRETARY',
+    };
     mockSupabase.single.mockResolvedValue({ data: mockStaff, error: null });
 
     // 2. Act
     const result = await queries.getProfileById('123');
 
     // 3. Assert
-    expect(result).toEqual(mockStaff);
+    expect(result).toEqual({
+      id: '123',
+      email: 'john@samson.com',
+      firstName: 'John',
+      middleName: null,
+      lastName: 'Smith',
+      suffix: null,
+      phoneNumber: null,
+      role: 'SECRETARY',
+      createdAt: undefined,
+      updatedAt: undefined,
+    });
     expect(mockSupabase.from).toHaveBeenCalledWith('staff');
   });
 });

@@ -1,0 +1,54 @@
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { ClinicConfigCommandsRepository } from "./clinic-config.commands";
+
+const mockSingle = vi.fn();
+const mockSelect = vi.fn();
+const mockEq = vi.fn();
+const mockUpdate = vi.fn();
+const mockFrom = vi.fn();
+
+const mockSupabase = {
+  from: mockFrom,
+} as any;
+
+describe("ClinicConfigCommandsRepository (Unit Test)", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+
+    mockFrom.mockReturnValue({ update: mockUpdate });
+    mockUpdate.mockReturnValue({ eq: mockEq });
+    mockEq.mockReturnValue({ select: mockSelect });
+    mockSelect.mockReturnValue({ single: mockSingle });
+  });
+
+  describe("updateConfig", () => {
+    it("should update the clinic config and return the result", async () => {
+      const fakeConfig = {
+        is_booking_open: false,
+        maintenance_message: "We are closed",
+        max_reschedules: 1,
+        clinic_name: "Samson Dental",
+        address: "123 Way",
+        phone: "555-0101",
+        email: "info@samson.com",
+      };
+
+      mockSingle.mockResolvedValue({ data: fakeConfig, error: null });
+
+      const repo = new ClinicConfigCommandsRepository(mockSupabase);
+      const result = await repo.updateConfig({ is_booking_open: false });
+
+      expect(result.is_booking_open).toBe(false);
+      expect(mockFrom).toHaveBeenCalledWith("clinic_settings");
+    });
+
+    it("should throw an error if supabase returns an error", async () => {
+      mockSingle.mockResolvedValue({ data: null, error: { message: "Update failed" } });
+
+      const repo = new ClinicConfigCommandsRepository(mockSupabase);
+      await expect(
+        repo.updateConfig({ is_booking_open: false })
+      ).rejects.toThrow("Failed to update clinic config: Update failed");
+    });
+  });
+});

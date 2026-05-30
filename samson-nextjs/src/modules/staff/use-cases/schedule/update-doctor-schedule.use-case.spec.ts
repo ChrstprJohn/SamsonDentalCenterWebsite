@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { UpdateDoctorScheduleUseCase } from './update-doctor-schedule.use-case';
-import { StaffScheduleCommands } from '../repositories/staff-schedule.commands';
+import { StaffScheduleCommands } from '../../repositories/schedule/staff-schedule.commands';
 
 describe('UpdateDoctorScheduleUseCase', () => {
     it('calls the repository to upsert schedule', async () => {

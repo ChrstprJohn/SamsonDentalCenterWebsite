@@ -1,6 +1,6 @@
 ﻿import { describe, it, expect, vi } from 'vitest';
 import { PatientProfileCommands } from './patient-profile.commands';
-import { RegisterPatientDto } from '../dtos';
+import { RegisterPatientDto } from '../../dtos';
 import { DomainError } from '@/shared/errors';
 
 describe('PatientProfileCommands', () => {
@@ -12,10 +12,15 @@ describe('PatientProfileCommands', () => {
       phoneNumber: '1234567890',
       dateOfBirth: '1990-01-01',
     };
-    const mockInsertedRecord = { 
-      id: 'user_123', 
-      ...validData,
-      created_at: new Date().toISOString() 
+    const createdAt = new Date().toISOString();
+    const mockInsertedRecord = {
+      id: 'user_123',
+      email: validData.email,
+      first_name: validData.firstName,
+      last_name: validData.lastName,
+      phone: validData.phoneNumber,
+      date_of_birth: validData.dateOfBirth,
+      created_at: createdAt,
     };
     const mockSupabase = {
       from: vi.fn().mockReturnThis(),
@@ -27,7 +32,19 @@ describe('PatientProfileCommands', () => {
     const commands = new PatientProfileCommands(mockSupabase as any);
     const result = await commands.createPatient('user_123', validData);
 
-    expect(result).toEqual(mockInsertedRecord);
+    expect(result).toEqual({
+      id: 'user_123',
+      email: validData.email,
+      firstName: validData.firstName,
+      middleName: null,
+      lastName: validData.lastName,
+      suffix: null,
+      phoneNumber: validData.phoneNumber,
+      dateOfBirth: validData.dateOfBirth,
+      avatarUrl: null,
+      createdAt,
+      updatedAt: undefined,
+    });
     expect(mockSupabase.from).toHaveBeenCalledWith('patients');
   });
 

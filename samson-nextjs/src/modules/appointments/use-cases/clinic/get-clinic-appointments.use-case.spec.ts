@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { GetClinicAppointmentsUseCase } from './get-clinic-appointments.use-case';
-import { ClinicAppointmentsQueries } from '../repositories/clinic-appointments.queries';
+import { ClinicAppointmentsQueries } from '../../repositories/clinic/clinic-appointments.queries';
 import { ZodError } from 'zod';
 
 describe('GetClinicAppointmentsUseCase', () => {

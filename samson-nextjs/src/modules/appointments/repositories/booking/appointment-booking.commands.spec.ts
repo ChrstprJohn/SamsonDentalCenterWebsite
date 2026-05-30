@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { AppointmentBookingCommands } from './appointment-booking.commands';
-import { SubmitBookingDto } from '../dtos';
+import { SubmitBookingDto } from '../../dtos';
 
 describe('AppointmentBookingCommands', () => {
   let commands: AppointmentBookingCommands;
@@ -49,7 +49,7 @@ describe('AppointmentBookingCommands', () => {
           patient_type: mockDto.patientType,
         })
       );
-      expect(result).toEqual({ id: 'appt-123' });
+      expect(result).toMatchObject({ id: 'appt-123' });
     });
 
     it('should throw DomainError on database error', async () => {

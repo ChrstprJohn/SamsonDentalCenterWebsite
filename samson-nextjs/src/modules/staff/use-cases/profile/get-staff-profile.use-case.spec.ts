@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { GetStaffProfileUseCase } from './get-staff-profile.use-case';
-import { StaffProfileQueries } from '../repositories/staff-profile.queries';
+import { StaffProfileQueries } from '../../repositories/profile/staff-profile.queries';
 
 describe('GetStaffProfileUseCase', () => {
   let useCase: GetStaffProfileUseCase;

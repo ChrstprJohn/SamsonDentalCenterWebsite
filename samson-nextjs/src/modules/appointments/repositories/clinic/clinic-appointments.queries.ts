@@ -1,5 +1,6 @@
 import { SupabaseClient } from '@supabase/supabase-js';
-import { GetClinicAppointmentsDto } from '../dtos';
+import { GetClinicAppointmentsDto } from '../../dtos';
+import { AppointmentDto, mapAppointmentRecords } from '../../dtos';
 
 export class ClinicAppointmentsQueries {
   constructor(private readonly supabase: SupabaseClient) {}
@@ -7,15 +8,17 @@ export class ClinicAppointmentsQueries {
   /**
    * Fetches appointments for the clinic with optional filters (Admin/Secretary Portal).
    */
-  async getAppointmentsByClinic(filters?: GetClinicAppointmentsDto) {
+  async getAppointmentsByClinic(filters?: GetClinicAppointmentsDto): Promise<AppointmentDto[]> {
     let query = this.supabase
       .from('appointments')
-      .select(`
+      .select(
+        `
         *,
         doctor:doctor_id (id, first_name, last_name, prefix, suffix),
         service:service_id (id, name, duration_minutes),
         patient:patient_id (id, first_name, last_name)
-      `)
+      `
+      )
       .order('start_time', { ascending: true });
 
     if (filters?.date) {
@@ -34,6 +37,6 @@ export class ClinicAppointmentsQueries {
       throw new Error(`Failed to fetch clinic appointments: ${error.message}`);
     }
 
-    return appointments || [];
+    return mapAppointmentRecords((appointments || []) as Record<string, unknown>[]);
   }
 }

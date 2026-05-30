@@ -1,7 +1,7 @@
 import { SubmitBookingDto } from '../../dtos';
 import { AppointmentBookingCommands } from '../../repositories';
 import { GetAvailabilityUseCase } from '../availability/get-availability.use-case';
-import { DomainError, ValidationError } from '@/shared/errors';
+import { ValidationError } from '@/shared/errors';
 
 export class SubmitBookingUseCase {
   constructor(
@@ -16,7 +16,6 @@ export class SubmitBookingUseCase {
   async execute(userId: string, dto: SubmitBookingDto) {
     const { serviceId, doctorId, date, startTime, endTime } = dto;
 
-    // 1. Verify availability of the requested slot on the given date
     const availability = await this.availabilityUseCase.getAvailableTimeSlots({
       serviceId,
       doctorId,
@@ -35,17 +34,21 @@ export class SubmitBookingUseCase {
     }
 
     try {
-      // 2. Perform database insertion
-      const appointment = await this.bookingCommands.createAppointment(userId, dto);
-      return appointment;
-    } catch (error: any) {
-      // Handle Postgres unique constraint violation on doctor_id, date, start_time
-      if (error?.message?.includes('duplicate key value') || error?.code === '23505') {
-        throw new ValidationError(
-          'This slot is already booked!',
-          'SLOT_ALREADY_BOOKED'
-        );
+      return await this.bookingCommands.createAppointment(userId, dto);
+    } catch (error: unknown) {
+      if (error instanceof Error && error.message.includes('duplicate key value')) {
+        throw new ValidationError('This slot is already booked!', 'SLOT_ALREADY_BOOKED');
       }
+
+      if (
+        typeof error === 'object' &&
+        error !== null &&
+        'code' in error &&
+        (error as { code?: string }).code === '23505'
+      ) {
+        throw new ValidationError('This slot is already booked!', 'SLOT_ALREADY_BOOKED');
+      }
+
       throw error;
     }
   }

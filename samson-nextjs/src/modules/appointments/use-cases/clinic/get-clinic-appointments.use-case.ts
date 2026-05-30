@@ -1,5 +1,5 @@
 import { ClinicAppointmentsQueries } from '../../repositories';
-import { GetClinicAppointmentsDto, getClinicAppointmentsSchema } from '../../dtos';
+import { AppointmentDto, GetClinicAppointmentsDto, getClinicAppointmentsSchema } from '../../dtos';
 
 export class GetClinicAppointmentsUseCase {
   constructor(
@@ -9,7 +9,7 @@ export class GetClinicAppointmentsUseCase {
   /**
    * Retrieves appointments for clinic dashboard based on filters, ensuring input validation.
    */
-  async execute(filters?: GetClinicAppointmentsDto) {
+  async execute(filters?: GetClinicAppointmentsDto): Promise<AppointmentDto[]> {
     const validatedFilters = filters ? getClinicAppointmentsSchema.parse(filters) : undefined;
     return this.clinicAppointmentsQueries.getAppointmentsByClinic(validatedFilters);
   }

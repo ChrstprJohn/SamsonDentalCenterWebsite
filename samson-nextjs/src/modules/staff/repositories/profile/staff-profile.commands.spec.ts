@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { StaffProfileCommands } from './staff-profile.commands';
-import { CreateStaffDto } from '../dtos';
+import { CreateStaffDto } from '../../dtos';
 import { DomainError } from '@/shared/errors';
 
 describe('StaffProfileCommands', () => {
@@ -41,7 +41,18 @@ describe('StaffProfileCommands', () => {
         const result = await commands.createStaff('staff_123', validData);
 
         // 3. Assert
-        expect(result).toEqual(mockInsertedRecord);
+        expect(result).toEqual({
+            id: 'staff_123',
+            email: validData.email,
+            firstName: validData.firstName,
+            middleName: validData.middleName,
+            lastName: validData.lastName,
+            suffix: validData.suffix,
+            phoneNumber: validData.phoneNumber,
+            role: validData.role,
+            createdAt: mockInsertedRecord.created_at,
+            updatedAt: undefined,
+        });
         expect(mockSupabase.from).toHaveBeenCalledWith('staff');
         expect(mockSupabase.insert).toHaveBeenCalledWith(
             expect.objectContaining({
@@ -71,7 +82,13 @@ describe('StaffProfileCommands', () => {
 
     describe('updateStaff', () => {
         it('successfully updates a staff record', async () => {
-            const mockUpdatedRecord = { id: 'staff_123', email: 'new@email.com' };
+            const mockUpdatedRecord = {
+                id: 'staff_123',
+                email: 'new@email.com',
+                first_name: 'Jane',
+                last_name: 'Smith',
+                role: 'SECRETARY',
+            };
             const mockSupabase = {
                 from: vi.fn().mockReturnThis(),
                 update: vi.fn().mockReturnThis(),
@@ -83,7 +100,18 @@ describe('StaffProfileCommands', () => {
 
             const result = await commands.updateStaff('staff_123', { email: 'new@email.com' });
 
-            expect(result).toEqual(mockUpdatedRecord);
+            expect(result).toEqual({
+                id: 'staff_123',
+                email: 'new@email.com',
+                firstName: 'Jane',
+                middleName: null,
+                lastName: 'Smith',
+                suffix: null,
+                phoneNumber: null,
+                role: 'SECRETARY',
+                createdAt: undefined,
+                updatedAt: undefined,
+            });
             expect(mockSupabase.update).toHaveBeenCalledWith({ email: 'new@email.com' });
             expect(mockSupabase.eq).toHaveBeenCalledWith('id', 'staff_123');
         });

@@ -22,24 +22,14 @@ export async function cancelAppointmentAction(formData: UserUpdateAppointmentSta
     const user = await getAuthenticatedUser();
     const supabase = await createClient();
 
-    // Verify ownership of the appointment
-    const { data: appointment, error: fetchError } = await supabase
-      .from('appointments')
-      .select('user_id, patient_id')
-      .eq('id', validData.appointmentId)
-      .single();
-
-    if (fetchError || !appointment) {
-      return { success: false, error: 'Appointment not found' };
-    }
-
-    const appointmentOwner = appointment.user_id || appointment.patient_id;
+    const statusCommands = new AppointmentStatusCommands(supabase);
+    const appointment = await statusCommands.getAppointmentById(validData.appointmentId);
+    const appointmentOwner = appointment.patientId || (appointment as { userId?: string }).userId;
     if (appointmentOwner !== user.id) {
       return { success: false, error: 'You are not authorized to cancel this appointment' };
     }
 
-    const statusCommands = new AppointmentStatusCommands(supabase);
-    const useCase = new UpdateAppointmentStatusUseCase(supabase, statusCommands);
+    const useCase = new UpdateAppointmentStatusUseCase(statusCommands);
 
     const result = await useCase.execute(
       validData.appointmentId,

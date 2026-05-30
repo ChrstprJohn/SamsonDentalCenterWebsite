@@ -1,12 +1,29 @@
 import { SupabaseClient } from '@supabase/supabase-js';
+import { DomainError } from '@/shared/errors';
 
 export class AppointmentAvailabilityQueries {
   constructor(private readonly supabase: SupabaseClient) {}
 
-  /**
-   * Fetches the working schedules of doctors for a specific date.
-   * If doctorId is provided, fetches only for that doctor.
-   */
+  async getWorkingSchedulesForMonth(month: string, doctorId?: string) {
+    let query = this.supabase
+      .from('staff_schedules')
+      .select('date, staff_id')
+      .eq('is_working', true)
+      .like('date', `${month}-%`);
+
+    if (doctorId) {
+      query = query.eq('staff_id', doctorId);
+    }
+
+    const { data: schedules, error } = await query;
+
+    if (error) {
+      throw new DomainError(`Failed to fetch monthly schedules: ${error.message}`, 'DATABASE_ERROR');
+    }
+
+    return schedules || [];
+  }
+
   async getDoctorSchedules(date: string, doctorId?: string) {
     let query = this.supabase
       .from('staff_schedules')
@@ -21,16 +38,12 @@ export class AppointmentAvailabilityQueries {
     const { data: schedules, error } = await query;
 
     if (error) {
-      throw new Error(`Failed to fetch doctor schedules: ${error.message}`);
+      throw new DomainError(`Failed to fetch doctor schedules: ${error.message}`, 'DATABASE_ERROR');
     }
 
     return schedules || [];
   }
 
-  /**
-   * Fetches existing appointments for a specific date to calculate overlapping slots.
-   * Excludes CANCELLED, REJECTED, and DISPLACED statuses as those free up the slot.
-   */
   async getExistingAppointments(date: string, doctorId?: string) {
     let query = this.supabase
       .from('appointments')
@@ -45,9 +58,53 @@ export class AppointmentAvailabilityQueries {
     const { data: appointments, error } = await query;
 
     if (error) {
-      throw new Error(`Failed to fetch existing appointments: ${error.message}`);
+      throw new DomainError(
+        `Failed to fetch existing appointments: ${error.message}`,
+        'DATABASE_ERROR'
+      );
     }
 
     return appointments || [];
+  }
+
+  async getServiceDuration(serviceId: string) {
+    const { data: service, error } = await this.supabase
+      .from('services')
+      .select('duration_minutes')
+      .eq('id', serviceId)
+      .single();
+
+    if (error || !service) {
+      throw new DomainError(
+        `Service not found: ${error?.message || 'Unknown error'}`,
+        'NOT_FOUND'
+      );
+    }
+
+    return service.duration_minutes as number;
+  }
+
+  async resolveDoctorDisplayName(doctorId: string) {
+    const { data: user } = await this.supabase
+      .from('users')
+      .select('first_name, last_name')
+      .eq('id', doctorId)
+      .single();
+
+    if (user) {
+      return `Dr. ${user.first_name} ${user.last_name}`;
+    }
+
+    const { data: doctor } = await this.supabase
+      .from('doctors')
+      .select('first_name, last_name')
+      .eq('id', doctorId)
+      .single();
+
+    if (doctor) {
+      return `Dr. ${doctor.first_name} ${doctor.last_name}`;
+    }
+
+    return 'Doctor';
   }
 }

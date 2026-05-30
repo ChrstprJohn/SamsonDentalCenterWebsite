@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { TerminateStaffUseCase } from './terminate-staff.use-case';
-import { StaffProfileCommands } from '../repositories/staff-profile.commands';
+import { StaffProfileCommands } from '../../repositories/profile/staff-profile.commands';
 
 describe('TerminateStaffUseCase', () => {
     it('successfully calls repository to terminate staff', async () => {

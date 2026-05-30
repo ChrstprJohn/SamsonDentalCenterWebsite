@@ -30,7 +30,7 @@ describe('AppointmentStatusCommands', () => {
         })
       );
       expect(mockSupabase.eq).toHaveBeenCalledWith('id', 'appt-1');
-      expect(result).toEqual({ id: 'appt-1', status: 'APPROVED' });
+      expect(result).toMatchObject({ id: 'appt-1', status: 'APPROVED' });
     });
 
     it('should set status_reason to null when no reason is provided', async () => {

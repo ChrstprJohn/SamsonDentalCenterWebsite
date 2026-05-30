@@ -26,7 +26,12 @@ describe('PatientAppointmentsQueries', () => {
       expect(mockSupabase.from).toHaveBeenCalledWith('appointments');
       expect(mockSupabase.eq).toHaveBeenCalledWith('user_id', 'user-123');
       expect(mockSupabase.order).toHaveBeenCalledWith('start_time', { ascending: false });
-      expect(result).toEqual(mockData);
+      expect(result).toEqual([
+        expect.objectContaining({
+          id: '1',
+          startTime: '2023-10-10',
+        }),
+      ]);
     });
 
     it('should throw an error on database failure', async () => {

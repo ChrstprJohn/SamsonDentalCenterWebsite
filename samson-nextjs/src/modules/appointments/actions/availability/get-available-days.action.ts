@@ -15,7 +15,7 @@ export async function getAvailableDaysAction(formData: GetAvailableDaysDto) {
     const validData = getAvailableDaysSchema.parse(formData);
     const supabase = await createClient();
     const availabilityQueries = new AppointmentAvailabilityQueries(supabase);
-    const useCase = new GetAvailabilityUseCase(supabase, availabilityQueries);
+    const useCase = new GetAvailabilityUseCase(availabilityQueries);
 
     const result = await useCase.getAvailableDays(validData);
     return { success: true, data: result };

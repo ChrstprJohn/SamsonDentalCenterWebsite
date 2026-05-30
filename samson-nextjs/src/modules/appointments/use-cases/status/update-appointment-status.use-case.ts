@@ -1,19 +1,15 @@
-import { SupabaseClient } from '@supabase/supabase-js';
-import { AppointmentStatusCommands } from '../../repositories';
-import { DomainError, ValidationError } from '@/shared/errors';
+import { AppointmentStatusCommands, AppointmentStatusValue } from '../../repositories';
+import { ValidationError } from '@/shared/errors';
 
 export class UpdateAppointmentStatusUseCase {
-  constructor(
-    private readonly supabase: SupabaseClient,
-    private readonly statusCommands: AppointmentStatusCommands
-  ) {}
+  constructor(private readonly statusCommands: AppointmentStatusCommands) {}
 
   /**
    * Enforces status machine rules, reschedule boundaries, and credibility telemetry increments.
    */
   async execute(
     appointmentId: string,
-    status: string,
+    status: AppointmentStatusValue,
     reason?: string,
     rescheduleMetadata?: {
       date: string;
@@ -22,38 +18,23 @@ export class UpdateAppointmentStatusUseCase {
       doctorId: string;
     }
   ) {
-    // 1. Fetch current appointment details
-    const { data: appointment, error: fetchError } = await this.supabase
-      .from('appointments')
-      .select('*')
-      .eq('id', appointmentId)
-      .single();
-
-    if (fetchError || !appointment) {
-      throw new ValidationError(
-        `Appointment not found: ${fetchError?.message || 'Unknown error'}`,
-        'NOT_FOUND'
-      );
-    }
-
+    const appointment = await this.statusCommands.getAppointmentById(appointmentId);
     const currentStatus = appointment.status;
 
-    // 2. Validate state machine transitions
-    // Terminal states: CANCELLED, REJECTED, COMPLETED, NO_SHOW
-    const terminalStates = ['CANCELLED', 'REJECTED', 'COMPLETED', 'NO_SHOW'];
-    if (terminalStates.includes(currentStatus)) {
+    const terminalStates = ['CANCELLED', 'REJECTED', 'COMPLETED', 'NO_SHOW'] as const;
+    if (terminalStates.includes(currentStatus as (typeof terminalStates)[number])) {
       throw new ValidationError(
         `Cannot transition appointment from terminal status: ${currentStatus}`,
         'INVALID_STATUS_TRANSITION'
       );
     }
 
-    let nextRescheduleCount = appointment.reschedule_count || 0;
+    const rescheduleCount = appointment.rescheduleCount ?? 0;
+    let nextRescheduleCount = rescheduleCount;
 
-    // 3. Handle rescheduling rules
     const isRescheduling = status === 'RESCHEDULE_REQUESTED' || !!rescheduleMetadata;
     if (isRescheduling) {
-      if (appointment.reschedule_count >= 1) {
+      if (rescheduleCount >= 1) {
         throw new ValidationError(
           'Maximum reschedule limit of 1 has been reached.',
           'RESCHEDULE_LIMIT_EXCEEDED'
@@ -62,7 +43,6 @@ export class UpdateAppointmentStatusUseCase {
       nextRescheduleCount = 1;
     }
 
-    // 4. Update the appointment status
     const updatedAppointment = await this.statusCommands.updateStatus(
       appointmentId,
       status,
@@ -71,8 +51,7 @@ export class UpdateAppointmentStatusUseCase {
       nextRescheduleCount
     );
 
-    // 5. Update user credibility metrics in patient_profiles
-    const userId = appointment.user_id || appointment.patient_id;
+    const userId = appointment.patientId || (appointment as { userId?: string }).userId;
     if (userId) {
       if (status === 'CANCELLED') {
         await this.statusCommands.incrementUserCredibilityMetric(userId, 'cancel_count');

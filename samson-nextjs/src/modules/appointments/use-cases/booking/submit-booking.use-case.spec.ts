@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { SubmitBookingUseCase } from './submit-booking.use-case';
-import { AppointmentBookingCommands } from '../repositories/appointment-booking.commands';
-import { GetAvailabilityUseCase } from './get-availability.use-case';
-import { SubmitBookingDto } from '../dtos/submit-booking.dto';
+import { AppointmentBookingCommands } from '../../repositories/booking/appointment-booking.commands';
+import { GetAvailabilityUseCase } from '../availability/get-availability.use-case';
+import { SubmitBookingDto } from '../../dtos/booking/submit-booking.dto';
 import { ValidationError } from '@/shared/errors';
 
 describe('SubmitBookingUseCase', () => {
