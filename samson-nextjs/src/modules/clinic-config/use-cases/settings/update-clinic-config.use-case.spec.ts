@@ -6,14 +6,14 @@ describe("UpdateClinicConfigUseCase (Unit Test)", () => {
   it("should successfully update the configuration", async () => {
     const mockRepo = {
       updateConfig: vi.fn().mockResolvedValue({
-        is_booking_open: false,
+        isBookingOpen: false,
       }),
     } as unknown as ClinicConfigCommandsRepository;
 
     const useCase = new UpdateClinicConfigUseCase(mockRepo);
-    const result = await useCase.execute({ is_booking_open: false });
+    const result = await useCase.execute({ isBookingOpen: false });
 
-    expect(result.is_booking_open).toBe(false);
-    expect(mockRepo.updateConfig).toHaveBeenCalledWith({ is_booking_open: false });
+    expect(result.isBookingOpen).toBe(false);
+    expect(mockRepo.updateConfig).toHaveBeenCalledWith({ isBookingOpen: false });
   });
 });

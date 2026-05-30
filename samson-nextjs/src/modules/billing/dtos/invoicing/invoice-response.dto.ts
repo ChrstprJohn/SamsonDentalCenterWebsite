@@ -1,37 +1,48 @@
 import { z } from "zod";
 
 export const invoiceStatusEnum = z.enum(["DRAFT", "FINALIZED", "PAID", "VOID"]);
+export const paymentMethodEnum = z.enum(["CASH", "CARD", "HMO"]);
 
 export const InvoiceResponseSchema = z.object({
   id: z.string().uuid(),
-  appointment_id: z.string().uuid(),
+  appointmentId: z.string().uuid(),
   amount: z.number().nonnegative(),
   status: invoiceStatusEnum,
-  created_at: z.string().optional().nullable(),
-  updated_at: z.string().optional().nullable(),
+  paymentMethod: paymentMethodEnum.nullable().optional(),
+  discountApplied: z.number().nonnegative().nullable().optional(),
+  createdAt: z.string().datetime().optional(),
+  updatedAt: z.string().datetime().optional(),
 });
 
 export type InvoiceStatus = z.infer<typeof invoiceStatusEnum>;
+export type PaymentMethod = z.infer<typeof paymentMethodEnum>;
 export type InvoiceResponseDto = z.infer<typeof InvoiceResponseSchema>;
 
 type MaybeRecord = Record<string, unknown>;
 
 const numberValue = (value: unknown) => {
   if (typeof value === "number") return value;
-  if (typeof value === "string") return Number(value);
+  if (typeof value === "string") return Number(value) || 0;
   return 0;
 };
 
+const nullableNumberValue = (value: unknown) => {
+  if (typeof value === "number") return value;
+  if (typeof value === "string") return Number(value) || null;
+  return null;
+};
+
 const stringValue = (value: unknown) => (typeof value === "string" ? value : "");
-const nullableStringValue = (value: unknown) => (typeof value === "string" ? value : null);
 
 export const mapInvoiceRecord = (record: MaybeRecord): InvoiceResponseDto => ({
   id: stringValue(record.id),
-  appointment_id: stringValue(record.appointment_id),
+  appointmentId: stringValue(record.appointment_id ?? record.appointmentId),
   amount: numberValue(record.amount),
   status: (record.status ?? "DRAFT") as InvoiceStatus,
-  created_at: nullableStringValue(record.created_at),
-  updated_at: nullableStringValue(record.updated_at),
+  paymentMethod: (record.payment_method ?? record.paymentMethod ?? null) as PaymentMethod | null,
+  discountApplied: nullableNumberValue(record.discount_applied ?? record.discountApplied),
+  createdAt: typeof record.created_at === "string" ? record.created_at : undefined,
+  updatedAt: typeof record.updated_at === "string" ? record.updated_at : undefined,
 });
 
 export const mapInvoiceRecords = (records: MaybeRecord[]) =>

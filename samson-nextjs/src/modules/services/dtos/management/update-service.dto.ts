@@ -1,8 +1,8 @@
 import { z } from "zod";
-import { CreateServiceSchema } from "./create-service.dto";
+import { createServiceSchema } from "./create-service.dto";
 
-export const UpdateServiceSchema = CreateServiceSchema.partial().extend({
+export const updateServiceSchema = createServiceSchema.partial().extend({
   id: z.string().uuid("Invalid service ID"),
 });
 
-export type UpdateServiceDto = z.infer<typeof UpdateServiceSchema>;
+export type UpdateServiceDto = z.infer<typeof updateServiceSchema>;

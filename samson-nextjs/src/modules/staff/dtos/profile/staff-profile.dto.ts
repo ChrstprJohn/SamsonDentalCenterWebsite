@@ -8,7 +8,7 @@ export const staffProfileSchema = z.object({
   middleName: z.string().nullable().optional(),
   lastName: z.string(),
   suffix: z.string().nullable().optional(),
-  phoneNumber: z.string().nullable().optional(),
+  phoneNumber: z.string().regex(/^\+?[1-9]\d{1,14}$/, "Must be a valid E.164 phone number").nullable().optional(),
   role: StaffRoleEnum,
   createdAt: z.string().datetime().optional(),
   updatedAt: z.string().datetime().optional(),

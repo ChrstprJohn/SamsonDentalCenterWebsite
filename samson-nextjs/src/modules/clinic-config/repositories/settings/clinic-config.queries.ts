@@ -1,5 +1,5 @@
 import { SupabaseClient } from "@supabase/supabase-js";
-import { ClinicConfigResponseDto } from "../../dtos/settings/get-clinic-config.dto";
+import { ClinicConfigResponseDto, mapClinicConfigRecord } from "../../dtos/settings/get-clinic-config.dto";
 
 export class ClinicConfigQueriesRepository {
   constructor(private readonly supabase: SupabaseClient) {}
@@ -12,6 +12,6 @@ export class ClinicConfigQueriesRepository {
       .maybeSingle();
 
     if (error) throw new Error(`Failed to fetch clinic config: ${error.message}`);
-    return data as ClinicConfigResponseDto | null;
+    return data ? mapClinicConfigRecord(data) : null;
   }
 }

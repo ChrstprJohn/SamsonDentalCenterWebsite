@@ -9,18 +9,18 @@ describe("CreateServiceUseCase (Unit Test)", () => {
         id: "svc-1",
         name: "Teeth Cleaning",
         description: null,
-        duration_minutes: 30,
+        durationMinutes: 30,
         price: 100,
-        is_active: true,
+        isActive: true,
       }),
     } as unknown as ServiceCommandsRepository;
 
     const useCase = new CreateServiceUseCase(mockRepo);
     const payload = {
       name: "Teeth Cleaning",
-      duration_minutes: 30,
+      durationMinutes: 30,
       price: 100,
-      is_active: true,
+      isActive: true,
     };
     
     const result = await useCase.execute(payload);

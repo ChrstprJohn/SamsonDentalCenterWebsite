@@ -7,10 +7,10 @@ describe("ServiceResponseSchema (DTO Validation)", () => {
       id: "550e8400-e29b-41d4-a716-446655440000",
       name: "Teeth Cleaning",
       description: null,
-      duration_minutes: 30,
+      durationMinutes: 30,
       price: null,
-      service_type: "GENERAL",
-      is_active: true,
+      serviceType: "GENERAL",
+      isActive: true,
     });
     expect(result.success).toBe(true);
   });
@@ -20,10 +20,10 @@ describe("ServiceResponseSchema (DTO Validation)", () => {
       id: "bad-id",
       name: "Teeth Cleaning",
       description: null,
-      duration_minutes: 30,
+      durationMinutes: 30,
       price: null,
-      service_type: "GENERAL",
-      is_active: true,
+      serviceType: "GENERAL",
+      isActive: true,
     });
     expect(result.success).toBe(false);
   });

@@ -6,7 +6,7 @@ describe("GetServicesUseCase (Unit Test)", () => {
   it("should successfully fetch services", async () => {
     const mockRepo = {
       getServices: vi.fn().mockResolvedValue([
-        { id: "svc-1", name: "Teeth Cleaning", duration_minutes: 30, is_active: true }
+        { id: "svc-1", name: "Teeth Cleaning", durationMinutes: 30, isActive: true }
       ]),
     } as unknown as ServiceQueriesRepository;
 

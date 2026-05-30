@@ -1,6 +1,6 @@
 "use server";
 
-import { UpdateClinicConfigDto, UpdateClinicConfigSchema } from "../../dtos/settings/update-clinic-config.dto";
+import { UpdateClinicConfigDto, updateClinicConfigSchema } from "../../dtos/settings/update-clinic-config.dto";
 import { UpdateClinicConfigUseCase } from "../../use-cases/settings/update-clinic-config.use-case";
 import { ClinicConfigCommandsRepository } from "../../repositories/settings/clinic-config.commands";
 import { createClient } from "../../../../shared/database/server";
@@ -8,7 +8,7 @@ import { createClient } from "../../../../shared/database/server";
 export async function updateClinicConfigAction(data: UpdateClinicConfigDto) {
   try {
     // 1. Validation
-    const parsed = UpdateClinicConfigSchema.parse(data);
+    const parsed = updateClinicConfigSchema.parse(data);
 
     // 2. DI Setup
     const supabase = await createClient();

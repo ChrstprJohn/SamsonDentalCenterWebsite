@@ -37,9 +37,9 @@ describe("ServiceCommandsRepository (Unit Test)", () => {
       const repo = new ServiceCommandsRepository(mockSupabase);
       const result = await repo.createService({
         name: "Teeth Cleaning",
-        duration_minutes: 30,
+        durationMinutes: 30,
         price: 100,
-        is_active: true,
+        isActive: true,
       });
 
       expect(result.id).toBe("svc-1");
@@ -51,7 +51,7 @@ describe("ServiceCommandsRepository (Unit Test)", () => {
 
       const repo = new ServiceCommandsRepository(mockSupabase);
       await expect(
-        repo.createService({ name: "X", duration_minutes: 10, is_active: true })
+        repo.createService({ name: "X", durationMinutes: 10, isActive: true })
       ).rejects.toThrow("Failed to create service: DB error");
     });
   });

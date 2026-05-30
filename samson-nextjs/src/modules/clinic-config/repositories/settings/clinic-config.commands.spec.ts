@@ -48,9 +48,9 @@ describe("ClinicConfigCommandsRepository (Unit Test)", () => {
       mockSingle.mockResolvedValue({ data: fakeConfig, error: null });
 
       const repo = new ClinicConfigCommandsRepository(mockSupabase);
-      const result = await repo.updateConfig({ is_booking_open: false });
+      const result = await repo.updateConfig({ isBookingOpen: false });
 
-      expect(result.is_booking_open).toBe(false);
+      expect(result.isBookingOpen).toBe(false);
       expect(mockFrom).toHaveBeenCalledWith("clinic_settings");
     });
 
@@ -59,7 +59,7 @@ describe("ClinicConfigCommandsRepository (Unit Test)", () => {
 
       const repo = new ClinicConfigCommandsRepository(mockSupabase);
       await expect(
-        repo.updateConfig({ is_booking_open: false })
+        repo.updateConfig({ isBookingOpen: false })
       ).rejects.toThrow("Failed to update clinic config: Update failed");
     });
   });

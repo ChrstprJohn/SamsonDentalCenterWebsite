@@ -196,9 +196,9 @@ Your pure business logic (`use-cases/`) shouldn't know anything about HTTP statu
 > ⚠️ **ONE FILE PER OPERATION — NEVER COMBINE DTOs.**
 
 * **Mandatory File Naming Convention**: Every DTO must live in its own file, named after the operation it belongs to:
-  * `create-service.dto.ts` → `CreateServiceSchema` + `CreateServiceDto`
-  * `update-service.dto.ts` → `UpdateServiceSchema` + `UpdateServiceDto`
-  * `service-response.dto.ts` → `ServiceResponseSchema` + `ServiceResponseDto`
+  * `create-service.dto.ts` → `createServiceSchema` + `CreateServiceDto`
+  * `update-service.dto.ts` → `updateServiceSchema` + `UpdateServiceDto`
+  * `service-response.dto.ts` → `serviceResponseSchema` + `ServiceResponseDto`
 
 * **Co-located Tests (Mandatory)**: Every `.dto.ts` file must have a sibling `.dto.spec.ts` file that tests all schema validation cases (valid input, missing required fields, invalid formats, edge cases).
 
@@ -217,10 +217,48 @@ Your pure business logic (`use-cases/`) shouldn't know anything about HTTP statu
 * **Derivation is allowed**: An `update-*.dto.ts` may import from its matching `create-*.dto.ts` to extend or `.partial()` it — but it must still live in its own file:
   ```ts
   // update-service.dto.ts
-  import { CreateServiceSchema } from './create-service.dto';
-  export const UpdateServiceSchema = CreateServiceSchema.partial().extend({ id: z.string().uuid() });
-  export type UpdateServiceDto = z.infer<typeof UpdateServiceSchema>;
+  import { createServiceSchema } from './create-service.dto';
+  export const updateServiceSchema = createServiceSchema.partial().extend({ id: z.string().uuid() });
+  export type UpdateServiceDto = z.infer<typeof updateServiceSchema>;
   ```
+
+### F. Coding, Casing, and Naming Conventions
+
+To maintain strict consistency and eliminate casing mixtures, we enforce the following conventions:
+
+#### 1. File Naming Conventions
+All filenames within a module must use **kebab-case** with double extensions indicating their architectural layer:
+- **DTOs**: `[operation].dto.ts` & `[operation].dto.spec.ts`
+- **Use Cases**: `[operation].use-case.ts` & `[operation].use-case.spec.ts`
+- **Actions**: `[operation].action.ts` & `[operation].action.spec.ts`
+- **Repositories**: `[resource].commands.ts`, `[resource].queries.ts` & their `.spec.ts` siblings.
+
+#### 2. Casing Standards for Variables and Properties
+- **Application Code & DTOs**: **Strictly `camelCase`**. Banish all `snake_case` properties from the application layer.
+  - *Yes*: `durationMinutes`, `serviceType`, `isActive`, `appointmentId`.
+  - *No*: `duration_minutes`, `service_type`, `is_active`, `appointment_id`.
+- **Database & Supabase Payload Boundaries**: The database naturally uses `snake_case`. Mappers must bridge the gap.
+  - Each response DTO must expose a mapper function (`mapXRecord`) that translates DB `snake_case` payloads to the strictly typed `camelCase` DTO interface.
+  - Banish direct use of raw DB types in use-cases and controllers.
+
+#### 3. Zod Schema & Types Naming
+- **Zod Schema Variable**: `camelCase` ending in `Schema` (e.g. `patientProfileSchema`, `serviceResponseSchema`, `createServiceSchema`).
+- **Inferred DTO Type**: **PascalCase** ending in `Dto` (e.g. `PatientProfileDto`, `ServiceResponseDto`, `CreateServiceDto`).
+
+#### 4. Architectural Component Conventions
+
+##### Use Cases
+- **Filenames**: `[operation].use-case.ts` (e.g. `register-patient.use-case.ts`)
+- **Export Pattern**: Export a single `camelCase` function matching the filename (e.g. `export const registerPatientUseCase = ...`).
+
+##### Server Actions
+- **Filenames**: `[operation].action.ts` (e.g. `submit-booking.action.ts`)
+- **Export Pattern**: Export a single `camelCase` function ending in `Action` (e.g. `export const submitBookingAction = ...`). Server Actions must contain the `'use server';` directive at the top of the file.
+
+##### Repositories (CQRS separation)
+- **Filenames**: `[resource].queries.ts` (for reads) or `[resource].commands.ts` (for writes/mutations).
+- **Export Pattern**: Export individual `camelCase` query/command functions (e.g. `export const getClinicAppointments = ...`, `export const createInvoice = ...`).
+- **Data Boundary**: Every repository function returning data must invoke the matching DTO mapper at the repository boundary, ensuring that all upstream components (Use Cases, Actions, UI) receive standard `camelCase` objects.
 
 ---
 

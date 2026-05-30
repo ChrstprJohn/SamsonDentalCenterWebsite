@@ -1,6 +1,6 @@
 "use server";
 
-import { CreateServiceDto, CreateServiceSchema } from "../../dtos/management/create-service.dto";
+import { CreateServiceDto, createServiceSchema } from "../../dtos/management/create-service.dto";
 import { CreateServiceUseCase } from "../../use-cases/management/create-service.use-case";
 import { ServiceCommandsRepository } from "../../repositories/management/service.commands";
 import { createClient } from "../../../../shared/database/server";
@@ -8,7 +8,7 @@ import { createClient } from "../../../../shared/database/server";
 export async function createServiceAction(data: CreateServiceDto) {
   try {
     // 1. Validation
-    const parsed = CreateServiceSchema.parse(data);
+    const parsed = createServiceSchema.parse(data);
 
     // 2. DI Setup
     const supabase = await createClient();

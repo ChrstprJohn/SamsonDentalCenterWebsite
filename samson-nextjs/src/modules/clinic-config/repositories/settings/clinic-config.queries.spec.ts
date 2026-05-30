@@ -48,7 +48,7 @@ describe("ClinicConfigQueriesRepository (Unit Test)", () => {
       const repo = new ClinicConfigQueriesRepository(mockSupabase);
       const result = await repo.getConfig();
 
-      expect(result?.clinic_name).toBe("Samson Dental");
+      expect(result?.clinicName).toBe("Samson Dental");
       expect(mockFrom).toHaveBeenCalledWith("clinic_settings");
     });
 

@@ -20,7 +20,7 @@ describe("updateServiceAction (Unit Test)", () => {
     const result = await updateServiceAction({
       id: "123e4567-e89b-12d3-a456-426614174000",
       name: "Clean Updated",
-      duration_minutes: 45,
+      durationMinutes: 45,
     });
     
     expect(result.data?.name).toBe("Clean Updated");

@@ -1,5 +1,5 @@
 import { SupabaseClient } from "@supabase/supabase-js";
-import { ServiceResponseDto } from "../../dtos/management/service-response.dto";
+import { ServiceResponseDto, mapServiceRecord, mapServiceRecords } from "../../dtos/management/service-response.dto";
 
 export class ServiceQueriesRepository {
   constructor(private readonly supabase: SupabaseClient) {}
@@ -13,7 +13,7 @@ export class ServiceQueriesRepository {
 
     const { data, error } = await query;
     if (error) throw new Error(`Failed to fetch services: ${error.message}`);
-    return data as ServiceResponseDto[];
+    return mapServiceRecords(data ?? []);
   }
 
   async getServiceById(id: string): Promise<ServiceResponseDto | null> {
@@ -24,6 +24,6 @@ export class ServiceQueriesRepository {
       .maybeSingle();
 
     if (error) throw new Error(`Failed to fetch service: ${error.message}`);
-    return data as ServiceResponseDto | null;
+    return data ? mapServiceRecord(data) : null;
   }
 }

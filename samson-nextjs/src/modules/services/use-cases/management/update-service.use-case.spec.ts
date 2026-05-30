@@ -8,9 +8,9 @@ describe("UpdateServiceUseCase (Unit Test)", () => {
       updateService: vi.fn().mockResolvedValue({
         id: "svc-1",
         name: "Teeth Cleaning Updated",
-        duration_minutes: 45,
+        durationMinutes: 45,
         price: 150,
-        is_active: true,
+        isActive: true,
       }),
     } as unknown as ServiceCommandsRepository;
 
@@ -18,7 +18,7 @@ describe("UpdateServiceUseCase (Unit Test)", () => {
     const payload = {
       id: "svc-1",
       name: "Teeth Cleaning Updated",
-      duration_minutes: 45,
+      durationMinutes: 45,
     };
     
     const result = await useCase.execute(payload);

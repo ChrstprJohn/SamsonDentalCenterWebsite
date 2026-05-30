@@ -11,9 +11,9 @@ vi.mock("../../use-cases/management/get-service-by-id.use-case", () => ({
       execute: vi.fn().mockResolvedValue({
         id: "svc-1",
         name: "Teeth Cleaning",
-        duration_minutes: 30,
+        durationMinutes: 30,
         price: 100,
-        is_active: true,
+        isActive: true,
         description: null,
       }),
     };

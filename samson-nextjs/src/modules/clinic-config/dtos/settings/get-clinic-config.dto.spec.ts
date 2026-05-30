@@ -1,126 +1,126 @@
 import { describe, it, expect } from "vitest";
-import { ClinicConfigResponseSchema, OperatingDaySchema } from "./get-clinic-config.dto";
+import { clinicConfigResponseSchema, operatingDaySchema } from "./get-clinic-config.dto";
 
 const validOperatingHours = {
-  monday: { is_open: true, open_time: "09:00", close_time: "17:00" },
-  tuesday: { is_open: true, open_time: "09:00", close_time: "17:00" },
-  wednesday: { is_open: true, open_time: "09:00", close_time: "17:00" },
-  thursday: { is_open: true, open_time: "09:00", close_time: "17:00" },
-  friday: { is_open: true, open_time: "09:00", close_time: "17:00" },
-  saturday: { is_open: false, open_time: null, close_time: null },
-  sunday: { is_open: false, open_time: null, close_time: null },
+  monday: { isOpen: true, openTime: "09:00", closeTime: "17:00" },
+  tuesday: { isOpen: true, openTime: "09:00", closeTime: "17:00" },
+  wednesday: { isOpen: true, openTime: "09:00", closeTime: "17:00" },
+  thursday: { isOpen: true, openTime: "09:00", closeTime: "17:00" },
+  friday: { isOpen: true, openTime: "09:00", closeTime: "17:00" },
+  saturday: { isOpen: false, openTime: null, closeTime: null },
+  sunday: { isOpen: false, openTime: null, closeTime: null },
 };
 
 const validConfig = {
-  is_booking_open: true,
-  maintenance_message: null,
-  max_reschedules: 1,
-  clinic_name: "Samson Dental",
+  isBookingOpen: true,
+  maintenanceMessage: null,
+  maxReschedules: 1,
+  clinicName: "Samson Dental",
   address: "123 Dental Way",
   phone: "555-0101",
   email: "contact@samsondental.com",
-  operating_hours: validOperatingHours,
-  allow_same_day_booking: true,
-  calendar_render_days: 30,
-  social_links: [
+  operatingHours: validOperatingHours,
+  allowSameDayBooking: true,
+  calendarRenderDays: 30,
+  socialLinks: [
     { platform: "Facebook", url: "https://facebook.com/samsondental" },
     { platform: "Instagram", url: "https://instagram.com/samsondental" },
   ],
 };
 
-describe("ClinicConfigResponseSchema (DTO Validation)", () => {
+describe("clinicConfigResponseSchema (DTO Validation)", () => {
   it("should pass with fully valid config", () => {
-    const result = ClinicConfigResponseSchema.safeParse(validConfig);
+    const result = clinicConfigResponseSchema.safeParse(validConfig);
     expect(result.success).toBe(true);
   });
 
-  it("should fail if clinic_name is empty", () => {
-    const result = ClinicConfigResponseSchema.safeParse({ ...validConfig, clinic_name: "" });
+  it("should fail if clinicName is empty", () => {
+    const result = clinicConfigResponseSchema.safeParse({ ...validConfig, clinicName: "" });
     expect(result.success).toBe(false);
   });
 
   it("should fail if email is not a valid email address", () => {
-    const result = ClinicConfigResponseSchema.safeParse({ ...validConfig, email: "not-an-email" });
+    const result = clinicConfigResponseSchema.safeParse({ ...validConfig, email: "not-an-email" });
     expect(result.success).toBe(false);
   });
 
-  it("should fail if max_reschedules is negative", () => {
-    const result = ClinicConfigResponseSchema.safeParse({ ...validConfig, max_reschedules: -1 });
+  it("should fail if maxReschedules is negative", () => {
+    const result = clinicConfigResponseSchema.safeParse({ ...validConfig, maxReschedules: -1 });
     expect(result.success).toBe(false);
   });
 
-  it("should fail if calendar_render_days is zero or negative", () => {
-    const zeroResult = ClinicConfigResponseSchema.safeParse({ ...validConfig, calendar_render_days: 0 });
-    const negativeResult = ClinicConfigResponseSchema.safeParse({ ...validConfig, calendar_render_days: -5 });
+  it("should fail if calendarRenderDays is zero or negative", () => {
+    const zeroResult = clinicConfigResponseSchema.safeParse({ ...validConfig, calendarRenderDays: 0 });
+    const negativeResult = clinicConfigResponseSchema.safeParse({ ...validConfig, calendarRenderDays: -5 });
     expect(zeroResult.success).toBe(false);
     expect(negativeResult.success).toBe(false);
   });
 
-  it("should fail if social_links has invalid url format", () => {
-    const result = ClinicConfigResponseSchema.safeParse({
+  it("should fail if socialLinks has invalid url format", () => {
+    const result = clinicConfigResponseSchema.safeParse({
       ...validConfig,
-      social_links: [{ platform: "Twitter", url: "not-a-url" }],
+      socialLinks: [{ platform: "Twitter", url: "not-a-url" }],
     });
     expect(result.success).toBe(false);
   });
 
-  it("should fail if social_links has empty platform name", () => {
-    const result = ClinicConfigResponseSchema.safeParse({
+  it("should fail if socialLinks has empty platform name", () => {
+    const result = clinicConfigResponseSchema.safeParse({
       ...validConfig,
-      social_links: [{ platform: "", url: "https://twitter.com" }],
+      socialLinks: [{ platform: "", url: "https://twitter.com" }],
     });
     expect(result.success).toBe(false);
   });
 
   it("should fail if a required field is missing", () => {
     const { phone, ...withoutPhone } = validConfig;
-    const result = ClinicConfigResponseSchema.safeParse(withoutPhone);
+    const result = clinicConfigResponseSchema.safeParse(withoutPhone);
     expect(result.success).toBe(false);
   });
 });
 
-describe("OperatingDaySchema (Sub-Validation)", () => {
+describe("operatingDaySchema (Sub-Validation)", () => {
   it("should pass for a valid open day", () => {
-    const result = OperatingDaySchema.safeParse({
-      is_open: true,
-      open_time: "08:30",
-      close_time: "17:00",
+    const result = operatingDaySchema.safeParse({
+      isOpen: true,
+      openTime: "08:30",
+      closeTime: "17:00",
     });
     expect(result.success).toBe(true);
   });
 
   it("should pass for a closed day with null times", () => {
-    const result = OperatingDaySchema.safeParse({
-      is_open: false,
-      open_time: null,
-      close_time: null,
+    const result = operatingDaySchema.safeParse({
+      isOpen: false,
+      openTime: null,
+      closeTime: null,
     });
     expect(result.success).toBe(true);
   });
 
-  it("should fail if open_time or close_time is null when is_open is true", () => {
-    const result = OperatingDaySchema.safeParse({
-      is_open: true,
-      open_time: null,
-      close_time: "17:00",
+  it("should fail if openTime or closeTime is null when isOpen is true", () => {
+    const result = operatingDaySchema.safeParse({
+      isOpen: true,
+      openTime: null,
+      closeTime: "17:00",
     });
     expect(result.success).toBe(false);
   });
 
-  it("should fail if close_time is before or equal to open_time", () => {
-    const result = OperatingDaySchema.safeParse({
-      is_open: true,
-      open_time: "17:00",
-      close_time: "09:00",
+  it("should fail if closeTime is before or equal to openTime", () => {
+    const result = operatingDaySchema.safeParse({
+      isOpen: true,
+      openTime: "17:00",
+      closeTime: "09:00",
     });
     expect(result.success).toBe(false);
   });
 
   it("should fail with invalid time format", () => {
-    const result = OperatingDaySchema.safeParse({
-      is_open: true,
-      open_time: "9:00 AM",
-      close_time: "17:00",
+    const result = operatingDaySchema.safeParse({
+      isOpen: true,
+      openTime: "9:00 AM",
+      closeTime: "17:00",
     });
     expect(result.success).toBe(false);
   });

@@ -12,6 +12,7 @@ export const appointmentStatusEnum = z.enum([
     'RESCHEDULE_REQUESTED',
     'DISPLACED',
     'CHECKED_IN',
+    'TREATMENT_RENDERED',
     'COMPLETED',
     'NO_SHOW',
 ]);
@@ -41,6 +42,7 @@ export const staffUpdateAppointmentStatusSchema = z
             'CANCELLED',
             'DISPLACED',
             'CHECKED_IN',
+            'TREATMENT_RENDERED',
             'COMPLETED',
             'NO_SHOW',
         ]),

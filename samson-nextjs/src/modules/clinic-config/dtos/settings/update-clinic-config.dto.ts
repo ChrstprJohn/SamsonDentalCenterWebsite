@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { ClinicConfigResponseSchema } from "./get-clinic-config.dto";
+import { clinicConfigResponseSchema } from "./get-clinic-config.dto";
 
-export const UpdateClinicConfigSchema = ClinicConfigResponseSchema.partial();
+export const updateClinicConfigSchema = clinicConfigResponseSchema.partial();
 
-export type UpdateClinicConfigDto = z.infer<typeof UpdateClinicConfigSchema>;
+export type UpdateClinicConfigDto = z.infer<typeof updateClinicConfigSchema>;

@@ -9,7 +9,7 @@ vi.mock("../../use-cases/settings/update-clinic-config.use-case", () => {
   return {
     UpdateClinicConfigUseCase: vi.fn(function () {
       return {
-      execute: vi.fn().mockResolvedValue({ is_booking_open: false }),
+      execute: vi.fn().mockResolvedValue({ isBookingOpen: false }),
       };
     }),
   };
@@ -18,10 +18,10 @@ vi.mock("../../use-cases/settings/update-clinic-config.use-case", () => {
 describe("updateClinicConfigAction (Unit Test)", () => {
   it("should successfully call the use case and return data", async () => {
     const result = await updateClinicConfigAction({
-      is_booking_open: false,
+      isBookingOpen: false,
     });
     
-    expect(result.data?.is_booking_open).toBe(false);
+    expect(result.data?.isBookingOpen).toBe(false);
     expect(result.error).toBeUndefined();
   });
 });

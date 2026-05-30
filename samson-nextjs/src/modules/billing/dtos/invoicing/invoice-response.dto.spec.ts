@@ -5,11 +5,11 @@ describe("InvoiceResponseSchema", () => {
   it("accepts a valid invoice response", () => {
     const result = InvoiceResponseSchema.safeParse({
       id: "da95a63c-333e-4b68-98e3-82bdf1a07bd2",
-      appointment_id: "1a95a63c-333e-4b68-98e3-82bdf1a07bd2",
+      appointmentId: "1a95a63c-333e-4b68-98e3-82bdf1a07bd2",
       amount: 1200,
       status: "DRAFT",
-      created_at: "2026-05-30T10:00:00Z",
-      updated_at: null,
+      createdAt: "2026-05-30T10:00:00Z",
+      updatedAt: undefined,
     });
 
     expect(result.success).toBe(true);
@@ -18,7 +18,7 @@ describe("InvoiceResponseSchema", () => {
   it("rejects invalid invoice statuses", () => {
     const result = InvoiceResponseSchema.safeParse({
       id: "da95a63c-333e-4b68-98e3-82bdf1a07bd2",
-      appointment_id: "1a95a63c-333e-4b68-98e3-82bdf1a07bd2",
+      appointmentId: "1a95a63c-333e-4b68-98e3-82bdf1a07bd2",
       amount: 1200,
       status: "REFUNDED",
     });

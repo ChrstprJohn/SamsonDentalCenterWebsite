@@ -19,9 +19,9 @@ describe("createServiceAction (Unit Test)", () => {
   it("should successfully call the use case and return data", async () => {
     const result = await createServiceAction({
       name: "Clean",
-      duration_minutes: 30,
+      durationMinutes: 30,
       price: 100,
-      is_active: true,
+      isActive: true,
     });
     
     expect(result.data?.id).toBe("svc-1");
@@ -31,7 +31,7 @@ describe("createServiceAction (Unit Test)", () => {
   it("should return an error object if validation fails", async () => {
     const result = await createServiceAction({
       name: "", // Invalid name
-      duration_minutes: 30,
+      durationMinutes: 30,
     } as any);
     
     expect(result.error).toBeDefined();
