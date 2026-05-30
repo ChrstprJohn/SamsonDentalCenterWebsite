@@ -173,23 +173,23 @@ Currently, we are focusing purely on the **Backend and Setup** aspects following
     - [x] `modules/appointments/actions/treatment/submit-treatment.action.ts` (and `.spec.ts`)
 
 ### Phase 8: Audit Logging Domain
-- [ ] **Audit Logging Domain:** Implement audit log mechanism to track staff actions (`get-audit-logs`, `create-audit-log`).
+- [x] **Audit Logging Domain:** Implement audit log mechanism to track staff actions (`get-audit-logs`, `create-audit-log`).
   - **DTOs:**
-    - [ ] `modules/audit-logs/dtos/logs/create-audit-log.dto.ts` (and `.spec.ts`)
-    - [ ] `modules/audit-logs/dtos/logs/get-audit-logs.dto.ts` (and `.spec.ts`)
-    - [ ] `modules/audit-logs/dtos/logs/audit-log-response.dto.ts` (and `.spec.ts`)
+    - [x] `modules/audit-logs/dtos/logs/create-audit-log.dto.ts` (and `.spec.ts`)
+    - [x] `modules/audit-logs/dtos/logs/get-audit-logs.dto.ts` (and `.spec.ts`)
+    - [x] `modules/audit-logs/dtos/logs/audit-log-response.dto.ts` (and `.spec.ts`)
   - **Repositories:**
-    - [ ] `modules/audit-logs/repositories/logs/audit-log.commands.ts` (and `.spec.ts`)
-    - [ ] `modules/audit-logs/repositories/logs/audit-log.queries.ts` (and `.spec.ts`)
+    - [x] `modules/audit-logs/repositories/logs/audit-log.commands.ts` (and `.spec.ts`)
+    - [x] `modules/audit-logs/repositories/logs/audit-log.queries.ts` (and `.spec.ts`)
   - **Use-Cases:**
-    - [ ] `modules/audit-logs/use-cases/logs/create-audit-log.use-case.ts` (and `.spec.ts`)
-    - [ ] `modules/audit-logs/use-cases/logs/get-audit-logs.use-case.ts` (and `.spec.ts`)
+    - [x] `modules/audit-logs/use-cases/logs/create-audit-log.use-case.ts` (and `.spec.ts`)
+    - [x] `modules/audit-logs/use-cases/logs/get-audit-logs.use-case.ts` (and `.spec.ts`)
   - **Actions:**
-    - [ ] `modules/audit-logs/actions/logs/get-audit-logs.action.ts` (and `.spec.ts`)
+    - [x] `modules/audit-logs/actions/logs/get-audit-logs.action.ts` (and `.spec.ts`)
     *(Note: `create-audit-log` is for internal use via Use-Cases or Subscribers. No direct Server Action for creation).*
   - **Facade:**
-    - [ ] `modules/audit-logs/index.ts`
-    - [ ] `modules/audit-logs/dtos/index.ts`
+    - [x] `modules/audit-logs/index.ts`
+    - [x] `modules/audit-logs/dtos/index.ts`
 
 ### Phase 9: Orchestrators & Events
 - [ ] **Cross-Domain Workflow:** Build orchestrators for multi-domain processes if required (e.g., `checkout.orchestrator.ts` connecting doctor treatment submission with billing).
