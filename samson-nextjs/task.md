@@ -22,36 +22,38 @@ Currently, we are focusing purely on the **Backend and Setup** aspects following
 - [x] **Testing:** Vitest unit tests implemented and passing for all shared kernel modules.
 
 ### ✅ Phase 2: Patients Domain (Backend) - COMPLETED
-- [x] **DTOs:** Defined Zod validation schemas for patient inputs (`register-patient.dto.ts`).
-- [x] **Repositories (CQRS):** Implemented pre-emptively split repositories (`patient-profile.commands.ts`, `patient-profile.queries.ts`) inside `modules/patients/repositories/`.
-- [x] **Use-Cases:** Implement pure business logic functions (e.g., `register-patient.use-case.ts`).
-- [x] **Server Actions:** Wire the Next.js form handling/RPCs in `modules/patients/actions/` (Controllers that validate DTOs, execute Use-Cases, and return results/errors).
-- [x] **Facade Config:** Export stable public APIs (if any) via `modules/patients/index.ts`.
+- [x] **DTOs:** Defined Zod validation schemas for patient inputs, organized into `profile/` subfolder.
+- [x] **Repositories (CQRS):** Implemented pre-emptively split repositories (`patient-profile.commands.ts`, `patient-profile.queries.ts`) organized into `profile/` subfolder under `repositories/`.
+- [x] **Use-Cases:** Implement pure business logic functions (e.g., `register-patient.use-case.ts`, `get-patient-profile.use-case.ts`) organized into `profile/` subfolder. All operations go through a Use-Case boundary (Strict Use-Case Pattern).
+- [x] **Server Actions:** Wire Next.js form handling/RPCs inside `modules/patients/actions/profile/` (`register-patient.action.ts`, `get-patient-profile.action.ts`) to keep code modular.
+- [x] **Facade Config:** Export stable public APIs via `modules/patients/index.ts`.
 
 ### ✅ Phase 3: Staff Domain (Backend) - COMPLETED
-- [x] **DTOs:** Define schemas for staff and schedules.
-- [x] **Repositories (Queries):** Implemented `staff-profile.queries.ts` with `getStaffProfile()` query inside `modules/staff/repositories/`. Tests passing via `staff-profile.queries.spec.ts`.
-- [x] **Repositories (Commands):** Implement `staff-profile.commands.ts` for write operations (create, update, terminate).
-- [x] **Use-Cases:** Write business logic for creating staff, terminating employment, or updating clinic hours (`use-cases/create-staff.use-case.ts`, etc.).
-- [x] **Server Actions (Segmented):** Create segmented action files inside `actions/` (e.g., `admin-staff.actions.ts`, `doctor-schedule.actions.ts`, `profile.actions.ts`) to avoid God classes.
+- [x] **DTOs:** Define schemas for staff and schedules, organized into `profile/` and `schedule/` subfolders.
+- [x] **Repositories (Queries):** Implemented `staff-profile.queries.ts` with `getStaffProfile()` query inside `repositories/profile/`.
+- [x] **Repositories (Commands):** Implement write repositories (`staff-profile.commands.ts`, `staff-schedule.commands.ts`) inside `profile/` and `schedule/` subfolders.
+- [x] **Use-Cases:** Write business logic for creating staff, terminating employment, or updating clinic schedules, organized into `profile/` and `schedule/` subfolders.
+- [x] **Server Actions (Segmented):** Create segmented actions under actor subfolders (`actions/admin/`, `actions/doctor/`) to avoid God classes.
 - [x] **Facade Config:** Export stable public APIs via `modules/staff/index.ts`.
 
 ### Phase 4: Appointments Domain (Backend)
 - [x] **DTOs / Schemas:**
-  - [x] Define `GetAvailabilityDto` (date, service_id).
-  - [x] Define `SubmitBookingDto` (service_id, doctor_id, date, start_time, end_time, user_note, dependent fields).
-  - [x] Define schemas for status updates (e.g., `UpdateAppointmentStatusDto` with reason notes).
-  - [x] Define `GetClinicAppointmentsDto` for clinic portal query filtering.
+  - [x] Define `GetAvailabilityDto` (organized under `availability/`).
+  - [x] Define `SubmitBookingDto` (organized under `booking/`).
+  - [x] Define schemas for status updates (organized under `status/`).
+  - [x] Define `GetClinicAppointmentsDto` (organized under `clinic/`).
 - [x] **Repositories (Queries):**
-  - [x] Implement `appointment.queries.ts` to fetch appointments by user (patient portal) and by clinic (admin/secretary portal).
-  - [x] Implement slot-checking queries (fetch existing overlapping appointments, fetch doctor schedules).
+  - [x] Implement `patient-appointments.queries.ts` (under `patient/`) and `clinic-appointments.queries.ts` (under `clinic/`).
+  - [x] Implement availability slot queries (`appointment-availability.queries.ts` under `availability/`).
 - [x] **Repositories (Commands):**
-  - [x] Implement `appointment-booking.commands.ts` for strictly creating appointments (the atomic wizard submission).
-  - [x] Implement `appointment-status.commands.ts` for status updates (`PENDING` -> `APPROVED`, `CANCELLED`, etc.) and metrics tracking.
-- [x] **Use-Cases (Business Logic):**
-  - [x] `get-availability.use-case.ts`: Calculate available slots (Doctor Schedules - Breaks - Existing Appointments).
-  - [x] `submit-booking.use-case.ts`: Atomic execution to prevent double-booking and save the appointment.
-  - [x] `update-appointment-status.use-case.ts`: Enforce status machine rules (e.g., only 1 Reschedule Request allowed, tracking credibility / no-shows).
+  - [x] Implement `appointment-booking.commands.ts` (under `booking/`).
+  - [x] Implement `appointment-status.commands.ts` (under `status/`).
+- [x] **Use-Cases (Strict Use-Case Pattern):**
+  - [x] `get-availability.use-case.ts` (under `availability/`).
+  - [x] `submit-booking.use-case.ts` (under `booking/`).
+  - [x] `update-appointment-status.use-case.ts` (under `status/`).
+  - [x] `get-patient-appointments.use-case.ts` (under `patient/`).
+  - [x] `get-clinic-appointments.use-case.ts` (under `clinic/`).
 - [ ] **Server Actions (Endpoints for Frontend):**
   - [ ] `booking-wizard.actions.ts`: Actions mapped directly to the frontend wizard (fetch availability, final submit).
   - [ ] `patient-portal.actions.ts`: Actions for the patient dashboard (cancel appointment, request reschedule).
@@ -65,5 +67,9 @@ Currently, we are focusing purely on the **Backend and Setup** aspects following
 
 ### 💡 Next Steps Guide:
 1. Review the checklist above.
-2. Tell me which Phase or Task you want to tackle first (I highly recommend starting with **Phase 1: Shared Core (Global Kernel)** and then moving to the **Patients domain**).
-3. I will guide you on the exact technical implementation, step-by-step, and wait for your command before writing any code.
+2. The foundational organizing, directory segregation, strict Use-Case implementation, and core domains (Patients, Staff, Appointments core use cases) are completely finished!
+3. The immediate next task is implementing the **Server Actions for Phase 4 (Appointments Domain)**:
+   - `booking-wizard.actions.ts` (availability, booking wizard submissions)
+   - `patient-portal.actions.ts` (patient rescheduling, cancellations)
+   - `staff-appointments.actions.ts` (admin-level approvals/completions)
+4. Tell me which of these Server Actions you would like to tackle first!
