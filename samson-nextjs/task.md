@@ -87,7 +87,7 @@ Currently, we are focusing purely on the **Backend and Setup** aspects following
     - [x] `modules/services/actions/management/update-service.action.ts` (and `.spec.ts`)
 - [x] **Clinic Config Domain:** Implement clinic settings management (`get-clinic-config`, `update-clinic-config` for open/closed status, hours, etc.).
   - **DTOs:**
-    - [x] `modules/clinic-config/dtos/settings/update-clinic-config.dto.ts` (and `.spec.ts`) - Must capture: isBookingOpen (boolean), maintenanceMessage (string), maxReschedulesAllowed (number), clinicName, operatingHours, etc.
+    - [x] `modules/clinic-config/dtos/settings/update-clinic-config.dto.ts` (and `.spec.ts`) - Must capture: isBookingOpen (boolean), maintenanceMessage (string), maxReschedulesAllowed (number), clinicName, operatingHours (Structured), same-day booking toggle (`allow_same_day_booking`), calendar render days (`calendar_render_days`), social_links (array of objects), etc.
   - **Repositories:**
     - [x] `modules/clinic-config/repositories/settings/clinic-config.commands.ts` (and `.spec.ts`)
     - [x] `modules/clinic-config/repositories/settings/clinic-config.queries.ts` (and `.spec.ts`)

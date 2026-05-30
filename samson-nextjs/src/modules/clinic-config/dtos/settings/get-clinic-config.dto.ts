@@ -45,6 +45,11 @@ export const OperatingHoursSchema = z.object({
   sunday: OperatingDaySchema,
 });
 
+export const SocialLinkSchema = z.object({
+  platform: z.string().min(1, "Platform name is required"),
+  url: z.string().url("Must be a valid URL"),
+});
+
 export const ClinicConfigResponseSchema = z.object({
   is_booking_open: z.boolean(),
   maintenance_message: z.string().nullable(),
@@ -54,6 +59,9 @@ export const ClinicConfigResponseSchema = z.object({
   phone: z.string().min(1, "Phone is required"),
   email: z.string().email("Invalid email"),
   operating_hours: OperatingHoursSchema,
+  allow_same_day_booking: z.boolean(),
+  calendar_render_days: z.number().int().positive("Calendar render days must be positive"),
+  social_links: z.array(SocialLinkSchema).default([]),
 });
 
 export type ClinicConfigResponseDto = z.infer<typeof ClinicConfigResponseSchema>;

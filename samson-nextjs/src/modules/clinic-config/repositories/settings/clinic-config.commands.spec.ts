@@ -40,6 +40,9 @@ describe("ClinicConfigCommandsRepository (Unit Test)", () => {
           saturday: { is_open: false, open_time: null, close_time: null },
           sunday: { is_open: false, open_time: null, close_time: null },
         },
+        allow_same_day_booking: false,
+        calendar_render_days: 30,
+        social_links: [],
       };
 
       mockSingle.mockResolvedValue({ data: fakeConfig, error: null });

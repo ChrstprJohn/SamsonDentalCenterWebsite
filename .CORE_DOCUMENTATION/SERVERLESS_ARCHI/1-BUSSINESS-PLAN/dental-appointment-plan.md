@@ -94,7 +94,9 @@ The admin portal should include:
 	- Booking open/closed status with maintenance message
 	- Max reschedules per appointment (default: 1)
 	- Clinic name, address, phone, email
-	- Operating hours
+	- Operating hours (Structured by day of the week, with is_open, open_time, close_time and validation constraints)
+	- Same-day booking configuration (`allow_same_day_booking` toggle)
+	- Calendar render timeline (`calendar_render_days` count for dynamic scheduling periods)
 	- Appointment slot duration
 	- Other clinic-wide settings that can be modified without deploying code)
 - Audit page
@@ -214,7 +216,7 @@ The footer should include standard pages and links:
 - **Pages**: Terms of Service, Privacy Policy
 - **Contact**: Clinic contact information (address, phone, email)
 - **Hours**: Operating hours
-- **Social Links**: Links to clinic social media (if applicable)
+- **Social Links**: Links to clinic social media (configured as a dynamic array of platform and url objects in the clinic config)
 - **Legal**: Copyright notice
 - Footer links should open in separate pages/modals rather than inline content
 - Footer should be consistent across all public and private portal pages
