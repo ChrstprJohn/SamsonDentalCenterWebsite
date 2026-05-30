@@ -6,7 +6,7 @@ import { UnauthorizedError } from '@/shared/errors/unauthorized.error';
 vi.mock('server-only', () => ({}));
 vi.mock('@/shared/auth/auth.util');
 vi.mock('@/shared/database/server');
-vi.mock('../../use-cases/terminate-staff.use-case', () => {
+vi.mock('../../use-cases/profile/terminate-staff.use-case', () => {
     return {
         TerminateStaffUseCase: class {
             execute = vi.fn().mockResolvedValue({ success: true });

@@ -18,9 +18,9 @@ This document defines the official development standards, architectural patterns
 3. **Facade (“Front Door”) Pattern (Modified for Next.js)**  
    Every module exposes a single public entry point (`index.ts`) for programmatic/RSC queries. However, due to Next.js compiler behaviors with the `'use server'` directive, **Server Actions (`actions/*`) must NOT be re-exported via `index.ts`**. Import Server Actions directly from their respective files in `src/modules/{domain}/actions/` in your UI components to avoid build-time dependency cycle issues and metadata leakage.
 
-4. **Data‑Layer Isolation (CQRS pattern where applicable)**  
+4. **Data‑Layer Isolation (Strict Use-Case Pattern)**  
    * **Server Actions / Route Handlers** – Act as the Controllers. Handle HTTP traffic, parsing `FormData` or JSON, and Next.js specific responses (`revalidatePath`, `redirect`).  
-   * **Use‑Cases / Services** – Contain pure business logic, free from Next.js-specific objects (no `NextRequest` or Next.js caching logic).  
+   * **Use‑Cases / Services** – Contain pure business logic, free from Next.js-specific objects. Every operation (both write commands and read queries) must go through a Use-Case boundary. This ensures consistency (UI/controllers interact uniformly with the domain) and future-proofing (e.g., adding authorization, caching, or logging later without refactoring the UI/controllers).  
    * **Repositories** – Direct interaction with the database (Supabase).
 
 ---
@@ -100,23 +100,27 @@ In a Modulith architecture, files can become bloated as business logic grows. Fo
   * Each business action gets its own file: `approve-appointment.use-case.ts`, `reschedule-appointment.use-case.ts`.
   * **Why?** It ensures single responsibility, restricts imports to only what that specific action needs, and makes unit testing much easier.
 
-### D. Pre-emptive Repository Segregation (No God Classes)
-* **Rule**: Never create a catch-all generic repository like `patient.commands.ts`. Break them down immediately upon creation by sub-resource or actor to prevent technical debt.
-* **Execution**: Apply **CQRS (Command/Query Responsibility Segregation)** combined with specific context splitting right out of the gate:
+### D. Pre-emptive Directory & File Segregation (No Junk Drawers)
+* **Rule**: Never create a catch-all generic repository or flat folders with dozens of files. As a domain module expands, keep folders like `repositories/`, `use-cases/`, `dtos/`, and `actions/` highly organized. Once any folder contains a substantial amount of files (typically 10-15+), organize them into **subfolders by Sub-Resource or Aggregate** (e.g., `booking/`, `availability/`, `schedule/`).
+* **Execution**: Apply **CQRS (Command/Query Responsibility Segregation)** combined with specific subfolder groupings for all key layers right out of the gate:
+  
   **1. Splitting by Resource Sub-type**
-  * `patient-profile.commands.ts` (Updates to name, email, etc.)
-  * `patient-insurance.commands.ts` (Handles insurance billing details)
-  * `patient-medical-history.commands.ts` (Handles sensitive health records)
-
+  * `repositories/patient/patient-profile.commands.ts`
+  * `repositories/insurance/patient-insurance.commands.ts`
+  * `repositories/history/patient-medical-history.commands.ts`
+  
   **2. Splitting by Actor (The "Samson Dental" way)**
   If rules for Admins vs. Patients dictate entirely different data checks:
-  * `admin-patient.commands.ts`
-  * `self-service-patient.commands.ts`
+  * `repositories/admin-patient.commands.ts`
+  * `repositories/self-service-patient.commands.ts`
+
+* **Consistency across layers**: Maintain this sub-resource structure uniformly across the `repositories/`, `use-cases/`, `dtos/`, and `actions/` directories. For example, if you have `repositories/booking/`, you should match it with `use-cases/booking/`, `dtos/booking/`, and `actions/booking/`.
 
 * **Why this prevents technical debt**:
-  * **Dependencies remain light:** You only inject the specific repository needed for a Use-Case.
-  * **Testability stays high:** You only need to mock 3-5 methods instead of 50.
-  * **Conflict reduction:** Multiple developers can work on different command files without creating massive git merge conflicts.
+  * **Zero Junk Drawers:** Keeps files logically clustered rather than flatly dumping 20+ files inside a single root layer.
+  * **Dependencies remain light:** You only inject/import the specific sub-resource or aggregate classes needed.
+  * **Testability stays high:** Clean mapping and separation of concern boundaries make unit tests easier to target and mock.
+  * **Conflict reduction:** Different developers work on distinct subfolders without git merge conflicts on central module facades.
 
 ### E. Managing Utilities (Local vs. Global)
 * **Trigger**: Unsure where to place a helper function.

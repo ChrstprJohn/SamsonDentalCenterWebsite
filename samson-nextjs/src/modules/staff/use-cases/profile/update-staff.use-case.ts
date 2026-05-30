@@ -1,5 +1,5 @@
-import { UpdateStaffDto } from '../dtos/update-staff.dto';
-import { StaffProfileCommands } from '../repositories/staff-profile.commands';
+import { UpdateStaffDto } from '../../dtos';
+import { StaffProfileCommands } from '../../repositories';
 
 export class UpdateStaffUseCase {
     constructor(private readonly staffCommands: StaffProfileCommands) {}

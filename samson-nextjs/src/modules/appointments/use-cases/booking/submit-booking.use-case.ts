@@ -1,6 +1,6 @@
-import { SubmitBookingDto } from '../dtos/submit-booking.dto';
-import { AppointmentBookingCommands } from '../repositories/appointment-booking.commands';
-import { GetAvailabilityUseCase } from './get-availability.use-case';
+import { SubmitBookingDto } from '../../dtos';
+import { AppointmentBookingCommands } from '../../repositories';
+import { GetAvailabilityUseCase } from '../availability/get-availability.use-case';
 import { DomainError, ValidationError } from '@/shared/errors';
 
 export class SubmitBookingUseCase {

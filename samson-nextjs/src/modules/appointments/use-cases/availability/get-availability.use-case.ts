@@ -1,12 +1,12 @@
 import { SupabaseClient } from '@supabase/supabase-js';
-import { AppointmentAvailabilityQueries } from '../repositories/appointment-availability.queries';
+import { AppointmentAvailabilityQueries } from '../../repositories';
 import {
   GetAvailableTimeSlotsDto,
   GetAvailableTimeSlotsResponseDto,
   AvailableSlotDto,
   GetAvailableDaysDto,
   GetAvailableDaysResponseDto,
-} from '../dtos/get-availability.dto';
+} from '../../dtos';
 import { DomainError } from '@/shared/errors';
 
 export class GetAvailabilityUseCase {

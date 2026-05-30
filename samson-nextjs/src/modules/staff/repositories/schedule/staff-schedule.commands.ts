@@ -1,5 +1,5 @@
 import { SupabaseClient } from '@supabase/supabase-js';
-import { DoctorScheduleDto, DayOfWeekMap } from '../dtos/doctor-schedule.dto';
+import { DoctorScheduleDto, DayOfWeekMap } from '../../dtos';
 import { DomainError } from '@/shared/errors';
 
 export class StaffScheduleCommands {

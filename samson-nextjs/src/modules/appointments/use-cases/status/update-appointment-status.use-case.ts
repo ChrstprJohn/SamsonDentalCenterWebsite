@@ -1,5 +1,5 @@
 import { SupabaseClient } from '@supabase/supabase-js';
-import { AppointmentStatusCommands } from '../repositories/appointment-status.commands';
+import { AppointmentStatusCommands } from '../../repositories';
 import { DomainError, ValidationError } from '@/shared/errors';
 
 export class UpdateAppointmentStatusUseCase {

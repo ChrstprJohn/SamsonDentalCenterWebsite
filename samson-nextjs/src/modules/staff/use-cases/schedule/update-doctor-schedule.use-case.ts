@@ -1,5 +1,5 @@
-import { DoctorScheduleDto } from '../dtos/doctor-schedule.dto';
-import { StaffScheduleCommands } from '../repositories/staff-schedule.commands';
+import { DoctorScheduleDto } from '../../dtos';
+import { StaffScheduleCommands } from '../../repositories';
 
 export class UpdateDoctorScheduleUseCase {
     constructor(private readonly scheduleCommands: StaffScheduleCommands) {}

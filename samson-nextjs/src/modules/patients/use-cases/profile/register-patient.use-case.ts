@@ -1,19 +1,19 @@
-import { CreateStaffDto } from '../dtos/create-staff.dto';
-import { StaffProfileCommands } from '../repositories/staff-profile.commands';
+import { RegisterPatientDto } from '../../dtos';
+import { PatientProfileCommands } from '../../repositories';
 
-export class CreateStaffUseCase {
+export class RegisterPatientUseCase {
     // Dependency Injection: The class receives its dependencies from the outside
-    constructor(private readonly staffCommands: StaffProfileCommands) {}
+    constructor(private readonly patientCommands: PatientProfileCommands) {}
 
-    async execute(userId: string, data: CreateStaffDto) {
+    async execute(userId: string, data: RegisterPatientDto) {
         // -------------------------------------------------------------
         // Business rules would go here (e.g., checking if the user
         // already has a patient profile by calling a Query repository).
         // -------------------------------------------------------------
 
         // Delegate the actual database writing to the Command repository
-        const newStaff = await this.staffCommands.createStaff(userId, data);
+        const newPatient = await this.patientCommands.createPatient(userId, data);
 
-        return newStaff;
+        return newPatient;
     }
 }

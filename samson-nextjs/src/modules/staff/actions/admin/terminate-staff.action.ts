@@ -3,8 +3,8 @@
 import { createClient } from '@/shared/database/server';
 import { authorizeRole } from '@/shared/auth/auth.util';
 import { DomainError } from '@/shared/errors';
-import { StaffProfileCommands } from '../../repositories/staff-profile.commands';
-import { TerminateStaffUseCase } from '../../use-cases/terminate-staff.use-case';
+import { StaffProfileCommands } from '../../repositories';
+import { TerminateStaffUseCase } from '../../use-cases';
 
 export async function terminateStaffAction(staffId: string) {
     try {

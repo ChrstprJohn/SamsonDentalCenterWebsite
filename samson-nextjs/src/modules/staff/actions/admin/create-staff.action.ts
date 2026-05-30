@@ -4,9 +4,9 @@ import { z } from 'zod';
 import { createClient } from '@/shared/database/server';
 import { authorizeRole } from '@/shared/auth/auth.util';
 import { DomainError } from '@/shared/errors';
-import { createStaffSchema, CreateStaffDto } from '../../dtos/create-staff.dto';
-import { StaffProfileCommands } from '../../repositories/staff-profile.commands';
-import { CreateStaffUseCase } from '../../use-cases/create-staff.use-case';
+import { createStaffSchema, CreateStaffDto } from '../../dtos';
+import { StaffProfileCommands } from '../../repositories';
+import { CreateStaffUseCase } from '../../use-cases';
 
 export async function createStaffAction(formData: CreateStaffDto) {
     try {

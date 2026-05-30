@@ -1,4 +1,4 @@
-import { StaffProfileCommands } from '../repositories/staff-profile.commands';
+import { StaffProfileCommands } from '../../repositories';
 
 export class TerminateStaffUseCase {
     constructor(private readonly staffCommands: StaffProfileCommands) {}
