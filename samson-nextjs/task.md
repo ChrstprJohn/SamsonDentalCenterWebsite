@@ -104,26 +104,26 @@ Currently, we are focusing purely on the **Backend and Setup** aspects following
     - [x] `modules/staff/actions/management/deactivate-user.action.ts` (and `.spec.ts`)
 
 ### Phase 7: Billing & Invoicing Domain
-- [ ] **Billing/Invoicing Domain:** Implement invoice generation when appointments are completed (`generate-invoice`, `get-invoices`, `update-invoice`).
+- [x] **Billing/Invoicing Domain:** Implement invoice generation when appointments are completed (`generate-invoice`, `get-invoices`, `update-invoice`).
   - **DTOs:**
-    - [ ] `modules/billing/dtos/invoicing/generate-invoice.dto.ts` (and `.spec.ts`)
-    - [ ] `modules/billing/dtos/invoicing/get-invoices.dto.ts` (and `.spec.ts`)
-    - [ ] `modules/billing/dtos/invoicing/update-invoice.dto.ts` (and `.spec.ts`)
-    - [ ] `modules/billing/dtos/invoicing/invoice-response.dto.ts` (and `.spec.ts`)
+    - [x] `modules/billing/dtos/invoicing/generate-invoice.dto.ts` (and `.spec.ts`)
+    - [x] `modules/billing/dtos/invoicing/get-invoices.dto.ts` (and `.spec.ts`)
+    - [x] `modules/billing/dtos/invoicing/update-invoice.dto.ts` (and `.spec.ts`)
+    - [x] `modules/billing/dtos/invoicing/invoice-response.dto.ts` (and `.spec.ts`)
   - **Repositories:**
-    - [ ] `modules/billing/repositories/invoicing/invoice.commands.ts` (and `.spec.ts`)
-    - [ ] `modules/billing/repositories/invoicing/invoice.queries.ts` (and `.spec.ts`)
+    - [x] `modules/billing/repositories/invoicing/invoice.commands.ts` (and `.spec.ts`)
+    - [x] `modules/billing/repositories/invoicing/invoice.queries.ts` (and `.spec.ts`)
   - **Use-Cases:**
-    - [ ] `modules/billing/use-cases/invoicing/generate-invoice.use-case.ts` (and `.spec.ts`)
-    - [ ] `modules/billing/use-cases/invoicing/get-invoices.use-case.ts` (and `.spec.ts`)
-    - [ ] `modules/billing/use-cases/invoicing/update-invoice.use-case.ts` (and `.spec.ts`)
+    - [x] `modules/billing/use-cases/invoicing/generate-invoice.use-case.ts` (and `.spec.ts`)
+    - [x] `modules/billing/use-cases/invoicing/get-invoices.use-case.ts` (and `.spec.ts`)
+    - [x] `modules/billing/use-cases/invoicing/update-invoice.use-case.ts` (and `.spec.ts`)
   - **Actions:**
-    - [ ] `modules/billing/actions/invoicing/generate-invoice.action.ts` (and `.spec.ts`)
-    - [ ] `modules/billing/actions/invoicing/get-invoices.action.ts` (and `.spec.ts`)
-    - [ ] `modules/billing/actions/invoicing/update-invoice.action.ts` (and `.spec.ts`)
+    - [x] `modules/billing/actions/invoicing/generate-invoice.action.ts` (and `.spec.ts`)
+    - [x] `modules/billing/actions/invoicing/get-invoices.action.ts` (and `.spec.ts`)
+    - [x] `modules/billing/actions/invoicing/update-invoice.action.ts` (and `.spec.ts`)
   - **Facade:**
-    - [ ] `modules/billing/index.ts`
-    - [ ] `modules/billing/dtos/index.ts`
+    - [x] `modules/billing/index.ts`
+    - [x] `modules/billing/dtos/index.ts`
 
 ### Phase 8: Audit Logging Domain
 - [ ] **Audit Logging Domain:** Implement audit log mechanism to track staff actions (`get-audit-logs`, `create-audit-log`).
