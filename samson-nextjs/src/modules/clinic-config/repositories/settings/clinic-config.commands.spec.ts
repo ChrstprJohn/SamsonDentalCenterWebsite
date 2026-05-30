@@ -31,6 +31,15 @@ describe("ClinicConfigCommandsRepository (Unit Test)", () => {
         address: "123 Way",
         phone: "555-0101",
         email: "info@samson.com",
+        operating_hours: {
+          monday: { is_open: true, open_time: "09:00", close_time: "17:00" },
+          tuesday: { is_open: true, open_time: "09:00", close_time: "17:00" },
+          wednesday: { is_open: true, open_time: "09:00", close_time: "17:00" },
+          thursday: { is_open: true, open_time: "09:00", close_time: "17:00" },
+          friday: { is_open: true, open_time: "09:00", close_time: "17:00" },
+          saturday: { is_open: false, open_time: null, close_time: null },
+          sunday: { is_open: false, open_time: null, close_time: null },
+        },
       };
 
       mockSingle.mockResolvedValue({ data: fakeConfig, error: null });
