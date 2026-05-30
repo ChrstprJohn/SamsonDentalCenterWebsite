@@ -36,7 +36,7 @@ Currently, we are focusing purely on the **Backend and Setup** aspects following
 - [x] **Server Actions (Segmented):** Create segmented actions under actor subfolders (`actions/admin/`, `actions/doctor/`) to avoid God classes.
 - [x] **Facade Config:** Export stable public APIs via `modules/staff/index.ts`.
 
-### Phase 4: Appointments Domain (Backend)
+### ✅ Phase 4: Appointments Domain (Backend) - COMPLETED
 - [x] **DTOs / Schemas:**
   - [x] Define `GetAvailabilityDto` (organized under `availability/`).
   - [x] Define `SubmitBookingDto` (organized under `booking/`).
@@ -54,10 +54,15 @@ Currently, we are focusing purely on the **Backend and Setup** aspects following
   - [x] `update-appointment-status.use-case.ts` (under `status/`).
   - [x] `get-patient-appointments.use-case.ts` (under `patient/`).
   - [x] `get-clinic-appointments.use-case.ts` (under `clinic/`).
-- [ ] **Server Actions (Endpoints for Frontend):**
-  - [ ] `booking-wizard.actions.ts`: Actions mapped directly to the frontend wizard (fetch availability, final submit).
-  - [ ] `patient-portal.actions.ts`: Actions for the patient dashboard (cancel appointment, request reschedule).
-  - [ ] `staff-appointments.actions.ts`: Actions for secretaries/admins to review, approve, reject, or complete appointments.
+- [x] **Server Actions (Endpoints for Frontend):** Organized into aggregate subfolders matching `use-cases/`, `repositories/`, `dtos/`.
+  - [x] `actions/availability/get-available-days.action.ts`
+  - [x] `actions/availability/get-available-time-slots.action.ts`
+  - [x] `actions/booking/submit-booking.action.ts`
+  - [x] `actions/clinic/get-clinic-appointments.action.ts` (SECRETARY+ role guard)
+  - [x] `actions/patient/get-patient-appointments.action.ts`
+  - [x] `actions/status/cancel-appointment.action.ts` (ownership guard)
+  - [x] `actions/status/request-reschedule.action.ts` (ownership guard)
+  - [x] `actions/status/update-appointment-status.action.ts` (SECRETARY+ role guard)
 
 ### Phase 5: Orchestrators & Events
 - [ ] **Cross-Domain Workflow:** Build orchestrators for multi-domain processes if required (e.g., `checkout.orchestrator.ts`).
@@ -67,9 +72,7 @@ Currently, we are focusing purely on the **Backend and Setup** aspects following
 
 ### 💡 Next Steps Guide:
 1. Review the checklist above.
-2. The foundational organizing, directory segregation, strict Use-Case implementation, and core domains (Patients, Staff, Appointments core use cases) are completely finished!
-3. The immediate next task is implementing the **Server Actions for Phase 4 (Appointments Domain)**:
-   - `booking-wizard.actions.ts` (availability, booking wizard submissions)
-   - `patient-portal.actions.ts` (patient rescheduling, cancellations)
-   - `staff-appointments.actions.ts` (admin-level approvals/completions)
-4. Tell me which of these Server Actions you would like to tackle first!
+2. Phases 1–4 are fully completed! All domains (Shared Core, Patients, Staff, Appointments) have DTOs, Repositories, Use-Cases, and Server Actions implemented with robust unit tests (181 tests passing).
+3. The next task is **Phase 5 (Orchestrators & Events)**:
+   - `checkout.orchestrator.ts`: Cross-domain workflow coordinator (e.g., Appointments + Billing).
+   - Background event subscribers using Next.js `after()` for emails/notifications on booking confirmation, cancellation, etc.
