@@ -9,6 +9,7 @@ describe("ServiceResponseSchema (DTO Validation)", () => {
       description: null,
       duration_minutes: 30,
       price: null,
+      service_type: "GENERAL",
       is_active: true,
     });
     expect(result.success).toBe(true);
@@ -21,6 +22,7 @@ describe("ServiceResponseSchema (DTO Validation)", () => {
       description: null,
       duration_minutes: 30,
       price: null,
+      service_type: "GENERAL",
       is_active: true,
     });
     expect(result.success).toBe(false);
@@ -34,3 +36,4 @@ describe("ServiceResponseSchema (DTO Validation)", () => {
     expect(result.success).toBe(false);
   });
 });
+

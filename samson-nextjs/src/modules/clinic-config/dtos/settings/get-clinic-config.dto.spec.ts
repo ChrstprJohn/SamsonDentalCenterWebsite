@@ -9,6 +9,7 @@ const validConfig = {
   address: "123 Dental Way",
   phone: "555-0101",
   email: "contact@samsondental.com",
+  operating_hours: "Mon-Fri: 9AM - 5PM",
 };
 
 describe("ClinicConfigResponseSchema (DTO Validation)", () => {

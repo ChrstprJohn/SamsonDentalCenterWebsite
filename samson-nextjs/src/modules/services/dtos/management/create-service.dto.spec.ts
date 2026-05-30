@@ -7,6 +7,7 @@ describe("CreateServiceSchema (DTO Validation)", () => {
       name: "Teeth Cleaning",
       duration_minutes: 30,
       price: 100,
+      service_type: "GENERAL",
       is_active: true,
     });
     expect(result.success).toBe(true);
@@ -37,7 +38,7 @@ describe("CreateServiceSchema (DTO Validation)", () => {
     expect(result.success).toBe(false);
   });
 
-  it("should default is_active to true when not provided", () => {
+  it("should default is_active to true and service_type to GENERAL when not provided", () => {
     const result = CreateServiceSchema.safeParse({
       name: "Cleaning",
       duration_minutes: 30,
@@ -45,7 +46,17 @@ describe("CreateServiceSchema (DTO Validation)", () => {
     expect(result.success).toBe(true);
     if (result.success) {
       expect(result.data.is_active).toBe(true);
+      expect(result.data.service_type).toBe("GENERAL");
     }
+  });
+
+  it("should fail with invalid service_type", () => {
+    const result = CreateServiceSchema.safeParse({
+      name: "Cleaning",
+      duration_minutes: 30,
+      service_type: "INVALID_TYPE",
+    });
+    expect(result.success).toBe(false);
   });
 
   it("should allow description to be null or omitted", () => {
@@ -55,3 +66,4 @@ describe("CreateServiceSchema (DTO Validation)", () => {
     expect(withOmit.success).toBe(true);
   });
 });
+

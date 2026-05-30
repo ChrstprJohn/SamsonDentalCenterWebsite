@@ -8,6 +8,8 @@ export const ClinicConfigResponseSchema = z.object({
   address: z.string().min(1, "Address is required"),
   phone: z.string().min(1, "Phone is required"),
   email: z.string().email("Invalid email"),
+  operating_hours: z.string().min(1, "Operating hours are required"),
 });
 
 export type ClinicConfigResponseDto = z.infer<typeof ClinicConfigResponseSchema>;
+

@@ -73,28 +73,28 @@ Currently, we are focusing purely on the **Backend and Setup** aspects following
 ### Phase 5: Services & Clinic Config Domain
 - [x] **Services Domain:** Implement CRUD for clinic services (`get-services`, `create-service`, `update-service`, `delete-service`).
   - **DTOs:**
-    - [ ] `modules/services/dtos/management/create-service.dto.ts` (and `.spec.ts`) - Needs: name, description, durationMinutes (important for calendar blocks), and serviceType (General vs. Specialized).
-    - [ ] `modules/services/dtos/management/update-service.dto.ts` (and `.spec.ts`)
-    - [ ] `modules/services/dtos/management/service-response.dto.ts` (and `.spec.ts`)
+    - [x] `modules/services/dtos/management/create-service.dto.ts` (and `.spec.ts`) - Needs: name, description, durationMinutes (important for calendar blocks), and serviceType (General vs. Specialized).
+    - [x] `modules/services/dtos/management/update-service.dto.ts` (and `.spec.ts`)
+    - [x] `modules/services/dtos/management/service-response.dto.ts` (and `.spec.ts`)
   - **Repositories:**
-    - [ ] `modules/services/repositories/management/service.commands.ts` (and `.spec.ts`)
-    - [ ] `modules/services/repositories/management/service.queries.ts` (and `.spec.ts`)
+    - [x] `modules/services/repositories/management/service.commands.ts` (and `.spec.ts`)
+    - [x] `modules/services/repositories/management/service.queries.ts` (and `.spec.ts`)
   - **Use-Cases:**
-    - [ ] `modules/services/use-cases/management/create-service.use-case.ts` (and `.spec.ts`)
-    - [ ] `modules/services/use-cases/management/update-service.use-case.ts` (and `.spec.ts`)
+    - [x] `modules/services/use-cases/management/create-service.use-case.ts` (and `.spec.ts`)
+    - [x] `modules/services/use-cases/management/update-service.use-case.ts` (and `.spec.ts`)
   - **Actions:**
-    - [ ] `modules/services/actions/management/create-service.action.ts` (and `.spec.ts`)
-    - [ ] `modules/services/actions/management/update-service.action.ts` (and `.spec.ts`)
+    - [x] `modules/services/actions/management/create-service.action.ts` (and `.spec.ts`)
+    - [x] `modules/services/actions/management/update-service.action.ts` (and `.spec.ts`)
 - [x] **Clinic Config Domain:** Implement clinic settings management (`get-clinic-config`, `update-clinic-config` for open/closed status, hours, etc.).
   - **DTOs:**
-    - [ ] `modules/clinic-config/dtos/settings/update-clinic-config.dto.ts` (and `.spec.ts`) - Must capture: isBookingOpen (boolean), maintenanceMessage (string), maxReschedulesAllowed (number), clinicName, operatingHours, etc.
+    - [x] `modules/clinic-config/dtos/settings/update-clinic-config.dto.ts` (and `.spec.ts`) - Must capture: isBookingOpen (boolean), maintenanceMessage (string), maxReschedulesAllowed (number), clinicName, operatingHours, etc.
   - **Repositories:**
-    - [ ] `modules/clinic-config/repositories/settings/clinic-config.commands.ts` (and `.spec.ts`)
-    - [ ] `modules/clinic-config/repositories/settings/clinic-config.queries.ts` (and `.spec.ts`)
+    - [x] `modules/clinic-config/repositories/settings/clinic-config.commands.ts` (and `.spec.ts`)
+    - [x] `modules/clinic-config/repositories/settings/clinic-config.queries.ts` (and `.spec.ts`)
   - **Use-Cases:**
-    - [ ] `modules/clinic-config/use-cases/settings/update-clinic-config.use-case.ts` (and `.spec.ts`)
+    - [x] `modules/clinic-config/use-cases/settings/update-clinic-config.use-case.ts` (and `.spec.ts`)
   - **Actions:**
-    - [ ] `modules/clinic-config/actions/settings/update-clinic-config.action.ts` (and `.spec.ts`)
+    - [x] `modules/clinic-config/actions/settings/update-clinic-config.action.ts` (and `.spec.ts`)
 
 ### Phase 6: Dependents & Admin User Management Domain
 - [x] **Patients Domain (Dependents):** Implement adding and fetching family members/dependents for bookings (`create-dependent`, `get-user-dependents`).
