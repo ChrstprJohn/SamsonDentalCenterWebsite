@@ -4,9 +4,9 @@ import { z } from 'zod';
 import { createClient } from '@/shared/database/server';
 import { getAuthenticatedUser } from '@/shared/auth/auth.util';
 import { DomainError } from '@/shared/errors';
-import { registerPatientSchema, RegisterPatientDto } from '../dtos';
-import { PatientProfileCommands } from '../repositories';
-import { RegisterPatientUseCase } from '../use-cases';
+import { registerPatientSchema, RegisterPatientDto } from '../../dtos';
+import { PatientProfileCommands } from '../../repositories';
+import { RegisterPatientUseCase } from '../../use-cases';
 
 export async function registerPatientAction(formData: RegisterPatientDto) {
   try {
