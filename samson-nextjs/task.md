@@ -142,7 +142,7 @@ Currently, we are focusing purely on the **Backend and Setup** aspects following
     - [x] `modules/billing/dtos/invoicing/generate-invoice.dto.ts` (and `.spec.ts`)
     - [x] `modules/billing/dtos/invoicing/get-invoices.dto.ts` (and `.spec.ts`)
     - [x] `modules/billing/dtos/invoicing/update-invoice.dto.ts` (and `.spec.ts`)
-    - [ ] `modules/billing/dtos/invoicing/finalize-invoice.dto.ts` (and `.spec.ts`) <-- Added for Secretary Checkout. Needs to capture paymentMethod (enum: Cash, Card, HMO), discountApplied, and line-item specific prices.
+    - [x] `modules/billing/dtos/invoicing/finalize-invoice.dto.ts` (and `.spec.ts`) <-- Added for Secretary Checkout. Needs to capture paymentMethod (enum: Cash, Card, HMO), discountApplied, and line-item specific prices.
     - [x] `modules/billing/dtos/invoicing/invoice-response.dto.ts` (and `.spec.ts`)
   - **Repositories:**
     - [x] `modules/billing/repositories/invoicing/invoice.commands.ts` (and `.spec.ts`)
@@ -151,12 +151,12 @@ Currently, we are focusing purely on the **Backend and Setup** aspects following
     - [x] `modules/billing/use-cases/invoicing/generate-invoice.use-case.ts` (and `.spec.ts`)
     - [x] `modules/billing/use-cases/invoicing/get-invoices.use-case.ts` (and `.spec.ts`)
     - [x] `modules/billing/use-cases/invoicing/update-invoice.use-case.ts` (and `.spec.ts`)
-    - [ ] `modules/billing/use-cases/invoicing/finalize-invoice.use-case.ts` (and `.spec.ts`)
+    - [x] `modules/billing/use-cases/invoicing/finalize-invoice.use-case.ts` (and `.spec.ts`)
   - **Actions:**
     - [x] `modules/billing/actions/invoicing/generate-invoice.action.ts` (and `.spec.ts`)
     - [x] `modules/billing/actions/invoicing/get-invoices.action.ts` (and `.spec.ts`)
     - [x] `modules/billing/actions/invoicing/update-invoice.action.ts` (and `.spec.ts`)
-    - [ ] `modules/billing/actions/invoicing/finalize-invoice.action.ts` (and `.spec.ts`)
+    - [x] `modules/billing/actions/invoicing/finalize-invoice.action.ts` (and `.spec.ts`)
   - **Facade:**
     - [x] `modules/billing/index.ts`
     - [x] `modules/billing/dtos/index.ts`

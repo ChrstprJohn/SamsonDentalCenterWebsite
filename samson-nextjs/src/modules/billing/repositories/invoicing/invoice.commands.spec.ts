@@ -94,4 +94,52 @@ describe("InvoiceCommandsRepository", () => {
       })
     ).rejects.toThrow("Failed to update invoice: Update failed");
   });
+
+  describe("finalizeInvoice", () => {
+    it("finalizes an invoice successfully", async () => {
+      mockSingle.mockResolvedValue({
+        data: {
+          id: "da95a63c-333e-4b68-98e3-82bdf1a07bd2",
+          appointment_id: "1a95a63c-333e-4b68-98e3-82bdf1a07bd2",
+          amount: 1400,
+          status: "FINALIZED",
+          payment_method: "CASH",
+          discount_applied: 100,
+        },
+        error: null,
+      });
+
+      const repo = new InvoiceCommandsRepository(mockSupabase);
+      const result = await repo.finalizeInvoice({
+        invoiceId: "da95a63c-333e-4b68-98e3-82bdf1a07bd2",
+        paymentMethod: "CASH",
+        discountApplied: 100,
+        amount: 1400,
+      });
+
+      expect(result.status).toBe("FINALIZED");
+      expect(result.paymentMethod).toBe("CASH");
+      expect(result.discountApplied).toBe(100);
+      expect(mockFrom).toHaveBeenCalledWith("invoices");
+      expect(mockUpdate).toHaveBeenCalledWith({
+        status: "FINALIZED",
+        payment_method: "CASH",
+        discount_applied: 100,
+        amount: 1400,
+      });
+    });
+
+    it("throws when finalization database query fails", async () => {
+      mockSingle.mockResolvedValue({ data: null, error: { message: "Finalization failed" } });
+
+      const repo = new InvoiceCommandsRepository(mockSupabase);
+      await expect(
+        repo.finalizeInvoice({
+          invoiceId: "da95a63c-333e-4b68-98e3-82bdf1a07bd2",
+          paymentMethod: "CARD",
+        })
+      ).rejects.toThrow("Failed to finalize invoice: Finalization failed");
+    });
+  });
 });
+
