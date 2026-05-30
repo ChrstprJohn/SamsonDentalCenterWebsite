@@ -125,15 +125,16 @@ Currently, we are focusing purely on the **Backend and Setup** aspects following
     - [x] `modules/staff/actions/management/get-all-users.action.ts` (and `.spec.ts`)
     - [x] `modules/staff/actions/management/deactivate-user.action.ts` (and `.spec.ts`)
 
-- [ ] **Doctor Service Mapping:** Allow admins/doctors to assign specialties/services to doctors.
+- [x] **Doctor Service Mapping:** Allow admins/doctors to assign specialties/services to doctors.
   - **DTOs:**
-    - [ ] `modules/staff/dtos/management/assign-doctor-services.dto.ts` (and `.spec.ts`) - An admin/doctor action to map a doctorId to an array of serviceIds they are qualified to perform.
+    - [x] `modules/staff/dtos/management/assign-doctor-services.dto.ts` (and `.spec.ts`) - An admin/doctor action to map a doctorId to an array of serviceIds they are qualified to perform.
   - **Repositories:**
-    - [ ] `modules/staff/repositories/management/doctor-services.commands.ts` (and `.spec.ts`)
+    - [x] `modules/staff/repositories/management/doctor-services.commands.ts` (and `.spec.ts`)
   - **Use-Cases:**
-    - [ ] `modules/staff/use-cases/management/assign-doctor-services.use-case.ts` (and `.spec.ts`)
+    - [x] `modules/staff/use-cases/management/assign-doctor-services.use-case.ts` (and `.spec.ts`)
   - **Actions:**
-    - [ ] `modules/staff/actions/management/assign-doctor-services.action.ts` (and `.spec.ts`)
+    - [x] `modules/staff/actions/management/assign-doctor-services.action.ts` (and `.spec.ts`)
+
 
 ### Phase 7: Billing & Invoicing Domain
 - [x] **Billing/Invoicing Domain:** Implement invoice generation when appointments are completed (`generate-invoice`, `get-invoices`, `update-invoice`).

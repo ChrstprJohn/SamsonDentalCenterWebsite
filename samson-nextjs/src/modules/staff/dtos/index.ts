@@ -6,3 +6,5 @@ export * from './schedule/doctor-schedule.dto';
 
 export * from './management/get-all-users.dto';
 export * from './management/deactivate-user.dto';
+export * from './management/assign-doctor-services.dto';
+
