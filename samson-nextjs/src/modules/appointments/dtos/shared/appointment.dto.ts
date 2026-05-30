@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { appointmentStatusEnum } from './status/update-appointment-status.dto';
+import { appointmentStatusEnum } from '../status/update-appointment-status.dto';
 
 export const appointmentDoctorSchema = z.object({
   id: z.string().uuid(),

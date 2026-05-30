@@ -11,11 +11,11 @@ Currently, we are focusing purely on the **Backend and Setup** aspects following
 
 ## 🚧 TO DO (Backend Tasks)
 
-### 🚨 Architecture Audit Fixes (Pending)
-- [ ] **Appointments Module:** Move `appointments/dtos/appointment.dto.ts` to an aggregate subfolder (e.g., `dtos/core/` or `dtos/shared/`) and add its missing `appointment.dto.spec.ts` test file.
-- [ ] **Patients Module:** Create missing test file `patients/dtos/profile/patient-profile.dto.spec.ts`.
-- [ ] **Staff Module:** Create missing test file `staff/dtos/profile/staff-profile.dto.spec.ts`.
-- [ ] **Staff Module:** Create missing test file `staff/dtos/profile/terminate-staff.dto.spec.ts`.
+### 🚨 Architecture Audit Fixes (Completed)
+- [x] **Appointments Module:** Move `appointments/dtos/appointment.dto.ts` to an aggregate subfolder (e.g., `dtos/core/` or `dtos/shared/`) and add its missing `appointment.dto.spec.ts` test file.
+- [x] **Patients Module:** Create missing test file `patients/dtos/profile/patient-profile.dto.spec.ts`.
+- [x] **Staff Module:** Create missing test file `staff/dtos/profile/staff-profile.dto.spec.ts`.
+- [x] **Staff Module:** Create missing test file `staff/dtos/profile/terminate-staff.dto.spec.ts`.
 
 ### ✅ Phase 1: Shared Core (Global Kernel) - COMPLETED
 - [x] **Global Error Handling:** Created base domain error classes in `shared/errors/` (`DomainError`, `NotFoundError`, `UnauthorizedError`, `ValidationError`) implementing domain-specific code mappings.
@@ -75,14 +75,74 @@ Currently, we are focusing purely on the **Backend and Setup** aspects following
 - [x] **Clinic Config Domain:** Implement clinic settings management (`get-clinic-config`, `update-clinic-config` for open/closed status, hours, etc.).
 
 ### Phase 6: Dependents & Admin User Management Domain
-- [ ] **Patients Domain (Dependents):** Implement adding and fetching family members/dependents for bookings (`create-dependent`, `get-user-dependents`).
-- [ ] **Admin User Management:** Implement user management for admins (`get-all-users`, `deactivate-user`).
+- [x] **Patients Domain (Dependents):** Implement adding and fetching family members/dependents for bookings (`create-dependent`, `get-user-dependents`).
+  - **DTOs:**
+    - [x] `modules/patients/dtos/dependents/create-dependent.dto.ts` (and `.spec.ts`)
+    - [x] `modules/patients/dtos/dependents/dependent-profile.dto.ts` (and `.spec.ts`)
+  - **Repositories:**
+    - [x] `modules/patients/repositories/dependents/patient-dependents.commands.ts` (and `.spec.ts`)
+    - [x] `modules/patients/repositories/dependents/patient-dependents.queries.ts` (and `.spec.ts`)
+  - **Use-Cases:**
+    - [x] `modules/patients/use-cases/dependents/create-dependent.use-case.ts` (and `.spec.ts`)
+    - [x] `modules/patients/use-cases/dependents/get-user-dependents.use-case.ts` (and `.spec.ts`)
+  - **Actions:**
+    - [x] `modules/patients/actions/dependents/create-dependent.action.ts` (and `.spec.ts`)
+    - [x] `modules/patients/actions/dependents/get-user-dependents.action.ts` (and `.spec.ts`)
+
+- [x] **Admin User Management:** Implement user management for admins (`get-all-users`, `deactivate-user`).
+  - **DTOs:**
+    - [x] `modules/staff/dtos/management/get-all-users.dto.ts` (and `.spec.ts`)
+    - [x] `modules/staff/dtos/management/deactivate-user.dto.ts` (and `.spec.ts`)
+  - **Repositories:**
+    - [x] `modules/staff/repositories/management/user-management.commands.ts` (and `.spec.ts`)
+    - [x] `modules/staff/repositories/management/user-management.queries.ts` (and `.spec.ts`)
+  - **Use-Cases:**
+    - [x] `modules/staff/use-cases/management/get-all-users.use-case.ts` (and `.spec.ts`)
+    - [x] `modules/staff/use-cases/management/deactivate-user.use-case.ts` (and `.spec.ts`)
+  - **Actions:**
+    - [x] `modules/staff/actions/management/get-all-users.action.ts` (and `.spec.ts`)
+    - [x] `modules/staff/actions/management/deactivate-user.action.ts` (and `.spec.ts`)
 
 ### Phase 7: Billing & Invoicing Domain
 - [ ] **Billing/Invoicing Domain:** Implement invoice generation when appointments are completed (`generate-invoice`, `get-invoices`, `update-invoice`).
+  - **DTOs:**
+    - [ ] `modules/billing/dtos/invoicing/generate-invoice.dto.ts` (and `.spec.ts`)
+    - [ ] `modules/billing/dtos/invoicing/get-invoices.dto.ts` (and `.spec.ts`)
+    - [ ] `modules/billing/dtos/invoicing/update-invoice.dto.ts` (and `.spec.ts`)
+    - [ ] `modules/billing/dtos/invoicing/invoice-response.dto.ts` (and `.spec.ts`)
+  - **Repositories:**
+    - [ ] `modules/billing/repositories/invoicing/invoice.commands.ts` (and `.spec.ts`)
+    - [ ] `modules/billing/repositories/invoicing/invoice.queries.ts` (and `.spec.ts`)
+  - **Use-Cases:**
+    - [ ] `modules/billing/use-cases/invoicing/generate-invoice.use-case.ts` (and `.spec.ts`)
+    - [ ] `modules/billing/use-cases/invoicing/get-invoices.use-case.ts` (and `.spec.ts`)
+    - [ ] `modules/billing/use-cases/invoicing/update-invoice.use-case.ts` (and `.spec.ts`)
+  - **Actions:**
+    - [ ] `modules/billing/actions/invoicing/generate-invoice.action.ts` (and `.spec.ts`)
+    - [ ] `modules/billing/actions/invoicing/get-invoices.action.ts` (and `.spec.ts`)
+    - [ ] `modules/billing/actions/invoicing/update-invoice.action.ts` (and `.spec.ts`)
+  - **Facade:**
+    - [ ] `modules/billing/index.ts`
+    - [ ] `modules/billing/dtos/index.ts`
 
 ### Phase 8: Audit Logging Domain
-- [ ] **Audit Logging Domain:** Implement audit log mechanism to track staff actions (`get-audit-logs`).
+- [ ] **Audit Logging Domain:** Implement audit log mechanism to track staff actions (`get-audit-logs`, `create-audit-log`).
+  - **DTOs:**
+    - [ ] `modules/audit-logs/dtos/logs/create-audit-log.dto.ts` (and `.spec.ts`)
+    - [ ] `modules/audit-logs/dtos/logs/get-audit-logs.dto.ts` (and `.spec.ts`)
+    - [ ] `modules/audit-logs/dtos/logs/audit-log-response.dto.ts` (and `.spec.ts`)
+  - **Repositories:**
+    - [ ] `modules/audit-logs/repositories/logs/audit-log.commands.ts` (and `.spec.ts`)
+    - [ ] `modules/audit-logs/repositories/logs/audit-log.queries.ts` (and `.spec.ts`)
+  - **Use-Cases:**
+    - [ ] `modules/audit-logs/use-cases/logs/create-audit-log.use-case.ts` (and `.spec.ts`)
+    - [ ] `modules/audit-logs/use-cases/logs/get-audit-logs.use-case.ts` (and `.spec.ts`)
+  - **Actions:**
+    - [ ] `modules/audit-logs/actions/logs/get-audit-logs.action.ts` (and `.spec.ts`)
+    *(Note: `create-audit-log` is for internal use via Use-Cases or Subscribers. No direct Server Action for creation).*
+  - **Facade:**
+    - [ ] `modules/audit-logs/index.ts`
+    - [ ] `modules/audit-logs/dtos/index.ts`
 
 ### Phase 9: Orchestrators & Events
 - [ ] **Cross-Domain Workflow:** Build orchestrators for multi-domain processes if required (e.g., `checkout.orchestrator.ts`).
