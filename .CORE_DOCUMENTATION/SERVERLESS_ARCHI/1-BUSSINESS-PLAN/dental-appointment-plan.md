@@ -18,19 +18,30 @@ Build a dental appointment website with a public landing experience and role-bas
 - If a visitor tries to book without an account, they are prompted to log in or create an account.
 - Terms of Service and Privacy Policy live in the footer and open separate pages instead of being placed on the landing page.
 
-### Account Access
+### Patient Account Access
 - Sign up and login for users.
 - Registration should collect only the minimum fields needed for booking and account access.
-- Current identity fields should be kept as:
+- Current patient identity fields should be kept as:
+	- First name (required)
+	- Middle name (optional)
+	- Last name (required)
+	- Suffix (optional)
 	- Email (required for account creation and OTP verification)
-	- First name
-	- Last name
-	- Middle name
-	- Suffix
-	- Contact number
+	- Phone number (required, E.164 format)
+	- Date of Birth (required, YYYY-MM-DD format)
 - OTP verification sent to email for confirmation.
 - Terms of Service and Privacy Policy must be checked during booking flow, and later during sign in and sign up flow.
 - Account creation must be confirmed before booking access is enabled.
+
+### Staff Profile Details
+- Staff accounts (Admin/Secretary) store the following fields:
+	- First name (required for creation, optional for updates)
+	- Middle name (optional)
+	- Last name (required for creation, optional for updates)
+	- Suffix (optional)
+	- Email (optional for updates)
+	- Phone number (optional, E.164 format)
+	- Role (Admin or Secretary)
 
 ### User Portal
 The public user portal should include:
@@ -134,14 +145,6 @@ The User Booking Wizard is tailored for authenticated patients, letting them boo
   4. **Review & Submit (`UserReviewStep`):** Displays detailed summaries and triggers `validateAbuse()` calling `/appointments/user-validate` to check for overlapping schedules, active appointment caps, daily service quotas, and dependent thresholds.
   5. **Atomic Wizard Submission:** Submits the consolidated payload to `/appointments/submit-wizard` which atomically registers the appointment under the chosen patient profile, cleans up the slot hold on the server, and triggers async staff notifications.
 
-### 2. Unified Slot Hold & Session Recovery System
-To protect clinic inventory and ensure slot atomicity, the wizard integrates with a centralized session-based slot hold system.
-
-- **Atomic Reservation:** Selected slots are reserved in the database with a 10-minute TTL (Time-to-Live). Unique database constraints prevent two users from holding the same slot simultaneously.
-- **Real-Time Visual Countdown:** Once a slot hold is secured, a global countdown timer (e.g. `9:59`) and an animated progress bar are rendered across all wizard steps. If the time remaining reaches 2 minutes (`120s`), the system triggers a warning toast. The progress bar changes color from amber to red when less than 1 minute remains.
-- **Session Recovery Interceptor:** The wizard leverages a `sessionId` (persisted in `localStorage` for users). If a user refreshes, closes the tab, or reloads during a booking, the wizard detects the active hold and displays a beautiful **"Resume Booking?" Bottom-Sheet Modal** showing their reserved slot and remaining hold time, allowing them to continue their checkout seamlessly.
-- **Graceful Expiration & Reselection:** If the 10-minute hold expires during the wizard checkout, the wizard shows a custom **"Need More Time?" Expiration Modal**, automatically releases the hold on the server, clears the form's date/time selections, and gracefully redirects the user back to the Schedule step while preserving all other entered profile/personal details, facilitating a fast and frictionless reselection.
-- **Exit & Rollback Cleanup:** Clicking the "Exit" button in the wizard header launches a **"Discard Booking?" Confirmation Modal**, warning the user that their slot will be released. Confirming the exit calls the server-side hold release, clears all local storage state, and rotates the user's `sessionId` to maintain inventory cleanliness.
 
 ## Appointment Status Constants
 - Pending: Submitted request, awaiting staff review.
@@ -151,7 +154,6 @@ To protect clinic inventory and ensure slot atomicity, the wizard integrates wit
 - Rescheduled: An approved appointment moved to a new time and requires a reschedule reason.
 - Cancelled: An approved appointment was cancelled by the user, secretary, or admin and requires a cancel reason.
 - Completed: Patient attended and the system unlocks invoicing and dental history updates.
-- Hold / Expired: Internal backend state used during the 10-minute rolling reservation window.
 
 ### Request Notes and Reasons
 - Every appointment can store a user note entered during booking.
@@ -175,13 +177,10 @@ To protect clinic inventory and ensure slot atomicity, the wizard integrates wit
 - Cancelled requests should free the slot back into availability if the appointment was previously active.
 
 ## Booking Availability Rules
-- Public availability must exclude approved, pending, and active lock states for the selected date.
-- Availability can be cached briefly on the client for faster rendering, but it must always be revalidated by the server before a hold is created.
-- A slot hold must be unique per time slot and enforced atomically so stale UI state cannot create double holds.
-- Slot locks are session-aware and expire automatically if the booking is abandoned.
-- Slot holds are temporary booking states, and they should not appear in the public time picker while active.
+- Public availability must exclude approved and pending states for the selected date.
+- Availability can be cached briefly on the client for faster rendering, but it must always be revalidated by the server upon submission.
 - Pending appointments should also remain hidden from the public time picker until they are approved or rejected.
-- Rejected, cancelled, and expired holds should return inventory to the public availability pool.
+- Rejected and cancelled appointments should return inventory to the public availability pool.
 - If online booking is turned off or the clinic is in maintenance mode, the booking page must show a closed page with a message and no booking actions.
 - Admins should be able to toggle booking open or closed from clinic config, including a maintenance message for the public booking page.
 
@@ -192,7 +191,6 @@ To protect clinic inventory and ensure slot atomicity, the wizard integrates wit
 - Displaced
 - Cancelled
 - Completed
-- Hold / Expired
 
 ## Navigation Plan
 The landing page navigation should scroll to page sections. For now, the exact section list is still to be decided.
@@ -214,7 +212,7 @@ The footer should include standard pages and links:
 ## MVP Priority
 1. Landing page and service presentation.
 2. Authentication with OTP email verification.
-3. Implemented User booking wizard with dynamic availability and slot holds.
+3. Implemented User booking wizard with dynamic availability.
 4. Pending appointment workflow.
 5. Secretary and admin approval flow with grouped row visibility.
 6. Admin management for services, doctors, users, and secretaries.
@@ -242,15 +240,7 @@ The footer should include standard pages and links:
 
 ### Frozen Specification Gaps
 
-#### 1. Booking Holds & Session Management
-- Holds are stored in the database with a TTL (time-to-live) of 10 minutes.
-- A background job or lazy cleanup purges expired holds and frees inventory.
-- Each user can have only one active booking session at a time; starting a new booking cancels any previous session.
-- Holds are internal only and invisible to admins/secretaries in dashboards.
-- Atomicity: slot claims use a database transaction checking (hold exists + appointment count = 0), then insert.
-- If a slot claim fails due to another user claiming it first, the frontend receives an error and must refresh availability for reselection.
-
-#### 2. Notifications for Grouped Bookings
+#### 1. Notifications for Grouped Bookings
 - Notifications fire per-appointment row as soon as each row is acted upon (approved/rejected/etc).
 - However, notifications are queued and sent asynchronously after all secretary decisions on the group are finalized.
 - Each notification is personalized per family member (e.g., "Your son Timmy's appointment approved for 2:00 PM").
@@ -258,10 +248,10 @@ The footer should include standard pages and links:
 
 #### 3. Availability Caching & Stale Data
 - Availability is cached on the client side for 2-5 minutes.
-- Cached times are revalidated on the backend before each slot claim attempt.
-- When a user clicks a stale or unavailable slot, the backend rejects the claim with an error.
+- Cached times are revalidated on the backend during booking submission.
+- When a user submits a stale or unavailable slot, the backend rejects the submission with an error.
 - Frontend must catch the error, refresh availability, and force the user to reselect.
-- Cached availability is only refreshed on-demand (when a slot claim fails), not eagerly on every doctor/service/date change.
+- Cached availability is only refreshed on-demand (when a booking fails), not eagerly on every doctor/service/date change.
 
 #### 4. Secretary Workflow Conflicts & Audit
 - Optimistic locking: if two secretaries attempt to act on the same appointment simultaneously, the first one succeeds and the second receives a conflict error.

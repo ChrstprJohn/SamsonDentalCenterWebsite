@@ -45,32 +45,49 @@ src/
 │   └── utils/                  # Global utilities (e.g., date-formatters)
 │
 ├── modules/                    # Self-contained business domains (The Core)
-│   ├── patients/               # Focuses purely on consumer/patient workflows
-│   │   ├── actions/            # Next.js Server Actions (Controllers, split by actor/resource)
-│   │   │   └── patient.actions.ts
+│   ├── services/               # Example: a fully expanded domain module
+│   │   ├── actions/
+│   │   │   └── management/                        # Subfolder by aggregate/actor
+│   │   │       ├── create-service.action.ts        # ONE action per file
+│   │   │       ├── create-service.action.spec.ts   # Co-located test (MANDATORY)
+│   │   │       ├── get-services.action.ts
+│   │   │       ├── get-services.action.spec.ts
+│   │   │       └── ...                            # One file per operation
 │   │   ├── dtos/
-│   │   ├── use-cases/          # register-patient.use-case.ts
-│   │   ├── repositories/       # patient.commands.ts, patient.queries.ts
-│   │   └── index.ts            # Public Facade
-│   │
-│   ├── staff/                  # Focuses purely on clinic employees & roles
-│   │   ├── actions/            # 👈 Folder to prevent god classes!
-│   │   │   ├── admin-staff.actions.ts     # Actions only the Admin can do (e.g., terminate staff)
-│   │   │   ├── doctor-schedule.actions.ts # Actions specific to Doctors (e.g., update clinic hours)
-│   │   │   └── profile.actions.ts         # Actions any logged-in staff can do (e.g., update phone)
+│   │   │   ├── index.ts                            # Barrel re-export only
+│   │   │   └── management/                        # Subfolder by aggregate
+│   │   │       ├── create-service.dto.ts           # ONE DTO per operation
+│   │   │       ├── create-service.dto.spec.ts      # Co-located test (MANDATORY)
+│   │   │       ├── update-service.dto.ts
+│   │   │       ├── update-service.dto.spec.ts
+│   │   │       ├── service-response.dto.ts         # Dedicated response/output shape
+│   │   │       └── service-response.dto.spec.ts
 │   │   ├── use-cases/
-│   │   │   ├── create-staff.use-case.ts
-│   │   │   ├── update-doctor-hours.use-case.ts
-│   │   │   └── terminate-employment.use-case.ts
+│   │   │   └── management/
+│   │   │       ├── create-service.use-case.ts      # ONE use-case per operation
+│   │   │       ├── create-service.use-case.spec.ts
+│   │   │       └── ...
 │   │   ├── repositories/
-│   │   │   ├── staff.commands.ts
-│   │   │   └── staff.queries.ts
-│   │   └── index.ts            # Public Facade (Ignores actions folder entirely)
+│   │   │   └── management/
+│   │   │       ├── service.commands.ts             # Write operations
+│   │   │       ├── service.commands.spec.ts
+│   │   │       ├── service.queries.ts              # Read operations
+│   │   │       └── service.queries.spec.ts
+│   │   └── index.ts                               # Public Facade
 │   │
 │   └── appointments/           # Interacts with patients/staff via IDs
 │       ├── actions/
-│       │   ├── patient-booking.actions.ts
-│       │   └── admin-appointments.actions.ts
+│       │   ├── booking/
+│       │   │   ├── submit-booking.action.ts
+│       │   │   └── submit-booking.action.spec.ts
+│       │   └── admin/
+│       │       ├── update-status.action.ts
+│       │       └── update-status.action.spec.ts
+│       ├── dtos/
+│       │   ├── index.ts
+│       │   └── booking/
+│       │       ├── submit-booking.dto.ts
+│       │       └── submit-booking.dto.spec.ts
 │       ├── use-cases/
 │       ├── repositories/
 │       └── index.ts
@@ -101,26 +118,50 @@ In a Modulith architecture, files can become bloated as business logic grows. Fo
   * **Why?** It ensures single responsibility, restricts imports to only what that specific action needs, and makes unit testing much easier.
 
 ### D. Pre-emptive Directory & File Segregation (No Junk Drawers)
-* **Rule**: Never create a catch-all generic repository or flat folders with dozens of files. As a domain module expands, keep folders like `repositories/`, `use-cases/`, `dtos/`, and `actions/` highly organized. Once any folder contains a substantial amount of files (typically 10-15+), organize them into **subfolders by Sub-Resource or Aggregate** (e.g., `booking/`, `availability/`, `schedule/`).
-* **Execution**: Apply **CQRS (Command/Query Responsibility Segregation)** combined with specific subfolder groupings for all key layers right out of the gate:
-  
-  **1. Splitting by Resource Sub-type**
-  * `repositories/patient/patient-profile.commands.ts`
-  * `repositories/insurance/patient-insurance.commands.ts`
-  * `repositories/history/patient-medical-history.commands.ts`
-  
-  **2. Splitting by Actor (The "Samson Dental" way)**
-  If rules for Admins vs. Patients dictate entirely different data checks:
-  * `repositories/admin-patient.commands.ts`
-  * `repositories/self-service-patient.commands.ts`
 
-* **Consistency across layers**: Maintain this sub-resource structure uniformly across the `repositories/`, `use-cases/`, `dtos/`, and `actions/` directories. For example, if you have `repositories/booking/`, you should match it with `use-cases/booking/`, `dtos/booking/`, and `actions/booking/`.
+> ⚠️ **MANDATORY FROM DAY ONE — NOT A FUTURE REFACTOR TRIGGER.**  
+> Do NOT create combined/monolithic files and plan to split them later. Structure correctly from the first file.
+
+* **Rule**: Every layer (`actions/`, `use-cases/`, `dtos/`, `repositories/`) must be organized into **aggregate subfolders** from the very first file created. Never place files directly in the layer root.
+
+* **One File = One Operation.** Every operation gets its own dedicated file — never group multiple operations into a single file. Each source file must be accompanied by a co-located `.spec.ts` test file.
+
+  **❌ WRONG — never do this:**
+  ```
+  dtos/
+  └── service.dto.ts          ← contains CreateDto + UpdateDto + ResponseDto — FORBIDDEN
+  ```
+
+  **✅ CORRECT — always do this:**
+  ```
+  dtos/
+  ├── index.ts                ← barrel re-export only, no logic
+  └── management/             ← aggregate subfolder
+      ├── create-service.dto.ts      ← one DTO, one concern
+      ├── create-service.dto.spec.ts ← co-located test
+      ├── update-service.dto.ts
+      ├── update-service.dto.spec.ts
+      ├── service-response.dto.ts    ← dedicated output shape
+      └── service-response.dto.spec.ts
+  ```
+
+* **Apply this structure uniformly** across all layers. If you have `dtos/management/`, you must match it with `use-cases/management/`, `actions/management/`, and `repositories/management/`.
+
+* **Splitting by Resource Sub-type** (for larger domains with multiple aggregates):
+  * `repositories/booking/appointment-booking.commands.ts`
+  * `repositories/availability/appointment-availability.queries.ts`
+  * Match: `dtos/booking/`, `use-cases/booking/`, `actions/booking/`
+
+* **Splitting by Actor** (when admin vs patient have different rules):
+  * `actions/admin/update-status.action.ts`
+  * `actions/patient/submit-booking.action.ts`
 
 * **Why this prevents technical debt**:
-  * **Zero Junk Drawers:** Keeps files logically clustered rather than flatly dumping 20+ files inside a single root layer.
-  * **Dependencies remain light:** You only inject/import the specific sub-resource or aggregate classes needed.
-  * **Testability stays high:** Clean mapping and separation of concern boundaries make unit tests easier to target and mock.
-  * **Conflict reduction:** Different developers work on distinct subfolders without git merge conflicts on central module facades.
+  * **No refactoring debt:** The structure is correct from the start — no costly reorgs later.
+  * **Zero junk drawers:** Files are always logically clustered, never dumped in a flat root layer.
+  * **Light dependencies:** Each file imports only the specific type/schema it needs.
+  * **High testability:** Each file has a single responsibility, making mocking and assertions trivial.
+  * **Conflict-free:** Developers work in isolated files with no merge conflicts on shared god-files.
 
 ### E. Managing Utilities (Local vs. Global)
 * **Trigger**: Unsure where to place a helper function.
@@ -151,8 +192,35 @@ Your pure business logic (`use-cases/`) shouldn't know anything about HTTP statu
 * **E2E Tests**: Use Playwright or Cypress in a global `test/` folder at the root to test the full-stack Next.js application from the outside in.
 
 ### E. Standardized DTOs (Data Transfer Objects)
-* **Input DTOs**: Use Zod schemas to validate incoming `FormData` or JSON *before* they hit the pure business logic in a Server Action.
-* **Output DTOs (Mappers)**: **Never** return raw database rows to the client (especially in Server Actions/Components). Always pass the raw data through a mapper/serializer to strip out sensitive fields before passing it to the UI.
+
+> ⚠️ **ONE FILE PER OPERATION — NEVER COMBINE DTOs.**
+
+* **Mandatory File Naming Convention**: Every DTO must live in its own file, named after the operation it belongs to:
+  * `create-service.dto.ts` → `CreateServiceSchema` + `CreateServiceDto`
+  * `update-service.dto.ts` → `UpdateServiceSchema` + `UpdateServiceDto`
+  * `service-response.dto.ts` → `ServiceResponseSchema` + `ServiceResponseDto`
+
+* **Co-located Tests (Mandatory)**: Every `.dto.ts` file must have a sibling `.dto.spec.ts` file that tests all schema validation cases (valid input, missing required fields, invalid formats, edge cases).
+
+* **DTOs Barrel (`dtos/index.ts`)**: Create an `index.ts` inside `dtos/` that re-exports all individual DTO files. This is the **only** file the module `index.ts` should reference for DTOs:
+  ```ts
+  // dtos/index.ts — re-export only, no schema definitions here
+  export * from './management/create-service.dto';
+  export * from './management/update-service.dto';
+  export * from './management/service-response.dto';
+  ```
+
+* **Input DTOs**: Use Zod schemas to validate incoming `FormData` or JSON *before* they hit the pure business logic in a Server Action. The schema and the inferred type must both be exported from the same file.
+
+* **Output DTOs (Response Shape)**: **Never** return raw database rows to the client. Define a dedicated `*-response.dto.ts` file with a Zod schema that defines exactly what the module exposes. Strip all sensitive or internal fields at this boundary.
+
+* **Derivation is allowed**: An `update-*.dto.ts` may import from its matching `create-*.dto.ts` to extend or `.partial()` it — but it must still live in its own file:
+  ```ts
+  // update-service.dto.ts
+  import { CreateServiceSchema } from './create-service.dto';
+  export const UpdateServiceSchema = CreateServiceSchema.partial().extend({ id: z.string().uuid() });
+  export type UpdateServiceDto = z.infer<typeof UpdateServiceSchema>;
+  ```
 
 ---
 
@@ -169,4 +237,5 @@ Following these steps will keep the Samson Dental codebase **modular, clean, sec
 
 ---
 
-*Document version: 2.0 (Next.js Edition) – last updated 2026‑05‑25*
+*Document version: 2.1 (Next.js Edition) – last updated 2026‑05‑30*  
+*v2.1 changes: Enforced per-operation file separation from day one (Section D & E). Removed "wait until 10-15 files" trigger. Mandated DTO-per-operation naming convention, co-located `.spec.ts` for all DTOs, and `dtos/index.ts` barrel pattern. Updated folder blueprint to reflect correct structure.*

@@ -11,6 +11,12 @@ Currently, we are focusing purely on the **Backend and Setup** aspects following
 
 ## 🚧 TO DO (Backend Tasks)
 
+### 🚨 Architecture Audit Fixes (Pending)
+- [ ] **Appointments Module:** Move `appointments/dtos/appointment.dto.ts` to an aggregate subfolder (e.g., `dtos/core/` or `dtos/shared/`) and add its missing `appointment.dto.spec.ts` test file.
+- [ ] **Patients Module:** Create missing test file `patients/dtos/profile/patient-profile.dto.spec.ts`.
+- [ ] **Staff Module:** Create missing test file `staff/dtos/profile/staff-profile.dto.spec.ts`.
+- [ ] **Staff Module:** Create missing test file `staff/dtos/profile/terminate-staff.dto.spec.ts`.
+
 ### ✅ Phase 1: Shared Core (Global Kernel) - COMPLETED
 - [x] **Global Error Handling:** Created base domain error classes in `shared/errors/` (`DomainError`, `NotFoundError`, `UnauthorizedError`, `ValidationError`) implementing domain-specific code mappings.
 - [x] **Auth Utilities:** Created `shared/auth/auth.util.ts` containing Server-only `getAuthenticatedUser()` and `authorizeRole()` checking active Supabase sessions and roles.
@@ -64,7 +70,21 @@ Currently, we are focusing purely on the **Backend and Setup** aspects following
   - [x] `actions/status/request-reschedule.action.ts` (ownership guard)
   - [x] `actions/status/update-appointment-status.action.ts` (SECRETARY+ role guard)
 
-### Phase 5: Orchestrators & Events
+### Phase 5: Services & Clinic Config Domain
+- [x] **Services Domain:** Implement CRUD for clinic services (`get-services`, `create-service`, `update-service`, `delete-service`).
+- [x] **Clinic Config Domain:** Implement clinic settings management (`get-clinic-config`, `update-clinic-config` for open/closed status, hours, etc.).
+
+### Phase 6: Dependents & Admin User Management Domain
+- [ ] **Patients Domain (Dependents):** Implement adding and fetching family members/dependents for bookings (`create-dependent`, `get-user-dependents`).
+- [ ] **Admin User Management:** Implement user management for admins (`get-all-users`, `deactivate-user`).
+
+### Phase 7: Billing & Invoicing Domain
+- [ ] **Billing/Invoicing Domain:** Implement invoice generation when appointments are completed (`generate-invoice`, `get-invoices`, `update-invoice`).
+
+### Phase 8: Audit Logging Domain
+- [ ] **Audit Logging Domain:** Implement audit log mechanism to track staff actions (`get-audit-logs`).
+
+### Phase 9: Orchestrators & Events
 - [ ] **Cross-Domain Workflow:** Build orchestrators for multi-domain processes if required (e.g., `checkout.orchestrator.ts`).
 - [ ] **Background Tasks:** Setup background event subscribers (using Next.js `after()`) for emails or side-effects.
 
@@ -72,7 +92,6 @@ Currently, we are focusing purely on the **Backend and Setup** aspects following
 
 ### 💡 Next Steps Guide:
 1. Review the checklist above.
-2. Phases 1–4 are fully completed! All domains (Shared Core, Patients, Staff, Appointments) have DTOs, Repositories, Use-Cases, and Server Actions implemented with robust unit tests (181 tests passing).
-3. The next task is **Phase 5 (Orchestrators & Events)**:
-   - `checkout.orchestrator.ts`: Cross-domain workflow coordinator (e.g., Appointments + Billing).
-   - Background event subscribers using Next.js `after()` for emails/notifications on booking confirmation, cancellation, etc.
+2. Phases 1–4 are fully completed! All core domains (Shared Core, Patients, Staff, Appointments) have DTOs, Repositories, Use-Cases, and Server Actions implemented with robust unit tests.
+3. The next task is **Phase 5 (Services & Clinic Config Domain)**:
+   - Implement the Services and Clinic Config domains.
