@@ -9,6 +9,8 @@ describe('RegisterPatientDto', () => {
       lastName: 'Doe',
       phoneNumber: '1234567890',
       dateOfBirth: '1990-01-01',
+      password: 'Password123!',
+      confirmPassword: 'Password123!',
     };
     
     // We expect the output to be trimmed/formatted if applicable
@@ -23,6 +25,8 @@ describe('RegisterPatientDto', () => {
       lastName: 'Doe',
       phoneNumber: '1234567890',
       dateOfBirth: '1990-01-01',
+      password: 'Password123!',
+      confirmPassword: 'Password123!',
     };
     
     const result = registerPatientSchema.safeParse(invalidData);
@@ -36,6 +40,8 @@ describe('RegisterPatientDto', () => {
       lastName: 'Doe',
       phoneNumber: '1234567890',
       dateOfBirth: '01-01-1990', // Wrong format
+      password: 'Password123!',
+      confirmPassword: 'Password123!',
     };
     
     const result = registerPatientSchema.safeParse(invalidData);

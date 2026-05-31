@@ -63,7 +63,7 @@ describe('SubmitTreatmentUseCase', () => {
       expect.stringContaining('Consultation (Routine)')
     );
     expect(mockInvoiceCommands.generateInvoice).toHaveBeenCalledWith({
-      appointment_id: 'appt-123',
+      appointmentId: 'appt-123',
       amount: 1300,
       status: 'DRAFT',
     });

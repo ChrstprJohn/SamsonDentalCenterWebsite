@@ -4,7 +4,7 @@ import { GenerateInvoiceSchema } from "./generate-invoice.dto";
 describe("GenerateInvoiceSchema", () => {
   it("accepts valid invoice generation data", () => {
     const result = GenerateInvoiceSchema.safeParse({
-      appointment_id: "da95a63c-333e-4b68-98e3-82bdf1a07bd2",
+      appointmentId: "da95a63c-333e-4b68-98e3-82bdf1a07bd2",
       amount: 900,
       status: "FINALIZED",
     });
@@ -14,7 +14,7 @@ describe("GenerateInvoiceSchema", () => {
 
   it("defaults status to DRAFT", () => {
     const result = GenerateInvoiceSchema.safeParse({
-      appointment_id: "da95a63c-333e-4b68-98e3-82bdf1a07bd2",
+      appointmentId: "da95a63c-333e-4b68-98e3-82bdf1a07bd2",
       amount: 900,
     });
 
@@ -26,7 +26,7 @@ describe("GenerateInvoiceSchema", () => {
 
   it("rejects negative amounts", () => {
     const result = GenerateInvoiceSchema.safeParse({
-      appointment_id: "da95a63c-333e-4b68-98e3-82bdf1a07bd2",
+      appointmentId: "da95a63c-333e-4b68-98e3-82bdf1a07bd2",
       amount: -1,
     });
 

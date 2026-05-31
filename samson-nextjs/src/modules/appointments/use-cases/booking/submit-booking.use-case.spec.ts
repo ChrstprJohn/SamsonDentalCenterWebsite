@@ -92,11 +92,12 @@ describe('SubmitBookingUseCase', () => {
     });
 
     // Mock DB unique constraint violation
-    const dbError = new Error('duplicate key value violates unique constraint');
+    const dbError = new Error('duplicate key value violates unique constraint') as any;
+    dbError.code = '23P01';
     mockBookingCommands.createAppointment.mockRejectedValueOnce(dbError);
 
     await expect(useCase.execute('user-123', mockDto)).rejects.toThrow(
-      'This slot is already booked!'
+      'This slot was just booked by someone else!'
     );
   });
 });

@@ -47,17 +47,15 @@ describe('AppointmentBookingCommands', () => {
       expect(mockSupabase.from).toHaveBeenCalledWith('appointments');
       expect(mockSupabase.insert).toHaveBeenCalledWith(
         expect.objectContaining({
-          user_id: 'user-123',
+          patient_id: 'user-123',
           status: 'PENDING',
-          idempotency_key: mockDto.idempotencyKey,
           service_id: mockDto.serviceId,
           doctor_id: mockDto.doctorId,
-          is_preferred_doctor: true,
+          dependent_id: null,
           date: mockDto.date,
           start_time: mockDto.startTime,
           end_time: mockDto.endTime,
           user_note: mockDto.userNote,
-          patient_type: mockDto.patientType,
         })
       );
       expect(result).toMatchObject({ id: validApptId });

@@ -53,7 +53,7 @@ describe('StaffProfileCommands (Functional)', () => {
             createdAt: mockInsertedRecord.created_at,
             updatedAt: undefined,
         });
-        expect(mockSupabase.from).toHaveBeenCalledWith('staff');
+        expect(mockSupabase.from).toHaveBeenCalledWith('users');
         expect(mockSupabase.insert).toHaveBeenCalledWith(
             expect.objectContaining({
                 id: '123e4567-e89b-12d3-a456-426614174000',

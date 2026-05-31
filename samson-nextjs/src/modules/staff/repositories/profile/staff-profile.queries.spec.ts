@@ -10,6 +10,7 @@ describe('StaffProfileQueries (Functional)', () => {
       from: vi.fn().mockReturnThis(),
       select: vi.fn().mockReturnThis(),
       eq: vi.fn().mockReturnThis(),
+      in: vi.fn().mockReturnThis(),
       single: vi.fn(),
     };
   });
@@ -51,7 +52,7 @@ describe('StaffProfileQueries (Functional)', () => {
       createdAt: undefined,
       updatedAt: undefined,
     });
-    expect(mockSupabase.from).toHaveBeenCalledWith('staff');
+    expect(mockSupabase.from).toHaveBeenCalledWith('users');
   });
 });
 

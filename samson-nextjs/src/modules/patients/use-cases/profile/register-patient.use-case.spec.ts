@@ -22,11 +22,11 @@ describe('RegisterPatientUseCase (Functional)', () => {
     const execute = registerPatientUseCase(mockCreatePatient);
 
     // 2. Act
-    const result = await execute(mockUserId, mockDto);
+    const result = await execute(mockDto);
 
     // 3. Assert
     expect(mockCreatePatient).toHaveBeenCalledTimes(1);
-    expect(mockCreatePatient).toHaveBeenCalledWith(mockUserId, mockDto);
+    expect(mockCreatePatient).toHaveBeenCalledWith(mockDto);
     expect(result).toEqual(mockCreatedPatient);
   });
 });

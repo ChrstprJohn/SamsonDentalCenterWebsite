@@ -42,6 +42,8 @@ describe('registerPatientAction', () => {
             email: 'john@example.com',
             phoneNumber: '+1234567890',
             dateOfBirth: '1990-01-01',
+            password: 'Password123!',
+            confirmPassword: 'Password123!',
         };
 
         // Act
@@ -49,9 +51,7 @@ describe('registerPatientAction', () => {
 
         // Assert
         expect(result).toEqual({ success: true, data: { id: 'patient_789', firstName: 'John' } });
-        expect(getAuthenticatedUser).toHaveBeenCalled();
         expect(mockExecute).toHaveBeenCalledWith(
-            'user_123',
             expect.objectContaining({ firstName: 'John' })
         );
     });

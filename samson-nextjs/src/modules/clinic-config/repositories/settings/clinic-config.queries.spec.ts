@@ -49,7 +49,7 @@ describe("getClinicConfigQuery (Unit Test)", () => {
       const result = await getConfig();
 
       expect(result?.clinicName).toBe("Samson Dental");
-      expect(mockFrom).toHaveBeenCalledWith("clinic_settings");
+      expect(mockFrom).toHaveBeenCalledWith("clinic_config");
     });
 
     it("should return null when no config exists", async () => {

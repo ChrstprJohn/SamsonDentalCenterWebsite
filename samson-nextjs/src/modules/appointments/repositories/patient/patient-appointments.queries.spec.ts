@@ -30,7 +30,7 @@ describe('PatientAppointmentsQueries', () => {
       const result = await queries.getAppointmentsByUser('user-123');
 
       expect(mockSupabase.from).toHaveBeenCalledWith('appointments');
-      expect(mockSupabase.eq).toHaveBeenCalledWith('user_id', 'user-123');
+      expect(mockSupabase.eq).toHaveBeenCalledWith('patient_id', 'user-123');
       expect(mockSupabase.order).toHaveBeenCalledWith('start_time', { ascending: false });
       expect(result).toEqual([
         expect.objectContaining({

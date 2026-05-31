@@ -21,22 +21,23 @@ describe('AppointmentAvailabilityQueries', () => {
 
   describe('getDoctorSchedules', () => {
     it('should fetch schedules for all doctors on a date', async () => {
-      const mockData = [{ id: '1', staff_id: 'doc-1' }];
+      const mockData = [{ id: '1', doctor_id: 'doc-1' }];
       mockSupabase.then = vi.fn((resolve) => resolve({ data: mockData, error: null }));
 
       const result = await queries.getDoctorSchedules('2024-10-10');
+      const dayOfWeek = new Date('2024-10-10').getDay();
 
-      expect(mockSupabase.from).toHaveBeenCalledWith('staff_schedules');
-      expect(mockSupabase.eq).toHaveBeenCalledWith('date', '2024-10-10');
-      expect(mockSupabase.eq).toHaveBeenCalledWith('is_working', true);
+      expect(mockSupabase.from).toHaveBeenCalledWith('doctor_schedules');
+      expect(mockSupabase.eq).toHaveBeenCalledWith('day_of_week', dayOfWeek);
       expect(result).toEqual(mockData);
     });
 
     it('should fetch schedule for a specific doctor if provided', async () => {
       await queries.getDoctorSchedules('2024-10-10', 'doc-2');
-
-      expect(mockSupabase.eq).toHaveBeenCalledWith('date', '2024-10-10');
-      expect(mockSupabase.eq).toHaveBeenCalledWith('staff_id', 'doc-2');
+      
+      const dayOfWeek = new Date('2024-10-10').getDay();
+      expect(mockSupabase.eq).toHaveBeenCalledWith('day_of_week', dayOfWeek);
+      expect(mockSupabase.eq).toHaveBeenCalledWith('doctor_id', 'doc-2');
     });
 
     it('should throw an error on DB failure', async () => {

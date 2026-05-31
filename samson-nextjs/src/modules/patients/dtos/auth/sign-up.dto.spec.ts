@@ -12,6 +12,7 @@ describe('signUpSchema', () => {
       phoneNumber: '+1234567890',
       dateOfBirth: '1990-01-01',
       password: 'StrongPass1',
+      confirmPassword: 'StrongPass1',
       acceptTerms: true,
     };
     const result = signUpSchema.safeParse(payload);
@@ -26,6 +27,7 @@ describe('signUpSchema', () => {
       phoneNumber: '+1234567890',
       dateOfBirth: '1990-01-01',
       password: 'short',
+      confirmPassword: 'short',
       acceptTerms: true,
     };
     const result = signUpSchema.safeParse(payload);
@@ -39,6 +41,8 @@ describe('signUpSchema', () => {
       email: 'invalid-email',
       phoneNumber: '+1234567890',
       dateOfBirth: '1990-01-01',
+      password: 'StrongPass1',
+      confirmPassword: 'StrongPass1',
       acceptTerms: true,
     };
     const result = signUpSchema.safeParse(payload);
@@ -52,6 +56,8 @@ describe('signUpSchema', () => {
       email: 'john.doe@example.com',
       phoneNumber: '12345',
       dateOfBirth: '1990-01-01',
+      password: 'StrongPass1',
+      confirmPassword: 'StrongPass1',
       acceptTerms: true,
     };
     const result = signUpSchema.safeParse(payload);
@@ -65,6 +71,8 @@ describe('signUpSchema', () => {
       email: 'john.doe@example.com',
       phoneNumber: '+1234567890',
       dateOfBirth: '1990-01-01',
+      password: 'StrongPass1',
+      confirmPassword: 'StrongPass1',
       acceptTerms: false,
     };
     const result = signUpSchema.safeParse(payload);

@@ -30,7 +30,7 @@ describe('PatientDependentsCommands (Functional)', () => {
     });
 
     expect(result.firstName).toBe('Jane');
-    expect(mockSupabase.from).toHaveBeenCalledWith('patient_dependents');
+    expect(mockSupabase.from).toHaveBeenCalledWith('dependents');
   });
 });
 

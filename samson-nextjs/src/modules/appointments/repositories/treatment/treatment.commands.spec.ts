@@ -29,7 +29,7 @@ describe('TreatmentCommands', () => {
     expect(mockUpdate).toHaveBeenCalledWith(
       expect.objectContaining({
         status: 'TREATMENT_RENDERED',
-        status_reason: 'Notes here',
+        clinical_notes: 'Notes here',
       })
     );
   });
@@ -40,6 +40,6 @@ describe('TreatmentCommands', () => {
     const commands = new TreatmentCommands(mockSupabase);
     await expect(
       commands.submitTreatment('appt-123', 'Notes')
-    ).rejects.toThrow('Failed to submit treatment: DB fail');
+    ).rejects.toThrow('Failed to submit treatment status: DB fail');
   });
 });

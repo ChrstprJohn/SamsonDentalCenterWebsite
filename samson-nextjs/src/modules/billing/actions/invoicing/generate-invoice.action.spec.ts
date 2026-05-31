@@ -31,7 +31,7 @@ describe("generateInvoiceAction", () => {
     });
 
     const result = await generateInvoiceAction({
-      appointment_id: "1a95a63c-333e-4b68-98e3-82bdf1a07bd2",
+      appointmentId: "1a95a63c-333e-4b68-98e3-82bdf1a07bd2",
       amount: 900,
       status: "DRAFT",
     });
@@ -43,7 +43,7 @@ describe("generateInvoiceAction", () => {
 
   it("returns a validation error for invalid payloads", async () => {
     const result = await generateInvoiceAction({
-      appointment_id: "appointment-1",
+      appointmentId: "appointment-1",
       amount: -1,
       status: "DRAFT",
     } as never);
