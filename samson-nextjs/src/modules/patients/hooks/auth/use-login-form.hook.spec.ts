@@ -17,6 +17,7 @@ describe('useLoginForm', () => {
       expect.objectContaining({
         defaultValues: {
           email: '',
+          password: '',
         },
       })
     );

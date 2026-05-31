@@ -55,9 +55,12 @@ Build the patient registration and portal login experiences. Collect minimal fie
   - [x] **OTP Verification Screen (`views/otp-verify-view.tsx`)**:
     - Animated code blocks inputs for verification.
     - Displays Resend OTP countdown trigger.
-- [ ] **1.3 Header Authentication Triggers**
-  - [ ] **Authenticated User Header**: Displays dynamic avatar, patient name, and dropdown navigation links to portals.
-  - [ ] **Notification Indicator**: Bell icon next to avatar representing pending items in the User Portal.
+- [x] **1.3 Header Authentication Triggers**
+  - [x] **Authenticated User Header (`components/auth/authenticated-user-header.tsx`)**: Displays dynamic avatar (initials fallback), patient name, chevron toggle, and dropdown navigation links (My Portal, Appointments, Settings, Sign Out). Driven by `hooks/auth/use-auth-header.hook.ts`.
+  - [x] **Notification Indicator (`components/auth/notification-indicator.tsx`)**: Bell icon with animated red badge next to avatar. Shows count (capped at 99+).
+  - [x] **Hook (`hooks/auth/use-auth-header.hook.ts`)**: Controls dropdown open/close state and `getInitials()` helper. Co-located spec `use-auth-header.hook.spec.ts` tests all pure logic paths.
+
+> 📋 **Testing Rule**: Every new hook must have a co-located `.spec.ts` file from day one. Pure logic helpers (like `getInitials`) are unit-tested directly. Trivial `useState` toggles are exempt per the Frontend Testing Guidelines (Section 1B).
 
 ---
 

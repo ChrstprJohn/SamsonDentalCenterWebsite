@@ -11,10 +11,25 @@ describe('signUpSchema', () => {
       email: 'john.doe@example.com',
       phoneNumber: '+1234567890',
       dateOfBirth: '1990-01-01',
+      password: 'StrongPass1',
       acceptTerms: true,
     };
     const result = signUpSchema.safeParse(payload);
     expect(result.success).toBe(true);
+  });
+
+  it('should reject payload with password shorter than 8 characters', () => {
+    const payload = {
+      firstName: 'John',
+      lastName: 'Doe',
+      email: 'john.doe@example.com',
+      phoneNumber: '+1234567890',
+      dateOfBirth: '1990-01-01',
+      password: 'short',
+      acceptTerms: true,
+    };
+    const result = signUpSchema.safeParse(payload);
+    expect(result.success).toBe(false);
   });
 
   it('should reject payload with invalid email format', () => {

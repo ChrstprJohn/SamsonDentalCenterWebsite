@@ -23,6 +23,7 @@ describe('useSignUpForm', () => {
           email: '',
           phoneNumber: '',
           dateOfBirth: '',
+          password: '',
         },
       })
     );
