@@ -42,9 +42,9 @@ Set up the base directories, core configuration, and the Shared UI kernel to ens
 
 Build the patient registration and portal login experiences. Collect minimal fields to ensure a frictionless onboarding process.
 
-- [ ] **1.1 Identity Collection & Schema Setup**
-  - [ ] **Zod Schema & DTO (`src/modules/patients/dtos/sign-up.dto.ts`)**:
-  - [ ] **Form Hook (`src/modules/patients/hooks/use-sign-up-form.hook.ts`)**:
+- [x] **1.1 Identity Collection & Schema Setup**
+  - [x] **Zod Schema & DTO (`src/modules/patients/dtos/auth/sign-up.dto.ts`)**:
+  - [x] **Form Hook (`src/modules/patients/hooks/auth/use-sign-up-form.hook.ts`)**:
     - Patient Fields: First Name (req), Middle Name (opt), Last Name (req), Suffix (opt), Email (req), Phone Number (req, E.164), Date of Birth (req, YYYY-MM-DD).
 - [ ] **1.2 Auth Pages Routing (`src/app/(public)/auth/`)**
   - [ ] **Sign-up page (`views/signup-view.tsx` & `components/signup-form.tsx`)**:
@@ -198,7 +198,8 @@ Ensure perfect visual state boundaries, robust schema validations, and premium E
   - [ ] Hook client boundary views to Server Actions (`actions/*.ts`), returning standard serialized payloads.
   - [ ] Implement the *Server-Action-to-RHF Error Bridge*: standardizing server exceptions and using RHF's `setError` to highlight the invalid inputs.
 - [ ] **8.2 Vitest Component & Hook Unit Testing**
-  - [ ] Unit test custom hooks (`useUserBooking.ts`, `use-sign-up-form.hook.spec.ts`) under simulated error and success states.
+  - [x] Unit test auth hooks (`use-sign-up-form.hook`, `use-login-form.hook`).
+  - [ ] Unit test custom hooks (`useUserBooking.ts`) under simulated error and success states.
   - [ ] Ensure Zod input rules correctly reject bad emails, incorrect E.164 phone formats, or invalid dates.
 - [ ] **8.3 Playwright End-to-End Testing**
   - [ ] Script a full walkthrough flow:
