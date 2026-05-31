@@ -72,46 +72,46 @@ Build the patient registration and portal login experiences. Collect minimal fie
 
 A high-fidelity, visually stunning single-page landing site designed with custom colors, gradients, and micro-animations.
 
-- [ ] **2.1 Main Landing Page (`src/app/(public)/page.tsx`)**
-  - [ ] **Hero Section**: Premium tagline, professional background graphic (or high-quality mock), and a prominent "Book Now" CTA.
-  - [ ] **Services Section**: Interactive cards that dynamically open modular overlay windows detailing the treatment.
-  - [ ] **About Us Section**: Highlighting the team and medical approach.
-  - [ ] **Gallery Section**: Carousel or grid highlighting the modern dental facilities.
-  - [ ] **Contact Section**: Operating hours, interactive maps, and clinic contact info.
-- [ ] **2.2 Navigation & Layout**
-  - [ ] **Sticky Navbar**: Transparent background which transitions to solid backdrop-blur upon scroll, linking sections.
-  - [ ] **Footer Primitive**: Consistent across public/private pages. Contains:
-    - [ ] Terms of Service and Privacy Policy separate pages.
-    - [ ] Contact details (address, phone, email).
-    - [ ] Operating hours (pulled dynamically from clinic config).
-    - [ ] Social links array and Copyright notice.
+- [x] **2.1 Main Landing Page (`src/app/(public)/(marketing)/page.tsx`)**
+  - [x] **Hero Section**: Premium tagline, professional background graphic, and a prominent "Book Now" CTA.
+  - [x] **Services Section**: Interactive cards that dynamically open modular overlay windows detailing the treatment.
+  - [x] **About Us Section**: Highlighting the team and medical approach.
+  - [x] **Gallery Section**: Highlighting the modern dental facilities.
+  - [x] **Contact Section**: Operating hours, contact info, and email inquiry form.
+- [x] **2.2 Navigation & Layout**
+  - [x] **Sticky Navbar**: Transparent background which transitions to solid backdrop-blur upon scroll, linking sections. Swaps with AuthenticatedUserHeader if a session exists.
+  - [x] **Footer Primitive**: Consistent across public/private pages. Contains:
+    - [x] Terms of Service and Privacy Policy separate pages.
+    - [x] Contact details (address, phone, email).
+    - [x] Operating hours (pulled dynamically from clinic config).
+    - [x] Social links array and Copyright notice.
 
 ---
 
 ## 🗓️ Phase 3: Patient Booking Wizard (Booking Domain)
 
-Develop the 4-step interactive wizard inside the `appointments` module using mock-first architecture before live hook integration.
+Develop the 4-step interactive wizard inside the `appointments` module using mock-first architecture.
 
-- [ ] **3.1 Set Up Booking Wizard Shell (`src/modules/appointments/views/booking-view.tsx`)**
-  - [ ] Create parent view tracking step transitions: `Service ➔ Schedule ➔ Details ➔ Review`.
-  - [ ] Establish `useUserBooking.ts` hook for wizard step states and temporary variables.
-- [ ] **3.2 Step 1: Service Selection (`UserServiceStep`)**
-  - [ ] Grid of services showing duration (e.g., 30m, 1h), description, and specialization category.
-- [ ] **3.3 Step 2: Schedule Selection (`DateTimeStep`)**
-  - [ ] Month/Week calendar picker displaying slot availability dynamically.
-  - [ ] **Slot Hold Trigger**: Selecting a slot initiates an optimistic 10-minute database slot hold. Shows a floating circular countdown timer.
-- [ ] **3.4 Step 3: Patient Details (`UserOtherInfoStep`)**
-  - [ ] **Self / Someone Else Selector**:
-    - If "Self", pre-populate and display the authenticated patient info.
-    - If "Someone Else", display the family member (Dependent) panel.
-  - [ ] **Dependent Management Sub-component**:
-    - Let the user select from their registered dependents.
-    - Or click "Add Family Member" to dynamically render a modal form collecting First, Middle, Last Name, Suffix, DOB, Relationship, Sex, and optional clinical notes on-the-fly.
-- [ ] **3.5 Step 4: Review & Submit (`UserReviewStep`)**
-  - [ ] Clear booking summary layout.
-  - [ ] Strict checkbox validation for Terms of Service and Privacy Policy.
-  - [ ] **Abuse Validation Call (`validateAbuse`)**: Captures overlaps, cap limits, and daily quotas prior to submission.
-  - [ ] **Atomic Submission**: Submits wizard payload, invalidates slot holds, and routes to a high-fidelity success confirmation page.
+- [x] **3.1 Set Up Booking Wizard Shell (`src/modules/appointments/views/booking-view.tsx`)**
+  - [x] Create parent view tracking step transitions: `Service ➔ Schedule ➔ Details ➔ Review`.
+  - [x] Establish `useUserBooking.ts` hook for wizard step states and temporary variables.
+- [x] **3.2 Step 1: Service Selection (`UserServiceStep`)**
+  - [x] Grid of services showing duration (e.g., 30m, 1h), description, and specialization category.
+- [x] **3.3 Step 2: Schedule Selection (`DateTimeStep`)**
+  - [x] Month/Week calendar picker displaying slot availability dynamically.
+  - [x] **Slot Hold Trigger**: Selecting a slot initiates an optimistic 10-minute database slot hold. Shows a floating circular countdown timer.
+- [x] **3.4 Step 3: Patient Details (`UserOtherInfoStep`)**
+  - [x] **Self / Someone Else Selector**:
+    - [x] If "Self", pre-populate and display the authenticated patient info.
+    - [x] If "Someone Else", display the family member (Dependent) panel.
+  - [x] **Dependent Management Sub-component**:
+    - [x] Let the user select from their registered dependents.
+    - [x] Or click "Add Family Member" to dynamically render a modal form collecting First, Middle, Last Name, Suffix, DOB, Relationship, Sex, and optional clinical notes on-the-fly.
+- [x] **3.5 Step 4: Review & Submit (`UserReviewStep`)**
+  - [x] Clear booking summary layout.
+  - [x] Strict checkbox validation for Terms of Service and Privacy Policy.
+  - [x] **Abuse Validation Call (`validateAbuse`)**: Captures overlaps, cap limits, and daily quotas prior to submission.
+  - [x] **Atomic Submission**: Submits wizard payload, invalidates slot holds, and routes to a high-fidelity success confirmation page.
 
 ---
 
