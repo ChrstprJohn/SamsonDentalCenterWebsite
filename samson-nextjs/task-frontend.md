@@ -64,7 +64,7 @@ Build the patient registration and portal login experiences. Collect minimal fie
   - [x] **Notification Indicator (`components/auth/notification-indicator.tsx`)**: Bell icon with animated red badge next to avatar. Shows count (capped at 99+).
   - [x] **Hook (`hooks/auth/use-auth-header.hook.ts`)**: Controls dropdown open/close state and `getInitials()` helper. Co-located spec `use-auth-header.hook.spec.ts` tests all pure logic paths.
 
-> 📋 **Testing Rule**: Every new hook must have a co-located `.spec.ts` file from day one. Pure logic helpers (like `getInitials`, digit validation) are unit-tested directly. Trivial `useState` toggles are exempt per the Frontend Testing Guidelines (Section 1B). View components must be backed by a companion hook that is testable in the node environment.
+> 📋 **Testing Rule**: Every new hook must have a co-located `.spec.ts` file from day one. Pure logic helpers (like `getInitials`, digit validation) are unit-tested directly. Trivial `useState` toggles are exempt per the Frontend Testing Guidelines (Section 1B). View components must be backed by a companion hook that is testable in the node environment. Hooks are organized into nested feature-based sub-folders under `hooks/{module}/{feature}/` (e.g. `hooks/auth/login/use-login-form.hook.ts`) to maintain clean namespace grouping.
 
 ---
 

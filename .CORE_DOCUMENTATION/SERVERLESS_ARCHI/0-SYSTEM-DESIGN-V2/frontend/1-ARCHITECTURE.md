@@ -79,9 +79,13 @@ src/
 │   │   │   ├── appointment-list.tsx
 │   │   │   └── booking-card.tsx # 100% dumb: receives props, renders UI
 │   │   │
-│   │   ├── hooks/              # State Machines & React Hook Form Schemas
-│   │   │   ├── use-booking-form.ts          # Zod + RHF + Server Action delegation
-│   │   │   └── use-booking-form-schema.ts   # Zod schema & inferred types
+│   │   ├── hooks/              # State Machines & React Hook Form Schemas (Domain-Module-Feature grouping)
+│   │   │   ├── booking/        # Feature namespace grouping folder
+│   │   │   │   ├── use-booking-form.ts          # Zod + RHF + Server Action delegation
+│   │   │   │   ├── use-booking-form.spec.ts     # Co-located unit tests for hook
+│   │   │   │   ├── use-booking-view.ts          # Orchestrator hook for view
+│   │   │   │   └── use-booking-view.spec.ts     # Co-located unit tests for view hook
+│   │   │   └── use-booking-form-schema.ts   # Zod schema & inferred types (placed flat under hooks/ or in feature folder)
 │   │   │
 │   │   ├── services/           # Technical Infrastructure Clients
 │   │   │   ├── appointments.server.ts  # 'server-only' DB fetchers (Strictly RSC only)
@@ -97,8 +101,10 @@ src/
 │       ├── views/
 │       ├── components/
 │       │   └── payment-summary.tsx
-│       └── hooks/
-│           └── use-payment-summary.ts
+│       └── hooks/              # Organized by Feature namespace
+│           └── payment/
+│               ├── use-payment-summary.ts
+│               └── use-payment-summary.spec.ts
 │
 ├── context/                    # Shared Global State Contexts
 │   └── theme-context.tsx       # Dark/Light mode context
