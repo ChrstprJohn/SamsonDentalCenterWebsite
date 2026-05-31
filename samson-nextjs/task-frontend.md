@@ -8,32 +8,33 @@ This document is the official implementation task list for the Samson Dental fro
 
 Set up the base directories, core configuration, and the Shared UI kernel to ensure unified styling and full type-safety.
 
-- [ ] **0.1 Setup Domain Folders in `src/modules/`**
+- [x] **0.1 Setup Domain Folders in `src/modules/`**
   - Create directory structures for the modules if not already populated:
-    - [ ] `appointments/` (actions, views, components, hooks, services, mocks)
-    - [ ] `billing/` (actions, views, components, hooks, services, mocks)
-    - [ ] `clinic-config/` (actions, views, components, hooks, services, mocks)
-    - [ ] `patients/` (actions, views, components, hooks, services, mocks)
-    - [ ] `services/` (actions, views, components, hooks, services, mocks)
-    - [ ] `staff/` (actions, views, components, hooks, services, mocks)
-    - [ ] `audit-logs/` (actions, views, components, hooks, services, mocks)
-- [ ] **0.2 Shared UI Design System Primitives (`src/components/ui/`)**
+    - [x] `appointments/` (actions, views, components, hooks, services, mocks)
+    - [x] `billing/` (actions, views, components, hooks, services, mocks)
+    - [x] `clinic-config/` (actions, views, components, hooks, services, mocks)
+    - [x] `patients/` (actions, views, components, hooks, services, mocks)
+    - [x] `services/` (actions, views, components, hooks, services, mocks)
+    - [x] `staff/` (actions, views, components, hooks, services, mocks)
+    - [x] `audit-logs/` (actions, views, components, hooks, services, mocks)
+- [x] **0.2 Shared UI Design System Primitives (`src/components/ui/`)**
   - *Constraint: All input primitives must use `React.forwardRef` to bind correctly with `react-hook-form`.*
-  - [ ] **Button (`button.tsx`)**: Premium styled with gradients, glassmorphism hovers, and active micro-animations.
-  - [ ] **Input (`input.tsx`)**: Native wrapper using `React.forwardRef` for standard text, email, date, and phone input styles.
-  - [ ] **Textarea (`textarea.tsx`)**: Native wrapper using `React.forwardRef` for notes.
-  - [ ] **Select (`select.tsx`)**: Dropdown wrapper using `React.forwardRef`.
-  - [ ] **Badge (`badge.tsx`)**: Status pill for appointments and invoices (green for completed, yellow for pending, blue for scheduled, red for cancelled/rejected).
-  - [ ] **Modal (`modal.tsx`)**: Animated premium backdrop-blur modal shell with escape key dismissal.
-  - [ ] **Dropdown & Menu Primitives**: Accessible dropdown wrapper for user profile menus.
-- [ ] **0.3 Core Global Hooks & Layout Utilities (`src/hooks/`)**
-  - [ ] **`use-media-query.ts`**: Hook for screen dimension matching.
-  - [ ] **`use-disclosure.ts`**: Pure controller for dialog/modal open/close states.
-  - [ ] **`use-click-outside.ts`**: Hook to dismiss menus and popovers on clicking elsewhere.
-- [ ] **0.4 Global Theme & Core Providers**
-  - [ ] **`src/context/theme-context.tsx`**: Theme toggle context (Dark/Light mode) supporting elegant dark mode as default.
-  - [ ] **`src/app/layout.tsx`**: Unified root layout with dynamic typography (e.g., Google Font *Outfit* or *Inter*), CSS variables, and global context injection.
-  - [ ] **`src/components/feedback/toast-container.tsx`**: Notification/Toast system for interactive micro-feedback.
+  - [x] **Button (`button.tsx`)**: Premium styled with gradients, glassmorphism hovers, and active micro-animations.
+  - [x] **Input (`input.tsx`)**: Native wrapper using `React.forwardRef` for standard text, email, date, and phone input styles.
+  - [x] **Textarea (`textarea.tsx`)**: Native wrapper using `React.forwardRef` for notes.
+  - [x] **Select (`select.tsx`)**: Dropdown wrapper using `React.forwardRef`.
+  - [x] **Badge (`badge.tsx`)**: Status pill for appointments and invoices (green for completed, yellow for pending, blue for scheduled, red for cancelled/rejected).
+  - [x] **Modal (`modal.tsx`)**: Animated premium backdrop-blur modal shell with escape key dismissal.
+  - [x] **Dropdown & Menu Primitives**: Accessible dropdown wrapper for user profile menus.
+- [x] **0.3 Core Global Hooks & Layout Utilities (`src/hooks/`)**
+  - [x] **`use-media-query.ts`**: Hook for screen dimension matching.
+  - [x] **`use-disclosure.ts`**: Pure controller for dialog/modal open/close states.
+  - [x] **`use-click-outside.ts`**: Hook to dismiss menus and popovers on clicking elsewhere.
+- [x] **0.4 Global Theme & Core Providers**
+  - [x] **`src/context/theme-context.tsx`**: Theme toggle context (Dark/Light mode) supporting elegant dark mode as default.
+  - [x] **`src/app/layout.tsx`**: Unified root layout with dynamic typography (e.g., Google Font *Outfit* or *Inter*), CSS variables, and global context injection.
+  - [x] **`src/components/feedback/toast-container.tsx`**: Notification/Toast system for interactive micro-feedback.
+
 
 ---
 
