@@ -1,15 +1,10 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { NotFoundError } from '@/shared/errors';
-import { StaffProfileDto, mapStaffProfile } from '../../dtos';
+import { StaffProfileDto, staffProfileSchema } from '../../dtos';
 
-export class StaffProfileQueries {
-  constructor(private readonly supabase: SupabaseClient) {}
-
-  /**
-   * Fetches a staff profile by their ID.
-   */
-  async getProfileById(staffId: string): Promise<StaffProfileDto> {
-    const { data: staff, error } = await this.supabase
+export const getProfileByIdQuery = (supabase: SupabaseClient) => {
+  return async (staffId: string): Promise<StaffProfileDto> => {
+    const { data: staff, error } = await supabase
       .from('staff')
       .select('*')
       .eq('id', staffId)
@@ -19,6 +14,15 @@ export class StaffProfileQueries {
       throw new NotFoundError('Staff profile not found.');
     }
 
-    return mapStaffProfile(staff as Record<string, unknown>);
+    return staffProfileSchema.parse(staff);
+  };
+};
+
+// Deprecated class for backwards compatibility
+export class StaffProfileQueries {
+  constructor(private readonly supabase: SupabaseClient) {}
+  async getProfileById(staffId: string): Promise<StaffProfileDto> {
+    return getProfileByIdQuery(this.supabase)(staffId);
   }
 }
+

@@ -8,11 +8,13 @@ vi.mock('@/shared/auth/auth.util');
 vi.mock('@/shared/database/server');
 vi.mock('../../use-cases/profile/terminate-staff.use-case', () => {
     return {
+        terminateStaffUseCase: () => vi.fn().mockResolvedValue({ success: true }),
         TerminateStaffUseCase: class {
             execute = vi.fn().mockResolvedValue({ success: true });
         },
     };
 });
+
 
 describe('terminateStaffAction (Unit Test)', () => {
     beforeEach(() => {

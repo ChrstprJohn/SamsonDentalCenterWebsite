@@ -5,17 +5,17 @@ import { createClient } from '@/shared/database/server';
 import { getAuthenticatedUser } from '@/shared/auth/auth.util';
 import { DomainError } from '@/shared/errors';
 import { registerPatientSchema, RegisterPatientDto } from '../../dtos';
-import { PatientProfileCommands } from '../../repositories';
-import { RegisterPatientUseCase } from '../../use-cases';
+import { createPatientCommand } from '../../repositories';
+import { registerPatientUseCase } from '../../use-cases';
 
 export async function registerPatientAction(formData: RegisterPatientDto) {
   try {
     const validData = registerPatientSchema.parse(formData);
     const user = await getAuthenticatedUser();
     const supabase = await createClient();
-    const patientRepository = new PatientProfileCommands(supabase);
-    const registerPatientUseCase = new RegisterPatientUseCase(patientRepository);
-    const newPatient = await registerPatientUseCase.execute(user.id, validData);
+    const repo = createPatientCommand(supabase);
+    const useCase = registerPatientUseCase(repo);
+    const newPatient = await useCase(user.id, validData);
     return { success: true, data: newPatient };
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -31,3 +31,4 @@ export async function registerPatientAction(formData: RegisterPatientDto) {
     return { success: false, error: 'An unexpected system error occurred' };
   }
 }
+

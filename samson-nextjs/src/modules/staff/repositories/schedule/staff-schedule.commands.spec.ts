@@ -1,9 +1,9 @@
 import { describe, it, expect, vi } from 'vitest';
-import { StaffScheduleCommands } from './staff-schedule.commands';
+import { upsertScheduleCommand } from './staff-schedule.commands';
 import { DomainError } from '@/shared/errors';
 import { DoctorScheduleDto } from '../../dtos/schedule/doctor-schedule.dto';
 
-describe('StaffScheduleCommands', () => {
+describe('StaffScheduleCommands (Functional)', () => {
     const validData: DoctorScheduleDto = {
         doctorId: '123e4567-e89b-12d3-a456-426614174000',
         dayOfWeek: 'MONDAY',
@@ -21,8 +21,8 @@ describe('StaffScheduleCommands', () => {
             single: vi.fn().mockResolvedValue({ data: { id: 'sched_123' }, error: null }),
         };
 
-        const commands = new StaffScheduleCommands(mockSupabase as any);
-        const result = await commands.upsertSchedule(validData);
+        const upsertSchedule = upsertScheduleCommand(mockSupabase as any);
+        const result = await upsertSchedule(validData);
 
         expect(result.id).toBe('sched_123');
         expect(mockSupabase.upsert).toHaveBeenCalledWith(
@@ -43,7 +43,7 @@ describe('StaffScheduleCommands', () => {
             single: vi.fn().mockResolvedValue({ data: null, error: { message: 'DB Error' } }),
         };
 
-        const commands = new StaffScheduleCommands(mockSupabase as any);
-        await expect(commands.upsertSchedule(validData)).rejects.toThrow(DomainError);
+        const upsertSchedule = upsertScheduleCommand(mockSupabase as any);
+        await expect(upsertSchedule(validData)).rejects.toThrow(DomainError);
     });
 });

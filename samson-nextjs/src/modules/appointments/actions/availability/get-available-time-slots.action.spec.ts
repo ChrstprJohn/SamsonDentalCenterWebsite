@@ -1,22 +1,28 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { getAvailableTimeSlotsAction } from './get-available-time-slots.action';
 import { createClient } from '@/shared/database/server';
-import { GetAvailabilityUseCase } from '../../use-cases';
 
 vi.mock('server-only', () => ({}));
 vi.mock('@/shared/database/server');
-vi.mock('../../use-cases/availability/get-availability.use-case');
+
+const { mockGetAvailableTimeSlots } = vi.hoisted(() => {
+  return { mockGetAvailableTimeSlots: vi.fn() };
+});
+
+vi.mock('../../use-cases/availability/get-availability.use-case', () => {
+  return {
+    getAvailabilityUseCase: () => ({
+      getAvailableTimeSlots: mockGetAvailableTimeSlots,
+    }),
+    GetAvailabilityUseCase: class {
+      getAvailableTimeSlots = mockGetAvailableTimeSlots;
+    },
+  };
+});
 
 describe('getAvailableTimeSlotsAction', () => {
-  const mockGetAvailableTimeSlots = vi.fn();
-
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(GetAvailabilityUseCase).mockImplementation(function () {
-      return {
-        getAvailableTimeSlots: mockGetAvailableTimeSlots,
-      } as any;
-    });
   });
 
   it('successfully validates inputs and executes getAvailableTimeSlots', async () => {

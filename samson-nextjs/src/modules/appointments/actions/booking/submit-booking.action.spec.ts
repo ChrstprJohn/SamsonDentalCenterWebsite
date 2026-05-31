@@ -2,24 +2,40 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { submitBookingAction } from './submit-booking.action';
 import { getAuthenticatedUser } from '@/shared/auth/auth.util';
 import { createClient } from '@/shared/database/server';
-import { SubmitBookingUseCase } from '../../use-cases';
 
 vi.mock('server-only', () => ({}));
 vi.mock('@/shared/auth/auth.util');
 vi.mock('@/shared/database/server');
-vi.mock('../../use-cases/availability/get-availability.use-case');
-vi.mock('../../use-cases/booking/submit-booking.use-case');
+
+vi.mock('../../use-cases/availability/get-availability.use-case', () => {
+  return {
+    getAvailabilityUseCase: () => ({
+      getAvailableDays: vi.fn(),
+      getAvailableTimeSlots: vi.fn(),
+    }),
+    GetAvailabilityUseCase: class {
+      getAvailableDays = vi.fn();
+      getAvailableTimeSlots = vi.fn();
+    },
+  };
+});
+
+const { mockSubmitBooking } = vi.hoisted(() => {
+  return { mockSubmitBooking: vi.fn() };
+});
+
+vi.mock('../../use-cases/booking/submit-booking.use-case', () => {
+  return {
+    submitBookingUseCase: () => mockSubmitBooking,
+    SubmitBookingUseCase: class {
+      execute = mockSubmitBooking;
+    },
+  };
+});
 
 describe('submitBookingAction', () => {
-  const mockSubmitBooking = vi.fn();
-
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(SubmitBookingUseCase).mockImplementation(function () {
-      return {
-        execute: mockSubmitBooking,
-      } as any;
-    });
   });
 
   it('successfully validates inputs, resolves auth, and submits booking', async () => {

@@ -3,15 +3,13 @@ import {
   CreateStaffDto,
   StaffProfileDto,
   UpdateStaffDto,
-  mapStaffProfile,
+  staffProfileSchema,
 } from '../../dtos';
 import { DomainError } from '@/shared/errors';
 
-export class StaffProfileCommands {
-  constructor(private readonly supabase: SupabaseClient) {}
-
-  async createStaff(userId: string, data: CreateStaffDto): Promise<StaffProfileDto> {
-    const { data: staff, error } = await this.supabase
+export const createStaffCommand = (supabase: SupabaseClient) => {
+  return async (userId: string, data: CreateStaffDto): Promise<StaffProfileDto> => {
+    const { data: staff, error } = await supabase
       .from('staff')
       .insert({
         id: userId,
@@ -33,10 +31,12 @@ export class StaffProfileCommands {
       );
     }
 
-    return mapStaffProfile(staff as Record<string, unknown>);
-  }
+    return staffProfileSchema.parse(staff);
+  };
+};
 
-  async updateStaff(id: string, data: Partial<UpdateStaffDto>): Promise<StaffProfileDto> {
+export const updateStaffCommand = (supabase: SupabaseClient) => {
+  return async (id: string, data: Partial<UpdateStaffDto>): Promise<StaffProfileDto> => {
     const payload: Record<string, string | null | undefined> = {};
     if (data.email) payload.email = data.email;
     if (data.firstName) payload.first_name = data.firstName;
@@ -46,7 +46,7 @@ export class StaffProfileCommands {
     if (data.role) payload.role = data.role;
     if (data.phoneNumber) payload.phone = data.phoneNumber;
 
-    const { data: staff, error } = await this.supabase
+    const { data: staff, error } = await supabase
       .from('staff')
       .update(payload)
       .eq('id', id)
@@ -60,11 +60,13 @@ export class StaffProfileCommands {
       );
     }
 
-    return mapStaffProfile(staff as Record<string, unknown>);
-  }
+    return staffProfileSchema.parse(staff);
+  };
+};
 
-  async terminateStaff(id: string) {
-    const { error } = await this.supabase.from('staff').delete().eq('id', id);
+export const terminateStaffCommand = (supabase: SupabaseClient) => {
+  return async (id: string) => {
+    const { error } = await supabase.from('staff').delete().eq('id', id);
 
     if (error) {
       throw new DomainError(
@@ -74,5 +76,23 @@ export class StaffProfileCommands {
     }
 
     return { success: true, id };
+  };
+};
+
+// Deprecated class for backwards compatibility
+export class StaffProfileCommands {
+  constructor(private readonly supabase: SupabaseClient) {}
+
+  async createStaff(userId: string, data: CreateStaffDto): Promise<StaffProfileDto> {
+    return createStaffCommand(this.supabase)(userId, data);
+  }
+
+  async updateStaff(id: string, data: Partial<UpdateStaffDto>): Promise<StaffProfileDto> {
+    return updateStaffCommand(this.supabase)(id, data);
+  }
+
+  async terminateStaff(id: string) {
+    return terminateStaffCommand(this.supabase)(id);
   }
 }
+

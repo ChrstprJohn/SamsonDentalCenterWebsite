@@ -9,10 +9,12 @@ vi.mock('@/shared/database/server', () => ({
   createClient: vi.fn().mockResolvedValue({}),
 }));
 vi.mock('../../repositories', () => ({
+  deactivateUserCommand: () => vi.fn().mockResolvedValue(true),
   UserManagementCommands: class {
     deactivateUser = vi.fn().mockResolvedValue(true);
   }
 }));
+
 
 describe('deactivateUserAction', () => {
   it('should deactivate user and return success', async () => {

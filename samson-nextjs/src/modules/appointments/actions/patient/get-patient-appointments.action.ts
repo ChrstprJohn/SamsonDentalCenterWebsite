@@ -3,8 +3,8 @@
 import { createClient } from '@/shared/database/server';
 import { getAuthenticatedUser } from '@/shared/auth/auth.util';
 import { DomainError } from '@/shared/errors';
-import { PatientAppointmentsQueries } from '../../repositories';
-import { GetPatientAppointmentsUseCase } from '../../use-cases';
+import { getAppointmentsByUserQuery } from '../../repositories';
+import { getPatientAppointmentsUseCase } from '../../use-cases';
 
 /**
  * Retrieves all appointments for the currently logged-in patient.
@@ -14,10 +14,9 @@ export async function getPatientAppointmentsAction() {
     const user = await getAuthenticatedUser();
     const supabase = await createClient();
 
-    const patientQueries = new PatientAppointmentsQueries(supabase);
-    const useCase = new GetPatientAppointmentsUseCase(patientQueries);
+    const useCase = getPatientAppointmentsUseCase(getAppointmentsByUserQuery(supabase));
 
-    const appointments = await useCase.execute(user.id);
+    const appointments = await useCase(user.id);
     return { success: true, data: appointments };
   } catch (error) {
     if (error instanceof DomainError) {

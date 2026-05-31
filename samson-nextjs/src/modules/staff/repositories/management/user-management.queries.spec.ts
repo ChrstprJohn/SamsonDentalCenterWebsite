@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
-import { UserManagementQueries } from './user-management.queries';
+import { getAllUsersQuery } from './user-management.queries';
 
-describe('UserManagementQueries', () => {
+describe('UserManagementQueries (Functional)', () => {
   it('should get all users', async () => {
     const mockSupabase = {
       from: vi.fn().mockReturnThis(),
@@ -13,8 +13,8 @@ describe('UserManagementQueries', () => {
       }),
     } as any;
 
-    const queries = new UserManagementQueries(mockSupabase);
-    const result = await queries.getAllUsers({ search: 'John' });
+    const getAllUsers = getAllUsersQuery(mockSupabase);
+    const result = await getAllUsers({ search: 'John' });
 
     expect(result.length).toBe(1);
     expect(result[0].id).toBe('123');
@@ -30,9 +30,10 @@ describe('UserManagementQueries', () => {
       }),
     } as any;
 
-    const queries = new UserManagementQueries(mockSupabase);
-    const result = await queries.getAllUsers({});
+    const getAllUsers = getAllUsersQuery(mockSupabase);
+    const result = await getAllUsers({});
 
     expect(result.length).toBe(1);
   });
 });
+

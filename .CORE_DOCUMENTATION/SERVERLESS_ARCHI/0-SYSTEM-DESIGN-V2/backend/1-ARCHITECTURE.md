@@ -212,7 +212,7 @@ Your pure business logic (`use-cases/`) shouldn't know anything about HTTP statu
 
 * **Input DTOs**: Use Zod schemas to validate incoming `FormData` or JSON *before* they hit the pure business logic in a Server Action. The schema and the inferred type must both be exported from the same file.
 
-* **Output DTOs (Response Shape)**: **Never** return raw database rows to the client. Define a dedicated `*-response.dto.ts` file with a Zod schema that defines exactly what the module exposes. Strip all sensitive or internal fields at this boundary.
+* **Output DTOs (Response Shape)**: **Never** return raw database rows to the client. Define a dedicated `*-response.dto.ts` file with a Zod schema that defines exactly what the module exposes. Use Zod's `.transform()` pipeline to convert database `snake_case` fields to application `camelCase` fields directly in the schema. Strip all sensitive or internal fields at this boundary.
 
 * **Derivation is allowed**: An `update-*.dto.ts` may import from its matching `create-*.dto.ts` to extend or `.partial()` it — but it must still live in its own file:
   ```ts
@@ -238,7 +238,7 @@ All filenames within a module must use **kebab-case** with double extensions ind
   - *Yes*: `durationMinutes`, `serviceType`, `isActive`, `appointmentId`.
   - *No*: `duration_minutes`, `service_type`, `is_active`, `appointment_id`.
 - **Database & Supabase Payload Boundaries**: The database naturally uses `snake_case`. Mappers must bridge the gap.
-  - Each response DTO must expose a mapper function (`mapXRecord`) that translates DB `snake_case` payloads to the strictly typed `camelCase` DTO interface.
+  - Use a single Zod schema with `.transform()` to bridge the database-to-application gap. The validation schema handles the mapping.
   - Banish direct use of raw DB types in use-cases and controllers.
 
 #### 3. Zod Schema & Types Naming
@@ -247,18 +247,18 @@ All filenames within a module must use **kebab-case** with double extensions ind
 
 #### 4. Architectural Component Conventions
 
-##### Use Cases
+##### Use Cases (Functional Pipeline)
 - **Filenames**: `[operation].use-case.ts` (e.g. `register-patient.use-case.ts`)
-- **Export Pattern**: Export a single `camelCase` function matching the filename (e.g. `export const registerPatientUseCase = ...`).
+- **Export Pattern**: Export a single `camelCase` async function closure matching the filename that accepts dependencies as arguments.
 
 ##### Server Actions
 - **Filenames**: `[operation].action.ts` (e.g. `submit-booking.action.ts`)
 - **Export Pattern**: Export a single `camelCase` function ending in `Action` (e.g. `export const submitBookingAction = ...`). Server Actions must contain the `'use server';` directive at the top of the file.
 
-##### Repositories (CQRS separation)
+##### Repositories (CQRS separation & Functional DI)
 - **Filenames**: `[resource].queries.ts` (for reads) or `[resource].commands.ts` (for writes/mutations).
-- **Export Pattern**: Export individual `camelCase` query/command functions (e.g. `export const getClinicAppointments = ...`, `export const createInvoice = ...`).
-- **Data Boundary**: Every repository function returning data must invoke the matching DTO mapper at the repository boundary, ensuring that all upstream components (Use Cases, Actions, UI) receive standard `camelCase` objects.
+- **Export Pattern**: Export individual functional query/command closures that accept the database client as a parameter (e.g., `export const getClinicAppointments = (supabase: SupabaseClient) => async (...) => { ... }`).
+- **Data Boundary**: Every repository query returning data must parse its raw database payloads directly through the matching unified Zod conversion schema using `.parse()`, ensuring that all upstream components receive standard `camelCase` objects.
 
 ---
 
@@ -275,11 +275,11 @@ All filenames within a module must use **kebab-case** with double extensions ind
 3. **Build features inside Domain Modules** (`src/modules/*`).
 4. **Wire the UI (`app/`) to the Modules** by importing Facades into your React Server Components (for data fetching) or calling Server Actions (for mutations).
 5. **Export ONLY Facades** via `index.ts` (with the exception of `actions/` files which must be imported directly). No module is allowed to reach directly into another module's `repositories/` or `utils/` files.
-6. **Implement orchestrators** for cross‑domain workflows.  
+6. **Implement orchestrators** for cross‑domain workflows, passing database clients as arguments to functional use-cases (Functional DI).
 
 Following these steps will keep the Samson Dental codebase **modular, clean, secure, and easy to extend** as new features are added.
 
 ---
 
-*Document version: 2.2 (Next.js Edition) – last updated 2026‑05‑30*  
-*v2.2 changes: Documented strict coding templates and blueprints. Formalized DRY database mapping helper guidelines and mapped boundary examples across all architectural layers.*
+*Document version: 3.0 (Functional & Zod Transformation Edition) – last updated 2026‑05‑31*  
+*v3.0 changes: Deprecated class-based OOP patterns and manual mappers in favor of pure functional closures and Zod `.transform()` pipelines.*

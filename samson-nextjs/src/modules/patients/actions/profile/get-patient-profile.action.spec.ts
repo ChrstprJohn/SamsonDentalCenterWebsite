@@ -8,17 +8,25 @@ import { NotFoundError } from '@/shared/errors';
 vi.mock('server-only', () => ({}));
 vi.mock('@/shared/auth/auth.util');
 vi.mock('@/shared/database/server');
-vi.mock('../../use-cases/profile/get-patient-profile.use-case');
+const { mockExecute } = vi.hoisted(() => {
+  return { mockExecute: vi.fn() };
+});
+
+vi.mock('../../use-cases/profile/get-patient-profile.use-case', () => {
+  return {
+    getPatientProfileUseCase: () => mockExecute,
+    GetPatientProfileUseCase: class {
+      execute = mockExecute;
+    },
+  };
+});
 
 describe('getPatientProfileAction', () => {
-  const mockExecute = vi.fn();
-
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(GetPatientProfileUseCase).mockImplementation(function () {
-      return { execute: mockExecute } as any;
-    });
   });
+
+
 
   it('successfully fetches patient profile for authenticated user', async () => {
     const mockUser = { id: 'patient_123' };

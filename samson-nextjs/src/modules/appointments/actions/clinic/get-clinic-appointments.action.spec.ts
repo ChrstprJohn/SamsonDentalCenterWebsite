@@ -2,24 +2,28 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { getClinicAppointmentsAction } from './get-clinic-appointments.action';
 import { authorizeRole } from '@/shared/auth/auth.util';
 import { createClient } from '@/shared/database/server';
-import { GetClinicAppointmentsUseCase } from '../../use-cases';
 import { UnauthorizedError } from '@/shared/errors';
 
 vi.mock('server-only', () => ({}));
 vi.mock('@/shared/auth/auth.util');
 vi.mock('@/shared/database/server');
-vi.mock('../../use-cases/clinic/get-clinic-appointments.use-case');
+
+const { mockGetClinicAppointments } = vi.hoisted(() => {
+  return { mockGetClinicAppointments: vi.fn() };
+});
+
+vi.mock('../../use-cases/clinic/get-clinic-appointments.use-case', () => {
+  return {
+    getClinicAppointmentsUseCase: () => mockGetClinicAppointments,
+    GetClinicAppointmentsUseCase: class {
+      execute = mockGetClinicAppointments;
+    },
+  };
+});
 
 describe('getClinicAppointmentsAction', () => {
-  const mockGetClinicAppointments = vi.fn();
-
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(GetClinicAppointmentsUseCase).mockImplementation(function () {
-      return {
-        execute: mockGetClinicAppointments,
-      } as any;
-    });
     vi.mocked(createClient).mockResolvedValue({} as any);
   });
 

@@ -62,16 +62,18 @@ These modules are smaller or foundational, making them good starting points to e
 These modules contain the primary entities and have slightly more complex relationships.
 
 ### 4. `staff` Module
-- [ ] **DTOs**: Rewrite `staff-profile.dto.ts` and related DTOs to use `.transform()`. Update `.spec.ts`.
-- [ ] **Repositories**: Refactor `staff-profile`, `staff-schedule`, `user-management`, and `doctor-services` queries and commands to functional closures.
-- [ ] **Use Cases**: Refactor all use-cases in `profile`, `schedule`, and `management` subfolders to functional closures.
-- [ ] **Server Actions**: Update all server actions in `staff/actions/` to use functional DI.
+- [x] **DTOs**: Rewrite `staff-profile.dto.ts` and related DTOs to use `.transform()`. Update `.spec.ts`.
+- [x] **Repositories**: Refactor `staff-profile`, `staff-schedule`, `user-management`, and `doctor-services` queries and commands to functional closures.
+- [x] **Use Cases**: Refactor all use-cases in `profile`, `schedule`, and `management` subfolders to functional closures.
+- [x] **Server Actions**: Update all server actions in `staff/actions/` to use functional DI.
+
 
 ### 5. `patients` Module
-- [ ] **DTOs**: Rewrite `patient-profile.dto.ts` and `dependent-profile.dto.ts` to use `.transform()`. Update `.spec.ts`.
-- [ ] **Repositories**: Refactor `patient-profile` and `patient-dependents` queries and commands to functional closures.
-- [ ] **Use Cases**: Refactor all use-cases in `profile` and `dependents` subfolders to functional closures.
-- [ ] **Server Actions**: Update all server actions in `patients/actions/` to use functional DI.
+- [x] **DTOs**: Rewrite `patient-profile.dto.ts` and `dependent-profile.dto.ts` to use `.transform()`. Update `.spec.ts`.
+- [x] **Repositories**: Refactor `patient-profile` and `patient-dependents` queries and commands to functional closures.
+- [x] **Use Cases**: Refactor all use-cases in `profile` and `dependents` subfolders to functional closures.
+- [x] **Server Actions**: Update all server actions in `patients/actions/` to use functional DI.
+
 
 ---
 
@@ -79,20 +81,20 @@ These modules contain the primary entities and have slightly more complex relati
 These modules depend heavily on the other modules and manage complex state.
 
 ### 6. `appointments` Module
-- [ ] **DTOs**: Rewrite all response DTOs in `booking`, `status`, `clinic`, `patient`, and `availability` to use `.transform()`. Update `.spec.ts`.
-- [ ] **Repositories**: Refactor all command/query repositories in `appointments/repositories/` to functional closures.
-- [ ] **Use Cases**: Refactor all use-cases in `appointments/use-cases/` to functional closures.
-- [ ] **Server Actions**: Update all server actions in `appointments/actions/` to use functional DI.
+- [x] **DTOs**: Rewrite all response DTOs in `booking`, `status`, `clinic`, `patient`, and `availability` to use `.transform()`. Update `.spec.ts`.
+- [x] **Repositories**: Refactor all command/query repositories in `appointments/repositories/` to functional closures.
+- [x] **Use Cases**: Refactor all use-cases in `appointments/use-cases/` to functional closures.
+- [x] **Server Actions**: Update all server actions in `appointments/actions/` to use functional DI.
 
 ### 7. `billing` Module
-- [ ] **DTOs**: Rewrite `invoice-response.dto.ts` to use `.transform()`. Update `.spec.ts`.
-- [ ] **Repositories**: Refactor `invoice.queries.ts` and `invoice.commands.ts` to functional closures.
-- [ ] **Use Cases**: Refactor `generate-invoice`, `update-invoice`, `finalize-invoice`, and `get-invoices` use-cases to functional closures.
-- [ ] **Server Actions**: Update all server actions in `billing/actions/` to use functional DI.
+- [x] **DTOs**: Rewrite `invoice-response.dto.ts` to use `.transform()`. Update `.spec.ts`.
+- [x] **Repositories**: Refactor `invoice.queries.ts` and `invoice.commands.ts` to functional closures.
+- [x] **Use Cases**: Refactor `generate-invoice`, `update-invoice`, `finalize-invoice`, and `get-invoices` use-cases to functional closures.
+- [x] **Server Actions**: Update all server actions in `billing/actions/` to use functional DI.
 
 ---
 
 ## Phase 4: Final Cleanup & Shared Logic
-- [ ] **Global Utils Review**: Search `src/shared/utils/` for unused mapping helpers (`stringValue`, `numberValue`, `booleanValue`, `nullableStringValue`). Delete them if no longer referenced.
-- [ ] **Cross-Module Orchestrators**: Verify that any orchestrators in `src/orchestrators/` successfully use the new functional DI patterns.
-- [ ] **E2E / Integration Verification**: Run all test suites to confirm total system stability.
+- [x] **Global Utils Review**: Search `src/shared/utils/` for unused mapping helpers (`stringValue`, `numberValue`, `booleanValue`, `nullableStringValue`). Delete them if no longer referenced.
+- [x] **Cross-Module Orchestrators**: Verify that any orchestrators in `src/orchestrators/` successfully use the new functional DI patterns.
+- [x] **E2E / Integration Verification**: Run all test suites to confirm total system stability.

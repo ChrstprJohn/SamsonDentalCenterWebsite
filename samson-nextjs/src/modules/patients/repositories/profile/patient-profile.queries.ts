@@ -1,15 +1,10 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { NotFoundError } from '@/shared/errors';
-import { PatientProfileDto, mapPatientProfile } from '../../dtos';
+import { PatientProfileDto, patientProfileSchema } from '../../dtos';
 
-export class PatientProfileQueries {
-  constructor(private readonly supabase: SupabaseClient) {}
-
-  /**
-   * Fetches a patient profile by their ID.
-   */
-  async getProfileById(patientId: string): Promise<PatientProfileDto> {
-    const { data: patient, error } = await this.supabase
+export const getPatientProfileByIdQuery = (supabase: SupabaseClient) => {
+  return async (patientId: string): Promise<PatientProfileDto> => {
+    const { data: patient, error } = await supabase
       .from('patients')
       .select('*')
       .eq('id', patientId)
@@ -19,6 +14,15 @@ export class PatientProfileQueries {
       throw new NotFoundError('Patient profile not found.');
     }
 
-    return mapPatientProfile(patient as Record<string, unknown>);
+    return patientProfileSchema.parse(patient);
+  };
+};
+
+// Deprecated class for backwards compatibility
+export class PatientProfileQueries {
+  constructor(private readonly supabase: SupabaseClient) {}
+  async getProfileById(patientId: string): Promise<PatientProfileDto> {
+    return getPatientProfileByIdQuery(this.supabase)(patientId);
   }
 }
+

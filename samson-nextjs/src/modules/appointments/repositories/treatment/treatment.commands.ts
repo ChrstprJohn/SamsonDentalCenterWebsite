@@ -1,14 +1,9 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { DomainError } from '@/shared/errors';
 
-export class TreatmentCommands {
-  constructor(private readonly supabase: SupabaseClient) {}
-
-  /**
-   * Updates an appointment's status to TREATMENT_RENDERED and saves the clinical notes.
-   */
-  async submitTreatment(appointmentId: string, clinicalNotes?: string | null): Promise<boolean> {
-    const { error } = await this.supabase
+export const submitTreatmentCommand = (supabase: SupabaseClient) => {
+  return async (appointmentId: string, clinicalNotes?: string | null): Promise<boolean> => {
+    const { error } = await supabase
       .from('appointments')
       .update({
         status: 'TREATMENT_RENDERED',
@@ -25,5 +20,17 @@ export class TreatmentCommands {
     }
 
     return true;
+  };
+};
+
+/** @deprecated Use functional commands directly instead */
+export class TreatmentCommands {
+  constructor(private readonly supabase: SupabaseClient) {}
+
+  /**
+   * Updates an appointment's status to TREATMENT_RENDERED and saves the clinical notes.
+   */
+  async submitTreatment(appointmentId: string, clinicalNotes?: string | null): Promise<boolean> {
+    return submitTreatmentCommand(this.supabase)(appointmentId, clinicalNotes);
   }
 }

@@ -5,8 +5,8 @@ import { createClient } from '@/shared/database/server';
 import { authorizeRole } from '@/shared/auth/auth.util';
 import { DomainError } from '@/shared/errors';
 import { staffUpdateAppointmentStatusSchema, StaffUpdateAppointmentStatusDto } from '../../dtos';
-import { AppointmentStatusCommands } from '../../repositories';
-import { UpdateAppointmentStatusUseCase } from '../../use-cases';
+import { getAppointmentByIdQuery, updateStatusCommand, incrementUserCredibilityMetricCommand } from '../../repositories';
+import { updateAppointmentStatusUseCase } from '../../use-cases';
 
 /**
  * Updates an appointment status on behalf of a clinic staff member.
@@ -20,8 +20,11 @@ export async function updateAppointmentStatusAction(formData: StaffUpdateAppoint
     const validData = staffUpdateAppointmentStatusSchema.parse(formData);
     const supabase = await createClient();
 
-    const statusCommands = new AppointmentStatusCommands(supabase);
-    const useCase = new UpdateAppointmentStatusUseCase(statusCommands);
+    const useCase = updateAppointmentStatusUseCase({
+      getAppointmentById: getAppointmentByIdQuery(supabase),
+      updateStatus: updateStatusCommand(supabase),
+      incrementUserCredibilityMetric: incrementUserCredibilityMetricCommand(supabase),
+    });
 
     // Format optional reschedule metadata
     const rescheduleMetadata =
@@ -34,7 +37,7 @@ export async function updateAppointmentStatusAction(formData: StaffUpdateAppoint
           }
         : undefined;
 
-    const result = await useCase.execute(
+    const result = await useCase(
       validData.appointmentId,
       validData.status,
       validData.statusReason || undefined,

@@ -2,15 +2,9 @@ import { SupabaseClient } from '@supabase/supabase-js';
 import { DomainError } from '@/shared/errors';
 import { SubmitBookingDto, AppointmentDto, mapAppointmentRecord } from '../../dtos';
 
-export class AppointmentBookingCommands {
-  constructor(private readonly supabase: SupabaseClient) {}
-
-  /**
-   * Strictly creates a new appointment request from the booking wizard.
-   * Maps properties to snake_case database columns.
-   */
-  async createAppointment(userId: string, data: SubmitBookingDto): Promise<AppointmentDto> {
-    const { data: appointment, error } = await this.supabase
+export const createAppointmentCommand = (supabase: SupabaseClient) => {
+  return async (userId: string, data: SubmitBookingDto): Promise<AppointmentDto> => {
+    const { data: appointment, error } = await supabase
       .from('appointments')
       .insert({
         user_id: userId,
@@ -44,5 +38,18 @@ export class AppointmentBookingCommands {
     }
 
     return mapAppointmentRecord(appointment as Record<string, unknown>);
+  };
+};
+
+/** @deprecated Use functional commands directly instead */
+export class AppointmentBookingCommands {
+  constructor(private readonly supabase: SupabaseClient) {}
+
+  /**
+   * Strictly creates a new appointment request from the booking wizard.
+   * Maps properties to snake_case database columns.
+   */
+  async createAppointment(userId: string, data: SubmitBookingDto): Promise<AppointmentDto> {
+    return createAppointmentCommand(this.supabase)(userId, data);
   }
 }

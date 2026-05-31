@@ -3,17 +3,12 @@ import { DomainError } from '@/shared/errors';
 import {
   RegisterPatientDto,
   PatientProfileDto,
-  mapPatientProfile,
+  patientProfileSchema,
 } from '../../dtos';
 
-export class PatientProfileCommands {
-  constructor(private readonly supabase: SupabaseClient) {}
-
-  /**
-   * Registers a new patient record in the database.
-   */
-  async createPatient(userId: string, data: RegisterPatientDto): Promise<PatientProfileDto> {
-    const { data: patient, error } = await this.supabase
+export const createPatientCommand = (supabase: SupabaseClient) => {
+  return async (userId: string, data: RegisterPatientDto): Promise<PatientProfileDto> => {
+    const { data: patient, error } = await supabase
       .from('patients')
       .insert({
         id: userId,
@@ -33,6 +28,15 @@ export class PatientProfileCommands {
       );
     }
 
-    return mapPatientProfile(patient as Record<string, unknown>);
+    return patientProfileSchema.parse(patient);
+  };
+};
+
+// Deprecated class for backwards compatibility
+export class PatientProfileCommands {
+  constructor(private readonly supabase: SupabaseClient) {}
+  async createPatient(userId: string, data: RegisterPatientDto): Promise<PatientProfileDto> {
+    return createPatientCommand(this.supabase)(userId, data);
   }
 }
+

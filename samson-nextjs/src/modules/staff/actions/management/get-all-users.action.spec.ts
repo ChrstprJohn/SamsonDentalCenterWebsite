@@ -9,10 +9,12 @@ vi.mock('@/shared/database/server', () => ({
   createClient: vi.fn().mockResolvedValue({}),
 }));
 vi.mock('../../repositories', () => ({
+  getAllUsersQuery: () => vi.fn().mockResolvedValue([{ id: 'user1' }]),
   UserManagementQueries: class {
     getAllUsers = vi.fn().mockResolvedValue([{ id: 'user1' }]);
   }
 }));
+
 
 describe('getAllUsersAction', () => {
   it('should get users and return success', async () => {

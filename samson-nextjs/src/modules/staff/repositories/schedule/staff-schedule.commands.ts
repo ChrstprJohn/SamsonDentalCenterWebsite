@@ -2,10 +2,8 @@ import { SupabaseClient } from '@supabase/supabase-js';
 import { DoctorScheduleDto, DayOfWeekMap } from '../../dtos';
 import { DomainError } from '@/shared/errors';
 
-export class StaffScheduleCommands {
-    constructor(private readonly supabase: SupabaseClient) {}
-
-    async upsertSchedule(data: DoctorScheduleDto) {
+export const upsertScheduleCommand = (supabase: SupabaseClient) => {
+    return async (data: DoctorScheduleDto) => {
         // Upsert based on doctor_id and day_of_week
         const payload = {
             doctor_id: data.doctorId,
@@ -16,7 +14,7 @@ export class StaffScheduleCommands {
             break_end_time: data.breakEndTime || null,
         };
 
-        const { data: schedule, error } = await this.supabase
+        const { data: schedule, error } = await supabase
             .from('doctor_schedules')
             .upsert(payload, { onConflict: 'doctor_id,day_of_week' })
             .select('*')
@@ -30,5 +28,13 @@ export class StaffScheduleCommands {
         }
 
         return schedule;
+    };
+};
+
+// Deprecated class for backwards compatibility
+export class StaffScheduleCommands {
+    constructor(private readonly supabase: SupabaseClient) {}
+    async upsertSchedule(data: DoctorScheduleDto) {
+        return upsertScheduleCommand(this.supabase)(data);
     }
-}
+}

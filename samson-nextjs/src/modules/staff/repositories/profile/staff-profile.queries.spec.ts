@@ -1,10 +1,9 @@
-﻿import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { StaffProfileQueries } from './staff-profile.queries';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { getProfileByIdQuery } from './staff-profile.queries';
 import { NotFoundError } from '@/shared/errors';
 
-describe('StaffProfileQueries', () => {
+describe('StaffProfileQueries (Functional)', () => {
   let mockSupabase: any;
-  let queries: StaffProfileQueries;
 
   beforeEach(() => {
     mockSupabase = {
@@ -13,7 +12,6 @@ describe('StaffProfileQueries', () => {
       eq: vi.fn().mockReturnThis(),
       single: vi.fn(),
     };
-    queries = new StaffProfileQueries(mockSupabase as any);
   });
 
   it('should throw NotFoundError if staff profile does not exist', async () => {
@@ -21,13 +19,14 @@ describe('StaffProfileQueries', () => {
     mockSupabase.single.mockResolvedValue({ data: null, error: { message: 'Not found' } });
 
     // 2 & 3. Act & Assert
-    await expect(queries.getProfileById('123')).rejects.toThrow(NotFoundError);
+    const getProfileById = getProfileByIdQuery(mockSupabase as any);
+    await expect(getProfileById('123e4567-e89b-12d3-a456-426614174000')).rejects.toThrow(NotFoundError);
   });
 
   it('should return staff data if found', async () => {
     // 1. Arrange
     const mockStaff = {
-      id: '123',
+      id: '123e4567-e89b-12d3-a456-426614174000',
       email: 'john@samson.com',
       first_name: 'John',
       last_name: 'Smith',
@@ -36,11 +35,12 @@ describe('StaffProfileQueries', () => {
     mockSupabase.single.mockResolvedValue({ data: mockStaff, error: null });
 
     // 2. Act
-    const result = await queries.getProfileById('123');
+    const getProfileById = getProfileByIdQuery(mockSupabase as any);
+    const result = await getProfileById('123e4567-e89b-12d3-a456-426614174000');
 
     // 3. Assert
     expect(result).toEqual({
-      id: '123',
+      id: '123e4567-e89b-12d3-a456-426614174000',
       email: 'john@samson.com',
       firstName: 'John',
       middleName: null,
@@ -54,3 +54,4 @@ describe('StaffProfileQueries', () => {
     expect(mockSupabase.from).toHaveBeenCalledWith('staff');
   });
 });
+

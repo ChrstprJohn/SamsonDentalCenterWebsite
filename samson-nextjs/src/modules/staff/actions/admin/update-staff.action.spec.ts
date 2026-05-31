@@ -8,11 +8,13 @@ vi.mock('@/shared/auth/auth.util');
 vi.mock('@/shared/database/server');
 vi.mock('../../use-cases/profile/update-staff.use-case', () => {
     return {
+        updateStaffUseCase: () => vi.fn().mockResolvedValue({ id: '123' }),
         UpdateStaffUseCase: class {
             execute = vi.fn().mockResolvedValue({ id: '123' });
         },
     };
 });
+
 
 describe('updateStaffAction (Unit Test)', () => {
     beforeEach(() => {

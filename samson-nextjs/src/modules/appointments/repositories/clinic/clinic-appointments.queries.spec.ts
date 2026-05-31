@@ -17,13 +17,18 @@ describe('ClinicAppointmentsQueries', () => {
 
   describe('getAppointmentsByClinic', () => {
     it('should fetch all appointments without filters', async () => {
-      const mockData = [{ id: '1' }];
+      const mockData = [{
+        id: '1a95a63c-333e-4b68-98e3-82bdf1a07bd2',
+        service_id: '2a95a63c-333e-4b68-98e3-82bdf1a07bd2',
+        doctor_id: '3a95a63c-333e-4b68-98e3-82bdf1a07bd2',
+        status: 'PENDING'
+      }];
       mockSupabase.order = vi.fn().mockReturnValue(Promise.resolve({ data: mockData, error: null }));
 
       const result = await queries.getAppointmentsByClinic();
 
       expect(mockSupabase.from).toHaveBeenCalledWith('appointments');
-      expect(result).toEqual([expect.objectContaining({ id: '1' })]);
+      expect(result).toEqual([expect.objectContaining({ id: '1a95a63c-333e-4b68-98e3-82bdf1a07bd2' })]);
     });
 
     it('should apply filters correctly', async () => {

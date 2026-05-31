@@ -1,14 +1,11 @@
 import { describe, it, expect, vi } from 'vitest';
-import { UpdateDoctorScheduleUseCase } from './update-doctor-schedule.use-case';
-import { StaffScheduleCommands } from '../../repositories/schedule/staff-schedule.commands';
+import { updateDoctorScheduleUseCase } from './update-doctor-schedule.use-case';
 
-describe('UpdateDoctorScheduleUseCase', () => {
+describe('UpdateDoctorScheduleUseCase (Functional)', () => {
     it('calls the repository to upsert schedule', async () => {
-        const mockCommands = {
-            upsertSchedule: vi.fn().mockResolvedValue({ id: 'sched_1' }),
-        } as unknown as StaffScheduleCommands;
+        const mockUpsertSchedule = vi.fn().mockResolvedValue({ id: 'sched_1' });
 
-        const useCase = new UpdateDoctorScheduleUseCase(mockCommands);
+        const execute = updateDoctorScheduleUseCase(mockUpsertSchedule);
 
         const req = {
             doctorId: 'doc_1',
@@ -17,9 +14,9 @@ describe('UpdateDoctorScheduleUseCase', () => {
             endTime: '17:00',
         } as any;
 
-        const result = await useCase.execute(req);
+        const result = await execute(req);
 
-        expect(mockCommands.upsertSchedule).toHaveBeenCalledWith(req);
+        expect(mockUpsertSchedule).toHaveBeenCalledWith(req);
         expect(result.id).toBe('sched_1');
     });
 });

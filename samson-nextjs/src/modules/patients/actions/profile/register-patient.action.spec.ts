@@ -8,18 +8,25 @@ import { RegisterPatientUseCase } from '../../use-cases';
 vi.mock('server-only', () => ({}));
 vi.mock('@/shared/auth/auth.util');
 vi.mock('@/shared/database/server');
-vi.mock('../../use-cases/profile/register-patient.use-case');
+const { mockExecute } = vi.hoisted(() => {
+  return { mockExecute: vi.fn() };
+});
+
+vi.mock('../../use-cases/profile/register-patient.use-case', () => {
+  return {
+    registerPatientUseCase: () => mockExecute,
+    RegisterPatientUseCase: class {
+      execute = mockExecute;
+    },
+  };
+});
 
 describe('registerPatientAction', () => {
-    const mockExecute = vi.fn();
-
     beforeEach(() => {
         vi.clearAllMocks();
-        // Inject the mock into the constructor using a standard function so 'new' works
-        vi.mocked(RegisterPatientUseCase).mockImplementation(function () {
-            return { execute: mockExecute } as any;
-        });
     });
+
+
 
     it('successfully validates data, resolves auth, and executes the use-case', async () => {
         // Arrange

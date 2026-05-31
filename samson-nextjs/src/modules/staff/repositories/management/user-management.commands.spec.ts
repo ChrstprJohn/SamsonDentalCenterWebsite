@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
-import { UserManagementCommands } from './user-management.commands';
+import { deactivateUserCommand } from './user-management.commands';
 
-describe('UserManagementCommands', () => {
+describe('UserManagementCommands (Functional)', () => {
   it('should deactivate user', async () => {
     const mockSupabase = {
       from: vi.fn().mockReturnThis(),
@@ -9,10 +9,11 @@ describe('UserManagementCommands', () => {
       eq: vi.fn().mockResolvedValue({ error: null }),
     } as any;
 
-    const commands = new UserManagementCommands(mockSupabase);
-    const result = await commands.deactivateUser('123', 'Testing');
+    const deactivateUser = deactivateUserCommand(mockSupabase);
+    const result = await deactivateUser('123', 'Testing');
 
     expect(result).toBe(true);
     expect(mockSupabase.from).toHaveBeenCalledWith('profiles');
   });
 });
+

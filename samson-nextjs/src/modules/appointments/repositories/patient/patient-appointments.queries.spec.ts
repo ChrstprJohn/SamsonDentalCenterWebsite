@@ -18,7 +18,13 @@ describe('PatientAppointmentsQueries', () => {
 
   describe('getAppointmentsByUser', () => {
     it('should fetch appointments for a specific user', async () => {
-      const mockData = [{ id: '1', start_time: '2023-10-10' }];
+      const mockData = [{
+        id: '1a95a63c-333e-4b68-98e3-82bdf1a07bd2',
+        service_id: '2a95a63c-333e-4b68-98e3-82bdf1a07bd2',
+        doctor_id: '3a95a63c-333e-4b68-98e3-82bdf1a07bd2',
+        status: 'PENDING',
+        start_time: '2023-10-10T10:00:00Z'
+      }];
       mockSupabase.order.mockResolvedValueOnce({ data: mockData, error: null });
 
       const result = await queries.getAppointmentsByUser('user-123');
@@ -28,8 +34,8 @@ describe('PatientAppointmentsQueries', () => {
       expect(mockSupabase.order).toHaveBeenCalledWith('start_time', { ascending: false });
       expect(result).toEqual([
         expect.objectContaining({
-          id: '1',
-          startTime: '2023-10-10',
+          id: '1a95a63c-333e-4b68-98e3-82bdf1a07bd2',
+          startTime: '2023-10-10T10:00:00Z',
         }),
       ]);
     });

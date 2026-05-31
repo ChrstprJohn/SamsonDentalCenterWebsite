@@ -1,18 +1,14 @@
 import { describe, it, expect, vi } from 'vitest';
-import { TerminateStaffUseCase } from './terminate-staff.use-case';
-import { StaffProfileCommands } from '../../repositories/profile/staff-profile.commands';
+import { terminateStaffUseCase } from './terminate-staff.use-case';
 
-describe('TerminateStaffUseCase', () => {
+describe('TerminateStaffUseCase (Functional)', () => {
     it('successfully calls repository to terminate staff', async () => {
-        const mockCommands = {
-            terminateStaff: vi.fn().mockResolvedValue({ success: true, id: '123' }),
-        } as unknown as StaffProfileCommands;
+        const mockTerminateStaff = vi.fn().mockResolvedValue({ success: true, id: '123' });
 
-        const useCase = new TerminateStaffUseCase(mockCommands);
+        const execute = terminateStaffUseCase(mockTerminateStaff);
+        const result = await execute('123');
 
-        const result = await useCase.execute('123');
-
-        expect(mockCommands.terminateStaff).toHaveBeenCalledWith('123');
+        expect(mockTerminateStaff).toHaveBeenCalledWith('123');
         expect(result.success).toBe(true);
     });
 });

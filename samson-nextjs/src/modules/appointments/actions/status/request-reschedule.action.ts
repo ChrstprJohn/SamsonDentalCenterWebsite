@@ -5,8 +5,8 @@ import { createClient } from '@/shared/database/server';
 import { getAuthenticatedUser } from '@/shared/auth/auth.util';
 import { DomainError } from '@/shared/errors';
 import { userUpdateAppointmentStatusSchema, UserUpdateAppointmentStatusDto } from '../../dtos';
-import { AppointmentStatusCommands } from '../../repositories';
-import { UpdateAppointmentStatusUseCase } from '../../use-cases';
+import { getAppointmentByIdQuery, updateStatusCommand, incrementUserCredibilityMetricCommand } from '../../repositories';
+import { updateAppointmentStatusUseCase } from '../../use-cases';
 
 /**
  * Requests a reschedule for an appointment on behalf of the patient.
@@ -22,16 +22,20 @@ export async function requestRescheduleAction(formData: UserUpdateAppointmentSta
     const user = await getAuthenticatedUser();
     const supabase = await createClient();
 
-    const statusCommands = new AppointmentStatusCommands(supabase);
-    const appointment = await statusCommands.getAppointmentById(validData.appointmentId);
-    const appointmentOwner = appointment.patientId || (appointment as { userId?: string }).userId;
+    const getAppointmentById = getAppointmentByIdQuery(supabase);
+    const appointment = await getAppointmentById(validData.appointmentId);
+    const appointmentOwner = appointment.patientId;
     if (appointmentOwner !== user.id) {
       return { success: false, error: 'You are not authorized to reschedule this appointment' };
     }
 
-    const useCase = new UpdateAppointmentStatusUseCase(statusCommands);
+    const useCase = updateAppointmentStatusUseCase({
+      getAppointmentById,
+      updateStatus: updateStatusCommand(supabase),
+      incrementUserCredibilityMetric: incrementUserCredibilityMetricCommand(supabase),
+    });
 
-    const result = await useCase.execute(
+    const result = await useCase(
       validData.appointmentId,
       'RESCHEDULE_REQUESTED',
       validData.statusReason

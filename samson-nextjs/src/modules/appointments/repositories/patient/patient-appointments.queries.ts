@@ -1,15 +1,9 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { AppointmentDto, mapAppointmentRecords } from '../../dtos';
 
-export class PatientAppointmentsQueries {
-  constructor(private readonly supabase: SupabaseClient) {}
-
-  /**
-   * Fetches all appointments for a specific user (Patient Portal).
-   * Orders by start time descending (newest first).
-   */
-  async getAppointmentsByUser(userId: string): Promise<AppointmentDto[]> {
-    const { data: appointments, error } = await this.supabase
+export const getAppointmentsByUserQuery = (supabase: SupabaseClient) => {
+  return async (userId: string): Promise<AppointmentDto[]> => {
+    const { data: appointments, error } = await supabase
       .from('appointments')
       .select(
         `
@@ -26,5 +20,18 @@ export class PatientAppointmentsQueries {
     }
 
     return mapAppointmentRecords((appointments || []) as Record<string, unknown>[]);
+  };
+};
+
+/** @deprecated Use functional queries directly instead */
+export class PatientAppointmentsQueries {
+  constructor(private readonly supabase: SupabaseClient) {}
+
+  /**
+   * Fetches all appointments for a specific user (Patient Portal).
+   * Orders by start time descending (newest first).
+   */
+  async getAppointmentsByUser(userId: string): Promise<AppointmentDto[]> {
+    return getAppointmentsByUserQuery(this.supabase)(userId);
   }
 }

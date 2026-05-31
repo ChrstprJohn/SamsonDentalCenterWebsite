@@ -4,19 +4,17 @@ import { TreatmentCommands } from '../../repositories/treatment/treatment.comman
 import { InvoiceCommandsRepository } from '@/modules/billing/repositories/invoicing/invoice.commands';
 import { DomainError } from '@/shared/errors';
 
-export class SubmitTreatmentUseCase {
-  constructor(
-    private readonly treatmentCommands: TreatmentCommands,
-    private readonly invoiceCommands: InvoiceCommandsRepository,
-    private readonly supabase: SupabaseClient
-  ) {}
-
-  async execute(data: SubmitTreatmentDto): Promise<boolean> {
+export const submitTreatmentUseCase = (deps: {
+  supabase: SupabaseClient;
+  submitTreatment: (appointmentId: string, clinicalNotes?: string | null) => Promise<boolean>;
+  generateInvoice: (data: { appointment_id: string; amount: number; status: 'DRAFT' }) => Promise<any>;
+}) => {
+  return async (data: SubmitTreatmentDto): Promise<boolean> => {
     const { appointmentId, actualServices, clinicalNotes } = data;
     const actualServiceIds = actualServices.map((s) => s.serviceId);
 
     // 1. Fetch details of the selected services to calculate invoice amount and construct summary
-    const { data: services, error: servicesError } = await this.supabase
+    const { data: services, error: servicesError } = await deps.supabase
       .from('services')
       .select('id, name, price')
       .in('id', actualServiceIds);
@@ -59,15 +57,32 @@ export class SubmitTreatmentUseCase {
     }, 0);
 
     // 2. Submit the treatment (updates appointment status to TREATMENT_RENDERED with notes)
-    await this.treatmentCommands.submitTreatment(appointmentId, finalNotes);
+    await deps.submitTreatment(appointmentId, finalNotes);
 
     // 3. Generate the Draft Invoice using the billing repository
-    await this.invoiceCommands.generateInvoice({
+    await deps.generateInvoice({
       appointment_id: appointmentId,
       amount: totalAmount,
       status: 'DRAFT',
     });
 
     return true;
+  };
+};
+
+/** @deprecated Use submitTreatmentUseCase directly instead */
+export class SubmitTreatmentUseCase {
+  constructor(
+    private readonly treatmentCommands: TreatmentCommands,
+    private readonly invoiceCommands: InvoiceCommandsRepository,
+    private readonly supabase: SupabaseClient
+  ) {}
+
+  async execute(data: SubmitTreatmentDto): Promise<boolean> {
+    return submitTreatmentUseCase({
+      supabase: this.supabase,
+      submitTreatment: (aid, notes) => this.treatmentCommands.submitTreatment(aid, notes),
+      generateInvoice: (inv) => this.invoiceCommands.generateInvoice(inv),
+    })(data);
   }
 }

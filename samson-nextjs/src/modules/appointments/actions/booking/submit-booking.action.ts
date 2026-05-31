@@ -6,12 +6,16 @@ import { getAuthenticatedUser } from '@/shared/auth/auth.util';
 import { DomainError } from '@/shared/errors';
 import { submitBookingSchema, SubmitBookingDto } from '../../dtos';
 import {
-  AppointmentAvailabilityQueries,
-  AppointmentBookingCommands,
+  getWorkingSchedulesForMonthQuery,
+  getDoctorSchedulesQuery,
+  getExistingAppointmentsQuery,
+  getServiceDurationQuery,
+  resolveDoctorDisplayNameQuery,
+  createAppointmentCommand,
 } from '../../repositories';
 import {
-  GetAvailabilityUseCase,
-  SubmitBookingUseCase,
+  getAvailabilityUseCase,
+  submitBookingUseCase,
 } from '../../use-cases';
 
 /**
@@ -23,13 +27,20 @@ export async function submitBookingAction(formData: SubmitBookingDto) {
     const user = await getAuthenticatedUser();
     const supabase = await createClient();
 
-    const availabilityQueries = new AppointmentAvailabilityQueries(supabase);
-    const availabilityUseCase = new GetAvailabilityUseCase(availabilityQueries);
+    const availabilityUseCase = getAvailabilityUseCase({
+      getWorkingSchedulesForMonth: getWorkingSchedulesForMonthQuery(supabase),
+      getDoctorSchedules: getDoctorSchedulesQuery(supabase),
+      getExistingAppointments: getExistingAppointmentsQuery(supabase),
+      getServiceDuration: getServiceDurationQuery(supabase),
+      resolveDoctorDisplayName: resolveDoctorDisplayNameQuery(supabase),
+    });
 
-    const bookingCommands = new AppointmentBookingCommands(supabase);
-    const useCase = new SubmitBookingUseCase(bookingCommands, availabilityUseCase);
+    const useCase = submitBookingUseCase({
+      createAppointment: createAppointmentCommand(supabase),
+      getAvailableTimeSlots: availabilityUseCase.getAvailableTimeSlots,
+    });
 
-    const appointment = await useCase.execute(user.id, validData);
+    const appointment = await useCase(user.id, validData);
     return { success: true, data: appointment };
   } catch (error) {
     if (error instanceof z.ZodError) {

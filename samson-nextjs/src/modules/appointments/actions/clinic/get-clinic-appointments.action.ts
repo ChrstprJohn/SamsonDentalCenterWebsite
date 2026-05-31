@@ -5,8 +5,8 @@ import { createClient } from '@/shared/database/server';
 import { authorizeRole } from '@/shared/auth/auth.util';
 import { DomainError } from '@/shared/errors';
 import { getClinicAppointmentsSchema, GetClinicAppointmentsDto } from '../../dtos';
-import { ClinicAppointmentsQueries } from '../../repositories';
-import { GetClinicAppointmentsUseCase } from '../../use-cases';
+import { getAppointmentsByClinicQuery } from '../../repositories';
+import { getClinicAppointmentsUseCase } from '../../use-cases';
 
 /**
  * Retrieves all appointments matching given filters for the clinic/staff dashboard.
@@ -20,10 +20,9 @@ export async function getClinicAppointmentsAction(formData: GetClinicAppointment
     const validFilters = getClinicAppointmentsSchema.parse(formData);
     const supabase = await createClient();
 
-    const clinicQueries = new ClinicAppointmentsQueries(supabase);
-    const useCase = new GetClinicAppointmentsUseCase(clinicQueries);
+    const useCase = getClinicAppointmentsUseCase(getAppointmentsByClinicQuery(supabase));
 
-    const appointments = await useCase.execute(validFilters);
+    const appointments = await useCase(validFilters);
     return { success: true, data: appointments };
   } catch (error) {
     if (error instanceof z.ZodError) {

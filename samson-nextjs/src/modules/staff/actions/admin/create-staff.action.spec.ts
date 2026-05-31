@@ -8,11 +8,13 @@ vi.mock('@/shared/auth/auth.util');
 vi.mock('@/shared/database/server');
 vi.mock('../../use-cases/profile/create-staff.use-case', () => {
     return {
+        createStaffUseCase: () => vi.fn().mockResolvedValue({ id: '123' }),
         CreateStaffUseCase: class {
             execute = vi.fn().mockResolvedValue({ id: '123' });
         },
     };
 });
+
 
 describe('createStaffAction (Unit Test)', () => {
     const mockStaffData = {

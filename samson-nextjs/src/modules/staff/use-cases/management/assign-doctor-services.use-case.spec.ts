@@ -1,21 +1,20 @@
 import { describe, it, expect, vi } from 'vitest';
-import { AssignDoctorServicesUseCase } from './assign-doctor-services.use-case';
+import { assignDoctorServicesUseCase } from './assign-doctor-services.use-case';
 
-describe('AssignDoctorServicesUseCase', () => {
-  it('should successfully execute and call repository', async () => {
-    const mockCommands = {
-      assignDoctorServices: vi.fn().mockResolvedValue(true),
-    } as any;
+describe('AssignDoctorServicesUseCase (Functional)', () => {
+  it('should successfully execute and call repository function', async () => {
+    const mockAssignDoctorServices = vi.fn().mockResolvedValue(true);
 
-    const useCase = new AssignDoctorServicesUseCase(mockCommands);
+    const execute = assignDoctorServicesUseCase(mockAssignDoctorServices);
     const data = {
       doctorId: 'doc-123',
       serviceIds: ['svc-1', 'svc-2'],
     };
 
-    const result = await useCase.execute(data);
+    const result = await execute(data);
 
     expect(result).toBe(true);
-    expect(mockCommands.assignDoctorServices).toHaveBeenCalledWith('doc-123', ['svc-1', 'svc-2']);
+    expect(mockAssignDoctorServices).toHaveBeenCalledWith('doc-123', ['svc-1', 'svc-2']);
   });
 });
+

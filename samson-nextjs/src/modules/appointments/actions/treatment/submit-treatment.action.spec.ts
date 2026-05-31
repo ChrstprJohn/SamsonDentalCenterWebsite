@@ -2,25 +2,29 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { submitTreatmentAction } from './submit-treatment.action';
 import { authorizeRole } from '@/shared/auth/auth.util';
 import { createClient } from '@/shared/database/server';
-import { SubmitTreatmentUseCase } from '../../use-cases/treatment/submit-treatment.use-case';
 
 vi.mock('server-only', () => ({}));
 vi.mock('@/shared/auth/auth.util');
 vi.mock('@/shared/database/server');
-vi.mock('../../use-cases/treatment/submit-treatment.use-case');
+
+const { mockExecute } = vi.hoisted(() => {
+  return { mockExecute: vi.fn() };
+});
+
+vi.mock('../../use-cases/treatment/submit-treatment.use-case', () => {
+  return {
+    submitTreatmentUseCase: () => mockExecute,
+    SubmitTreatmentUseCase: class {
+      execute = mockExecute;
+    },
+  };
+});
 
 describe('submitTreatmentAction', () => {
-  const mockExecute = vi.fn();
-
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(authorizeRole).mockResolvedValue({ id: 'doctor-1' } as any);
     vi.mocked(createClient).mockResolvedValue({} as any);
-    vi.mocked(SubmitTreatmentUseCase).mockImplementation(function () {
-      return {
-        execute: mockExecute,
-      } as any;
-    });
   });
 
   it('successfully validates inputs, resolves auth, and submits treatment', async () => {

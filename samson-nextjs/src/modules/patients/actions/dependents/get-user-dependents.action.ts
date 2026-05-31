@@ -1,8 +1,8 @@
 'use server';
 
 import { getAuthenticatedUser } from '@/shared/auth/auth.util';
-import { GetUserDependentsUseCase } from '../../use-cases';
-import { PatientDependentsQueries } from '../../repositories';
+import { getUserDependentsUseCase } from '../../use-cases';
+import { getDependentsByPatientIdQuery } from '../../repositories';
 import { UnauthorizedError } from '@/shared/errors';
 import { createClient } from '@/shared/database/server';
 
@@ -14,9 +14,9 @@ export async function getUserDependentsAction(patientId: string) {
     }
 
     const supabase = await createClient();
-    const queries = new PatientDependentsQueries(supabase);
-    const useCase = new GetUserDependentsUseCase(queries);
-    const dependents = await useCase.execute(patientId);
+    const repo = getDependentsByPatientIdQuery(supabase);
+    const useCase = getUserDependentsUseCase(repo);
+    const dependents = await useCase(patientId);
     return { success: true, data: dependents };
   } catch (error: any) {
     return { success: false, error: error.message };

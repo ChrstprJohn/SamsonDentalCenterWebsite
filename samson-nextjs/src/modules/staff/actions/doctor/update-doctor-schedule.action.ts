@@ -5,8 +5,8 @@ import { createClient } from '@/shared/database/server';
 import { authorizeRole } from '@/shared/auth/auth.util';
 import { DomainError } from '@/shared/errors';
 import { doctorScheduleSchema, DoctorScheduleDto } from '../../dtos';
-import { StaffScheduleCommands } from '../../repositories';
-import { UpdateDoctorScheduleUseCase } from '../../use-cases';
+import { upsertScheduleCommand } from '../../repositories';
+import { updateDoctorScheduleUseCase } from '../../use-cases';
 
 export async function updateDoctorScheduleAction(formData: DoctorScheduleDto) {
     try {
@@ -16,10 +16,10 @@ export async function updateDoctorScheduleAction(formData: DoctorScheduleDto) {
         await authorizeRole('DOCTOR');
 
         const supabase = await createClient();
-        const repository = new StaffScheduleCommands(supabase);
-        const useCase = new UpdateDoctorScheduleUseCase(repository);
+        const repo = upsertScheduleCommand(supabase);
+        const useCase = updateDoctorScheduleUseCase(repo);
 
-        const schedule = await useCase.execute(validData);
+        const schedule = await useCase(validData);
         return { success: true, data: schedule };
     } catch (error) {
         if (error instanceof z.ZodError) {

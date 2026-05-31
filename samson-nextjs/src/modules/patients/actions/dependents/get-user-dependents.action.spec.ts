@@ -8,10 +8,12 @@ vi.mock('@/shared/database/server', () => ({
   createClient: vi.fn().mockResolvedValue({}),
 }));
 vi.mock('../../repositories', () => ({
+  getDependentsByPatientIdQuery: () => vi.fn().mockResolvedValue([{ id: 'dep1' }]),
   PatientDependentsQueries: class {
     getDependentsByPatientId = vi.fn().mockResolvedValue([{ id: 'dep1' }]);
   }
 }));
+
 
 describe('getUserDependentsAction', () => {
   it('should get dependents and return success', async () => {

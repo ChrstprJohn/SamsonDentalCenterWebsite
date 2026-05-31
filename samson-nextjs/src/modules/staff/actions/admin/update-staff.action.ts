@@ -5,8 +5,8 @@ import { createClient } from '@/shared/database/server';
 import { authorizeRole } from '@/shared/auth/auth.util';
 import { DomainError } from '@/shared/errors';
 import { updateStaffSchema, UpdateStaffDto } from '../../dtos';
-import { StaffProfileCommands } from '../../repositories';
-import { UpdateStaffUseCase } from '../../use-cases';
+import { updateStaffCommand } from '../../repositories';
+import { updateStaffUseCase } from '../../use-cases';
 
 export async function updateStaffAction(formData: UpdateStaffDto) {
     try {
@@ -14,10 +14,10 @@ export async function updateStaffAction(formData: UpdateStaffDto) {
         await authorizeRole('ADMIN');
 
         const supabase = await createClient();
-        const staffRepository = new StaffProfileCommands(supabase);
-        const updateStaffUseCase = new UpdateStaffUseCase(staffRepository);
+        const repo = updateStaffCommand(supabase);
+        const useCase = updateStaffUseCase(repo);
 
-        const updatedStaff = await updateStaffUseCase.execute(validData.id, validData);
+        const updatedStaff = await useCase(validData.id, validData);
         return { success: true, data: updatedStaff };
     } catch (error) {
         if (error instanceof z.ZodError) {

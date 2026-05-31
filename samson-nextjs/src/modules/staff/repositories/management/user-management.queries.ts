@@ -1,15 +1,13 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { GetAllUsersDto, UserProfileResponseDto } from '../../dtos';
 
-export class UserManagementQueries {
-  constructor(private readonly supabase: SupabaseClient) {}
-
-  async getAllUsers(params?: GetAllUsersDto): Promise<UserProfileResponseDto[]> {
+export const getAllUsersQuery = (supabase: SupabaseClient) => {
+  return async (params?: GetAllUsersDto): Promise<UserProfileResponseDto[]> => {
     const limit = params?.limit || 20;
     const page = params?.page || 1;
     const offset = (page - 1) * limit;
 
-    let query = this.supabase
+    let query = supabase
       .from('profiles')
       .select('*')
       .range(offset, offset + limit - 1);
@@ -32,5 +30,14 @@ export class UserManagementQueries {
       role: u.role,
       isActive: u.is_active ?? true,
     }));
+  };
+};
+
+// Deprecated class for backwards compatibility
+export class UserManagementQueries {
+  constructor(private readonly supabase: SupabaseClient) {}
+  async getAllUsers(params?: GetAllUsersDto): Promise<UserProfileResponseDto[]> {
+    return getAllUsersQuery(this.supabase)(params);
   }
 }
+

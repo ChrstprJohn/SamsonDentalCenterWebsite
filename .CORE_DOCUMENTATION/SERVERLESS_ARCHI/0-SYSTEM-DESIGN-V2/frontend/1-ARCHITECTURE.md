@@ -145,3 +145,17 @@ The "Mandatory Hook Binding" rule is relaxed for trivial, localized UI state to 
 ---
 
 *Document version: 2.0 (Next.js Frontend) – last updated 2026‑05‑30*
+💡 Recommended Micro-Optimizations
+1. Enforce Module-Level Path Aliases
+As domain modules scale, imports can quickly devolve into messy, unreadable relative path strings (e.g., import { Button } from "../../../../components/ui/button"). To maintain your self-contained module boundaries, explicitly mandate TypeScript path aliases.
+
+Add to Section 4: Enforce strict @/* usage.
+
+The Rule: All shared items must use @/components or @/hooks. Cross-module imports must use @/modules/appointments/exports. Internal module imports should use clean relative paths (../components/card).
+
+2. Define the Server-Action-to-RHF Error Bridge
+Section 2 mentions Zod + RHF + Server Action delegation. In a real app, validation happens twice: once instantly in the browser via Zod, and once securely on the server (e.g., checking database slot availability).
+
+When a Server Action rejects a submission due to a database conflict, that error needs a clean path back into the UI.
+
+The Strategy: Mandate that all Server Actions return a standardized, serializable response format, and use React Hook Form's built-in setError method to map server-side database rejections directly back onto their corresponding UI input fields.

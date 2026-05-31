@@ -6,22 +6,33 @@ import { SubmitBookingDto } from '../../dtos';
 describe('AppointmentBookingCommands', () => {
   let commands: AppointmentBookingCommands;
   let mockSupabase: any;
+  const validApptId = 'da95a63c-333e-4b68-98e3-82bdf1a07bd2';
+  const validServiceId = 'da95a63c-333e-4b68-98e3-82bdf1a07bd3';
+  const validDoctorId = 'da95a63c-333e-4b68-98e3-82bdf1a07bd4';
 
   beforeEach(() => {
     mockSupabase = {
       from: vi.fn().mockReturnThis(),
       insert: vi.fn().mockReturnThis(),
       select: vi.fn().mockReturnThis(),
-      single: vi.fn().mockResolvedValue({ data: { id: 'appt-123' }, error: null }),
+      single: vi.fn().mockResolvedValue({
+        data: {
+          id: validApptId,
+          service_id: validServiceId,
+          doctor_id: validDoctorId,
+          status: 'PENDING',
+        },
+        error: null,
+      }),
     };
     commands = new AppointmentBookingCommands(mockSupabase as unknown as SupabaseClient);
   });
 
   describe('createAppointment', () => {
     const mockDto: SubmitBookingDto = {
-      idempotencyKey: '00000000-0000-0000-0000-000000000000',
-      serviceId: '1111f111-1111-1111-1111-111111111111',
-      doctorId: '22222222-2222-2222-2222-222222222222',
+      idempotencyKey: 'da95a63c-333e-4b68-98e3-82bdf1a07bd5',
+      serviceId: validServiceId,
+      doctorId: validDoctorId,
       isPreferredDoctor: true,
       date: '2024-12-25',
       startTime: '2024-12-25T10:00:00Z',
@@ -49,7 +60,7 @@ describe('AppointmentBookingCommands', () => {
           patient_type: mockDto.patientType,
         })
       );
-      expect(result).toMatchObject({ id: 'appt-123' });
+      expect(result).toMatchObject({ id: validApptId });
     });
 
     it('should throw DomainError on database error', async () => {

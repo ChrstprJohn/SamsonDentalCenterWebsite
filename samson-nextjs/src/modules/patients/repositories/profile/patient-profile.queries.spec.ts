@@ -1,8 +1,8 @@
-﻿import { describe, it, expect, vi } from 'vitest';
-import { PatientProfileQueries } from './patient-profile.queries';
+import { describe, it, expect, vi } from 'vitest';
+import { getPatientProfileByIdQuery } from './patient-profile.queries';
 import { NotFoundError } from '@/shared/errors';
 
-describe('PatientProfileQueries', () => {
+describe('PatientProfileQueries (Functional)', () => {
   it('throws NotFoundError if patient does not exist', async () => {
     const mockSupabase = {
       from: vi.fn().mockReturnThis(),
@@ -11,13 +11,13 @@ describe('PatientProfileQueries', () => {
       single: vi.fn().mockResolvedValue({ data: null, error: new Error('Not found') }),
     };
 
-    const queries = new PatientProfileQueries(mockSupabase as any);
-    await expect(queries.getProfileById('123')).rejects.toThrow(NotFoundError);
+    const getProfileById = getPatientProfileByIdQuery(mockSupabase as any);
+    await expect(getProfileById('123e4567-e89b-12d3-a456-426614174000')).rejects.toThrow(NotFoundError);
   });
 
   it('returns patient data if found', async () => {
     const mockPatient = {
-      id: '123',
+      id: '123e4567-e89b-12d3-a456-426614174000',
       email: 'john@example.com',
       first_name: 'John',
       last_name: 'Doe',
@@ -31,10 +31,10 @@ describe('PatientProfileQueries', () => {
       single: vi.fn().mockResolvedValue({ data: mockPatient, error: null }),
     };
 
-    const queries = new PatientProfileQueries(mockSupabase as any);
-    const result = await queries.getProfileById('123');
+    const getProfileById = getPatientProfileByIdQuery(mockSupabase as any);
+    const result = await getProfileById('123e4567-e89b-12d3-a456-426614174000');
     expect(result).toEqual({
-      id: '123',
+      id: '123e4567-e89b-12d3-a456-426614174000',
       email: 'john@example.com',
       firstName: 'John',
       middleName: null,
@@ -48,3 +48,4 @@ describe('PatientProfileQueries', () => {
     });
   });
 });
+

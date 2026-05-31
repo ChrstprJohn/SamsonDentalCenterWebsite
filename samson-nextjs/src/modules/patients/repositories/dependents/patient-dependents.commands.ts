@@ -1,11 +1,9 @@
 import { SupabaseClient } from '@supabase/supabase-js';
-import { CreateDependentDto, DependentProfileDto, mapDependentProfile } from '../../dtos';
+import { CreateDependentDto, DependentProfileDto, dependentProfileSchema } from '../../dtos';
 
-export class PatientDependentsCommands {
-  constructor(private readonly supabase: SupabaseClient) {}
-
-  async addDependent(data: CreateDependentDto): Promise<DependentProfileDto> {
-    const { data: dependent, error } = await this.supabase
+export const addDependentCommand = (supabase: SupabaseClient) => {
+  return async (data: CreateDependentDto): Promise<DependentProfileDto> => {
+    const { data: dependent, error } = await supabase
       .from('patient_dependents')
       .insert({
         patient_id: data.patientId,
@@ -21,6 +19,15 @@ export class PatientDependentsCommands {
       throw new Error(`Failed to add dependent: ${error?.message || 'Unknown error'}`);
     }
 
-    return mapDependentProfile(dependent as Record<string, unknown>);
+    return dependentProfileSchema.parse(dependent);
+  };
+};
+
+// Deprecated class for backwards compatibility
+export class PatientDependentsCommands {
+  constructor(private readonly supabase: SupabaseClient) {}
+  async addDependent(data: CreateDependentDto): Promise<DependentProfileDto> {
+    return addDependentCommand(this.supabase)(data);
   }
 }
+

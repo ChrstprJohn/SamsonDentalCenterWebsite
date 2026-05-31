@@ -1,11 +1,12 @@
 import { describe, it, expect, vi } from 'vitest';
-import { CreateDependentUseCase } from './create-dependent.use-case';
+import { createDependentUseCase } from './create-dependent.use-case';
 
-describe('CreateDependentUseCase', () => {
+describe('CreateDependentUseCase (Functional)', () => {
   it('should execute successfully', async () => {
-    const mockCommands = { addDependent: vi.fn().mockResolvedValue({ id: '123' }) } as any;
-    const useCase = new CreateDependentUseCase(mockCommands);
-    const result = await useCase.execute({
+    const mockAddDependent = vi.fn().mockResolvedValue({ id: '123' });
+
+    const execute = createDependentUseCase(mockAddDependent);
+    const result = await execute({
       patientId: '123e4567-e89b-12d3-a456-426614174000',
       firstName: 'Jane',
       lastName: 'Doe',

@@ -11,10 +11,12 @@ vi.mock('@/shared/database/server', () => ({
 }));
 
 vi.mock('../../repositories', () => ({
+  assignDoctorServicesCommand: () => vi.fn().mockResolvedValue(true),
   DoctorServicesCommands: class {
     assignDoctorServices = vi.fn().mockResolvedValue(true);
   }
 }));
+
 
 describe('assignDoctorServicesAction', () => {
   it('should assign doctor services and return success', async () => {

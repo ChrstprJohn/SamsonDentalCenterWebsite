@@ -2,8 +2,8 @@
 
 import { getAuthenticatedUser, authorizeRole } from '@/shared/auth/auth.util';
 import { AssignDoctorServicesDto, assignDoctorServicesSchema } from '../../dtos';
-import { AssignDoctorServicesUseCase } from '../../use-cases';
-import { DoctorServicesCommands } from '../../repositories';
+import { assignDoctorServicesUseCase } from '../../use-cases';
+import { assignDoctorServicesCommand } from '../../repositories';
 import { ValidationError, UnauthorizedError, DomainError } from '@/shared/errors';
 import { createClient } from '@/shared/database/server';
 
@@ -21,9 +21,9 @@ export async function assignDoctorServicesAction(data: AssignDoctorServicesDto) 
     }
 
     const supabase = await createClient();
-    const commands = new DoctorServicesCommands(supabase);
-    const useCase = new AssignDoctorServicesUseCase(commands);
-    await useCase.execute(parsed.data);
+    const repo = assignDoctorServicesCommand(supabase);
+    const useCase = assignDoctorServicesUseCase(repo);
+    await useCase(parsed.data);
 
     return { success: true };
   } catch (error: any) {
@@ -33,3 +33,4 @@ export async function assignDoctorServicesAction(data: AssignDoctorServicesDto) 
     return { success: false, error: error.message || 'An unexpected error occurred' };
   }
 }
+

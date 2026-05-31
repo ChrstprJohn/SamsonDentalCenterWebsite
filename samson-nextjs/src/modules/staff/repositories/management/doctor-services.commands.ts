@@ -1,15 +1,10 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { DomainError } from '@/shared/errors';
 
-export class DoctorServicesCommands {
-  constructor(private readonly supabase: SupabaseClient) {}
-
-  /**
-   * Maps a doctor ID to an array of service IDs in the database.
-   */
-  async assignDoctorServices(doctorId: string, serviceIds: string[]): Promise<boolean> {
+export const assignDoctorServicesCommand = (supabase: SupabaseClient) => {
+  return async (doctorId: string, serviceIds: string[]): Promise<boolean> => {
     // 1. Delete all existing mappings for the doctor
-    const { error: deleteError } = await this.supabase
+    const { error: deleteError } = await supabase
       .from('doctor_services')
       .delete()
       .eq('doctor_id', doctorId);
@@ -28,7 +23,7 @@ export class DoctorServicesCommands {
         service_id: serviceId,
       }));
 
-      const { error: insertError } = await this.supabase
+      const { error: insertError } = await supabase
         .from('doctor_services')
         .insert(payload);
 
@@ -41,5 +36,14 @@ export class DoctorServicesCommands {
     }
 
     return true;
+  };
+};
+
+// Deprecated class for backwards compatibility
+export class DoctorServicesCommands {
+  constructor(private readonly supabase: SupabaseClient) {}
+  async assignDoctorServices(doctorId: string, serviceIds: string[]): Promise<boolean> {
+    return assignDoctorServicesCommand(this.supabase)(doctorId, serviceIds);
   }
 }
+

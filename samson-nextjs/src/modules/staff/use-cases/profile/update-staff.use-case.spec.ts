@@ -1,18 +1,14 @@
 import { describe, it, expect, vi } from 'vitest';
-import { UpdateStaffUseCase } from './update-staff.use-case';
-import { StaffProfileCommands } from '../../repositories/profile/staff-profile.commands';
+import { updateStaffUseCase } from './update-staff.use-case';
 
-describe('UpdateStaffUseCase', () => {
+describe('UpdateStaffUseCase (Functional)', () => {
     it('successfully calls repository to update staff', async () => {
-        const mockCommands = {
-            updateStaff: vi.fn().mockResolvedValue({ id: '123', email: 'updated@samson.com' }),
-        } as unknown as StaffProfileCommands;
+        const mockUpdateStaff = vi.fn().mockResolvedValue({ id: '123', email: 'updated@samson.com' });
 
-        const useCase = new UpdateStaffUseCase(mockCommands);
+        const execute = updateStaffUseCase(mockUpdateStaff);
+        const result = await execute('123', { email: 'updated@samson.com' });
 
-        const result = await useCase.execute('123', { email: 'updated@samson.com' });
-
-        expect(mockCommands.updateStaff).toHaveBeenCalledWith('123', {
+        expect(mockUpdateStaff).toHaveBeenCalledWith('123', {
             email: 'updated@samson.com',
         });
         expect(result.email).toBe('updated@samson.com');

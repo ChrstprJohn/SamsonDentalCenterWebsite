@@ -5,8 +5,8 @@ import { createClient } from '@/shared/database/server';
 import { authorizeRole } from '@/shared/auth/auth.util';
 import { DomainError } from '@/shared/errors';
 import { terminateStaffSchema, TerminateStaffDto } from '../../dtos';
-import { StaffProfileCommands } from '../../repositories';
-import { TerminateStaffUseCase } from '../../use-cases';
+import { terminateStaffCommand } from '../../repositories';
+import { terminateStaffUseCase } from '../../use-cases';
 
 export async function terminateStaffAction(formData: TerminateStaffDto | string) {
     try {
@@ -16,10 +16,10 @@ export async function terminateStaffAction(formData: TerminateStaffDto | string)
         );
 
         const supabase = await createClient();
-        const staffRepository = new StaffProfileCommands(supabase);
-        const terminateStaffUseCase = new TerminateStaffUseCase(staffRepository);
+        const repo = terminateStaffCommand(supabase);
+        const useCase = terminateStaffUseCase(repo);
 
-        await terminateStaffUseCase.execute(validData.staffId);
+        await useCase(validData.staffId);
         return { success: true };
     } catch (error) {
         if (error instanceof z.ZodError) {
@@ -29,3 +29,4 @@ export async function terminateStaffAction(formData: TerminateStaffDto | string)
         return { success: false, error: 'An unexpected system error occurred' };
     }
 }
+

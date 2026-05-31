@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
-import { PatientDependentsCommands } from './patient-dependents.commands';
+import { addDependentCommand } from './patient-dependents.commands';
 
-describe('PatientDependentsCommands', () => {
+describe('PatientDependentsCommands (Functional)', () => {
   it('should add a dependent', async () => {
     const mockSupabase = {
       from: vi.fn().mockReturnThis(),
@@ -20,8 +20,8 @@ describe('PatientDependentsCommands', () => {
       }),
     } as any;
 
-    const commands = new PatientDependentsCommands(mockSupabase);
-    const result = await commands.addDependent({
+    const addDependent = addDependentCommand(mockSupabase);
+    const result = await addDependent({
       patientId: '123e4567-e89b-12d3-a456-426614174000',
       firstName: 'Jane',
       lastName: 'Doe',
@@ -33,3 +33,4 @@ describe('PatientDependentsCommands', () => {
     expect(mockSupabase.from).toHaveBeenCalledWith('patient_dependents');
   });
 });
+

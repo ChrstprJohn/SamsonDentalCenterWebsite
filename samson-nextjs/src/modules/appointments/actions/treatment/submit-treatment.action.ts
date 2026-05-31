@@ -5,9 +5,9 @@ import { authorizeRole } from '@/shared/auth/auth.util';
 import { createClient } from '@/shared/database/server';
 import { DomainError } from '@/shared/errors';
 import { SubmitTreatmentDto, submitTreatmentSchema } from '../../dtos/treatment/submit-treatment.dto';
-import { TreatmentCommands } from '../../repositories/treatment/treatment.commands';
-import { InvoiceCommandsRepository } from '@/modules/billing/repositories/invoicing/invoice.commands';
-import { SubmitTreatmentUseCase } from '../../use-cases/treatment/submit-treatment.use-case';
+import { submitTreatmentCommand } from '../../repositories/treatment/treatment.commands';
+import { generateInvoiceCommand } from '@/modules/billing/repositories/invoicing/invoice.commands';
+import { submitTreatmentUseCase } from '../../use-cases/treatment/submit-treatment.use-case';
 
 export async function submitTreatmentAction(formData: SubmitTreatmentDto) {
   try {
@@ -17,11 +17,13 @@ export async function submitTreatmentAction(formData: SubmitTreatmentDto) {
     await authorizeRole('DOCTOR');
 
     const supabase = await createClient();
-    const treatmentRepo = new TreatmentCommands(supabase);
-    const invoiceRepo = new InvoiceCommandsRepository(supabase);
-    const useCase = new SubmitTreatmentUseCase(treatmentRepo, invoiceRepo, supabase);
+    const useCase = submitTreatmentUseCase({
+      supabase,
+      submitTreatment: submitTreatmentCommand(supabase),
+      generateInvoice: generateInvoiceCommand(supabase),
+    });
 
-    await useCase.execute(validData);
+    await useCase(validData);
     return { success: true };
   } catch (error) {
     if (error instanceof z.ZodError) {

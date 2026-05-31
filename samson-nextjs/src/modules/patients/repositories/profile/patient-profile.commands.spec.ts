@@ -1,20 +1,20 @@
-﻿import { describe, it, expect, vi } from 'vitest';
-import { PatientProfileCommands } from './patient-profile.commands';
+import { describe, it, expect, vi } from 'vitest';
+import { createPatientCommand } from './patient-profile.commands';
 import { RegisterPatientDto } from '../../dtos';
 import { DomainError } from '@/shared/errors';
 
-describe('PatientProfileCommands', () => {
+describe('PatientProfileCommands (Functional)', () => {
   it('successfully creates a patient', async () => {
     const validData: RegisterPatientDto = {
       email: 'test@example.com',
       firstName: 'John',
       lastName: 'Doe',
-      phoneNumber: '1234567890',
+      phoneNumber: '+1234567890',
       dateOfBirth: '1990-01-01',
     };
     const createdAt = new Date().toISOString();
     const mockInsertedRecord = {
-      id: 'user_123',
+      id: '123e4567-e89b-12d3-a456-426614174000',
       email: validData.email,
       first_name: validData.firstName,
       last_name: validData.lastName,
@@ -29,11 +29,11 @@ describe('PatientProfileCommands', () => {
       single: vi.fn().mockResolvedValue({ data: mockInsertedRecord, error: null }),
     };
 
-    const commands = new PatientProfileCommands(mockSupabase as any);
-    const result = await commands.createPatient('user_123', validData);
+    const createPatient = createPatientCommand(mockSupabase as any);
+    const result = await createPatient('123e4567-e89b-12d3-a456-426614174000', validData);
 
     expect(result).toEqual({
-      id: 'user_123',
+      id: '123e4567-e89b-12d3-a456-426614174000',
       email: validData.email,
       firstName: validData.firstName,
       middleName: null,
@@ -53,7 +53,7 @@ describe('PatientProfileCommands', () => {
       email: 'test@example.com',
       firstName: 'John',
       lastName: 'Doe',
-      phoneNumber: '1234567890',
+      phoneNumber: '+1234567890',
       dateOfBirth: '1990-01-01',
     };
     const mockSupabase = {
@@ -63,8 +63,9 @@ describe('PatientProfileCommands', () => {
       single: vi.fn().mockResolvedValue({ data: null, error: { message: 'Database constraint failed' } }),
     };
 
-    const commands = new PatientProfileCommands(mockSupabase as any);
-    await expect(commands.createPatient('user_123', validData))
+    const createPatient = createPatientCommand(mockSupabase as any);
+    await expect(createPatient('123e4567-e89b-12d3-a456-426614174000', validData))
       .rejects.toThrow(DomainError);
   });
 });
+

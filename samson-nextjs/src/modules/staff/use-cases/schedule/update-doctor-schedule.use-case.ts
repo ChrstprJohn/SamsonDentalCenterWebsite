@@ -1,12 +1,19 @@
 import { DoctorScheduleDto } from '../../dtos';
 import { StaffScheduleCommands } from '../../repositories';
 
+export const updateDoctorScheduleUseCase = (
+    upsertSchedule: (data: DoctorScheduleDto) => Promise<any>
+) => {
+    return async (data: DoctorScheduleDto) => {
+        return await upsertSchedule(data);
+    };
+};
+
+// Deprecated class for backwards compatibility
 export class UpdateDoctorScheduleUseCase {
     constructor(private readonly scheduleCommands: StaffScheduleCommands) {}
-
     async execute(data: DoctorScheduleDto) {
-        // In the future, you could add business rules here
-        // e.g., "Cannot change schedule if appointments are booked"
-        return await this.scheduleCommands.upsertSchedule(data);
+        return updateDoctorScheduleUseCase((d) => this.scheduleCommands.upsertSchedule(d))(data);
     }
 }
+

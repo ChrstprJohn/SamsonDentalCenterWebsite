@@ -2,22 +2,28 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { updateAppointmentStatusAction } from './update-appointment-status.action';
 import { authorizeRole } from '@/shared/auth/auth.util';
 import { createClient } from '@/shared/database/server';
-import { UpdateAppointmentStatusUseCase } from '../../use-cases';
 import { UnauthorizedError } from '@/shared/errors';
 
 vi.mock('server-only', () => ({}));
 vi.mock('@/shared/auth/auth.util');
 vi.mock('@/shared/database/server');
-vi.mock('../../use-cases/status/update-appointment-status.use-case');
+
+const { mockUpdateStatus } = vi.hoisted(() => {
+  return { mockUpdateStatus: vi.fn() };
+});
+
+vi.mock('../../use-cases/status/update-appointment-status.use-case', () => {
+  return {
+    updateAppointmentStatusUseCase: () => mockUpdateStatus,
+    UpdateAppointmentStatusUseCase: class {
+      execute = mockUpdateStatus;
+    },
+  };
+});
 
 describe('updateAppointmentStatusAction', () => {
-  const mockUpdateStatus = vi.fn();
-
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(UpdateAppointmentStatusUseCase).mockImplementation(function () {
-      return { execute: mockUpdateStatus } as any;
-    });
     vi.mocked(createClient).mockResolvedValue({} as any);
   });
 

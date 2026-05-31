@@ -2,8 +2,8 @@
 
 import { getAuthenticatedUser, authorizeRole } from '@/shared/auth/auth.util';
 import { GetAllUsersDto, getAllUsersSchema } from '../../dtos';
-import { GetAllUsersUseCase } from '../../use-cases';
-import { UserManagementQueries } from '../../repositories';
+import { getAllUsersUseCase } from '../../use-cases';
+import { getAllUsersQuery } from '../../repositories';
 import { ValidationError, UnauthorizedError } from '@/shared/errors';
 import { createClient } from '@/shared/database/server';
 
@@ -21,9 +21,9 @@ export async function getAllUsersAction(params?: GetAllUsersDto) {
     }
 
     const supabase = await createClient();
-    const queries = new UserManagementQueries(supabase);
-    const useCase = new GetAllUsersUseCase(queries);
-    const users = await useCase.execute(parsed.data);
+    const repo = getAllUsersQuery(supabase);
+    const useCase = getAllUsersUseCase(repo);
+    const users = await useCase(parsed.data);
     return { success: true, data: users };
   } catch (error: any) {
     return { success: false, error: error.message };

@@ -8,11 +8,13 @@ vi.mock('@/shared/auth/auth.util');
 vi.mock('@/shared/database/server');
 vi.mock('../../use-cases/schedule/update-doctor-schedule.use-case', () => {
     return {
+        updateDoctorScheduleUseCase: () => vi.fn().mockResolvedValue({ id: 'sched_1' }),
         UpdateDoctorScheduleUseCase: class {
             execute = vi.fn().mockResolvedValue({ id: 'sched_1' });
         },
     };
 });
+
 
 describe('updateDoctorScheduleAction (Unit Test)', () => {
     beforeEach(() => {

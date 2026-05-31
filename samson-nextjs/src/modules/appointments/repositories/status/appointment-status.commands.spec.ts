@@ -5,6 +5,10 @@ import { AppointmentStatusCommands } from './appointment-status.commands';
 describe('AppointmentStatusCommands', () => {
   let commands: AppointmentStatusCommands;
   let mockSupabase: any;
+  const validApptId = '1a95a63c-333e-4b68-98e3-82bdf1a07bd2';
+  const validServiceId = '2a95a63c-333e-4b68-98e3-82bdf1a07bd2';
+  const validDoctorId = '3a95a63c-333e-4b68-98e3-82bdf1a07bd2';
+  const newDoctorId = '4a95a63c-333e-4b68-98e3-82bdf1a07bd2';
 
   beforeEach(() => {
     mockSupabase = {
@@ -12,7 +16,15 @@ describe('AppointmentStatusCommands', () => {
       update: vi.fn().mockReturnThis(),
       eq: vi.fn().mockReturnThis(),
       select: vi.fn().mockReturnThis(),
-      single: vi.fn().mockResolvedValue({ data: { id: 'appt-1', status: 'APPROVED' }, error: null }),
+      single: vi.fn().mockResolvedValue({
+        data: {
+          id: validApptId,
+          service_id: validServiceId,
+          doctor_id: validDoctorId,
+          status: 'APPROVED',
+        },
+        error: null,
+      }),
       rpc: vi.fn().mockResolvedValue({ error: null }),
     };
     commands = new AppointmentStatusCommands(mockSupabase as unknown as SupabaseClient);
@@ -20,7 +32,7 @@ describe('AppointmentStatusCommands', () => {
 
   describe('updateStatus', () => {
     it('should update appointment status with a reason', async () => {
-      const result = await commands.updateStatus('appt-1', 'APPROVED', 'Schedule confirmed');
+      const result = await commands.updateStatus(validApptId, 'APPROVED', 'Schedule confirmed');
 
       expect(mockSupabase.from).toHaveBeenCalledWith('appointments');
       expect(mockSupabase.update).toHaveBeenCalledWith(
@@ -29,12 +41,12 @@ describe('AppointmentStatusCommands', () => {
           status_reason: 'Schedule confirmed',
         })
       );
-      expect(mockSupabase.eq).toHaveBeenCalledWith('id', 'appt-1');
-      expect(result).toMatchObject({ id: 'appt-1', status: 'APPROVED' });
+      expect(mockSupabase.eq).toHaveBeenCalledWith('id', validApptId);
+      expect(result).toMatchObject({ id: validApptId, status: 'APPROVED' });
     });
 
     it('should set status_reason to null when no reason is provided', async () => {
-      await commands.updateStatus('appt-1', 'CHECKED_IN');
+      await commands.updateStatus(validApptId, 'CHECKED_IN');
 
       expect(mockSupabase.update).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -49,10 +61,10 @@ describe('AppointmentStatusCommands', () => {
         date: '2025-01-15',
         startTime: '2025-01-15T09:00:00Z',
         endTime: '2025-01-15T09:30:00Z',
-        doctorId: 'doc-new',
+        doctorId: newDoctorId,
       };
 
-      await commands.updateStatus('appt-1', 'APPROVED', 'Rescheduled by secretary', reschedule);
+      await commands.updateStatus(validApptId, 'APPROVED', 'Rescheduled by secretary', reschedule);
 
       expect(mockSupabase.update).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -61,7 +73,7 @@ describe('AppointmentStatusCommands', () => {
           date: '2025-01-15',
           start_time: '2025-01-15T09:00:00Z',
           end_time: '2025-01-15T09:30:00Z',
-          doctor_id: 'doc-new',
+          doctor_id: newDoctorId,
         })
       );
     });
@@ -69,7 +81,7 @@ describe('AppointmentStatusCommands', () => {
     it('should throw DomainError on database failure', async () => {
       mockSupabase.single.mockResolvedValueOnce({ data: null, error: { message: 'Update failed' } });
 
-      await expect(commands.updateStatus('appt-1', 'CANCELLED', 'No longer needed')).rejects.toThrow(
+      await expect(commands.updateStatus(validApptId, 'CANCELLED', 'No longer needed')).rejects.toThrow(
         'Failed to update appointment status: Update failed'
       );
     });

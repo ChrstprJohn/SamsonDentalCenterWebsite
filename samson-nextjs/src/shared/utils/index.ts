@@ -8,4 +8,4 @@ export * from './slugify.util';
 export * from './capitalize.util';
 export * from './is-defined.util';
 export * from './get-base-url.util';
-export * from './mapping.util';
+

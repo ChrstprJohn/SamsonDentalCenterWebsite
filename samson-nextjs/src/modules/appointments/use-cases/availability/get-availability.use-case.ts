@@ -6,55 +6,22 @@ import {
   GetAvailableDaysDto,
   GetAvailableDaysResponseDto,
 } from '../../dtos';
-import { DomainError } from '@/shared/errors';
 
-export class GetAvailabilityUseCase {
-  constructor(private readonly availabilityQueries: AppointmentAvailabilityQueries) {}
-
-  /**
-   * Calculates monthly days that have at least one doctor scheduled and one available booking slot.
-   */
-  async getAvailableDays(dto: GetAvailableDaysDto): Promise<GetAvailableDaysResponseDto> {
-    const { month, serviceId, doctorId } = dto;
-    const schedules = await this.availabilityQueries.getWorkingSchedulesForMonth(month, doctorId);
-
-    if (!schedules || schedules.length === 0) {
-      return { month, serviceId, availableDates: [] };
-    }
-
-    const datesWithSchedules = Array.from(new Set(schedules.map((schedule) => schedule.date))).sort();
-    const availableDates: string[] = [];
-
-    for (const date of datesWithSchedules) {
-      const slotsResponse = await this.getAvailableTimeSlots({
-        serviceId,
-        doctorId,
-        date,
-      });
-
-      if (slotsResponse.availableSlots.length > 0) {
-        availableDates.push(date);
-      }
-    }
-
-    return {
-      month,
-      serviceId,
-      availableDates,
-    };
-  }
-
-  /**
-   * Calculates and returns available sliced time slots for a given date, service, and doctor.
-   */
-  async getAvailableTimeSlots(
+export const getAvailabilityUseCase = (deps: {
+  getWorkingSchedulesForMonth: (month: string, doctorId?: string) => Promise<any[]>;
+  getDoctorSchedules: (date: string, doctorId?: string) => Promise<any[]>;
+  getExistingAppointments: (date: string, doctorId?: string) => Promise<any[]>;
+  getServiceDuration: (serviceId: string) => Promise<number>;
+  resolveDoctorDisplayName: (doctorId: string) => Promise<string>;
+}) => {
+  const getAvailableTimeSlots = async (
     dto: GetAvailableTimeSlotsDto
-  ): Promise<GetAvailableTimeSlotsResponseDto> {
+  ): Promise<GetAvailableTimeSlotsResponseDto> => {
     const { serviceId, doctorId, date } = dto;
 
-    const duration = await this.availabilityQueries.getServiceDuration(serviceId);
-    const schedules = await this.availabilityQueries.getDoctorSchedules(date, doctorId);
-    const appointments = await this.availabilityQueries.getExistingAppointments(date, doctorId);
+    const duration = await deps.getServiceDuration(serviceId);
+    const schedules = await deps.getDoctorSchedules(date, doctorId);
+    const appointments = await deps.getExistingAppointments(date, doctorId);
 
     const availableSlots: AvailableSlotDto[] = [];
 
@@ -62,7 +29,7 @@ export class GetAvailabilityUseCase {
       const docId = schedule.staff_id || schedule.doctor_id || doctorId;
       if (!docId) continue;
 
-      const doctorName = await this.availabilityQueries.resolveDoctorDisplayName(docId);
+      const doctorName = await deps.resolveDoctorDisplayName(docId);
 
       const schedStartStr = schedule.start_time.includes(':')
         ? schedule.start_time
@@ -135,5 +102,64 @@ export class GetAvailabilityUseCase {
       serviceId,
       availableSlots,
     };
+  };
+
+  const getAvailableDays = async (dto: GetAvailableDaysDto): Promise<GetAvailableDaysResponseDto> => {
+    const { month, serviceId, doctorId } = dto;
+    const schedules = await deps.getWorkingSchedulesForMonth(month, doctorId);
+
+    if (!schedules || schedules.length === 0) {
+      return { month, serviceId, availableDates: [] };
+    }
+
+    const datesWithSchedules = Array.from(new Set(schedules.map((schedule) => schedule.date))).sort();
+    const availableDates: string[] = [];
+
+    for (const date of datesWithSchedules) {
+      const slotsResponse = await getAvailableTimeSlots({
+        serviceId,
+        doctorId,
+        date,
+      });
+
+      if (slotsResponse.availableSlots.length > 0) {
+        availableDates.push(date);
+      }
+    }
+
+    return {
+      month,
+      serviceId,
+      availableDates,
+    };
+  };
+
+  return {
+    getAvailableDays,
+    getAvailableTimeSlots,
+  };
+};
+
+export class GetAvailabilityUseCase {
+  constructor(private readonly availabilityQueries: AppointmentAvailabilityQueries) {}
+
+  async getAvailableDays(dto: GetAvailableDaysDto): Promise<GetAvailableDaysResponseDto> {
+    return getAvailabilityUseCase({
+      getWorkingSchedulesForMonth: (m, d) => this.availabilityQueries.getWorkingSchedulesForMonth(m, d),
+      getDoctorSchedules: (dt, d) => this.availabilityQueries.getDoctorSchedules(dt, d),
+      getExistingAppointments: (dt, d) => this.availabilityQueries.getExistingAppointments(dt, d),
+      getServiceDuration: (s) => this.availabilityQueries.getServiceDuration(s),
+      resolveDoctorDisplayName: (d) => this.availabilityQueries.resolveDoctorDisplayName(d),
+    }).getAvailableDays(dto);
+  }
+
+  async getAvailableTimeSlots(dto: GetAvailableTimeSlotsDto): Promise<GetAvailableTimeSlotsResponseDto> {
+    return getAvailabilityUseCase({
+      getWorkingSchedulesForMonth: (m, d) => this.availabilityQueries.getWorkingSchedulesForMonth(m, d),
+      getDoctorSchedules: (dt, d) => this.availabilityQueries.getDoctorSchedules(dt, d),
+      getExistingAppointments: (dt, d) => this.availabilityQueries.getExistingAppointments(dt, d),
+      getServiceDuration: (s) => this.availabilityQueries.getServiceDuration(s),
+      resolveDoctorDisplayName: (d) => this.availabilityQueries.resolveDoctorDisplayName(d),
+    }).getAvailableTimeSlots(dto);
   }
 }

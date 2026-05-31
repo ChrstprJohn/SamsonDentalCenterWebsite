@@ -1,19 +1,19 @@
-import { CreateStaffDto } from '../../dtos';
+import { CreateStaffDto, StaffProfileDto } from '../../dtos';
 import { StaffProfileCommands } from '../../repositories';
 
+export const createStaffUseCase = (
+    createStaff: (userId: string, data: CreateStaffDto) => Promise<StaffProfileDto>
+) => {
+    return async (userId: string, data: CreateStaffDto) => {
+        return await createStaff(userId, data);
+    };
+};
+
+// Deprecated class for backwards compatibility
 export class CreateStaffUseCase {
-    // Dependency Injection: The class receives its dependencies from the outside
     constructor(private readonly staffCommands: StaffProfileCommands) {}
-
     async execute(userId: string, data: CreateStaffDto) {
-        // -------------------------------------------------------------
-        // Business rules would go here (e.g., checking if the user
-        // already has a patient profile by calling a Query repository).
-        // -------------------------------------------------------------
-
-        // Delegate the actual database writing to the Command repository
-        const newStaff = await this.staffCommands.createStaff(userId, data);
-
-        return newStaff;
+        return createStaffUseCase((uid, d) => this.staffCommands.createStaff(uid, d))(userId, data);
     }
 }
+

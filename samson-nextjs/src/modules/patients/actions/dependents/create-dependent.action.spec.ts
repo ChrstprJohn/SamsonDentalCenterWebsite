@@ -8,10 +8,12 @@ vi.mock('@/shared/database/server', () => ({
   createClient: vi.fn().mockResolvedValue({}),
 }));
 vi.mock('../../repositories', () => ({
+  addDependentCommand: () => vi.fn().mockResolvedValue({ id: '123' }),
   PatientDependentsCommands: class {
     addDependent = vi.fn().mockResolvedValue({ id: '123' });
   }
 }));
+
 
 describe('createDependentAction', () => {
   it('should create dependent and return success', async () => {

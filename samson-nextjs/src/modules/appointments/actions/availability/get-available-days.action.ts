@@ -4,8 +4,14 @@ import { z } from 'zod';
 import { createClient } from '@/shared/database/server';
 import { DomainError } from '@/shared/errors';
 import { getAvailableDaysSchema, GetAvailableDaysDto } from '../../dtos';
-import { AppointmentAvailabilityQueries } from '../../repositories';
-import { GetAvailabilityUseCase } from '../../use-cases';
+import {
+  getWorkingSchedulesForMonthQuery,
+  getDoctorSchedulesQuery,
+  getExistingAppointmentsQuery,
+  getServiceDurationQuery,
+  resolveDoctorDisplayNameQuery,
+} from '../../repositories';
+import { getAvailabilityUseCase } from '../../use-cases';
 
 /**
  * Retrieves the available calendar days for booking in a given month.
@@ -14,8 +20,14 @@ export async function getAvailableDaysAction(formData: GetAvailableDaysDto) {
   try {
     const validData = getAvailableDaysSchema.parse(formData);
     const supabase = await createClient();
-    const availabilityQueries = new AppointmentAvailabilityQueries(supabase);
-    const useCase = new GetAvailabilityUseCase(availabilityQueries);
+    
+    const useCase = getAvailabilityUseCase({
+      getWorkingSchedulesForMonth: getWorkingSchedulesForMonthQuery(supabase),
+      getDoctorSchedules: getDoctorSchedulesQuery(supabase),
+      getExistingAppointments: getExistingAppointmentsQuery(supabase),
+      getServiceDuration: getServiceDurationQuery(supabase),
+      resolveDoctorDisplayName: resolveDoctorDisplayNameQuery(supabase),
+    });
 
     const result = await useCase.getAvailableDays(validData);
     return { success: true, data: result };

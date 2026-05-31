@@ -1,9 +1,9 @@
 import { describe, it, expect, vi } from 'vitest';
-import { StaffProfileCommands } from './staff-profile.commands';
+import { createStaffCommand, updateStaffCommand, terminateStaffCommand } from './staff-profile.commands';
 import { CreateStaffDto } from '../../dtos';
 import { DomainError } from '@/shared/errors';
 
-describe('StaffProfileCommands', () => {
+describe('StaffProfileCommands (Functional)', () => {
     const validData: CreateStaffDto = {
         firstName: 'Jane',
         middleName: null,
@@ -17,7 +17,7 @@ describe('StaffProfileCommands', () => {
     it('successfully creates a staff record', async () => {
         // 1. Arrange
         const mockInsertedRecord = {
-            id: 'staff_123',
+            id: '123e4567-e89b-12d3-a456-426614174000',
             first_name: validData.firstName,
             middle_name: validData.middleName,
             last_name: validData.lastName,
@@ -35,14 +35,14 @@ describe('StaffProfileCommands', () => {
             single: vi.fn().mockResolvedValue({ data: mockInsertedRecord, error: null }),
         };
 
-        const commands = new StaffProfileCommands(mockSupabase as any);
+        const createStaff = createStaffCommand(mockSupabase as any);
 
         // 2. Act
-        const result = await commands.createStaff('staff_123', validData);
+        const result = await createStaff('123e4567-e89b-12d3-a456-426614174000', validData);
 
         // 3. Assert
         expect(result).toEqual({
-            id: 'staff_123',
+            id: '123e4567-e89b-12d3-a456-426614174000',
             email: validData.email,
             firstName: validData.firstName,
             middleName: validData.middleName,
@@ -56,7 +56,7 @@ describe('StaffProfileCommands', () => {
         expect(mockSupabase.from).toHaveBeenCalledWith('staff');
         expect(mockSupabase.insert).toHaveBeenCalledWith(
             expect.objectContaining({
-                id: 'staff_123',
+                id: '123e4567-e89b-12d3-a456-426614174000',
                 first_name: 'Jane',
             })
         );
@@ -74,16 +74,16 @@ describe('StaffProfileCommands', () => {
             }),
         };
 
-        const commands = new StaffProfileCommands(mockSupabase as any);
+        const createStaff = createStaffCommand(mockSupabase as any);
 
         // 2 & 3. Act & Assert
-        await expect(commands.createStaff('staff_123', validData)).rejects.toThrow(DomainError);
+        await expect(createStaff('123e4567-e89b-12d3-a456-426614174000', validData)).rejects.toThrow(DomainError);
     });
 
     describe('updateStaff', () => {
         it('successfully updates a staff record', async () => {
             const mockUpdatedRecord = {
-                id: 'staff_123',
+                id: '123e4567-e89b-12d3-a456-426614174000',
                 email: 'new@email.com',
                 first_name: 'Jane',
                 last_name: 'Smith',
@@ -96,12 +96,12 @@ describe('StaffProfileCommands', () => {
                 select: vi.fn().mockReturnThis(),
                 single: vi.fn().mockResolvedValue({ data: mockUpdatedRecord, error: null }),
             };
-            const commands = new StaffProfileCommands(mockSupabase as any);
+            const updateStaff = updateStaffCommand(mockSupabase as any);
 
-            const result = await commands.updateStaff('staff_123', { email: 'new@email.com' });
+            const result = await updateStaff('123e4567-e89b-12d3-a456-426614174000', { email: 'new@email.com' });
 
             expect(result).toEqual({
-                id: 'staff_123',
+                id: '123e4567-e89b-12d3-a456-426614174000',
                 email: 'new@email.com',
                 firstName: 'Jane',
                 middleName: null,
@@ -113,7 +113,7 @@ describe('StaffProfileCommands', () => {
                 updatedAt: undefined,
             });
             expect(mockSupabase.update).toHaveBeenCalledWith({ email: 'new@email.com' });
-            expect(mockSupabase.eq).toHaveBeenCalledWith('id', 'staff_123');
+            expect(mockSupabase.eq).toHaveBeenCalledWith('id', '123e4567-e89b-12d3-a456-426614174000');
         });
 
         it('throws DomainError on database error', async () => {
@@ -126,10 +126,10 @@ describe('StaffProfileCommands', () => {
                     .fn()
                     .mockResolvedValue({ data: null, error: { message: 'Network error' } }),
             };
-            const commands = new StaffProfileCommands(mockSupabase as any);
+            const updateStaff = updateStaffCommand(mockSupabase as any);
 
             await expect(
-                commands.updateStaff('staff_123', { email: 'new@email.com' })
+                updateStaff('123e4567-e89b-12d3-a456-426614174000', { email: 'new@email.com' })
             ).rejects.toThrow(DomainError);
         });
     });
@@ -141,13 +141,13 @@ describe('StaffProfileCommands', () => {
                 delete: vi.fn().mockReturnThis(),
                 eq: vi.fn().mockResolvedValue({ error: null }),
             };
-            const commands = new StaffProfileCommands(mockSupabase as any);
+            const terminateStaff = terminateStaffCommand(mockSupabase as any);
 
-            const result = await commands.terminateStaff('staff_123');
+            const result = await terminateStaff('123e4567-e89b-12d3-a456-426614174000');
 
-            expect(result).toEqual({ success: true, id: 'staff_123' });
+            expect(result).toEqual({ success: true, id: '123e4567-e89b-12d3-a456-426614174000' });
             expect(mockSupabase.delete).toHaveBeenCalled();
-            expect(mockSupabase.eq).toHaveBeenCalledWith('id', 'staff_123');
+            expect(mockSupabase.eq).toHaveBeenCalledWith('id', '123e4567-e89b-12d3-a456-426614174000');
         });
     });
 });

@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { authorizeRole } from "@/shared/auth/auth.util";
 import { createClient } from "@/shared/database/server";
-import { UpdateInvoiceUseCase } from "../../use-cases";
+import { UpdateInvoiceUseCase, updateInvoiceUseCase } from "../../use-cases";
 import { updateInvoiceAction } from "./update-invoice.action";
 
 vi.mock("server-only", () => ({}));
@@ -16,6 +16,7 @@ describe("updateInvoiceAction", () => {
     vi.clearAllMocks();
     vi.mocked(authorizeRole).mockResolvedValue({ id: "staff-1" } as never);
     vi.mocked(createClient).mockResolvedValue({} as never);
+    vi.mocked(updateInvoiceUseCase).mockImplementation(() => mockExecute);
     vi.mocked(UpdateInvoiceUseCase).mockImplementation(function () {
       return { execute: mockExecute } as unknown as UpdateInvoiceUseCase;
     });

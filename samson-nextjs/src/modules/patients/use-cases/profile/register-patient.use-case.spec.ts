@@ -1,10 +1,9 @@
 import { describe, it, expect, vi } from 'vitest';
-import { RegisterPatientUseCase } from './register-patient.use-case';
-import { PatientProfileCommands } from '../../repositories/profile/patient-profile.commands';
+import { registerPatientUseCase } from './register-patient.use-case';
 import { RegisterPatientDto } from '../../dtos/profile/register-patient.dto';
 
-describe('RegisterPatientUseCase', () => {
-  it('should successfully register a patient by delegating to the repository', async () => {
+describe('RegisterPatientUseCase (Functional)', () => {
+  it('should successfully register a patient by delegating to the repository function', async () => {
     // 1. Arrange: Setup mock data
     const mockUserId = 'user-123';
     const mockDto: RegisterPatientDto = {
@@ -19,21 +18,15 @@ describe('RegisterPatientUseCase', () => {
     
     const mockCreatedPatient = { id: 'patient-abc', ...mockDto };
 
-    // Create a mock of the commands repository
-    // We mock only the method we need
-    const mockCommands = {
-      createPatient: vi.fn().mockResolvedValue(mockCreatedPatient)
-    } as unknown as PatientProfileCommands;
-
-    // Inject the fake repository
-    const useCase = new RegisterPatientUseCase(mockCommands);
+    const mockCreatePatient = vi.fn().mockResolvedValue(mockCreatedPatient);
+    const execute = registerPatientUseCase(mockCreatePatient);
 
     // 2. Act
-    const result = await useCase.execute(mockUserId, mockDto);
+    const result = await execute(mockUserId, mockDto);
 
     // 3. Assert
-    expect(mockCommands.createPatient).toHaveBeenCalledTimes(1);
-    expect(mockCommands.createPatient).toHaveBeenCalledWith(mockUserId, mockDto);
+    expect(mockCreatePatient).toHaveBeenCalledTimes(1);
+    expect(mockCreatePatient).toHaveBeenCalledWith(mockUserId, mockDto);
     expect(result).toEqual(mockCreatedPatient);
   });
 });

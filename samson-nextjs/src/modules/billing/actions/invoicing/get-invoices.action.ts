@@ -5,8 +5,8 @@ import { authorizeRole } from "@/shared/auth/auth.util";
 import { createClient } from "@/shared/database/server";
 import { DomainError } from "@/shared/errors";
 import { GetInvoicesDto, GetInvoicesSchema } from "../../dtos";
-import { InvoiceQueriesRepository } from "../../repositories";
-import { GetInvoicesUseCase } from "../../use-cases";
+import { getInvoicesQuery } from "../../repositories";
+import { getInvoicesUseCase } from "../../use-cases";
 
 export async function getInvoicesAction(params?: GetInvoicesDto) {
   try {
@@ -14,10 +14,10 @@ export async function getInvoicesAction(params?: GetInvoicesDto) {
 
     const parsed = GetInvoicesSchema.parse(params || {});
     const supabase = await createClient();
-    const queries = new InvoiceQueriesRepository(supabase);
-    const useCase = new GetInvoicesUseCase(queries);
+    
+    const useCase = getInvoicesUseCase(getInvoicesQuery(supabase));
 
-    const invoices = await useCase.execute(parsed);
+    const invoices = await useCase(parsed);
     return { success: true, data: invoices };
   } catch (error) {
     if (error instanceof z.ZodError) {

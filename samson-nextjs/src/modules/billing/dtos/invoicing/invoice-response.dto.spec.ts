@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { InvoiceResponseSchema, mapInvoiceRecord } from "./invoice-response.dto";
+import { invoiceResponseSchema, mapInvoiceRecord } from "./invoice-response.dto";
 
-describe("InvoiceResponseSchema", () => {
+describe("invoiceResponseSchema", () => {
   it("accepts a valid invoice response", () => {
-    const result = InvoiceResponseSchema.safeParse({
+    const result = invoiceResponseSchema.safeParse({
       id: "da95a63c-333e-4b68-98e3-82bdf1a07bd2",
       appointmentId: "1a95a63c-333e-4b68-98e3-82bdf1a07bd2",
       amount: 1200,
@@ -16,7 +16,7 @@ describe("InvoiceResponseSchema", () => {
   });
 
   it("rejects invalid invoice statuses", () => {
-    const result = InvoiceResponseSchema.safeParse({
+    const result = invoiceResponseSchema.safeParse({
       id: "da95a63c-333e-4b68-98e3-82bdf1a07bd2",
       appointmentId: "1a95a63c-333e-4b68-98e3-82bdf1a07bd2",
       amount: 1200,

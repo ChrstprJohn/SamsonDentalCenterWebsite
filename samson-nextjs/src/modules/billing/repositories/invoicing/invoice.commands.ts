@@ -4,11 +4,9 @@ import { UpdateInvoiceDto } from "../../dtos/invoicing/update-invoice.dto";
 import { FinalizeInvoiceDto } from "../../dtos/invoicing/finalize-invoice.dto";
 import { InvoiceResponseDto, mapInvoiceRecord } from "../../dtos/invoicing/invoice-response.dto";
 
-export class InvoiceCommandsRepository {
-  constructor(private readonly supabase: SupabaseClient) {}
-
-  async generateInvoice(data: GenerateInvoiceDto): Promise<InvoiceResponseDto> {
-    const { data: result, error } = await this.supabase
+export const generateInvoiceCommand = (supabase: SupabaseClient) => {
+  return async (data: GenerateInvoiceDto): Promise<InvoiceResponseDto> => {
+    const { data: result, error } = await supabase
       .from("invoices")
       .insert([data])
       .select()
@@ -16,11 +14,13 @@ export class InvoiceCommandsRepository {
 
     if (error) throw new Error(`Failed to generate invoice: ${error.message}`);
     return mapInvoiceRecord(result as Record<string, unknown>);
-  }
+  };
+};
 
-  async updateInvoice(data: UpdateInvoiceDto): Promise<InvoiceResponseDto> {
+export const updateInvoiceCommand = (supabase: SupabaseClient) => {
+  return async (data: UpdateInvoiceDto): Promise<InvoiceResponseDto> => {
     const { id, ...updates } = data;
-    const { data: result, error } = await this.supabase
+    const { data: result, error } = await supabase
       .from("invoices")
       .update(updates)
       .eq("id", id)
@@ -29,9 +29,11 @@ export class InvoiceCommandsRepository {
 
     if (error) throw new Error(`Failed to update invoice: ${error.message}`);
     return mapInvoiceRecord(result as Record<string, unknown>);
-  }
+  };
+};
 
-  async finalizeInvoice(data: FinalizeInvoiceDto): Promise<InvoiceResponseDto> {
+export const finalizeInvoiceCommand = (supabase: SupabaseClient) => {
+  return async (data: FinalizeInvoiceDto): Promise<InvoiceResponseDto> => {
     const { invoiceId, paymentMethod, discountApplied, amount } = data;
     const dbPayload: Record<string, any> = {
       status: "FINALIZED",
@@ -44,7 +46,7 @@ export class InvoiceCommandsRepository {
       dbPayload.amount = amount;
     }
 
-    const { data: result, error } = await this.supabase
+    const { data: result, error } = await supabase
       .from("invoices")
       .update(dbPayload)
       .eq("id", invoiceId)
@@ -53,6 +55,22 @@ export class InvoiceCommandsRepository {
 
     if (error) throw new Error(`Failed to finalize invoice: ${error.message}`);
     return mapInvoiceRecord(result as Record<string, unknown>);
+  };
+};
+
+/** @deprecated Use functional commands directly instead */
+export class InvoiceCommandsRepository {
+  constructor(private readonly supabase: SupabaseClient) {}
+
+  async generateInvoice(data: GenerateInvoiceDto): Promise<InvoiceResponseDto> {
+    return generateInvoiceCommand(this.supabase)(data);
+  }
+
+  async updateInvoice(data: UpdateInvoiceDto): Promise<InvoiceResponseDto> {
+    return updateInvoiceCommand(this.supabase)(data);
+  }
+
+  async finalizeInvoice(data: FinalizeInvoiceDto): Promise<InvoiceResponseDto> {
+    return finalizeInvoiceCommand(this.supabase)(data);
   }
 }
-

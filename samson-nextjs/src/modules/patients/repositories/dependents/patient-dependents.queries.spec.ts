@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
-import { PatientDependentsQueries } from './patient-dependents.queries';
+import { getDependentsByPatientIdQuery } from './patient-dependents.queries';
 
-describe('PatientDependentsQueries', () => {
+describe('PatientDependentsQueries (Functional)', () => {
   it('should get dependents', async () => {
     const mockSupabase = {
       from: vi.fn().mockReturnThis(),
@@ -21,10 +21,11 @@ describe('PatientDependentsQueries', () => {
       }),
     } as any;
 
-    const queries = new PatientDependentsQueries(mockSupabase);
-    const result = await queries.getDependentsByPatientId('123e4567-e89b-12d3-a456-426614174000');
+    const getDependentsByPatientId = getDependentsByPatientIdQuery(mockSupabase);
+    const result = await getDependentsByPatientId('123e4567-e89b-12d3-a456-426614174000');
 
     expect(result.length).toBe(1);
     expect(result[0].firstName).toBe('Jane');
   });
 });
+

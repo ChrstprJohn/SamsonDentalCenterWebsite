@@ -1,11 +1,13 @@
 import { describe, it, expect, vi } from 'vitest';
-import { DeactivateUserUseCase } from './deactivate-user.use-case';
+import { deactivateUserUseCase } from './deactivate-user.use-case';
 
-describe('DeactivateUserUseCase', () => {
+describe('DeactivateUserUseCase (Functional)', () => {
   it('should execute successfully', async () => {
-    const mockCommands = { deactivateUser: vi.fn().mockResolvedValue(true) } as any;
-    const useCase = new DeactivateUserUseCase(mockCommands);
-    const result = await useCase.execute({ userId: '123' });
+    const mockDeactivateUser = vi.fn().mockResolvedValue(true);
+
+    const execute = deactivateUserUseCase(mockDeactivateUser);
+    const result = await execute({ userId: '123' });
+
     expect(result).toBe(true);
   });
 });

@@ -3,8 +3,8 @@
 import { createClient } from '@/shared/database/server';
 import { getAuthenticatedUser } from '@/shared/auth/auth.util';
 import { DomainError, NotFoundError } from '@/shared/errors';
-import { PatientProfileQueries } from '../../repositories';
-import { GetPatientProfileUseCase } from '../../use-cases';
+import { getPatientProfileByIdQuery } from '../../repositories';
+import { getPatientProfileUseCase } from '../../use-cases';
 
 export async function getPatientProfileAction() {
   try {
@@ -13,11 +13,11 @@ export async function getPatientProfileAction() {
 
     // 2. Instantiate Repositories and Use-Cases
     const supabase = await createClient();
-    const patientQueries = new PatientProfileQueries(supabase);
-    const getPatientProfileUseCase = new GetPatientProfileUseCase(patientQueries);
+    const repo = getPatientProfileByIdQuery(supabase);
+    const useCase = getPatientProfileUseCase(repo);
 
     // 3. Execution (fetch the profile for the authenticated user)
-    const profile = await getPatientProfileUseCase.execute(user.id);
+    const profile = await useCase(user.id);
 
     // 4. Output mapping
     return { success: true, data: profile };
@@ -34,3 +34,4 @@ export async function getPatientProfileAction() {
     return { success: false, error: 'An unexpected system error occurred' };
   }
 }
+

@@ -5,8 +5,8 @@ import { authorizeRole } from "@/shared/auth/auth.util";
 import { createClient } from "@/shared/database/server";
 import { DomainError } from "@/shared/errors";
 import { UpdateInvoiceDto, UpdateInvoiceSchema } from "../../dtos";
-import { InvoiceCommandsRepository } from "../../repositories";
-import { UpdateInvoiceUseCase } from "../../use-cases";
+import { updateInvoiceCommand } from "../../repositories";
+import { updateInvoiceUseCase } from "../../use-cases";
 
 export async function updateInvoiceAction(data: UpdateInvoiceDto) {
   try {
@@ -14,10 +14,10 @@ export async function updateInvoiceAction(data: UpdateInvoiceDto) {
 
     const parsed = UpdateInvoiceSchema.parse(data);
     const supabase = await createClient();
-    const commands = new InvoiceCommandsRepository(supabase);
-    const useCase = new UpdateInvoiceUseCase(commands);
+    
+    const useCase = updateInvoiceUseCase(updateInvoiceCommand(supabase));
 
-    const invoice = await useCase.execute(parsed);
+    const invoice = await useCase(parsed);
     return { success: true, data: invoice };
   } catch (error) {
     if (error instanceof z.ZodError) {
