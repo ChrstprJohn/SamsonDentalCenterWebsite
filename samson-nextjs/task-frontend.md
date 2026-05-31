@@ -161,14 +161,14 @@ The high-volume workflow center for clinic staff. Fully dynamic dashboard (no ca
 
 A clinical dashboard designed to streamline in-operatory documentation.
 
-- [ ] **6.1 Doctor Dashboard (`src/app/(portals)/doctor/`)**
-  - [ ] Lists today's active schedule and upcoming patient queue assigned to the doctor.
-- [ ] **6.2 Clinical Session View**
-  - [ ] **Patient Dental History (Read-only)**: Vertical timeline showing all past clinical charts, notes, and services rendered.
-  - [ ] **Treatment Rendered Form**:
-    - Input boxes for entering clinical notes, diagnostic remarks, and actual dental procedures completed.
-    - Multi-select checkbox grid of services to generate the **Draft Invoice** payload.
-    - Submit action changes the appointment status to `Treatment Rendered` and routes back to the dashboard.
+- [x] **6.1 Doctor Dashboard (`src/app/(portals)/doctor/`)**
+  - [x] Lists today's active schedule and upcoming patient queue assigned to the doctor.
+- [x] **6.2 Clinical Session View**
+  - [x] **Patient Dental History (Read-only)**: Vertical timeline showing all past clinical charts, notes, and services rendered.
+  - [x] **Treatment Rendered Form**:
+    - [x] Input boxes for entering clinical notes, diagnostic remarks, and actual dental procedures completed.
+    - [x] Multi-select checkbox grid of services to generate the **Draft Invoice** payload.
+    - [x] Submit action changes the appointment status to `Treatment Rendered` and routes back to the dashboard.
 
 ---
 
@@ -176,23 +176,23 @@ A clinical dashboard designed to streamline in-operatory documentation.
 
 Complete administrative oversight of clinical rosters, services, and system-wide operation parameters.
 
-- [ ] **7.1 Admin Analytics Dashboard (`src/app/(portals)/admin/`)**
-  - [ ] Analytics graphs (e.g. appointment statistics, daily clinic performance).
-- [ ] **7.2 Administrative Roster CRUD Panels**
-  - [ ] **Manage Services**: List, add, edit details, set durations (30m, 1h, etc.), toggle active state, or archive services.
-  - [ ] **Manage Doctors**: Create doctor accounts, configure custom weekly work schedules, breaks, and days off.
-  - [ ] **Manage Users & Secretaries**: System-wide list with user account search, status edits, and deactivation triggers.
-- [ ] **7.3 Global Clinic Config Editor**
-  - [ ] **Clinic Info**: Form fields for clinic name, physical address, email, and phone contact.
-  - [ ] **Operating Hours Roster**: Set default open/close times per weekday with integrated validation constraints.
-  - [ ] **Scheduling Policies**:
-    - Toggle `allow_same_day_booking`.
-    - Input box for `calendar_render_days` count.
-    - Select default slot durations.
-    - Input box for `max_reschedules_per_appointment`.
-  - [ ] **Booking Toggle**: Primary toggle switch to open or close online booking. When toggled off, inputs a custom maintenance message to display on the public booking wizard page.
-- [ ] **7.4 Global System Audit**
-  - [ ] Lightweight read-only system-wide audit logs showing actors, times, and actions taken.
+- [x] **7.1 Admin Analytics Dashboard (`src/app/(portals)/admin/`)**
+  - [x] Analytics graphs (e.g. appointment statistics, daily clinic performance).
+- [x] **7.2 Administrative Roster CRUD Panels**
+  - [x] **Manage Services**: List, add, edit details, set durations (30m, 1h, etc.), toggle active state, or archive services.
+  - [x] **Manage Doctors**: Create doctor accounts, configure custom weekly work schedules, breaks, and days off.
+  - [x] **Manage Users & Secretaries**: System-wide list with user account search, status edits, and deactivation triggers.
+- [x] **7.3 Global Clinic Config Editor**
+  - [x] **Clinic Info**: Form fields for clinic name, physical address, email, and phone contact.
+  - [x] **Operating Hours Roster**: Set default open/close times per weekday with integrated validation constraints.
+  - [x] **Scheduling Policies**:
+    - [x] Toggle `allow_same_day_booking`.
+    - [x] Input box for `calendar_render_days` count.
+    - [x] Select default slot durations.
+    - [x] Input box for `max_reschedules_per_appointment`.
+  - [x] **Booking Toggle**: Primary toggle switch to open or close online booking. When toggled off, inputs a custom maintenance message to display on the public booking wizard page.
+- [x] **7.4 Global System Audit**
+  - [x] Lightweight read-only system-wide audit logs showing actors, times, and actions taken.
 
 ---
 
