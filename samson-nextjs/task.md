@@ -192,8 +192,8 @@ Currently, we are focusing purely on the **Backend and Setup** aspects following
     - [x] `modules/audit-logs/dtos/index.ts`
 
 ### Phase 9: Orchestrators & Events
-- [ ] **Cross-Domain Workflow:** Build orchestrators for multi-domain processes if required (e.g., `checkout.orchestrator.ts` connecting doctor treatment submission with billing).
-- [ ] **Background Tasks:** Setup background event subscribers (using Next.js `after()`) for emails or side-effects.
+- [x] **Cross-Domain Workflow:** Build orchestrators for multi-domain processes if required (e.g., `checkout.orchestrator.ts` connecting doctor treatment submission with billing).
+- [x] **Background Tasks:** Setup background event subscribers (using Next.js `after()`) for emails or side-effects.
 
 ---
 
