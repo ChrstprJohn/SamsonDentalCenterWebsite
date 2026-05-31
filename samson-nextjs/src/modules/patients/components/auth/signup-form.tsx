@@ -84,6 +84,15 @@ export function SignUpForm({ register, onSubmit, errors, isLoading }: SignUpForm
         disabled={isLoading}
       />
 
+      <Input
+        label="Confirm Password *"
+        type="password"
+        error={errors.confirmPassword?.message}
+        {...register('confirmPassword')}
+        placeholder="Re-enter your password"
+        disabled={isLoading}
+      />
+
       <div className="flex flex-col gap-2 mt-2">
         <label className="flex items-start gap-2.5 cursor-pointer">
           <input
