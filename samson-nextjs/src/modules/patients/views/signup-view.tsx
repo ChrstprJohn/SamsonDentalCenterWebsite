@@ -1,32 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useSignUpForm } from '../hooks/auth/use-sign-up-form.hook';
-import { SignUpInput } from '../dtos/auth/sign-up.dto';
+import React from 'react';
+import { useSignUpView } from '../hooks/auth/use-sign-up-view.hook';
 import { SignUpForm } from '../components/auth/signup-form';
-import { useToast } from '@/components/feedback/toast-container';
 
 export function SignUpView() {
-  const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
-  const { addToast } = useToast();
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useSignUpForm();
-
-  const onSubmit = async (data: SignUpInput) => {
-    setIsLoading(true);
-    // Simulate API registration call (mock-first)
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setIsLoading(false);
-    
-    addToast('Account created successfully! Please verify your email with the OTP.', 'success');
-    router.push(`/auth/verify?email=${encodeURIComponent(data.email)}&type=signup`);
-  };
+  const { isLoading, register, handleSubmit, errors, onSubmit } = useSignUpView();
 
   return (
     <div className="w-full max-w-lg p-8 rounded-3xl border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-slate-950/40 backdrop-blur-2xl shadow-2xl">

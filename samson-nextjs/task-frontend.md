@@ -48,19 +48,23 @@ Build the patient registration and portal login experiences. Collect minimal fie
     - Patient Fields: First Name (req), Middle Name (opt), Last Name (req), Suffix (opt), Email (req), Phone Number (req, E.164), Date of Birth (req, YYYY-MM-DD).
 - [x] **1.2 Auth Pages Routing (`src/app/(public)/auth/`)**
   - [x] **Sign-up page (`views/signup-view.tsx` & `components/auth/signup-form.tsx`)**:
+    - Refactored: all logic extracted to `hooks/auth/use-sign-up-view.hook.ts`.
+    - View is now a pure dumb orchestrator — zero inline state or effects.
+    - Co-located spec: `use-sign-up-view.hook.spec.ts` — tests routing URL, success toast, email encoding.
     - Includes interactive Terms of Service & Privacy Policy checkboxes.
-    - Captures patient fields with client-side Zod validation.
   - [x] **Login page (`views/login-view.tsx` & `components/auth/login-form.tsx`)**:
-    - Simple and clean entry point (Email & Password/OTP toggle).
+    - Refactored: logic extracted to `hooks/auth/use-login-view.hook.ts`.
+    - Password / OTP toggle on the form component.
+    - Co-located spec: `use-login-view.hook.spec.ts` — tests routing, toast, email encoding.
   - [x] **OTP Verification Screen (`views/otp-verify-view.tsx`)**:
-    - Animated code blocks inputs for verification.
-    - Displays Resend OTP countdown trigger.
+    - Refactored: all digit input, countdown timer, verify, and resend logic extracted to `hooks/auth/use-otp-verify-view.hook.ts`.
+    - Co-located spec: `use-otp-verify-view.hook.spec.ts` — tests digit filtering, multi-char paste, incomplete OTP rejection, success navigation & toasts.
 - [x] **1.3 Header Authentication Triggers**
   - [x] **Authenticated User Header (`components/auth/authenticated-user-header.tsx`)**: Displays dynamic avatar (initials fallback), patient name, chevron toggle, and dropdown navigation links (My Portal, Appointments, Settings, Sign Out). Driven by `hooks/auth/use-auth-header.hook.ts`.
   - [x] **Notification Indicator (`components/auth/notification-indicator.tsx`)**: Bell icon with animated red badge next to avatar. Shows count (capped at 99+).
   - [x] **Hook (`hooks/auth/use-auth-header.hook.ts`)**: Controls dropdown open/close state and `getInitials()` helper. Co-located spec `use-auth-header.hook.spec.ts` tests all pure logic paths.
 
-> 📋 **Testing Rule**: Every new hook must have a co-located `.spec.ts` file from day one. Pure logic helpers (like `getInitials`) are unit-tested directly. Trivial `useState` toggles are exempt per the Frontend Testing Guidelines (Section 1B).
+> 📋 **Testing Rule**: Every new hook must have a co-located `.spec.ts` file from day one. Pure logic helpers (like `getInitials`, digit validation) are unit-tested directly. Trivial `useState` toggles are exempt per the Frontend Testing Guidelines (Section 1B). View components must be backed by a companion hook that is testable in the node environment.
 
 ---
 

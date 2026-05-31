@@ -1,66 +1,21 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import React from 'react';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/components/feedback/toast-container';
+import { useOTPVerifyView } from '../hooks/auth/use-otp-verify-view.hook';
 
 export function OTPVerifyView() {
-  const [code, setCode] = useState<string[]>(Array(6).fill(''));
-  const [isLoading, setIsLoading] = useState(false);
-  const [countdown, setCountdown] = useState(60);
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const email = searchParams.get('email') || 'your email';
-  const { addToast } = useToast();
-  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-
-  useEffect(() => {
-    if (countdown > 0) {
-      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [countdown]);
-
-  const handleChange = (index: number, val: string) => {
-    if (!/^\d*$/.test(val)) return;
-    const newCode = [...code];
-    newCode[index] = val.substring(val.length - 1);
-    setCode(newCode);
-
-    // Focus next input
-    if (val && index < 5) {
-      inputRefs.current[index + 1]?.focus();
-    }
-  };
-
-  const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Backspace' && !code[index] && index > 0) {
-      inputRefs.current[index - 1]?.focus();
-    }
-  };
-
-  const handleVerify = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const otp = code.join('');
-    if (otp.length < 6) {
-      addToast('Please enter the full 6-digit code.', 'error');
-      return;
-    }
-
-    setIsLoading(true);
-    // Simulate verification API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setIsLoading(false);
-
-    addToast('Email verified successfully! Welcome to Samson Dental.', 'success');
-    router.push('/user');
-  };
-
-  const handleResend = () => {
-    setCountdown(60);
-    addToast('New verification code sent to your email.', 'info');
-  };
+  const {
+    code,
+    isLoading,
+    countdown,
+    email,
+    inputRefs,
+    handleChange,
+    handleKeyDown,
+    handleVerify,
+    handleResend,
+  } = useOTPVerifyView();
 
   return (
     <div className="w-full max-w-md p-8 rounded-3xl border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-slate-950/40 backdrop-blur-2xl shadow-2xl">
@@ -69,7 +24,8 @@ export function OTPVerifyView() {
           Verify Account
         </h1>
         <p className="text-sm text-slate-500 dark:text-slate-400">
-          We have sent a 6-digit OTP verification code to <span className="font-semibold text-slate-750 dark:text-slate-300">{email}</span>.
+          We have sent a 6-digit OTP verification code to{' '}
+          <span className="font-semibold text-slate-750 dark:text-slate-300">{email}</span>.
         </p>
       </div>
 

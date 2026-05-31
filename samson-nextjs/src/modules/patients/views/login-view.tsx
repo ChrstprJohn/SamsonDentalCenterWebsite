@@ -1,32 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useLoginForm } from '../hooks/auth/use-login-form.hook';
-import { LoginInput } from '../dtos/auth/login.dto';
+import React from 'react';
+import { useLoginView } from '../hooks/auth/use-login-view.hook';
 import { LoginForm } from '../components/auth/login-form';
-import { useToast } from '@/components/feedback/toast-container';
 
 export function LoginView() {
-  const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
-  const { addToast } = useToast();
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useLoginForm();
-
-  const onSubmit = async (data: LoginInput) => {
-    setIsLoading(true);
-    // Simulate API login call (mock-first)
-    await new Promise((resolve) => setTimeout(resolve, 1200));
-    setIsLoading(false);
-    
-    addToast('Verification code sent to your email!', 'success');
-    router.push(`/auth/verify?email=${encodeURIComponent(data.email)}&type=login`);
-  };
+  const { isLoading, register, handleSubmit, errors, onSubmit } = useLoginView();
 
   return (
     <div className="w-full max-w-md p-8 rounded-3xl border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-slate-950/40 backdrop-blur-2xl shadow-2xl">
@@ -35,7 +14,7 @@ export function LoginView() {
           Welcome Back
         </h1>
         <p className="text-sm text-slate-500 dark:text-slate-400">
-          Enter your email to verify and access your account.
+          Enter your credentials to access your account.
         </p>
       </div>
 
@@ -47,7 +26,7 @@ export function LoginView() {
       />
 
       <p className="text-xs text-center text-slate-500 dark:text-slate-400 mt-6">
-        Don't have an account yet?   {' '}
+        Don&apos;t have an account yet?{' '}
         <a href="/auth/signup" className="text-blue-500 font-semibold hover:underline">
           Sign Up
         </a>
