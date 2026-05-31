@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { ClinicConfigCommandsRepository } from "./clinic-config.commands";
+import { updateClinicConfigCommand } from "./clinic-config.commands";
 
 const mockSingle = vi.fn();
 const mockSelect = vi.fn();
@@ -11,7 +11,7 @@ const mockSupabase = {
   from: mockFrom,
 } as any;
 
-describe("ClinicConfigCommandsRepository (Unit Test)", () => {
+describe("updateClinicConfigCommand (Unit Test)", () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
@@ -21,7 +21,7 @@ describe("ClinicConfigCommandsRepository (Unit Test)", () => {
     mockSelect.mockReturnValue({ single: mockSingle });
   });
 
-  describe("updateConfig", () => {
+  describe("execute", () => {
     it("should update the clinic config and return the result", async () => {
       const fakeConfig = {
         is_booking_open: false,
@@ -47,19 +47,20 @@ describe("ClinicConfigCommandsRepository (Unit Test)", () => {
 
       mockSingle.mockResolvedValue({ data: fakeConfig, error: null });
 
-      const repo = new ClinicConfigCommandsRepository(mockSupabase);
-      const result = await repo.updateConfig({ isBookingOpen: false });
+      const updateConfig = updateClinicConfigCommand(mockSupabase);
+      const result = await updateConfig({ isBookingOpen: false });
 
       expect(result.isBookingOpen).toBe(false);
       expect(mockFrom).toHaveBeenCalledWith("clinic_settings");
+      expect(mockUpdate).toHaveBeenCalledWith({ is_booking_open: false });
     });
 
     it("should throw an error if supabase returns an error", async () => {
       mockSingle.mockResolvedValue({ data: null, error: { message: "Update failed" } });
 
-      const repo = new ClinicConfigCommandsRepository(mockSupabase);
+      const updateConfig = updateClinicConfigCommand(mockSupabase);
       await expect(
-        repo.updateConfig({ isBookingOpen: false })
+        updateConfig({ isBookingOpen: false })
       ).rejects.toThrow("Failed to update clinic config: Update failed");
     });
   });

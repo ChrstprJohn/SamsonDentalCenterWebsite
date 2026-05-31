@@ -1,19 +1,22 @@
 import { describe, it, expect, vi } from "vitest";
 import { updateServiceAction } from "./update-service.action";
 
+const mocks = vi.hoisted(() => ({
+  updateServiceCommand: vi.fn(() => vi.fn()),
+  updateServiceUseCase: vi.fn(() => vi.fn().mockResolvedValue({ id: "svc-1", name: "Clean Updated" })),
+}));
+
 vi.mock("../../../../shared/database/server", () => ({
   createClient: vi.fn().mockResolvedValue({}),
 }));
 
-vi.mock("../../use-cases/management/update-service.use-case", () => {
-  return {
-    UpdateServiceUseCase: vi.fn(function () {
-      return {
-      execute: vi.fn().mockResolvedValue({ id: "svc-1", name: "Clean Updated" }),
-      };
-    }),
-  };
-});
+vi.mock("../../repositories/management/service.commands", () => ({
+  updateServiceCommand: mocks.updateServiceCommand,
+}));
+
+vi.mock("../../use-cases/management/update-service.use-case", () => ({
+  updateServiceUseCase: mocks.updateServiceUseCase,
+}));
 
 describe("updateServiceAction (Unit Test)", () => {
   it("should successfully call the use case and return data", async () => {

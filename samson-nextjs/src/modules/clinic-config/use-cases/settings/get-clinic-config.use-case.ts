@@ -1,4 +1,3 @@
-import { ClinicConfigQueriesRepository } from "../../repositories/settings/clinic-config.queries";
 import { ClinicConfigResponseDto } from "../../dtos/settings/get-clinic-config.dto";
 
 const DEFAULT_CONFIG: ClinicConfigResponseDto = {
@@ -23,11 +22,11 @@ const DEFAULT_CONFIG: ClinicConfigResponseDto = {
   socialLinks: [],
 };
 
-export class GetClinicConfigUseCase {
-  constructor(private readonly queries: ClinicConfigQueriesRepository) {}
-
-  async execute(): Promise<ClinicConfigResponseDto> {
-    const config = await this.queries.getConfig();
+export const getClinicConfigUseCase = (
+  getClinicConfig: () => Promise<ClinicConfigResponseDto | null>
+) => {
+  return async (): Promise<ClinicConfigResponseDto> => {
+    const config = await getClinicConfig();
     return config || DEFAULT_CONFIG;
-  }
-}
+  };
+};

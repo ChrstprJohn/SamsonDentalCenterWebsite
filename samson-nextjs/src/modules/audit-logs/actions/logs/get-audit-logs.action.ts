@@ -5,8 +5,8 @@ import { authorizeRole } from '@/shared/auth/auth.util';
 import { createClient } from '@/shared/database/server';
 import { DomainError } from '@/shared/errors';
 import { GetAuditLogsDto, getAuditLogsSchema } from '../../dtos/logs/get-audit-logs.dto';
-import { AuditLogQueries } from '../../repositories/logs/audit-log.queries';
-import { GetAuditLogsUseCase } from '../../use-cases/logs/get-audit-logs.use-case';
+import { getAuditLogsQuery } from '../../repositories/logs/audit-log.queries';
+import { getAuditLogsUseCase } from '../../use-cases/logs/get-audit-logs.use-case';
 
 export async function getAuditLogsAction(filters?: GetAuditLogsDto) {
   try {
@@ -19,10 +19,10 @@ export async function getAuditLogsAction(filters?: GetAuditLogsDto) {
     }
 
     const supabase = await createClient();
-    const queries = new AuditLogQueries(supabase);
-    const useCase = new GetAuditLogsUseCase(queries);
+    const query = getAuditLogsQuery(supabase);
+    const useCase = getAuditLogsUseCase(query);
 
-    const logs = await useCase.execute(parsed);
+    const logs = await useCase(parsed);
     return { success: true, data: logs };
   } catch (error) {
     if (error instanceof z.ZodError) {

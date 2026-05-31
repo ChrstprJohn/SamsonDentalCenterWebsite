@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
-import { CreateAuditLogUseCase } from './create-audit-log.use-case';
+import { createAuditLogUseCase } from './create-audit-log.use-case';
 
-describe('CreateAuditLogUseCase', () => {
+describe('createAuditLogUseCase', () => {
   it('executes and creates audit log via repository', async () => {
     const mockResponse = {
       id: 'log-1',
@@ -10,20 +10,18 @@ describe('CreateAuditLogUseCase', () => {
       targetId: 'appt-1',
     };
 
-    const mockCommands = {
-      createAuditLog: vi.fn().mockResolvedValue(mockResponse),
-    } as any;
+    const createAuditLog = vi.fn().mockResolvedValue(mockResponse);
 
-    const useCase = new CreateAuditLogUseCase(mockCommands);
+    const useCase = createAuditLogUseCase(createAuditLog);
     const data = {
       actorId: 'user-1',
       action: 'APPROVED_APPOINTMENT',
       targetId: 'appt-1',
     };
 
-    const result = await useCase.execute(data);
+    const result = await useCase(data);
 
     expect(result).toEqual(mockResponse);
-    expect(mockCommands.createAuditLog).toHaveBeenCalledWith(data);
+    expect(createAuditLog).toHaveBeenCalledWith(data);
   });
 });

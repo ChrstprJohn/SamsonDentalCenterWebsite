@@ -1,31 +1,30 @@
 import { describe, it, expect, vi } from "vitest";
-import { CreateServiceUseCase } from "./create-service.use-case";
-import { ServiceCommandsRepository } from "../../repositories/management/service.commands";
+import { createServiceUseCase } from "./create-service.use-case";
 
-describe("CreateServiceUseCase (Unit Test)", () => {
+describe("createServiceUseCase (Unit Test)", () => {
   it("should successfully create a service", async () => {
-    const mockRepo = {
-      createService: vi.fn().mockResolvedValue({
-        id: "svc-1",
-        name: "Teeth Cleaning",
-        description: null,
-        durationMinutes: 30,
-        price: 100,
-        isActive: true,
-      }),
-    } as unknown as ServiceCommandsRepository;
+    const createService = vi.fn().mockResolvedValue({
+      id: "550e8400-e29b-41d4-a716-446655440000",
+      name: "Teeth Cleaning",
+      description: null,
+      durationMinutes: 30,
+      price: 100,
+      serviceType: "GENERAL",
+      isActive: true,
+    });
 
-    const useCase = new CreateServiceUseCase(mockRepo);
+    const useCase = createServiceUseCase(createService);
     const payload = {
       name: "Teeth Cleaning",
       durationMinutes: 30,
       price: 100,
+      serviceType: "GENERAL" as const,
       isActive: true,
     };
     
-    const result = await useCase.execute(payload);
+    const result = await useCase(payload);
 
-    expect(result.id).toBe("svc-1");
-    expect(mockRepo.createService).toHaveBeenCalledWith(payload);
+    expect(result.id).toBe("550e8400-e29b-41d4-a716-446655440000");
+    expect(createService).toHaveBeenCalledWith(payload);
   });
 });

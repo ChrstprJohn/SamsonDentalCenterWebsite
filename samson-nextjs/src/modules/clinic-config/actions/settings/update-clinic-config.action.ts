@@ -1,8 +1,8 @@
 "use server";
 
 import { UpdateClinicConfigDto, updateClinicConfigSchema } from "../../dtos/settings/update-clinic-config.dto";
-import { UpdateClinicConfigUseCase } from "../../use-cases/settings/update-clinic-config.use-case";
-import { ClinicConfigCommandsRepository } from "../../repositories/settings/clinic-config.commands";
+import { updateClinicConfigUseCase } from "../../use-cases/settings/update-clinic-config.use-case";
+import { updateClinicConfigCommand } from "../../repositories/settings/clinic-config.commands";
 import { createClient } from "../../../../shared/database/server";
 
 export async function updateClinicConfigAction(data: UpdateClinicConfigDto) {
@@ -12,11 +12,11 @@ export async function updateClinicConfigAction(data: UpdateClinicConfigDto) {
 
     // 2. DI Setup
     const supabase = await createClient();
-    const repository = new ClinicConfigCommandsRepository(supabase);
-    const useCase = new UpdateClinicConfigUseCase(repository);
+    const command = updateClinicConfigCommand(supabase);
+    const useCase = updateClinicConfigUseCase(command);
 
     // 3. Execution
-    const result = await useCase.execute(parsed);
+    const result = await useCase(parsed);
     return { data: result };
   } catch (error: any) {
     return { error: error.message || "Failed to update clinic config" };

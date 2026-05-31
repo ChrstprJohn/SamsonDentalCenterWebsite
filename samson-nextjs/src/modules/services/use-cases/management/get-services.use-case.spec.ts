@@ -1,19 +1,22 @@
 import { describe, it, expect, vi } from "vitest";
-import { GetServicesUseCase } from "./get-services.use-case";
-import { ServiceQueriesRepository } from "../../repositories/management/service.queries";
+import { getServicesUseCase } from "./get-services.use-case";
 
-describe("GetServicesUseCase (Unit Test)", () => {
+describe("getServicesUseCase (Unit Test)", () => {
   it("should successfully fetch services", async () => {
-    const mockRepo = {
-      getServices: vi.fn().mockResolvedValue([
-        { id: "svc-1", name: "Teeth Cleaning", durationMinutes: 30, isActive: true }
-      ]),
-    } as unknown as ServiceQueriesRepository;
+    const getServices = vi.fn().mockResolvedValue([
+      {
+        id: "550e8400-e29b-41d4-a716-446655440000",
+        name: "Teeth Cleaning",
+        durationMinutes: 30,
+        serviceType: "GENERAL",
+        isActive: true,
+      },
+    ]);
 
-    const useCase = new GetServicesUseCase(mockRepo);
-    const result = await useCase.execute(false);
+    const useCase = getServicesUseCase(getServices);
+    const result = await useCase(false);
 
     expect(result.length).toBe(1);
-    expect(mockRepo.getServices).toHaveBeenCalledWith(false);
+    expect(getServices).toHaveBeenCalledWith(false);
   });
 });

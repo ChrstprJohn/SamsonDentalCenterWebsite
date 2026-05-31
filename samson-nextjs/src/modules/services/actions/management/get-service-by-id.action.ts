@@ -1,7 +1,7 @@
 "use server";
 
-import { GetServiceByIdUseCase } from "../../use-cases/management/get-service-by-id.use-case";
-import { ServiceQueriesRepository } from "../../repositories/management/service.queries";
+import { getServiceByIdUseCase } from "../../use-cases/management/get-service-by-id.use-case";
+import { getServiceByIdQuery } from "../../repositories/management/service.queries";
 import { createClient } from "../../../../shared/database/server";
 
 export async function getServiceByIdAction(id: string) {
@@ -9,10 +9,10 @@ export async function getServiceByIdAction(id: string) {
     if (!id || typeof id !== "string") throw new Error("Invalid service ID");
 
     const supabase = await createClient();
-    const repository = new ServiceQueriesRepository(supabase);
-    const useCase = new GetServiceByIdUseCase(repository);
+    const query = getServiceByIdQuery(supabase);
+    const useCase = getServiceByIdUseCase(query);
 
-    const result = await useCase.execute(id);
+    const result = await useCase(id);
 
     if (!result) {
       return { error: "Service not found" };

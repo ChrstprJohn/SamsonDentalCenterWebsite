@@ -1,12 +1,15 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { authorizeRole } from '@/shared/auth/auth.util';
 import { createClient } from '@/shared/database/server';
-import { GetAuditLogsUseCase } from '../../use-cases/logs/get-audit-logs.use-case';
+import { getAuditLogsUseCase } from '../../use-cases/logs/get-audit-logs.use-case';
 import { getAuditLogsAction } from './get-audit-logs.action';
 
 vi.mock('server-only', () => ({}));
 vi.mock('@/shared/auth/auth.util');
 vi.mock('@/shared/database/server');
+vi.mock('../../repositories/logs/audit-log.queries', () => ({
+  getAuditLogsQuery: vi.fn(() => vi.fn()),
+}));
 vi.mock('../../use-cases/logs/get-audit-logs.use-case');
 
 describe('getAuditLogsAction', () => {
@@ -16,11 +19,7 @@ describe('getAuditLogsAction', () => {
     vi.clearAllMocks();
     vi.mocked(authorizeRole).mockResolvedValue({ id: 'admin-1' } as any);
     vi.mocked(createClient).mockResolvedValue({} as any);
-    vi.mocked(GetAuditLogsUseCase).mockImplementation(function () {
-      return {
-        execute: mockExecute,
-      } as any;
-    });
+    vi.mocked(getAuditLogsUseCase).mockReturnValue(mockExecute as any);
   });
 
   it('successfully fetches audit logs when authorized as ADMIN', async () => {

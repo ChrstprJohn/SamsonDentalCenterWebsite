@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { ClinicConfigQueriesRepository } from "./clinic-config.queries";
+import { getClinicConfigQuery } from "./clinic-config.queries";
 
 const mockMaybeSingle = vi.fn();
 const mockEq = vi.fn();
@@ -10,7 +10,7 @@ const mockSupabase = {
   from: mockFrom,
 } as any;
 
-describe("ClinicConfigQueriesRepository (Unit Test)", () => {
+describe("getClinicConfigQuery (Unit Test)", () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
@@ -19,7 +19,7 @@ describe("ClinicConfigQueriesRepository (Unit Test)", () => {
     mockEq.mockReturnValue({ maybeSingle: mockMaybeSingle });
   });
 
-  describe("getConfig", () => {
+  describe("execute", () => {
     it("should return the clinic config when found", async () => {
       const fakeConfig = {
         is_booking_open: true,
@@ -45,8 +45,8 @@ describe("ClinicConfigQueriesRepository (Unit Test)", () => {
 
       mockMaybeSingle.mockResolvedValue({ data: fakeConfig, error: null });
 
-      const repo = new ClinicConfigQueriesRepository(mockSupabase);
-      const result = await repo.getConfig();
+      const getConfig = getClinicConfigQuery(mockSupabase);
+      const result = await getConfig();
 
       expect(result?.clinicName).toBe("Samson Dental");
       expect(mockFrom).toHaveBeenCalledWith("clinic_settings");
@@ -55,8 +55,8 @@ describe("ClinicConfigQueriesRepository (Unit Test)", () => {
     it("should return null when no config exists", async () => {
       mockMaybeSingle.mockResolvedValue({ data: null, error: null });
 
-      const repo = new ClinicConfigQueriesRepository(mockSupabase);
-      const result = await repo.getConfig();
+      const getConfig = getClinicConfigQuery(mockSupabase);
+      const result = await getConfig();
 
       expect(result).toBeNull();
     });
@@ -64,8 +64,8 @@ describe("ClinicConfigQueriesRepository (Unit Test)", () => {
     it("should throw an error if supabase returns an error", async () => {
       mockMaybeSingle.mockResolvedValue({ data: null, error: { message: "Fetch failed" } });
 
-      const repo = new ClinicConfigQueriesRepository(mockSupabase);
-      await expect(repo.getConfig()).rejects.toThrow(
+      const getConfig = getClinicConfigQuery(mockSupabase);
+      await expect(getConfig()).rejects.toThrow(
         "Failed to fetch clinic config: Fetch failed"
       );
     });

@@ -1,11 +1,9 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import { UpdateClinicConfigDto } from "../../dtos/settings/update-clinic-config.dto";
-import { ClinicConfigResponseDto, mapClinicConfigRecord } from "../../dtos/settings/get-clinic-config.dto";
+import { ClinicConfigResponseDto, clinicConfigResponseSchema } from "../../dtos/settings/get-clinic-config.dto";
 
-export class ClinicConfigCommandsRepository {
-  constructor(private readonly supabase: SupabaseClient) {}
-
-  async updateConfig(data: UpdateClinicConfigDto): Promise<ClinicConfigResponseDto> {
+export const updateClinicConfigCommand = (supabase: SupabaseClient) => {
+  return async (data: UpdateClinicConfigDto): Promise<ClinicConfigResponseDto> => {
     const dbPayload: Record<string, any> = {};
     if (data.isBookingOpen !== undefined) dbPayload.is_booking_open = data.isBookingOpen;
     if (data.maintenanceMessage !== undefined) dbPayload.maintenance_message = data.maintenanceMessage;
@@ -33,14 +31,14 @@ export class ClinicConfigCommandsRepository {
       dbPayload.operating_hours = dbOperatingHours;
     }
 
-    const { data: result, error } = await this.supabase
+    const { data: result, error } = await supabase
       .from("clinic_settings")
       .update(dbPayload)
-      .eq("id", 1) // Always update the single row
+      .eq("id", 1)
       .select()
       .single();
 
     if (error) throw new Error(`Failed to update clinic config: ${error.message}`);
-    return mapClinicConfigRecord(result);
-  }
-}
+    return clinicConfigResponseSchema.parse(result);
+  };
+};

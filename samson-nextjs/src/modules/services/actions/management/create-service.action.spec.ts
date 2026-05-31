@@ -1,19 +1,22 @@
 import { describe, it, expect, vi } from "vitest";
 import { createServiceAction } from "./create-service.action";
 
+const mocks = vi.hoisted(() => ({
+  createServiceCommand: vi.fn(() => vi.fn()),
+  createServiceUseCase: vi.fn(() => vi.fn().mockResolvedValue({ id: "svc-1", name: "Clean" })),
+}));
+
 vi.mock("../../../../shared/database/server", () => ({
   createClient: vi.fn().mockResolvedValue({}),
 }));
 
-vi.mock("../../use-cases/management/create-service.use-case", () => {
-  return {
-    CreateServiceUseCase: vi.fn(function () {
-      return {
-      execute: vi.fn().mockResolvedValue({ id: "svc-1", name: "Clean" }),
-      };
-    }),
-  };
-});
+vi.mock("../../repositories/management/service.commands", () => ({
+  createServiceCommand: mocks.createServiceCommand,
+}));
+
+vi.mock("../../use-cases/management/create-service.use-case", () => ({
+  createServiceUseCase: mocks.createServiceUseCase,
+}));
 
 describe("createServiceAction (Unit Test)", () => {
   it("should successfully call the use case and return data", async () => {
@@ -21,6 +24,7 @@ describe("createServiceAction (Unit Test)", () => {
       name: "Clean",
       durationMinutes: 30,
       price: 100,
+      serviceType: "GENERAL",
       isActive: true,
     });
     

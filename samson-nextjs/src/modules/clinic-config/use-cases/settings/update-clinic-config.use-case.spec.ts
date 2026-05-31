@@ -1,19 +1,16 @@
 import { describe, it, expect, vi } from "vitest";
-import { UpdateClinicConfigUseCase } from "./update-clinic-config.use-case";
-import { ClinicConfigCommandsRepository } from "../../repositories/settings/clinic-config.commands";
+import { updateClinicConfigUseCase } from "./update-clinic-config.use-case";
 
-describe("UpdateClinicConfigUseCase (Unit Test)", () => {
+describe("updateClinicConfigUseCase (Unit Test)", () => {
   it("should successfully update the configuration", async () => {
-    const mockRepo = {
-      updateConfig: vi.fn().mockResolvedValue({
-        isBookingOpen: false,
-      }),
-    } as unknown as ClinicConfigCommandsRepository;
+    const updateConfig = vi.fn().mockResolvedValue({
+      isBookingOpen: false,
+    });
 
-    const useCase = new UpdateClinicConfigUseCase(mockRepo);
-    const result = await useCase.execute({ isBookingOpen: false });
+    const useCase = updateClinicConfigUseCase(updateConfig);
+    const result = await useCase({ isBookingOpen: false });
 
     expect(result.isBookingOpen).toBe(false);
-    expect(mockRepo.updateConfig).toHaveBeenCalledWith({ isBookingOpen: false });
+    expect(updateConfig).toHaveBeenCalledWith({ isBookingOpen: false });
   });
 });

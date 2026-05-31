@@ -1,10 +1,9 @@
-import { ServiceQueriesRepository } from "../../repositories/management/service.queries";
 import { ServiceResponseDto } from "../../dtos/management/service-response.dto";
 
-export class GetServicesUseCase {
-  constructor(private readonly serviceQueries: ServiceQueriesRepository) {}
-
-  async execute(includeInactive = false): Promise<ServiceResponseDto[]> {
-    return await this.serviceQueries.getServices(includeInactive);
-  }
-}
+export const getServicesUseCase = (
+  getServices: (includeInactive?: boolean) => Promise<ServiceResponseDto[]>
+) => {
+  return async (includeInactive = false): Promise<ServiceResponseDto[]> => {
+    return await getServices(includeInactive);
+  };
+};

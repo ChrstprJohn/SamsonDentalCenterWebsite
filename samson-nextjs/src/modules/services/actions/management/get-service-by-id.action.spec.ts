@@ -1,26 +1,37 @@
-import { describe, it, expect, vi } from "vitest";
+import { beforeEach, describe, it, expect, vi } from "vitest";
 import { getServiceByIdAction } from "./get-service-by-id.action";
+
+const mocks = vi.hoisted(() => ({
+  execute: vi.fn().mockResolvedValue({
+    id: "svc-1",
+    name: "Teeth Cleaning",
+    durationMinutes: 30,
+    price: 100,
+    isActive: true,
+    description: null,
+  }),
+  getServiceByIdQuery: vi.fn(() => vi.fn()),
+  getServiceByIdUseCase: vi.fn(),
+}));
 
 vi.mock("../../../../shared/database/server", () => ({
   createClient: vi.fn().mockResolvedValue({}),
 }));
 
+vi.mock("../../repositories/management/service.queries", () => ({
+  getServiceByIdQuery: mocks.getServiceByIdQuery,
+}));
+
 vi.mock("../../use-cases/management/get-service-by-id.use-case", () => ({
-  GetServiceByIdUseCase: vi.fn(function () {
-    return {
-      execute: vi.fn().mockResolvedValue({
-        id: "svc-1",
-        name: "Teeth Cleaning",
-        durationMinutes: 30,
-        price: 100,
-        isActive: true,
-        description: null,
-      }),
-    };
-  }),
+  getServiceByIdUseCase: mocks.getServiceByIdUseCase,
 }));
 
 describe("getServiceByIdAction (Unit Test)", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.getServiceByIdUseCase.mockReturnValue(mocks.execute);
+  });
+
   it("should return service data when found", async () => {
     const result = await getServiceByIdAction("svc-1");
     expect(result.data?.id).toBe("svc-1");
@@ -34,14 +45,7 @@ describe("getServiceByIdAction (Unit Test)", () => {
   });
 
   it("should return not-found error when use-case returns null", async () => {
-    const { GetServiceByIdUseCase } = await import(
-      "../../use-cases/management/get-service-by-id.use-case"
-    );
-    (GetServiceByIdUseCase as any).mockImplementationOnce(function () {
-      return {
-        execute: vi.fn().mockResolvedValue(null),
-      };
-    });
+    mocks.getServiceByIdUseCase.mockReturnValueOnce(vi.fn().mockResolvedValue(null));
 
     const result = await getServiceByIdAction("nonexistent");
     expect(result.error).toBe("Service not found");

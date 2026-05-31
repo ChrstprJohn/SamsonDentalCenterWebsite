@@ -1,16 +1,13 @@
 import { describe, it, expect, vi } from "vitest";
-import { DeleteServiceUseCase } from "./delete-service.use-case";
-import { ServiceCommandsRepository } from "../../repositories/management/service.commands";
+import { deleteServiceUseCase } from "./delete-service.use-case";
 
-describe("DeleteServiceUseCase (Unit Test)", () => {
+describe("deleteServiceUseCase (Unit Test)", () => {
   it("should successfully delete a service", async () => {
-    const mockRepo = {
-      deleteService: vi.fn().mockResolvedValue(undefined),
-    } as unknown as ServiceCommandsRepository;
+    const deleteService = vi.fn().mockResolvedValue(undefined);
 
-    const useCase = new DeleteServiceUseCase(mockRepo);
-    await useCase.execute("svc-1");
+    const useCase = deleteServiceUseCase(deleteService);
+    await useCase("550e8400-e29b-41d4-a716-446655440000");
 
-    expect(mockRepo.deleteService).toHaveBeenCalledWith("svc-1");
+    expect(deleteService).toHaveBeenCalledWith("550e8400-e29b-41d4-a716-446655440000");
   });
 });

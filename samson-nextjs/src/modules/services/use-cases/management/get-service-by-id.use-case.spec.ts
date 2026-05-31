@@ -1,34 +1,30 @@
 import { describe, it, expect, vi } from "vitest";
-import { GetServiceByIdUseCase } from "./get-service-by-id.use-case";
-import { ServiceQueriesRepository } from "../../repositories/management/service.queries";
+import { getServiceByIdUseCase } from "./get-service-by-id.use-case";
 
-describe("GetServiceByIdUseCase (Unit Test)", () => {
+describe("getServiceByIdUseCase (Unit Test)", () => {
   it("should return a service when found", async () => {
-    const mockRepo = {
-      getServiceById: vi.fn().mockResolvedValue({
-        id: "svc-1",
-        name: "Teeth Cleaning",
-        description: null,
-        durationMinutes: 30,
-        price: 100,
-        isActive: true,
-      }),
-    } as unknown as ServiceQueriesRepository;
+    const getServiceById = vi.fn().mockResolvedValue({
+      id: "550e8400-e29b-41d4-a716-446655440000",
+      name: "Teeth Cleaning",
+      description: null,
+      durationMinutes: 30,
+      price: 100,
+      serviceType: "GENERAL",
+      isActive: true,
+    });
 
-    const useCase = new GetServiceByIdUseCase(mockRepo);
-    const result = await useCase.execute("svc-1");
+    const useCase = getServiceByIdUseCase(getServiceById);
+    const result = await useCase("550e8400-e29b-41d4-a716-446655440000");
 
-    expect(result?.id).toBe("svc-1");
-    expect(mockRepo.getServiceById).toHaveBeenCalledWith("svc-1");
+    expect(result?.id).toBe("550e8400-e29b-41d4-a716-446655440000");
+    expect(getServiceById).toHaveBeenCalledWith("550e8400-e29b-41d4-a716-446655440000");
   });
 
   it("should return null when service is not found", async () => {
-    const mockRepo = {
-      getServiceById: vi.fn().mockResolvedValue(null),
-    } as unknown as ServiceQueriesRepository;
+    const getServiceById = vi.fn().mockResolvedValue(null);
 
-    const useCase = new GetServiceByIdUseCase(mockRepo);
-    const result = await useCase.execute("nonexistent");
+    const useCase = getServiceByIdUseCase(getServiceById);
+    const result = await useCase("550e8400-e29b-41d4-a716-446655440000");
 
     expect(result).toBeNull();
   });

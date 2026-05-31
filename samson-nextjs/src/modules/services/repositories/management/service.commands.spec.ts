@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { ServiceCommandsRepository } from "./service.commands";
+import { createServiceCommand, deleteServiceCommand, updateServiceCommand } from "./service.commands";
 
 const mockFrom = vi.fn();
 const mockInsert = vi.fn();
@@ -12,7 +12,7 @@ const mockSupabase = {
   from: mockFrom,
 } as any;
 
-describe("ServiceCommandsRepository (Unit Test)", () => {
+describe("service command closures (Unit Test)", () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
@@ -30,28 +30,37 @@ describe("ServiceCommandsRepository (Unit Test)", () => {
   describe("createService", () => {
     it("should create a service and return the result", async () => {
       mockSingle.mockResolvedValue({
-        data: { id: "svc-1", name: "Teeth Cleaning", duration_minutes: 30, price: 100, is_active: true, description: null },
+        data: {
+          id: "550e8400-e29b-41d4-a716-446655440000",
+          name: "Teeth Cleaning",
+          duration_minutes: 30,
+          price: 100,
+          service_type: "GENERAL",
+          is_active: true,
+          description: null,
+        },
         error: null,
       });
 
-      const repo = new ServiceCommandsRepository(mockSupabase);
-      const result = await repo.createService({
+      const createService = createServiceCommand(mockSupabase);
+      const result = await createService({
         name: "Teeth Cleaning",
         durationMinutes: 30,
         price: 100,
+        serviceType: "GENERAL",
         isActive: true,
       });
 
-      expect(result.id).toBe("svc-1");
+      expect(result.id).toBe("550e8400-e29b-41d4-a716-446655440000");
       expect(mockFrom).toHaveBeenCalledWith("services");
     });
 
     it("should throw an error if supabase returns an error", async () => {
       mockSingle.mockResolvedValue({ data: null, error: { message: "DB error" } });
 
-      const repo = new ServiceCommandsRepository(mockSupabase);
+      const createService = createServiceCommand(mockSupabase);
       await expect(
-        repo.createService({ name: "X", durationMinutes: 10, isActive: true })
+        createService({ name: "X", durationMinutes: 10, serviceType: "GENERAL", isActive: true })
       ).rejects.toThrow("Failed to create service: DB error");
     });
   });
@@ -59,12 +68,20 @@ describe("ServiceCommandsRepository (Unit Test)", () => {
   describe("updateService", () => {
     it("should update a service and return the result", async () => {
       mockSingle.mockResolvedValue({
-        data: { id: "svc-1", name: "Updated", duration_minutes: 45, price: 150, is_active: true, description: null },
+        data: {
+          id: "550e8400-e29b-41d4-a716-446655440000",
+          name: "Updated",
+          duration_minutes: 45,
+          price: 150,
+          service_type: "GENERAL",
+          is_active: true,
+          description: null,
+        },
         error: null,
       });
 
-      const repo = new ServiceCommandsRepository(mockSupabase);
-      const result = await repo.updateService({ id: "svc-1", name: "Updated" });
+      const updateService = updateServiceCommand(mockSupabase);
+      const result = await updateService({ id: "550e8400-e29b-41d4-a716-446655440000", name: "Updated" });
 
       expect(result.name).toBe("Updated");
     });
@@ -72,9 +89,9 @@ describe("ServiceCommandsRepository (Unit Test)", () => {
     it("should throw an error if supabase returns an error", async () => {
       mockSingle.mockResolvedValue({ data: null, error: { message: "Update failed" } });
 
-      const repo = new ServiceCommandsRepository(mockSupabase);
+      const updateService = updateServiceCommand(mockSupabase);
       await expect(
-        repo.updateService({ id: "svc-1", name: "X" })
+        updateService({ id: "550e8400-e29b-41d4-a716-446655440000", name: "X" })
       ).rejects.toThrow("Failed to update service: Update failed");
     });
   });
@@ -83,15 +100,15 @@ describe("ServiceCommandsRepository (Unit Test)", () => {
     it("should soft-delete a service (set is_active to false)", async () => {
       mockEq.mockResolvedValue({ error: null });
 
-      const repo = new ServiceCommandsRepository(mockSupabase);
-      await expect(repo.deleteService("svc-1")).resolves.toBeUndefined();
+      const deleteService = deleteServiceCommand(mockSupabase);
+      await expect(deleteService("550e8400-e29b-41d4-a716-446655440000")).resolves.toBeUndefined();
     });
 
     it("should throw an error if supabase returns an error", async () => {
       mockEq.mockResolvedValue({ error: { message: "Delete failed" } });
 
-      const repo = new ServiceCommandsRepository(mockSupabase);
-      await expect(repo.deleteService("svc-1")).rejects.toThrow(
+      const deleteService = deleteServiceCommand(mockSupabase);
+      await expect(deleteService("550e8400-e29b-41d4-a716-446655440000")).rejects.toThrow(
         "Failed to delete service: Delete failed"
       );
     });

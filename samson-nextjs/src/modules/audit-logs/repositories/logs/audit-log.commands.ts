@@ -1,12 +1,10 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { CreateAuditLogDto } from '../../dtos/logs/create-audit-log.dto';
-import { AuditLogResponseDto, mapAuditLogRecord } from '../../dtos/logs/audit-log-response.dto';
+import { AuditLogResponseDto, auditLogResponseSchema } from '../../dtos/logs/audit-log-response.dto';
 import { DomainError } from '@/shared/errors';
 
-export class AuditLogCommands {
-  constructor(private readonly supabase: SupabaseClient) {}
-
-  async createAuditLog(data: CreateAuditLogDto): Promise<AuditLogResponseDto> {
+export const createAuditLogCommand = (supabase: SupabaseClient) => {
+  return async (data: CreateAuditLogDto): Promise<AuditLogResponseDto> => {
     const dbPayload = {
       actor_id: data.actorId,
       action: data.action,
@@ -14,7 +12,7 @@ export class AuditLogCommands {
       reason: data.reason || null,
     };
 
-    const { data: result, error } = await this.supabase
+    const { data: result, error } = await supabase
       .from('audit_logs')
       .insert([dbPayload])
       .select()
@@ -27,6 +25,6 @@ export class AuditLogCommands {
       );
     }
 
-    return mapAuditLogRecord(result as Record<string, unknown>);
-  }
-}
+    return auditLogResponseSchema.parse(result);
+  };
+};

@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
-import { GetAuditLogsUseCase } from './get-audit-logs.use-case';
+import { getAuditLogsUseCase } from './get-audit-logs.use-case';
 
-describe('GetAuditLogsUseCase', () => {
+describe('getAuditLogsUseCase', () => {
   it('executes and fetches audit logs via queries repository', async () => {
     const mockResponse = [
       {
@@ -12,18 +12,16 @@ describe('GetAuditLogsUseCase', () => {
       },
     ];
 
-    const mockQueries = {
-      getAuditLogs: vi.fn().mockResolvedValue(mockResponse),
-    } as any;
+    const getAuditLogs = vi.fn().mockResolvedValue(mockResponse);
 
-    const useCase = new GetAuditLogsUseCase(mockQueries);
+    const useCase = getAuditLogsUseCase(getAuditLogs);
     const filters = {
       action: 'APPROVED_APPOINTMENT',
     };
 
-    const result = await useCase.execute(filters);
+    const result = await useCase(filters);
 
     expect(result).toEqual(mockResponse);
-    expect(mockQueries.getAuditLogs).toHaveBeenCalledWith(filters);
+    expect(getAuditLogs).toHaveBeenCalledWith(filters);
   });
 });

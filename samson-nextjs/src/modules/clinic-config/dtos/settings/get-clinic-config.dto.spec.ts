@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { clinicConfigResponseSchema, operatingDaySchema } from "./get-clinic-config.dto";
+import {
+  clinicConfigAppSchema,
+  clinicConfigResponseSchema,
+  operatingDaySchema,
+} from "./get-clinic-config.dto";
 
 const validOperatingHours = {
   monday: { isOpen: true, openTime: "09:00", closeTime: "17:00" },
@@ -29,35 +33,65 @@ const validConfig = {
 };
 
 describe("clinicConfigResponseSchema (DTO Validation)", () => {
+  it("should transform snake_case database config to camelCase response config", () => {
+    const result = clinicConfigResponseSchema.parse({
+      is_booking_open: true,
+      maintenance_message: null,
+      max_reschedules: 1,
+      clinic_name: "Samson Dental",
+      address: "123 Dental Way",
+      phone: "555-0101",
+      email: "contact@samsondental.com",
+      operating_hours: {
+        monday: { is_open: true, open_time: "09:00", close_time: "17:00" },
+        tuesday: { is_open: true, open_time: "09:00", close_time: "17:00" },
+        wednesday: { is_open: true, open_time: "09:00", close_time: "17:00" },
+        thursday: { is_open: true, open_time: "09:00", close_time: "17:00" },
+        friday: { is_open: true, open_time: "09:00", close_time: "17:00" },
+        saturday: { is_open: false, open_time: null, close_time: null },
+        sunday: { is_open: false, open_time: null, close_time: null },
+      },
+      allow_same_day_booking: true,
+      calendar_render_days: 30,
+      social_links: [
+        { platform: "Facebook", url: "https://facebook.com/samsondental" },
+      ],
+    });
+
+    expect(result.clinicName).toBe("Samson Dental");
+    expect(result.operatingHours.monday.isOpen).toBe(true);
+    expect(result.allowSameDayBooking).toBe(true);
+  });
+
   it("should pass with fully valid config", () => {
-    const result = clinicConfigResponseSchema.safeParse(validConfig);
+    const result = clinicConfigAppSchema.safeParse(validConfig);
     expect(result.success).toBe(true);
   });
 
   it("should fail if clinicName is empty", () => {
-    const result = clinicConfigResponseSchema.safeParse({ ...validConfig, clinicName: "" });
+    const result = clinicConfigAppSchema.safeParse({ ...validConfig, clinicName: "" });
     expect(result.success).toBe(false);
   });
 
   it("should fail if email is not a valid email address", () => {
-    const result = clinicConfigResponseSchema.safeParse({ ...validConfig, email: "not-an-email" });
+    const result = clinicConfigAppSchema.safeParse({ ...validConfig, email: "not-an-email" });
     expect(result.success).toBe(false);
   });
 
   it("should fail if maxReschedules is negative", () => {
-    const result = clinicConfigResponseSchema.safeParse({ ...validConfig, maxReschedules: -1 });
+    const result = clinicConfigAppSchema.safeParse({ ...validConfig, maxReschedules: -1 });
     expect(result.success).toBe(false);
   });
 
   it("should fail if calendarRenderDays is zero or negative", () => {
-    const zeroResult = clinicConfigResponseSchema.safeParse({ ...validConfig, calendarRenderDays: 0 });
-    const negativeResult = clinicConfigResponseSchema.safeParse({ ...validConfig, calendarRenderDays: -5 });
+    const zeroResult = clinicConfigAppSchema.safeParse({ ...validConfig, calendarRenderDays: 0 });
+    const negativeResult = clinicConfigAppSchema.safeParse({ ...validConfig, calendarRenderDays: -5 });
     expect(zeroResult.success).toBe(false);
     expect(negativeResult.success).toBe(false);
   });
 
   it("should fail if socialLinks has invalid url format", () => {
-    const result = clinicConfigResponseSchema.safeParse({
+    const result = clinicConfigAppSchema.safeParse({
       ...validConfig,
       socialLinks: [{ platform: "Twitter", url: "not-a-url" }],
     });
@@ -65,7 +99,7 @@ describe("clinicConfigResponseSchema (DTO Validation)", () => {
   });
 
   it("should fail if socialLinks has empty platform name", () => {
-    const result = clinicConfigResponseSchema.safeParse({
+    const result = clinicConfigAppSchema.safeParse({
       ...validConfig,
       socialLinks: [{ platform: "", url: "https://twitter.com" }],
     });
@@ -74,7 +108,7 @@ describe("clinicConfigResponseSchema (DTO Validation)", () => {
 
   it("should fail if a required field is missing", () => {
     const { phone, ...withoutPhone } = validConfig;
-    const result = clinicConfigResponseSchema.safeParse(withoutPhone);
+    const result = clinicConfigAppSchema.safeParse(withoutPhone);
     expect(result.success).toBe(false);
   });
 });
@@ -125,4 +159,3 @@ describe("operatingDaySchema (Sub-Validation)", () => {
     expect(result.success).toBe(false);
   });
 });
-

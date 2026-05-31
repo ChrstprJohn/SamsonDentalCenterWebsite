@@ -1,29 +1,27 @@
 import { describe, it, expect, vi } from "vitest";
-import { UpdateServiceUseCase } from "./update-service.use-case";
-import { ServiceCommandsRepository } from "../../repositories/management/service.commands";
+import { updateServiceUseCase } from "./update-service.use-case";
 
-describe("UpdateServiceUseCase (Unit Test)", () => {
+describe("updateServiceUseCase (Unit Test)", () => {
   it("should successfully update a service", async () => {
-    const mockRepo = {
-      updateService: vi.fn().mockResolvedValue({
-        id: "svc-1",
-        name: "Teeth Cleaning Updated",
-        durationMinutes: 45,
-        price: 150,
-        isActive: true,
-      }),
-    } as unknown as ServiceCommandsRepository;
+    const updateService = vi.fn().mockResolvedValue({
+      id: "550e8400-e29b-41d4-a716-446655440000",
+      name: "Teeth Cleaning Updated",
+      durationMinutes: 45,
+      price: 150,
+      serviceType: "GENERAL",
+      isActive: true,
+    });
 
-    const useCase = new UpdateServiceUseCase(mockRepo);
+    const useCase = updateServiceUseCase(updateService);
     const payload = {
-      id: "svc-1",
+      id: "550e8400-e29b-41d4-a716-446655440000",
       name: "Teeth Cleaning Updated",
       durationMinutes: 45,
     };
     
-    const result = await useCase.execute(payload);
+    const result = await useCase(payload);
 
     expect(result.name).toBe("Teeth Cleaning Updated");
-    expect(mockRepo.updateService).toHaveBeenCalledWith(payload);
+    expect(updateService).toHaveBeenCalledWith(payload);
   });
 });

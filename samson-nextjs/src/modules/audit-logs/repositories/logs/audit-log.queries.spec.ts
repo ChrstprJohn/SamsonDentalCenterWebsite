@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { AuditLogQueries } from './audit-log.queries';
+import { getAuditLogsQuery } from './audit-log.queries';
 
 const mockFrom = vi.fn();
 const mockSelect = vi.fn();
@@ -10,7 +10,7 @@ const mockSupabase = {
   from: mockFrom,
 } as any;
 
-describe('AuditLogQueries', () => {
+describe('getAuditLogsQuery', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
@@ -36,8 +36,8 @@ describe('AuditLogQueries', () => {
       error: null,
     });
 
-    const queries = new AuditLogQueries(mockSupabase);
-    const result = await queries.getAuditLogs();
+    const getAuditLogs = getAuditLogsQuery(mockSupabase);
+    const result = await getAuditLogs();
 
     expect(result.length).toBe(1);
     expect(result[0].actorId).toBe('da95a63c-333e-4b68-98e3-82bdf1a07bd3');
@@ -57,8 +57,8 @@ describe('AuditLogQueries', () => {
       error: null,
     });
 
-    const queries = new AuditLogQueries(mockSupabase);
-    await queries.getAuditLogs({
+    const getAuditLogs = getAuditLogsQuery(mockSupabase);
+    await getAuditLogs({
       actorId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd3',
     });
 
@@ -68,7 +68,7 @@ describe('AuditLogQueries', () => {
   it('throws DomainError when query fails', async () => {
     mockOrder.mockResolvedValue({ data: null, error: { message: 'Fetch failed' } });
 
-    const queries = new AuditLogQueries(mockSupabase);
-    await expect(queries.getAuditLogs()).rejects.toThrow('Failed to fetch audit logs: Fetch failed');
+    const getAuditLogs = getAuditLogsQuery(mockSupabase);
+    await expect(getAuditLogs()).rejects.toThrow('Failed to fetch audit logs: Fetch failed');
   });
 });

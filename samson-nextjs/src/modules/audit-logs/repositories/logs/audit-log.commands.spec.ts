@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { AuditLogCommands } from './audit-log.commands';
+import { createAuditLogCommand } from './audit-log.commands';
 
 const mockFrom = vi.fn();
 const mockInsert = vi.fn();
@@ -10,7 +10,7 @@ const mockSupabase = {
   from: mockFrom,
 } as any;
 
-describe('AuditLogCommands', () => {
+describe('createAuditLogCommand', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
@@ -32,8 +32,8 @@ describe('AuditLogCommands', () => {
       error: null,
     });
 
-    const commands = new AuditLogCommands(mockSupabase);
-    const result = await commands.createAuditLog({
+    const createAuditLog = createAuditLogCommand(mockSupabase);
+    const result = await createAuditLog({
       actorId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd3',
       action: 'MARKED_NO_SHOW',
       targetId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd4',
@@ -55,9 +55,9 @@ describe('AuditLogCommands', () => {
   it('throws DomainError when database insert fails', async () => {
     mockSingle.mockResolvedValue({ data: null, error: { message: 'Insert failed' } });
 
-    const commands = new AuditLogCommands(mockSupabase);
+    const createAuditLog = createAuditLogCommand(mockSupabase);
     await expect(
-      commands.createAuditLog({
+      createAuditLog({
         actorId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd3',
         action: 'MARKED_NO_SHOW',
         targetId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd4',

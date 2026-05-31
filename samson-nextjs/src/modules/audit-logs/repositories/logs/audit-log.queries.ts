@@ -1,13 +1,11 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { GetAuditLogsDto } from '../../dtos/logs/get-audit-logs.dto';
-import { AuditLogResponseDto, mapAuditLogRecords } from '../../dtos/logs/audit-log-response.dto';
+import { AuditLogResponseDto, auditLogResponseSchema } from '../../dtos/logs/audit-log-response.dto';
 import { DomainError } from '@/shared/errors';
 
-export class AuditLogQueries {
-  constructor(private readonly supabase: SupabaseClient) {}
-
-  async getAuditLogs(filters?: GetAuditLogsDto): Promise<AuditLogResponseDto[]> {
-    let query = this.supabase
+export const getAuditLogsQuery = (supabase: SupabaseClient) => {
+  return async (filters?: GetAuditLogsDto): Promise<AuditLogResponseDto[]> => {
+    let query = supabase
       .from('audit_logs')
       .select('*')
       .order('created_at', { ascending: false });
@@ -33,6 +31,6 @@ export class AuditLogQueries {
       );
     }
 
-    return mapAuditLogRecords((result || []) as Record<string, unknown>[]);
-  }
-}
+    return auditLogResponseSchema.array().parse(result || []);
+  };
+};
