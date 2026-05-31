@@ -139,21 +139,21 @@ The personal hub for patient dashboards, history logs, and notifications.
 
 The high-volume workflow center for clinic staff. Fully dynamic dashboard (no caching) featuring popups and invoices.
 
-- [ ] **5.1 Secretary Dashboard (`src/app/(portals)/secretary/`)**
-  - [ ] Priority columns displaying incoming pending requests, upcoming calendar, and check-in tracking.
-- [ ] **5.2 Pending & Grouped Booking Requests Panel**
-  - [ ] Show family bookings grouped under unified card containers to prevent UI separation.
-  - [ ] **Approval Dialog Popup**: Let secretaries add custom or pick from predefined reasons before approving.
-  - [ ] **Rejection Dialog Popup**: Mandatory custom rejection reason.
-  - [ ] **Batch Finalization**: Support selecting multiple rows for family groups and clicking "Finalize Group" to fire queued asynchronous notifications at once.
-- [ ] **5.3 Checked-In & Check-Out Workflows**
-  - [ ] **Check-in Tracker**: Quick action button to mark patients as checked-in upon arrival.
-  - [ ] **Check-Out Process (Finalizing Invoices)**:
-    - Renders a list of draft invoices created by doctors under **Treatment Rendered**.
-    - Let the secretary open the draft, add final prices, apply custom discounts/codes, select payment method, and click "Check-Out / Completed" to lock and finalize.
-- [ ] **5.4 Audit Logs & Communications**
-  - [ ] **Audit Viewer**: View a lightweight read-only log filtering decisions (approved, rejected, cancelled, rescheduled) with timestamps, actor IDs, and reasons.
-  - [ ] **Email Log Viewer**: Searchable log showing all system-generated emails sent out to patients.
+- [x] **5.1 Secretary Dashboard (`src/app/(portals)/secretary/`)**
+  - [x] Priority columns displaying incoming pending requests, upcoming calendar, and check-in tracking.
+- [x] **5.2 Pending & Grouped Booking Requests Panel**
+  - [x] Show family bookings grouped under unified card containers to prevent UI separation.
+  - [x] **Approval Dialog Popup**: Let secretaries add custom or pick from predefined reasons before approving.
+  - [x] **Rejection Dialog Popup**: Mandatory custom rejection reason.
+  - [x] **Batch Finalization**: Support selecting multiple rows for family groups and clicking "Finalize Group" to fire queued asynchronous notifications at once.
+- [x] **5.3 Checked-In & Check-Out Workflows**
+  - [x] **Check-in Tracker**: Quick action button to mark patients as checked-in upon arrival.
+  - [x] **Check-Out Process (Finalizing Invoices)**:
+    - [x] Renders a list of draft invoices created by doctors under **Treatment Rendered**.
+    - [x] Let the secretary open the draft, add final prices, apply custom discounts/codes, select payment method, and click "Check-Out / Completed" to lock and finalize.
+- [x] **5.4 Audit Logs & Communications**
+  - [x] **Audit Viewer**: View a lightweight read-only log filtering decisions (approved, rejected, cancelled, rescheduled) with timestamps, actor IDs, and reasons.
+  - [x] **Email Log Viewer**: Searchable log showing all system-generated emails sent out to patients.
 
 ---
 
