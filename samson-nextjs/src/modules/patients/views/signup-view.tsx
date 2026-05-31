@@ -1,10 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
-import { signUpSchema, SignUpInput } from '../hooks/use-auth-schema';
+import { useSignUpForm } from '../hooks/auth/use-sign-up-form.hook';
+import { SignUpInput } from '../dtos/auth/sign-up.dto';
 import { SignUpForm } from '../components/signup-form';
 import { useToast } from '@/components/feedback/toast-container';
 
@@ -17,18 +16,7 @@ export function SignUpView() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<SignUpInput>({
-    resolver: zodResolver(signUpSchema),
-    defaultValues: {
-      firstName: '',
-      middleName: '',
-      lastName: '',
-      suffix: '',
-      email: '',
-      phoneNumber: '',
-      dateOfBirth: '',
-    },
-  });
+  } = useSignUpForm();
 
   const onSubmit = async (data: SignUpInput) => {
     setIsLoading(true);

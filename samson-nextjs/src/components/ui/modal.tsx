@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
-import { useClickOutside } from '../../hooks/use-click-outside';
+import { useClickOutside } from '../../shared/hooks/use-click-outside';
 
 interface ModalProps {
   isOpen: boolean;

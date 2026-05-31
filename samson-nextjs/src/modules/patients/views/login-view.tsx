@@ -1,10 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
-import { loginSchema, LoginInput } from '../hooks/use-auth-schema';
+import { useLoginForm } from '../hooks/auth/use-login-form.hook';
+import { LoginInput } from '../dtos/auth/login.dto';
 import { LoginForm } from '../components/login-form';
 import { useToast } from '@/components/feedback/toast-container';
 
@@ -17,12 +16,7 @@ export function LoginView() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginInput>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: '',
-    },
-  });
+  } = useLoginForm();
 
   const onSubmit = async (data: LoginInput) => {
     setIsLoading(true);

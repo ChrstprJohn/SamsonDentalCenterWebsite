@@ -1,6 +1,6 @@
 import React from 'react';
 import { UseFormRegister, FieldErrors } from 'react-hook-form';
-import { SignUpInput } from '../hooks/use-auth-schema';
+import { SignUpInput } from '../dtos/auth/sign-up.dto';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
