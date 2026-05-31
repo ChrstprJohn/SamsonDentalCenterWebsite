@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import type { SignUpInput } from '../../dtos/auth/sign-up.dto';
+import type { SignUpInput } from '../../../dtos/auth/sign-up.dto';
 
 // ─── Mock all external hooks ─────────────────────────────────────────────────
 const mockPush = vi.fn();

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useLoginView } from '../hooks/auth/use-login-view.hook';
+import { useLoginView } from '../hooks/auth/login/use-login-view.hook';
 import { LoginForm } from '../components/auth/login-form';
 
 export function LoginView() {

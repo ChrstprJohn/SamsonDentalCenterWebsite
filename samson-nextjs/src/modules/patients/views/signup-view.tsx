@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useSignUpView } from '../hooks/auth/use-sign-up-view.hook';
+import { useSignUpView } from '../hooks/auth/sign-up/use-sign-up-view.hook';
 import { SignUpForm } from '../components/auth/signup-form';
 
 export function SignUpView() {

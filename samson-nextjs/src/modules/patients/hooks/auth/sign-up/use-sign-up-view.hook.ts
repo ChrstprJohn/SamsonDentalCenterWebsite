@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSignUpForm } from './use-sign-up-form.hook';
 import { useToast } from '@/components/feedback/toast-container';
-import type { SignUpInput } from '../../dtos/auth/sign-up.dto';
+import type { SignUpInput } from '../../../dtos/auth/sign-up.dto';
 
 export interface UseSignUpViewReturn {
   isLoading: boolean;

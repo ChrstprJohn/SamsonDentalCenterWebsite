@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { useOTPVerifyView } from '../hooks/auth/use-otp-verify-view.hook';
+import { useOTPVerifyView } from '../hooks/auth/otp/use-otp-verify-view.hook';
 
 export function OTPVerifyView() {
   const {

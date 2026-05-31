@@ -2,8 +2,8 @@
 
 import React, { useRef } from 'react';
 import Link from 'next/link';
-import type { AuthHeaderUser } from '../../hooks/auth/use-auth-header.hook';
-import { useAuthHeader } from '../../hooks/auth/use-auth-header.hook';
+import type { AuthHeaderUser } from '../../hooks/auth/header/use-auth-header.hook';
+import { useAuthHeader } from '../../hooks/auth/header/use-auth-header.hook';
 import { useClickOutside } from '@/shared/hooks/use-click-outside';
 import { NotificationIndicator } from './notification-indicator';
 

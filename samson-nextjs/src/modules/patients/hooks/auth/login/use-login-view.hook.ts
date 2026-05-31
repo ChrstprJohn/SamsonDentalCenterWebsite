@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLoginForm } from './use-login-form.hook';
 import { useToast } from '@/components/feedback/toast-container';
-import type { LoginInput } from '../../dtos/auth/login.dto';
+import type { LoginInput } from '../../../dtos/auth/login.dto';
 
 export interface UseLoginViewReturn {
   isLoading: boolean;
