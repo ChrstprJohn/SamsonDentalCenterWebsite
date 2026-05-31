@@ -119,19 +119,19 @@ Develop the 4-step interactive wizard inside the `appointments` module using moc
 
 The personal hub for patient dashboards, history logs, and notifications.
 
-- [ ] **4.1 Dashboard Layout (`src/app/(portals)/user/`)**
-  - [ ] **Upcoming Appointments Panel**: Display scheduled slots with statuses, assigned doctor, and cancel/reschedule triggers.
-  - [ ] **Appointment History Panel**: Log of past treatments, billing invoices, and clinician notes.
-  - [ ] **My Requests Section**: Grouped rows showing pending bookings currently awaiting secretary approval.
-- [ ] **4.2 User Settings & Preferences**
-  - [ ] **Profile Editor**: Edit contact fields, upload/select a custom avatar.
-  - [ ] **Notification Settings**: Control preferences for SMS, Email, and in-app bell alerts.
-- [ ] **4.3 Reschedule & Cancellation Workflows**
-  - [ ] **Cancellation Trigger**: Triggers validation check, requires filling out a cancellation reason, and pops up a custom modal verification before committing.
-  - [ ] **Reschedule Trigger**:
-    - Checks `{ rescheduleCount, maxReschedules }` parameters.
-    - If rescheduled limit is reached (1 by default), blocks actions and displays a notice requesting staff contact.
-    - If allowed, redirects to DateTimeStep, keeping original booking group history alive.
+- [x] **4.1 Dashboard Layout (`src/app/(portals)/user/`)**
+  - [x] **Upcoming Appointments Panel**: Display scheduled slots with statuses, assigned doctor, and cancel/reschedule triggers.
+  - [x] **Appointment History Panel**: Log of past treatments, billing invoices, and clinician notes.
+  - [x] **My Requests Section**: Grouped rows showing pending bookings currently awaiting secretary approval.
+- [x] **4.2 User Settings & Preferences**
+  - [x] **Profile Editor**: Edit contact fields, upload/select a custom avatar.
+  - [x] **Notification Settings**: Control preferences for SMS, Email, and in-app bell alerts.
+- [x] **4.3 Reschedule & Cancellation Workflows**
+  - [x] **Cancellation Trigger**: Triggers validation check, requires filling out a cancellation reason, and pops up a custom modal verification before committing.
+  - [x] **Reschedule Trigger**:
+    - [x] Checks `{ rescheduleCount, maxReschedules }` parameters.
+    - [x] If rescheduled limit is reached (1 by default), blocks actions and displays a notice requesting staff contact.
+    - [x] If allowed, redirects to DateTimeStep, keeping original booking group history alive.
 
 ---
 
