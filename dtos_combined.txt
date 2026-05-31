@@ -1,0 +1,1178 @@
+﻿--- C:\Users\picar\Desktop\samson-website\samson-nextjs\src\modules\appointments\dtos\availability\get-availability.dto.ts ---
+import { z } from 'zod';
+
+// Utility helper to clear empty form or query parameters cleanly
+const emptyStringToUndefined = z.literal('').transform(() => undefined);
+const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
+const MONTH_REGEX = /^\d{4}-\d{2}$/;
+
+// ==========================================
+// 1. MONTHLY CALENDAR AVAILABILITY (DAYS)
+// ==========================================
+
+export const getAvailableDaysSchema = z.object({
+    serviceId: z.string().uuid('Invalid Service ID format'),
+    // Omit or pass undefined for 'Any Doctor'
+    doctorId: z.string().uuid('Invalid Doctor ID format').optional().or(emptyStringToUndefined),
+    // Expects YYYY-MM to query an entire calendar page efficiently
+    month: z.string().regex(MONTH_REGEX, 'Month must be in YYYY-MM format'),
+});
+
+export type GetAvailableDaysDto = z.infer<typeof getAvailableDaysSchema>;
+
+// Output DTO: Lightweight array of enabled calendar dates
+export const getAvailableDaysResponseSchema = z.object({
+    month: z.string().regex(MONTH_REGEX),
+    serviceId: z.string().uuid(),
+    // Array of dates containing inventory (e.g., ["2026-06-01", "2026-06-03"])
+    availableDates: z.array(z.string().regex(DATE_REGEX)),
+});
+
+export type GetAvailableDaysResponseDto = z.infer<typeof getAvailableDaysResponseSchema>;
+
+// ==========================================
+// 2. DAILY AVAILABILITY (TIME SLOTS)
+// ==========================================
+
+export const getAvailableTimeSlotsSchema = z.object({
+    serviceId: z.string().uuid('Invalid Service ID format'),
+    // Omit or pass undefined for 'Any Doctor'
+    doctorId: z.string().uuid('Invalid Doctor ID format').optional().or(emptyStringToUndefined),
+    // Specific date clicked on the calendar wizard
+    date: z.string().regex(DATE_REGEX, 'Date must be in YYYY-MM-DD format'),
+});
+
+export type GetAvailableTimeSlotsDto = z.infer<typeof getAvailableTimeSlotsSchema>;
+
+// Shared Slot Entity
+export const availableSlotSchema = z.object({
+    startTime: z.string().datetime({ message: 'Must be a valid ISO UTC timestamp' }),
+    endTime: z.string().datetime({ message: 'Must be a valid ISO UTC timestamp' }),
+    // Houses the implicitly assigned least-busy doctor if 'Any Doctor' was picked
+    doctorId: z.string().uuid(),
+    doctorName: z.string().trim(),
+});
+
+// Output DTO: Sliced and load-balanced time windows returned to the public picker
+export const getAvailableTimeSlotsResponseSchema = z.object({
+    date: z.string().regex(DATE_REGEX),
+    serviceId: z.string().uuid(),
+    availableSlots: z.array(availableSlotSchema),
+});
+
+export type AvailableSlotDto = z.infer<typeof availableSlotSchema>;
+export type GetAvailableTimeSlotsResponseDto = z.infer<typeof getAvailableTimeSlotsResponseSchema>;
+
+--- C:\Users\picar\Desktop\samson-website\samson-nextjs\src\modules\appointments\dtos\booking\submit-booking.dto.ts ---
+import { z } from 'zod';
+
+// Utility helper to intercept empty form fields and strip them down to undefined for Supabase NULL insertion
+const emptyStringToUndefined = z.literal('').transform(() => undefined);
+const cleanOptionalString = z.string().trim().optional().transform(val => val === '' ? undefined : val).optional();
+
+export const submitBookingSchema = z
+    .object({
+        idempotencyKey: z.string().uuid('Idempotency key must be a valid UUID'),
+        serviceId: z.string().uuid('Invalid Service ID format'),
+        doctorId: z.string().uuid('Invalid Doctor ID format'), // Comes precisely from the availability slot data
+        isPreferredDoctor: z.boolean().optional().default(false), // Optional tracking metric for database telemetry
+
+        date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format'),
+        startTime: z.string().datetime('Must be a valid ISO string'),
+        endTime: z.string().datetime('Must be a valid ISO string'),
+        userNote: cleanOptionalString,
+
+        patientType: z.enum(['SELF', 'EXISTING_DEPENDENT', 'NEW_DEPENDENT']),
+        dependentId: z
+            .string()
+            .uuid('Invalid Dependent ID format')
+            .optional()
+            .or(emptyStringToUndefined)
+            .optional(),
+
+        // Required block options are trimmed first to secure against pure whitespace strings
+        dependentFirstName: z.string().trim().optional(),
+        dependentMiddleName: cleanOptionalString,
+        dependentLastName: z.string().trim().optional(),
+        dependentSuffix: cleanOptionalString,
+        dependentBirthday: z
+            .string()
+            .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format')
+            .optional()
+            .or(emptyStringToUndefined)
+            .optional(),
+        dependentSex: z.enum(['MALE', 'FEMALE']).optional(),
+        dependentRelationship: z.string().trim().optional(),
+    })
+    .superRefine((data, ctx) => {
+        // 1. Chronological Ordering Boundary Guard
+        if (new Date(data.startTime) >= new Date(data.endTime)) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Start time must be before end time',
+                path: ['endTime'],
+            });
+        }
+
+        // 2. Bound Family Verification Verification Rule
+        if (data.patientType === 'EXISTING_DEPENDENT' && !data.dependentId) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Dependent ID is required for existing dependents',
+                path: ['dependentId'],
+            });
+        }
+
+        // 3. Conditional Requirements Isolation Block for New Registrations
+        if (data.patientType === 'NEW_DEPENDENT') {
+            if (!data.dependentFirstName || data.dependentFirstName.length === 0) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: 'Dependent first name is required',
+                    path: ['dependentFirstName'],
+                });
+            }
+            if (!data.dependentLastName || data.dependentLastName.length === 0) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: 'Dependent last name is required',
+                    path: ['dependentLastName'],
+                });
+            }
+            if (!data.dependentRelationship || data.dependentRelationship.length === 0) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: 'Dependent relationship is required',
+                    path: ['dependentRelationship'],
+                });
+            }
+            if (!data.dependentBirthday) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: 'Dependent birthday is required',
+                    path: ['dependentBirthday'],
+                });
+            }
+            if (!data.dependentSex) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: 'Dependent sex is required',
+                    path: ['dependentSex'],
+                });
+            }
+        }
+    });
+
+export type SubmitBookingDto = z.infer<typeof submitBookingSchema>;
+
+--- C:\Users\picar\Desktop\samson-website\samson-nextjs\src\modules\appointments\dtos\clinic\get-clinic-appointments.dto.ts ---
+import { z } from 'zod';
+
+const emptyStringToUndefined = z.literal('').transform(() => undefined);
+const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
+
+export const getClinicAppointmentsSchema = z.object({
+  date: z
+    .string()
+    .regex(DATE_REGEX, 'Date must be in YYYY-MM-DD format')
+    .optional()
+    .or(emptyStringToUndefined),
+  status: z.string().trim().optional().or(emptyStringToUndefined),
+  doctorId: z
+    .string()
+    .uuid('Invalid Doctor ID format')
+    .optional()
+    .or(emptyStringToUndefined),
+});
+
+export type GetClinicAppointmentsDto = z.infer<typeof getClinicAppointmentsSchema>;
+
+--- C:\Users\picar\Desktop\samson-website\samson-nextjs\src\modules\appointments\dtos\shared\appointment.dto.ts ---
+import { z } from 'zod';
+import { appointmentStatusEnum } from '../status/update-appointment-status.dto';
+
+export const appointmentDoctorSchema = z.preprocess(
+  (val: any) => {
+    if (!val || typeof val !== 'object') return val;
+    return {
+      id: val.id,
+      firstName: val.first_name ?? val.firstName,
+      lastName: val.last_name ?? val.lastName,
+      prefix: val.prefix,
+      suffix: val.suffix,
+    };
+  },
+  z.object({
+    id: z.string().uuid(),
+    firstName: z.string(),
+    lastName: z.string(),
+    prefix: z.string().nullable().optional(),
+    suffix: z.string().nullable().optional(),
+  })
+);
+
+export const appointmentServiceSchema = z.preprocess(
+  (val: any) => {
+    if (!val || typeof val !== 'object') return val;
+    return {
+      id: val.id,
+      name: val.name,
+      durationMinutes: val.duration_minutes ?? val.durationMinutes,
+    };
+  },
+  z.object({
+    id: z.string().uuid(),
+    name: z.string(),
+    durationMinutes: z.number().int().nonnegative(),
+  })
+);
+
+export const appointmentPatientSchema = z.preprocess(
+  (val: any) => {
+    if (!val || typeof val !== 'object') return val;
+    return {
+      id: val.id,
+      firstName: val.first_name ?? val.firstName,
+      lastName: val.last_name ?? val.lastName,
+    };
+  },
+  z.object({
+    id: z.string().uuid(),
+    firstName: z.string(),
+    lastName: z.string(),
+  })
+);
+
+export const appointmentDtoSchema = z.preprocess(
+  (record: any) => {
+    if (!record || typeof record !== 'object') return record;
+    const stringValue = (value: unknown) => (typeof value === 'string' ? value : '');
+    const nullableStringValue = (value: unknown) =>
+      typeof value === 'string' && value.length > 0 ? value : null;
+    const intValue = (value: unknown, fallback = 0) =>
+      typeof value === 'number' ? value : fallback;
+
+    let doctorData = record.doctor;
+    if (!doctorData && (record.doctor_id || record.doctorId)) {
+      doctorData = {
+        id: record.doctor_id ?? record.doctorId,
+        firstName: '',
+        lastName: '',
+        prefix: null,
+        suffix: null,
+      };
+    }
+
+    return {
+      id: record.id,
+      patientId: record.patient_id ?? record.patientId ?? record.user_id ?? record.userId,
+      serviceId: record.service_id ?? record.serviceId,
+      doctorId: record.doctor_id ?? record.doctorId,
+      date: stringValue(record.date),
+      startTime: stringValue(record.start_time ?? record.startTime),
+      endTime: stringValue(record.end_time ?? record.endTime),
+      status: record.status,
+      userNote: nullableStringValue(record.user_note ?? record.userNote),
+      statusReason: nullableStringValue(record.status_reason ?? record.statusReason),
+      rescheduleCount: intValue(record.reschedule_count ?? record.rescheduleCount),
+      createdAt: typeof record.created_at === 'string' ? record.created_at : record.createdAt,
+      updatedAt: typeof record.updated_at === 'string' ? record.updated_at : record.updatedAt,
+      doctor: doctorData,
+      service: record.service,
+      patient: record.patient,
+    };
+  },
+  z.object({
+    id: z.string().uuid(),
+    patientId: z.string().uuid().nullable().optional(),
+    serviceId: z.string().uuid(),
+    doctorId: z.string().uuid(),
+    date: z.string(),
+    startTime: z.string(),
+    endTime: z.string(),
+    status: appointmentStatusEnum,
+    userNote: z.string().nullable().optional(),
+    statusReason: z.string().nullable().optional(),
+    rescheduleCount: z.number().int().nonnegative().optional(),
+    createdAt: z.string().datetime().optional(),
+    updatedAt: z.string().datetime().optional(),
+    doctor: appointmentDoctorSchema.nullable().optional(),
+    service: appointmentServiceSchema.nullable().optional(),
+    patient: appointmentPatientSchema.nullable().optional(),
+  })
+);
+
+export type AppointmentDto = z.infer<typeof appointmentDtoSchema>;
+
+type MaybeRecord = Record<string, unknown>;
+
+export const mapAppointmentRecord = (record: MaybeRecord): AppointmentDto => {
+  return appointmentDtoSchema.parse(record);
+};
+
+export const mapAppointmentRecords = (records: MaybeRecord[]): AppointmentDto[] =>
+  records.map((record) => mapAppointmentRecord(record));
+
+
+--- C:\Users\picar\Desktop\samson-website\samson-nextjs\src\modules\appointments\dtos\status\update-appointment-status.dto.ts ---
+import { z } from 'zod';
+
+// Reusable utility to convert empty form inputs into undefined, forcing DB NULL values
+const emptyStringToUndefined = z.literal('').transform(() => undefined);
+const cleanOptionalString = z.string().trim().optional().transform(val => val === '' ? undefined : val);
+
+export const appointmentStatusEnum = z.enum([
+    'PENDING',
+    'APPROVED',
+    'REJECTED',
+    'CANCELLED',
+    'RESCHEDULE_REQUESTED',
+    'DISPLACED',
+    'CHECKED_IN',
+    'TREATMENT_RENDERED',
+    'COMPLETED',
+    'NO_SHOW',
+]);
+
+// ==========================================
+// USER ACTION SCHEMA
+// ==========================================
+
+export const userUpdateAppointmentStatusSchema = z.object({
+    appointmentId: z.string().uuid('Invalid Appointment ID format'),
+    status: z.enum(['CANCELLED', 'RESCHEDULE_REQUESTED']),
+    statusReason: z.string().trim().min(1, 'Reason is strictly required for your action.'),
+});
+
+export type UserUpdateAppointmentStatusDto = z.infer<typeof userUpdateAppointmentStatusSchema>;
+
+// ==========================================
+// STAFF ACTION SCHEMA
+// ==========================================
+
+export const staffUpdateAppointmentStatusSchema = z
+    .object({
+        appointmentId: z.string().uuid('Invalid Appointment ID format'),
+        status: z.enum([
+            'APPROVED',
+            'REJECTED',
+            'CANCELLED',
+            'DISPLACED',
+            'CHECKED_IN',
+            'TREATMENT_RENDERED',
+            'COMPLETED',
+            'NO_SHOW',
+        ]),
+        statusReason: cleanOptionalString,
+
+        // Form Sanitized Reschedule Metadata
+        newDate: z
+            .string()
+            .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format')
+            .or(emptyStringToUndefined)
+            .optional(),
+        newStartTime: z
+            .string()
+            .datetime('Must be a valid ISO string')
+            .or(emptyStringToUndefined)
+            .optional(),
+        newEndTime: z
+            .string()
+            .datetime('Must be a valid ISO string')
+            .or(emptyStringToUndefined)
+            .optional(),
+        newDoctorId: z
+            .string()
+            .uuid('Invalid Doctor ID format')
+            .or(emptyStringToUndefined)
+            .optional(),
+    })
+    .superRefine((data, ctx) => {
+        // 1. Audit Trail Reasoning Guard
+        const requiresReason = ['REJECTED', 'CANCELLED', 'DISPLACED'].includes(data.status);
+
+        if (requiresReason && (!data.statusReason || data.statusReason.length === 0)) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Reason is required when status is ' + data.status,
+                path: ['statusReason'],
+            });
+        }
+
+        // 2. Cohesive Reschedule Block Validation
+        const hasNewSchedule = !!(
+            data.newDate ||
+            data.newStartTime ||
+            data.newEndTime ||
+            data.newDoctorId
+        );
+
+        if (hasNewSchedule) {
+            if (!data.newDate) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: 'New date is required for rescheduling',
+                    path: ['newDate'],
+                });
+            }
+            if (!data.newStartTime) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: 'New start time is required for rescheduling',
+                    path: ['newStartTime'],
+                });
+            }
+            if (!data.newEndTime) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: 'New end time is required for rescheduling',
+                    path: ['newEndTime'],
+                });
+            }
+            if (!data.newDoctorId) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: 'Assigning a doctor is required for rescheduling',
+                    path: ['newDoctorId'],
+                });
+            }
+
+            // Chronological progression validation
+            if (
+                data.newStartTime &&
+                data.newEndTime &&
+                new Date(data.newStartTime) >= new Date(data.newEndTime)
+            ) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: 'New start time must be before end time',
+                    path: ['newEndTime'],
+                });
+            }
+        }
+    });
+
+export type StaffUpdateAppointmentStatusDto = z.infer<typeof staffUpdateAppointmentStatusSchema>;
+
+--- C:\Users\picar\Desktop\samson-website\samson-nextjs\src\modules\appointments\dtos\treatment\submit-treatment.dto.ts ---
+import { z } from 'zod';
+
+export const servicePerformedSchema = z.object({
+  serviceId: z.string().uuid('Service ID must be a valid UUID'),
+  comment: z.string().optional().nullable(),
+});
+
+export const submitTreatmentSchema = z.object({
+  appointmentId: z.string().uuid('Appointment ID must be a valid UUID'),
+  actualServices: z.array(servicePerformedSchema).min(1, 'At least one service must be performed'),
+  clinicalNotes: z.string().optional().nullable(),
+});
+
+export type SubmitTreatmentDto = z.infer<typeof submitTreatmentSchema>;
+
+--- C:\Users\picar\Desktop\samson-website\samson-nextjs\src\modules\audit-logs\dtos\logs\audit-log-response.dto.ts ---
+import { z } from 'zod';
+
+export const auditLogDbSchema = z.object({
+  id: z.string().uuid(),
+  actor_id: z.string().uuid(),
+  action: z.string(),
+  target_id: z.string().uuid(),
+  reason: z.string().nullable().optional(),
+  created_at: z.string().datetime().optional(),
+});
+
+export const auditLogResponseSchema = auditLogDbSchema.transform((record) => ({
+  id: record.id,
+  actorId: record.actor_id,
+  action: record.action,
+  targetId: record.target_id,
+  reason: record.reason ?? null,
+  createdAt: record.created_at,
+}));
+
+export type AuditLogResponseDto = z.infer<typeof auditLogResponseSchema>;
+
+--- C:\Users\picar\Desktop\samson-website\samson-nextjs\src\modules\audit-logs\dtos\logs\create-audit-log.dto.ts ---
+import { z } from 'zod';
+
+export const createAuditLogSchema = z.object({
+  actorId: z.string().uuid('Actor ID must be a valid UUID'),
+  action: z.string().min(1, 'Action description is required'),
+  targetId: z.string().uuid('Target ID must be a valid UUID'),
+  reason: z.string().optional().nullable(),
+});
+
+export type CreateAuditLogDto = z.infer<typeof createAuditLogSchema>;
+
+--- C:\Users\picar\Desktop\samson-website\samson-nextjs\src\modules\audit-logs\dtos\logs\get-audit-logs.dto.ts ---
+import { z } from 'zod';
+
+export const getAuditLogsSchema = z.object({
+  actorId: z.string().uuid('Actor ID must be a valid UUID').optional(),
+  action: z.string().optional(),
+  targetId: z.string().uuid('Target ID must be a valid UUID').optional(),
+});
+
+export type GetAuditLogsDto = z.infer<typeof getAuditLogsSchema>;
+
+--- C:\Users\picar\Desktop\samson-website\samson-nextjs\src\modules\billing\dtos\invoicing\finalize-invoice.dto.ts ---
+import { z } from "zod";
+import { paymentMethodEnum } from "./invoice-response.dto";
+
+export const finalizeInvoiceSchema = z.object({
+  invoiceId: z.string().uuid("Invoice ID must be a valid UUID"),
+  paymentMethod: paymentMethodEnum,
+  discountApplied: z.number().nonnegative("Discount must be non-negative").optional().nullable(),
+  amount: z.number().nonnegative("Amount must be non-negative").optional(),
+});
+
+export type FinalizeInvoiceDto = z.infer<typeof finalizeInvoiceSchema>;
+
+--- C:\Users\picar\Desktop\samson-website\samson-nextjs\src\modules\billing\dtos\invoicing\generate-invoice.dto.ts ---
+import { z } from "zod";
+import { invoiceStatusEnum } from "./invoice-response.dto";
+
+export const GenerateInvoiceSchema = z.object({
+  appointment_id: z.string().uuid(),
+  amount: z.number().nonnegative(),
+  status: invoiceStatusEnum.default("DRAFT"),
+});
+
+export type GenerateInvoiceDto = z.infer<typeof GenerateInvoiceSchema>;
+
+--- C:\Users\picar\Desktop\samson-website\samson-nextjs\src\modules\billing\dtos\invoicing\get-invoices.dto.ts ---
+import { z } from "zod";
+import { invoiceStatusEnum } from "./invoice-response.dto";
+
+export const GetInvoicesSchema = z.object({
+  appointment_id: z.string().uuid().optional(),
+  status: invoiceStatusEnum.optional(),
+  page: z.number().int().positive().default(1),
+  limit: z.number().int().positive().max(100).default(20),
+});
+
+export type GetInvoicesDto = z.infer<typeof GetInvoicesSchema>;
+
+--- C:\Users\picar\Desktop\samson-website\samson-nextjs\src\modules\billing\dtos\invoicing\invoice-response.dto.ts ---
+import { z } from "zod";
+
+export const invoiceStatusEnum = z.enum(["DRAFT", "FINALIZED", "PAID", "VOID"]);
+export const paymentMethodEnum = z.enum(["CASH", "CARD", "HMO"]);
+
+export const invoiceResponseSchema = z.preprocess(
+  (record: any) => {
+    if (!record || typeof record !== 'object') return record;
+    const stringValue = (value: unknown) => (typeof value === 'string' ? value : '');
+    const numberValue = (value: unknown) => {
+      if (typeof value === "number") return value;
+      if (typeof value === "string") return Number(value) || 0;
+      return 0;
+    };
+
+    const nullableNumberValue = (value: unknown) => {
+      if (typeof value === "number") return value;
+      if (typeof value === "string") return Number(value) || null;
+      return null;
+    };
+
+    return {
+      id: stringValue(record.id),
+      appointmentId: stringValue(record.appointment_id ?? record.appointmentId),
+      amount: numberValue(record.amount),
+      status: record.status ?? "DRAFT",
+      paymentMethod: record.payment_method ?? record.paymentMethod ?? null,
+      discountApplied: nullableNumberValue(record.discount_applied ?? record.discountApplied),
+      createdAt: typeof record.created_at === 'string' ? record.created_at : record.createdAt,
+      updatedAt: typeof record.updated_at === 'string' ? record.updated_at : record.updatedAt,
+    };
+  },
+  z.object({
+    id: z.string().uuid(),
+    appointmentId: z.string().uuid(),
+    amount: z.number().nonnegative(),
+    status: invoiceStatusEnum,
+    paymentMethod: paymentMethodEnum.nullable().optional(),
+    discountApplied: z.number().nonnegative().nullable().optional(),
+    createdAt: z.string().datetime().optional(),
+    updatedAt: z.string().datetime().optional(),
+  })
+);
+
+export type InvoiceStatus = z.infer<typeof invoiceStatusEnum>;
+export type PaymentMethod = z.infer<typeof paymentMethodEnum>;
+export type InvoiceResponseDto = z.infer<typeof invoiceResponseSchema>;
+
+type MaybeRecord = Record<string, unknown>;
+
+export const mapInvoiceRecord = (record: MaybeRecord): InvoiceResponseDto => {
+  return invoiceResponseSchema.parse(record);
+};
+
+export const mapInvoiceRecords = (records: MaybeRecord[]): InvoiceResponseDto[] =>
+  records.map((record) => mapInvoiceRecord(record));
+
+--- C:\Users\picar\Desktop\samson-website\samson-nextjs\src\modules\billing\dtos\invoicing\update-invoice.dto.ts ---
+import { z } from "zod";
+import { invoiceStatusEnum } from "./invoice-response.dto";
+
+export const UpdateInvoiceSchema = z.object({
+  id: z.string().uuid(),
+  amount: z.number().nonnegative().optional(),
+  status: invoiceStatusEnum.optional(),
+});
+
+export type UpdateInvoiceDto = z.infer<typeof UpdateInvoiceSchema>;
+
+--- C:\Users\picar\Desktop\samson-website\samson-nextjs\src\modules\clinic-config\dtos\settings\get-clinic-config.dto.ts ---
+import { z } from "zod";
+
+const WEEK_DAYS = [
+  "monday",
+  "tuesday",
+  "wednesday",
+  "thursday",
+  "friday",
+  "saturday",
+  "sunday",
+] as const;
+
+export const TimeStringSchema = z
+  .string()
+  .regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Time must be in HH:MM 24-hour format");
+
+export const operatingDaySchema = z
+  .object({
+    isOpen: z.boolean(),
+    openTime: TimeStringSchema.nullable(),
+    closeTime: TimeStringSchema.nullable(),
+  })
+  .refine(
+    (data) => {
+      if (data.isOpen) {
+        return data.openTime !== null && data.closeTime !== null;
+      }
+      return true;
+    },
+    {
+      message: "Open time and close time are required when the clinic is open",
+      path: ["openTime"],
+    }
+  )
+  .refine(
+    (data) => {
+      if (data.isOpen && data.openTime && data.closeTime) {
+        return data.openTime < data.closeTime;
+      }
+      return true;
+    },
+    {
+      message: "Close time must be after open time",
+      path: ["closeTime"],
+    }
+  );
+
+export const operatingHoursSchema = z.object({
+  monday: operatingDaySchema,
+  tuesday: operatingDaySchema,
+  wednesday: operatingDaySchema,
+  thursday: operatingDaySchema,
+  friday: operatingDaySchema,
+  saturday: operatingDaySchema,
+  sunday: operatingDaySchema,
+});
+
+export const socialLinkSchema = z.object({
+  platform: z.string().min(1, "Platform name is required"),
+  url: z.string().url("Must be a valid URL"),
+});
+
+const operatingDayDbSchema = z.object({
+  is_open: z.boolean(),
+  open_time: TimeStringSchema.nullable(),
+  close_time: TimeStringSchema.nullable(),
+});
+
+const operatingHoursDbSchema = z.object(
+  Object.fromEntries(WEEK_DAYS.map((day) => [day, operatingDayDbSchema])) as Record<
+    (typeof WEEK_DAYS)[number],
+    typeof operatingDayDbSchema
+  >
+);
+
+export const clinicConfigAppSchema = z.object({
+  isBookingOpen: z.boolean(),
+  maintenanceMessage: z.string().nullable(),
+  maxReschedules: z.number().int().min(0),
+  clinicName: z.string().min(1, "Clinic name is required"),
+  address: z.string().min(1, "Address is required"),
+  phone: z.string().min(1, "Phone is required"),
+  email: z.string().email("Invalid email"),
+  operatingHours: operatingHoursSchema,
+  allowSameDayBooking: z.boolean(),
+  calendarRenderDays: z.number().int().positive("Calendar render days must be positive"),
+  socialLinks: z.array(socialLinkSchema).default([]),
+});
+
+export const clinicConfigDbSchema = z.object({
+  is_booking_open: z.boolean(),
+  maintenance_message: z.string().nullable(),
+  max_reschedules: z.number().int().min(0),
+  clinic_name: z.string().min(1, "Clinic name is required"),
+  address: z.string().min(1, "Address is required"),
+  phone: z.string().min(1, "Phone is required"),
+  email: z.string().email("Invalid email"),
+  operating_hours: operatingHoursDbSchema,
+  allow_same_day_booking: z.boolean(),
+  calendar_render_days: z.number().int().positive("Calendar render days must be positive"),
+  social_links: z.array(socialLinkSchema).default([]),
+});
+
+export const clinicConfigResponseSchema = clinicConfigDbSchema.transform((record) => ({
+  isBookingOpen: record.is_booking_open,
+  maintenanceMessage: record.maintenance_message,
+  maxReschedules: record.max_reschedules,
+  clinicName: record.clinic_name,
+  address: record.address,
+  phone: record.phone,
+  email: record.email,
+  operatingHours: Object.fromEntries(
+    WEEK_DAYS.map((day) => [
+      day,
+      {
+        isOpen: record.operating_hours[day].is_open,
+        openTime: record.operating_hours[day].open_time,
+        closeTime: record.operating_hours[day].close_time,
+      },
+    ])
+  ) as z.infer<typeof operatingHoursSchema>,
+  allowSameDayBooking: record.allow_same_day_booking,
+  calendarRenderDays: record.calendar_render_days,
+  socialLinks: record.social_links,
+}));
+
+export type ClinicConfigResponseDto = z.infer<typeof clinicConfigResponseSchema>;
+
+
+
+--- C:\Users\picar\Desktop\samson-website\samson-nextjs\src\modules\clinic-config\dtos\settings\update-clinic-config.dto.ts ---
+import { z } from "zod";
+import { clinicConfigAppSchema } from "./get-clinic-config.dto";
+
+export const updateClinicConfigSchema = clinicConfigAppSchema.partial();
+
+export type UpdateClinicConfigDto = z.infer<typeof updateClinicConfigSchema>;
+
+--- C:\Users\picar\Desktop\samson-website\samson-nextjs\src\modules\patients\dtos\auth\login.dto.ts ---
+import { z } from 'zod';
+
+export const loginSchema = z.object({
+  email: z.string().email('Invalid email address'),
+  password: z.string().optional(),
+  acceptTerms: z.literal(true, {
+    message: 'You must accept the Terms and Privacy Policy',
+  }),
+});
+
+export type LoginInput = z.infer<typeof loginSchema>;
+
+--- C:\Users\picar\Desktop\samson-website\samson-nextjs\src\modules\patients\dtos\auth\sign-up.dto.ts ---
+import { z } from 'zod';
+
+export const signUpSchema = z.object({
+  firstName: z.string().min(1, 'First name is required'),
+  middleName: z.string().optional(),
+  lastName: z.string().min(1, 'Last name is required'),
+  suffix: z.string().optional(),
+  email: z.string().email('Invalid email address'),
+  phoneNumber: z.string().regex(/^\+?[1-9]\d{9,14}$/, 'Phone number must be in E.164 format (e.g. +1234567890)'),
+  dateOfBirth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date of birth must be in YYYY-MM-DD format (e.g. 1990-01-01)'),
+  password: z.string().min(8, 'Password must be at least 8 characters long'),
+  acceptTerms: z.literal(true, {
+    message: 'You must accept the Terms and Privacy Policy',
+  }),
+});
+
+export type SignUpInput = z.infer<typeof signUpSchema>;
+
+--- C:\Users\picar\Desktop\samson-website\samson-nextjs\src\modules\patients\dtos\dependents\create-dependent.dto.ts ---
+import { z } from 'zod';
+
+export const dependentRelationshipEnum = z.enum(['CHILD', 'SPOUSE', 'PARENT', 'SIBLING', 'OTHER']);
+export type DependentRelationship = z.infer<typeof dependentRelationshipEnum>;
+
+export const createDependentSchema = z.object({
+  patientId: z.string().uuid(),
+  firstName: z.string().min(1, 'First name is required'),
+  lastName: z.string().min(1, 'Last name is required'),
+  dateOfBirth: z.string(),
+  relationship: dependentRelationshipEnum,
+});
+
+export type CreateDependentDto = z.infer<typeof createDependentSchema>;
+
+--- C:\Users\picar\Desktop\samson-website\samson-nextjs\src\modules\patients\dtos\dependents\dependent-profile.dto.ts ---
+import { z } from 'zod';
+import { dependentRelationshipEnum } from './create-dependent.dto';
+
+export const dependentProfileSchema = z.preprocess(
+  (record: any) => {
+    if (!record || typeof record !== 'object') return record;
+    const stringValue = (value: unknown) => (typeof value === 'string' ? value : '');
+
+    return {
+      id: stringValue(record.id),
+      patientId: stringValue(record.patient_id ?? record.patientId),
+      firstName: stringValue(record.first_name ?? record.firstName),
+      lastName: stringValue(record.last_name ?? record.lastName),
+      dateOfBirth: stringValue(record.date_of_birth ?? record.dateOfBirth),
+      relationship: record.relationship ?? 'OTHER',
+      createdAt: typeof record.created_at === 'string' ? record.created_at : record.createdAt,
+      updatedAt: typeof record.updated_at === 'string' ? record.updated_at : record.updatedAt,
+    };
+  },
+  z.object({
+    id: z.string().uuid(),
+    patientId: z.string().uuid(),
+    firstName: z.string(),
+    lastName: z.string(),
+    dateOfBirth: z.string(),
+    relationship: dependentRelationshipEnum,
+    createdAt: z.string().datetime().optional(),
+    updatedAt: z.string().datetime().optional(),
+  })
+);
+
+export type DependentProfileDto = z.infer<typeof dependentProfileSchema>;
+
+type MaybeRecord = Record<string, unknown>;
+
+export const mapDependentProfile = (record: MaybeRecord): DependentProfileDto => {
+  return dependentProfileSchema.parse(record);
+};
+
+export const mapDependentProfiles = (records: MaybeRecord[]): DependentProfileDto[] =>
+  records.map((r) => mapDependentProfile(r));
+
+
+--- C:\Users\picar\Desktop\samson-website\samson-nextjs\src\modules\patients\dtos\profile\patient-profile.dto.ts ---
+import { z } from 'zod';
+
+export const patientProfileSchema = z.preprocess(
+  (record: any) => {
+    if (!record || typeof record !== 'object') return record;
+    const stringValue = (value: unknown) => (typeof value === 'string' ? value : '');
+    const nullableStringValue = (value: unknown) =>
+      typeof value === 'string' && value.length > 0 ? value : null;
+
+    return {
+      id: stringValue(record.id),
+      email: stringValue(record.email),
+      firstName: stringValue(record.first_name ?? record.firstName),
+      middleName: nullableStringValue(record.middle_name ?? record.middleName),
+      lastName: stringValue(record.last_name ?? record.lastName),
+      suffix: nullableStringValue(record.suffix),
+      phoneNumber: stringValue(record.phone ?? record.phone_number ?? record.phoneNumber),
+      dateOfBirth: stringValue(record.date_of_birth ?? record.dateOfBirth),
+      avatarUrl: nullableStringValue(record.avatar_url ?? record.avatarUrl),
+      createdAt: typeof record.created_at === 'string' ? record.created_at : record.createdAt,
+      updatedAt: typeof record.updated_at === 'string' ? record.updated_at : record.updatedAt,
+    };
+  },
+  z.object({
+    id: z.string().uuid(),
+    email: z.string().email(),
+    firstName: z.string(),
+    middleName: z.string().nullable().optional(),
+    lastName: z.string(),
+    suffix: z.string().nullable().optional(),
+    phoneNumber: z.string().regex(/^\+?[1-9]\d{1,14}$/, "Must be a valid E.164 phone number"),
+    dateOfBirth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Must be in YYYY-MM-DD format"),
+    avatarUrl: z.string().url().nullable().optional(),
+    createdAt: z.string().datetime().optional(),
+    updatedAt: z.string().datetime().optional(),
+  })
+);
+
+export type PatientProfileDto = z.infer<typeof patientProfileSchema>;
+
+type MaybeRecord = Record<string, unknown>;
+
+export const mapPatientProfile = (record: MaybeRecord): PatientProfileDto => {
+  return patientProfileSchema.parse(record);
+};
+
+
+--- C:\Users\picar\Desktop\samson-website\samson-nextjs\src\modules\patients\dtos\profile\register-patient.dto.ts ---
+import { z } from 'zod';
+
+export const registerPatientSchema = z.object({
+  firstName: z.string().min(1, 'First name is required').trim(),
+  middleName: z.string().trim().optional(),
+  lastName: z.string().min(1, 'Last name is required').trim(),
+  suffix: z.string().trim().optional(),
+  email: z.string().email('Invalid email address').toLowerCase().trim(),
+  // E.164-like validation: optional '+' followed by 10-15 digits
+  phoneNumber: z.string().regex(/^\+?[1-9]\d{9,14}$/, 'Invalid phone number format'),
+  dateOfBirth: z.string().date('Invalid date format. Expected YYYY-MM-DD'),
+});
+
+export type RegisterPatientDto = z.infer<typeof registerPatientSchema>;
+
+--- C:\Users\picar\Desktop\samson-website\samson-nextjs\src\modules\services\dtos\management\create-service.dto.ts ---
+import { z } from "zod";
+
+export const createServiceSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  description: z.string().optional().nullable(),
+  durationMinutes: z.number().int().positive("Duration must be positive"),
+  price: z.number().nonnegative("Price cannot be negative").optional().nullable(),
+  serviceType: z.enum(["GENERAL", "SPECIALIZED"]).default("GENERAL"),
+  isActive: z.boolean().default(true),
+});
+
+export type CreateServiceDto = z.infer<typeof createServiceSchema>;
+
+
+--- C:\Users\picar\Desktop\samson-website\samson-nextjs\src\modules\services\dtos\management\service-response.dto.ts ---
+import { z } from "zod";
+
+export const serviceDbSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+  description: z.string().nullable().optional(),
+  duration_minutes: z.number().int().positive(),
+  price: z.number().nonnegative().nullable().optional(),
+  service_type: z.enum(["GENERAL", "SPECIALIZED"]).default("GENERAL"),
+  is_active: z.boolean().default(true),
+  created_at: z.string().datetime().optional(),
+  updated_at: z.string().datetime().optional(),
+});
+
+export const serviceResponseSchema = serviceDbSchema.transform((record) => ({
+  id: record.id,
+  name: record.name,
+  description: record.description ?? null,
+  durationMinutes: record.duration_minutes,
+  price: record.price ?? null,
+  serviceType: record.service_type,
+  isActive: record.is_active,
+  createdAt: record.created_at,
+  updatedAt: record.updated_at,
+}));
+
+export type ServiceResponseDto = z.infer<typeof serviceResponseSchema>;
+
+--- C:\Users\picar\Desktop\samson-website\samson-nextjs\src\modules\services\dtos\management\update-service.dto.ts ---
+import { z } from "zod";
+import { createServiceSchema } from "./create-service.dto";
+
+export const updateServiceSchema = createServiceSchema.partial().extend({
+  id: z.string().uuid("Invalid service ID"),
+});
+
+export type UpdateServiceDto = z.infer<typeof updateServiceSchema>;
+
+--- C:\Users\picar\Desktop\samson-website\samson-nextjs\src\modules\staff\dtos\management\assign-doctor-services.dto.ts ---
+import { z } from 'zod';
+
+export const assignDoctorServicesSchema = z.object({
+  doctorId: z.string().uuid('Doctor ID must be a valid UUID'),
+  serviceIds: z.array(z.string().uuid('Service IDs must be valid UUIDs')),
+});
+
+export type AssignDoctorServicesDto = z.infer<typeof assignDoctorServicesSchema>;
+
+--- C:\Users\picar\Desktop\samson-website\samson-nextjs\src\modules\staff\dtos\management\deactivate-user.dto.ts ---
+import { z } from 'zod';
+
+export const deactivateUserSchema = z.object({
+  userId: z.string().uuid(),
+  reason: z.string().optional(),
+});
+
+export type DeactivateUserDto = z.infer<typeof deactivateUserSchema>;
+
+--- C:\Users\picar\Desktop\samson-website\samson-nextjs\src\modules\staff\dtos\management\get-all-users.dto.ts ---
+import { z } from 'zod';
+
+export const getAllUsersSchema = z.object({
+  page: z.number().int().min(1).optional().default(1),
+  limit: z.number().int().min(1).max(100).optional().default(20),
+  search: z.string().optional(),
+});
+
+export type GetAllUsersDto = z.input<typeof getAllUsersSchema>;
+
+export const userProfileResponseSchema = z.object({
+  id: z.string().uuid(),
+  email: z.string().email().nullable().optional(),
+  firstName: z.string(),
+  lastName: z.string(),
+  role: z.string(),
+  isActive: z.boolean(),
+});
+
+export type UserProfileResponseDto = z.infer<typeof userProfileResponseSchema>;
+
+--- C:\Users\picar\Desktop\samson-website\samson-nextjs\src\modules\staff\dtos\profile\create-staff.dto.ts ---
+import { z } from 'zod';
+
+export const StaffRoleEnum = z.enum(['ADMIN', 'DOCTOR', 'SECRETARY']);
+
+export const createStaffSchema = z.object({
+    firstName: z.string().trim().min(1, 'First name is required'),
+    middleName: z.string().trim().optional().nullable(),
+    lastName: z.string().trim().min(1, 'Last name is required'),
+    suffix: z.string().trim().optional().nullable(),
+    email: z.string().trim().toLowerCase().email('Invalid email address'),
+    role: StaffRoleEnum,
+    phoneNumber: z.string().regex(/^\+?[1-9]\d{9,14}$/, 'Invalid phone number format'),
+    // specializations removed - handled by a separate update action well focus on account creation here
+});
+
+export type CreateStaffDto = z.infer<typeof createStaffSchema>;
+
+--- C:\Users\picar\Desktop\samson-website\samson-nextjs\src\modules\staff\dtos\profile\staff-profile.dto.ts ---
+import { z } from 'zod';
+import { StaffRoleEnum } from './create-staff.dto';
+
+export const staffProfileSchema = z.preprocess(
+  (record: any) => {
+    if (!record || typeof record !== 'object') return record;
+    const stringValue = (value: unknown) => (typeof value === 'string' ? value : '');
+    const nullableStringValue = (value: unknown) =>
+      typeof value === 'string' && value.length > 0 ? value : null;
+
+    return {
+      id: stringValue(record.id),
+      email: nullableStringValue(record.email),
+      firstName: stringValue(record.first_name ?? record.firstName),
+      middleName: nullableStringValue(record.middle_name ?? record.middleName),
+      lastName: stringValue(record.last_name ?? record.lastName),
+      suffix: nullableStringValue(record.suffix),
+      phoneNumber: nullableStringValue(record.phone ?? record.phone_number ?? record.phoneNumber),
+      role: record.role ?? 'SECRETARY',
+      createdAt: typeof record.created_at === 'string' ? record.created_at : record.createdAt,
+      updatedAt: typeof record.updated_at === 'string' ? record.updated_at : record.updatedAt,
+    };
+  },
+  z.object({
+    id: z.string().uuid(),
+    email: z.string().email().nullable().optional(),
+    firstName: z.string(),
+    middleName: z.string().nullable().optional(),
+    lastName: z.string(),
+    suffix: z.string().nullable().optional(),
+    phoneNumber: z.string().regex(/^\+?[1-9]\d{1,14}$/, "Must be a valid E.164 phone number").nullable().optional(),
+    role: StaffRoleEnum,
+    createdAt: z.string().datetime().optional(),
+    updatedAt: z.string().datetime().optional(),
+  })
+);
+
+export type StaffProfileDto = z.infer<typeof staffProfileSchema>;
+
+type MaybeRecord = Record<string, unknown>;
+
+export const mapStaffProfile = (record: MaybeRecord): StaffProfileDto => {
+  return staffProfileSchema.parse(record);
+};
+
+--- C:\Users\picar\Desktop\samson-website\samson-nextjs\src\modules\staff\dtos\profile\terminate-staff.dto.ts ---
+import { z } from 'zod';
+
+export const terminateStaffSchema = z.object({
+  staffId: z.string().uuid('Invalid staff ID'),
+});
+
+export type TerminateStaffDto = z.infer<typeof terminateStaffSchema>;
+
+--- C:\Users\picar\Desktop\samson-website\samson-nextjs\src\modules\staff\dtos\profile\update-staff.dto.ts ---
+import { z } from 'zod';
+import { StaffRoleEnum } from './create-staff.dto';
+
+export const updateStaffSchema = z.object({
+    id: z.string().uuid('Invalid staff ID'),
+    email: z.string().trim().toLowerCase().email('Invalid email').optional(),
+    firstName: z.string().trim().min(1, 'First name is required').optional(),
+    lastName: z.string().trim().min(1, 'Last name is required').optional(),
+    middleName: z.string().trim().optional().nullable(),
+    suffix: z.string().trim().optional().nullable(),
+    phoneNumber: z
+        .string()
+        .regex(/^\+?[1-9]\d{9,14}$/, 'Invalid phone number format')
+        .optional(),
+    role: StaffRoleEnum.optional(),
+});
+
+export type UpdateStaffDto = z.infer<typeof updateStaffSchema>;
+
+--- C:\Users\picar\Desktop\samson-website\samson-nextjs\src\modules\staff\dtos\schedule\doctor-schedule.dto.ts ---
+import { z } from 'zod';
+
+const timeRegex = /^([01]\d|2[0-3]):?([0-5]\d)$/;
+const timeStringSchema = z.string().regex(timeRegex, 'Invalid time format (HH:MM required)');
+
+export const DayOfWeekEnum = z.enum([
+    'SUNDAY',
+    'MONDAY',
+    'TUESDAY',
+    'WEDNESDAY',
+    'THURSDAY',
+    'FRIDAY',
+    'SATURDAY',
+]);
+
+// Optional helper to keep your DTO and DB logic synced
+export const DayOfWeekMap: Record<z.infer<typeof DayOfWeekEnum>, number> = {
+    SUNDAY: 0,
+    MONDAY: 1,
+    TUESDAY: 2,
+    WEDNESDAY: 3,
+    THURSDAY: 4,
+    FRIDAY: 5,
+    SATURDAY: 6,
+};
+
+export const doctorScheduleSchema = z
+    .object({
+        doctorId: z.string().uuid('Invalid doctor ID'),
+        dayOfWeek: DayOfWeekEnum,
+        startTime: timeStringSchema,
+        endTime: timeStringSchema,
+        breakStartTime: timeStringSchema.optional().nullable(),
+        breakEndTime: timeStringSchema.optional().nullable(),
+    })
+    .refine(
+        (data) => {
+            return data.startTime < data.endTime;
+        },
+        {
+            message: 'End time must be after start time',
+            path: ['endTime'],
+        }
+    )
+    .refine(
+        (data) => {
+            if (!data.breakStartTime || !data.breakEndTime) return true;
+            return data.breakStartTime < data.breakEndTime;
+        },
+        {
+            message: 'Break end time must be after break start time',
+            path: ['breakEndTime'],
+        }
+    )
+    .refine(
+        (data) => {
+            if (!data.breakStartTime || !data.breakEndTime) return true;
+            return data.breakStartTime >= data.startTime && data.breakEndTime <= data.endTime;
+        },
+        {
+            message: 'Break must be entirely within the working hours',
+            path: ['breakStartTime'],
+        }
+    );
+
+export type DoctorScheduleDto = z.infer<typeof doctorScheduleSchema>;
+

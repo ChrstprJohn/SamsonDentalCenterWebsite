@@ -8,11 +8,11 @@ export const getAppointmentsByUserQuery = (supabase: SupabaseClient) => {
       .select(
         `
         *,
-        doctor:doctor_id (id, first_name, last_name, prefix, suffix),
-        service:service_id (id, name, duration_minutes)
+        doctor:users!appointments_doctor_id_fkey (id, first_name, last_name, suffix),
+        service:services!appointments_service_id_fkey (id, name, duration_minutes)
       `
       )
-      .eq('user_id', userId)
+      .eq('patient_id', userId)
       .order('start_time', { ascending: false });
 
     if (error) {

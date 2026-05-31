@@ -4,9 +4,9 @@ import { ClinicConfigResponseDto, clinicConfigResponseSchema } from "../../dtos/
 export const getClinicConfigQuery = (supabase: SupabaseClient) => {
   return async (): Promise<ClinicConfigResponseDto | null> => {
     const { data, error } = await supabase
-      .from("clinic_settings")
+      .from("clinic_config")
       .select("*")
-      .eq("id", 1)
+      .eq("is_singleton", true)
       .maybeSingle();
 
     if (error) throw new Error(`Failed to fetch clinic config: ${error.message}`);

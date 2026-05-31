@@ -35,8 +35,12 @@ export async function submitBookingAction(formData: SubmitBookingDto) {
       resolveDoctorDisplayName: resolveDoctorDisplayNameQuery(supabase),
     });
 
+    const { addDependentCommand } = await import('@/modules/patients/repositories');
+    const createDependent = addDependentCommand(supabase);
+
     const useCase = submitBookingUseCase({
       createAppointment: createAppointmentCommand(supabase),
+      createDependent,
       getAvailableTimeSlots: availabilityUseCase.getAvailableTimeSlots,
     });
 

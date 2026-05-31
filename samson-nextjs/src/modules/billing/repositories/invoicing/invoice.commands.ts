@@ -6,9 +6,15 @@ import { InvoiceResponseDto, mapInvoiceRecord } from "../../dtos/invoicing/invoi
 
 export const generateInvoiceCommand = (supabase: SupabaseClient) => {
   return async (data: GenerateInvoiceDto): Promise<InvoiceResponseDto> => {
+    const dbPayload = {
+      appointment_id: data.appointmentId,
+      amount: data.amount,
+      status: data.status,
+    };
+
     const { data: result, error } = await supabase
       .from("invoices")
-      .insert([data])
+      .insert([dbPayload])
       .select()
       .single();
 

@@ -7,7 +7,7 @@ import { DomainError } from '@/shared/errors';
 export const submitTreatmentUseCase = (deps: {
   supabase: SupabaseClient;
   submitTreatment: (appointmentId: string, clinicalNotes?: string | null) => Promise<boolean>;
-  generateInvoice: (data: { appointment_id: string; amount: number; status: 'DRAFT' }) => Promise<any>;
+  generateInvoice: (data: { appointmentId: string; amount: number; status: 'DRAFT' }) => Promise<any>;
 }) => {
   return async (data: SubmitTreatmentDto): Promise<boolean> => {
     const { appointmentId, actualServices, clinicalNotes } = data;
@@ -61,7 +61,7 @@ export const submitTreatmentUseCase = (deps: {
 
     // 3. Generate the Draft Invoice using the billing repository
     await deps.generateInvoice({
-      appointment_id: appointmentId,
+      appointmentId: appointmentId,
       amount: totalAmount,
       status: 'DRAFT',
     });

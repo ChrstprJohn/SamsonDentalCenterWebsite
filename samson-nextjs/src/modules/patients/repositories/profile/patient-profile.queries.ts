@@ -5,9 +5,10 @@ import { PatientProfileDto, patientProfileSchema } from '../../dtos';
 export const getPatientProfileByIdQuery = (supabase: SupabaseClient) => {
   return async (patientId: string): Promise<PatientProfileDto> => {
     const { data: patient, error } = await supabase
-      .from('patients')
+      .from('users')
       .select('*')
       .eq('id', patientId)
+      .eq('role', 'PATIENT')
       .single();
 
     if (error || !patient) {
@@ -25,4 +26,3 @@ export class PatientProfileQueries {
     return getPatientProfileByIdQuery(this.supabase)(patientId);
   }
 }
-

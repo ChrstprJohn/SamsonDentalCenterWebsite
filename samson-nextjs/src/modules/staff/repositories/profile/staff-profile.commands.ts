@@ -10,7 +10,7 @@ import { DomainError } from '@/shared/errors';
 export const createStaffCommand = (supabase: SupabaseClient) => {
   return async (userId: string, data: CreateStaffDto): Promise<StaffProfileDto> => {
     const { data: staff, error } = await supabase
-      .from('staff')
+      .from('users')
       .insert({
         id: userId,
         email: data.email,
@@ -19,7 +19,7 @@ export const createStaffCommand = (supabase: SupabaseClient) => {
         last_name: data.lastName,
         suffix: data.suffix,
         role: data.role,
-        phone: data.phoneNumber,
+        phone_number: data.phoneNumber,
       })
       .select('*')
       .single();
@@ -44,10 +44,10 @@ export const updateStaffCommand = (supabase: SupabaseClient) => {
     if (data.middleName !== undefined) payload.middle_name = data.middleName;
     if (data.suffix !== undefined) payload.suffix = data.suffix;
     if (data.role) payload.role = data.role;
-    if (data.phoneNumber) payload.phone = data.phoneNumber;
+    if (data.phoneNumber) payload.phone_number = data.phoneNumber;
 
     const { data: staff, error } = await supabase
-      .from('staff')
+      .from('users')
       .update(payload)
       .eq('id', id)
       .select('*')
@@ -66,7 +66,7 @@ export const updateStaffCommand = (supabase: SupabaseClient) => {
 
 export const terminateStaffCommand = (supabase: SupabaseClient) => {
   return async (id: string) => {
-    const { error } = await supabase.from('staff').delete().eq('id', id);
+    const { error } = await supabase.from('users').delete().eq('id', id);
 
     if (error) {
       throw new DomainError(

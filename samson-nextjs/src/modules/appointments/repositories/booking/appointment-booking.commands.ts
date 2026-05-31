@@ -3,29 +3,19 @@ import { DomainError } from '@/shared/errors';
 import { SubmitBookingDto, AppointmentDto, mapAppointmentRecord } from '../../dtos';
 
 export const createAppointmentCommand = (supabase: SupabaseClient) => {
-  return async (userId: string, data: SubmitBookingDto): Promise<AppointmentDto> => {
+  return async (userId: string, data: SubmitBookingDto & { resolvedDependentId?: string }): Promise<AppointmentDto> => {
     const { data: appointment, error } = await supabase
       .from('appointments')
       .insert({
-        user_id: userId,
+        patient_id: userId,
         status: 'PENDING',
-        idempotency_key: data.idempotencyKey,
         service_id: data.serviceId,
         doctor_id: data.doctorId,
-        is_preferred_doctor: data.isPreferredDoctor ?? false,
+        dependent_id: data.resolvedDependentId || data.dependentId || null,
         date: data.date,
         start_time: data.startTime,
         end_time: data.endTime,
-        user_note: data.userNote,
-        patient_type: data.patientType,
-        dependent_id: data.dependentId,
-        dependent_first_name: data.dependentFirstName,
-        dependent_middle_name: data.dependentMiddleName,
-        dependent_last_name: data.dependentLastName,
-        dependent_suffix: data.dependentSuffix,
-        dependent_birthday: data.dependentBirthday,
-        dependent_sex: data.dependentSex,
-        dependent_relationship: data.dependentRelationship,
+        user_note: data.userNote || null,
       })
       .select('*')
       .single();
@@ -45,10 +35,6 @@ export const createAppointmentCommand = (supabase: SupabaseClient) => {
 export class AppointmentBookingCommands {
   constructor(private readonly supabase: SupabaseClient) {}
 
-  /**
-   * Strictly creates a new appointment request from the booking wizard.
-   * Maps properties to snake_case database columns.
-   */
   async createAppointment(userId: string, data: SubmitBookingDto): Promise<AppointmentDto> {
     return createAppointmentCommand(this.supabase)(userId, data);
   }

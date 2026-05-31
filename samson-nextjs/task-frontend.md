@@ -200,11 +200,14 @@ Complete administrative oversight of clinical rosters, services, and system-wide
 
 Ensure perfect visual state boundaries, robust schema validations, and premium E2E flow testing.
 
-- [ ] **8.1 Live Swap & Server Actions Hookup**
-  - [ ] Replace RSC mock datasets (`mocks/*.mock.ts`) with live database queries (`services/*.server.ts`) inside routes.
-  - [ ] Hook client boundary views to Server Actions (`actions/*.ts`), returning standard serialized payloads.
-  - [ ] Implement the *Server-Action-to-RHF Error Bridge*: standardizing server exceptions and using RHF's `setError` to highlight the invalid inputs.
-- [ ] **8.2 Vitest Component & Hook Unit Testing**
+- [x] **8.1 Backend Mock Swap & Schema Alignment (COMPLETED)**
+  - [x] All repositories now execute live Supabase queries mapped to the 3NF Postgres schema.
+  - [x] Foreign key joins, exclusion constraints, and trigger logic fully integrated at the domain layer.
+- [ ] **8.2 Frontend & Server Actions Hookup (IN PROGRESS)**
+  - [x] Connect client boundary views (React forms) directly to the newly perfected Server Actions (`actions/*.ts`). *(Auth Domain Connected)*
+  - [x] Implement the *Server-Action-to-RHF Error Bridge*: Standardize server exceptions (like `SLOT_ALREADY_BOOKED` or `ValidationError`) and use `react-hook-form`'s `setError` to highlight invalid inputs elegantly on the UI.
+  - [ ] Replace any remaining RSC mock dataset imports (`mocks/*.mock.ts`) inside pages with live queries from the new actions.
+- [ ] **8.3 Vitest Component & Hook Unit Testing**
   - [x] Unit test auth hooks (`use-sign-up-form.hook`, `use-login-form.hook`).
   - [ ] Unit test custom hooks (`useUserBooking.ts`) under simulated error and success states.
   - [ ] Ensure Zod input rules correctly reject bad emails, incorrect E.164 phone formats, or invalid dates.

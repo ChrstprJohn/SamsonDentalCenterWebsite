@@ -65,7 +65,9 @@ describe('registerPatientAction', () => {
 
         // Assert
         expect(result.success).toBe(false);
-        expect(result.error).toContain('Validation failed');
+        if (!result.success) {
+            expect(result.error).toContain('Validation failed');
+        }
         // Ensure the system didn't waste resources on Auth or DB if validation failed
         expect(getAuthenticatedUser).not.toHaveBeenCalled();
         expect(mockExecute).not.toHaveBeenCalled();

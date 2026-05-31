@@ -4,7 +4,7 @@ import { DependentProfileDto, dependentProfileSchema } from '../../dtos';
 export const getDependentsByPatientIdQuery = (supabase: SupabaseClient) => {
   return async (patientId: string): Promise<DependentProfileDto[]> => {
     const { data: dependents, error } = await supabase
-      .from('patient_dependents')
+      .from('dependents')
       .select('*')
       .eq('patient_id', patientId);
 

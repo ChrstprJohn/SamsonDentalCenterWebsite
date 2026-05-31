@@ -14,6 +14,7 @@ export function useSignUpForm() {
       phoneNumber: '',
       dateOfBirth: '',
       password: '',
+      confirmPassword: '',
     },
   });
 }

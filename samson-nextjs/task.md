@@ -195,10 +195,19 @@ Currently, we are focusing purely on the **Backend and Setup** aspects following
 - [x] **Cross-Domain Workflow:** Build orchestrators for multi-domain processes if required (e.g., `checkout.orchestrator.ts` connecting doctor treatment submission with billing).
 - [x] **Background Tasks:** Setup background event subscribers (using Next.js `after()`) for emails or side-effects.
 
+### Phase 9.5: Database Schema
+- [x] **Database Design**: Create 3NF ACID compliant schema.
+- [x] **Database Implementation**: Export schema.sql and execute in Supabase.
+- [x] **Database Seeding**: Export seed.sql and populate default data.
+
 ---
 
 ### 💡 Next Steps Guide:
-1. Review the checklist above.
-2. Phases 1–4 are fully completed! All core domains (Shared Core, Patients, Staff, Appointments) have DTOs, Repositories, Use-Cases, and Server Actions implemented with robust unit tests.
-3. The next task is **Phase 5 (Services & Clinic Config Domain)**:
-   - Implement the Services and Clinic Config domains.
+1. The PostgreSQL Database Schema is complete and live on Supabase!
+2. All DTOs, Use-Cases, and Server Actions are built.
+3. **Phase 8.1 (Mock Swap & Integration) is COMPLETE**: All domain repositories now perfectly map to the live database schema!
+4. The next major task is **Phase 8.2 (E2E Frontend Integration)**:
+   - [x] Implemented `ActionResponse` Error Bridge for seamless Server Action -> React Hook Form validation routing.
+   - [x] Connected Auth Domain (Sign-up, Login, OTP Verify) to live Server Actions.
+   - [ ] Connect the Booking Domain and Administrative Portals to live actions.
+   - [ ] Execute a full end-to-end user journey.

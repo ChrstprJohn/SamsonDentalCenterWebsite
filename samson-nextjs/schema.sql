@@ -1,19 +1,12 @@
-# Samson Dental - Database Schema (Supabase / PostgreSQL)
+-- ============================================================================
+-- 🦷 Samson Dental - ACID Compliant 3NF Database Schema (PostgreSQL)
+-- ============================================================================
 
-This document defines the core entities for the PostgreSQL database hosted on **Supabase**. The schema relies on raw PostgreSQL tables, relationships, and Supabase Auth for user management. It is designed to be highly scalable, 3NF, and ACID compliant, matching the backend Zod DTOs perfectly.
-
----
-
-## 1. Extensions
-```sql
+-- 1. EXTENSIONS
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "btree_gist"; -- Required for overlapping time-range constraints
-```
 
----
-
-## 2. Enums
-```sql
+-- 2. ENUMS
 CREATE TYPE user_role AS ENUM ('PATIENT', 'SECRETARY', 'DOCTOR', 'ADMIN');
 CREATE TYPE dependent_relationship AS ENUM ('CHILD', 'SPOUSE', 'PARENT', 'SIBLING', 'OTHER');
 CREATE TYPE gender AS ENUM ('MALE', 'FEMALE');
@@ -21,15 +14,10 @@ CREATE TYPE service_type AS ENUM ('GENERAL', 'SPECIALIZED');
 CREATE TYPE appointment_status AS ENUM ('PENDING', 'APPROVED', 'REJECTED', 'CANCELLED', 'RESCHEDULE_REQUESTED', 'DISPLACED', 'CHECKED_IN', 'TREATMENT_RENDERED', 'COMPLETED', 'NO_SHOW');
 CREATE TYPE invoice_status AS ENUM ('DRAFT', 'FINALIZED', 'PAID', 'VOID');
 CREATE TYPE payment_method AS ENUM ('CASH', 'CARD', 'HMO');
-```
 
----
+-- 3. CORE TABLES
 
-## 3. Core Tables
-
-### `users`
-Unified Identity for Patients, Doctors, Secretaries, and Admins.
-```sql
+-- USERS (Unified Identity for Patients, Doctors, Secretaries, Admins)
 CREATE TABLE users (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
     email TEXT UNIQUE NOT NULL,
@@ -47,11 +35,8 @@ CREATE TABLE users (
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
-```
 
-### `dependents`
-Normalized family members representing patients without distinct login accounts.
-```sql
+-- DEPENDENTS (Normalized family members)
 CREATE TABLE dependents (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     patient_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
@@ -63,11 +48,8 @@ CREATE TABLE dependents (
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
-```
 
-### `services`
-Clinical treatments offered by the clinic.
-```sql
+-- SERVICES
 CREATE TABLE services (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name TEXT NOT NULL,
@@ -79,21 +61,15 @@ CREATE TABLE services (
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
-```
 
-### `doctor_services`
-Many-to-Many junction mapping which doctors can perform which specialized treatments.
-```sql
+-- DOCTOR_SERVICES (Junction Table: Many-to-Many)
 CREATE TABLE doctor_services (
     doctor_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
     service_id UUID REFERENCES services(id) ON DELETE CASCADE NOT NULL,
     PRIMARY KEY (doctor_id, service_id)
 );
-```
 
-### `doctor_schedules`
-Defines available operating slots for doctors on specific days of the week.
-```sql
+-- DOCTOR_SCHEDULES
 CREATE TABLE doctor_schedules (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     doctor_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
@@ -108,11 +84,8 @@ CREATE TABLE doctor_schedules (
     CONSTRAINT valid_time_range CHECK (start_time < end_time),
     CONSTRAINT valid_break_range CHECK (break_start_time IS NULL OR (break_start_time < break_end_time AND break_start_time >= start_time AND break_end_time <= end_time))
 );
-```
 
-### `clinic_config`
-Global configuration settings (Singleton Pattern).
-```sql
+-- CLINIC_CONFIG (Singleton pattern enforced by a boolean flag)
 CREATE TABLE clinic_config (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     is_singleton BOOLEAN DEFAULT true UNIQUE NOT NULL CHECK (is_singleton = true),
@@ -129,11 +102,8 @@ CREATE TABLE clinic_config (
     social_links JSONB DEFAULT '[]'::jsonb NOT NULL,
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
-```
 
-### `appointments`
-Core booking entity representing an intent to receive treatment.
-```sql
+-- APPOINTMENTS
 CREATE TABLE appointments (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     patient_id UUID REFERENCES users(id) ON DELETE RESTRICT NOT NULL,
@@ -146,7 +116,7 @@ CREATE TABLE appointments (
     status appointment_status DEFAULT 'PENDING'::appointment_status NOT NULL,
     user_note TEXT,
     status_reason TEXT,
-    clinical_notes TEXT,
+    clinical_notes TEXT, 
     reschedule_count INT DEFAULT 0 NOT NULL,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -158,11 +128,8 @@ CREATE TABLE appointments (
     ),
     CONSTRAINT valid_appointment_time CHECK (start_time < end_time)
 );
-```
 
-### `appointment_treatments`
-Actual treatments rendered during the appointment session (for drafting invoices).
-```sql
+-- APPOINTMENT_TREATMENTS (Actual services performed)
 CREATE TABLE appointment_treatments (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     appointment_id UUID REFERENCES appointments(id) ON DELETE CASCADE NOT NULL,
@@ -170,11 +137,8 @@ CREATE TABLE appointment_treatments (
     comment TEXT,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
-```
 
-### `invoices`
-Formal financial request resulting from completed appointments.
-```sql
+-- INVOICES
 CREATE TABLE invoices (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     appointment_id UUID REFERENCES appointments(id) ON DELETE RESTRICT UNIQUE NOT NULL,
@@ -185,26 +149,18 @@ CREATE TABLE invoices (
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
-```
 
-### `audit_logs`
-Logs critical state mutations performed by staff for compliance.
-```sql
+-- AUDIT_LOGS
 CREATE TABLE audit_logs (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     actor_id UUID REFERENCES users(id) ON DELETE SET NULL,
     action TEXT NOT NULL,
-    target_id UUID NOT NULL,
+    target_id UUID NOT NULL, 
     reason TEXT,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
-```
 
----
-
-## 4. Triggers
-Auto-updating timestamps ensuring `updated_at` stays accurate.
-```sql
+-- 4. TRIGGERS (Auto-update 'updated_at' columns)
 CREATE OR REPLACE FUNCTION update_modified_column()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -220,4 +176,27 @@ CREATE TRIGGER update_doctor_schedules_modtime BEFORE UPDATE ON doctor_schedules
 CREATE TRIGGER update_clinic_config_modtime BEFORE UPDATE ON clinic_config FOR EACH ROW EXECUTE FUNCTION update_modified_column();
 CREATE TRIGGER update_appointments_modtime BEFORE UPDATE ON appointments FOR EACH ROW EXECUTE FUNCTION update_modified_column();
 CREATE TRIGGER update_invoices_modtime BEFORE UPDATE ON invoices FOR EACH ROW EXECUTE FUNCTION update_modified_column();
-```
+
+-- ============================================================================
+-- 5. SUPABASE AUTH TRIGGER (Automatically creates a 'users' row on Signup)
+-- ============================================================================
+CREATE OR REPLACE FUNCTION public.handle_new_user() 
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO public.users (id, email, first_name, last_name, phone_number, role, is_active)
+  VALUES (
+    NEW.id, 
+    NEW.email, 
+    COALESCE(NEW.raw_user_meta_data->>'firstName', 'Unknown'), 
+    COALESCE(NEW.raw_user_meta_data->>'lastName', 'Unknown'), 
+    COALESCE(NEW.raw_user_meta_data->>'phoneNumber', ''), 
+    'PATIENT'::user_role,
+    true
+  );
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE OR REPLACE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();

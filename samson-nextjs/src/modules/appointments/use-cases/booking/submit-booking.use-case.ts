@@ -4,11 +4,12 @@ import { GetAvailabilityUseCase } from '../availability/get-availability.use-cas
 import { ValidationError } from '@/shared/errors';
 
 export const submitBookingUseCase = (deps: {
-  createAppointment: (userId: string, data: SubmitBookingDto) => Promise<any>;
+  createAppointment: (userId: string, data: SubmitBookingDto & { resolvedDependentId?: string }) => Promise<any>;
+  createDependent?: (data: any) => Promise<any>; // Optional dependency to support dependent creation
   getAvailableTimeSlots: (dto: { serviceId: string; doctorId: string; date: string }) => Promise<any>;
 }) => {
   return async (userId: string, dto: SubmitBookingDto) => {
-    const { serviceId, doctorId, date, startTime, endTime } = dto;
+    const { serviceId, doctorId, date, startTime, endTime, patientType } = dto;
 
     const availability = await deps.getAvailableTimeSlots({
       serviceId,
@@ -27,20 +28,31 @@ export const submitBookingUseCase = (deps: {
       );
     }
 
-    try {
-      return await deps.createAppointment(userId, dto);
-    } catch (error: unknown) {
-      if (error instanceof Error && error.message.includes('duplicate key value')) {
-        throw new ValidationError('This slot is already booked!', 'SLOT_ALREADY_BOOKED');
-      }
+    let resolvedDependentId = dto.dependentId;
 
+    // Handle dynamic dependent creation if patient type is NEW_DEPENDENT
+    if (patientType === 'NEW_DEPENDENT' && deps.createDependent) {
+      const newDependent = await deps.createDependent({
+        patientId: userId,
+        firstName: dto.dependentFirstName!,
+        lastName: dto.dependentLastName!,
+        dateOfBirth: dto.dependentBirthday!,
+        relationship: dto.dependentRelationship!
+      });
+      resolvedDependentId = newDependent.id;
+    }
+
+    try {
+      return await deps.createAppointment(userId, { ...dto, resolvedDependentId });
+    } catch (error: unknown) {
+      // Catch Postgres Exclusion Constraint violation (23P01) for overlapping appointments
       if (
         typeof error === 'object' &&
         error !== null &&
         'code' in error &&
-        (error as { code?: string }).code === '23505'
+        ((error as { code?: string }).code === '23P01' || (error as { code?: string }).code === '23505')
       ) {
-        throw new ValidationError('This slot is already booked!', 'SLOT_ALREADY_BOOKED');
+        throw new ValidationError('This slot was just booked by someone else!', 'SLOT_ALREADY_BOOKED');
       }
 
       throw error;
@@ -55,10 +67,6 @@ export class SubmitBookingUseCase {
     private readonly availabilityUseCase: GetAvailabilityUseCase
   ) {}
 
-  /**
-   * Executes appointment booking atomic verification and record insertion.
-   * Prevents double-booking at the business logic layer.
-   */
   async execute(userId: string, dto: SubmitBookingDto) {
     return submitBookingUseCase({
       createAppointment: (uid, d) => this.bookingCommands.createAppointment(uid, d),

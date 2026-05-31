@@ -4,7 +4,7 @@ import { CreateDependentDto, DependentProfileDto, dependentProfileSchema } from 
 export const addDependentCommand = (supabase: SupabaseClient) => {
   return async (data: CreateDependentDto): Promise<DependentProfileDto> => {
     const { data: dependent, error } = await supabase
-      .from('patient_dependents')
+      .from('dependents')
       .insert({
         patient_id: data.patientId,
         first_name: data.firstName,

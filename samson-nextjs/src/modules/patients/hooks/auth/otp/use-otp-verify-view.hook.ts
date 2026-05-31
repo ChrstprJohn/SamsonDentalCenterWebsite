@@ -58,16 +58,38 @@ export function useOTPVerifyView(): UseOTPVerifyViewReturn {
       addToast('Please enter the full 6-digit code.', 'error');
       return;
     }
+    
     setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    const { verifyOtpAction } = await import('../../../actions/auth/verify-otp.action');
+    const type = searchParams.get('type') === 'signup' ? 'signup' : 'login';
+    
+    const response = await verifyOtpAction({
+      email,
+      token: otp,
+      type
+    });
+    
     setIsLoading(false);
+
+    if (!response.success) {
+      addToast(response.error, 'error');
+      return;
+    }
+
     addToast('Email verified successfully! Welcome to Samson Dental.', 'success');
     router.push('/user');
   };
 
-  const handleResend = (): void => {
+  const handleResend = async (): Promise<void> => {
     setCountdown(60);
-    addToast('New verification code sent to your email.', 'info');
+    const { resendOtpAction } = await import('../../../actions/auth/verify-otp.action');
+    const response = await resendOtpAction(email);
+    
+    if (response.success) {
+      addToast('New verification code sent to your email.', 'info');
+    } else {
+      addToast(response.error, 'error');
+    }
   };
 
   return {

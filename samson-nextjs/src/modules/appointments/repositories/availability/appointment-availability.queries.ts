@@ -3,14 +3,13 @@ import { DomainError } from '@/shared/errors';
 
 export const getWorkingSchedulesForMonthQuery = (supabase: SupabaseClient) => {
   return async (month: string, doctorId?: string) => {
+    // month is format YYYY-MM
     let query = supabase
-      .from('staff_schedules')
-      .select('date, staff_id')
-      .eq('is_working', true)
-      .like('date', `${month}-%`);
+      .from('doctor_schedules')
+      .select('day_of_week, doctor_id');
 
     if (doctorId) {
-      query = query.eq('staff_id', doctorId);
+      query = query.eq('doctor_id', doctorId);
     }
 
     const { data: schedules, error } = await query;
@@ -19,20 +18,38 @@ export const getWorkingSchedulesForMonthQuery = (supabase: SupabaseClient) => {
       throw new DomainError(`Failed to fetch monthly schedules: ${error.message}`, 'DATABASE_ERROR');
     }
 
-    return schedules || [];
+    // Generate dates for the month based on recurring day_of_week
+    const generatedSchedules: Array<{ date: string; staff_id: string }> = [];
+    const [year, monthStr] = month.split('-');
+    const daysInMonth = new Date(parseInt(year), parseInt(monthStr), 0).getDate();
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      const currentDate = new Date(parseInt(year), parseInt(monthStr) - 1, day);
+      const dayOfWeek = currentDate.getDay(); // 0 = Sun, 1 = Mon, etc.
+      
+      const matchingSchedules = schedules?.filter(s => s.day_of_week === dayOfWeek) || [];
+      for (const sched of matchingSchedules) {
+        generatedSchedules.push({
+          date: currentDate.toISOString().split('T')[0],
+          staff_id: sched.doctor_id
+        });
+      }
+    }
+
+    return generatedSchedules;
   };
 };
 
 export const getDoctorSchedulesQuery = (supabase: SupabaseClient) => {
   return async (date: string, doctorId?: string) => {
+    const dayOfWeek = new Date(date).getDay();
     let query = supabase
-      .from('staff_schedules')
+      .from('doctor_schedules')
       .select('*')
-      .eq('date', date)
-      .eq('is_working', true);
+      .eq('day_of_week', dayOfWeek);
 
     if (doctorId) {
-      query = query.eq('staff_id', doctorId);
+      query = query.eq('doctor_id', doctorId);
     }
 
     const { data: schedules, error } = await query;
@@ -99,16 +116,6 @@ export const resolveDoctorDisplayNameQuery = (supabase: SupabaseClient) => {
 
     if (user) {
       return `Dr. ${user.first_name} ${user.last_name}`;
-    }
-
-    const { data: doctor } = await supabase
-      .from('doctors')
-      .select('first_name, last_name')
-      .eq('id', doctorId)
-      .single();
-
-    if (doctor) {
-      return `Dr. ${doctor.first_name} ${doctor.last_name}`;
     }
 
     return 'Doctor';

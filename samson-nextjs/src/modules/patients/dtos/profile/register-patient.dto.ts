@@ -9,6 +9,11 @@ export const registerPatientSchema = z.object({
   // E.164-like validation: optional '+' followed by 10-15 digits
   phoneNumber: z.string().regex(/^\+?[1-9]\d{9,14}$/, 'Invalid phone number format'),
   dateOfBirth: z.string().date('Invalid date format. Expected YYYY-MM-DD'),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
+  confirmPassword: z.string()
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"],
 });
 
 export type RegisterPatientDto = z.infer<typeof registerPatientSchema>;
