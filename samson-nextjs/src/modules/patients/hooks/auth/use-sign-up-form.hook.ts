@@ -13,6 +13,7 @@ export function useSignUpForm() {
       email: '',
       phoneNumber: '',
       dateOfBirth: '',
+      password: '',
     },
   });
 }

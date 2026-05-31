@@ -46,13 +46,13 @@ Build the patient registration and portal login experiences. Collect minimal fie
   - [x] **Zod Schema & DTO (`src/modules/patients/dtos/auth/sign-up.dto.ts`)**:
   - [x] **Form Hook (`src/modules/patients/hooks/auth/use-sign-up-form.hook.ts`)**:
     - Patient Fields: First Name (req), Middle Name (opt), Last Name (req), Suffix (opt), Email (req), Phone Number (req, E.164), Date of Birth (req, YYYY-MM-DD).
-- [ ] **1.2 Auth Pages Routing (`src/app/(public)/auth/`)**
-  - [ ] **Sign-up page (`views/signup-view.tsx` & `components/signup-form.tsx`)**:
+- [x] **1.2 Auth Pages Routing (`src/app/(public)/auth/`)**
+  - [x] **Sign-up page (`views/signup-view.tsx` & `components/auth/signup-form.tsx`)**:
     - Includes interactive Terms of Service & Privacy Policy checkboxes.
     - Captures patient fields with client-side Zod validation.
-  - [ ] **Login page (`views/login-view.tsx` & `components/login-form.tsx`)**:
+  - [x] **Login page (`views/login-view.tsx` & `components/auth/login-form.tsx`)**:
     - Simple and clean entry point (Email & Password/OTP toggle).
-  - [ ] **OTP Verification Screen (`views/otp-verify-view.tsx`)**:
+  - [x] **OTP Verification Screen (`views/otp-verify-view.tsx`)**:
     - Animated code blocks inputs for verification.
     - Displays Resend OTP countdown trigger.
 - [ ] **1.3 Header Authentication Triggers**

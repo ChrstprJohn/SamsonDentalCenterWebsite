@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLoginForm } from '../hooks/auth/use-login-form.hook';
 import { LoginInput } from '../dtos/auth/login.dto';
-import { LoginForm } from '../components/login-form';
+import { LoginForm } from '../components/auth/login-form';
 import { useToast } from '@/components/feedback/toast-container';
 
 export function LoginView() {

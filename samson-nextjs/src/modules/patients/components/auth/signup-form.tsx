@@ -1,6 +1,6 @@
 import React from 'react';
 import { UseFormRegister, FieldErrors } from 'react-hook-form';
-import { SignUpInput } from '../dtos/auth/sign-up.dto';
+import { SignUpInput } from '../../dtos/auth/sign-up.dto';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
@@ -74,6 +74,15 @@ export function SignUpForm({ register, onSubmit, errors, isLoading }: SignUpForm
           disabled={isLoading}
         />
       </div>
+
+      <Input
+        label="Password *"
+        type="password"
+        error={errors.password?.message}
+        {...register('password')}
+        placeholder="Create a strong password"
+        disabled={isLoading}
+      />
 
       <div className="flex flex-col gap-2 mt-2">
         <label className="flex items-start gap-2.5 cursor-pointer">

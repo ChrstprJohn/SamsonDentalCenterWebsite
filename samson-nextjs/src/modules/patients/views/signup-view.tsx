@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSignUpForm } from '../hooks/auth/use-sign-up-form.hook';
 import { SignUpInput } from '../dtos/auth/sign-up.dto';
-import { SignUpForm } from '../components/signup-form';
+import { SignUpForm } from '../components/auth/signup-form';
 import { useToast } from '@/components/feedback/toast-container';
 
 export function SignUpView() {
