@@ -22,7 +22,7 @@ Instead of sending the email immediately, we write a record to the `email_outbox
 | `recipient` | TEXT | The patient's email address |
 | `subject` | TEXT | Email subject line |
 | `template_name` | TEXT | Identifier for the React Email template (e.g. `signup_otp`) |
-| `payload` | JSONB | Data needed for the template (e.g. `{ "firstName": "John", "otpCode": "123456" }`) |
+| `payload` | JSONB | Data needed for the template (e.g. `{ "firstName": "John", "otpCode": "57194889" }`) |
 | `status` | ENUM | `PENDING`, `SENT`, `FAILED` |
 | `error_logs` | TEXT | Stores the error trace if Resend fails |
 | `retry_count` | INT | Tracks delivery attempts |

@@ -8,7 +8,7 @@ Rather than relying on Supabase's native email sender which offers limited UI cu
 ## Key Capabilities
 
 ### 1. Custom OTP Generation
-The system generates a secure 6-digit OTP code programmatically via the backend, ensuring full control over the code format and lifecycle.
+The system generates a secure OTP code (dynamically configured to match the 8-digit Supabase project setting) programmatically via the backend, ensuring full control over the code format and lifecycle.
 
 ### 2. Transactional Integrity
 Emails are not dispatched directly during the HTTP request. Instead, the OTP and email payload are stored in an `email_outbox` database table within the same transaction as the user creation. This guarantees that:
