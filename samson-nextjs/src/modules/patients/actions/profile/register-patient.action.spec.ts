@@ -11,12 +11,15 @@ vi.mock('@/shared/database/server');
 vi.mock('next/server', () => ({
   after: vi.fn((cb) => cb()),
 }));
+vi.mock('@/orchestrators/event-subscribers', () => ({
+  bootstrapEventSubscribers: vi.fn(),
+}));
 const { mockExecute } = vi.hoisted(() => {
   return { mockExecute: vi.fn() };
 });
 
-vi.mock('../../../emails', () => ({
-  processOutboxUseCase: vi.fn().mockReturnValue(vi.fn()),
+vi.mock('@/shared/outbox/outbox.dispatcher', () => ({
+  globalOutboxDispatcher: vi.fn().mockReturnValue(vi.fn()),
 }));
 
 vi.mock('../../use-cases/profile/register-patient.use-case', () => {

@@ -7,24 +7,33 @@ import { DomainError } from '@/shared/errors';
 import { registerPatientSchema, RegisterPatientDto } from '../../dtos';
 import { createPatientCommand } from '../../repositories';
 import { registerPatientUseCase } from '../../use-cases';
-import { processOutboxUseCase } from '../../../emails';
+import { globalOutboxDispatcher } from '@/shared/outbox/outbox.dispatcher';
+import { bootstrapEventSubscribers } from '@/orchestrators/event-subscribers';
 
 import { ActionResponse } from '@/shared/utils/action-response';
 
-export async function registerPatientAction(formData: RegisterPatientDto): Promise<ActionResponse<any>> {
+export const registerPatientAction = async (
+  payload: RegisterPatientDto
+): Promise<ActionResponse<{ id: string; firstName: string }>> => {
   try {
-    const validData = registerPatientSchema.parse(formData);
+    // 1. Validate payload
+    const validatedData = registerPatientSchema.parse(payload);
+
+    // 2. Resolve internal dependencies (Database client & Auth context)
     const supabaseAdmin = await createAdminClient();
+    
+    // 3. Inject dependencies into Use-Case
     const repo = createPatientCommand(supabaseAdmin);
     const useCase = registerPatientUseCase(repo);
-    
-    // We no longer fetch a mock user ID, Supabase Auth handles it.
-    const newPatient = await useCase(validData);
+
+    // 4. Execute Business Logic
+    const newPatient = await useCase(validatedData);
     
     // Non-blocking background worker trigger
     after(async () => {
-      const processOutbox = processOutboxUseCase(supabaseAdmin);
-      await processOutbox();
+      bootstrapEventSubscribers();
+      const dispatchOutbox = globalOutboxDispatcher(supabaseAdmin);
+      await dispatchOutbox();
     });
     
     return { success: true, data: newPatient };

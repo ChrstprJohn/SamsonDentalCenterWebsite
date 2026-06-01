@@ -2,10 +2,10 @@ import { describe, it, expect, vi } from 'vitest';
 import { createPatientCommand } from './patient-profile.commands';
 import { RegisterPatientDto } from '../../dtos';
 import { DomainError } from '@/shared/errors';
-import { emailOutboxCommands } from '../../../emails';
+import { outboxCommands } from '@/shared/outbox/outbox.commands';
 
 vi.mock('server-only', () => ({}));
-vi.mock('../../../emails');
+vi.mock('@/shared/outbox/outbox.commands');
 
 describe('PatientProfileCommands (Functional)', () => {
   it('successfully creates a patient', async () => {
@@ -41,8 +41,8 @@ describe('PatientProfileCommands (Functional)', () => {
       single: vi.fn().mockResolvedValue({ data: mockInsertedRecord, error: null }),
     };
 
-    vi.mocked(emailOutboxCommands).mockReturnValue({
-      queueEmail: vi.fn(),
+    vi.mocked(outboxCommands).mockReturnValue({
+      emitEvent: vi.fn(),
     } as any);
 
     const createPatient = createPatientCommand(mockSupabase as any);

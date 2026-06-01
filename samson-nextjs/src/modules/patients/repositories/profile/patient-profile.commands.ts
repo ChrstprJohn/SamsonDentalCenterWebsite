@@ -1,6 +1,6 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { DomainError } from '@/shared/errors';
-import { emailOutboxCommands } from '../../../emails';
+import { outboxCommands } from '@/shared/outbox/outbox.commands';
 import {
   RegisterPatientDto,
   PatientProfileDto,
@@ -33,16 +33,15 @@ export const createPatientCommand = (supabaseAdmin: SupabaseClient) => {
       );
     }
 
-    // 2. Queue the OTP email in the transactional outbox
+    // 2. Queue the PATIENT_REGISTERED event in the transactional outbox
     const otpCode = authData.properties?.email_otp;
     if (otpCode) {
-      const outbox = emailOutboxCommands(supabaseAdmin);
-      await outbox.queueEmail(
-        data.email,
-        'Your Samson Dental Center Verification Code',
-        'signup_otp',
-        { firstName: data.firstName, otpCode }
-      );
+      const outbox = outboxCommands(supabaseAdmin);
+      await outbox.emitEvent('PATIENT_REGISTERED', { 
+        email: data.email, 
+        firstName: data.firstName, 
+        otpCode 
+      });
     }
 
     // 3. Fetch the newly created profile from the 'users' table (inserted via Postgres Trigger)
