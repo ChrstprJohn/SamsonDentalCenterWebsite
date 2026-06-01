@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import { UseFormRegister, FieldErrors } from 'react-hook-form';
 import { LoginInput } from '../../dtos/auth/login.dto';

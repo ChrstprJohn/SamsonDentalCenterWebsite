@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { UseFormRegister, FieldErrors } from 'react-hook-form';
 import { ForgotPasswordDto } from '../../dtos/auth/forgot-password.dto';

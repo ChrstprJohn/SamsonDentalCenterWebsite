@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import type { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
 import { ServiceCard } from '@/modules/services/components/service-card';

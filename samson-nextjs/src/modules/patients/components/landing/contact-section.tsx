@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import type { ClinicConfigResponseDto } from '@/modules/clinic-config/dtos/settings/get-clinic-config.dto';
 import { Button } from '@/components/ui/button';
