@@ -34,7 +34,6 @@ async function simulateLoginSubmit(
 const validData: LoginInput = {
   email: 'john@example.com',
   password: 'StrongPass1',
-  acceptTerms: true,
 };
 
 describe('useLoginView — onSubmit logic (extracted)', () => {

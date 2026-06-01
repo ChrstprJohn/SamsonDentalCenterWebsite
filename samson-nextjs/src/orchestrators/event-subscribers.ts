@@ -1,5 +1,6 @@
 import { registerSubscriber } from '@/shared/outbox/outbox.registry';
 import { onPatientRegisteredSubscriber } from '@/modules/emails/subscribers/on-patient-registered.subscriber';
+import { onPasswordResetRequestedSubscriber } from '@/modules/emails/subscribers/on-password-reset-requested.subscriber';
 
 /**
  * Bootstraps the Event Bus Registry.
@@ -11,6 +12,7 @@ import { onPatientRegisteredSubscriber } from '@/modules/emails/subscribers/on-p
  */
 export const bootstrapEventSubscribers = () => {
   registerSubscriber('PATIENT_REGISTERED', onPatientRegisteredSubscriber.handle);
+  registerSubscriber('PASSWORD_RESET_REQUESTED', onPasswordResetRequestedSubscriber.handle);
   
   // Future SMS Module
   // registerSubscriber('PATIENT_REGISTERED', onPatientRegisteredSmsSubscriber.handle);

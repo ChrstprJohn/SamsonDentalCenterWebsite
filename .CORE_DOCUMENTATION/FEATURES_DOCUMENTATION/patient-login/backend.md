@@ -81,7 +81,7 @@ Our backend processes are fully covered using Vitest specs, verifying schema rul
 
 1. **DTO Validation Testing (`login.dto.spec.ts`)**:
    * Validates correct inputs (e.g., checking that realistic email patterns parse successfully).
-   * Verifies that incorrect email shapes, missing passwords, or unaccepted terms properly trigger Zod validation failures.
+   * Verifies that incorrect email shapes or missing passwords properly trigger Zod validation failures.
 2. **Server Action Mocking (`login.action.spec.ts`)**:
    * Stubs the server-side Supabase client and its underlying `auth.signInWithPassword` routine.
    * Asserts that successful inputs yield a `success: true` flag and propagate user credentials.

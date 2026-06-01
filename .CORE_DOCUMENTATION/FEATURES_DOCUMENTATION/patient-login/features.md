@@ -11,8 +11,8 @@ The Patient Log-In flow is the primary gateway for registered patients to access
 ### Key Capabilities & Rules
 1. **Secure Credential Entry**:
    * Collects mandatory identity fields: Email Address and Password.
-2. **Explicit Consent & Terms Check**:
-   * Enforces explicit acceptance of Terms of Service & Privacy Policy via a required client-side checkbox validation (`acceptTerms`) before submission.
+2. **Seamless Recovery**:
+   * Direct integration with the password recovery ("Forgot Password") flow for seamless self-service support.
 3. **Robust Input Validation**:
    * Utilizes client-side Zod schemas for immediate syntax checking (e.g., ensuring a valid email format).
 4. **Server-Side Security Verification**:
@@ -35,7 +35,7 @@ sequenceDiagram
     participant Action as loginAction (Server Action)
     participant Supa as Supabase Auth Service
 
-    Patient->>View: Enters credentials & accepts terms
+    Patient->>View: Enters credentials
     View->>Hook: Fires submission event (validated via client Zod)
     Hook->>Action: Invokes loginAction(formData)
     
@@ -59,7 +59,7 @@ sequenceDiagram
 ```
 
 ### Flow Breakdown
-1. **User Action**: The patient completes the login form, checks the terms acceptance box, and clicks "Log In".
+1. **User Action**: The patient completes the login form and clicks "Log In". If they forgot their password, they can trigger the separate Forgot Password flow.
 2. **Client Validation**: React Hook Form with a Zod resolver instantly checks for valid formatting. If valid, the submission delegates to `useLoginView`.
 3. **Server Action Invocation**: The hook triggers the `loginAction` server action, passing a plain serialized `LoginInput` object.
 4. **Server-Side Validation**: The action parses inputs using `loginSchema` and performs a secondary server check to ensure the password exists.

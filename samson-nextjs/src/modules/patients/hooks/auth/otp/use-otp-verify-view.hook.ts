@@ -5,13 +5,14 @@ import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 import { useToast } from '@/components/feedback/toast-container';
 
-export const OTP_LENGTH = 8;
+export const OTP_LENGTH = 6;
 
 export interface UseOTPVerifyViewReturn {
   code: string[];
   isLoading: boolean;
   countdown: number;
   email: string;
+  type: 'signup' | 'recovery';
   inputRefs: React.MutableRefObject<(HTMLInputElement | null)[]>;
   handleChange: (index: number, val: string) => void;
   handleKeyDown: (index: number, e: React.KeyboardEvent<HTMLInputElement>) => void;
@@ -26,6 +27,8 @@ export function useOTPVerifyView(): UseOTPVerifyViewReturn {
   const router = useRouter();
   const searchParams = useSearchParams();
   const email = searchParams.get('email') || 'your email';
+  const typeParam = searchParams.get('type');
+  const type: 'signup' | 'recovery' = typeParam === 'recovery' ? 'recovery' : 'signup';
   const { addToast } = useToast();
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -67,7 +70,7 @@ export function useOTPVerifyView(): UseOTPVerifyViewReturn {
     const response = await verifyOtpAction({
       email,
       token: otp,
-      type: 'signup'
+      type
     });
     
     setIsLoading(false);
@@ -77,14 +80,19 @@ export function useOTPVerifyView(): UseOTPVerifyViewReturn {
       return;
     }
 
-    addToast('Email verified successfully! Welcome to Samson Dental.', 'success');
-    router.push('/user');
+    if (type === 'recovery') {
+      addToast('Verification successful! Please reset your password.', 'success');
+      router.push('/auth/reset-password');
+    } else {
+      addToast('Email verified successfully! Welcome to Samson Dental.', 'success');
+      router.push('/user');
+    }
   };
 
   const handleResend = async (): Promise<void> => {
     setCountdown(60);
     const { resendOtpAction } = await import('../../../actions/auth/verify-otp.action');
-    const response = await resendOtpAction(email);
+    const response = await resendOtpAction(email, type);
     
     if (response.success) {
       addToast('New verification code sent to your email.', 'info');
@@ -98,6 +106,7 @@ export function useOTPVerifyView(): UseOTPVerifyViewReturn {
     isLoading,
     countdown,
     email,
+    type,
     inputRefs,
     handleChange,
     handleKeyDown,

@@ -3,6 +3,7 @@ import { Resend } from 'resend';
 import { render } from '@react-email/components';
 import React from 'react';
 import SignupOtpEmail from '@/components/emails/signup-otp-email';
+import ResetPasswordOtpEmail from '@/components/emails/reset-password-otp-email';
 
 if (!process.env.RESEND_API_KEY) {
   // We don't throw an error at boot, but we will throw when attempting to send if missing.
@@ -14,6 +15,7 @@ const resend = new Resend(process.env.RESEND_API_KEY || 're_test_123');
 // Define a type mapping for all possible templates
 type EmailTemplates = {
   'signup_otp': { firstName: string; otpCode: string };
+  'reset_password_otp': { firstName: string; otpCode: string };
 };
 
 export const ResendService = {
@@ -34,7 +36,7 @@ export const ResendService = {
 
     // Render the appropriate React Email component to an HTML string
     switch (templateName) {
-      case 'signup_otp':
+      case 'signup_otp': {
         const otpPayload = payload as EmailTemplates['signup_otp'];
         // Note: render returns a Promise in newer react-email versions if using suspense, 
         // but typically synchronous for basic templates. Await to be safe.
@@ -43,6 +45,15 @@ export const ResendService = {
           otpCode: otpPayload.otpCode 
         }));
         break;
+      }
+      case 'reset_password_otp': {
+        const resetPayload = payload as EmailTemplates['reset_password_otp'];
+        html = await render(React.createElement(ResetPasswordOtpEmail, { 
+          firstName: resetPayload.firstName, 
+          otpCode: resetPayload.otpCode 
+        }));
+        break;
+      }
       default:
         throw new Error(`Unknown email template: ${templateName}`);
     }
