@@ -25,14 +25,21 @@ export function LoginForm({ register, onSubmit, errors, isLoading }: LoginFormPr
         disabled={isLoading}
       />
 
-      <Input
-        label="Password *"
-        type="password"
-        error={errors.password?.message}
-        {...register('password')}
-        placeholder="••••••••"
-        disabled={isLoading}
-      />
+      <div className="flex flex-col gap-1.5">
+        <Input
+          label="Password *"
+          type="password"
+          error={errors.password?.message}
+          {...register('password')}
+          placeholder="••••••••"
+          disabled={isLoading}
+        />
+        <div className="flex justify-end">
+          <a href="/auth/forgot-password" className="text-xs text-blue-500 font-semibold hover:underline">
+            Forgot Password?
+          </a>
+        </div>
+      </div>
 
 
 

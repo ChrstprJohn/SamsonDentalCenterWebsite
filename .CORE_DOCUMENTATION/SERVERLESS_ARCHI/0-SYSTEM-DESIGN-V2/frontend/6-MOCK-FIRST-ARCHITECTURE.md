@@ -325,3 +325,88 @@ export function Button({ children, variant = "primary", className = "", ...props
 ```
 
 By following this **Mock-First Architecture** and combining it with the **Trivial State Exemption** (any component may manage simple layout toggles inline), your frontend developer has everything they need to write gorgeous, high-performance interfaces independently, while the backend code remains isolated and scalable.
+
+
+To empower a frontend developer to focus purely on the "Dumb UI" while you handle the logic, you need to provide them with a "Developer Contract".
+
+Think of this as "Headless Component Development." You are providing them with the "API" for their component before the actual API exists.
+
+1. The "Contract" Structure (What to provide)
+When you hand off a task, give them a single folder (e.g., src/modules/patients/components/my-feature/) containing these three files:
+
+feature.types.ts: The strict data shape.
+
+feature.hook.ts: The mocked logic that exports the functions and state.
+
+feature-ui.tsx: The "Empty" component with the props already defined.
+
+2. The Improved "Mock-Hook" Template
+Provide the frontend developer with a hook that already has "Development Modes." This allows them to toggle between "Loading," "Empty," and "Populated" states without you writing any backend code.
+
+TypeScript
+// src/modules/patients/hooks/use-feature.hook.ts
+import { useState } from 'react';
+import { MOCK_DATA } from '../mocks/feature.mock';
+
+export function useFeature() {
+  // Toggle these during development to see how the UI looks in different states
+  const [devMode] = useState<'LOADING' | 'EMPTY' | 'DATA'>('DATA');
+
+  const isLoading = devMode === 'LOADING';
+  const data = devMode === 'DATA' ? MOCK_DATA : [];
+
+  const handleAction = async (id: string) => {
+    console.log(`[UI DEVELOPMENT] Action triggered for: ${id}`);
+    await new Promise(r => setTimeout(r, 800)); // Simulate network latency
+    alert(`Mock action success for ${id}`);
+  };
+
+  return {
+    data,
+    isLoading,
+    error: null,
+    handleAction
+  };
+}
+3. The "Instructional Checklist" for the UI Developer
+Include this in the comment header of the component.tsx file you give them. It removes ambiguity:
+
+UI DEVELOPMENT INSTRUCTIONS:
+
+Props: Use the provided interface for all data requirements. Do not add useState or useEffect inside this component.
+
+States: Use the isLoading boolean to render a Skeleton screen.
+
+Actions: Pass handleAction directly to onClick or onSubmit.
+
+Logic: If you need a new calculation or a new state (like "isExpanded"), request a change to the hook, do not create it in the UI layer.
+
+Contract: If you need more data (e.g., user avatar, extra metadata), update feature.types.ts and I will update the Mock.
+
+4. How to scale this for "Complex" UI (Side Effects)
+If the component is complex, give them a "State Machine Schema" in the comment block. This prevents them from asking, "What happens when I click this?"
+
+TypeScript
+// src/modules/patients/components/my-feature.tsx
+
+/**
+ * STATE FLOW:
+ * 1. IDLE -> Click "Book" -> PENDING
+ * 2. PENDING -> Success -> SUCCESS (Show Green Check)
+ * 3. PENDING -> Failure -> ERROR (Show Red Alert + Retry Button)
+ */
+Why this is the ultimate "Parallel Flow":
+Zero Waiting: They never ask, "Is the API ready?" They use devMode = 'DATA' and move on.
+
+Separation of Concerns: You handle the Repository and Action logic; they handle the Tailwind and Accessibility.
+
+Instant Feedback: Because they are using a hook, when you finally "Swap" the hook to use the real database, their UI code doesn't change a single character.
+
+Your Task for the next hand-off:
+Draft the types.ts (The Contract).
+
+Generate the hook with the devMode toggle.
+
+Create the component file with the Props interface already defined and // TODO: Implement UI comments in the JSX.
+
+This ensures they can just "fill in the blanks" while you focus on the complex backend logic. Does this structure feel sufficient to hand off your current features, or would you like me to help you define the specific "DevMode" toggles for your upcoming PatientAuth module?
