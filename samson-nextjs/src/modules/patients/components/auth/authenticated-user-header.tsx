@@ -22,7 +22,7 @@ export function AuthenticatedUserHeader({
   user,
   notificationCount = 0,
 }: AuthenticatedUserHeaderProps) {
-  const { isDropdownOpen, toggleDropdown, closeDropdown, getInitials } = useAuthHeader();
+  const { isDropdownOpen, toggleDropdown, closeDropdown, getInitials, logout, isLoading } = useAuthHeader();
   const initials = getInitials(user);
   const displayName = `${user.firstName} ${user.lastName}`.trim();
 
@@ -125,11 +125,9 @@ export function AuthenticatedUserHeader({
               <button
                 role="menuitem"
                 id="sign-out-btn"
-                className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-rose-500 hover:text-rose-600 dark:text-rose-400 dark:hover:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-500/8 transition-colors duration-150 cursor-pointer"
-                onClick={() => {
-                  closeDropdown();
-                  /* future: call sign-out server action */
-                }}
+                disabled={isLoading}
+                className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-rose-500 hover:text-rose-600 dark:text-rose-400 dark:hover:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-500/8 transition-colors duration-150 cursor-pointer disabled:opacity-50"
+                onClick={logout}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
