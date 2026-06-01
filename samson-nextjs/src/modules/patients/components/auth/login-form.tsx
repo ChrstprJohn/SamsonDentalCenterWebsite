@@ -34,29 +34,7 @@ export function LoginForm({ register, onSubmit, errors, isLoading }: LoginFormPr
         disabled={isLoading}
       />
 
-      <div className="flex flex-col gap-2 mt-2">
-        <label className="flex items-start gap-2.5 cursor-pointer">
-          <input
-            type="checkbox"
-            className="mt-1 h-4 w-4 rounded border-slate-350 dark:border-white/10 text-blue-600 focus:ring-blue-500/50 cursor-pointer"
-            {...register('acceptTerms')}
-            disabled={isLoading}
-          />
-          <span className="text-xs text-slate-600 dark:text-slate-400 leading-tight">
-            I accept the{' '}
-            <a href="#" className="text-blue-500 hover:underline">
-              Terms of Service
-            </a>{' '}
-            and{' '}
-            <a href="#" className="text-blue-500 hover:underline">
-              Privacy Policy
-            </a>
-          </span>
-        </label>
-        {errors.acceptTerms && (
-          <p className="text-[11px] font-semibold text-red-500">{errors.acceptTerms.message}</p>
-        )}
-      </div>
+
 
       <Button type="submit" variant="primary" className="w-full mt-4" disabled={isLoading}>
         {isLoading ? 'Signing In...' : 'Log In'}

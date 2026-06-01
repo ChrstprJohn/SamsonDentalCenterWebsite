@@ -15,7 +15,6 @@ describe('loginAction Server Action', () => {
     const invalidInput = {
       email: 'invalid-email',
       password: '123',
-      acceptTerms: false,
     };
 
     const response = await loginAction(invalidInput as any);
@@ -25,7 +24,6 @@ describe('loginAction Server Action', () => {
       expect(response.error).toBe('Validation failed');
       expect(response.fieldErrors).toBeDefined();
       expect(response.fieldErrors?.email).toBeDefined();
-      expect(response.fieldErrors?.acceptTerms).toBeDefined();
     }
   });
 
@@ -33,7 +31,6 @@ describe('loginAction Server Action', () => {
     const input = {
       email: 'john.doe@example.com',
       password: '',
-      acceptTerms: true,
     };
 
     const response = await loginAction(input);
@@ -49,7 +46,6 @@ describe('loginAction Server Action', () => {
     const input = {
       email: 'john.doe@example.com',
       password: 'password123',
-      acceptTerms: true,
     };
 
     const mockSupabase = {
@@ -79,7 +75,6 @@ describe('loginAction Server Action', () => {
     const input = {
       email: 'john.doe@example.com',
       password: 'password123',
-      acceptTerms: true,
     };
 
     const mockSession = { user: { email: 'john.doe@example.com' }, session: { access_token: 'token' } };
