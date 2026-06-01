@@ -37,7 +37,7 @@ export function useForgotPasswordView() {
     }
 
     addToast('If an account with that email exists, we sent a reset link.', 'success');
-    router.push(`/auth/verify-otp?email=${encodeURIComponent(data.email)}&type=recovery`);
+    router.push(`/auth/verify?email=${encodeURIComponent(data.email)}&type=recovery`);
   };
 
   return { form, isLoading, onSubmit };

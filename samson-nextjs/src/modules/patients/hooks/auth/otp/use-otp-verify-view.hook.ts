@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 import { useToast } from '@/components/feedback/toast-container';
 
-export const OTP_LENGTH = 6;
+export const OTP_LENGTH = 8;
 
 export interface UseOTPVerifyViewReturn {
   code: string[];
