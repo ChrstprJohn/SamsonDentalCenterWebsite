@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { useOTPVerifyView } from '../hooks/auth/otp/use-otp-verify-view.hook';
+import { useOTPVerifyView, OTP_LENGTH } from '../hooks/auth/otp/use-otp-verify-view.hook';
 
 export function OTPVerifyView() {
   const {
@@ -24,13 +24,13 @@ export function OTPVerifyView() {
           Verify Account
         </h1>
         <p className="text-sm text-slate-500 dark:text-slate-400">
-          We have sent a 6-digit OTP verification code to{' '}
+          We have sent an {OTP_LENGTH}-digit OTP verification code to{' '}
           <span className="font-semibold text-slate-750 dark:text-slate-300">{email}</span>.
         </p>
       </div>
 
       <form onSubmit={handleVerify} className="flex flex-col gap-6">
-        <div className="flex justify-between gap-2">
+        <div className={`grid gap-1.5`} style={{ gridTemplateColumns: `repeat(${OTP_LENGTH}, minmax(0, 1fr))` }}>
           {code.map((num, i) => (
             <input
               key={i}
@@ -43,7 +43,7 @@ export function OTPVerifyView() {
               value={num}
               onChange={(e) => handleChange(i, e.target.value)}
               onKeyDown={(e) => handleKeyDown(i, e)}
-              className="w-12 h-14 text-center text-lg font-bold rounded-xl border border-slate-200 dark:border-white/10 bg-white/5 dark:bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-300 text-slate-800 dark:text-slate-100"
+              className="w-full h-14 text-center text-lg font-bold rounded-xl border border-slate-200 dark:border-white/10 bg-white/5 dark:bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-300 text-slate-800 dark:text-slate-100"
               disabled={isLoading}
             />
           ))}

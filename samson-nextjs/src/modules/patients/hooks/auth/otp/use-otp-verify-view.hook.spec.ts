@@ -31,8 +31,8 @@ async function simulateVerifySubmit(
   deps: { push: typeof mockPush; addToast: typeof mockAddToast }
 ): Promise<void> {
   const otp = code.join('');
-  if (otp.length < 6) {
-    deps.addToast('Please enter the full 6-digit code.', 'error');
+  if (otp.length < 8) {
+    deps.addToast('Please enter the full 8-digit code.', 'error');
     return;
   }
   await new Promise((resolve) => setTimeout(resolve, 1500));
@@ -48,32 +48,32 @@ function simulateResend(deps: { addToast: typeof mockAddToast }): void {
 
 describe('useOTPVerifyView — handleChange (digit input logic)', () => {
   it('should reject non-numeric input and return null', () => {
-    const code = Array(6).fill('');
+    const code = Array(8).fill('');
     const result = handleChangeLogic(code, 0, 'a');
     expect(result).toBeNull();
   });
 
   it('should accept a single digit and update the correct index', () => {
-    const code = Array(6).fill('');
+    const code = Array(8).fill('');
     const result = handleChangeLogic(code, 0, '5');
     expect(result![0]).toBe('5');
     expect(result![1]).toBe('');
   });
 
   it('should accept an empty string (backspace scenario)', () => {
-    const code = ['1', '2', '3', '4', '5', '6'];
+    const code = ['1', '2', '3', '4', '5', '6', '7', '8'];
     const result = handleChangeLogic(code, 2, '');
     expect(result![2]).toBe('');
   });
 
   it('should only keep the last character when multiple chars are provided', () => {
-    const code = Array(6).fill('');
+    const code = Array(8).fill('');
     const result = handleChangeLogic(code, 2, '123');
     expect(result![2]).toBe('3');
   });
 
   it('should not mutate the original code array', () => {
-    const code = Array(6).fill('');
+    const code = Array(8).fill('');
     handleChangeLogic(code, 0, '7');
     expect(code[0]).toBe('');
   });
@@ -89,22 +89,22 @@ describe('useOTPVerifyView — handleVerify (submission)', () => {
     vi.useRealTimers();
   });
 
-  it('should show an error toast when OTP is incomplete (< 6 digits)', async () => {
-    const incompleteCode = ['1', '2', '', '', '', ''];
+  it('should show an error toast when OTP is incomplete (< 8 digits)', async () => {
+    const incompleteCode = ['1', '2', '', '', '', '', '', ''];
     await simulateVerifySubmit(incompleteCode, { push: mockPush, addToast: mockAddToast });
 
-    expect(mockAddToast).toHaveBeenCalledWith('Please enter the full 6-digit code.', 'error');
+    expect(mockAddToast).toHaveBeenCalledWith('Please enter the full 8-digit code.', 'error');
     expect(mockPush).not.toHaveBeenCalled();
   });
 
   it('should NOT navigate when OTP is entirely empty', async () => {
-    const emptyCode = Array(6).fill('');
+    const emptyCode = Array(8).fill('');
     await simulateVerifySubmit(emptyCode, { push: mockPush, addToast: mockAddToast });
     expect(mockPush).not.toHaveBeenCalled();
   });
 
-  it('should navigate to /user after a valid 6-digit OTP', async () => {
-    const fullCode = ['1', '2', '3', '4', '5', '6'];
+  it('should navigate to /user after a valid 8-digit OTP', async () => {
+    const fullCode = ['1', '2', '3', '4', '5', '6', '7', '8'];
     const p = simulateVerifySubmit(fullCode, { push: mockPush, addToast: mockAddToast });
     await vi.runAllTimersAsync();
     await p;
@@ -113,7 +113,7 @@ describe('useOTPVerifyView — handleVerify (submission)', () => {
   });
 
   it('should show a success toast on successful verification', async () => {
-    const fullCode = ['1', '2', '3', '4', '5', '6'];
+    const fullCode = ['1', '2', '3', '4', '5', '6', '7', '8'];
     const p = simulateVerifySubmit(fullCode, { push: mockPush, addToast: mockAddToast });
     await vi.runAllTimersAsync();
     await p;
@@ -125,7 +125,7 @@ describe('useOTPVerifyView — handleVerify (submission)', () => {
   });
 
   it('should not navigate before the async delay completes', async () => {
-    const fullCode = ['1', '2', '3', '4', '5', '6'];
+    const fullCode = ['1', '2', '3', '4', '5', '6', '7', '8'];
     simulateVerifySubmit(fullCode, { push: mockPush, addToast: mockAddToast });
     // Timers not advanced — should not have navigated yet
     expect(mockPush).not.toHaveBeenCalled();

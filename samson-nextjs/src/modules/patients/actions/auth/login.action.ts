@@ -10,37 +10,27 @@ export async function loginAction(formData: LoginInput): Promise<ActionResponse<
     const validData = loginSchema.parse(formData);
     const supabase = await createClient();
 
-    if (validData.password) {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: validData.email,
-        password: validData.password,
-      });
-
-      if (error) {
-        return { 
-          success: false, 
-          error: error.message,
-          fieldErrors: { password: ['Invalid email or password'] } 
-        };
-      }
-      return { success: true, data };
-    } else {
-      const { data, error } = await supabase.auth.signInWithOtp({
-        email: validData.email,
-        options: {
-          shouldCreateUser: false,
-        }
-      });
-
-      if (error) {
-        return { 
-          success: false, 
-          error: error.message,
-          fieldErrors: { email: [error.message] }
-        };
-      }
-      return { success: true, data };
+    if (!validData.password) {
+      return {
+        success: false,
+        error: 'Password is required',
+        fieldErrors: { password: ['Password is required'] }
+      };
     }
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: validData.email,
+      password: validData.password,
+    });
+
+    if (error) {
+      return { 
+        success: false, 
+        error: error.message,
+        fieldErrors: { password: ['Invalid email or password'] } 
+      };
+    }
+    return { success: true, data };
   } catch (error) {
     if (error instanceof z.ZodError) {
       return {

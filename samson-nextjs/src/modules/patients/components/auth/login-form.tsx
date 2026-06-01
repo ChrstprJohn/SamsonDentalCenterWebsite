@@ -12,35 +12,9 @@ interface LoginFormProps {
 }
 
 export function LoginForm({ register, onSubmit, errors, isLoading }: LoginFormProps) {
-  const [loginMethod, setLoginMethod] = useState<'password' | 'otp'>('password');
 
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-4 w-full">
-      {/* Toggle Selector */}
-      <div className="flex p-1 bg-slate-100 dark:bg-slate-900/60 rounded-xl border border-slate-200/50 dark:border-white/5">
-        <button
-          type="button"
-          onClick={() => setLoginMethod('password')}
-          className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all duration-300 ${
-            loginMethod === 'password'
-              ? 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 shadow-sm'
-              : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
-          }`}
-        >
-          Password
-        </button>
-        <button
-          type="button"
-          onClick={() => setLoginMethod('otp')}
-          className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all duration-300 ${
-            loginMethod === 'otp'
-              ? 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 shadow-sm'
-              : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
-          }`}
-        >
-          Verification Code (OTP)
-        </button>
-      </div>
 
       <Input
         label="Email Address *"
@@ -51,16 +25,14 @@ export function LoginForm({ register, onSubmit, errors, isLoading }: LoginFormPr
         disabled={isLoading}
       />
 
-      {loginMethod === 'password' && (
-        <Input
-          label="Password *"
-          type="password"
-          error={errors.password?.message}
-          {...register('password')}
-          placeholder="••••••••"
-          disabled={isLoading}
-        />
-      )}
+      <Input
+        label="Password *"
+        type="password"
+        error={errors.password?.message}
+        {...register('password')}
+        placeholder="••••••••"
+        disabled={isLoading}
+      />
 
       <div className="flex flex-col gap-2 mt-2">
         <label className="flex items-start gap-2.5 cursor-pointer">
@@ -87,13 +59,7 @@ export function LoginForm({ register, onSubmit, errors, isLoading }: LoginFormPr
       </div>
 
       <Button type="submit" variant="primary" className="w-full mt-4" disabled={isLoading}>
-        {isLoading
-          ? loginMethod === 'password'
-            ? 'Signing In...'
-            : 'Sending Code...'
-          : loginMethod === 'password'
-          ? 'Log In'
-          : 'Send Verification Code'}
+        {isLoading ? 'Signing In...' : 'Log In'}
       </Button>
     </form>
   );

@@ -6,7 +6,7 @@ import { ActionResponse } from '@/shared/utils/action-response';
 interface VerifyOtpInput {
   email: string;
   token: string;
-  type: 'signup' | 'login';
+  type: 'signup';
 }
 
 export async function verifyOtpAction(data: VerifyOtpInput): Promise<ActionResponse<any>> {
@@ -16,7 +16,7 @@ export async function verifyOtpAction(data: VerifyOtpInput): Promise<ActionRespo
     const { data: sessionData, error } = await supabase.auth.verifyOtp({
       email: data.email,
       token: data.token,
-      type: data.type === 'signup' ? 'signup' : 'magiclink',
+      type: 'signup',
     });
 
     if (error) {

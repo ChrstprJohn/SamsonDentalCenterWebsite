@@ -48,15 +48,10 @@ export function useLoginView(): UseLoginViewReturn {
     }
 
     // Success flow - Check if it was OTP or Password
-    if (data.password) {
-      addToast('Logged in successfully!', 'success');
-      // If password login succeeded, we have a session immediately. Navigate to portal.
-      // (Typically you might check roles and route, but for now route to user portal)
-      router.push('/user');
-    } else {
-      addToast('Verification code sent to your email!', 'success');
-      router.push(`/auth/verify?email=${encodeURIComponent(data.email)}&type=login`);
-    }
+    addToast('Logged in successfully!', 'success');
+    // If password login succeeded, we have a session immediately. Navigate to portal.
+    // (Typically you might check roles and route, but for now route to user portal)
+    router.push('/user');
   };
 
   return { isLoading, register, handleSubmit, errors, onSubmit };

@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 import { useToast } from '@/components/feedback/toast-container';
 
+export const OTP_LENGTH = 8;
+
 export interface UseOTPVerifyViewReturn {
   code: string[];
   isLoading: boolean;
@@ -18,7 +20,7 @@ export interface UseOTPVerifyViewReturn {
 }
 
 export function useOTPVerifyView(): UseOTPVerifyViewReturn {
-  const [code, setCode] = useState<string[]>(Array(6).fill(''));
+  const [code, setCode] = useState<string[]>(Array(OTP_LENGTH).fill(''));
   const [isLoading, setIsLoading] = useState(false);
   const [countdown, setCountdown] = useState(60);
   const router = useRouter();
@@ -40,7 +42,7 @@ export function useOTPVerifyView(): UseOTPVerifyViewReturn {
     const newCode = [...code];
     newCode[index] = val.substring(val.length - 1);
     setCode(newCode);
-    if (val && index < 5) {
+    if (val && index < OTP_LENGTH - 1) {
       inputRefs.current[index + 1]?.focus();
     }
   };
@@ -54,19 +56,18 @@ export function useOTPVerifyView(): UseOTPVerifyViewReturn {
   const handleVerify = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
     const otp = code.join('');
-    if (otp.length < 6) {
-      addToast('Please enter the full 6-digit code.', 'error');
+    if (otp.length < OTP_LENGTH) {
+      addToast(`Please enter the full ${OTP_LENGTH}-digit code.`, 'error');
       return;
     }
     
     setIsLoading(true);
     const { verifyOtpAction } = await import('../../../actions/auth/verify-otp.action');
-    const type = searchParams.get('type') === 'signup' ? 'signup' : 'login';
     
     const response = await verifyOtpAction({
       email,
       token: otp,
-      type
+      type: 'signup'
     });
     
     setIsLoading(false);
