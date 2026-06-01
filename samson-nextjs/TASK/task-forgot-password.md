@@ -17,3 +17,7 @@ The user reported that navigating through the forgot password flow fails to redi
 - [x] **Align OTP Length**:
   - **File**: `use-otp-verify-view.hook.ts`
   - **Change**: Updated `OTP_LENGTH` from 6 to 8. This correctly renders 8 input fields for both signup and forgot password flows. Unit tests confirm all parsing logic holds for an 8-digit OTP.
+- [x] **Prevent Automatic Login After Reset**:
+  - **File**: `reset-password.use-case.ts`, `reset-password.commands.ts`
+  - **Change**: Added and injected a `signOutCommand` that invalidates the temporary session established by the OTP immediately after `supabase.auth.updateUser` succeeds.
+  - **Reason**: Forces the user to manually log in using their new credentials, enhancing security and meeting the user's expected flow.

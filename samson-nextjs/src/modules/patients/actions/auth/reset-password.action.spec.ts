@@ -22,6 +22,9 @@ describe('resetPasswordAction', () => {
           data: { user: { id: '123' } },
           error: null,
         }),
+        signOut: vi.fn().mockResolvedValue({
+          error: null,
+        }),
       },
     };
     (createClient as any).mockResolvedValue(mockSupabase);

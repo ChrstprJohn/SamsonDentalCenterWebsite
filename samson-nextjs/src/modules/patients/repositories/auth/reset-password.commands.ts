@@ -22,3 +22,12 @@ export const updatePasswordCommand = (supabase: SupabaseClient) => {
     }
   };
 };
+
+export const signOutCommand = (supabase: SupabaseClient) => {
+  return async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.warn('Failed to sign out after password reset:', error);
+    }
+  };
+};

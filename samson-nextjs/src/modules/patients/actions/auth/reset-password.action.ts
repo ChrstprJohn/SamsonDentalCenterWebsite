@@ -3,7 +3,7 @@
 import { z } from 'zod';
 import { createClient } from '@/shared/database/server';
 import { resetPasswordSchema, ResetPasswordDto } from '../../dtos/auth/reset-password.dto';
-import { getSessionUserQuery, updatePasswordCommand } from '../../repositories/auth/reset-password.commands';
+import { getSessionUserQuery, updatePasswordCommand, signOutCommand } from '../../repositories/auth/reset-password.commands';
 import { resetPasswordUseCase } from '../../use-cases/auth/reset-password.use-case';
 import { ActionResponse } from '@/shared/utils/action-response';
 import { DomainError } from '@/shared/errors';
@@ -21,7 +21,8 @@ export const resetPasswordAction = async (
     // 3. Inject dependencies into Use-Case
     const getSessionUser = getSessionUserQuery(supabase);
     const updatePassword = updatePasswordCommand(supabase);
-    const useCase = resetPasswordUseCase({ getSessionUser, updatePassword });
+    const signOut = signOutCommand(supabase);
+    const useCase = resetPasswordUseCase({ getSessionUser, updatePassword, signOut });
 
     // 4. Execute Business Logic
     await useCase(validatedData);
