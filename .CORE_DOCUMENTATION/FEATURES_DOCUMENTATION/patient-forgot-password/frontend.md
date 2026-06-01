@@ -53,7 +53,7 @@ export const resetPasswordSchema = z.object({
 1. **`useForgotPasswordView`**: 
    - Uses `react-hook-form` and the `forgotPasswordSchema`.
    - Triggers `requestPasswordResetAction`.
-   - On success, it navigates the user to `/auth/verify-otp?email=...&type=recovery`.
+   - On success, it navigates the user to `/auth/verify?email=...&type=recovery`.
    
 2. **`useOTPVerifyView` (Shared)**: 
    - Dynamically reads the `type` search param. If `type === 'recovery'`, it redirects to `/auth/reset-password` upon successful OTP validation, bypassing the `/user` portal entry meant for standard logins/signups.

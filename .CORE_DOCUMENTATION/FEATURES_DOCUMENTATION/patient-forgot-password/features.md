@@ -12,7 +12,7 @@ The Forgot Password flow enables patients to recover access to their accounts au
 1. **Secure Email Delivery via Outbox**:
    * Recovery emails are not sent directly from the UI or web server. Instead, a `PASSWORD_RESET_REQUESTED` domain event is emitted to the transactional outbox to ensure reliable delivery.
 2. **OTP-Based Verification**:
-   * Users verify their identity using a 6-digit OTP code sent to their registered email address.
+   * Users verify their identity using an 8-digit OTP code sent to their registered email address.
 3. **Session Re-establishment**:
    * Successfully verifying the OTP automatically grants a secure, temporary session required to set a new password.
 4. **Preventing Email Enumeration**:
@@ -63,5 +63,5 @@ sequenceDiagram
 
 ### Flow Breakdown
 1. **Request Page**: Patient enters their email. The server action validates the email, fetches the user's `firstName`, uses Supabase Admin to generate a recovery link, and queues a `PASSWORD_RESET_REQUESTED` event in the Outbox. The background dispatcher then kicks off the Resend API.
-2. **Verification Page**: Patient enters the 6-digit code. The server action (`verifyOtpAction`) verifies the code. Crucially, the action asserts state logic: it ensures the `type` is 'recovery', the user is known, and the session matches.
+2. **Verification Page**: Patient enters the 8-digit code. The server action (`verifyOtpAction`) verifies the code. Crucially, the action asserts state logic: it ensures the `type` is 'recovery', the user is known, and the session matches.
 3. **New Password Page**: With the session established by the OTP verification, the patient enters their new password. `resetPasswordAction` securely updates the credentials using `supabase.auth.updateUser()`.
