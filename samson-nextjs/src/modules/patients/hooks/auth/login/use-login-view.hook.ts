@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useLoginForm } from './use-login-form.hook';
 import { useToast } from '@/components/feedback/toast-container';
 import { loginAction } from '../../../actions/auth/login.action';
@@ -19,6 +19,7 @@ export interface UseLoginViewReturn {
 export function useLoginView(): UseLoginViewReturn {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { addToast } = useToast();
   const form = useLoginForm();
   const {
@@ -49,9 +50,9 @@ export function useLoginView(): UseLoginViewReturn {
 
     // Success flow - Check if it was OTP or Password
     addToast('Logged in successfully!', 'success');
-    // If password login succeeded, we have a session immediately. Navigate to portal.
-    // (Typically you might check roles and route, but for now route to user portal)
-    router.push('/user');
+    // Navigate to requested redirect or default to user portal
+    const redirectTo = searchParams.get('redirect') || '/user';
+    router.push(redirectTo);
   };
 
   return { isLoading, register, handleSubmit, errors, onSubmit };

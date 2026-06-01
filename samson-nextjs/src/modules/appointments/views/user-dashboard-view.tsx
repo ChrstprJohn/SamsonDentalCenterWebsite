@@ -93,7 +93,7 @@ export function UserDashboardView({ maxReschedules }: UserDashboardViewProps) {
     setAppointments(updated);
 
     addToast('Redirecting to scheduler page...', 'info');
-    router.push(`/user/booking?service=${appt.serviceId}&reschedule=true`);
+    router.push(`/booking?service=${appt.serviceId}&reschedule=true`);
   };
 
   const handleCancelClick = (appt: AppointmentRecord) => {
@@ -139,7 +139,7 @@ export function UserDashboardView({ maxReschedules }: UserDashboardViewProps) {
           <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-white">Patient Dashboard</h2>
           <p className="text-xs text-slate-500">Oversee, track, reschedule, or cancel your clinic reservations in real-time.</p>
         </div>
-        <Button onClick={() => router.push('/user/booking')}>
+        <Button onClick={() => router.push('/booking')}>
           + New Booking
         </Button>
       </div>

@@ -67,9 +67,9 @@ export function Navbar({ user }: NavbarProps) {
   const handleBookNow = () => {
     setIsMobileMenuOpen(false);
     if (user) {
-      router.push('/user'); // Or future: wizard page directly
+      router.push('/booking');
     } else {
-      router.push('/auth/login?redirect=/user');
+      router.push('/auth/login?redirect=/booking');
     }
   };
 
