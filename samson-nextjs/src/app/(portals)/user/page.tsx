@@ -1,5 +1,6 @@
 import React from 'react';
 import { getClinicConfigAction } from '@/modules/clinic-config/actions/settings/get-clinic-config.action';
+import { getPatientAppointmentsAction } from '@/modules/appointments/actions/patient/get-patient-appointments.action';
 import { UserDashboardView } from '@/modules/appointments/views/user-dashboard-view';
 
 export const metadata = {
@@ -9,17 +10,29 @@ export const metadata = {
 
 export default async function UserDashboardPage() {
   let maxReschedules = 1; // standard default fallback
+  let appointments: any[] = [];
 
   try {
-    const configResponse = await getClinicConfigAction();
+    const [configResponse, apptsResponse] = await Promise.all([
+      getClinicConfigAction(),
+      getPatientAppointmentsAction()
+    ]);
+
     if (configResponse && 'data' in configResponse && configResponse.data) {
       maxReschedules = configResponse.data.maxReschedules;
     }
+    
+    if (apptsResponse && 'data' in apptsResponse && apptsResponse.data) {
+      appointments = apptsResponse.data;
+    }
   } catch (err) {
-    console.error('Failed to load clinic reschedule limits on dashboard:', err);
+    console.error('Failed to load dashboard data:', err);
   }
 
   return (
-    <UserDashboardView maxReschedules={maxReschedules} />
+    <UserDashboardView 
+      initialAppointments={appointments}
+      maxReschedules={maxReschedules} 
+    />
   );
 }

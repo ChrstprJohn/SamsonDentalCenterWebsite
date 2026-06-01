@@ -19,7 +19,7 @@ vi.mock('../components/landing/contact-section', () => ({ ContactSection: () => 
 vi.mock('@/components/ui/modal', () => ({ Modal: ({ children, isOpen }: any) => (isOpen ? <div data-testid="modal">{children}</div> : null) }));
 
 describe('LandingView', () => {
-  const mockConfig = { id: 'c1', name: 'Test Clinic', address: '123 Test St', phone: '123', email: 'test@test.com', workingHours: [] };
+  const mockConfig = { id: 'c1', name: 'Test Clinic', address: '123 Test St', phone: '123', email: 'test@test.com', workingHours: [] } as any;
 
   it('should render all sections correctly', () => {
     (useLandingView as any).mockReturnValue({

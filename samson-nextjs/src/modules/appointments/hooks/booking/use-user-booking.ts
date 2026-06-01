@@ -1,12 +1,19 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useToast } from '@/components/feedback/toast-container';
 import type { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
+import { submitBookingAction } from '../../actions/booking/submit-booking.action';
+
+import { useBookingState } from './use-booking-state';
+import { useBookingData } from './use-booking-data';
+import { createBookingPayload } from './submit-booking-payload.mapper';
 
 export type BookingStep = 1 | 2 | 3 | 4;
 
 export interface BookingSlot {
-  time: string; // e.g. "09:00"
+  time: string; // e.g. "09:00 AM"
   doctorId: string;
   doctorName: string;
   isPreferred?: boolean;
@@ -36,6 +43,14 @@ interface UseUserBookingReturn {
   userNote: string;
   termsAccepted: boolean;
   privacyAccepted: boolean;
+  
+  availableDates: string[];
+  availableSlots: BookingSlot[];
+  isLoadingAvailability: boolean;
+
+  isSubmitting: boolean;
+  isSuccess: boolean;
+  isNextDisabled: () => boolean;
 
   nextStep: () => void;
   prevStep: () => void;
@@ -43,8 +58,6 @@ interface UseUserBookingReturn {
   selectService: (service: ServiceResponseDto) => void;
   selectDate: (date: string) => void;
   selectSlot: (slot: BookingSlot) => void;
-  startSlotHold: () => void;
-  releaseSlotHold: () => void;
   setPatientType: (type: 'SELF' | 'EXISTING_DEPENDENT' | 'NEW_DEPENDENT') => void;
   setSelectedDependentId: (id: string | null) => void;
   setNewDependentData: (data: NewDependentInput | null) => void;
@@ -53,109 +66,78 @@ interface UseUserBookingReturn {
   setPrivacyAccepted: (accepted: boolean) => void;
   validateAbuse: () => { valid: boolean; message?: string };
   resetWizard: () => void;
+  handleSubmit: () => Promise<void>;
 }
 
-const HOLD_DURATION_SECONDS = 600; // 10 minutes
+export function useUserBooking(services: ServiceResponseDto[] = []): UseUserBookingReturn {
+  const searchParams = useSearchParams();
+  const { addToast } = useToast();
 
-export function useUserBooking(): UseUserBookingReturn {
-  const [currentStep, setCurrentStep] = useState<BookingStep>(1);
-  const [selectedService, setSelectedService] = useState<ServiceResponseDto | null>(null);
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const [selectedSlot, setSelectedSlot] = useState<BookingSlot | null>(null);
-  const [slotHoldRemaining, setSlotHoldRemaining] = useState<number>(HOLD_DURATION_SECONDS);
-  const [isSlotHoldActive, setIsSlotHoldActive] = useState<boolean>(false);
-  const [patientType, setPatientType] = useState<'SELF' | 'EXISTING_DEPENDENT' | 'NEW_DEPENDENT'>('SELF');
-  const [selectedDependentId, setSelectedDependentId] = useState<string | null>(null);
-  const [newDependentData, setNewDependentData] = useState<NewDependentInput | null>(null);
-  const [userNote, setUserNote] = useState<string>('');
-  const [termsAccepted, setTermsAccepted] = useState<boolean>(false);
-  const [privacyAccepted, setPrivacyAccepted] = useState<boolean>(false);
+  const state = useBookingState();
+  const data = useBookingData(state.selectedService?.id, state.selectedDate);
 
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
-  // Handle countdown logic
+  // Auto-select service if passed in query param
   useEffect(() => {
-    if (isSlotHoldActive && slotHoldRemaining > 0) {
-      timerRef.current = setTimeout(() => {
-        setSlotHoldRemaining((prev) => prev - 1);
-      }, 1000);
-    } else if (slotHoldRemaining === 0) {
-      releaseSlotHold();
-    }
-
-    return () => {
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
+    const serviceId = searchParams.get('service');
+    if (serviceId && services.length > 0 && !state.selectedService) {
+      const found = services.find((s) => s.id === serviceId);
+      if (found) {
+        selectService(found);
       }
-    };
-  }, [isSlotHoldActive, slotHoldRemaining]);
+    }
+  }, [searchParams, services, state.selectedService]);
 
   const nextStep = () => {
-    // Step-by-step validations
-    if (currentStep === 1 && !selectedService) return;
-    if (currentStep === 2 && (!selectedDate || !selectedSlot)) return;
-    if (currentStep === 3) {
-      if (patientType === 'EXISTING_DEPENDENT' && !selectedDependentId) return;
-      if (patientType === 'NEW_DEPENDENT' && !newDependentData) return;
+    if (state.currentStep === 1 && !state.selectedService) return;
+    if (state.currentStep === 2 && (!state.selectedDate || !state.selectedSlot)) return;
+    if (state.currentStep === 3) {
+      if (state.patientType === 'EXISTING_DEPENDENT' && !state.selectedDependentId) return;
+      if (state.patientType === 'NEW_DEPENDENT' && !state.newDependentData) return;
     }
-    if (currentStep < 4) {
-      setCurrentStep((prev) => (prev + 1) as BookingStep);
+    if (state.currentStep < 4) {
+      state.setCurrentStep((prev) => (prev + 1) as BookingStep);
     }
   };
 
   const prevStep = () => {
-    if (currentStep > 1) {
-      setCurrentStep((prev) => (prev - 1) as BookingStep);
+    if (state.currentStep > 1) {
+      state.setCurrentStep((prev) => (prev - 1) as BookingStep);
     }
   };
 
   const goToStep = (step: BookingStep) => {
-    // Ensure prerequisites are met
-    if (step > 1 && !selectedService) return;
-    if (step > 2 && (!selectedDate || !selectedSlot)) return;
+    if (step > 1 && !state.selectedService) return;
+    if (step > 2 && (!state.selectedDate || !state.selectedSlot)) return;
     if (step > 3) {
-      if (patientType === 'EXISTING_DEPENDENT' && !selectedDependentId) return;
-      if (patientType === 'NEW_DEPENDENT' && !newDependentData) return;
+      if (state.patientType === 'EXISTING_DEPENDENT' && !state.selectedDependentId) return;
+      if (state.patientType === 'NEW_DEPENDENT' && !state.newDependentData) return;
     }
-    setCurrentStep(step);
+    state.setCurrentStep(step);
   };
 
   const selectService = (service: ServiceResponseDto) => {
-    setSelectedService(service);
-    // Reset subsequent steps upon changing service
-    setSelectedDate(null);
-    setSelectedSlot(null);
-    releaseSlotHold();
+    state.setSelectedService(service);
+    state.setSelectedDate(null);
+    state.setSelectedSlot(null);
+    state.releaseSlotHold();
   };
 
   const selectDate = (date: string) => {
-    setSelectedDate(date);
-    setSelectedSlot(null);
-    releaseSlotHold();
+    state.setSelectedDate(date);
+    state.setSelectedSlot(null);
+    state.releaseSlotHold();
   };
 
   const selectSlot = (slot: BookingSlot) => {
-    setSelectedSlot(slot);
-    startSlotHold();
-  };
-
-  const startSlotHold = () => {
-    setSlotHoldRemaining(HOLD_DURATION_SECONDS);
-    setIsSlotHoldActive(true);
-  };
-
-  const releaseSlotHold = () => {
-    setIsSlotHoldActive(false);
-    setSlotHoldRemaining(HOLD_DURATION_SECONDS);
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-    }
+    state.setSelectedSlot(slot);
+    state.startSlotHold();
   };
 
   const validateAbuse = (): { valid: boolean; message?: string } => {
-    // Abuse Safeguard Logic: check for multiple active bookings, slot spams, etc.
-    // For Mock-first: we scan if notes contain suspicious keywords or spams
-    if (userNote.toLowerCase().includes('spam') || userNote.length > 500) {
+    if (state.userNote.toLowerCase().includes('spam') || state.userNote.length > 500) {
       return {
         valid: false,
         message: 'Suspicious request activity detected. Please review your booking details or contact the receptionist.',
@@ -165,48 +147,81 @@ export function useUserBooking(): UseUserBookingReturn {
   };
 
   const resetWizard = () => {
-    setCurrentStep(1);
-    setSelectedService(null);
-    setSelectedDate(null);
-    setSelectedSlot(null);
-    releaseSlotHold();
-    setPatientType('SELF');
-    setSelectedDependentId(null);
-    setNewDependentData(null);
-    setUserNote('');
-    setTermsAccepted(false);
-    setPrivacyAccepted(false);
+    state.resetState();
+    data.setAvailableDates([]);
+    data.setAvailableSlots([]);
+    setIsSuccess(false);
+    setIsSubmitting(false);
+  };
+
+  const isNextDisabled = () => {
+    if (state.currentStep === 1 && !state.selectedService) return true;
+    if (state.currentStep === 2 && (!state.selectedDate || !state.selectedSlot)) return true;
+    if (state.currentStep === 3) {
+      if (state.patientType === 'EXISTING_DEPENDENT' && !state.selectedDependentId) return true;
+      if (state.patientType === 'NEW_DEPENDENT' && !state.newDependentData) return true;
+    }
+    return false;
+  };
+
+  const handleSubmit = async () => {
+    if (!state.termsAccepted || !state.privacyAccepted) {
+      addToast('Please accept both terms and privacy policies.', 'error');
+      return;
+    }
+
+    if (!state.selectedService || !state.selectedDate || !state.selectedSlot) {
+      addToast('Missing booking details.', 'error');
+      return;
+    }
+
+    const abuse = validateAbuse();
+    if (!abuse.valid) {
+      addToast(abuse.message || 'Suspicious booking activity detected.', 'error');
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    const payload = createBookingPayload({
+      selectedService: state.selectedService,
+      selectedSlot: state.selectedSlot,
+      selectedDate: state.selectedDate,
+      patientType: state.patientType,
+      selectedDependentId: state.selectedDependentId,
+      newDependentData: state.newDependentData,
+      userNote: state.userNote,
+    });
+
+    try {
+      const response = await submitBookingAction(payload);
+      if (response.success) {
+        setIsSuccess(true);
+        addToast('Appointment scheduled successfully!', 'success');
+      } else {
+        addToast(response.error || 'Failed to submit booking.', 'error');
+      }
+    } catch (err) {
+      addToast('An unexpected error occurred.', 'error');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return {
-    currentStep,
-    selectedService,
-    selectedDate,
-    selectedSlot,
-    slotHoldRemaining,
-    isSlotHoldActive,
-    patientType,
-    selectedDependentId,
-    newDependentData,
-    userNote,
-    termsAccepted,
-    privacyAccepted,
-
+    ...state,
+    ...data,
+    isSubmitting,
+    isSuccess,
+    isNextDisabled,
     nextStep,
     prevStep,
     goToStep,
     selectService,
     selectDate,
     selectSlot,
-    startSlotHold,
-    releaseSlotHold,
-    setPatientType,
-    setSelectedDependentId,
-    setNewDependentData,
-    setUserNote,
-    setTermsAccepted,
-    setPrivacyAccepted,
     validateAbuse,
     resetWizard,
+    handleSubmit,
   };
 }

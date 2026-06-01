@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Modal } from '@/components/ui/modal';
+import { AddDependentModal } from './add-dependent-modal';
+import { ExistingDependentSelector, MOCK_DEPENDENTS } from './existing-dependent-selector';
 import type { NewDependentInput } from '../../hooks/booking/use-user-booking';
 
 interface PatientDetailsStepProps {
@@ -16,11 +16,6 @@ interface PatientDetailsStepProps {
   onSetUserNote: (note: string) => void;
 }
 
-const MOCK_DEPENDENTS = [
-  { id: 'dep-1', name: 'Jane Samson', relationship: 'Spouse', dob: '1992-04-12' },
-  { id: 'dep-2', name: 'Timmy Samson', relationship: 'Child', dob: '2016-09-22' },
-];
-
 export function PatientDetailsStep({
   patientType,
   selectedDependentId,
@@ -32,39 +27,11 @@ export function PatientDetailsStep({
   onSetUserNote,
 }: PatientDetailsStepProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
-  // Modal form states
-  const [firstName, setFirstName] = useState('');
-  const [middleName, setMiddleName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [dob, setDob] = useState('');
-  const [sex, setSex] = useState<'MALE' | 'FEMALE'>('MALE');
-  const [relationship, setRelationship] = useState('Child');
 
-  const handleAddDependentSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!firstName || !lastName || !dob || !relationship) return;
-
-    const data: NewDependentInput = {
-      firstName,
-      middleName: middleName || undefined,
-      lastName,
-      birthday: dob,
-      sex,
-      relationship,
-    };
-
+  const handleAddDependentSubmit = (data: NewDependentInput) => {
     onSetNewDependent(data);
     onSetPatientType('NEW_DEPENDENT');
     setIsModalOpen(false);
-    
-    // Clear form
-    setFirstName('');
-    setMiddleName('');
-    setLastName('');
-    setDob('');
-    setSex('MALE');
-    setRelationship('Child');
   };
 
   return (
@@ -135,31 +102,10 @@ export function PatientDetailsStep({
       )}
 
       {patientType === 'EXISTING_DEPENDENT' && (
-        <div className="flex flex-col gap-3">
-          <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Select Registered Dependent</h4>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {MOCK_DEPENDENTS.map((dep) => {
-              const isSelected = selectedDependentId === dep.id;
-              return (
-                <div
-                  key={dep.id}
-                  onClick={() => onSelectDependent(dep.id)}
-                  className={`p-4 rounded-xl border cursor-pointer flex justify-between items-center transition-all ${
-                    isSelected
-                      ? 'border-blue-500 bg-blue-50/40 dark:bg-blue-500/10 ring-2 ring-blue-500/20'
-                      : 'border-slate-200/80 dark:border-white/5 bg-white dark:bg-slate-900/30 hover:border-slate-350'
-                  }`}
-                >
-                  <div className="flex flex-col">
-                    <span className="text-xs font-bold text-slate-800 dark:text-slate-200">{dep.name}</span>
-                    <span className="text-[10px] text-slate-500 mt-0.5">{dep.relationship}</span>
-                  </div>
-                  <span className="text-[10px] text-slate-400">📅 {dep.dob}</span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+        <ExistingDependentSelector
+          selectedDependentId={selectedDependentId}
+          onSelectDependent={onSelectDependent}
+        />
       )}
 
       {patientType === 'NEW_DEPENDENT' && newDependentData && (
@@ -195,109 +141,11 @@ export function PatientDetailsStep({
         />
       </div>
 
-      {/* Add New Dependent Modal Dialog */}
-      <Modal
+      <AddDependentModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="Add Family Member / Dependent"
-        size="md"
-      >
-        <form onSubmit={handleAddDependentSubmit} className="flex flex-col gap-4 py-2 text-slate-700 dark:text-slate-350 text-sm">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-slate-500">First Name</label>
-              <input
-                type="text"
-                required
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                className="px-3 py-2 rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-950 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800 dark:text-white"
-              />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-slate-500">Last Name</label>
-              <input
-                type="text"
-                required
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                className="px-3 py-2 rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-950 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800 dark:text-white"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-slate-500">Middle Name (Opt)</label>
-              <input
-                type="text"
-                value={middleName}
-                onChange={(e) => setMiddleName(e.target.value)}
-                className="px-3 py-2 rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-950 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800 dark:text-white"
-              />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-slate-500">Date of Birth</label>
-              <input
-                type="date"
-                required
-                value={dob}
-                onChange={(e) => setDob(e.target.value)}
-                className="px-3 py-2 rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-950 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800 dark:text-white"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-slate-500">Relationship</label>
-              <select
-                value={relationship}
-                onChange={(e) => setRelationship(e.target.value)}
-                className="px-3 py-2 rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-950 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800 dark:text-white"
-              >
-                <option value="Spouse">Spouse</option>
-                <option value="Child">Child</option>
-                <option value="Parent">Parent</option>
-                <option value="Sibling">Sibling</option>
-              </select>
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-slate-500">Biological Sex</label>
-              <div className="flex gap-4 mt-2">
-                <label className="flex items-center gap-1.5 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="sex"
-                    checked={sex === 'MALE'}
-                    onChange={() => setSex('MALE')}
-                  />
-                  Male
-                </label>
-                <label className="flex items-center gap-1.5 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="sex"
-                    checked={sex === 'FEMALE'}
-                    onChange={() => setSex('FEMALE')}
-                  />
-                  Female
-                </label>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex gap-3 justify-end border-t border-slate-100 dark:border-white/5 pt-4 mt-4">
-            <Button variant="secondary" onClick={() => setIsModalOpen(false)}>
-              Cancel
-            </Button>
-            <Button type="submit">
-              Attach Member
-            </Button>
-          </div>
-        </form>
-      </Modal>
+        onSubmit={handleAddDependentSubmit}
+      />
     </div>
   );
 }

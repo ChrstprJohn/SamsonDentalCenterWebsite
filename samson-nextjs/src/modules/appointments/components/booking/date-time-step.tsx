@@ -6,48 +6,36 @@ import type { BookingSlot } from '../../hooks/booking/use-user-booking';
 interface DateTimeStepProps {
   selectedDate: string | null;
   selectedSlot: BookingSlot | null;
+  availableDates?: string[];
   availableSlots?: BookingSlot[];
+  isLoading?: boolean;
   slotHoldRemaining: number;
   isSlotHoldActive: boolean;
   onSelectDate: (date: string) => void;
   onSelectSlot: (slot: BookingSlot) => void;
 }
 
-const MOCK_SLOTS: BookingSlot[] = [
-  { time: '09:00 AM', doctorId: 'd-1', doctorName: 'Dr. Sarah Samson' },
-  { time: '10:30 AM', doctorId: 'd-1', doctorName: 'Dr. Sarah Samson' },
-  { time: '01:00 PM', doctorId: 'd-2', doctorName: 'Dr. James Mercer', isPreferred: true },
-  { time: '02:30 PM', doctorId: 'd-2', doctorName: 'Dr. James Mercer' },
-  { time: '04:00 PM', doctorId: 'd-1', doctorName: 'Dr. Sarah Samson' },
-];
-
 export function DateTimeStep({
   selectedDate,
   selectedSlot,
-  availableSlots,
+  availableDates = [],
+  availableSlots = [],
+  isLoading = false,
   slotHoldRemaining,
   isSlotHoldActive,
   onSelectDate,
   onSelectSlot,
 }: DateTimeStepProps) {
-  const slotsToDisplay = availableSlots || MOCK_SLOTS;
-  // Get next 7 days for scheduling
-  const dates = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date();
-    d.setDate(d.getDate() + i + 1); // Start tomorrow
-    return d;
-  });
-
-  const formatDate = (date: Date) => {
-    return date.toISOString().split('T')[0];
-  };
+  
+  // Create Date objects from available YYYY-MM-DD strings to format them
+  const datesToDisplay = availableDates.map(dateStr => new Date(dateStr));
 
   const getDayName = (date: Date) => {
-    return date.toLocaleDateString('en-US', { weekday: 'short' });
+    return date.toLocaleDateString('en-US', { weekday: 'short', timeZone: 'UTC' });
   };
 
   const getDayNum = (date: Date) => {
-    return date.getDate();
+    return date.getUTCDate();
   };
 
   const formatTimer = (seconds: number) => {
@@ -63,10 +51,14 @@ export function DateTimeStep({
         <p className="text-xs text-slate-500">Pick an available day and convenient timing slot.</p>
       </div>
 
+      {isLoading && (!selectedDate || availableSlots.length === 0) && (
+        <div className="text-sm text-slate-500 animate-pulse py-4">Checking live clinic schedule...</div>
+      )}
+
       {/* Date Carousel */}
       <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none">
-        {dates.map((date) => {
-          const dateStr = formatDate(date);
+        {datesToDisplay.length > 0 ? datesToDisplay.map((date, idx) => {
+          const dateStr = availableDates[idx];
           const isSelected = selectedDate === dateStr;
           return (
             <button
@@ -83,20 +75,26 @@ export function DateTimeStep({
               <span className="text-lg font-extrabold">{getDayNum(date)}</span>
             </button>
           );
-        })}
+        }) : !isLoading && (
+          <div className="text-xs text-slate-400 py-4 border border-dashed border-slate-200 dark:border-white/5 w-full text-center rounded-xl">
+            No upcoming days with availability found for this service.
+          </div>
+        )}
       </div>
 
       {/* Time Slots & Holds */}
       {selectedDate ? (
         <div className="flex flex-col gap-4 mt-2">
           <h4 className="text-sm font-bold text-slate-800 dark:text-white">Available Time Slots</h4>
-          {slotsToDisplay.length > 0 ? (
+          {isLoading ? (
+            <div className="text-xs text-slate-400 animate-pulse">Loading available slots...</div>
+          ) : availableSlots.length > 0 ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {slotsToDisplay.map((slot) => {
+              {availableSlots.map((slot) => {
                 const isSelected = selectedSlot?.time === slot.time;
                 return (
                   <button
-                    key={slot.time}
+                    key={slot.time + slot.doctorId}
                     type="button"
                     onClick={() => onSelectSlot(slot)}
                     className={`p-3 rounded-xl border text-left transition-all duration-200 cursor-pointer ${
