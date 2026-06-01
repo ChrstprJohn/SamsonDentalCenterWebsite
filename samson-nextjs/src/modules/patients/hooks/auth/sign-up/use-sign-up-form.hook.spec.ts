@@ -25,6 +25,7 @@ describe('useSignUpForm', () => {
           dateOfBirth: '',
           password: '',
           confirmPassword: '',
+          acceptTerms: false,
         },
       })
     );
