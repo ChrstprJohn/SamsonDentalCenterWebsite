@@ -31,18 +31,27 @@ This document defines the official development standards, architectural patterns
 src/
 ├── shared/                     # Global Shared Kernel
 │   ├── auth/                   # Shared token verification & session middleware (Supabase Auth)
-│   ├── database/               # Supabase client (`@supabase/supabase-js`) & raw SQL helpers
+│   ├── database/               # Supabase client & raw SQL helpers
 │   ├── errors/                 # Global error classes
+│   ├── services/               # Infrastructure & external service integrations
+│   │   └── email/              # Email delivery providers (e.g., ResendService)
 │   ├── middleware/             # Validation, error handling
 │   └── utils/                  # Global utilities (e.g., date-formatters)
 │
 ├── modules/                    # Self-contained business domains
 │   ├── patients/               # Focuses purely on consumer/patient workflows
-│   │   ├── routes.ts
-│   │   ├── controllers/        # patient.controller.ts
-│   │   ├── dtos/
-│   │   ├── use-cases/          # register-patient.use-case.ts
-│   │   └── repositories/       # patient.commands.ts, patient.queries.ts
+│   │   ├── actions/            # Next.js Server Actions (e.g., registerPatientAction)
+│   │   ├── dtos/               # Validation schemas (Zod)
+│   │   ├── use-cases/          # Pure business logic (e.g., registerPatientUseCase)
+│   │   ├── repositories/       # DB commands and queries
+│   │   └── index.ts            # Public facade entry point
+│   │
+│   ├── emails/                 # Core domain logic for outbox templates & queue
+│   │   ├── actions/            # processOutboxAction
+│   │   ├── dtos/               # queueEmailDto
+│   │   ├── use-cases/          # processOutboxUseCase
+│   │   ├── repositories/       # emailOutboxCommands
+│   │   └── index.ts            # Public facade entry point
 │   │
 │   ├── staff/                  # Focuses purely on clinic employees & roles
 │   │   ├── routes.ts

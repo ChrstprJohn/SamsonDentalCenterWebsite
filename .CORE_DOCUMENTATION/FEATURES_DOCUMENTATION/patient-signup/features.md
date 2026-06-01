@@ -48,6 +48,7 @@ sequenceDiagram
         Supa-->>Repo: Creates user credentials & fires DB trigger
         Repo-->>UC: Maps & returns active user profile
         UC-->>Action: Returns validated patient profile payload
+        Action->>Action: Triggers sendWelcomeEmail() via Resend API
     end
 
     Action-->>Hook: Returns ActionResponse (success: true)
@@ -61,4 +62,6 @@ sequenceDiagram
 3. **Action Delegation**: The view hook invokes the Next.js Server Action (`registerPatientAction`), passing a plain serializable data transfer object.
 4. **Security & Identity Execution**: The Server Action creates a secure client instance, runs the backend Zod validation schema, and calls the use-case.
 5. **Database Transaction**: The repository invokes `supabase.auth.signUp()`. A PostgreSQL database trigger automatically translates auth credentials into a structured profile row in the `users` table.
-6. **Confirmation & OTP**: The client receives a success status, alerts the patient via a toast, and routes them to the verification screen.
+6. **Transactional Custom Email (Resend)**: The Server Action securely triggers a custom welcome email directly through the **Resend API** to bypass generic default Supabase mailers.
+7. **Confirmation & OTP**: The client receives a success status, alerts the patient via a toast, and routes them to the verification screen.
+   

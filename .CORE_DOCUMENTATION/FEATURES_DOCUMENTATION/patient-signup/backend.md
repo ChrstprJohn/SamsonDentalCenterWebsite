@@ -101,6 +101,54 @@ export const registerPatientUseCase = (
 
 ---
 
+## ✉️ Email Dispatch Integration (Transactional Outbox Pattern)
+
+Instead of relying on Supabase’s default automated verification emails or blocking API requests with direct Resend integration, our architecture uses a **Transactional Outbox** pattern combined with Next.js's **`after()`** API to safely queue and dispatch custom branded OTP emails.
+
+### 1. Silent OTP Generation and Queueing (`patient-profile.commands.ts`)
+During registration, the backend generates an OTP silently via the Supabase Admin Auth API, queues the email transactionally in `email_outbox`, and completes the registration:
+
+```typescript
+// 1. Sign up user via Supabase Auth Admin and generate OTP (Link) silently
+const { data: authData, error: authError } = await supabaseAdmin.auth.admin.generateLink({
+  type: 'signup',
+  email: data.email,
+  password: data.password,
+  options: {
+    data: { firstName: data.firstName, lastName: data.lastName, role: 'PATIENT' }
+  }
+});
+
+// 2. Queue the OTP email in the transactional outbox
+const otpCode = authData.properties?.email_otp;
+if (otpCode) {
+  const outbox = emailOutboxCommands(supabaseAdmin);
+  await outbox.queueEmail(
+    data.email,
+    'Your Samson Dental Center Verification Code',
+    'signup_otp',
+    { firstName: data.firstName, otpCode }
+  );
+}
+```
+
+### 2. Zero-Blocking Background Dispatch in Server Action (`register-patient.action.ts`)
+The server action processes the signup request and schedules the email outbox processor using Next.js `after()`, returning a quick HTTP response without waiting for Resend API calls:
+
+```typescript
+const newPatient = await useCase(validData);
+
+// Non-blocking background worker trigger
+after(async () => {
+  const processOutbox = processOutboxUseCase(supabaseAdmin);
+  await processOutbox();
+});
+
+return { success: true, data: newPatient };
+```
+
+---
+
 ## 🧪 Backend Unit Testing Strategies
 
 Our backend is tested using modular mock closures to guarantee reliability:

@@ -2,6 +2,10 @@ import { describe, it, expect, vi } from 'vitest';
 import { createPatientCommand } from './patient-profile.commands';
 import { RegisterPatientDto } from '../../dtos';
 import { DomainError } from '@/shared/errors';
+import { emailOutboxCommands } from '../../../emails';
+
+vi.mock('server-only', () => ({}));
+vi.mock('../../../emails');
 
 describe('PatientProfileCommands (Functional)', () => {
   it('successfully creates a patient', async () => {
@@ -25,13 +29,21 @@ describe('PatientProfileCommands (Functional)', () => {
       created_at: createdAt,
     };
     const mockSupabase = {
-      auth: { signUp: vi.fn().mockResolvedValue({ data: { user: { id: '123e4567-e89b-12d3-a456-426614174000' } }, error: null }) },
+      auth: { 
+        admin: {
+          generateLink: vi.fn().mockResolvedValue({ data: { user: { id: '123e4567-e89b-12d3-a456-426614174000' } }, error: null })
+        }
+      },
       from: vi.fn().mockReturnThis(),
       insert: vi.fn().mockReturnThis(),
       select: vi.fn().mockReturnThis(),
       eq: vi.fn().mockReturnThis(),
       single: vi.fn().mockResolvedValue({ data: mockInsertedRecord, error: null }),
     };
+
+    vi.mocked(emailOutboxCommands).mockReturnValue({
+      queueEmail: vi.fn(),
+    } as any);
 
     const createPatient = createPatientCommand(mockSupabase as any);
     const result = await createPatient(validData);
@@ -63,7 +75,11 @@ describe('PatientProfileCommands (Functional)', () => {
       confirmPassword: 'Password123!',
     };
     const mockSupabase = {
-      auth: { signUp: vi.fn().mockResolvedValue({ data: null, error: { message: 'Auth failed' } }) },
+      auth: { 
+        admin: {
+          generateLink: vi.fn().mockResolvedValue({ data: null, error: { message: 'Auth failed' } })
+        }
+      },
       from: vi.fn().mockReturnThis(),
       insert: vi.fn().mockReturnThis(),
       select: vi.fn().mockReturnThis(),

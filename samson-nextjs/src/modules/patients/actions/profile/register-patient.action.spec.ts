@@ -1,16 +1,23 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { registerPatientAction } from './register-patient.action';
 import { getAuthenticatedUser } from '@/shared/auth/auth.util';
-import { createClient } from '@/shared/database/server';
+import { createAdminClient } from '@/shared/database/server';
 import { RegisterPatientUseCase } from '../../use-cases';
 
 // 1. Mocks
 vi.mock('server-only', () => ({}));
 vi.mock('@/shared/auth/auth.util');
 vi.mock('@/shared/database/server');
+vi.mock('next/server', () => ({
+  after: vi.fn((cb) => cb()),
+}));
 const { mockExecute } = vi.hoisted(() => {
   return { mockExecute: vi.fn() };
 });
+
+vi.mock('../../../emails', () => ({
+  processOutboxUseCase: vi.fn().mockReturnValue(vi.fn()),
+}));
 
 vi.mock('../../use-cases/profile/register-patient.use-case', () => {
   return {
@@ -32,7 +39,7 @@ describe('registerPatientAction', () => {
         // Arrange
         const mockUser = { id: 'user_123' };
         vi.mocked(getAuthenticatedUser).mockResolvedValue(mockUser as any);
-        vi.mocked(createClient).mockResolvedValue({} as any);
+        vi.mocked(createAdminClient).mockResolvedValue({} as any);
 
         mockExecute.mockResolvedValue({ id: 'patient_789', firstName: 'John' });
 

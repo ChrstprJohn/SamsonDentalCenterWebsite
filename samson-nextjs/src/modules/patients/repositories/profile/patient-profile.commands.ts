@@ -1,15 +1,18 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { DomainError } from '@/shared/errors';
+import { emailOutboxCommands } from '../../../emails';
 import {
   RegisterPatientDto,
   PatientProfileDto,
   patientProfileSchema,
 } from '../../dtos';
 
-export const createPatientCommand = (supabase: SupabaseClient) => {
+export const createPatientCommand = (supabaseAdmin: SupabaseClient) => {
   return async (data: RegisterPatientDto): Promise<PatientProfileDto> => {
-    // 1. Sign up the user via Supabase Auth
-    const { data: authData, error: authError } = await supabase.auth.signUp({
+    // 1. Sign up the user via Supabase Auth Admin and generate OTP (Link)
+    // We use the admin client so we can generate the token without sending the native email
+    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.generateLink({
+      type: 'signup',
       email: data.email,
       password: data.password,
       options: {
@@ -30,8 +33,20 @@ export const createPatientCommand = (supabase: SupabaseClient) => {
       );
     }
 
-    // 2. Fetch the newly created profile from the 'users' table (inserted via Postgres Trigger)
-    const { data: userProfile, error: profileError } = await supabase
+    // 2. Queue the OTP email in the transactional outbox
+    const otpCode = authData.properties?.email_otp;
+    if (otpCode) {
+      const outbox = emailOutboxCommands(supabaseAdmin);
+      await outbox.queueEmail(
+        data.email,
+        'Your Samson Dental Center Verification Code',
+        'signup_otp',
+        { firstName: data.firstName, otpCode }
+      );
+    }
+
+    // 3. Fetch the newly created profile from the 'users' table (inserted via Postgres Trigger)
+    const { data: userProfile, error: profileError } = await supabaseAdmin
       .from('users')
       .select('*')
       .eq('id', authData.user.id)

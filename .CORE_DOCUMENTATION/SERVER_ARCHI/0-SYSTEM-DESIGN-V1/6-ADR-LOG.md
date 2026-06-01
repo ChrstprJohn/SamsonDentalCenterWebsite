@@ -36,3 +36,12 @@ This document serves as the historical log for major architectural decisions in 
 * **Decision:** We will never break a live API route. Instead, we will use **Additive Routing**. When breaking changes are needed, we create a new `/v2` controller route. The `/v1` controller is converted into a Gatekeeper that translates legacy inputs into the modern shape and passes them to the single, shared underlying Service layer.
 * **Consequences:** Our core business logic stays clean and un-versioned. We must maintain translation logic in legacy controllers until old clients are deprecated.
 * **Reference:** [5-API_VERSIONING.md](5-API_VERSIONING.md)
+
+---
+
+## ADR-004: Transactional Outbox for OTP Emails
+* **Date:** June 2026
+* **Status:** Accepted
+* **Context:** Supabase provides default email sending capabilities, but they are limited in UI customization (React Email) and error observability. Sending emails directly in the signup API route blocks the HTTP response and risks failure if the email provider hangs.
+* **Decision:** We will use the **Transactional Outbox Pattern** combined with **Next.js `after()`**. OTPs are generated and saved to an `email_outbox` Postgres table in the same transaction as user creation. A background worker reads the outbox and dispatches beautiful React Email templates via Resend.
+* **Consequences:** We gain 100% guarantee that the email is queued if the user is created. We get full visibility into failed emails in the DB. The API response to the user is instantaneous.

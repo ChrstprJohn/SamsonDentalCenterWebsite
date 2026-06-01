@@ -121,3 +121,19 @@ Tracks actions performed by staff (Secretaries/Admins) for accountability.
 | `target_id` | `uuid` | Not Null | ID of the affected record (e.g., Appointment ID) |
 | `reason` | `text` | Nullable | |
 | `created_at` | `timestamptz` | Default: `now()` | |
+
+### 8. `email_outbox`
+Stores outbound emails to guarantee delivery using the Transactional Outbox pattern.
+
+| Column | Type | Constraints | Description |
+|---|---|---|---|
+| `id` | `uuid` | Primary Key, Default: `uuid_generate_v4()` | |
+| `recipient` | `text` | Not Null | Recipient's email address |
+| `subject` | `text` | Not Null | Email subject line |
+| `template_name`| `text` | Not Null | e.g., 'signup_otp' |
+| `payload` | `jsonb`| Not Null | Template variables (JSON format) |
+| `status` | `email_status`| Default: `PENDING` | Enum: `PENDING`, `SENT`, `FAILED` |
+| `error_logs` | `text` | Nullable | Captures API failure reason |
+| `retry_count` | `int`  | Default: 0 | Auto-increments up to 3 |
+| `created_at` | `timestamptz`| Default: `now()` | |
+| `updated_at` | `timestamptz`| Default: `now()` | |

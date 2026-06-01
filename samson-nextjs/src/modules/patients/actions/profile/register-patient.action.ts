@@ -1,23 +1,31 @@
 'use server';
 
 import { z } from 'zod';
-import { createClient } from '@/shared/database/server';
+import { createAdminClient } from '@/shared/database/server';
+import { after } from 'next/server';
 import { DomainError } from '@/shared/errors';
 import { registerPatientSchema, RegisterPatientDto } from '../../dtos';
 import { createPatientCommand } from '../../repositories';
 import { registerPatientUseCase } from '../../use-cases';
+import { processOutboxUseCase } from '../../../emails';
 
 import { ActionResponse } from '@/shared/utils/action-response';
 
 export async function registerPatientAction(formData: RegisterPatientDto): Promise<ActionResponse<any>> {
   try {
     const validData = registerPatientSchema.parse(formData);
-    const supabase = await createClient();
-    const repo = createPatientCommand(supabase);
+    const supabaseAdmin = await createAdminClient();
+    const repo = createPatientCommand(supabaseAdmin);
     const useCase = registerPatientUseCase(repo);
     
     // We no longer fetch a mock user ID, Supabase Auth handles it.
     const newPatient = await useCase(validData);
+    
+    // Non-blocking background worker trigger
+    after(async () => {
+      const processOutbox = processOutboxUseCase(supabaseAdmin);
+      await processOutbox();
+    });
     
     return { success: true, data: newPatient };
   } catch (error) {
