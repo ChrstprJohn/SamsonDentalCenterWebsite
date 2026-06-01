@@ -6,6 +6,7 @@ import type { BookingSlot } from '../../hooks/booking/use-user-booking';
 interface DateTimeStepProps {
   selectedDate: string | null;
   selectedSlot: BookingSlot | null;
+  availableSlots?: BookingSlot[];
   slotHoldRemaining: number;
   isSlotHoldActive: boolean;
   onSelectDate: (date: string) => void;
@@ -23,11 +24,13 @@ const MOCK_SLOTS: BookingSlot[] = [
 export function DateTimeStep({
   selectedDate,
   selectedSlot,
+  availableSlots,
   slotHoldRemaining,
   isSlotHoldActive,
   onSelectDate,
   onSelectSlot,
 }: DateTimeStepProps) {
+  const slotsToDisplay = availableSlots || MOCK_SLOTS;
   // Get next 7 days for scheduling
   const dates = Array.from({ length: 7 }, (_, i) => {
     const d = new Date();
@@ -87,26 +90,36 @@ export function DateTimeStep({
       {selectedDate ? (
         <div className="flex flex-col gap-4 mt-2">
           <h4 className="text-sm font-bold text-slate-800 dark:text-white">Available Time Slots</h4>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {MOCK_SLOTS.map((slot) => {
-              const isSelected = selectedSlot?.time === slot.time;
-              return (
-                <button
-                  key={slot.time}
-                  type="button"
-                  onClick={() => onSelectSlot(slot)}
-                  className={`p-3 rounded-xl border text-left transition-all duration-200 cursor-pointer ${
-                    isSelected
-                      ? 'border-blue-500 bg-blue-50/40 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold ring-2 ring-blue-500/20'
-                      : 'border-slate-200/80 dark:border-white/5 bg-white dark:bg-slate-900/30 text-slate-700 dark:text-slate-350 hover:border-slate-350'
-                  }`}
-                >
-                  <span className="text-xs font-extrabold block">{slot.time}</span>
-                  <span className="text-[9px] text-slate-400 block truncate mt-0.5">{slot.doctorName}</span>
-                </button>
-              );
-            })}
-          </div>
+          {slotsToDisplay.length > 0 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {slotsToDisplay.map((slot) => {
+                const isSelected = selectedSlot?.time === slot.time;
+                return (
+                  <button
+                    key={slot.time}
+                    type="button"
+                    onClick={() => onSelectSlot(slot)}
+                    className={`p-3 rounded-xl border text-left transition-all duration-200 cursor-pointer ${
+                      isSelected
+                        ? 'border-blue-500 bg-blue-50/40 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold ring-2 ring-blue-500/20'
+                        : 'border-slate-200/80 dark:border-white/5 bg-white dark:bg-slate-900/30 text-slate-700 dark:text-slate-350 hover:border-slate-350'
+                    }`}
+                  >
+                    <span className="text-xs font-extrabold block">{slot.time}</span>
+                    <span className="text-[9px] text-slate-400 block truncate mt-0.5">{slot.doctorName}</span>
+                  </button>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="text-center py-6 px-4 border border-dashed border-slate-200 dark:border-white/10 rounded-2xl bg-slate-50/50 dark:bg-slate-900/20">
+              <span className="text-2xl mb-2 block">📅</span>
+              <h5 className="text-sm font-bold text-slate-800 dark:text-slate-200">No Slots Available</h5>
+              <p className="text-xs text-slate-500 mt-1 max-w-[250px] mx-auto">
+                All doctors are fully booked on this date. Please select a different day from the calendar above.
+              </p>
+            </div>
+          )}
 
           {/* Real-time hold countdown */}
           {isSlotHoldActive && selectedSlot && (

@@ -1,5 +1,6 @@
 import React from 'react';
 import { getServicesAction } from '@/modules/services/actions/management/get-services.action';
+import { getClinicConfigAction } from '@/modules/clinic-config/actions/settings/get-clinic-config.action';
 import { BookingView } from '@/modules/appointments/views/booking-view';
 import type { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
 
@@ -10,14 +11,43 @@ export const metadata = {
 
 export default async function BookingPage() {
   let services: ServiceResponseDto[] = [];
+  let clinicConfig = null;
 
   try {
-    const response = await getServicesAction(false);
-    if (response && 'data' in response && response.data) {
-      services = response.data;
+    const [servicesRes, configRes] = await Promise.all([
+      getServicesAction(false),
+      getClinicConfigAction()
+    ]);
+    
+    if (servicesRes && 'data' in servicesRes && servicesRes.data) {
+      services = servicesRes.data;
+    }
+    if (configRes && 'data' in configRes && configRes.data) {
+      clinicConfig = configRes.data;
     }
   } catch (err) {
-    console.error('Failed to load services on booking portal page:', err);
+    console.error('Failed to load data on booking portal page:', err);
+  }
+
+  const isBookingOpen = clinicConfig?.isBookingOpen ?? true;
+  const maintenanceMessage = clinicConfig?.maintenanceMessage || 'Online booking is temporarily disabled. Please contact the clinic directly to schedule an appointment.';
+
+  if (!isBookingOpen) {
+    return (
+      <main className="flex-1 flex items-center justify-center p-6 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-905 dark:to-slate-950 min-h-[80vh]">
+        <div className="w-full max-w-xl p-10 rounded-3xl border border-amber-200/50 dark:border-amber-500/10 bg-white/70 dark:bg-slate-950/40 backdrop-blur-2xl shadow-2xl text-center flex flex-col gap-6">
+          <div className="w-16 h-16 mx-auto rounded-full bg-amber-100 dark:bg-amber-500/10 flex items-center justify-center text-3xl">
+            🛑
+          </div>
+          <div className="flex flex-col gap-3">
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Booking Currently Closed</h1>
+            <p className="text-slate-600 dark:text-slate-400">
+              {maintenanceMessage}
+            </p>
+          </div>
+        </div>
+      </main>
+    );
   }
 
   return (
