@@ -41,6 +41,7 @@ const validData: SignUpInput = {
   phoneNumber: '+1234567890',
   dateOfBirth: '1990-01-01',
   password: 'StrongPass1',
+  confirmPassword: 'StrongPass1',
   acceptTerms: true,
 };
 

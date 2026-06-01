@@ -39,12 +39,51 @@ describe('RegisterPatientDto', () => {
       firstName: 'John',
       lastName: 'Doe',
       phoneNumber: '1234567890',
-      dateOfBirth: '01-01-1990', // Wrong format
+      dateOfBirth: 'not-a-date', // Truly wrong format
       password: 'Password123!',
       confirmPassword: 'Password123!',
     };
     
     const result = registerPatientSchema.safeParse(invalidData);
     expect(result.success).toBe(false);
+  });
+
+  it('normalizes different date of birth formats', () => {
+    const baseData = {
+      email: 'test@example.com',
+      firstName: 'John',
+      lastName: 'Doe',
+      phoneNumber: '1234567890',
+      password: 'Password123!',
+      confirmPassword: 'Password123!',
+    };
+
+    // 1. Test MM/DD/YYYY format
+    const result1 = registerPatientSchema.parse({
+      ...baseData,
+      dateOfBirth: '05/07/2026',
+    });
+    expect(result1.dateOfBirth).toBe('2026-05-07');
+
+    // 2. Test MM/DD/YY format (1900s)
+    const result2 = registerPatientSchema.parse({
+      ...baseData,
+      dateOfBirth: '05/07/90',
+    });
+    expect(result2.dateOfBirth).toBe('1990-05-07');
+
+    // 3. Test MM/DD/YY format (2000s)
+    const result3 = registerPatientSchema.parse({
+      ...baseData,
+      dateOfBirth: '05/07/26',
+    });
+    expect(result3.dateOfBirth).toBe('2026-05-07');
+
+    // 4. Test MM-DD-YYYY format with dashes
+    const result4 = registerPatientSchema.parse({
+      ...baseData,
+      dateOfBirth: '05-07-2026',
+    });
+    expect(result4.dateOfBirth).toBe('2026-05-07');
   });
 });

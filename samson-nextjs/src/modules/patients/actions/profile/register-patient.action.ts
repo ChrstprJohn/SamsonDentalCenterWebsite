@@ -39,6 +39,7 @@ export const registerPatientAction = async (
     return { success: true, data: newPatient };
   } catch (error) {
     if (error instanceof z.ZodError) {
+      console.error('VALIDATION FAILED ON SERVER:', error.flatten().fieldErrors);
       return {
         success: false,
         error: 'Validation failed',

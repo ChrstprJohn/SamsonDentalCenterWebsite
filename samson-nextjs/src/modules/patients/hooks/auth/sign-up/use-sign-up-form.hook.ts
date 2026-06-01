@@ -4,7 +4,7 @@ import { signUpSchema, SignUpInput } from '../../../dtos/auth/sign-up.dto';
 
 export function useSignUpForm() {
   return useForm<SignUpInput>({
-    resolver: zodResolver(signUpSchema),
+    resolver: zodResolver(signUpSchema) as any,
     defaultValues: {
       firstName: '',
       middleName: '',

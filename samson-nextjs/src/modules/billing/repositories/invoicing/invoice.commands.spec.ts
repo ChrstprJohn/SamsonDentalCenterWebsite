@@ -40,7 +40,7 @@ describe("InvoiceCommandsRepository", () => {
 
     const repo = new InvoiceCommandsRepository(mockSupabase);
     const result = await repo.generateInvoice({
-      appointment_id: "1a95a63c-333e-4b68-98e3-82bdf1a07bd2",
+      appointmentId: "1a95a63c-333e-4b68-98e3-82bdf1a07bd2",
       amount: 900,
       status: "DRAFT",
     });
@@ -55,7 +55,7 @@ describe("InvoiceCommandsRepository", () => {
     const repo = new InvoiceCommandsRepository(mockSupabase);
     await expect(
       repo.generateInvoice({
-        appointment_id: "1a95a63c-333e-4b68-98e3-82bdf1a07bd2",
+        appointmentId: "1a95a63c-333e-4b68-98e3-82bdf1a07bd2",
         amount: 900,
         status: "DRAFT",
       })

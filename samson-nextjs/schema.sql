@@ -178,19 +178,31 @@ CREATE TRIGGER update_appointments_modtime BEFORE UPDATE ON appointments FOR EAC
 CREATE TRIGGER update_invoices_modtime BEFORE UPDATE ON invoices FOR EACH ROW EXECUTE FUNCTION update_modified_column();
 
 -- ============================================================================
--- 5. SUPABASE AUTH TRIGGER (Automatically creates a 'users' row on Signup)
--- ============================================================================
 CREATE OR REPLACE FUNCTION public.handle_new_user() 
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO public.users (id, email, first_name, last_name, phone_number, role, is_active)
+  INSERT INTO public.users (
+    id, 
+    email, 
+    first_name, 
+    last_name, 
+    middle_name, 
+    suffix, 
+    phone_number, 
+    date_of_birth, 
+    role, 
+    is_active
+  )
   VALUES (
     NEW.id, 
     NEW.email, 
     COALESCE(NEW.raw_user_meta_data->>'firstName', 'Unknown'), 
     COALESCE(NEW.raw_user_meta_data->>'lastName', 'Unknown'), 
+    NEW.raw_user_meta_data->>'middleName', 
+    NEW.raw_user_meta_data->>'suffix', 
     COALESCE(NEW.raw_user_meta_data->>'phoneNumber', ''), 
-    'PATIENT'::user_role,
+    NULLIF(NEW.raw_user_meta_data->>'dateOfBirth', '')::DATE, 
+    'PATIENT'::public.user_role,
     true
   );
   RETURN NEW;

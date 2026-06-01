@@ -13,7 +13,9 @@ describe('RegisterPatientUseCase (Functional)', () => {
       suffix: 'Jr.',
       email: 'john.doe@example.com', 
       dateOfBirth: '1990-01-01',
-      phoneNumber: '+1234567890'
+      phoneNumber: '+1234567890',
+      password: 'password123',
+      confirmPassword: 'password123'
     };
     
     const mockCreatedPatient = { id: 'patient-abc', ...mockDto };

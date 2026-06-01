@@ -14,7 +14,7 @@ describe("GenerateInvoiceUseCase", () => {
     } as unknown as InvoiceCommandsRepository;
 
     const payload = {
-      appointment_id: "1a95a63c-333e-4b68-98e3-82bdf1a07bd2",
+      appointmentId: "1a95a63c-333e-4b68-98e3-82bdf1a07bd2",
       amount: 900,
       status: "DRAFT" as const,
     };

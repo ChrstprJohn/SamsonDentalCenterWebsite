@@ -81,6 +81,7 @@ export function SignUpForm({ register, onSubmit, errors, isLoading }: SignUpForm
         error={errors.password?.message}
         {...register('password')}
         placeholder="Create a strong password"
+        autoComplete="new-password"
         disabled={isLoading}
       />
 
@@ -90,6 +91,7 @@ export function SignUpForm({ register, onSubmit, errors, isLoading }: SignUpForm
         error={errors.confirmPassword?.message}
         {...register('confirmPassword')}
         placeholder="Re-enter your password"
+        autoComplete="new-password"
         disabled={isLoading}
       />
 

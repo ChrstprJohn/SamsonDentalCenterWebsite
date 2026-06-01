@@ -31,8 +31,8 @@ export const patientProfileSchema = z.preprocess(
     phoneNumber: z.string().regex(/^\+?[1-9]\d{1,14}$/, "Must be a valid E.164 phone number"),
     dateOfBirth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Must be in YYYY-MM-DD format"),
     avatarUrl: z.string().url().nullable().optional(),
-    createdAt: z.string().datetime().optional(),
-    updatedAt: z.string().datetime().optional(),
+    createdAt: z.string().optional(),
+    updatedAt: z.string().optional(),
   })
 );
 

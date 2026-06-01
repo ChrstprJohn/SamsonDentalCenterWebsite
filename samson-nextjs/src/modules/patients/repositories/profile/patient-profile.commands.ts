@@ -33,39 +33,45 @@ export const createPatientCommand = (supabaseAdmin: SupabaseClient) => {
       );
     }
 
-    // 2. Queue the PATIENT_REGISTERED event in the transactional outbox
-    const otpCode = authData.properties?.email_otp;
-    if (otpCode) {
-      const outbox = outboxCommands(supabaseAdmin);
-      await outbox.emitEvent('PATIENT_REGISTERED', { 
-        email: data.email, 
-        firstName: data.firstName, 
-        otpCode 
-      });
+    try {
+      // 2. Queue the PATIENT_REGISTERED event in the transactional outbox
+      const otpCode = authData.properties?.email_otp;
+      if (otpCode) {
+        const outbox = outboxCommands(supabaseAdmin);
+        await outbox.emitEvent('PATIENT_REGISTERED', { 
+          email: data.email, 
+          firstName: data.firstName, 
+          otpCode 
+        });
+      }
+
+      // 3. Fetch the newly created profile from the 'users' table (inserted via Postgres Trigger)
+      const { data: userProfile, error: profileError } = await supabaseAdmin
+        .from('users')
+        .select('*')
+        .eq('id', authData.user.id)
+        .single();
+
+      if (profileError || !userProfile) {
+        // Fallback construction in case of trigger lag
+        return patientProfileSchema.parse({
+          id: authData.user.id,
+          email: data.email,
+          first_name: data.firstName,
+          last_name: data.lastName,
+          phone_number: data.phoneNumber,
+          date_of_birth: data.dateOfBirth,
+          role: 'PATIENT',
+          is_active: true,
+        });
+      }
+
+      return patientProfileSchema.parse(userProfile);
+    } catch (error) {
+      // Rollback Auth user if downstream operations fail (guarantees atomicity)
+      await supabaseAdmin.auth.admin.deleteUser(authData.user.id);
+      throw error;
     }
-
-    // 3. Fetch the newly created profile from the 'users' table (inserted via Postgres Trigger)
-    const { data: userProfile, error: profileError } = await supabaseAdmin
-      .from('users')
-      .select('*')
-      .eq('id', authData.user.id)
-      .single();
-
-    if (profileError || !userProfile) {
-      // Fallback construction in case of trigger lag
-      return patientProfileSchema.parse({
-        id: authData.user.id,
-        email: data.email,
-        first_name: data.firstName,
-        last_name: data.lastName,
-        phone_number: data.phoneNumber,
-        date_of_birth: data.dateOfBirth,
-        role: 'PATIENT',
-        is_active: true,
-      });
-    }
-
-    return patientProfileSchema.parse(userProfile);
   };
 };
 
