@@ -3,6 +3,7 @@ import { resetPasswordAction } from './reset-password.action';
 import { createClient } from '@/shared/database/server';
 
 // Mock dependencies
+vi.mock('server-only', () => ({}));
 vi.mock('@/shared/database/server', () => ({
   createClient: vi.fn(),
 }));

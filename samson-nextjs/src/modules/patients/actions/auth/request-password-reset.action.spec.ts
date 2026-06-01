@@ -3,7 +3,7 @@ import { requestPasswordResetAction } from './request-password-reset.action';
 import { requestPasswordResetCommand } from '../../repositories/auth/password-recovery.commands';
 import { globalOutboxDispatcher } from '@/shared/outbox/outbox.dispatcher';
 
-// Mock dependencies
+vi.mock('server-only', () => ({}));
 vi.mock('@/shared/database/server', () => ({
   createAdminClient: vi.fn().mockResolvedValue({}),
 }));

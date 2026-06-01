@@ -2,9 +2,19 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { verifyOtpAction, resendOtpAction } from './verify-otp.action';
 import { createClient, createAdminClient } from '@/shared/database/server';
 
+vi.mock('server-only', () => ({}));
 vi.mock('@/shared/database/server', () => ({
   createClient: vi.fn(),
   createAdminClient: vi.fn(),
+}));
+vi.mock('next/server', () => ({
+  after: vi.fn((cb) => cb()),
+}));
+vi.mock('@/orchestrators/event-subscribers', () => ({
+  bootstrapEventSubscribers: vi.fn(),
+}));
+vi.mock('@/shared/outbox/outbox.dispatcher', () => ({
+  globalOutboxDispatcher: vi.fn().mockReturnValue(vi.fn()),
 }));
 
 describe('verify-otp.action Server Actions', () => {
