@@ -11,14 +11,14 @@ interface ServicesSectionProps {
 
 export function ServicesSection({ services, onSelectService }: ServicesSectionProps) {
   return (
-    <section id="services" className="py-20 md:py-28 px-6 border-t border-slate-105 dark:border-white/5 bg-white dark:bg-slate-900/10">
+    <section id="services" className="py-20 md:py-28 px-6 border-t border-card-border bg-card">
       <div className="max-w-7xl mx-auto flex flex-col gap-12">
         <div className="text-center max-w-xl mx-auto">
-          <span className="text-xs uppercase font-bold tracking-widest text-blue-500 dark:text-blue-400">Treatments</span>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white mt-2 mb-4">
+          <span className="text-xs uppercase font-bold tracking-widest text-accent-blue-text">Treatments</span>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-text-primary mt-2 mb-4">
             Our Professional Services
           </h2>
-          <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+          <p className="text-sm text-text-secondary leading-relaxed">
             We offer comprehensive, patient-centered clinical dentistry using the highest standards of diagnostic accuracy.
           </p>
         </div>

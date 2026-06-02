@@ -77,17 +77,17 @@ export function Navbar({ user }: NavbarProps) {
     <header
       className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
         isScrolled
-          ? 'bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl shadow-md border-b border-slate-100 dark:border-white/5 py-3'
+          ? 'bg-card/85 backdrop-blur-xl shadow-md border-b border-card-border py-3'
           : 'bg-transparent py-5'
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xl font-bold shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform duration-200">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-start to-primary-end flex items-center justify-center text-white text-xl font-bold shadow-md shadow-primary-start/20 group-hover:scale-105 transition-transform duration-200">
             🦷
           </div>
-          <span className="text-lg font-bold tracking-tight bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300 bg-clip-text text-transparent group-hover:opacity-90 transition-opacity">
+          <span className="text-lg font-bold tracking-tight bg-gradient-to-r from-text-primary to-text-secondary bg-clip-text text-transparent group-hover:opacity-90 transition-opacity">
             Samson Dental
           </span>
         </Link>
@@ -100,7 +100,7 @@ export function Navbar({ user }: NavbarProps) {
                 key={item.href}
                 href={item.href}
                 onClick={(e) => handleNavClick(e, item.href)}
-                className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
+                className="text-sm font-medium text-text-secondary hover:text-accent-blue-text transition-colors"
               >
                 {item.label}
               </a>

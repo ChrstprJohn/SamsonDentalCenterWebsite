@@ -59,7 +59,7 @@ describe('useForgotPasswordView', () => {
       'If an account with that email exists, we sent a reset link.',
       'success'
     );
-    expect(mockPush).toHaveBeenCalledWith('/auth/verify-otp?email=test%40example.com&type=recovery');
+    expect(mockPush).toHaveBeenCalledWith('/auth/verify?email=test%40example.com&type=recovery');
   });
 
   it('should handle failed password reset request with field errors', async () => {

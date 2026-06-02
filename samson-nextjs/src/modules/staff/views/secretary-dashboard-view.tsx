@@ -276,8 +276,8 @@ export function SecretaryDashboardView() {
   return (
     <div className="flex flex-col gap-10">
       <div className="flex flex-col gap-1">
-        <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-white">Secretary Dashboard</h2>
-        <p className="text-xs text-slate-500">Coordinate clinic schedules, batch family bookings, check-in patients, and finalize transaction checkouts.</p>
+        <h2 className="text-2xl md:text-3xl font-extrabold text-text-primary">Secretary Dashboard</h2>
+        <p className="text-xs text-text-muted">Coordinate clinic schedules, batch family bookings, check-in patients, and finalize transaction checkouts.</p>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
@@ -287,7 +287,7 @@ export function SecretaryDashboardView() {
           {/* 👥 1. Pending & Grouped Booking Requests Panel */}
           <section className="flex flex-col gap-4">
             <div className="flex justify-between items-center">
-              <h3 className="text-sm font-bold uppercase tracking-wider text-slate-400">Pending Booking Queue</h3>
+              <h3 className="text-sm font-bold uppercase tracking-wider text-text-muted">Pending Booking Queue</h3>
               {selectedPendingIds.length > 0 && (
                 <Button
                   size="sm"
@@ -303,12 +303,12 @@ export function SecretaryDashboardView() {
               {Object.entries(familyGroups).map(([famId, members]) => (
                 <div
                   key={famId}
-                  className="p-5 rounded-3xl border border-blue-200/60 dark:border-white/5 bg-blue-500/5 backdrop-blur-md flex flex-col gap-4"
+                  className="p-5 rounded-3xl border border-card-border bg-accent-blue-bg/40 backdrop-blur-md flex flex-col gap-4"
                 >
-                  <div className="flex justify-between items-center border-b border-slate-100 dark:border-white/5 pb-3">
+                  <div className="flex justify-between items-center border-b border-card-border pb-3">
                     <div className="flex flex-col">
-                      <span className="text-xs font-bold text-blue-500 uppercase tracking-wider">Family Group Batched Row</span>
-                      <span className="text-[10px] text-slate-400 mt-0.5">Members scheduled on same dateUnit</span>
+                      <span className="text-xs font-bold text-primary-start uppercase tracking-wider">Family Group Batched Row</span>
+                      <span className="text-[10px] text-text-muted mt-0.5">Members scheduled on same dateUnit</span>
                     </div>
                     <Button
                       size="sm"
@@ -324,7 +324,7 @@ export function SecretaryDashboardView() {
 
                   <div className="flex flex-col gap-3">
                     {members.map((pb) => (
-                      <div key={pb.id} className="flex items-center gap-3 bg-white dark:bg-slate-900/60 p-3 rounded-2xl border border-slate-150 dark:border-white/5 text-xs justify-between">
+                      <div key={pb.id} className="flex items-center gap-3 bg-card p-3 rounded-2xl border border-card-border text-xs justify-between">
                         <div className="flex items-center gap-3">
                           <input
                             type="checkbox"
@@ -332,14 +332,14 @@ export function SecretaryDashboardView() {
                             onChange={() => handlePendingSelect(pb.id)}
                           />
                           <div className="flex flex-col">
-                            <span className="font-bold text-slate-800 dark:text-slate-200">
+                            <span className="font-bold text-text-primary">
                               {pb.patientName} ({pb.relationship})
                             </span>
-                            <span className="text-[10px] text-slate-400 mt-0.5">{pb.serviceName}</span>
+                            <span className="text-[10px] text-text-muted mt-0.5">{pb.serviceName}</span>
                           </div>
                         </div>
                         <div className="flex items-center gap-4">
-                          <span className="font-semibold text-slate-700 dark:text-slate-350">📅 {pb.date} at {pb.time}</span>
+                          <span className="font-semibold text-text-secondary">📅 {pb.date} at {pb.time}</span>
                           <div className="flex gap-2">
                             <Button
                               variant="secondary"
@@ -370,7 +370,7 @@ export function SecretaryDashboardView() {
 
               {/* Render Individual Bookings */}
               {individuals.map((pb) => (
-                <div key={pb.id} className="p-4 rounded-2xl border border-slate-200 dark:border-white/5 bg-white dark:bg-slate-900/40 flex items-center justify-between text-xs hover:shadow-md transition-shadow">
+                <div key={pb.id} className="p-4 rounded-2xl border border-card-border bg-card flex items-center justify-between text-xs hover:shadow-md transition-shadow">
                   <div className="flex items-center gap-3">
                     <input
                       type="checkbox"
@@ -378,12 +378,12 @@ export function SecretaryDashboardView() {
                       onChange={() => handlePendingSelect(pb.id)}
                     />
                     <div className="flex flex-col">
-                      <span className="font-bold text-slate-800 dark:text-slate-200">{pb.patientName}</span>
-                      <span className="text-[10px] text-slate-400 mt-0.5">{pb.serviceName}</span>
+                      <span className="font-bold text-text-primary">{pb.patientName}</span>
+                      <span className="text-[10px] text-text-muted mt-0.5">{pb.serviceName}</span>
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
-                    <span className="font-semibold text-slate-700 dark:text-slate-350">📅 {pb.date} at {pb.time}</span>
+                    <span className="font-semibold text-text-secondary">📅 {pb.date} at {pb.time}</span>
                     <div className="flex gap-2">
                       <Button
                         variant="secondary"
@@ -410,7 +410,7 @@ export function SecretaryDashboardView() {
               ))}
 
               {pendingQueue.length === 0 && (
-                <div className="text-center py-10 border border-dashed border-slate-200 dark:border-white/5 rounded-3xl text-sm text-slate-400">
+                <div className="text-center py-10 border border-dashed border-card-border rounded-3xl text-sm text-text-muted">
                   No pending booking requests awaiting review.
                 </div>
               )}
@@ -419,23 +419,23 @@ export function SecretaryDashboardView() {
 
           {/* 📍 2. Check-In & Arrival Tracker Panel */}
           <section className="flex flex-col gap-4">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-400">Check-In Tracker</h3>
+            <h3 className="text-sm font-bold uppercase tracking-wider text-text-muted">Check-In Tracker</h3>
             <div className="flex flex-col gap-4">
               {upcomingList.map((ua) => (
                 <div
                   key={ua.id}
-                  className="p-5 rounded-2xl border border-slate-200 dark:border-white/5 bg-white dark:bg-slate-900/40 flex flex-col sm:flex-row justify-between sm:items-center gap-4 hover:shadow-md transition-shadow"
+                  className="p-5 rounded-2xl border border-card-border bg-card flex flex-col sm:flex-row justify-between sm:items-center gap-4 hover:shadow-md transition-shadow"
                 >
                   <div className="flex flex-col gap-1">
                     <span className={`inline-flex self-start px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${
                       ua.status === 'CHECKED_IN'
-                        ? 'bg-blue-100 dark:bg-blue-500/10 text-blue-650 dark:text-blue-450'
-                        : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
+                        ? 'bg-accent-blue-bg text-accent-blue-text'
+                        : 'bg-secondary-bg text-text-secondary'
                     }`}>
                       {ua.status === 'CHECKED_IN' ? 'Checked In' : 'Scheduled'}
                     </span>
-                    <h4 className="text-base font-bold text-slate-800 dark:text-white mt-1">{ua.patientName}</h4>
-                    <p className="text-xs text-slate-500">📅 {ua.date} at {ua.time} | 👨‍⚕️ {ua.doctorName}</p>
+                    <h4 className="text-base font-bold text-text-primary mt-1">{ua.patientName}</h4>
+                    <p className="text-xs text-text-muted">📅 {ua.date} at {ua.time} | 👨‍⚕️ {ua.doctorName}</p>
                   </div>
                   <Button
                     variant={ua.status === 'CHECKED_IN' ? 'secondary' : 'primary'}
@@ -455,20 +455,20 @@ export function SecretaryDashboardView() {
           
           {/* 💳 3. Checkout Invoices Panel */}
           <section className="flex flex-col gap-4">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-400">Checkout Queue</h3>
+            <h3 className="text-sm font-bold uppercase tracking-wider text-text-muted">Checkout Queue</h3>
             <div className="flex flex-col gap-4">
               {draftInvoices.map((di) => (
                 <div
                   key={di.id}
-                  className="p-5 rounded-2xl border border-slate-200 dark:border-white/5 bg-white dark:bg-slate-900/40 flex flex-col gap-4 hover:shadow-md"
+                  className="p-5 rounded-2xl border border-card-border bg-card flex flex-col gap-4 hover:shadow-md"
                 >
                   <div className="flex flex-col">
                     <span className="text-[10px] text-amber-500 font-bold uppercase tracking-widest">Draft Invoice</span>
-                    <h4 className="font-bold text-slate-800 dark:text-white mt-1">{di.patientName}</h4>
-                    <span className="text-[10px] text-slate-400 mt-0.5">{di.serviceName} | Dr. {di.doctorName.replace('Dr. ', '')}</span>
+                    <h4 className="font-bold text-text-primary mt-1">{di.patientName}</h4>
+                    <span className="text-[10px] text-text-muted mt-0.5">{di.serviceName} | Dr. {di.doctorName.replace('Dr. ', '')}</span>
                   </div>
-                  <div className="flex justify-between items-center border-t border-slate-100 dark:border-white/5 pt-3">
-                    <span className="text-sm font-extrabold text-slate-800 dark:text-slate-200">${di.basePrice}</span>
+                  <div className="flex justify-between items-center border-t border-card-border pt-3">
+                    <span className="text-sm font-extrabold text-text-primary">${di.basePrice}</span>
                     <Button size="sm" onClick={() => setActiveInvoice(di)}>
                       Check-Out
                     </Button>
@@ -477,7 +477,7 @@ export function SecretaryDashboardView() {
               ))}
 
               {draftInvoices.length === 0 && (
-                <div className="text-center py-8 border border-dashed border-slate-200 dark:border-white/5 rounded-2xl text-xs text-slate-400">
+                <div className="text-center py-8 border border-dashed border-card-border rounded-2xl text-xs text-text-muted">
                   No draft invoices awaiting checkout.
                 </div>
               )}
@@ -486,24 +486,24 @@ export function SecretaryDashboardView() {
 
           {/* ✉️ 4. Email Communications Timeline */}
           <section className="flex flex-col gap-4">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-400">Patient Notifications</h3>
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/5 rounded-3xl p-5 shadow-lg flex flex-col gap-4">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-text-muted">Patient Notifications</h3>
+            <div className="bg-card border border-card-border rounded-3xl p-5 shadow-lg flex flex-col gap-4">
               <input
                 type="text"
                 placeholder="Search recipient or subject..."
                 value={emailSearch}
                 onChange={(e) => setEmailSearch(e.target.value)}
-                className="px-3 py-2 rounded-xl border border-slate-250 dark:border-white/5 bg-slate-50 dark:bg-slate-950 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 w-full text-slate-800 dark:text-white"
+                className="px-3 py-2 rounded-xl border border-card-border bg-card text-xs focus:outline-none focus:ring-2 focus:ring-primary-ring w-full text-text-primary"
               />
 
               <div className="flex flex-col gap-3 max-h-[300px] overflow-y-auto pr-1">
                 {filteredEmails.map((log, idx) => (
-                  <div key={idx} className="flex flex-col gap-0.5 p-3 rounded-xl border border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-slate-900/20 text-[10px]">
+                  <div key={idx} className="flex flex-col gap-0.5 p-3 rounded-xl border border-card-border bg-secondary-bg/50 text-[10px]">
                     <div className="flex justify-between">
-                      <span className="font-bold text-slate-700 dark:text-slate-350">{log.recipient}</span>
-                      <span className="text-slate-400">{log.timestamp.split(' ')[1] || log.timestamp}</span>
+                      <span className="font-bold text-text-primary">{log.recipient}</span>
+                      <span className="text-text-muted">{log.timestamp.split(' ')[1] || log.timestamp}</span>
                     </div>
-                    <span className="text-slate-500 mt-0.5">{log.subject}</span>
+                    <span className="text-text-secondary mt-0.5">{log.subject}</span>
                     <span className="inline-flex self-start px-1.5 py-0.2 rounded bg-emerald-500/10 text-emerald-500 text-[8px] font-bold uppercase mt-1">
                       {log.status}
                     </span>
@@ -517,18 +517,18 @@ export function SecretaryDashboardView() {
 
       {/* 📜 5. Audit Timelines Panel */}
       <section className="flex flex-col gap-4">
-        <h3 className="text-sm font-bold uppercase tracking-wider text-slate-400">Secretary Audit Timeline</h3>
-        <div className="border border-slate-200 dark:border-white/5 rounded-3xl overflow-hidden bg-white dark:bg-slate-900/20 divide-y divide-slate-150 dark:divide-white/5">
+        <h3 className="text-sm font-bold uppercase tracking-wider text-text-muted">Secretary Audit Timeline</h3>
+        <div className="border border-card-border rounded-3xl overflow-hidden bg-card divide-y divide-card-border">
           {audits.map((item, idx) => (
             <div key={idx} className="p-5 flex flex-col gap-1.5 text-xs">
               <div className="flex justify-between items-start">
-                <span className="inline-flex px-2 py-0.5 rounded bg-blue-500/10 text-blue-500 font-bold text-[9px] uppercase tracking-wider">
+                <span className="inline-flex px-2 py-0.5 rounded bg-accent-blue-bg text-accent-blue-text font-bold text-[9px] uppercase tracking-wider">
                   {item.action}
                 </span>
-                <span className="text-[10px] text-slate-400">{item.timestamp}</span>
+                <span className="text-[10px] text-text-muted">{item.timestamp}</span>
               </div>
-              <p className="text-slate-750 dark:text-slate-350 leading-relaxed mt-1">{item.details}</p>
-              <span className="text-[10px] text-slate-500">Actor: {item.actor}</span>
+              <p className="text-text-secondary leading-relaxed mt-1">{item.details}</p>
+              <span className="text-[10px] text-text-muted">Actor: {item.actor}</span>
             </div>
           ))}
         </div>
@@ -544,16 +544,16 @@ export function SecretaryDashboardView() {
         title="Approve Booking Request"
         size="sm"
       >
-        <form onSubmit={handleApproveSubmit} className="flex flex-col gap-4 text-sm text-slate-700 dark:text-slate-350 py-1">
+        <form onSubmit={handleApproveSubmit} className="flex flex-col gap-4 text-sm text-text-secondary py-1">
           <p className="leading-relaxed">
             Confirm administrative approval for the selected appointment(s)?
           </p>
           <div className="flex flex-col gap-1.5 mt-1">
-            <label className="text-xs font-semibold text-slate-500">Pick Approval Reason</label>
+            <label className="text-xs font-semibold text-text-secondary">Pick Approval Reason</label>
             <select
               value={approveReason}
               onChange={(e) => setApproveReason(e.target.value)}
-              className="px-3 py-2 rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-950 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800 dark:text-white"
+              className="px-3 py-2 rounded-lg border border-card-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary-ring text-text-primary"
             >
               <option value="Roster schedule cleared">Roster schedule cleared</option>
               <option value="Treatment room available">Treatment room available</option>
@@ -562,7 +562,7 @@ export function SecretaryDashboardView() {
             </select>
           </div>
 
-          <div className="flex gap-3 justify-end border-t border-slate-100 dark:border-white/5 pt-4 mt-3">
+          <div className="flex gap-3 justify-end border-t border-card-border pt-4 mt-3">
             <Button
               type="button"
               variant="secondary"
@@ -591,23 +591,23 @@ export function SecretaryDashboardView() {
         title="Reject Booking Request"
         size="sm"
       >
-        <form onSubmit={handleRejectSubmit} className="flex flex-col gap-4 text-sm text-slate-700 dark:text-slate-350 py-1">
+        <form onSubmit={handleRejectSubmit} className="flex flex-col gap-4 text-sm text-text-secondary py-1">
           <p className="leading-relaxed">
             Specify the mandatory rejection reason for: <strong>{activePending?.patientName}</strong>?
           </p>
           <div className="flex flex-col gap-1.5 mt-1">
-            <label className="text-xs font-semibold text-slate-500">Mandatory Reason Details</label>
+            <label className="text-xs font-semibold text-text-secondary">Mandatory Reason Details</label>
             <textarea
               required
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
               placeholder="Enter rejection reason (e.g. clinic fully booked, conflicting treatment plan)..."
               rows={3}
-              className="px-3 py-2 rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-950 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800 dark:text-white"
+              className="px-3 py-2 rounded-lg border border-card-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary-ring text-text-primary"
             />
           </div>
 
-          <div className="flex gap-3 justify-end border-t border-slate-100 dark:border-white/5 pt-4 mt-3">
+          <div className="flex gap-3 justify-end border-t border-card-border pt-4 mt-3">
             <Button
               type="button"
               variant="secondary"
@@ -637,32 +637,32 @@ export function SecretaryDashboardView() {
         size="md"
       >
         {activeInvoice && (
-          <form onSubmit={handleCheckoutSubmit} className="flex flex-col gap-4 text-sm text-slate-700 dark:text-slate-350 py-1">
+          <form onSubmit={handleCheckoutSubmit} className="flex flex-col gap-4 text-sm text-text-secondary py-1">
             <div className="flex flex-col gap-0.5">
-              <span className="text-[10px] text-slate-400 uppercase tracking-widest">Draft Receipt</span>
-              <h4 className="text-base font-bold text-slate-900 dark:text-white">{activeInvoice.patientName}</h4>
-              <p className="text-xs text-slate-500">{activeInvoice.serviceName} | Dr. {activeInvoice.doctorName}</p>
+              <span className="text-[10px] text-text-muted uppercase tracking-widest">Draft Receipt</span>
+              <h4 className="text-base font-bold text-text-primary">{activeInvoice.patientName}</h4>
+              <p className="text-xs text-text-muted">{activeInvoice.serviceName} | Dr. {activeInvoice.doctorName}</p>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 border-y border-slate-100 dark:border-white/5 py-4 my-2">
+            <div className="grid grid-cols-2 gap-4 border-y border-card-border py-4 my-2">
               <div className="flex flex-col gap-1">
-                <label className="text-xs font-semibold text-slate-500">Apply Discount (%)</label>
+                <label className="text-xs font-semibold text-text-secondary">Apply Discount (%)</label>
                 <input
                   type="number"
                   min="0"
                   max="100"
                   value={discountPercent}
                   onChange={(e) => setDiscountPercent(Math.max(0, Math.min(100, parseInt(e.target.value) || 0)))}
-                  className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-950 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800 dark:text-white w-full"
+                  className="px-3 py-1.5 rounded-lg border border-card-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary-ring text-text-primary w-full"
                 />
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="text-xs font-semibold text-slate-500">Payment Method</label>
+                <label className="text-xs font-semibold text-text-secondary">Payment Method</label>
                 <select
                   value={paymentMethod}
                   onChange={(e) => setPaymentMethod(e.target.value as any)}
-                  className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-950 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800 dark:text-white w-full"
+                  className="px-3 py-1.5 rounded-lg border border-card-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary-ring text-text-primary w-full"
                 >
                   <option value="CARD">Credit/Debit Card</option>
                   <option value="CASH">Cash Payment</option>
@@ -671,17 +671,17 @@ export function SecretaryDashboardView() {
               </div>
             </div>
 
-            <div className="flex justify-between items-center mt-2 p-4 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-100 dark:border-white/5">
+            <div className="flex justify-between items-center mt-2 p-4 bg-secondary-bg rounded-2xl border border-card-border">
               <div className="flex flex-col">
-                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Total Due</span>
-                <span className="text-lg font-extrabold text-blue-600 dark:text-blue-400">
+                <span className="text-[10px] text-text-muted font-bold uppercase tracking-wider">Total Due</span>
+                <span className="text-lg font-extrabold text-primary-start">
                   ${calculateFinalPrice(activeInvoice.basePrice, discountPercent)}
                 </span>
               </div>
-              <span className="text-xs text-slate-400">Base Price: ${activeInvoice.basePrice} | Discount: {discountPercent}%</span>
+              <span className="text-xs text-text-muted">Base Price: ${activeInvoice.basePrice} | Discount: {discountPercent}%</span>
             </div>
 
-            <div className="flex gap-3 justify-end border-t border-slate-100 dark:border-white/5 pt-4 mt-4">
+            <div className="flex gap-3 justify-end border-t border-card-border pt-4 mt-4">
               <Button
                 type="button"
                 variant="secondary"

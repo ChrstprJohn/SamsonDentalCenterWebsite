@@ -52,15 +52,15 @@ export default async function SecretaryPortalLayout({
 
   if (!isAuthorized) {
     return (
-      <div className="flex flex-col min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+      <div className="flex flex-col min-h-screen bg-background transition-colors duration-300">
         <Navbar user={headerUser} />
         <main className="flex-1 flex flex-col items-center justify-center p-6 text-center gap-6 pt-[120px]">
-          <div className="w-16 h-16 rounded-full bg-rose-100 dark:bg-rose-500/10 flex items-center justify-center text-3xl text-rose-600 dark:text-rose-400">
+          <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center text-3xl text-red-500">
             ⚠️
           </div>
           <div className="flex flex-col gap-2 max-w-md">
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Access Denied</h1>
-            <p className="text-xs text-slate-500 leading-relaxed">
+            <h1 className="text-2xl font-bold text-text-primary">Access Denied</h1>
+            <p className="text-xs text-text-muted leading-relaxed">
               Your patient account lacks necessary administrative credentials to access the Secretary operational dashboard. Please contact a roster administrator if you require clinical clearance.
             </p>
           </div>
@@ -74,7 +74,7 @@ export default async function SecretaryPortalLayout({
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+    <div className="flex flex-col min-h-screen bg-background transition-colors duration-300">
       <Navbar user={headerUser} />
       
       {/* Sidebar + Main content layout */}
@@ -83,14 +83,14 @@ export default async function SecretaryPortalLayout({
         <aside className="lg:col-span-3 flex flex-col gap-2">
           <Link
             href="/secretary"
-            className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors text-slate-700 dark:text-slate-200"
+            className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold hover:bg-secondary-bg transition-colors text-text-secondary hover:text-text-primary"
           >
             <span>🏠</span>
             Dashboard Queue
           </Link>
           <Link
             href="/secretary"
-            className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors text-slate-700 dark:text-slate-200"
+            className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold hover:bg-secondary-bg transition-colors text-text-secondary hover:text-text-primary"
           >
             <span>📋</span>
             Patient Records

@@ -46,7 +46,7 @@ export default async function UserPortalLayout({
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+    <div className="flex flex-col min-h-screen bg-background transition-colors duration-300">
       <Navbar user={headerUser} />
       
       {/* Sidebar + Main content layout */}
@@ -55,14 +55,14 @@ export default async function UserPortalLayout({
         <aside className="lg:col-span-3 flex flex-col gap-2">
           <Link
             href="/user"
-            className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors text-slate-700 dark:text-slate-200"
+            className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold hover:bg-secondary-bg transition-colors text-text-secondary hover:text-text-primary"
           >
             <span>🏠</span>
             My Dashboard
           </Link>
           <Link
             href="/user/settings"
-            className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors text-slate-700 dark:text-slate-200"
+            className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold hover:bg-secondary-bg transition-colors text-text-secondary hover:text-text-primary"
           >
             <span>⚙️</span>
             Profile Settings

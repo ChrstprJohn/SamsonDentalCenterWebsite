@@ -40,8 +40,8 @@ export function UserDashboardView({ initialAppointments, maxReschedules }: UserD
     <div className="flex flex-col gap-10">
       <div className="flex justify-between items-center">
         <div className="flex flex-col gap-1">
-          <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-white">Patient Dashboard</h2>
-          <p className="text-xs text-slate-500">Oversee, track, reschedule, or cancel your clinic reservations in real-time.</p>
+          <h2 className="text-2xl md:text-3xl font-extrabold text-text-primary">Patient Dashboard</h2>
+          <p className="text-xs text-text-muted">Oversee, track, reschedule, or cancel your clinic reservations in real-time.</p>
         </div>
         <Button onClick={() => router.push('/booking')}>
           + New Booking

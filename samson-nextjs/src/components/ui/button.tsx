@@ -17,13 +17,13 @@ export function Button({
 
   const variants = {
     primary:
-      'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/10 hover:from-blue-500 hover:to-indigo-500',
+      'bg-gradient-to-r from-primary-start to-primary-end text-white shadow-lg shadow-primary-start/10 hover:from-primary-hover-start hover:to-primary-hover-end',
     secondary:
-      'border border-slate-250 dark:border-slate-800 bg-white/5 text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-900',
+      'border border-card-border bg-card text-secondary-text hover:bg-secondary-bg-hover',
     danger:
       'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-lg shadow-red-500/10 hover:from-red-500 hover:to-rose-500',
     ghost:
-      'text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-900',
+      'text-text-secondary hover:text-text-primary hover:bg-secondary-bg',
     glass:
       'border border-white/10 bg-white/5 text-slate-100 backdrop-blur-md hover:bg-white/10 hover:border-white/20',
   };

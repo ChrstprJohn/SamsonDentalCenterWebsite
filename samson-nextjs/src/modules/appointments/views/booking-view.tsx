@@ -62,7 +62,7 @@ export function BookingView({ services }: BookingViewProps) {
   }
 
   return (
-    <div className="w-full max-w-2xl mx-auto p-6 md:p-10 rounded-3xl border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-slate-950/40 backdrop-blur-2xl shadow-2xl flex flex-col gap-8">
+    <div className="w-full max-w-2xl mx-auto p-6 md:p-10 rounded-3xl border border-card-border bg-card/75 backdrop-blur-2xl shadow-2xl flex flex-col gap-8">
       <BookingProgressTabs 
         currentStep={currentStep}
         goToStep={goToStep}
@@ -121,7 +121,7 @@ export function BookingView({ services }: BookingViewProps) {
       </div>
 
       {/* footer controls */}
-      <div className="flex items-center justify-between border-t border-slate-100 dark:border-white/5 pt-6 mt-4">
+      <div className="flex items-center justify-between border-t border-card-border pt-6 mt-4">
         <Button
           variant="secondary"
           onClick={prevStep}

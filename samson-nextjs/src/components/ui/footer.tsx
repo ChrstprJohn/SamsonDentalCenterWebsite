@@ -46,12 +46,12 @@ export function Footer({ config }: FooterProps) {
   };
 
   return (
-    <footer className="bg-slate-900 text-slate-400 border-t border-slate-800 py-16">
+    <footer className="bg-slate-950 text-slate-400 border-t border-slate-900 py-16">
       <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12">
         {/* Brand & Mission */}
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-lg font-bold shadow-md shadow-blue-500/20">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-start to-primary-end flex items-center justify-center text-white text-lg font-bold shadow-md shadow-primary-start/20">
               🦷
             </div>
             <span className="text-white text-lg font-bold tracking-tight">
@@ -87,17 +87,17 @@ export function Footer({ config }: FooterProps) {
           <h3 className="text-white text-sm font-semibold tracking-wider uppercase">Get In Touch</h3>
           <div className="flex flex-col gap-3 text-sm">
             <p className="flex items-start gap-2.5 leading-relaxed">
-              <span className="text-base text-blue-400">📍</span>
+              <span className="text-base text-primary-start">📍</span>
               {address}
             </p>
             <p className="flex items-center gap-2.5">
-              <span className="text-base text-blue-400">📞</span>
+              <span className="text-base text-primary-start">📞</span>
               <a href={`tel:${phone}`} className="hover:text-white transition-colors">
                 {phone}
               </a>
             </p>
             <p className="flex items-center gap-2.5">
-              <span className="text-base text-blue-400">✉️</span>
+              <span className="text-base text-primary-start">✉️</span>
               <a href={`mailto:${email}`} className="hover:text-white transition-colors">
                 {email}
               </a>

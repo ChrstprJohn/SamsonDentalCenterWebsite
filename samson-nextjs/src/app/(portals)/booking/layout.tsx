@@ -45,7 +45,7 @@ export default async function BookingLayout({
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+    <div className="flex flex-col min-h-screen bg-background transition-colors duration-300">
       <Navbar user={headerUser} />
       
       {/* Main content layout (no sidebar) */}

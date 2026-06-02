@@ -34,14 +34,14 @@ export default async function BookingPage() {
 
   if (!isBookingOpen) {
     return (
-      <main className="flex-1 flex items-center justify-center p-6 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-905 dark:to-slate-950 min-h-[80vh]">
-        <div className="w-full max-w-xl p-10 rounded-3xl border border-amber-200/50 dark:border-amber-500/10 bg-white/70 dark:bg-slate-950/40 backdrop-blur-2xl shadow-2xl text-center flex flex-col gap-6">
-          <div className="w-16 h-16 mx-auto rounded-full bg-amber-100 dark:bg-amber-500/10 flex items-center justify-center text-3xl">
+      <main className="flex-1 flex items-center justify-center p-6 bg-gradient-to-br from-background to-secondary-bg min-h-[80vh]">
+        <div className="w-full max-w-xl p-10 rounded-3xl border border-card-border bg-card/75 backdrop-blur-2xl shadow-2xl text-center flex flex-col gap-6">
+          <div className="w-16 h-16 mx-auto rounded-full bg-amber-500/10 flex items-center justify-center text-3xl">
             🛑
           </div>
           <div className="flex flex-col gap-3">
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Booking Currently Closed</h1>
-            <p className="text-slate-600 dark:text-slate-400">
+            <h1 className="text-2xl font-bold text-text-primary">Booking Currently Closed</h1>
+            <p className="text-text-secondary">
               {maintenanceMessage}
             </p>
           </div>
@@ -51,7 +51,7 @@ export default async function BookingPage() {
   }
 
   return (
-    <main className="flex-1 flex items-center justify-center p-6 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-905 dark:to-slate-950 min-h-[80vh]">
+    <main className="flex-1 flex items-center justify-center p-6 bg-gradient-to-br from-background to-secondary-bg min-h-[80vh]">
       <BookingView services={services} />
     </main>
   );
