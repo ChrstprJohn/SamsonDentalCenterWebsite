@@ -20,8 +20,8 @@
     "semantic_hash": "ac4f578815b1a96acbe3a5cd8783de4a"
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\next-env.d.ts": {
-    "mtime": 1780332729.706429,
-    "ast_hash": "2a74d3909800ca5467fa83b0ab4a4890",
+    "mtime": 1780458659.30898,
+    "ast_hash": "d0f8375ae1199dc7acd3977fc33b78b8",
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\next.config.ts": {
@@ -40,9 +40,9 @@
     "semantic_hash": "239f3ebf717465dc636818a1a619398d"
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\schema.sql": {
-    "mtime": 1780290177.8844895,
-    "ast_hash": "0fb77d84d09446bf103ee5cba1c2e3dd",
-    "semantic_hash": "0fb77d84d09446bf103ee5cba1c2e3dd"
+    "mtime": 1780459352.595958,
+    "ast_hash": "9ca7caffa29e42a17bb919a70b7c4222",
+    "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\app\\(portals)\\admin\\layout.tsx": {
     "mtime": 1780372603.390741,
@@ -3005,8 +3005,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\TASK\\task-booking-service.md": {
-    "mtime": 1780332215.3351684,
-    "ast_hash": "aa2c27e349ac34b67729733dc5c51cf1",
+    "mtime": 1780459482.590129,
+    "ast_hash": "1dac15bc2d0335485d051a6411b8c8c1",
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\TASK\\task-frontend-tailwind.md": {
@@ -3017,6 +3017,11 @@
   "C:\\Users\\picar\\Desktop\\samson-website\\.CORE_DOCUMENTATION\\SERVERLESS_ARCHI\\README.md": {
     "mtime": 1780458335.52151,
     "ast_hash": "ea4718c869f71649b351e990375481de",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\migrations\\20260603120100_add_services_rls_policy.sql": {
+    "mtime": 1780459347.1384141,
+    "ast_hash": "9c8d7fb1f4d53c2f8915022bba759b77",
     "semantic_hash": ""
   }
 }

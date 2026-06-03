@@ -1,5 +1,7 @@
 import React from 'react';
-import { getServicesAction } from '@/modules/services/actions/management/get-services.action';
+import { getServicesUseCase } from '@/modules/services/use-cases/management/get-services.use-case';
+import { getServicesQuery } from '@/modules/services/repositories/management/service.queries';
+import { createClient } from '@/shared/database/server';
 import { getClinicConfigAction } from '@/modules/clinic-config/actions/settings/get-clinic-config.action';
 import { BookingView } from '@/modules/appointments/views/booking-view';
 import type { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
@@ -14,14 +16,19 @@ export default async function BookingPage() {
   let clinicConfig = null;
 
   try {
+    const supabase = await createClient();
+    const query = getServicesQuery(supabase);
+    const useCase = getServicesUseCase(query);
+
     const [servicesRes, configRes] = await Promise.all([
-      getServicesAction(false),
+      useCase(false),
       getClinicConfigAction()
     ]);
     
-    if (servicesRes && 'data' in servicesRes && servicesRes.data) {
-      services = servicesRes.data;
+    if (servicesRes) {
+      services = servicesRes;
     }
+    
     if (configRes && 'data' in configRes && configRes.data) {
       clinicConfig = configRes.data;
     }

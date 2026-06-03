@@ -8,8 +8,8 @@ export const serviceDbSchema = z.object({
   price: z.number().nonnegative().nullable().optional(),
   service_type: z.enum(["GENERAL", "SPECIALIZED"]).default("GENERAL"),
   is_active: z.boolean().default(true),
-  created_at: z.string().datetime().optional(),
-  updated_at: z.string().datetime().optional(),
+  created_at: z.string().optional(),
+  updated_at: z.string().optional(),
 });
 
 export const serviceResponseSchema = serviceDbSchema.transform((record) => ({

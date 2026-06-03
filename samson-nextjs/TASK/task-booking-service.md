@@ -10,12 +10,14 @@
 ## To-Do List
 
 ### Phase 1: Fix Service Step Rendering
-- [ ] **1. Database & Seed Data**
-  - [ ] Add seed data to the `services` table (e.g., General Cleaning, Whitening, Orthodontics) with `is_active: true`.
-  - [ ] Validate Supabase RLS policies allow authenticated `SELECT` queries on `services`.
-- [ ] **2. Backend Integration & Data Validation**
-  - [ ] Ensure `getServicesAction(false)` fetches correctly.
-  - [ ] Verify `serviceResponseSchema` handles real DB payloads without strict parsing failures.
+- [x] **1. Database & Seed Data**
+  - [x] Add seed data to the `services` table (e.g., General Cleaning, Whitening, Orthodontics) with `is_active: true`.
+  - [x] Validate Supabase RLS policies allow authenticated `SELECT` queries on `services`.
+- [x] **2. Backend Integration & Data Validation**
+  - [x] Ensure `getServicesAction(false)` fetches correctly.
+  - [x] Verify `serviceResponseSchema` handles real DB payloads without strict parsing failures (fixed Zod `datetime()` strictness for Postgres timestamps).
+- [x] **3. Frontend Integration**
+  - [x] Ensure the booking flow UI correctly fetches and reflects the active services in Step 1.
 
 ### Phase 2: Align Step 2 with Business Plan (Doctor Selection)
 - [ ] **1. State Management Updates (`use-booking-state.ts`)**
@@ -43,6 +45,14 @@
   - [ ] Remove the `@deprecated` class wrappers from `appointment-booking.commands.ts` (`AppointmentBookingCommands`).
 - [ ] **4. Frontend God Component Prevention (`frontend/1-ARCHITECTURE.md`)**
   - [ ] Extract the footer action buttons (Next, Back, Submit) from `booking-view.tsx` into a separate `BookingFooterControls` sub-component to bring the view below the 150-line threshold (currently at 152 lines).
+- [x] **5. Server Action Data Fetching Violation (`frontend/1-ARCHITECTURE.md`)**
+  - [x] Refactor `src/app/(portals)/booking/page.tsx` to stop using `getServicesAction(false)` (a Server Action) for data fetching.
+  - [x] Use Functional DI directly in the React Server Component to securely fetch data via `getServicesUseCase(getServicesQuery(supabase))`.
+- [x] **6. DTO Spec Desync & Strictness (`backend/1-ARCHITECTURE.md` & `1.5-CODING-PATTERNS.md`)**
+  - [x] Revert `service-response.dto.ts` back to `z.string().optional()` to keep the schema simple and avoid over-engineering Postgres timestamp parsing.
+  - [x] Remove the Postgres timestamp coercion test from `service-response.dto.spec.ts`.
+- [x] **7. Debug Artifact Cleanup**
+  - [x] Remove `console.log()` and `export const dynamic = 'force-dynamic';` from `src/app/(portals)/booking/page.tsx`.
 
 ### Phase 4: End-to-End Verification
 - [ ] **1. Integration Testing**
