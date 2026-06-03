@@ -3010,8 +3010,13 @@
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\TASK\\task-frontend-tailwind.md": {
-    "mtime": 1780333149.425431,
-    "ast_hash": "0cc0debee11e4328942701631b06d7f2",
+    "mtime": 1780373532.4964116,
+    "ast_hash": "31ca7ae9554edb123cef37ea58665f4b",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\.CORE_DOCUMENTATION\\SERVERLESS_ARCHI\\README.md": {
+    "mtime": 1780458335.52151,
+    "ast_hash": "ea4718c869f71649b351e990375481de",
     "semantic_hash": ""
   }
 }
