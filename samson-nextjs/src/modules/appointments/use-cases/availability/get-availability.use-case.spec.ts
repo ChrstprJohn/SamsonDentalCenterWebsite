@@ -28,11 +28,12 @@ describe('GetAvailabilityUseCase', () => {
       mockAvailabilityQueries.getServiceDuration.mockResolvedValueOnce(30);
       mockAvailabilityQueries.getDoctorSchedules.mockResolvedValueOnce([
         {
-          staff_id: doctorId,
-          start_time: '09:00:00',
-          end_time: '11:00:00',
-          break_start_time: null,
-          break_end_time: null,
+          id: 'sched-1',
+          doctorId: doctorId,
+          startTime: '09:00:00',
+          endTime: '11:00:00',
+          breakStartTime: null,
+          breakEndTime: null,
         },
       ]);
       mockAvailabilityQueries.getExistingAppointments.mockResolvedValueOnce([]);
@@ -63,11 +64,12 @@ describe('GetAvailabilityUseCase', () => {
       mockAvailabilityQueries.getServiceDuration.mockResolvedValueOnce(30);
       mockAvailabilityQueries.getDoctorSchedules.mockResolvedValueOnce([
         {
-          staff_id: doctorId,
-          start_time: '09:00:00',
-          end_time: '11:00:00',
-          break_start_time: '10:00:00',
-          break_end_time: '10:30:00',
+          id: 'sched-1',
+          doctorId: doctorId,
+          startTime: '09:00:00',
+          endTime: '11:00:00',
+          breakStartTime: '10:00:00',
+          breakEndTime: '10:30:00',
         },
       ]);
       mockAvailabilityQueries.getExistingAppointments.mockResolvedValueOnce([]);
@@ -89,19 +91,22 @@ describe('GetAvailabilityUseCase', () => {
       mockAvailabilityQueries.getServiceDuration.mockResolvedValueOnce(30);
       mockAvailabilityQueries.getDoctorSchedules.mockResolvedValueOnce([
         {
-          staff_id: doctorId,
-          start_time: '09:00:00',
-          end_time: '11:00:00',
-          break_start_time: null,
-          break_end_time: null,
+          id: 'sched-1',
+          doctorId: doctorId,
+          startTime: '09:00:00',
+          endTime: '11:00:00',
+          breakStartTime: null,
+          breakEndTime: null,
         },
       ]);
       mockAvailabilityQueries.getExistingAppointments.mockResolvedValueOnce([
         {
-          doctor_id: doctorId,
-          start_time: '2024-12-25T09:30:00Z',
-          end_time: '2024-12-25T10:00:00Z',
+          id: 'appt-1',
+          doctorId: doctorId,
+          startTime: '2024-12-25T09:30:00Z',
+          endTime: '2024-12-25T10:00:00Z',
           status: 'APPROVED',
+          date: '2024-12-25',
         },
       ]);
       mockAvailabilityQueries.resolveDoctorDisplayName.mockResolvedValueOnce('Dr. John Doe');
@@ -122,8 +127,22 @@ describe('GetAvailabilityUseCase', () => {
   describe('getAvailableDays', () => {
     it('should return available dates for the month', async () => {
       mockAvailabilityQueries.getWorkingSchedulesForMonth.mockResolvedValueOnce([
-        { date: '2024-12-01', staff_id: doctorId },
-        { date: '2024-12-02', staff_id: doctorId },
+        {
+          date: '2024-12-01',
+          staffId: doctorId,
+          startTime: '09:00:00',
+          endTime: '10:00:00',
+          breakStartTime: null,
+          breakEndTime: null,
+        },
+        {
+          date: '2024-12-02',
+          staffId: doctorId,
+          startTime: '09:00:00',
+          endTime: '10:00:00',
+          breakStartTime: null,
+          breakEndTime: null,
+        },
       ]);
 
       mockAvailabilityQueries.getServiceDuration.mockResolvedValue(30);
@@ -131,26 +150,44 @@ describe('GetAvailabilityUseCase', () => {
       mockAvailabilityQueries.getDoctorSchedules
         .mockResolvedValueOnce([
           {
-            staff_id: doctorId,
-            start_time: '09:00',
-            end_time: '10:00',
-            doctor_name: 'Dr. John Doe',
+            id: 'sched-1',
+            doctorId: doctorId,
+            startTime: '09:00',
+            endTime: '10:00',
+            breakStartTime: null,
+            breakEndTime: null,
           },
         ])
         .mockResolvedValueOnce([
           {
-            staff_id: doctorId,
-            start_time: '09:00',
-            end_time: '10:00',
-            doctor_name: 'Dr. John Doe',
+            id: 'sched-2',
+            doctorId: doctorId,
+            startTime: '09:00',
+            endTime: '10:00',
+            breakStartTime: null,
+            breakEndTime: null,
           },
         ]);
 
       mockAvailabilityQueries.getExistingAppointments
         .mockResolvedValueOnce([])
         .mockResolvedValueOnce([
-          { doctor_id: doctorId, start_time: '2024-12-02T09:00:00Z', end_time: '2024-12-02T09:30:00Z' },
-          { doctor_id: doctorId, start_time: '2024-12-02T09:30:00Z', end_time: '2024-12-02T10:00:00Z' },
+          {
+            id: 'appt-1',
+            doctorId: doctorId,
+            startTime: '2024-12-02T09:00:00Z',
+            endTime: '2024-12-02T09:30:00Z',
+            status: 'APPROVED',
+            date: '2024-12-02',
+          },
+          {
+            id: 'appt-2',
+            doctorId: doctorId,
+            startTime: '2024-12-02T09:30:00Z',
+            endTime: '2024-12-02T10:00:00Z',
+            status: 'APPROVED',
+            date: '2024-12-02',
+          },
         ]);
 
       const result = await useCase.getAvailableDays({

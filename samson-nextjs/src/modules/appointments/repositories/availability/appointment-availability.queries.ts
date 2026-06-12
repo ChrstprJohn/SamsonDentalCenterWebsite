@@ -1,13 +1,14 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { DomainError } from '@/shared/errors';
 import { getExistingAppointmentsForMonthQuery } from './get-existing-appointments-for-month.queries';
+import { doctorScheduleResponseSchema, appointmentResponseSchema } from '../../dtos';
 
 export const getWorkingSchedulesForMonthQuery = (supabase: SupabaseClient) => {
   return async (month: string, doctorId?: string, serviceId?: string) => {
     // month is format YYYY-MM
     let query = supabase
       .from('doctor_schedules')
-      .select('day_of_week, doctor_id, start_time, end_time, break_start_time, break_end_time');
+      .select('id, day_of_week, doctor_id, start_time, end_time, break_start_time, break_end_time');
 
     if (doctorId) {
       query = query.eq('doctor_id', doctorId);
@@ -32,14 +33,16 @@ export const getWorkingSchedulesForMonthQuery = (supabase: SupabaseClient) => {
       throw new DomainError(`Failed to fetch monthly schedules: ${error.message}`, 'DATABASE_ERROR');
     }
 
+    const mappedSchedules = schedules?.map(s => doctorScheduleResponseSchema.parse(s)) || [];
+
     // Generate dates for the month based on recurring day_of_week
     const generatedSchedules: Array<{
       date: string;
-      staff_id: string;
-      start_time: string;
-      end_time: string;
-      break_start_time: string | null;
-      break_end_time: string | null;
+      staffId: string;
+      startTime: string;
+      endTime: string;
+      breakStartTime: string | null;
+      breakEndTime: string | null;
     }> = [];
     const [year, monthStr] = month.split('-');
     const daysInMonth = new Date(parseInt(year), parseInt(monthStr), 0).getDate();
@@ -48,15 +51,15 @@ export const getWorkingSchedulesForMonthQuery = (supabase: SupabaseClient) => {
       const currentDate = new Date(parseInt(year), parseInt(monthStr) - 1, day);
       const dayOfWeek = currentDate.getDay(); // 0 = Sun, 1 = Mon, etc.
       
-      const matchingSchedules = schedules?.filter(s => s.day_of_week === dayOfWeek) || [];
+      const matchingSchedules = mappedSchedules.filter(s => s.dayOfWeek === dayOfWeek);
       for (const sched of matchingSchedules) {
         generatedSchedules.push({
           date: currentDate.toISOString().split('T')[0],
-          staff_id: sched.doctor_id,
-          start_time: sched.start_time,
-          end_time: sched.end_time,
-          break_start_time: sched.break_start_time,
-          break_end_time: sched.break_end_time
+          staffId: sched.doctorId,
+          startTime: sched.startTime,
+          endTime: sched.endTime,
+          breakStartTime: sched.breakStartTime,
+          breakEndTime: sched.breakEndTime
         });
       }
     }
@@ -96,7 +99,7 @@ export const getDoctorSchedulesQuery = (supabase: SupabaseClient) => {
       throw new DomainError(`Failed to fetch doctor schedules: ${error.message}`, 'DATABASE_ERROR');
     }
 
-    return schedules || [];
+    return schedules?.map(s => doctorScheduleResponseSchema.parse(s)) || [];
   };
 };
 
@@ -104,7 +107,7 @@ export const getExistingAppointmentsQuery = (supabase: SupabaseClient) => {
   return async (date: string, doctorId?: string) => {
     let query = supabase
       .from('appointments')
-      .select('id, start_time, end_time, doctor_id, status')
+      .select('id, start_time, end_time, doctor_id, status, date')
       .eq('date', date)
       .not('status', 'in', '("CANCELLED","REJECTED","DISPLACED")');
 
@@ -121,7 +124,7 @@ export const getExistingAppointmentsQuery = (supabase: SupabaseClient) => {
       );
     }
 
-    return appointments || [];
+    return appointments?.map(a => appointmentResponseSchema.parse(a)) || [];
   };
 };
 

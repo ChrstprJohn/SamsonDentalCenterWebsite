@@ -1,17 +1,9 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { DomainError } from '@/shared/errors';
-
-export interface MonthAppointment {
-  id: string;
-  start_time: string;
-  end_time: string;
-  doctor_id: string;
-  status: string;
-  date: string;
-}
+import { appointmentResponseSchema, AppointmentResponseDto } from '../../dtos';
 
 export const getExistingAppointmentsForMonthQuery = (supabase: SupabaseClient) => {
-  return async (month: string, doctorId?: string): Promise<MonthAppointment[]> => {
+  return async (month: string, doctorId?: string): Promise<AppointmentResponseDto[]> => {
     // month is format YYYY-MM
     const [yearStr, monthStr] = month.split('-');
     const year = parseInt(yearStr, 10);
@@ -44,6 +36,6 @@ export const getExistingAppointmentsForMonthQuery = (supabase: SupabaseClient) =
       );
     }
 
-    return appointments || [];
+    return appointments?.map(a => appointmentResponseSchema.parse(a)) || [];
   };
 };

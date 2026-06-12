@@ -2,11 +2,15 @@ import { AppointmentAvailabilityQueries } from '../../repositories';
 import {
   GetAvailableTimeSlotsDto,
   GetAvailableTimeSlotsResponseDto,
-  AvailableSlotDto,
   GetAvailableDaysDto,
   GetAvailableDaysResponseDto,
 } from '../../dtos';
+import { getAvailableDaysUseCase } from './get-available-days.use-case';
+import { getAvailableTimeSlotsUseCase } from './get-available-time-slots.use-case';
 
+/**
+ * Backward compatibility wrapper grouping the split availability use cases.
+ */
 export const getAvailabilityUseCase = (deps: {
   getWorkingSchedulesForMonth: (month: string, doctorId?: string, serviceId?: string) => Promise<any[]>;
   getDoctorSchedules: (date: string, doctorId?: string, serviceId?: string) => Promise<any[]>;
@@ -15,226 +19,12 @@ export const getAvailabilityUseCase = (deps: {
   resolveDoctorDisplayName: (doctorId: string) => Promise<string>;
   getExistingAppointmentsForMonth?: (month: string, doctorId?: string) => Promise<any[]>;
 }) => {
-  const getAvailableTimeSlots = async (
-    dto: GetAvailableTimeSlotsDto
-  ): Promise<GetAvailableTimeSlotsResponseDto> => {
-    const { serviceId, doctorId, date } = dto;
-
-    const duration = await deps.getServiceDuration(serviceId);
-    const schedules = await deps.getDoctorSchedules(date, doctorId, serviceId);
-    const appointments = await deps.getExistingAppointments(date, doctorId);
-
-    const availableSlots: AvailableSlotDto[] = [];
-
-    for (const schedule of schedules) {
-      const docId = schedule.staff_id || schedule.doctor_id || doctorId;
-      if (!docId) continue;
-
-      const doctorName = await deps.resolveDoctorDisplayName(docId);
-
-      const schedStartStr = schedule.start_time.includes(':')
-        ? schedule.start_time
-        : `${schedule.start_time}:00`;
-      const schedEndStr = schedule.end_time.includes(':')
-        ? schedule.end_time
-        : `${schedule.end_time}:00`;
-
-      const dayStart = new Date(
-        `${date}T${schedStartStr.length === 5 ? `${schedStartStr}:00` : schedStartStr}Z`
-      );
-      const dayEnd = new Date(
-        `${date}T${schedEndStr.length === 5 ? `${schedEndStr}:00` : schedEndStr}Z`
-      );
-
-      let breakStart: Date | null = null;
-      let breakEnd: Date | null = null;
-      if (schedule.break_start_time && schedule.break_end_time) {
-        const bStartStr = schedule.break_start_time.includes(':')
-          ? schedule.break_start_time
-          : `${schedule.break_start_time}:00`;
-        const bEndStr = schedule.break_end_time.includes(':')
-          ? schedule.break_end_time
-          : `${schedule.break_end_time}:00`;
-        breakStart = new Date(
-          `${date}T${bStartStr.length === 5 ? `${bStartStr}:00` : bStartStr}Z`
-        );
-        breakEnd = new Date(
-          `${date}T${bEndStr.length === 5 ? `${bEndStr}:00` : bEndStr}Z`
-        );
-      }
-
-      let currentStart = new Date(dayStart.getTime());
-      while (currentStart.getTime() + duration * 60 * 1000 <= dayEnd.getTime()) {
-        const currentEnd = new Date(currentStart.getTime() + duration * 60 * 1000);
-
-        const fallsInBreak =
-          breakStart &&
-          breakEnd &&
-          currentStart.getTime() < breakEnd.getTime() &&
-          currentEnd.getTime() > breakStart.getTime();
-
-        if (!fallsInBreak) {
-          const docAppointments = appointments.filter((appt) => appt.doctor_id === docId);
-          const hasOverlap = docAppointments.some((appt) => {
-            const apptStart = new Date(appt.start_time);
-            const apptEnd = new Date(appt.end_time);
-            return (
-              currentStart.getTime() < apptEnd.getTime() &&
-              currentEnd.getTime() > apptStart.getTime()
-            );
-          });
-
-          if (!hasOverlap) {
-            availableSlots.push({
-              startTime: currentStart.toISOString(),
-              endTime: currentEnd.toISOString(),
-              doctorId: docId,
-              doctorName: doctorName.trim(),
-            });
-          }
-        }
-
-        currentStart = new Date(currentStart.getTime() + duration * 60 * 1000);
-      }
-    }
-
-    return {
-      date,
-      serviceId,
-      availableSlots,
-    };
-  };
-
-  const getAvailableDays = async (dto: GetAvailableDaysDto): Promise<GetAvailableDaysResponseDto> => {
-    const { month, serviceId, doctorId } = dto;
-    const duration = await deps.getServiceDuration(serviceId);
-    const schedules = await deps.getWorkingSchedulesForMonth(month, doctorId, serviceId);
-
-    if (!schedules || schedules.length === 0) {
-      return { month, serviceId, availableDates: [] };
-    }
-
-    // Determine if we can do in-memory calculations
-    const useInMemoryAppointments = typeof deps.getExistingAppointmentsForMonth === 'function';
-    // If the mock schedules lack start_time or end_time, we cannot calculate in-memory.
-    const canUseInMemory =
-      useInMemoryAppointments &&
-      schedules.every(
-        (s) => s.start_time !== undefined && s.end_time !== undefined
-      );
-
-    let appointments: any[] = [];
-    if (canUseInMemory && deps.getExistingAppointmentsForMonth) {
-      appointments = await deps.getExistingAppointmentsForMonth(month, doctorId);
-    }
-
-    const availableDates: string[] = [];
-
-    if (canUseInMemory) {
-      const datesWithSchedules = Array.from(new Set(schedules.map((schedule) => schedule.date))).sort();
-
-      for (const date of datesWithSchedules) {
-        const daySchedules = schedules.filter((s) => s.date === date);
-        let dateHasSlot = false;
-
-        for (const schedule of daySchedules) {
-          const docId = schedule.staff_id || schedule.doctor_id || doctorId;
-          if (!docId) continue;
-
-          const schedStartStr = schedule.start_time.includes(':')
-            ? schedule.start_time
-            : `${schedule.start_time}:00`;
-          const schedEndStr = schedule.end_time.includes(':')
-            ? schedule.end_time
-            : `${schedule.end_time}:00`;
-
-          const dayStart = new Date(
-            `${date}T${schedStartStr.length === 5 ? `${schedStartStr}:00` : schedStartStr}Z`
-          );
-          const dayEnd = new Date(
-            `${date}T${schedEndStr.length === 5 ? `${schedEndStr}:00` : schedEndStr}Z`
-          );
-
-          let breakStart: Date | null = null;
-          let breakEnd: Date | null = null;
-          if (schedule.break_start_time && schedule.break_end_time) {
-            const bStartStr = schedule.break_start_time.includes(':')
-              ? schedule.break_start_time
-              : `${schedule.break_start_time}:00`;
-            const bEndStr = schedule.break_end_time.includes(':')
-              ? schedule.break_end_time
-              : `${schedule.break_end_time}:00`;
-            breakStart = new Date(
-              `${date}T${bStartStr.length === 5 ? `${bStartStr}:00` : bStartStr}Z`
-            );
-            breakEnd = new Date(
-              `${date}T${bEndStr.length === 5 ? `${bEndStr}:00` : bEndStr}Z`
-            );
-          }
-
-          let currentStart = new Date(dayStart.getTime());
-          while (currentStart.getTime() + duration * 60 * 1000 <= dayEnd.getTime()) {
-            const currentEnd = new Date(currentStart.getTime() + duration * 60 * 1000);
-
-            const fallsInBreak =
-              breakStart &&
-              breakEnd &&
-              currentStart.getTime() < breakEnd.getTime() &&
-              currentEnd.getTime() > breakStart.getTime();
-
-            if (!fallsInBreak) {
-              const docAppointments = appointments.filter(
-                (appt) => appt.doctor_id === docId && appt.date === date
-              );
-              const hasOverlap = docAppointments.some((appt) => {
-                const apptStart = new Date(appt.start_time);
-                const apptEnd = new Date(appt.end_time);
-                return (
-                  currentStart.getTime() < apptEnd.getTime() &&
-                  currentEnd.getTime() > apptStart.getTime()
-                );
-              });
-
-              if (!hasOverlap) {
-                dateHasSlot = true;
-                break;
-              }
-            }
-
-            currentStart = new Date(currentStart.getTime() + duration * 60 * 1000);
-          }
-
-          if (dateHasSlot) {
-            break;
-          }
-        }
-
-        if (dateHasSlot) {
-          availableDates.push(date);
-        }
-      }
-    } else {
-      // Fallback behavior (sequential database calls)
-      const datesWithSchedules = Array.from(new Set(schedules.map((schedule) => schedule.date))).sort();
-      for (const date of datesWithSchedules) {
-        const slotsResponse = await getAvailableTimeSlots({
-          serviceId,
-          doctorId,
-          date,
-        });
-
-        if (slotsResponse.availableSlots.length > 0) {
-          availableDates.push(date);
-        }
-      }
-    }
-
-    return {
-      month,
-      serviceId,
-      availableDates,
-    };
-  };
+  const getAvailableTimeSlots = getAvailableTimeSlotsUseCase(deps);
+  
+  const getAvailableDays = getAvailableDaysUseCase({
+    ...deps,
+    getAvailableTimeSlots,
+  });
 
   return {
     getAvailableDays,
@@ -242,6 +32,7 @@ export const getAvailabilityUseCase = (deps: {
   };
 };
 
+/** @deprecated Use getAvailableDaysUseCase or getAvailableTimeSlotsUseCase functional pipelines directly instead */
 export class GetAvailabilityUseCase {
   constructor(private readonly availabilityQueries: AppointmentAvailabilityQueries) {}
 

@@ -10,6 +10,7 @@ import {
   getExistingAppointmentsQuery,
   getServiceDurationQuery,
   resolveDoctorDisplayNameQuery,
+  getExistingAppointmentsForMonthQuery,
 } from '../../repositories';
 import { getAvailabilityUseCase } from '../../use-cases';
 
@@ -27,6 +28,7 @@ export async function getAvailableDaysAction(formData: GetAvailableDaysDto) {
       getExistingAppointments: getExistingAppointmentsQuery(supabase),
       getServiceDuration: getServiceDurationQuery(supabase),
       resolveDoctorDisplayName: resolveDoctorDisplayNameQuery(supabase),
+      getExistingAppointmentsForMonth: getExistingAppointmentsForMonthQuery(supabase),
     });
 
     const result = await useCase.getAvailableDays(validData);
