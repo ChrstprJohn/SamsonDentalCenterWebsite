@@ -1,11 +1,12 @@
-import { SupabaseClient } from '@supabase/supabase-js';
 import { SubmitTreatmentDto } from '../../dtos/treatment/submit-treatment.dto';
 import { TreatmentCommands } from '../../repositories/treatment/treatment.commands';
 import { InvoiceCommandsRepository } from '@/modules/billing/repositories/invoicing/invoice.commands';
 import { DomainError } from '@/shared/errors';
+import { getServicesByIdsQuery } from '@/modules/services/repositories/management/service.queries';
+import { SupabaseClient } from '@supabase/supabase-js';
 
 export const submitTreatmentUseCase = (deps: {
-  supabase: SupabaseClient;
+  getServicesDetails: (serviceIds: string[]) => Promise<any[]>;
   submitTreatment: (appointmentId: string, clinicalNotes?: string | null) => Promise<boolean>;
   generateInvoice: (data: { appointmentId: string; amount: number; status: 'DRAFT' }) => Promise<any>;
 }) => {
@@ -14,14 +15,11 @@ export const submitTreatmentUseCase = (deps: {
     const actualServiceIds = actualServices.map((s) => s.serviceId);
 
     // 1. Fetch details of the selected services to calculate invoice amount and construct summary
-    const { data: services, error: servicesError } = await deps.supabase
-      .from('services')
-      .select('id, name, price')
-      .in('id', actualServiceIds);
+    const services = await deps.getServicesDetails(actualServiceIds);
 
-    if (servicesError || !services || services.length === 0) {
+    if (!services || services.length === 0) {
       throw new DomainError(
-        `Failed to fetch service details: ${servicesError?.message || 'Services not found'}`,
+        'Failed to fetch service details: Services not found',
         'DATABASE_ERROR'
       );
     }
@@ -80,9 +78,10 @@ export class SubmitTreatmentUseCase {
 
   async execute(data: SubmitTreatmentDto): Promise<boolean> {
     return submitTreatmentUseCase({
-      supabase: this.supabase,
+      getServicesDetails: getServicesByIdsQuery(this.supabase),
       submitTreatment: (aid, notes) => this.treatmentCommands.submitTreatment(aid, notes),
       generateInvoice: (inv) => this.invoiceCommands.generateInvoice(inv),
     })(data);
   }
 }
+

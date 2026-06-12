@@ -24,8 +24,8 @@ describe('SubmitTreatmentUseCase', () => {
   it('submits treatment and generates draft invoice successfully', async () => {
     mockIn.mockResolvedValue({
       data: [
-        { id: 'svc-1', name: 'Consultation', price: 500 },
-        { id: 'svc-2', name: 'X-Ray', price: 800 },
+        { id: '1254055a-8d15-4751-9189-e56d96c6505d', name: 'Consultation', price: 500, duration_minutes: 30, service_type: 'GENERAL', is_active: true },
+        { id: '0903fb74-6fbf-475c-a590-1cd20c6ad38f', name: 'X-Ray', price: 800, duration_minutes: 15, service_type: 'GENERAL', is_active: true },
       ],
       error: null,
     });
@@ -47,8 +47,8 @@ describe('SubmitTreatmentUseCase', () => {
     const result = await useCase.execute({
       appointmentId: 'appt-123',
       actualServices: [
-        { serviceId: 'svc-1', comment: 'Routine' },
-        { serviceId: 'svc-2', comment: null },
+        { serviceId: '1254055a-8d15-4751-9189-e56d96c6505d', comment: 'Routine' },
+        { serviceId: '0903fb74-6fbf-475c-a590-1cd20c6ad38f', comment: null },
       ],
       clinicalNotes: 'Upper molar filling done',
     });
@@ -84,8 +84,8 @@ describe('SubmitTreatmentUseCase', () => {
     await expect(
       useCase.execute({
         appointmentId: 'appt-123',
-        actualServices: [{ serviceId: 'svc-1' }],
+        actualServices: [{ serviceId: '1254055a-8d15-4751-9189-e56d96c6505d' }],
       })
-    ).rejects.toThrow('Failed to fetch service details: Fetch failed');
+    ).rejects.toThrow('Failed to fetch services by ids: Fetch failed');
   });
 });

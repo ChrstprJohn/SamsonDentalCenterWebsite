@@ -120,3 +120,16 @@ The following is a list of test files and test cases that need to be created/upd
 - **Test cases:**
   - Passes down doctor props from the custom booking hook to the `DateTimeStep` sub-component correctly.
   - Verify slot holding props are removed.
+
+---
+
+## 4. Services Module Tests
+
+### [ ] `src/modules/services/repositories/management/service.queries.spec.ts` (Update)
+- **Target:** `getServicesByIdsQuery`
+- **Test cases:**
+  - Retrieve multiple services matching a list of UUIDs correctly.
+  - Returns parsed ServiceResponseDto array mapping snake_case db columns to camelCase properties.
+  - Return empty array when empty list of IDs is provided.
+  - Handles database fetch errors correctly.
+

@@ -26,7 +26,7 @@ describe('useBookingData', () => {
       data: { availableDates: ['2025-01-01', '2025-01-02'] },
     });
 
-    const { result } = renderHook(() => useBookingData('s1', null));
+    const { result } = renderHook(() => useBookingData('s1', null, undefined));
 
     expect(result.current.isLoadingAvailability).toBe(true);
 
@@ -48,7 +48,7 @@ describe('useBookingData', () => {
       },
     });
 
-    const { result } = renderHook(() => useBookingData('s1', '2025-01-01'));
+    const { result } = renderHook(() => useBookingData('s1', '2025-01-01', undefined));
 
     await waitFor(() => {
       expect(result.current.availableSlots.length).toBe(1);

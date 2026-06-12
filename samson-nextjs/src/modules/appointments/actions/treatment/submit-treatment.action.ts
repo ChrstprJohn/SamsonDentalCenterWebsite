@@ -8,6 +8,7 @@ import { SubmitTreatmentDto, submitTreatmentSchema } from '../../dtos/treatment/
 import { submitTreatmentCommand } from '../../repositories/treatment/treatment.commands';
 import { generateInvoiceCommand } from '@/modules/billing/repositories/invoicing/invoice.commands';
 import { submitTreatmentUseCase } from '../../use-cases/treatment/submit-treatment.use-case';
+import { getServicesByIdsQuery } from '@/modules/services';
 
 export async function submitTreatmentAction(formData: SubmitTreatmentDto) {
   try {
@@ -18,10 +19,11 @@ export async function submitTreatmentAction(formData: SubmitTreatmentDto) {
 
     const supabase = await createClient();
     const useCase = submitTreatmentUseCase({
-      supabase,
+      getServicesDetails: getServicesByIdsQuery(supabase),
       submitTreatment: submitTreatmentCommand(supabase),
       generateInvoice: generateInvoiceCommand(supabase),
     });
+
 
     await useCase(validData);
     return { success: true };

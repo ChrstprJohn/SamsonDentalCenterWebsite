@@ -27,3 +27,17 @@ export const getServiceByIdQuery = (supabase: SupabaseClient) => {
     return data ? serviceResponseSchema.parse(data) : null;
   };
 };
+
+export const getServicesByIdsQuery = (supabase: SupabaseClient) => {
+  return async (ids: string[]): Promise<ServiceResponseDto[]> => {
+    if (ids.length === 0) return [];
+    const { data, error } = await supabase
+      .from("services")
+      .select("*")
+      .in("id", ids);
+
+    if (error) throw new Error(`Failed to fetch services by ids: ${error.message}`);
+    return serviceResponseSchema.array().parse(data ?? []);
+  };
+};
+
