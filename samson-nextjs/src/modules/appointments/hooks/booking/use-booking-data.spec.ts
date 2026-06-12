@@ -17,7 +17,7 @@ vi.mock('../../actions/availability/get-available-time-slots.action', () => ({
 
 describe('useBookingData', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
   });
 
   it('should fetch available dates and doctors when a serviceId is provided', async () => {
@@ -90,6 +90,13 @@ describe('useBookingData', () => {
   });
 
   it('should fetch available slots when serviceId and date are provided', async () => {
+    (getStepTwoDataAction as any).mockResolvedValue({
+      success: true,
+      data: {
+        doctors: [],
+        availability: { availableDates: [], availabilityMap: {} },
+      },
+    });
     (getAvailableTimeSlotsAction as any).mockResolvedValue({
       success: true,
       data: {
