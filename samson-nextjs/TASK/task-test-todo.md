@@ -1,6 +1,6 @@
-# Test Todo - Doctor Selection Feature
+# Test Todo - Doctor Selection & Latency Optimization Features
 
-The following is a list of test files and test cases that need to be created/updated to achieve full coverage for the newly added Doctor Selection feature.
+The following is a list of test files and test cases that need to be created/updated to achieve full coverage for the **Doctor Selection** feature and the subsequent **Latency Optimization / Slot Hold Removal** updates.
 
 ---
 
