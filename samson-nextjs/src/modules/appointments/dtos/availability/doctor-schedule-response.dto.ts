@@ -6,8 +6,8 @@ export const doctorScheduleDbSchema = z.object({
   day_of_week: z.number().int().min(0).max(6),
   start_time: z.string(),
   end_time: z.string(),
-  break_start_time: z.string().nullable().optional(),
-  break_end_time: z.string().nullable().optional(),
+  break_start_time: z.string().nullable(),
+  break_end_time: z.string().nullable(),
 });
 
 export const doctorScheduleResponseSchema = doctorScheduleDbSchema.transform((data) => ({
