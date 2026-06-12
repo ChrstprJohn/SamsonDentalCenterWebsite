@@ -13,8 +13,6 @@ interface DateTimeStepProps {
   availableSlots?: BookingSlot[];
   isLoading?: boolean;
   isLoadingDoctors?: boolean;
-  slotHoldRemaining: number;
-  isSlotHoldActive: boolean;
   onSelectDate: (date: string) => void;
   onSelectSlot: (slot: BookingSlot) => void;
   onSelectDoctor: (doctorId: string) => void;
@@ -29,8 +27,6 @@ export function DateTimeStep({
   availableSlots = [],
   isLoading = false,
   isLoadingDoctors = false,
-  slotHoldRemaining,
-  isSlotHoldActive,
   onSelectDate,
   onSelectSlot,
   onSelectDoctor,
@@ -45,12 +41,6 @@ export function DateTimeStep({
 
   const getDayNum = (date: Date) => {
     return date.getUTCDate();
-  };
-
-  const formatTimer = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   };
 
   return (
@@ -177,24 +167,6 @@ export function DateTimeStep({
               <p className="text-xs text-slate-500 mt-1 max-w-[250px] mx-auto">
                 All doctors are fully booked on this date. Please select a different day from the calendar above.
               </p>
-            </div>
-          )}
-
-          {/* Real-time hold countdown */}
-          {isSlotHoldActive && selectedSlot && (
-            <div className="mt-6 p-4 rounded-2xl border border-amber-200/60 bg-amber-500/5 backdrop-blur-md flex items-center justify-between animate-pulse">
-              <div className="flex items-center gap-3">
-                <span className="text-xl">⏳</span>
-                <div className="flex flex-col">
-                  <span className="text-xs font-bold text-amber-800 dark:text-amber-450">Temporary Slot Reservation</span>
-                  <span className="text-[10px] text-slate-500">Hold expires automatically on timeout.</span>
-                </div>
-              </div>
-              <div className="flex items-center justify-center w-14 h-14 rounded-full border-4 border-amber-500/20 border-t-amber-500 flex-shrink-0">
-                <span className="text-xs font-extrabold text-amber-600 dark:text-amber-400">
-                  {formatTimer(slotHoldRemaining)}
-                </span>
-              </div>
             </div>
           )}
         </div>

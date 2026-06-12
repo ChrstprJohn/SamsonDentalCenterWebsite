@@ -48,8 +48,6 @@ describe('BookingView', () => {
     selectedDependentId: null,
     newDependentData: null,
     userNote: '',
-    isSlotHoldActive: false,
-    slotHoldRemaining: 0,
     isSubmitting: false,
     isSuccess: false,
     

@@ -34,6 +34,17 @@
   - [x] Add a Dropdown or Card Selection UI above the Date Carousel allowing users to select "Any Doctor" or a specific doctor.
   - [x] Ensure the Date Carousel disables dates where the selected doctor is not working.
 
+### Phase 2.5: Optimize Latency & Remove Slot Holding (Business Plan Alignment)
+- [x] **1. Defer Fetches (Step 1 Gating)**
+  - [x] Modify `useBookingData` hook to accept `currentStep` and gate API requests so they only fetch when `currentStep >= 2` to avoid fetching on each service selection in Step 1.
+- [x] **2. Implement Monthly Appointments Query**
+  - [x] Create `src/modules/appointments/repositories/availability/get-existing-appointments-for-month.queries.ts` to retrieve active appointments for a month in one DB query.
+- [x] **3. Optimize Availability Calculations (In-Memory Processing)**
+  - [x] Modify `getWorkingSchedulesForMonthQuery` in `appointment-availability.queries.ts` to return full schedule details (times, breaks).
+  - [x] Refactor `getAvailableDays` in `get-availability.use-case.ts` to pre-fetch schedules, appointments, and service durations once and calculate calendar availability in-memory, eliminating N+1 DB requests.
+- [x] **4. Remove Slot Reservation/Holding Mechanism**
+  - [x] Remove slot hold countdown timer, hooks, state, types, and files reference across the app (`useBookingState`, `useUserBooking`, `DateTimeStep`, `BookingView`, etc.) since slot holding is omitted from the business plan.
+
 ### Phase 3: Architectural Audit Fixes (V2 Compliance)
 - [ ] **1. Zod Transformation Blueprint Refactor (`backend/1.5-CODING-PATTERNS.md`)**
   - [ ] Refactor `dtos/shared/appointment.dto.ts`. Remove the messy `z.preprocess()` logic.

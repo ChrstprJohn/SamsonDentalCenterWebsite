@@ -8,7 +8,8 @@ import type { BookingSlot } from './use-user-booking';
 export function useBookingData(
   selectedServiceId: string | undefined,
   selectedDate: string | null,
-  selectedDoctorId: string | undefined
+  selectedDoctorId: string | undefined,
+  currentStep = 2
 ) {
   const [availableDates, setAvailableDates] = useState<string[]>([]);
   const [availableSlots, setAvailableSlots] = useState<BookingSlot[]>([]);
@@ -19,7 +20,7 @@ export function useBookingData(
   // Fetch Doctors when Service is selected
   useEffect(() => {
     async function fetchDoctors() {
-      if (!selectedServiceId) {
+      if (!selectedServiceId || currentStep < 2) {
         setDoctors([]);
         return;
       }
@@ -40,12 +41,12 @@ export function useBookingData(
       }
     }
     fetchDoctors();
-  }, [selectedServiceId]);
+  }, [selectedServiceId, currentStep]);
 
   // Fetch Available Dates when Service/Doctor is selected
   useEffect(() => {
     async function fetchDates() {
-      if (!selectedServiceId) {
+      if (!selectedServiceId || currentStep < 2) {
         setAvailableDates([]);
         return;
       }
@@ -71,12 +72,12 @@ export function useBookingData(
       }
     }
     fetchDates();
-  }, [selectedServiceId, selectedDoctorId]);
+  }, [selectedServiceId, selectedDoctorId, currentStep]);
 
   // Fetch Available Slots when Date/Doctor is selected
   useEffect(() => {
     async function fetchSlots() {
-      if (!selectedServiceId || !selectedDate) {
+      if (!selectedServiceId || !selectedDate || currentStep < 2) {
         setAvailableSlots([]);
         return;
       }
@@ -113,7 +114,7 @@ export function useBookingData(
       }
     }
     fetchSlots();
-  }, [selectedServiceId, selectedDate, selectedDoctorId]);
+  }, [selectedServiceId, selectedDate, selectedDoctorId, currentStep]);
 
   return {
     availableDates,

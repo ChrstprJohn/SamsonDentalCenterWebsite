@@ -37,23 +37,33 @@ The following is a list of test files and test cases that need to be created/upd
   - Query filtered by `serviceId` (only returns schedules of doctors who offer that service).
   - Query filtered by both `doctorId` and `serviceId`.
 
+### [ ] `src/modules/appointments/repositories/availability/get-existing-appointments-for-month.queries.spec.ts` (New)
+- **Target:** `getExistingAppointmentsForMonthQuery`
+- **Test cases:**
+  - Retrieve all active appointments for the given month (e.g. YYYY-MM).
+  - Filter active appointments by doctorId if provided.
+  - Exclude appointments with cancelled, rejected, or displaced status.
+
 ### [ ] `src/modules/appointments/use-cases/availability/get-availability.use-case.spec.ts` (Update)
 - **Target:** `getAvailabilityUseCase` / `GetAvailabilityUseCase`
 - **Test cases:**
   - Verify `getAvailableDays` propagates `serviceId` to `getWorkingSchedulesForMonth`.
   - Verify `getAvailableTimeSlots` propagates `serviceId` to `getDoctorSchedules`.
+  - Verify in-memory calendar availability calculations if `getExistingAppointmentsForMonth` is defined.
 
 ### [ ] `src/modules/appointments/hooks/booking/use-booking-state.spec.ts` (Update)
 - **Target:** `useBookingState` hook
 - **Test cases:**
   - Verify `selectedDoctorId` state defaults to `'ANY'`.
   - Verify `selectedDoctorId` resets to `'ANY'` on `resetState`.
+  - Verify slot holding timer and state are fully removed.
 
 ### [ ] `src/modules/appointments/hooks/booking/use-booking-data.spec.ts` (Update)
 - **Target:** `useBookingData` hook
 - **Test cases:**
   - Verify doctors list is fetched via `getDoctorsAction` when `selectedServiceId` changes.
   - Verify availability fetches pass down `selectedDoctorId` filter (`undefined` if `'ANY'`).
+  - Verify data fetching is gated by `currentStep >= 2` (does not run on Step 1 clicks).
 
 ### [ ] `src/modules/appointments/hooks/booking/use-user-booking.spec.ts` (Update)
 - **Target:** `useUserBooking` hook
@@ -61,6 +71,7 @@ The following is a list of test files and test cases that need to be created/upd
   - Expose `selectedDoctorId` and list of `doctors`.
   - `selectDoctor` resets `selectedDate` and `selectedSlot`.
   - `selectService` resets `selectedDoctorId` to `'ANY'`.
+  - Verify slot hold handlers (`startSlotHold`, `releaseSlotHold`) are removed.
 
 ---
 
@@ -72,8 +83,10 @@ The following is a list of test files and test cases that need to be created/upd
   - Renders the "Preferred Doctor" card selection layout correctly.
   - Clicking a doctor card invokes `onSelectDoctor` handler.
   - Highlights selected doctor card active state.
+  - Verify the temporary slot countdown banner is NOT rendered.
 
 ### [ ] `src/modules/appointments/views/booking-view.spec.tsx` (Update)
 - **Target:** `BookingView` component
 - **Test cases:**
   - Passes down doctor props from the custom booking hook to the `DateTimeStep` sub-component correctly.
+  - Verify slot holding props are removed.

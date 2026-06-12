@@ -22,8 +22,6 @@ export function BookingView({ services }: BookingViewProps) {
     selectedDate,
     selectedSlot,
     selectedDoctorId,
-    slotHoldRemaining,
-    isSlotHoldActive,
     patientType,
     selectedDependentId,
     newDependentData,
@@ -92,8 +90,6 @@ export function BookingView({ services }: BookingViewProps) {
             availableSlots={availableSlots}
             isLoading={isLoadingAvailability}
             isLoadingDoctors={isLoadingDoctors}
-            slotHoldRemaining={slotHoldRemaining}
-            isSlotHoldActive={isSlotHoldActive}
             onSelectDate={selectDate}
             onSelectSlot={selectSlot}
             onSelectDoctor={selectDoctor}

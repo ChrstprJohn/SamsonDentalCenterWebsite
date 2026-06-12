@@ -1,12 +1,13 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { DomainError } from '@/shared/errors';
+import { getExistingAppointmentsForMonthQuery } from './get-existing-appointments-for-month.queries';
 
 export const getWorkingSchedulesForMonthQuery = (supabase: SupabaseClient) => {
   return async (month: string, doctorId?: string, serviceId?: string) => {
     // month is format YYYY-MM
     let query = supabase
       .from('doctor_schedules')
-      .select('day_of_week, doctor_id');
+      .select('day_of_week, doctor_id, start_time, end_time, break_start_time, break_end_time');
 
     if (doctorId) {
       query = query.eq('doctor_id', doctorId);
@@ -32,7 +33,14 @@ export const getWorkingSchedulesForMonthQuery = (supabase: SupabaseClient) => {
     }
 
     // Generate dates for the month based on recurring day_of_week
-    const generatedSchedules: Array<{ date: string; staff_id: string }> = [];
+    const generatedSchedules: Array<{
+      date: string;
+      staff_id: string;
+      start_time: string;
+      end_time: string;
+      break_start_time: string | null;
+      break_end_time: string | null;
+    }> = [];
     const [year, monthStr] = month.split('-');
     const daysInMonth = new Date(parseInt(year), parseInt(monthStr), 0).getDate();
 
@@ -44,7 +52,11 @@ export const getWorkingSchedulesForMonthQuery = (supabase: SupabaseClient) => {
       for (const sched of matchingSchedules) {
         generatedSchedules.push({
           date: currentDate.toISOString().split('T')[0],
-          staff_id: sched.doctor_id
+          staff_id: sched.doctor_id,
+          start_time: sched.start_time,
+          end_time: sched.end_time,
+          break_start_time: sched.break_start_time,
+          break_end_time: sched.break_end_time
         });
       }
     }
@@ -162,6 +174,10 @@ export class AppointmentAvailabilityQueries {
 
   async getExistingAppointments(date: string, doctorId?: string) {
     return getExistingAppointmentsQuery(this.supabase)(date, doctorId);
+  }
+
+  async getExistingAppointmentsForMonth(month: string, doctorId?: string) {
+    return getExistingAppointmentsForMonthQuery(this.supabase)(month, doctorId);
   }
 
   async getServiceDuration(serviceId: string) {

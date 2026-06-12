@@ -13,6 +13,7 @@ export const getAvailabilityUseCase = (deps: {
   getExistingAppointments: (date: string, doctorId?: string) => Promise<any[]>;
   getServiceDuration: (serviceId: string) => Promise<number>;
   resolveDoctorDisplayName: (doctorId: string) => Promise<string>;
+  getExistingAppointmentsForMonth?: (month: string, doctorId?: string) => Promise<any[]>;
 }) => {
   const getAvailableTimeSlots = async (
     dto: GetAvailableTimeSlotsDto
@@ -106,24 +107,125 @@ export const getAvailabilityUseCase = (deps: {
 
   const getAvailableDays = async (dto: GetAvailableDaysDto): Promise<GetAvailableDaysResponseDto> => {
     const { month, serviceId, doctorId } = dto;
+    const duration = await deps.getServiceDuration(serviceId);
     const schedules = await deps.getWorkingSchedulesForMonth(month, doctorId, serviceId);
 
     if (!schedules || schedules.length === 0) {
       return { month, serviceId, availableDates: [] };
     }
 
-    const datesWithSchedules = Array.from(new Set(schedules.map((schedule) => schedule.date))).sort();
+    // Determine if we can do in-memory calculations
+    const useInMemoryAppointments = typeof deps.getExistingAppointmentsForMonth === 'function';
+    // If the mock schedules lack start_time or end_time, we cannot calculate in-memory.
+    const canUseInMemory =
+      useInMemoryAppointments &&
+      schedules.every(
+        (s) => s.start_time !== undefined && s.end_time !== undefined
+      );
+
+    let appointments: any[] = [];
+    if (canUseInMemory && deps.getExistingAppointmentsForMonth) {
+      appointments = await deps.getExistingAppointmentsForMonth(month, doctorId);
+    }
+
     const availableDates: string[] = [];
 
-    for (const date of datesWithSchedules) {
-      const slotsResponse = await getAvailableTimeSlots({
-        serviceId,
-        doctorId,
-        date,
-      });
+    if (canUseInMemory) {
+      const datesWithSchedules = Array.from(new Set(schedules.map((schedule) => schedule.date))).sort();
 
-      if (slotsResponse.availableSlots.length > 0) {
-        availableDates.push(date);
+      for (const date of datesWithSchedules) {
+        const daySchedules = schedules.filter((s) => s.date === date);
+        let dateHasSlot = false;
+
+        for (const schedule of daySchedules) {
+          const docId = schedule.staff_id || schedule.doctor_id || doctorId;
+          if (!docId) continue;
+
+          const schedStartStr = schedule.start_time.includes(':')
+            ? schedule.start_time
+            : `${schedule.start_time}:00`;
+          const schedEndStr = schedule.end_time.includes(':')
+            ? schedule.end_time
+            : `${schedule.end_time}:00`;
+
+          const dayStart = new Date(
+            `${date}T${schedStartStr.length === 5 ? `${schedStartStr}:00` : schedStartStr}Z`
+          );
+          const dayEnd = new Date(
+            `${date}T${schedEndStr.length === 5 ? `${schedEndStr}:00` : schedEndStr}Z`
+          );
+
+          let breakStart: Date | null = null;
+          let breakEnd: Date | null = null;
+          if (schedule.break_start_time && schedule.break_end_time) {
+            const bStartStr = schedule.break_start_time.includes(':')
+              ? schedule.break_start_time
+              : `${schedule.break_start_time}:00`;
+            const bEndStr = schedule.break_end_time.includes(':')
+              ? schedule.break_end_time
+              : `${schedule.break_end_time}:00`;
+            breakStart = new Date(
+              `${date}T${bStartStr.length === 5 ? `${bStartStr}:00` : bStartStr}Z`
+            );
+            breakEnd = new Date(
+              `${date}T${bEndStr.length === 5 ? `${bEndStr}:00` : bEndStr}Z`
+            );
+          }
+
+          let currentStart = new Date(dayStart.getTime());
+          while (currentStart.getTime() + duration * 60 * 1000 <= dayEnd.getTime()) {
+            const currentEnd = new Date(currentStart.getTime() + duration * 60 * 1000);
+
+            const fallsInBreak =
+              breakStart &&
+              breakEnd &&
+              currentStart.getTime() < breakEnd.getTime() &&
+              currentEnd.getTime() > breakStart.getTime();
+
+            if (!fallsInBreak) {
+              const docAppointments = appointments.filter(
+                (appt) => appt.doctor_id === docId && appt.date === date
+              );
+              const hasOverlap = docAppointments.some((appt) => {
+                const apptStart = new Date(appt.start_time);
+                const apptEnd = new Date(appt.end_time);
+                return (
+                  currentStart.getTime() < apptEnd.getTime() &&
+                  currentEnd.getTime() > apptStart.getTime()
+                );
+              });
+
+              if (!hasOverlap) {
+                dateHasSlot = true;
+                break;
+              }
+            }
+
+            currentStart = new Date(currentStart.getTime() + duration * 60 * 1000);
+          }
+
+          if (dateHasSlot) {
+            break;
+          }
+        }
+
+        if (dateHasSlot) {
+          availableDates.push(date);
+        }
+      }
+    } else {
+      // Fallback behavior (sequential database calls)
+      const datesWithSchedules = Array.from(new Set(schedules.map((schedule) => schedule.date))).sort();
+      for (const date of datesWithSchedules) {
+        const slotsResponse = await getAvailableTimeSlots({
+          serviceId,
+          doctorId,
+          date,
+        });
+
+        if (slotsResponse.availableSlots.length > 0) {
+          availableDates.push(date);
+        }
       }
     }
 
@@ -150,6 +252,9 @@ export class GetAvailabilityUseCase {
       getExistingAppointments: (dt, d) => this.availabilityQueries.getExistingAppointments(dt, d),
       getServiceDuration: (s) => this.availabilityQueries.getServiceDuration(s),
       resolveDoctorDisplayName: (d) => this.availabilityQueries.resolveDoctorDisplayName(d),
+      getExistingAppointmentsForMonth: this.availabilityQueries.getExistingAppointmentsForMonth
+        ? (m, d) => this.availabilityQueries.getExistingAppointmentsForMonth(m, d)
+        : undefined,
     }).getAvailableDays(dto);
   }
 
@@ -160,6 +265,9 @@ export class GetAvailabilityUseCase {
       getExistingAppointments: (dt, d) => this.availabilityQueries.getExistingAppointments(dt, d),
       getServiceDuration: (s) => this.availabilityQueries.getServiceDuration(s),
       resolveDoctorDisplayName: (d) => this.availabilityQueries.resolveDoctorDisplayName(d),
+      getExistingAppointmentsForMonth: this.availabilityQueries.getExistingAppointmentsForMonth
+        ? (m, d) => this.availabilityQueries.getExistingAppointmentsForMonth(m, d)
+        : undefined,
     }).getAvailableTimeSlots(dto);
   }
 }

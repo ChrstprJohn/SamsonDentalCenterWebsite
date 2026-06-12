@@ -36,8 +36,6 @@ interface UseUserBookingReturn {
   selectedDate: string | null;
   selectedSlot: BookingSlot | null;
   selectedDoctorId: string;
-  slotHoldRemaining: number;
-  isSlotHoldActive: boolean;
   patientType: 'SELF' | 'EXISTING_DEPENDENT' | 'NEW_DEPENDENT';
   selectedDependentId: string | null;
   newDependentData: NewDependentInput | null;
@@ -78,7 +76,7 @@ export function useUserBooking(services: ServiceResponseDto[] = []): UseUserBook
   const { addToast } = useToast();
 
   const state = useBookingState();
-  const data = useBookingData(state.selectedService?.id, state.selectedDate, state.selectedDoctorId);
+  const data = useBookingData(state.selectedService?.id, state.selectedDate, state.selectedDoctorId, state.currentStep);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -127,25 +125,21 @@ export function useUserBooking(services: ServiceResponseDto[] = []): UseUserBook
     state.setSelectedDate(null);
     state.setSelectedSlot(null);
     state.setSelectedDoctorId('ANY');
-    state.releaseSlotHold();
   };
 
   const selectDate = (date: string) => {
     state.setSelectedDate(date);
     state.setSelectedSlot(null);
-    state.releaseSlotHold();
   };
 
   const selectDoctor = (doctorId: string) => {
     state.setSelectedDoctorId(doctorId);
     state.setSelectedDate(null);
     state.setSelectedSlot(null);
-    state.releaseSlotHold();
   };
 
   const selectSlot = (slot: BookingSlot) => {
     state.setSelectedSlot(slot);
-    state.startSlotHold();
   };
 
   const validateAbuse = (): { valid: boolean; message?: string } => {
