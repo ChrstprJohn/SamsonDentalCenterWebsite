@@ -5,18 +5,15 @@ import { createClient } from '@/shared/database/server';
 vi.mock('server-only', () => ({}));
 vi.mock('@/shared/database/server');
 
-const { mockGetAvailableTimeSlots } = vi.hoisted(() => {
-  return { mockGetAvailableTimeSlots: vi.fn() };
+const { mockGetAvailableTimeSlotsUseCase } = vi.hoisted(() => {
+  return { mockGetAvailableTimeSlotsUseCase: vi.fn() };
 });
 
-vi.mock('../../use-cases/availability/get-availability.use-case', () => {
+vi.mock('../../use-cases', async (importOriginal) => {
+  const original = await importOriginal<any>();
   return {
-    getAvailabilityUseCase: () => ({
-      getAvailableTimeSlots: mockGetAvailableTimeSlots,
-    }),
-    GetAvailabilityUseCase: class {
-      getAvailableTimeSlots = mockGetAvailableTimeSlots;
-    },
+    ...original,
+    getAvailableTimeSlotsUseCase: () => mockGetAvailableTimeSlotsUseCase,
   };
 });
 
@@ -27,7 +24,7 @@ describe('getAvailableTimeSlotsAction', () => {
 
   it('successfully validates inputs and executes getAvailableTimeSlots', async () => {
     vi.mocked(createClient).mockResolvedValue({} as any);
-    mockGetAvailableTimeSlots.mockResolvedValue({
+    mockGetAvailableTimeSlotsUseCase.mockResolvedValueOnce({
       date: '2026-06-01',
       serviceId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd2',
       availableSlots: [],
@@ -48,7 +45,7 @@ describe('getAvailableTimeSlotsAction', () => {
         availableSlots: [],
       },
     });
-    expect(mockGetAvailableTimeSlots).toHaveBeenCalledWith(payload);
+    expect(mockGetAvailableTimeSlotsUseCase).toHaveBeenCalledWith(payload);
   });
 
   it('returns validation error on invalid input', async () => {
@@ -60,6 +57,6 @@ describe('getAvailableTimeSlotsAction', () => {
     const result = await getAvailableTimeSlotsAction(payload as any);
     expect(result.success).toBe(false);
     expect(result.error).toContain('Validation failed');
-    expect(mockGetAvailableTimeSlots).not.toHaveBeenCalled();
+    expect(mockGetAvailableTimeSlotsUseCase).not.toHaveBeenCalled();
   });
 });

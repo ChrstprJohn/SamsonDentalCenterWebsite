@@ -1,12 +1,16 @@
-import { SubmitBookingDto } from '../../dtos';
-import { AppointmentBookingCommands } from '../../repositories';
-import { GetAvailabilityUseCase } from '../availability/get-availability.use-case';
+import { SubmitBookingDto, GetAvailableTimeSlotsResponseDto } from '../../dtos';
 import { ValidationError } from '@/shared/errors';
 
 export const submitBookingUseCase = (deps: {
   createAppointment: (userId: string, data: SubmitBookingDto & { resolvedDependentId?: string }) => Promise<any>;
-  createDependent?: (data: any) => Promise<any>; // Optional dependency to support dependent creation
-  getAvailableTimeSlots: (dto: { serviceId: string; doctorId: string; date: string }) => Promise<any>;
+  createDependent?: (data: {
+    patientId: string;
+    firstName: string;
+    lastName: string;
+    dateOfBirth: string;
+    relationship: string;
+  }) => Promise<{ id: string }>;
+  getAvailableTimeSlots: (dto: { serviceId: string; doctorId: string; date: string }) => Promise<GetAvailableTimeSlotsResponseDto>;
 }) => {
   return async (userId: string, dto: SubmitBookingDto) => {
     const { serviceId, doctorId, date, startTime, endTime, patientType } = dto;
@@ -18,7 +22,7 @@ export const submitBookingUseCase = (deps: {
     });
 
     const isSlotAvailable = availability.availableSlots.some(
-      (slot: any) => slot.startTime === startTime && slot.endTime === endTime
+      (slot) => slot.startTime === startTime && slot.endTime === endTime
     );
 
     if (!isSlotAvailable) {
@@ -59,18 +63,3 @@ export const submitBookingUseCase = (deps: {
     }
   };
 };
-
-/** @deprecated Use submitBookingUseCase directly instead */
-export class SubmitBookingUseCase {
-  constructor(
-    private readonly bookingCommands: AppointmentBookingCommands,
-    private readonly availabilityUseCase: GetAvailabilityUseCase
-  ) {}
-
-  async execute(userId: string, dto: SubmitBookingDto) {
-    return submitBookingUseCase({
-      createAppointment: (uid, d) => this.bookingCommands.createAppointment(uid, d),
-      getAvailableTimeSlots: (d) => this.availabilityUseCase.getAvailableTimeSlots(d),
-    })(userId, dto);
-  }
-}

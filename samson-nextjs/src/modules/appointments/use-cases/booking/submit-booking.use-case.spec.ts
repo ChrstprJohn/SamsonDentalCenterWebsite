@@ -1,14 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { SubmitBookingUseCase } from './submit-booking.use-case';
-import { AppointmentBookingCommands } from '../../repositories/booking/appointment-booking.commands';
-import { GetAvailabilityUseCase } from '../availability/get-availability.use-case';
+import { submitBookingUseCase } from './submit-booking.use-case';
 import { SubmitBookingDto } from '../../dtos/booking/submit-booking.dto';
 import { ValidationError } from '@/shared/errors';
 
-describe('SubmitBookingUseCase', () => {
-  let useCase: SubmitBookingUseCase;
-  let mockBookingCommands: any;
-  let mockAvailabilityUseCase: any;
+describe('submitBookingUseCase', () => {
+  let mockCreateAppointment: any;
+  let mockGetAvailableTimeSlots: any;
 
   const mockDto: SubmitBookingDto = {
     idempotencyKey: '00000000-0000-0000-0000-000000000000',
@@ -23,23 +20,13 @@ describe('SubmitBookingUseCase', () => {
   };
 
   beforeEach(() => {
-    mockBookingCommands = {
-      createAppointment: vi.fn(),
-    };
-
-    mockAvailabilityUseCase = {
-      getAvailableTimeSlots: vi.fn(),
-    };
-
-    useCase = new SubmitBookingUseCase(
-      mockBookingCommands as unknown as AppointmentBookingCommands,
-      mockAvailabilityUseCase as unknown as GetAvailabilityUseCase
-    );
+    mockCreateAppointment = vi.fn();
+    mockGetAvailableTimeSlots = vi.fn();
   });
 
   it('should successfully book an appointment if the slot is completely available', async () => {
     // Mock the slot as available
-    mockAvailabilityUseCase.getAvailableTimeSlots.mockResolvedValueOnce({
+    mockGetAvailableTimeSlots.mockResolvedValueOnce({
       date: '2024-12-25',
       serviceId: mockDto.serviceId,
       availableSlots: [
@@ -53,32 +40,42 @@ describe('SubmitBookingUseCase', () => {
     });
 
     const mockCreatedAppt = { id: 'appt-123', status: 'PENDING' };
-    mockBookingCommands.createAppointment.mockResolvedValueOnce(mockCreatedAppt);
+    mockCreateAppointment.mockResolvedValueOnce(mockCreatedAppt);
 
-    const result = await useCase.execute('user-123', mockDto);
+    const useCase = submitBookingUseCase({
+      createAppointment: mockCreateAppointment,
+      getAvailableTimeSlots: mockGetAvailableTimeSlots,
+    });
+
+    const result = await useCase('user-123', mockDto);
 
     expect(result).toEqual(mockCreatedAppt);
-    expect(mockBookingCommands.createAppointment).toHaveBeenCalledWith('user-123', mockDto);
+    expect(mockCreateAppointment).toHaveBeenCalledWith('user-123', mockDto);
   });
 
   it('should throw ValidationError if the requested slot is not in the list of available slots', async () => {
     // Mock availability returning no slots (slot is taken)
-    mockAvailabilityUseCase.getAvailableTimeSlots.mockResolvedValueOnce({
+    mockGetAvailableTimeSlots.mockResolvedValueOnce({
       date: '2024-12-25',
       serviceId: mockDto.serviceId,
       availableSlots: [],
     });
 
-    await expect(useCase.execute('user-123', mockDto)).rejects.toThrow(
+    const useCase = submitBookingUseCase({
+      createAppointment: mockCreateAppointment,
+      getAvailableTimeSlots: mockGetAvailableTimeSlots,
+    });
+
+    await expect(useCase('user-123', mockDto)).rejects.toThrow(
       ValidationError
     );
 
-    expect(mockBookingCommands.createAppointment).not.toHaveBeenCalled();
+    expect(mockCreateAppointment).not.toHaveBeenCalled();
   });
 
   it('should throw ValidationError if a database unique constraint violation occurs', async () => {
     // Mock availability returning the slot as available (simulating race condition before DB insert)
-    mockAvailabilityUseCase.getAvailableTimeSlots.mockResolvedValueOnce({
+    mockGetAvailableTimeSlots.mockResolvedValueOnce({
       date: '2024-12-25',
       serviceId: mockDto.serviceId,
       availableSlots: [
@@ -94,9 +91,14 @@ describe('SubmitBookingUseCase', () => {
     // Mock DB unique constraint violation
     const dbError = new Error('duplicate key value violates unique constraint') as any;
     dbError.code = '23P01';
-    mockBookingCommands.createAppointment.mockRejectedValueOnce(dbError);
+    mockCreateAppointment.mockRejectedValueOnce(dbError);
 
-    await expect(useCase.execute('user-123', mockDto)).rejects.toThrow(
+    const useCase = submitBookingUseCase({
+      createAppointment: mockCreateAppointment,
+      getAvailableTimeSlots: mockGetAvailableTimeSlots,
+    });
+
+    await expect(useCase('user-123', mockDto)).rejects.toThrow(
       'This slot was just booked by someone else!'
     );
   });

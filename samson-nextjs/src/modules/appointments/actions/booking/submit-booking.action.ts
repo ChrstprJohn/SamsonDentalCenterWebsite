@@ -6,7 +6,6 @@ import { getAuthenticatedUser } from '@/shared/auth/auth.util';
 import { DomainError } from '@/shared/errors';
 import { submitBookingSchema, SubmitBookingDto } from '../../dtos';
 import {
-  getWorkingSchedulesForMonthQuery,
   getDoctorSchedulesQuery,
   getExistingAppointmentsQuery,
   getServiceDurationQuery,
@@ -14,7 +13,7 @@ import {
   createAppointmentCommand,
 } from '../../repositories';
 import {
-  getAvailabilityUseCase,
+  getAvailableTimeSlotsUseCase,
   submitBookingUseCase,
 } from '../../use-cases';
 
@@ -27,11 +26,10 @@ export async function submitBookingAction(formData: SubmitBookingDto) {
     const user = await getAuthenticatedUser();
     const supabase = await createClient();
 
-    const availabilityUseCase = getAvailabilityUseCase({
-      getWorkingSchedulesForMonth: getWorkingSchedulesForMonthQuery(supabase),
+    const getAvailableTimeSlots = getAvailableTimeSlotsUseCase({
+      getServiceDuration: getServiceDurationQuery(supabase),
       getDoctorSchedules: getDoctorSchedulesQuery(supabase),
       getExistingAppointments: getExistingAppointmentsQuery(supabase),
-      getServiceDuration: getServiceDurationQuery(supabase),
       resolveDoctorDisplayName: resolveDoctorDisplayNameQuery(supabase),
     });
 
@@ -41,7 +39,7 @@ export async function submitBookingAction(formData: SubmitBookingDto) {
     const useCase = submitBookingUseCase({
       createAppointment: createAppointmentCommand(supabase),
       createDependent,
-      getAvailableTimeSlots: availabilityUseCase.getAvailableTimeSlots,
+      getAvailableTimeSlots,
     });
 
     const appointment = await useCase(user.id, validData);

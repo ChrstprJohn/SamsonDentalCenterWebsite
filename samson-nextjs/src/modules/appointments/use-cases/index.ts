@@ -1,4 +1,3 @@
-export * from './availability/get-availability.use-case';
 export * from './availability/get-available-days.use-case';
 export * from './availability/get-available-time-slots.use-case';
 export * from './booking/submit-booking.use-case';

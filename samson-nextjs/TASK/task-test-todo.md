@@ -30,56 +30,50 @@ The following is a list of test files and test cases that need to be created/upd
 
 ## 2. Appointments Module Tests
 
-### [ ] `src/modules/appointments/repositories/availability/appointment-availability.queries.spec.ts` (Update)
-- **Target:** `getWorkingSchedulesForMonthQuery` and `getDoctorSchedulesQuery`
-- **Test cases:**
-  - Query schedules of all doctors works correctly.
-  - Query filtered by `serviceId` (only returns schedules of doctors who offer that service).
-  - Query filtered by both `doctorId` and `serviceId`.
+### [x] `src/modules/appointments/repositories/availability/get-working-schedules-for-month.queries.spec.ts` (New)
+### [x] `src/modules/appointments/repositories/availability/get-doctor-schedules.queries.spec.ts` (New)
+### [x] `src/modules/appointments/repositories/availability/get-existing-appointments.queries.spec.ts` (New)
+### [x] `src/modules/appointments/repositories/availability/get-service-duration.queries.spec.ts` (New)
+### [x] `src/modules/appointments/repositories/availability/resolve-doctor-display-name.queries.spec.ts` (New)
 
-### [ ] `src/modules/appointments/repositories/availability/get-existing-appointments-for-month.queries.spec.ts` (New)
+### [x] `src/modules/appointments/repositories/availability/get-existing-appointments-for-month.queries.spec.ts` (New)
 - **Target:** `getExistingAppointmentsForMonthQuery`
 - **Test cases:**
   - Retrieve all active appointments for the given month (e.g. YYYY-MM).
   - Filter active appointments by doctorId if provided.
   - Exclude appointments with cancelled, rejected, or displaced status.
 
-### [ ] `src/modules/appointments/dtos/availability/doctor-schedule-response.dto.spec.ts` (New)
+### [x] `src/modules/appointments/dtos/availability/doctor-schedule-response.dto.spec.ts` (New)
 - **Target:** `doctorScheduleResponseSchema`
 - **Test cases:**
   - Transform database keys (`doctor_id`, `day_of_week`, `start_time`, `end_time`, `break_start_time`, `break_end_time`) into standard camelCase properties.
   - Validate field types and UUID formats.
 
-### [ ] `src/modules/appointments/dtos/availability/appointment-response.dto.spec.ts` (New)
+### [x] `src/modules/appointments/dtos/availability/appointment-response.dto.spec.ts` (New)
 - **Target:** `appointmentResponseSchema`
 - **Test cases:**
   - Transform database keys (`start_time`, `end_time`, `doctor_id`) into standard camelCase properties.
   - Validate field types and UUID formats.
 
-### [ ] `src/modules/appointments/use-cases/availability/get-available-days.use-case.spec.ts` (New)
+### [x] `src/modules/appointments/use-cases/availability/get-available-days.use-case.spec.ts` (New)
 - **Target:** `getAvailableDaysUseCase`
 - **Test cases:**
   - Query schedules and calculate days correctly using in-memory calculations.
   - Fallback to sequential checks if in-memory dependencies are not defined.
 
-### [ ] `src/modules/appointments/use-cases/availability/get-available-time-slots.use-case.spec.ts` (New)
+### [x] `src/modules/appointments/use-cases/availability/get-available-time-slots.use-case.spec.ts` (New)
 - **Target:** `getAvailableTimeSlotsUseCase`
 - **Test cases:**
   - Retrieve and slice daily timeslots correctly.
   - Exclude lunch breaks and active appointments.
   - Verify doctor display name is resolved once per schedule.
 
-### [ ] `src/modules/appointments/utils/availability.utils.spec.ts` (New)
+### [x] `src/modules/appointments/utils/availability.utils.spec.ts` (New)
 - **Target:** `generateAvailableSlotsForDay`
 - **Test cases:**
   - Validate slot generation logic loop in-memory with various durations.
   - Verify lunch break exclusions.
   - Verify appointment overlap exclusions.
-
-### [ ] `src/modules/appointments/use-cases/availability/get-availability.use-case.spec.ts` (Update)
-- **Target:** `getAvailabilityUseCase` / `GetAvailabilityUseCase`
-- **Test cases:**
-  - Verify backwards compatibility wrapper correctly delegates to the split use cases.
 
 ### [ ] `src/modules/appointments/hooks/booking/use-booking-state.spec.ts` (Update)
 - **Target:** `useBookingState` hook

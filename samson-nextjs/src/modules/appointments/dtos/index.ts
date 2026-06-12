@@ -1,4 +1,6 @@
-export * from './availability/get-availability.dto';
+export * from './availability/get-available-days.dto';
+export * from './availability/get-available-time-slots.dto';
+export * from './availability/availability-internal.dto';
 export * from './availability/doctor-schedule-response.dto';
 export * from './availability/appointment-response.dto';
 export * from './booking/submit-booking.dto';
@@ -6,4 +8,3 @@ export * from './shared/appointment.dto';
 export * from './status/update-appointment-status.dto';
 export * from './clinic/get-clinic-appointments.dto';
 export * from './treatment/submit-treatment.dto';
-

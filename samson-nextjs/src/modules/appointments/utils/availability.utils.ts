@@ -1,32 +1,4 @@
-export interface ScheduleInput {
-  staffId: string;
-  startTime: string;
-  endTime: string;
-  breakStartTime?: string | null;
-  breakEndTime?: string | null;
-}
-
-export interface AppointmentInput {
-  id: string;
-  startTime: string;
-  endTime: string;
-  doctorId: string;
-  status: string;
-  date: string;
-}
-
-export interface GeneratedSlot {
-  startTime: string; // ISO string
-  endTime: string;   // ISO string
-  doctorId: string;
-}
-
-export interface GenerateSlotsParams {
-  date: string;
-  duration: number; // in minutes
-  schedules: ScheduleInput[];
-  appointments: AppointmentInput[];
-}
+import { GeneratedSlot, GenerateSlotsParams } from '../dtos';
 
 /**
  * Computes the available time slots for a single date based on working schedules and appointments.
@@ -37,8 +9,12 @@ export function generateAvailableSlotsForDay(params: GenerateSlotsParams): Gener
   const availableSlots: GeneratedSlot[] = [];
 
   for (const schedule of schedules) {
-    const docId = schedule.staffId;
+    const docId = schedule.doctorId;
     if (!docId) continue;
+
+    const docAppointments = appointments.filter(
+      (appt) => appt.doctorId === docId && appt.date === date
+    );
 
     const schedStartStr = schedule.startTime.includes(':')
       ? schedule.startTime
@@ -82,9 +58,6 @@ export function generateAvailableSlotsForDay(params: GenerateSlotsParams): Gener
         currentEnd.getTime() > breakStart.getTime();
 
       if (!fallsInBreak) {
-        const docAppointments = appointments.filter(
-          (appt) => appt.doctorId === docId && appt.date === date
-        );
         const hasOverlap = docAppointments.some((appt) => {
           const apptStart = new Date(appt.startTime);
           const apptEnd = new Date(appt.endTime);

@@ -11,7 +11,7 @@ import {
   getServiceDurationQuery,
   resolveDoctorDisplayNameQuery,
 } from '../../repositories';
-import { getAvailabilityUseCase } from '../../use-cases';
+import { getAvailableTimeSlotsUseCase } from '../../use-cases';
 
 /**
  * Retrieves the available time slots for booking on a specific date.
@@ -21,15 +21,14 @@ export async function getAvailableTimeSlotsAction(formData: GetAvailableTimeSlot
     const validData = getAvailableTimeSlotsSchema.parse(formData);
     const supabase = await createClient();
     
-    const useCase = getAvailabilityUseCase({
-      getWorkingSchedulesForMonth: getWorkingSchedulesForMonthQuery(supabase),
+    const useCase = getAvailableTimeSlotsUseCase({
+      getServiceDuration: getServiceDurationQuery(supabase),
       getDoctorSchedules: getDoctorSchedulesQuery(supabase),
       getExistingAppointments: getExistingAppointmentsQuery(supabase),
-      getServiceDuration: getServiceDurationQuery(supabase),
       resolveDoctorDisplayName: resolveDoctorDisplayNameQuery(supabase),
     });
 
-    const result = await useCase.getAvailableTimeSlots(validData);
+    const result = await useCase(validData);
     return { success: true, data: result };
   } catch (error) {
     if (error instanceof z.ZodError) {

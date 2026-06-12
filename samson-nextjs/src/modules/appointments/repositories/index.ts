@@ -1,9 +1,11 @@
-export * from './availability/appointment-availability.queries';
+export * from './availability/get-working-schedules-for-month.queries';
+export * from './availability/get-doctor-schedules.queries';
+export * from './availability/get-existing-appointments.queries';
+export * from './availability/get-service-duration.queries';
+export * from './availability/resolve-doctor-display-name.queries';
 export * from './availability/get-existing-appointments-for-month.queries';
 export * from './booking/appointment-booking.commands';
 export * from './status/appointment-status.commands';
 export * from './clinic/clinic-appointments.queries';
 export * from './patient/patient-appointments.queries';
 export * from './treatment/treatment.commands';
-
-

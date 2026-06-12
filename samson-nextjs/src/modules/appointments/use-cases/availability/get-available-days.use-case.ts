@@ -1,4 +1,10 @@
-import { GetAvailableDaysDto, GetAvailableDaysResponseDto } from '../../dtos';
+import {
+  GetAvailableDaysDto,
+  GetAvailableDaysResponseDto,
+  AppointmentResponseDto,
+  GetAvailableTimeSlotsResponseDto,
+  WorkingScheduleMonthItem,
+} from '../../dtos';
 import { generateAvailableSlotsForDay } from '../../utils/availability.utils';
 
 /**
@@ -6,15 +12,30 @@ import { generateAvailableSlotsForDay } from '../../utils/availability.utils';
  * Calculates daily calendar cell eligibility in-memory by pre-fetching schedules/appointments.
  */
 export const getAvailableDaysUseCase = (deps: {
-  getWorkingSchedulesForMonth: (month: string, doctorId?: string, serviceId?: string) => Promise<any[]>;
+  getWorkingSchedulesForMonth: (
+    month: string,
+    doctorId?: string,
+    serviceId?: string
+  ) => Promise<WorkingScheduleMonthItem[]>;
   getServiceDuration: (serviceId: string) => Promise<number>;
-  getExistingAppointmentsForMonth?: (month: string, doctorId?: string) => Promise<any[]>;
-  getAvailableTimeSlots?: (dto: { serviceId: string; doctorId?: string; date: string }) => Promise<any>;
+  getExistingAppointmentsForMonth?: (
+    month: string,
+    doctorId?: string
+  ) => Promise<AppointmentResponseDto[]>;
+  getAvailableTimeSlots?: (dto: {
+    serviceId: string;
+    doctorId?: string;
+    date: string;
+  }) => Promise<GetAvailableTimeSlotsResponseDto>;
 }) => {
   return async (dto: GetAvailableDaysDto): Promise<GetAvailableDaysResponseDto> => {
     const { month, serviceId, doctorId } = dto;
-    const duration = await deps.getServiceDuration(serviceId);
-    const schedules = await deps.getWorkingSchedulesForMonth(month, doctorId, serviceId);
+
+    // Eliminate async waterfall by running initial fetches concurrently in parallel
+    const [duration, schedules] = await Promise.all([
+      deps.getServiceDuration(serviceId),
+      deps.getWorkingSchedulesForMonth(month, doctorId, serviceId),
+    ]);
 
     if (!schedules || schedules.length === 0) {
       return { month, serviceId, availableDates: [] };
@@ -28,7 +49,7 @@ export const getAvailableDaysUseCase = (deps: {
         (s) => s.startTime !== undefined && s.endTime !== undefined
       );
 
-    let appointments: any[] = [];
+    let appointments: AppointmentResponseDto[] = [];
     if (canUseInMemory && deps.getExistingAppointmentsForMonth) {
       appointments = await deps.getExistingAppointmentsForMonth(month, doctorId);
     }
@@ -41,20 +62,14 @@ export const getAvailableDaysUseCase = (deps: {
       for (const date of datesWithSchedules) {
         const daySchedules = schedules.filter((s) => s.date === date);
 
-        // Map schedules to match utility input shape
-        const mappedSchedules = daySchedules.map((s) => ({
-          staffId: s.staffId,
-          startTime: s.startTime,
-          endTime: s.endTime,
-          breakStartTime: s.breakStartTime,
-          breakEndTime: s.breakEndTime,
-        }));
+        // Pre-filter appointments down to the specific date to optimize performance
+        const dayAppointments = appointments.filter((appt) => appt.date === date);
 
         const slots = generateAvailableSlotsForDay({
           date,
           duration,
-          schedules: mappedSchedules,
-          appointments,
+          schedules: daySchedules,
+          appointments: dayAppointments,
         });
 
         if (slots.length > 0) {
@@ -62,20 +77,20 @@ export const getAvailableDaysUseCase = (deps: {
         }
       }
     } else {
-      // Fallback behavior: sequential checking using daily availability calls
+      // Fallback behavior: parallel checking using daily availability calls to avoid async waterfall
       const datesWithSchedules = Array.from(new Set(schedules.map((schedule) => schedule.date))).sort();
-      for (const date of datesWithSchedules) {
-        if (deps.getAvailableTimeSlots) {
-          const slotsResponse = await deps.getAvailableTimeSlots({
+      if (deps.getAvailableTimeSlots) {
+        const checkAvailabilityPromises = datesWithSchedules.map(async (date) => {
+          const slotsResponse = await deps.getAvailableTimeSlots!({
             serviceId,
             doctorId,
             date,
           });
+          return slotsResponse.availableSlots.length > 0 ? date : null;
+        });
 
-          if (slotsResponse.availableSlots.length > 0) {
-            availableDates.push(date);
-          }
-        }
+        const results = await Promise.all(checkAvailabilityPromises);
+        availableDates.push(...results.filter((date): date is string => date !== null));
       }
     }
 
