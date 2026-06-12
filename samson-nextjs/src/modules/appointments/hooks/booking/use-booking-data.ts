@@ -1,14 +1,47 @@
 import { useState, useEffect } from 'react';
 import { getAvailableDaysAction } from '../../actions/availability/get-available-days.action';
 import { getAvailableTimeSlotsAction } from '../../actions/availability/get-available-time-slots.action';
+import { getDoctorsAction } from '@/modules/staff/actions/management/get-doctors.action';
+import type { UserProfileResponseDto } from '@/modules/staff/dtos';
 import type { BookingSlot } from './use-user-booking';
 
-export function useBookingData(selectedServiceId: string | undefined, selectedDate: string | null) {
+export function useBookingData(
+  selectedServiceId: string | undefined,
+  selectedDate: string | null,
+  selectedDoctorId: string | undefined
+) {
   const [availableDates, setAvailableDates] = useState<string[]>([]);
   const [availableSlots, setAvailableSlots] = useState<BookingSlot[]>([]);
+  const [doctors, setDoctors] = useState<UserProfileResponseDto[]>([]);
   const [isLoadingAvailability, setIsLoadingAvailability] = useState(false);
+  const [isLoadingDoctors, setIsLoadingDoctors] = useState(false);
 
-  // Fetch Available Dates when Service is selected
+  // Fetch Doctors when Service is selected
+  useEffect(() => {
+    async function fetchDoctors() {
+      if (!selectedServiceId) {
+        setDoctors([]);
+        return;
+      }
+      setIsLoadingDoctors(true);
+      try {
+        const res = await getDoctorsAction({ serviceId: selectedServiceId });
+        if (res.success && res.data) {
+          setDoctors(res.data);
+        } else {
+          setDoctors([]);
+        }
+      } catch (err) {
+        console.error(err);
+        setDoctors([]);
+      } finally {
+        setIsLoadingDoctors(false);
+      }
+    }
+    fetchDoctors();
+  }, [selectedServiceId]);
+
+  // Fetch Available Dates when Service/Doctor is selected
   useEffect(() => {
     async function fetchDates() {
       if (!selectedServiceId) {
@@ -22,6 +55,7 @@ export function useBookingData(selectedServiceId: string | undefined, selectedDa
         const res = await getAvailableDaysAction({
           serviceId: selectedServiceId,
           month: monthStr,
+          doctorId: selectedDoctorId === 'ANY' ? undefined : selectedDoctorId,
         });
         if (res.success && res.data) {
           setAvailableDates(res.data.availableDates);
@@ -36,9 +70,9 @@ export function useBookingData(selectedServiceId: string | undefined, selectedDa
       }
     }
     fetchDates();
-  }, [selectedServiceId]);
+  }, [selectedServiceId, selectedDoctorId]);
 
-  // Fetch Available Slots when Date is selected
+  // Fetch Available Slots when Date/Doctor is selected
   useEffect(() => {
     async function fetchSlots() {
       if (!selectedServiceId || !selectedDate) {
@@ -50,6 +84,7 @@ export function useBookingData(selectedServiceId: string | undefined, selectedDa
         const res = await getAvailableTimeSlotsAction({
           serviceId: selectedServiceId,
           date: selectedDate,
+          doctorId: selectedDoctorId === 'ANY' ? undefined : selectedDoctorId,
         });
         if (res.success && res.data) {
           const formattedSlots: BookingSlot[] = res.data.availableSlots.map(slot => {
@@ -77,13 +112,16 @@ export function useBookingData(selectedServiceId: string | undefined, selectedDa
       }
     }
     fetchSlots();
-  }, [selectedServiceId, selectedDate]);
+  }, [selectedServiceId, selectedDate, selectedDoctorId]);
 
   return {
     availableDates,
     availableSlots,
+    doctors,
     isLoadingAvailability,
+    isLoadingDoctors,
     setAvailableDates,
     setAvailableSlots,
   };
 }
+

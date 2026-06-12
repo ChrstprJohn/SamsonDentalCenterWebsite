@@ -21,6 +21,7 @@ export function BookingView({ services }: BookingViewProps) {
     selectedService,
     selectedDate,
     selectedSlot,
+    selectedDoctorId,
     slotHoldRemaining,
     isSlotHoldActive,
     patientType,
@@ -31,7 +32,9 @@ export function BookingView({ services }: BookingViewProps) {
     privacyAccepted,
     availableDates,
     availableSlots,
+    doctors,
     isLoadingAvailability,
+    isLoadingDoctors,
     isSubmitting,
     isSuccess,
     isNextDisabled,
@@ -42,6 +45,7 @@ export function BookingView({ services }: BookingViewProps) {
     selectService,
     selectDate,
     selectSlot,
+    selectDoctor,
     setPatientType,
     setSelectedDependentId,
     setNewDependentData,
@@ -82,13 +86,17 @@ export function BookingView({ services }: BookingViewProps) {
           <DateTimeStep
             selectedDate={selectedDate}
             selectedSlot={selectedSlot}
+            selectedDoctorId={selectedDoctorId}
+            doctors={doctors}
             availableDates={availableDates}
             availableSlots={availableSlots}
             isLoading={isLoadingAvailability}
+            isLoadingDoctors={isLoadingDoctors}
             slotHoldRemaining={slotHoldRemaining}
             isSlotHoldActive={isSlotHoldActive}
             onSelectDate={selectDate}
             onSelectSlot={selectSlot}
+            onSelectDoctor={selectDoctor}
           />
         )}
         {currentStep === 3 && (

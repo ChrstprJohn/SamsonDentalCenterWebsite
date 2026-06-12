@@ -35,6 +35,7 @@ interface UseUserBookingReturn {
   selectedService: ServiceResponseDto | null;
   selectedDate: string | null;
   selectedSlot: BookingSlot | null;
+  selectedDoctorId: string;
   slotHoldRemaining: number;
   isSlotHoldActive: boolean;
   patientType: 'SELF' | 'EXISTING_DEPENDENT' | 'NEW_DEPENDENT';
@@ -46,7 +47,9 @@ interface UseUserBookingReturn {
   
   availableDates: string[];
   availableSlots: BookingSlot[];
+  doctors: any[];
   isLoadingAvailability: boolean;
+  isLoadingDoctors: boolean;
 
   isSubmitting: boolean;
   isSuccess: boolean;
@@ -58,6 +61,7 @@ interface UseUserBookingReturn {
   selectService: (service: ServiceResponseDto) => void;
   selectDate: (date: string) => void;
   selectSlot: (slot: BookingSlot) => void;
+  selectDoctor: (doctorId: string) => void;
   setPatientType: (type: 'SELF' | 'EXISTING_DEPENDENT' | 'NEW_DEPENDENT') => void;
   setSelectedDependentId: (id: string | null) => void;
   setNewDependentData: (data: NewDependentInput | null) => void;
@@ -74,7 +78,7 @@ export function useUserBooking(services: ServiceResponseDto[] = []): UseUserBook
   const { addToast } = useToast();
 
   const state = useBookingState();
-  const data = useBookingData(state.selectedService?.id, state.selectedDate);
+  const data = useBookingData(state.selectedService?.id, state.selectedDate, state.selectedDoctorId);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -122,11 +126,19 @@ export function useUserBooking(services: ServiceResponseDto[] = []): UseUserBook
     state.setSelectedService(service);
     state.setSelectedDate(null);
     state.setSelectedSlot(null);
+    state.setSelectedDoctorId('ANY');
     state.releaseSlotHold();
   };
 
   const selectDate = (date: string) => {
     state.setSelectedDate(date);
+    state.setSelectedSlot(null);
+    state.releaseSlotHold();
+  };
+
+  const selectDoctor = (doctorId: string) => {
+    state.setSelectedDoctorId(doctorId);
+    state.setSelectedDate(null);
     state.setSelectedSlot(null);
     state.releaseSlotHold();
   };
@@ -220,6 +232,7 @@ export function useUserBooking(services: ServiceResponseDto[] = []): UseUserBook
     selectService,
     selectDate,
     selectSlot,
+    selectDoctor,
     validateAbuse,
     resetWizard,
     handleSubmit,

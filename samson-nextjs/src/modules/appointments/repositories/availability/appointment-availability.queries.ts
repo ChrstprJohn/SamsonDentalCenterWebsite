@@ -2,7 +2,7 @@ import { SupabaseClient } from '@supabase/supabase-js';
 import { DomainError } from '@/shared/errors';
 
 export const getWorkingSchedulesForMonthQuery = (supabase: SupabaseClient) => {
-  return async (month: string, doctorId?: string) => {
+  return async (month: string, doctorId?: string, serviceId?: string) => {
     // month is format YYYY-MM
     let query = supabase
       .from('doctor_schedules')
@@ -10,6 +10,19 @@ export const getWorkingSchedulesForMonthQuery = (supabase: SupabaseClient) => {
 
     if (doctorId) {
       query = query.eq('doctor_id', doctorId);
+    }
+
+    if (serviceId) {
+      const { data: mappings } = await supabase
+        .from('doctor_services')
+        .select('doctor_id')
+        .eq('service_id', serviceId);
+
+      const doctorIds = mappings?.map((m: any) => m.doctor_id) || [];
+      if (doctorIds.length === 0) {
+        return [];
+      }
+      query = query.in('doctor_id', doctorIds);
     }
 
     const { data: schedules, error } = await query;
@@ -41,7 +54,7 @@ export const getWorkingSchedulesForMonthQuery = (supabase: SupabaseClient) => {
 };
 
 export const getDoctorSchedulesQuery = (supabase: SupabaseClient) => {
-  return async (date: string, doctorId?: string) => {
+  return async (date: string, doctorId?: string, serviceId?: string) => {
     const dayOfWeek = new Date(date).getDay();
     let query = supabase
       .from('doctor_schedules')
@@ -50,6 +63,19 @@ export const getDoctorSchedulesQuery = (supabase: SupabaseClient) => {
 
     if (doctorId) {
       query = query.eq('doctor_id', doctorId);
+    }
+
+    if (serviceId) {
+      const { data: mappings } = await supabase
+        .from('doctor_services')
+        .select('doctor_id')
+        .eq('service_id', serviceId);
+
+      const doctorIds = mappings?.map((m: any) => m.doctor_id) || [];
+      if (doctorIds.length === 0) {
+        return [];
+      }
+      query = query.in('doctor_id', doctorIds);
     }
 
     const { data: schedules, error } = await query;
@@ -126,12 +152,12 @@ export const resolveDoctorDisplayNameQuery = (supabase: SupabaseClient) => {
 export class AppointmentAvailabilityQueries {
   constructor(private readonly supabase: SupabaseClient) {}
 
-  async getWorkingSchedulesForMonth(month: string, doctorId?: string) {
-    return getWorkingSchedulesForMonthQuery(this.supabase)(month, doctorId);
+  async getWorkingSchedulesForMonth(month: string, doctorId?: string, serviceId?: string) {
+    return getWorkingSchedulesForMonthQuery(this.supabase)(month, doctorId, serviceId);
   }
 
-  async getDoctorSchedules(date: string, doctorId?: string) {
-    return getDoctorSchedulesQuery(this.supabase)(date, doctorId);
+  async getDoctorSchedules(date: string, doctorId?: string, serviceId?: string) {
+    return getDoctorSchedulesQuery(this.supabase)(date, doctorId, serviceId);
   }
 
   async getExistingAppointments(date: string, doctorId?: string) {

@@ -9,6 +9,7 @@ export function useBookingState() {
   const [selectedService, setSelectedService] = useState<ServiceResponseDto | null>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<BookingSlot | null>(null);
+  const [selectedDoctorId, setSelectedDoctorId] = useState<string>('ANY');
   
   const [slotHoldRemaining, setSlotHoldRemaining] = useState<number>(HOLD_DURATION_SECONDS);
   const [isSlotHoldActive, setIsSlotHoldActive] = useState<boolean>(false);
@@ -58,6 +59,7 @@ export function useBookingState() {
     setSelectedService(null);
     setSelectedDate(null);
     setSelectedSlot(null);
+    setSelectedDoctorId('ANY');
     releaseSlotHold();
     setPatientType('SELF');
     setSelectedDependentId(null);
@@ -72,6 +74,7 @@ export function useBookingState() {
     selectedService, setSelectedService,
     selectedDate, setSelectedDate,
     selectedSlot, setSelectedSlot,
+    selectedDoctorId, setSelectedDoctorId,
     slotHoldRemaining,
     isSlotHoldActive,
     patientType, setPatientType,

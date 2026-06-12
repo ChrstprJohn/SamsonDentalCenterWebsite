@@ -8,8 +8,8 @@ import {
 } from '../../dtos';
 
 export const getAvailabilityUseCase = (deps: {
-  getWorkingSchedulesForMonth: (month: string, doctorId?: string) => Promise<any[]>;
-  getDoctorSchedules: (date: string, doctorId?: string) => Promise<any[]>;
+  getWorkingSchedulesForMonth: (month: string, doctorId?: string, serviceId?: string) => Promise<any[]>;
+  getDoctorSchedules: (date: string, doctorId?: string, serviceId?: string) => Promise<any[]>;
   getExistingAppointments: (date: string, doctorId?: string) => Promise<any[]>;
   getServiceDuration: (serviceId: string) => Promise<number>;
   resolveDoctorDisplayName: (doctorId: string) => Promise<string>;
@@ -20,7 +20,7 @@ export const getAvailabilityUseCase = (deps: {
     const { serviceId, doctorId, date } = dto;
 
     const duration = await deps.getServiceDuration(serviceId);
-    const schedules = await deps.getDoctorSchedules(date, doctorId);
+    const schedules = await deps.getDoctorSchedules(date, doctorId, serviceId);
     const appointments = await deps.getExistingAppointments(date, doctorId);
 
     const availableSlots: AvailableSlotDto[] = [];
@@ -106,7 +106,7 @@ export const getAvailabilityUseCase = (deps: {
 
   const getAvailableDays = async (dto: GetAvailableDaysDto): Promise<GetAvailableDaysResponseDto> => {
     const { month, serviceId, doctorId } = dto;
-    const schedules = await deps.getWorkingSchedulesForMonth(month, doctorId);
+    const schedules = await deps.getWorkingSchedulesForMonth(month, doctorId, serviceId);
 
     if (!schedules || schedules.length === 0) {
       return { month, serviceId, availableDates: [] };
@@ -145,8 +145,8 @@ export class GetAvailabilityUseCase {
 
   async getAvailableDays(dto: GetAvailableDaysDto): Promise<GetAvailableDaysResponseDto> {
     return getAvailabilityUseCase({
-      getWorkingSchedulesForMonth: (m, d) => this.availabilityQueries.getWorkingSchedulesForMonth(m, d),
-      getDoctorSchedules: (dt, d) => this.availabilityQueries.getDoctorSchedules(dt, d),
+      getWorkingSchedulesForMonth: (m, d, s) => this.availabilityQueries.getWorkingSchedulesForMonth(m, d, s),
+      getDoctorSchedules: (dt, d, s) => this.availabilityQueries.getDoctorSchedules(dt, d, s),
       getExistingAppointments: (dt, d) => this.availabilityQueries.getExistingAppointments(dt, d),
       getServiceDuration: (s) => this.availabilityQueries.getServiceDuration(s),
       resolveDoctorDisplayName: (d) => this.availabilityQueries.resolveDoctorDisplayName(d),
@@ -155,8 +155,8 @@ export class GetAvailabilityUseCase {
 
   async getAvailableTimeSlots(dto: GetAvailableTimeSlotsDto): Promise<GetAvailableTimeSlotsResponseDto> {
     return getAvailabilityUseCase({
-      getWorkingSchedulesForMonth: (m, d) => this.availabilityQueries.getWorkingSchedulesForMonth(m, d),
-      getDoctorSchedules: (dt, d) => this.availabilityQueries.getDoctorSchedules(dt, d),
+      getWorkingSchedulesForMonth: (m, d, s) => this.availabilityQueries.getWorkingSchedulesForMonth(m, d, s),
+      getDoctorSchedules: (dt, d, s) => this.availabilityQueries.getDoctorSchedules(dt, d, s),
       getExistingAppointments: (dt, d) => this.availabilityQueries.getExistingAppointments(dt, d),
       getServiceDuration: (s) => this.availabilityQueries.getServiceDuration(s),
       resolveDoctorDisplayName: (d) => this.availabilityQueries.resolveDoctorDisplayName(d),

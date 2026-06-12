@@ -20,19 +20,19 @@
   - [x] Ensure the booking flow UI correctly fetches and reflects the active services in Step 1.
 
 ### Phase 2: Align Step 2 with Business Plan (Doctor Selection)
-- [ ] **1. State Management Updates (`use-booking-state.ts`)**
-  - [ ] Add `selectedDoctorId` state (defaulting to `'ANY'`).
-  - [ ] Add a `selectDoctor` updater function.
-- [ ] **2. Data Fetching Hooks (`use-booking-data.ts`)**
-  - [ ] Modify `useBookingData` to accept `selectedDoctorId` as a parameter.
-  - [ ] Pass `selectedDoctorId` to `getAvailableDaysAction` and `getAvailableTimeSlotsAction` so it filters availability based on the chosen doctor's schedule.
-- [ ] **3. Backend Server Actions Updates**
-  - [ ] Ensure `getAvailableDaysAction` and `getAvailableTimeSlotsAction` accept and respect an optional `doctorId` parameter.
-  - [ ] Ensure timeslots returned include the correct `doctorId` and `doctorName` metadata.
-- [ ] **4. Frontend UI Components (`date-time-step.tsx`)**
-  - [ ] Fetch the list of active doctors (e.g., via a new `getDoctorsAction`).
-  - [ ] Add a Dropdown or Card Selection UI above the Date Carousel allowing users to select "Any Doctor" or a specific doctor.
-  - [ ] Ensure the Date Carousel disables dates where the selected doctor is not working.
+- [x] **1. State Management Updates (`use-booking-state.ts`)**
+  - [x] Add `selectedDoctorId` state (defaulting to `'ANY'`).
+  - [x] Add a `selectDoctor` updater function.
+- [x] **2. Data Fetching Hooks (`use-booking-data.ts`)**
+  - [x] Modify `useBookingData` to accept `selectedDoctorId` as a parameter.
+  - [x] Pass `selectedDoctorId` to `getAvailableDaysAction` and `getAvailableTimeSlotsAction` so it filters availability based on the chosen doctor's schedule.
+- [x] **3. Backend Server Actions Updates**
+  - [x] Ensure `getAvailableDaysAction` and `getAvailableTimeSlotsAction` accept and respect an optional `doctorId` parameter.
+  - [x] Ensure timeslots returned include the correct `doctorId` and `doctorName` metadata.
+- [x] **4. Frontend UI Components (`date-time-step.tsx`)**
+  - [x] Fetch the list of active doctors (e.g., via a new `getDoctorsAction`).
+  - [x] Add a Dropdown or Card Selection UI above the Date Carousel allowing users to select "Any Doctor" or a specific doctor.
+  - [x] Ensure the Date Carousel disables dates where the selected doctor is not working.
 
 ### Phase 3: Architectural Audit Fixes (V2 Compliance)
 - [ ] **1. Zod Transformation Blueprint Refactor (`backend/1.5-CODING-PATTERNS.md`)**
