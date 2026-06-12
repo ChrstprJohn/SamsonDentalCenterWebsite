@@ -26,6 +26,7 @@ export function useBookingData(
       setIsLoadingDoctors(true);
       try {
         const res = await getDoctorsAction({ serviceId: selectedServiceId });
+        console.log('getDoctorsAction result in browser:', res);
         if (res.success && res.data) {
           setDoctors(res.data);
         } else {
