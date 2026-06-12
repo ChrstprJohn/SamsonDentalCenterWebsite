@@ -6,7 +6,6 @@ describe('getAvailableTimeSlotsUseCase', () => {
   const doctorId = '22222222-2222-2222-2222-222222222222';
 
   it('should generate available time slots correctly when doctor has working schedule and no appointments or breaks', async () => {
-    const getServiceDuration = vi.fn().mockResolvedValue(30);
     const getDoctorSchedules = vi.fn().mockResolvedValue([
       {
         id: 'sched-1',
@@ -16,16 +15,15 @@ describe('getAvailableTimeSlotsUseCase', () => {
         endTime: '11:00:00',
         breakStartTime: null,
         breakEndTime: null,
+        doctorName: 'Dr. John Doe',
       },
     ]);
     const getExistingAppointments = vi.fn().mockResolvedValue([]);
-    const resolveDoctorDisplayName = vi.fn().mockResolvedValue('Dr. John Doe');
 
     const useCase = getAvailableTimeSlotsUseCase({
-      getServiceDuration,
+      duration: 30,
       getDoctorSchedules,
       getExistingAppointments,
-      resolveDoctorDisplayName,
     });
 
     const result = await useCase({
@@ -50,7 +48,6 @@ describe('getAvailableTimeSlotsUseCase', () => {
   });
 
   it('should exclude slots that overlap with doctor break time', async () => {
-    const getServiceDuration = vi.fn().mockResolvedValue(30);
     const getDoctorSchedules = vi.fn().mockResolvedValue([
       {
         id: 'sched-1',
@@ -60,16 +57,15 @@ describe('getAvailableTimeSlotsUseCase', () => {
         endTime: '11:00:00',
         breakStartTime: '10:00:00',
         breakEndTime: '10:30:00',
+        doctorName: 'Dr. John Doe',
       },
     ]);
     const getExistingAppointments = vi.fn().mockResolvedValue([]);
-    const resolveDoctorDisplayName = vi.fn().mockResolvedValue('Dr. John Doe');
 
     const useCase = getAvailableTimeSlotsUseCase({
-      getServiceDuration,
+      duration: 30,
       getDoctorSchedules,
       getExistingAppointments,
-      resolveDoctorDisplayName,
     });
 
     const result = await useCase({
@@ -85,7 +81,6 @@ describe('getAvailableTimeSlotsUseCase', () => {
   });
 
   it('should exclude slots that overlap with existing appointments', async () => {
-    const getServiceDuration = vi.fn().mockResolvedValue(30);
     const getDoctorSchedules = vi.fn().mockResolvedValue([
       {
         id: 'sched-1',
@@ -95,6 +90,7 @@ describe('getAvailableTimeSlotsUseCase', () => {
         endTime: '11:00:00',
         breakStartTime: null,
         breakEndTime: null,
+        doctorName: 'Dr. John Doe',
       },
     ]);
     const getExistingAppointments = vi.fn().mockResolvedValue([
@@ -107,13 +103,11 @@ describe('getAvailableTimeSlotsUseCase', () => {
         date: '2024-12-25',
       },
     ]);
-    const resolveDoctorDisplayName = vi.fn().mockResolvedValue('Dr. John Doe');
 
     const useCase = getAvailableTimeSlotsUseCase({
-      getServiceDuration,
+      duration: 30,
       getDoctorSchedules,
       getExistingAppointments,
-      resolveDoctorDisplayName,
     });
 
     const result = await useCase({

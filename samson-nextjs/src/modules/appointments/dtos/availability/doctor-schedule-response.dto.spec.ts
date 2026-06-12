@@ -12,7 +12,7 @@ describe('doctorScheduleResponseSchema', () => {
     break_end_time: '13:00:00',
   };
 
-  it('should successfully parse and transform a valid database schedule record', () => {
+  it('should successfully parse and transform a valid database schedule record without doctor details', () => {
     const result = doctorScheduleResponseSchema.parse(validRecord);
     expect(result).toEqual({
       id: validRecord.id,
@@ -22,6 +22,28 @@ describe('doctorScheduleResponseSchema', () => {
       endTime: validRecord.end_time,
       breakStartTime: validRecord.break_start_time,
       breakEndTime: validRecord.break_end_time,
+      doctorName: undefined,
+    });
+  });
+
+  it('should successfully parse and transform a valid record with joined doctor details', () => {
+    const recordWithDoctor = {
+      ...validRecord,
+      doctor: {
+        first_name: 'Jane',
+        last_name: 'Doe',
+      },
+    };
+    const result = doctorScheduleResponseSchema.parse(recordWithDoctor);
+    expect(result).toEqual({
+      id: validRecord.id,
+      doctorId: validRecord.doctor_id,
+      dayOfWeek: validRecord.day_of_week,
+      startTime: validRecord.start_time,
+      endTime: validRecord.end_time,
+      breakStartTime: validRecord.break_start_time,
+      breakEndTime: validRecord.break_end_time,
+      doctorName: 'Dr. Jane Doe',
     });
   });
 

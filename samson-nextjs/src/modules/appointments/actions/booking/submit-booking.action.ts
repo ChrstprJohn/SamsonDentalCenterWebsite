@@ -9,7 +9,6 @@ import {
   getDoctorSchedulesQuery,
   getExistingAppointmentsQuery,
   getServiceDurationQuery,
-  resolveDoctorDisplayNameQuery,
   createAppointmentCommand,
 } from '../../repositories';
 import {
@@ -25,12 +24,12 @@ export async function submitBookingAction(formData: SubmitBookingDto) {
     const validData = submitBookingSchema.parse(formData);
     const user = await getAuthenticatedUser();
     const supabase = await createClient();
+    const duration = getServiceDurationQuery(supabase)(validData.serviceId);
 
     const getAvailableTimeSlots = getAvailableTimeSlotsUseCase({
-      getServiceDuration: getServiceDurationQuery(supabase),
+      duration,
       getDoctorSchedules: getDoctorSchedulesQuery(supabase),
       getExistingAppointments: getExistingAppointmentsQuery(supabase),
-      resolveDoctorDisplayName: resolveDoctorDisplayNameQuery(supabase),
     });
 
     const { addDependentCommand } = await import('@/modules/patients/repositories');

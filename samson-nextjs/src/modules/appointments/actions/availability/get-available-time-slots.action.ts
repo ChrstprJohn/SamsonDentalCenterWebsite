@@ -5,11 +5,9 @@ import { createClient } from '@/shared/database/server';
 import { DomainError } from '@/shared/errors';
 import { getAvailableTimeSlotsSchema, GetAvailableTimeSlotsDto } from '../../dtos';
 import {
-  getWorkingSchedulesForMonthQuery,
   getDoctorSchedulesQuery,
   getExistingAppointmentsQuery,
   getServiceDurationQuery,
-  resolveDoctorDisplayNameQuery,
 } from '../../repositories';
 import { getAvailableTimeSlotsUseCase } from '../../use-cases';
 
@@ -20,12 +18,12 @@ export async function getAvailableTimeSlotsAction(formData: GetAvailableTimeSlot
   try {
     const validData = getAvailableTimeSlotsSchema.parse(formData);
     const supabase = await createClient();
+    const duration = getServiceDurationQuery(supabase)(validData.serviceId);
     
     const useCase = getAvailableTimeSlotsUseCase({
-      getServiceDuration: getServiceDurationQuery(supabase),
+      duration,
       getDoctorSchedules: getDoctorSchedulesQuery(supabase),
       getExistingAppointments: getExistingAppointmentsQuery(supabase),
-      resolveDoctorDisplayName: resolveDoctorDisplayNameQuery(supabase),
     });
 
     const result = await useCase(validData);

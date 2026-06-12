@@ -5,25 +5,22 @@ import { doctorScheduleResponseSchema } from '../../dtos';
 export const getWorkingSchedulesForMonthQuery = (supabase: SupabaseClient) => {
   return async (month: string, doctorId?: string, serviceId?: string) => {
     // month is format YYYY-MM
+    let selectFields = 'id, day_of_week, doctor_id, start_time, end_time, break_start_time, break_end_time, doctor:doctor_id!inner(first_name, last_name)';
+
+    if (serviceId) {
+      selectFields = 'id, day_of_week, doctor_id, start_time, end_time, break_start_time, break_end_time, doctor:doctor_id!inner(first_name, last_name, doctor_services!inner(service_id))';
+    }
+
     let query = supabase
       .from('doctor_schedules')
-      .select('id, day_of_week, doctor_id, start_time, end_time, break_start_time, break_end_time');
+      .select(selectFields);
 
     if (doctorId) {
       query = query.eq('doctor_id', doctorId);
     }
 
     if (serviceId) {
-      const { data: mappings } = await supabase
-        .from('doctor_services')
-        .select('doctor_id')
-        .eq('service_id', serviceId);
-
-      const doctorIds = mappings?.map((m: any) => m.doctor_id) || [];
-      if (doctorIds.length === 0) {
-        return [];
-      }
-      query = query.in('doctor_id', doctorIds);
+      query = query.eq('doctor.doctor_services.service_id', serviceId);
     }
 
     const { data: schedules, error } = await query;

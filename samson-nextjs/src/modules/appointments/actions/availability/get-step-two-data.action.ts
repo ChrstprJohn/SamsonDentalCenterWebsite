@@ -12,31 +12,47 @@ import {
   getExistingAppointmentsForMonthQuery,
 } from '../../repositories';
 import { getAvailableDaysUseCase, getAvailableTimeSlotsUseCase } from '../../use-cases';
+import { getActiveDoctorsQuery } from '@/modules/staff/repositories';
+import { getDoctorsUseCase } from '@/modules/staff/use-cases';
 
 /**
- * Retrieves the available calendar days for booking in a given month.
+ * Consolidates step two availability and doctor preference data in a single flight.
  */
-export async function getAvailableDaysAction(formData: GetAvailableDaysDto) {
+export async function getStepTwoDataAction(formData: GetAvailableDaysDto) {
   try {
     const validData = getAvailableDaysSchema.parse(formData);
     const supabase = await createClient();
+
+    // Initialize Use Cases
+    const getDoctors = getDoctorsUseCase(getActiveDoctorsQuery(supabase));
     const duration = getServiceDurationQuery(supabase)(validData.serviceId);
-    
+
     const getAvailableTimeSlots = getAvailableTimeSlotsUseCase({
       duration,
       getDoctorSchedules: getDoctorSchedulesQuery(supabase),
       getExistingAppointments: getExistingAppointmentsQuery(supabase),
     });
 
-    const useCase = getAvailableDaysUseCase({
+    const getAvailableDays = getAvailableDaysUseCase({
       getWorkingSchedulesForMonth: getWorkingSchedulesForMonthQuery(supabase),
       duration,
       getExistingAppointmentsForMonth: getExistingAppointmentsForMonthQuery(supabase),
       getAvailableTimeSlots,
     });
 
-    const result = await useCase(validData);
-    return { success: true, data: result };
+    // Execute concurrently in parallel
+    const [doctors, availability] = await Promise.all([
+      getDoctors(validData.serviceId),
+      getAvailableDays(validData),
+    ]);
+
+    return {
+      success: true,
+      data: {
+        doctors,
+        availability,
+      },
+    };
   } catch (error) {
     if (error instanceof z.ZodError) {
       return {
@@ -47,7 +63,7 @@ export async function getAvailableDaysAction(formData: GetAvailableDaysDto) {
     if (error instanceof DomainError) {
       return { success: false, error: error.message };
     }
-    console.error('ACTION ERROR (getAvailableDays):', error);
+    console.error('ACTION ERROR (getStepTwoData):', error);
     return { success: false, error: 'An unexpected system error occurred' };
   }
 }

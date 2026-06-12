@@ -59,6 +59,7 @@ describe('getAvailableDaysResponseSchema', () => {
         month: '2026-05',
         serviceId: VALID_SERVICE_ID,
         availableDates: [],
+        availabilityMap: {},
       }).success
     ).toBe(true);
 
@@ -67,6 +68,16 @@ describe('getAvailableDaysResponseSchema', () => {
         month: '2026-05',
         serviceId: VALID_SERVICE_ID,
         availableDates: ['2026-05-01', '2026-05-15', '2026-05-28'],
+        availabilityMap: {
+          '2026-05-01': [
+            {
+              startTime: '2026-05-01T09:00:00.000Z',
+              endTime: '2026-05-01T09:30:00.000Z',
+              doctorId: VALID_DOCTOR_ID,
+              doctorName: 'Dr. Jane Doe',
+            },
+          ],
+        },
       }).success
     ).toBe(true);
   });
@@ -77,6 +88,7 @@ describe('getAvailableDaysResponseSchema', () => {
         month: '2026-05',
         serviceId: VALID_SERVICE_ID,
         availableDates: ['05-28-2026'], // Wrong format structure
+        availabilityMap: {},
       }).success
     ).toBe(false);
   });

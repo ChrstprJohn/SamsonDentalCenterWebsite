@@ -20,8 +20,31 @@ vi.mock('../../use-cases/availability/get-availability.use-case', () => {
   };
 });
 
-const { mockSubmitBooking } = vi.hoisted(() => {
-  return { mockSubmitBooking: vi.fn() };
+const { mockSubmitBooking, mockGetServiceDuration } = vi.hoisted(() => {
+  return {
+    mockSubmitBooking: vi.fn(),
+    mockGetServiceDuration: vi.fn(),
+  };
+});
+
+vi.mock('../../use-cases', async (importOriginal) => {
+  const original = await importOriginal<any>();
+  return {
+    ...original,
+    getAvailableTimeSlotsUseCase: () => vi.fn(),
+    submitBookingUseCase: () => mockSubmitBooking,
+  };
+});
+
+vi.mock('../../repositories', async (importOriginal) => {
+  const original = await importOriginal<any>();
+  return {
+    ...original,
+    getServiceDurationQuery: () => mockGetServiceDuration,
+    getDoctorSchedulesQuery: () => vi.fn(),
+    getExistingAppointmentsQuery: () => vi.fn(),
+    createAppointmentCommand: () => vi.fn(),
+  };
 });
 
 vi.mock('../../use-cases/booking/submit-booking.use-case', () => {
@@ -41,6 +64,7 @@ describe('submitBookingAction', () => {
   it('successfully validates inputs, resolves auth, and submits booking', async () => {
     vi.mocked(createClient).mockResolvedValue({} as any);
     vi.mocked(getAuthenticatedUser).mockResolvedValue({ id: 'user_123' } as any);
+    mockGetServiceDuration.mockResolvedValueOnce(30);
     mockSubmitBooking.mockResolvedValue({ id: 'appt_999' });
 
     const payload = {

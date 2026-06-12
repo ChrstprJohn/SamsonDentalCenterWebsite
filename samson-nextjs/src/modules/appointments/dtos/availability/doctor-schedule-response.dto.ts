@@ -8,6 +8,10 @@ export const doctorScheduleDbSchema = z.object({
   end_time: z.string(),
   break_start_time: z.string().nullable(),
   break_end_time: z.string().nullable(),
+  doctor: z.object({
+    first_name: z.string(),
+    last_name: z.string(),
+  }).nullable().optional(),
 });
 
 export const doctorScheduleResponseSchema = doctorScheduleDbSchema.transform((data) => ({
@@ -18,6 +22,9 @@ export const doctorScheduleResponseSchema = doctorScheduleDbSchema.transform((da
   endTime: data.end_time,
   breakStartTime: data.break_start_time,
   breakEndTime: data.break_end_time,
+  doctorName: data.doctor
+    ? `Dr. ${data.doctor.first_name} ${data.doctor.last_name}`.trim()
+    : undefined,
 }));
 
 export type DoctorScheduleResponseDto = z.infer<typeof doctorScheduleResponseSchema>;

@@ -25,7 +25,6 @@ describe('getAvailableDaysUseCase', () => {
       },
     ]);
 
-    const getServiceDuration = vi.fn().mockResolvedValue(30);
     const getExistingAppointmentsForMonth = vi.fn().mockResolvedValue([
       {
         id: 'appt-1',
@@ -47,7 +46,7 @@ describe('getAvailableDaysUseCase', () => {
 
     const useCase = getAvailableDaysUseCase({
       getWorkingSchedulesForMonth,
-      getServiceDuration,
+      duration: 30,
       getExistingAppointmentsForMonth,
     });
 
@@ -58,8 +57,48 @@ describe('getAvailableDaysUseCase', () => {
     });
 
     expect(result.availableDates).toEqual(['2024-12-01']);
+    expect(result.availabilityMap['2024-12-01']).toHaveLength(2);
     expect(getWorkingSchedulesForMonth).toHaveBeenCalledWith('2024-12', doctorId, serviceId);
     expect(getExistingAppointmentsForMonth).toHaveBeenCalledWith('2024-12', doctorId);
+  });
+
+  it('should fire schedules and monthly appointments queries before awaiting either result', async () => {
+    let resolveSchedules: (value: any[]) => void = () => {};
+    let resolveAppointments: (value: any[]) => void = () => {};
+    const getWorkingSchedulesForMonth = vi.fn(
+      () => new Promise<any[]>((resolve) => {
+        resolveSchedules = resolve;
+      })
+    );
+    const getExistingAppointmentsForMonth = vi.fn(
+      () => new Promise<any[]>((resolve) => {
+        resolveAppointments = resolve;
+      })
+    );
+
+    const useCase = getAvailableDaysUseCase({
+      getWorkingSchedulesForMonth,
+      duration: Promise.resolve(30),
+      getExistingAppointmentsForMonth,
+    });
+
+    const resultPromise = useCase({
+      serviceId,
+      doctorId,
+      month: '2024-12',
+    });
+
+    expect(getWorkingSchedulesForMonth).toHaveBeenCalledWith('2024-12', doctorId, serviceId);
+    expect(getExistingAppointmentsForMonth).toHaveBeenCalledWith('2024-12', doctorId);
+
+    resolveSchedules([]);
+    resolveAppointments([]);
+    await expect(resultPromise).resolves.toEqual({
+      month: '2024-12',
+      serviceId,
+      availableDates: [],
+      availabilityMap: {},
+    });
   });
 
   it('should return available dates using fallback getAvailableTimeSlots when monthly appointments function is missing', async () => {
@@ -73,14 +112,20 @@ describe('getAvailableDaysUseCase', () => {
         breakEndTime: null,
       },
     ]);
-    const getServiceDuration = vi.fn().mockResolvedValue(30);
     const getAvailableTimeSlots = vi.fn().mockResolvedValue({
-      availableSlots: [{ startTime: '2024-12-01T09:00:00.000Z', endTime: '2024-12-01T09:30:00.000Z' }],
+      availableSlots: [
+        {
+          startTime: '2024-12-01T09:00:00.000Z',
+          endTime: '2024-12-01T09:30:00.000Z',
+          doctorId,
+          doctorName: 'Dr. Jane Doe',
+        },
+      ],
     });
 
     const useCase = getAvailableDaysUseCase({
       getWorkingSchedulesForMonth,
-      getServiceDuration,
+      duration: 30,
       getAvailableTimeSlots,
     });
 
@@ -91,6 +136,7 @@ describe('getAvailableDaysUseCase', () => {
     });
 
     expect(result.availableDates).toEqual(['2024-12-01']);
+    expect(result.availabilityMap['2024-12-01']).toHaveLength(1);
     expect(getAvailableTimeSlots).toHaveBeenCalledWith({ serviceId, doctorId, date: '2024-12-01' });
   });
 });

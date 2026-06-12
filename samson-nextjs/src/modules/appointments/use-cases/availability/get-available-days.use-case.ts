@@ -4,6 +4,7 @@ import {
   AppointmentResponseDto,
   GetAvailableTimeSlotsResponseDto,
   WorkingScheduleMonthItem,
+  AvailabilityMapDto,
 } from '../../dtos';
 import { generateAvailableSlotsForDay } from '../../utils/availability.utils';
 
@@ -17,7 +18,7 @@ export const getAvailableDaysUseCase = (deps: {
     doctorId?: string,
     serviceId?: string
   ) => Promise<WorkingScheduleMonthItem[]>;
-  getServiceDuration: (serviceId: string) => Promise<number>;
+  duration: number | Promise<number>;
   getExistingAppointmentsForMonth?: (
     month: string,
     doctorId?: string
@@ -31,14 +32,18 @@ export const getAvailableDaysUseCase = (deps: {
   return async (dto: GetAvailableDaysDto): Promise<GetAvailableDaysResponseDto> => {
     const { month, serviceId, doctorId } = dto;
 
+    const appointmentsPromise =
+      deps.getExistingAppointmentsForMonth?.(month, doctorId) ?? Promise.resolve([]);
+
     // Eliminate async waterfall by running initial fetches concurrently in parallel
-    const [duration, schedules] = await Promise.all([
-      deps.getServiceDuration(serviceId),
+    const [duration, schedules, appointments] = await Promise.all([
+      deps.duration,
       deps.getWorkingSchedulesForMonth(month, doctorId, serviceId),
+      appointmentsPromise,
     ]);
 
     if (!schedules || schedules.length === 0) {
-      return { month, serviceId, availableDates: [] };
+      return { month, serviceId, availableDates: [], availabilityMap: {} };
     }
 
     // Determine if we can do in-memory calculations (requires the monthly helper and complete schedules)
@@ -49,12 +54,8 @@ export const getAvailableDaysUseCase = (deps: {
         (s) => s.startTime !== undefined && s.endTime !== undefined
       );
 
-    let appointments: AppointmentResponseDto[] = [];
-    if (canUseInMemory && deps.getExistingAppointmentsForMonth) {
-      appointments = await deps.getExistingAppointmentsForMonth(month, doctorId);
-    }
-
     const availableDates: string[] = [];
+    const availabilityMap: AvailabilityMapDto = {};
 
     if (canUseInMemory) {
       const datesWithSchedules = Array.from(new Set(schedules.map((schedule) => schedule.date))).sort();
@@ -74,6 +75,14 @@ export const getAvailableDaysUseCase = (deps: {
 
         if (slots.length > 0) {
           availableDates.push(date);
+          availabilityMap[date] = slots.map((slot) => ({
+            startTime: slot.startTime,
+            endTime: slot.endTime,
+            doctorId: slot.doctorId,
+            doctorName:
+              daySchedules.find((schedule) => schedule.doctorId === slot.doctorId)?.doctorName ||
+              'Doctor',
+          }));
         }
       }
     } else {
@@ -86,11 +95,17 @@ export const getAvailableDaysUseCase = (deps: {
             doctorId,
             date,
           });
-          return slotsResponse.availableSlots.length > 0 ? date : null;
+          return slotsResponse.availableSlots.length > 0
+            ? { date, slots: slotsResponse.availableSlots }
+            : null;
         });
 
         const results = await Promise.all(checkAvailabilityPromises);
-        availableDates.push(...results.filter((date): date is string => date !== null));
+        for (const result of results) {
+          if (!result) continue;
+          availableDates.push(result.date);
+          availabilityMap[result.date] = result.slots;
+        }
       }
     }
 
@@ -98,6 +113,7 @@ export const getAvailableDaysUseCase = (deps: {
       month,
       serviceId,
       availableDates,
+      availabilityMap,
     };
   };
 };

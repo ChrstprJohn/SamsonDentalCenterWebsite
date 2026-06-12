@@ -1,13 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { getAvailableDaysAction } from './get-available-days.action';
+import { getStepTwoDataAction } from './get-step-two-data.action';
 import { createClient } from '@/shared/database/server';
 
 vi.mock('server-only', () => ({}));
 vi.mock('@/shared/database/server');
 
-const { mockGetAvailableDaysUseCase, mockGetServiceDuration } = vi.hoisted(() => {
+const { mockGetAvailableDaysUseCase, mockGetDoctorsUseCase, mockGetServiceDuration } = vi.hoisted(() => {
   return {
     mockGetAvailableDaysUseCase: vi.fn(),
+    mockGetDoctorsUseCase: vi.fn(),
     mockGetServiceDuration: vi.fn(),
   };
 });
@@ -18,6 +19,14 @@ vi.mock('../../use-cases', async (importOriginal) => {
     ...original,
     getAvailableDaysUseCase: () => mockGetAvailableDaysUseCase,
     getAvailableTimeSlotsUseCase: () => vi.fn(),
+  };
+});
+
+vi.mock('@/modules/staff/use-cases', async (importOriginal) => {
+  const original = await importOriginal<any>();
+  return {
+    ...original,
+    getDoctorsUseCase: () => mockGetDoctorsUseCase,
   };
 });
 
@@ -33,37 +42,44 @@ vi.mock('../../repositories', async (importOriginal) => {
   };
 });
 
-describe('getAvailableDaysAction', () => {
+describe('getStepTwoDataAction', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('successfully validates inputs and executes getAvailableDays', async () => {
+  it('successfully validates inputs and executes concurrently', async () => {
     vi.mocked(createClient).mockResolvedValue({} as any);
     mockGetServiceDuration.mockResolvedValueOnce(30);
-    mockGetAvailableDaysUseCase.mockResolvedValueOnce({
+    
+    const mockDoctors = [
+      { id: 'doc-1', firstName: 'Jane', lastName: 'Doe', email: 'jane@samsondental.com', role: 'DOCTOR', isActive: true }
+    ];
+    const mockAvailability = {
       month: '2026-06',
       serviceId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd2',
       availableDates: ['2026-06-01'],
       availabilityMap: {},
-    });
+    };
+
+    mockGetDoctorsUseCase.mockResolvedValueOnce(mockDoctors);
+    mockGetAvailableDaysUseCase.mockResolvedValueOnce(mockAvailability);
 
     const payload = {
       serviceId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd2',
       month: '2026-06',
     };
 
-    const result = await getAvailableDaysAction(payload as any);
+    const result = await getStepTwoDataAction(payload as any);
 
     expect(result).toEqual({
       success: true,
       data: {
-        month: '2026-06',
-        serviceId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd2',
-        availableDates: ['2026-06-01'],
-        availabilityMap: {},
+        doctors: mockDoctors,
+        availability: mockAvailability,
       },
     });
+
+    expect(mockGetDoctorsUseCase).toHaveBeenCalledWith(payload.serviceId);
     expect(mockGetAvailableDaysUseCase).toHaveBeenCalledWith(payload);
   });
 
@@ -73,9 +89,10 @@ describe('getAvailableDaysAction', () => {
       month: 'invalid-month',
     };
 
-    const result = await getAvailableDaysAction(payload as any);
+    const result = await getStepTwoDataAction(payload as any);
     expect(result.success).toBe(false);
     expect(result.error).toContain('Validation failed');
+    expect(mockGetDoctorsUseCase).not.toHaveBeenCalled();
     expect(mockGetAvailableDaysUseCase).not.toHaveBeenCalled();
   });
 });

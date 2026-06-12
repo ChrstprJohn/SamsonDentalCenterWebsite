@@ -22,6 +22,7 @@ export interface GenerateSlotsParams {
 export interface WorkingScheduleMonthItem {
   date: string;
   doctorId: string;
+  doctorName?: string;
   startTime: string;
   endTime: string;
   breakStartTime: string | null;

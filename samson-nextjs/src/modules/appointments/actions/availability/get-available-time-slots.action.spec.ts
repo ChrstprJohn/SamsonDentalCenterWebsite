@@ -5,8 +5,11 @@ import { createClient } from '@/shared/database/server';
 vi.mock('server-only', () => ({}));
 vi.mock('@/shared/database/server');
 
-const { mockGetAvailableTimeSlotsUseCase } = vi.hoisted(() => {
-  return { mockGetAvailableTimeSlotsUseCase: vi.fn() };
+const { mockGetAvailableTimeSlotsUseCase, mockGetServiceDuration } = vi.hoisted(() => {
+  return {
+    mockGetAvailableTimeSlotsUseCase: vi.fn(),
+    mockGetServiceDuration: vi.fn(),
+  };
 });
 
 vi.mock('../../use-cases', async (importOriginal) => {
@@ -17,6 +20,16 @@ vi.mock('../../use-cases', async (importOriginal) => {
   };
 });
 
+vi.mock('../../repositories', async (importOriginal) => {
+  const original = await importOriginal<any>();
+  return {
+    ...original,
+    getServiceDurationQuery: () => mockGetServiceDuration,
+    getDoctorSchedulesQuery: () => vi.fn(),
+    getExistingAppointmentsQuery: () => vi.fn(),
+  };
+});
+
 describe('getAvailableTimeSlotsAction', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -24,6 +37,7 @@ describe('getAvailableTimeSlotsAction', () => {
 
   it('successfully validates inputs and executes getAvailableTimeSlots', async () => {
     vi.mocked(createClient).mockResolvedValue({} as any);
+    mockGetServiceDuration.mockResolvedValueOnce(30);
     mockGetAvailableTimeSlotsUseCase.mockResolvedValueOnce({
       date: '2026-06-01',
       serviceId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd2',

@@ -44,6 +44,7 @@ describe('getDoctorSchedulesQuery', () => {
       endTime: '17:00:00',
       breakStartTime: null,
       breakEndTime: null,
+      doctorName: undefined,
     }]);
   });
 
