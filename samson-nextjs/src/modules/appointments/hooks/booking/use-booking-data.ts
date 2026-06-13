@@ -17,6 +17,7 @@ function formatSlotsForBooking(slots: AvailableSlotDto[]): BookingSlot[] {
 
     return {
       time: formattedTime,
+      originalStartTime: slot.startTime,
       doctorId: slot.doctorId,
       doctorName: slot.doctorName,
     };

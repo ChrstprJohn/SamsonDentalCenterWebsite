@@ -3,7 +3,7 @@
 import React from 'react';
 import type { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
 import type { BookingSlot, NewDependentInput } from '../../hooks/booking/use-user-booking';
-import { formatShortDate } from '@/shared/utils/date.util';
+import { formatShortDate, formatClinicTime, calculateEndTimeFromIso } from '@/shared/utils/date.util';
 
 interface ReviewStepProps {
   service: ServiceResponseDto | null;
@@ -43,6 +43,13 @@ export function ReviewStep({
       return selectedDependentId === 'dep-1' ? 'Jane Samson (Spouse)' : 'Timmy Samson (Child)';
     }
     return 'Patient';
+  };
+
+  const getSlotRange = () => {
+    if (!date || !slot || !service) return '';
+    const start = new Date(slot.originalStartTime);
+    const end = calculateEndTimeFromIso(slot.originalStartTime, service.durationMinutes);
+    return `${formatClinicTime(start)} - ${formatClinicTime(end)}`;
   };
 
   return (
@@ -90,8 +97,12 @@ export function ReviewStep({
         <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">2. Date & Time</h4>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div className="flex flex-col gap-1">
-            <span className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Reserved Slot</span>
-            <span className="font-bold text-slate-800 dark:text-slate-250 text-sm">📅 {date ? formatShortDate(date) : ''} at {slot?.time}</span>
+            <span className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Appointment Date</span>
+            <span className="font-bold text-slate-800 dark:text-slate-250 text-sm">📅 {date ? formatShortDate(date) : ''}</span>
+          </div>
+          <div className="flex flex-col gap-1">
+            <span className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Time Range</span>
+            <span className="font-bold text-slate-800 dark:text-slate-250 text-sm">⏰ {getSlotRange()}</span>
           </div>
           <div className="flex flex-col gap-1">
             <span className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Assigned Practitioner</span>

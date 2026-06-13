@@ -42,3 +42,11 @@ export function formatClinicTime(date: Date | string): string {
     hour12: true
   }).format(d);
 }
+
+/**
+ * Calculates the end time given an ISO string and duration in minutes.
+ * Returns a new Date object representing the end time, safely preserving timezone.
+ */
+export function calculateEndTimeFromIso(isoString: string, durationMinutes: number): Date {
+  return new Date(new Date(isoString).getTime() + durationMinutes * 60000);
+}

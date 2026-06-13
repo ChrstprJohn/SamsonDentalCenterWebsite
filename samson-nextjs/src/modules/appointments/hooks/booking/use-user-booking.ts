@@ -14,6 +14,7 @@ export type BookingStep = 1 | 2 | 3 | 4;
 
 export interface BookingSlot {
   time: string; // e.g. "09:00 AM"
+  originalStartTime: string; // The raw ISO string from backend
   doctorId: string;
   doctorName: string;
   isPreferred?: boolean;
