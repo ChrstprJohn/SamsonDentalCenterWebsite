@@ -1,4 +1,4 @@
-import { GeneratedSlot, GenerateSlotsParams } from '../dtos';
+import { GeneratedSlot, GenerateSlotsParams } from '../dtos/exports';
 
 function parseTimeToMs(date: string, timeString: string): number {
   const normalizedTime = timeString.includes(':') ? timeString : `${timeString}:00`;

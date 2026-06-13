@@ -1,5 +1,5 @@
-import { z } from "zod";
-import { invoiceStatusEnum } from "./invoice-response.dto";
+import { z } from 'zod';
+import { invoiceStatusEnum } from './invoice-response.dto';
 
 export const UpdateInvoiceSchema = z.object({
   id: z.string().uuid(),

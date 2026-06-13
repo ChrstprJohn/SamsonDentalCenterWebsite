@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { TreatmentCommands } from './treatment.commands';
+import { submitTreatmentCommand } from './treatment.commands';
 
 const mockFrom = vi.fn();
 const mockUpdate = vi.fn();
@@ -21,8 +21,8 @@ describe('TreatmentCommands', () => {
   });
 
   it('updates appointment to TREATMENT_RENDERED with clinical notes', async () => {
-    const commands = new TreatmentCommands(mockSupabase);
-    const result = await commands.submitTreatment('appt-123', 'Notes here');
+    const cmdFn = submitTreatmentCommand(mockSupabase);
+    const result = await cmdFn('appt-123', 'Notes here');
 
     expect(result).toBe(true);
     expect(mockFrom).toHaveBeenCalledWith('appointments');
@@ -37,9 +37,9 @@ describe('TreatmentCommands', () => {
   it('throws DomainError when database update fails', async () => {
     mockEq.mockResolvedValue({ error: { message: 'DB fail' } });
 
-    const commands = new TreatmentCommands(mockSupabase);
+    const cmdFn = submitTreatmentCommand(mockSupabase);
     await expect(
-      commands.submitTreatment('appt-123', 'Notes')
+      cmdFn('appt-123', 'Notes')
     ).rejects.toThrow('Failed to submit treatment status: DB fail');
   });
 });

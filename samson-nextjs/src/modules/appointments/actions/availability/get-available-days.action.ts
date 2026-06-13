@@ -3,15 +3,9 @@
 import { z } from 'zod';
 import { createClient } from '@/shared/database/server';
 import { DomainError } from '@/shared/errors';
-import { getAvailableDaysSchema, GetAvailableDaysDto } from '../../dtos';
-import {
-  getWorkingSchedulesForMonthQuery,
-  getDoctorSchedulesQuery,
-  getExistingAppointmentsQuery,
-  getServiceDurationQuery,
-  getExistingAppointmentsForMonthQuery,
-} from '../../repositories';
-import { getAvailableDaysUseCase, getAvailableTimeSlotsUseCase } from '../../use-cases';
+import { getAvailableDaysSchema, GetAvailableDaysDto } from '../../dtos/exports';
+import { getWorkingSchedulesForMonthQuery, getDoctorSchedulesQuery, getExistingAppointmentsQuery, getServiceDurationQuery, getExistingAppointmentsForMonthQuery } from '../../repositories/exports';
+import { getAvailableDaysUseCase, getAvailableTimeSlotsUseCase } from '../../use-cases/exports';
 
 /**
  * Retrieves the available calendar days for booking in a given month.

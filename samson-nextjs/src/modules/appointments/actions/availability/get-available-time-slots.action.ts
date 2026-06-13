@@ -3,13 +3,9 @@
 import { z } from 'zod';
 import { createClient } from '@/shared/database/server';
 import { DomainError } from '@/shared/errors';
-import { getAvailableTimeSlotsSchema, GetAvailableTimeSlotsDto } from '../../dtos';
-import {
-  getDoctorSchedulesQuery,
-  getExistingAppointmentsQuery,
-  getServiceDurationQuery,
-} from '../../repositories';
-import { getAvailableTimeSlotsUseCase } from '../../use-cases';
+import { getAvailableTimeSlotsSchema, GetAvailableTimeSlotsDto } from '../../dtos/exports';
+import { getDoctorSchedulesQuery, getExistingAppointmentsQuery, getServiceDurationQuery } from '../../repositories/exports';
+import { getAvailableTimeSlotsUseCase } from '../../use-cases/exports';
 
 /**
  * Retrieves the available time slots for booking on a specific date.

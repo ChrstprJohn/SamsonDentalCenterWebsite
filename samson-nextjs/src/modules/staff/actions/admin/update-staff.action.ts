@@ -4,9 +4,9 @@ import { z } from 'zod';
 import { createClient } from '@/shared/database/server';
 import { authorizeRole } from '@/shared/auth/auth.util';
 import { DomainError } from '@/shared/errors';
-import { updateStaffSchema, UpdateStaffDto } from '../../dtos';
-import { updateStaffCommand } from '../../repositories';
-import { updateStaffUseCase } from '../../use-cases';
+import { updateStaffSchema, UpdateStaffDto } from '../../dtos/exports';
+import { updateStaffCommand } from '../../repositories/exports';
+import { updateStaffUseCase } from '../../use-cases/exports';
 
 export async function updateStaffAction(formData: UpdateStaffDto) {
     try {

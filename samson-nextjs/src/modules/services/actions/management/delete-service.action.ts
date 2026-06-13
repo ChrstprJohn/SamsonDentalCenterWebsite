@@ -1,8 +1,8 @@
 "use server";
 
-import { deleteServiceUseCase } from "../../use-cases/management/delete-service.use-case";
-import { deleteServiceCommand } from "../../repositories/management/service.commands";
-import { createClient } from "../../../../shared/database/server";
+import { deleteServiceUseCase } from '../../use-cases/management/delete-service.use-case';
+import { deleteServiceCommand } from '../../repositories/management/service.commands';
+import { createClient } from '../../../../shared/database/server';
 
 export async function deleteServiceAction(id: string) {
   try {

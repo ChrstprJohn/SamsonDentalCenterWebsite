@@ -8,7 +8,7 @@ import type { ServiceResponseDto } from '@/modules/services/dtos/management/serv
 import { getPatientProfileAction } from '@/modules/patients/actions/profile/get-patient-profile.action';
 import { getUserDependentsAction } from '@/modules/patients/actions/dependents/get-user-dependents.action';
 import { getAuthenticatedUser } from '@/shared/auth/auth.util';
-import { getAppointmentByIdQuery } from '@/modules/appointments/repositories';
+import { getAppointmentByIdQuery } from '@/modules/appointments/repositories/exports';
 
 export const metadata = {
   title: 'Book Appointment | Patient Portal',

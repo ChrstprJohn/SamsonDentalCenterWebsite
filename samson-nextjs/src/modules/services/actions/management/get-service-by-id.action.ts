@@ -1,8 +1,8 @@
 "use server";
 
-import { getServiceByIdUseCase } from "../../use-cases/management/get-service-by-id.use-case";
-import { getServiceByIdQuery } from "../../repositories/management/service.queries";
-import { createClient } from "../../../../shared/database/server";
+import { getServiceByIdUseCase } from '../../use-cases/management/get-service-by-id.use-case';
+import { getServiceByIdQuery } from '../../repositories/management/service.queries';
+import { createClient } from '../../../../shared/database/server';
 
 export async function getServiceByIdAction(id: string) {
   try {

@@ -1,23 +1,18 @@
 "use server";
 
-import { z } from "zod";
-import { after } from "next/server";
-import { authorizeRole, getAuthenticatedUser } from "@/shared/auth/auth.util";
-import { createClient } from "@/shared/database/server";
-import { DomainError } from "@/shared/errors";
-import { FinalizeInvoiceDto, finalizeInvoiceSchema } from "../../dtos";
-import { finalizeInvoiceCommand } from "../../repositories";
-import { finalizeInvoiceUseCase } from "../../use-cases";
-import { updateAppointmentStatusUseCase } from "@/modules/appointments/use-cases";
-import {
-  getAppointmentByIdQuery,
-  updateStatusCommand,
-  incrementUserCredibilityMetricCommand,
-  insertLedgerEntryCommand
-} from "@/modules/appointments/repositories/status";
-import { createAuditLogUseCase } from "@/modules/audit-logs/use-cases";
-import { createAuditLogCommand } from "@/modules/audit-logs/repositories/logs/audit-log.commands";
-import { checkoutOrchestrator } from "@/orchestrators/checkout.orchestrator";
+import { z } from 'zod';
+import { after } from 'next/server';
+import { authorizeRole, getAuthenticatedUser } from '@/shared/auth/auth.util';
+import { createClient } from '@/shared/database/server';
+import { DomainError } from '@/shared/errors';
+import { FinalizeInvoiceDto, finalizeInvoiceSchema } from '../../dtos/exports';
+import { finalizeInvoiceCommand } from '../../repositories/exports';
+import { finalizeInvoiceUseCase } from '../../use-cases/exports';
+import { updateAppointmentStatusUseCase } from '@/modules/appointments/use-cases/exports';
+import { getAppointmentByIdQuery, updateStatusCommand, incrementUserCredibilityMetricCommand, insertLedgerEntryCommand } from '@/modules/appointments/repositories/status/exports';
+import { createAuditLogUseCase } from '@/modules/audit-logs/use-cases/exports';
+import { createAuditLogCommand } from '@/modules/audit-logs/repositories/logs/audit-log.commands';
+import { checkoutOrchestrator } from '@/orchestrators/checkout.orchestrator';
 
 // Background task trigger (e.g. Email Receipt)
 async function sendBackgroundReceipt(invoiceId: string, email: string) {

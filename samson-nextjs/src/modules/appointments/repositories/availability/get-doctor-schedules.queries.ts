@@ -1,6 +1,6 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { DomainError } from '@/shared/errors';
-import { doctorScheduleResponseSchema } from '../../dtos';
+import { doctorScheduleResponseSchema } from '../../dtos/exports';
 
 export const getDoctorSchedulesQuery = (supabase: SupabaseClient) => {
   return async (date: string, doctorId?: string, serviceId?: string) => {

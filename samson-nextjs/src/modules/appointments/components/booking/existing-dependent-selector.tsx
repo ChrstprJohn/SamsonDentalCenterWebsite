@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import type { DependentProfileDto } from '@/modules/patients/dtos';
+import type { DependentProfileDto } from '@/modules/patients/dtos/exports';
 import { formatShortDate } from '@/shared/utils/date.util';
 
 interface ExistingDependentSelectorProps {

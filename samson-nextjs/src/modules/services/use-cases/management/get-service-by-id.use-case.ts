@@ -1,4 +1,4 @@
-import { ServiceResponseDto } from "../../dtos/management/service-response.dto";
+import { ServiceResponseDto } from '../../dtos/management/service-response.dto';
 
 export const getServiceByIdUseCase = (
   getServiceById: (id: string) => Promise<ServiceResponseDto | null>

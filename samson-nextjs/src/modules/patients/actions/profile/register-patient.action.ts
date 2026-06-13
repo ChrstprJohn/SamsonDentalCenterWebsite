@@ -4,9 +4,9 @@ import { z } from 'zod';
 import { createAdminClient } from '@/shared/database/server';
 import { after } from 'next/server';
 import { DomainError } from '@/shared/errors';
-import { registerPatientSchema, RegisterPatientDto } from '../../dtos';
-import { createPatientCommand } from '../../repositories';
-import { registerPatientUseCase } from '../../use-cases';
+import { registerPatientSchema, RegisterPatientDto } from '../../dtos/exports';
+import { createPatientCommand } from '../../repositories/exports';
+import { registerPatientUseCase } from '../../use-cases/exports';
 import { globalOutboxDispatcher } from '@/shared/outbox/outbox.dispatcher';
 import { bootstrapEventSubscribers } from '@/orchestrators/event-subscribers';
 

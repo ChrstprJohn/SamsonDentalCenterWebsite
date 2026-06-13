@@ -1,5 +1,5 @@
-import { SupabaseClient } from "@supabase/supabase-js";
-import { ClinicConfigResponseDto, clinicConfigResponseSchema } from "../../dtos/settings/get-clinic-config.dto";
+import { SupabaseClient } from '@supabase/supabase-js';
+import { ClinicConfigResponseDto, clinicConfigResponseSchema } from '../../dtos/settings/get-clinic-config.dto';
 
 export const getClinicConfigQuery = (supabase: SupabaseClient) => {
   return async (): Promise<ClinicConfigResponseDto | null> => {

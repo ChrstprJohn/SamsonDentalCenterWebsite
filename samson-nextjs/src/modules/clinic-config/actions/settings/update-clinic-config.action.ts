@@ -1,9 +1,9 @@
 "use server";
 
-import { UpdateClinicConfigDto, updateClinicConfigSchema } from "../../dtos/settings/update-clinic-config.dto";
-import { updateClinicConfigUseCase } from "../../use-cases/settings/update-clinic-config.use-case";
-import { updateClinicConfigCommand } from "../../repositories/settings/clinic-config.commands";
-import { createClient } from "../../../../shared/database/server";
+import { UpdateClinicConfigDto, updateClinicConfigSchema } from '../../dtos/settings/update-clinic-config.dto';
+import { updateClinicConfigUseCase } from '../../use-cases/settings/update-clinic-config.use-case';
+import { updateClinicConfigCommand } from '../../repositories/settings/clinic-config.commands';
+import { createClient } from '../../../../shared/database/server';
 
 export async function updateClinicConfigAction(data: UpdateClinicConfigDto) {
   try {

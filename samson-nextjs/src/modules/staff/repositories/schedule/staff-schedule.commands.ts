@@ -1,5 +1,5 @@
 import { SupabaseClient } from '@supabase/supabase-js';
-import { DoctorScheduleDto, DayOfWeekMap } from '../../dtos';
+import { DoctorScheduleDto, DayOfWeekMap } from '../../dtos/exports';
 import { DomainError } from '@/shared/errors';
 
 export const upsertScheduleCommand = (supabase: SupabaseClient) => {
@@ -30,11 +30,3 @@ export const upsertScheduleCommand = (supabase: SupabaseClient) => {
         return schedule;
     };
 };
-
-// Deprecated class for backwards compatibility
-export class StaffScheduleCommands {
-    constructor(private readonly supabase: SupabaseClient) {}
-    async upsertSchedule(data: DoctorScheduleDto) {
-        return upsertScheduleCommand(this.supabase)(data);
-    }
-}

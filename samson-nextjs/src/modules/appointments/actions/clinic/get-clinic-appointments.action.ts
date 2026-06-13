@@ -4,9 +4,9 @@ import { z } from 'zod';
 import { createClient } from '@/shared/database/server';
 import { authorizeRole } from '@/shared/auth/auth.util';
 import { DomainError } from '@/shared/errors';
-import { getClinicAppointmentsSchema, GetClinicAppointmentsDto } from '../../dtos';
-import { getAppointmentsByClinicQuery } from '../../repositories';
-import { getClinicAppointmentsUseCase } from '../../use-cases';
+import { getClinicAppointmentsSchema, GetClinicAppointmentsDto } from '../../dtos/exports';
+import { getAppointmentsByClinicQuery } from '../../repositories/exports';
+import { getClinicAppointmentsUseCase } from '../../use-cases/exports';
 
 /**
  * Retrieves all appointments matching given filters for the clinic/staff dashboard.

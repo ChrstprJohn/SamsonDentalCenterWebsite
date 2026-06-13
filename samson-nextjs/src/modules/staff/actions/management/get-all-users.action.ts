@@ -1,9 +1,9 @@
 'use server';
 
 import { getAuthenticatedUser, authorizeRole } from '@/shared/auth/auth.util';
-import { GetAllUsersDto, getAllUsersSchema } from '../../dtos';
-import { getAllUsersUseCase } from '../../use-cases';
-import { getAllUsersQuery } from '../../repositories';
+import { GetAllUsersDto, getAllUsersSchema } from '../../dtos/exports';
+import { getAllUsersUseCase } from '../../use-cases/exports';
+import { getAllUsersQuery } from '../../repositories/exports';
 import { ValidationError, UnauthorizedError } from '@/shared/errors';
 import { createClient } from '@/shared/database/server';
 

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { createPatientCommand } from './patient-profile.commands';
-import { RegisterPatientDto } from '../../dtos';
+import { RegisterPatientDto } from '../../dtos/exports';
 import { DomainError } from '@/shared/errors';
 import { outboxCommands } from '@/shared/outbox/outbox.commands';
 

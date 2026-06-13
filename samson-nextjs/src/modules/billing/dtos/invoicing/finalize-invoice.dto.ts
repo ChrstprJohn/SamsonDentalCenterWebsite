@@ -1,5 +1,5 @@
-import { z } from "zod";
-import { paymentMethodEnum } from "./invoice-response.dto";
+import { z } from 'zod';
+import { paymentMethodEnum } from './invoice-response.dto';
 
 export const finalizeInvoiceSchema = z.object({
   invoiceId: z.string().uuid("Invoice ID must be a valid UUID"),

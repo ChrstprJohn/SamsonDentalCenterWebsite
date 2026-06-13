@@ -1,6 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { SupabaseClient } from "@supabase/supabase-js";
-import { InvoiceCommandsRepository } from "./invoice.commands";
+import {
+  generateInvoiceCommand,
+  updateInvoiceCommand,
+  finalizeInvoiceCommand,
+} from "./invoice.commands";
 
 const mockFrom = vi.fn();
 const mockInsert = vi.fn();
@@ -38,8 +42,8 @@ describe("InvoiceCommandsRepository", () => {
       error: null,
     });
 
-    const repo = new InvoiceCommandsRepository(mockSupabase);
-    const result = await repo.generateInvoice({
+    const cmd = generateInvoiceCommand(mockSupabase);
+    const result = await cmd({
       appointmentId: "1a95a63c-333e-4b68-98e3-82bdf1a07bd2",
       amount: 900,
       status: "DRAFT",
@@ -52,9 +56,9 @@ describe("InvoiceCommandsRepository", () => {
   it("throws when invoice generation fails", async () => {
     mockSingle.mockResolvedValue({ data: null, error: { message: "DB error" } });
 
-    const repo = new InvoiceCommandsRepository(mockSupabase);
+    const cmd = generateInvoiceCommand(mockSupabase);
     await expect(
-      repo.generateInvoice({
+      cmd({
         appointmentId: "1a95a63c-333e-4b68-98e3-82bdf1a07bd2",
         amount: 900,
         status: "DRAFT",
@@ -73,8 +77,8 @@ describe("InvoiceCommandsRepository", () => {
       error: null,
     });
 
-    const repo = new InvoiceCommandsRepository(mockSupabase);
-    const result = await repo.updateInvoice({
+    const cmd = updateInvoiceCommand(mockSupabase);
+    const result = await cmd({
       id: "da95a63c-333e-4b68-98e3-82bdf1a07bd2",
       amount: 1200,
       status: "FINALIZED",
@@ -86,9 +90,9 @@ describe("InvoiceCommandsRepository", () => {
   it("throws when invoice update fails", async () => {
     mockSingle.mockResolvedValue({ data: null, error: { message: "Update failed" } });
 
-    const repo = new InvoiceCommandsRepository(mockSupabase);
+    const cmd = updateInvoiceCommand(mockSupabase);
     await expect(
-      repo.updateInvoice({
+      cmd({
         id: "da95a63c-333e-4b68-98e3-82bdf1a07bd2",
         status: "VOID",
       })
@@ -109,8 +113,8 @@ describe("InvoiceCommandsRepository", () => {
         error: null,
       });
 
-      const repo = new InvoiceCommandsRepository(mockSupabase);
-      const result = await repo.finalizeInvoice({
+      const cmd = finalizeInvoiceCommand(mockSupabase);
+      const result = await cmd({
         invoiceId: "da95a63c-333e-4b68-98e3-82bdf1a07bd2",
         paymentMethod: "CASH",
         discountApplied: 100,
@@ -132,9 +136,9 @@ describe("InvoiceCommandsRepository", () => {
     it("throws when finalization database query fails", async () => {
       mockSingle.mockResolvedValue({ data: null, error: { message: "Finalization failed" } });
 
-      const repo = new InvoiceCommandsRepository(mockSupabase);
+      const cmd = finalizeInvoiceCommand(mockSupabase);
       await expect(
-        repo.finalizeInvoice({
+        cmd({
           invoiceId: "da95a63c-333e-4b68-98e3-82bdf1a07bd2",
           paymentMethod: "CARD",
         })

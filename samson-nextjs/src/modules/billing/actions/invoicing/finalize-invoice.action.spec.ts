@@ -1,13 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { authorizeRole } from "@/shared/auth/auth.util";
 import { createClient } from "@/shared/database/server";
-import { FinalizeInvoiceUseCase, finalizeInvoiceUseCase } from "../../use-cases";
+import { finalizeInvoiceUseCase } from '../../use-cases/exports';
 import { finalizeInvoiceAction } from "./finalize-invoice.action";
 
 vi.mock("server-only", () => ({}));
 vi.mock("@/shared/auth/auth.util");
 vi.mock("@/shared/database/server");
-vi.mock("../../use-cases");
+vi.mock('../../use-cases/exports');
 
 describe("finalizeInvoiceAction", () => {
   const mockExecute = vi.fn();
@@ -17,9 +17,6 @@ describe("finalizeInvoiceAction", () => {
     vi.mocked(authorizeRole).mockResolvedValue({ id: "staff-1" } as never);
     vi.mocked(createClient).mockResolvedValue({} as never);
     vi.mocked(finalizeInvoiceUseCase).mockImplementation(() => mockExecute);
-    vi.mocked(FinalizeInvoiceUseCase).mockImplementation(function () {
-      return { execute: mockExecute } as unknown as FinalizeInvoiceUseCase;
-    });
   });
 
   it("finalizes an invoice when authorized", async () => {

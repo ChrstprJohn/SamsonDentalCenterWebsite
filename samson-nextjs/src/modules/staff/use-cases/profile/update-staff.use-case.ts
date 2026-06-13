@@ -1,5 +1,5 @@
-import { UpdateStaffDto, StaffProfileDto } from '../../dtos';
-import { StaffProfileCommands } from '../../repositories';
+import { UpdateStaffDto, StaffProfileDto } from '../../dtos/exports';
+
 
 export const updateStaffUseCase = (
     updateStaff: (id: string, data: Partial<UpdateStaffDto>) => Promise<StaffProfileDto>
@@ -8,12 +8,3 @@ export const updateStaffUseCase = (
         return await updateStaff(id, data);
     };
 };
-
-// Deprecated class for backwards compatibility
-export class UpdateStaffUseCase {
-    constructor(private readonly staffCommands: StaffProfileCommands) {}
-    async execute(id: string, data: Partial<UpdateStaffDto>) {
-        return updateStaffUseCase((sid, d) => this.staffCommands.updateStaff(sid, d))(id, data);
-    }
-}
-

@@ -1,5 +1,5 @@
 import { SupabaseClient } from '@supabase/supabase-js';
-import { CreateDependentDto, DependentProfileDto, dependentProfileSchema } from '../../dtos';
+import { CreateDependentDto, DependentProfileDto, dependentProfileSchema } from '../../dtos/exports';
 
 export const addDependentCommand = (supabase: SupabaseClient) => {
   return async (data: CreateDependentDto): Promise<DependentProfileDto> => {
@@ -25,11 +25,5 @@ export const addDependentCommand = (supabase: SupabaseClient) => {
   };
 };
 
-// Deprecated class for backwards compatibility
-export class PatientDependentsCommands {
-  constructor(private readonly supabase: SupabaseClient) {}
-  async addDependent(data: CreateDependentDto): Promise<DependentProfileDto> {
-    return addDependentCommand(this.supabase)(data);
-  }
-}
+
 

@@ -5,7 +5,7 @@ import { createClient } from '@/shared/database/server';
 import { getAuthenticatedUser } from '@/shared/auth/auth.util';
 import { DomainError } from '@/shared/errors';
 import { requestRescheduleSchema, RequestRescheduleDto } from '../../dtos/status/request-reschedule.dto';
-import { getAppointmentByIdQuery, updateStatusCommand, incrementUserCredibilityMetricCommand, insertLedgerEntryCommand } from '../../repositories';
+import { getAppointmentByIdQuery, updateStatusCommand, incrementUserCredibilityMetricCommand, insertLedgerEntryCommand } from '../../repositories/exports';
 import { requestRescheduleUseCase } from '../../use-cases/status/request-reschedule.use-case';
 
 /**

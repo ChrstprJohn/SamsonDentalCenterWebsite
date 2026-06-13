@@ -1,10 +1,5 @@
 import { SupabaseClient } from '@supabase/supabase-js';
-import {
-  CreateStaffDto,
-  StaffProfileDto,
-  UpdateStaffDto,
-  staffProfileSchema,
-} from '../../dtos';
+import { CreateStaffDto, StaffProfileDto, UpdateStaffDto, staffProfileSchema } from '../../dtos/exports';
 import { DomainError } from '@/shared/errors';
 
 export const createStaffCommand = (supabase: SupabaseClient) => {
@@ -78,21 +73,3 @@ export const terminateStaffCommand = (supabase: SupabaseClient) => {
     return { success: true, id };
   };
 };
-
-// Deprecated class for backwards compatibility
-export class StaffProfileCommands {
-  constructor(private readonly supabase: SupabaseClient) {}
-
-  async createStaff(userId: string, data: CreateStaffDto): Promise<StaffProfileDto> {
-    return createStaffCommand(this.supabase)(userId, data);
-  }
-
-  async updateStaff(id: string, data: Partial<UpdateStaffDto>): Promise<StaffProfileDto> {
-    return updateStaffCommand(this.supabase)(id, data);
-  }
-
-  async terminateStaff(id: string) {
-    return terminateStaffCommand(this.supabase)(id);
-  }
-}
-

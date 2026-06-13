@@ -1,6 +1,6 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { DomainError } from '@/shared/errors';
-import { doctorScheduleResponseSchema } from '../../dtos';
+import { doctorScheduleResponseSchema } from '../../dtos/exports';
 import { unstable_cache } from 'next/cache';
 
 export const getWorkingSchedulesForMonthQuery = (supabase: SupabaseClient) => {

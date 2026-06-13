@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { FinalizeInvoiceUseCase } from "./finalize-invoice.use-case";
+import { finalizeInvoiceUseCase } from "./finalize-invoice.use-case";
 
 describe("FinalizeInvoiceUseCase", () => {
   it("executes and finalizes invoice via repository", async () => {
@@ -12,11 +12,9 @@ describe("FinalizeInvoiceUseCase", () => {
       discountApplied: 100,
     };
 
-    const mockRepo = {
-      finalizeInvoice: vi.fn().mockResolvedValue(mockResponse),
-    } as any;
+    const mockFinalizeInvoice = vi.fn().mockResolvedValue(mockResponse);
 
-    const useCase = new FinalizeInvoiceUseCase(mockRepo);
+    const executeFn = finalizeInvoiceUseCase(mockFinalizeInvoice);
     const data = {
       invoiceId: "invoice-1",
       paymentMethod: "CASH" as const,
@@ -24,9 +22,9 @@ describe("FinalizeInvoiceUseCase", () => {
       amount: 1400,
     };
 
-    const result = await useCase.execute(data);
+    const result = await executeFn(data);
 
     expect(result).toEqual(mockResponse);
-    expect(mockRepo.finalizeInvoice).toHaveBeenCalledWith(data);
+    expect(mockFinalizeInvoice).toHaveBeenCalledWith(data);
   });
 });

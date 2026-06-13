@@ -10,7 +10,7 @@ vi.mock('@/shared/database/server', () => ({
   createClient: vi.fn().mockResolvedValue({}),
 }));
 
-vi.mock('../../repositories', () => ({
+vi.mock('../../repositories/exports', () => ({
   assignDoctorServicesCommand: () => vi.fn().mockResolvedValue(true),
   DoctorServicesCommands: class {
     assignDoctorServices = vi.fn().mockResolvedValue(true);

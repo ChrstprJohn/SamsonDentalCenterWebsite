@@ -1,5 +1,5 @@
-import { DoctorScheduleDto } from '../../dtos';
-import { StaffScheduleCommands } from '../../repositories';
+import { DoctorScheduleDto } from '../../dtos/exports';
+
 
 export const updateDoctorScheduleUseCase = (
     upsertSchedule: (data: DoctorScheduleDto) => Promise<any>
@@ -8,12 +8,3 @@ export const updateDoctorScheduleUseCase = (
         return await upsertSchedule(data);
     };
 };
-
-// Deprecated class for backwards compatibility
-export class UpdateDoctorScheduleUseCase {
-    constructor(private readonly scheduleCommands: StaffScheduleCommands) {}
-    async execute(data: DoctorScheduleDto) {
-        return updateDoctorScheduleUseCase((d) => this.scheduleCommands.upsertSchedule(d))(data);
-    }
-}
-

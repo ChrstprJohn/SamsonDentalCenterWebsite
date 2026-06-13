@@ -1,12 +1,12 @@
 "use server";
 
-import { z } from "zod";
-import { authorizeRole } from "@/shared/auth/auth.util";
-import { createClient } from "@/shared/database/server";
-import { DomainError } from "@/shared/errors";
-import { FinalizeInvoiceDto, finalizeInvoiceSchema } from "../../dtos";
-import { finalizeInvoiceCommand } from "../../repositories";
-import { finalizeInvoiceUseCase } from "../../use-cases";
+import { z } from 'zod';
+import { authorizeRole } from '@/shared/auth/auth.util';
+import { createClient } from '@/shared/database/server';
+import { DomainError } from '@/shared/errors';
+import { FinalizeInvoiceDto, finalizeInvoiceSchema } from '../../dtos/exports';
+import { finalizeInvoiceCommand } from '../../repositories/exports';
+import { finalizeInvoiceUseCase } from '../../use-cases/exports';
 
 export async function finalizeInvoiceAction(data: FinalizeInvoiceDto) {
   try {

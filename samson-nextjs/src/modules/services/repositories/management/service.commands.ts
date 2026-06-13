@@ -1,7 +1,7 @@
-import { SupabaseClient } from "@supabase/supabase-js";
-import { CreateServiceDto } from "../../dtos/management/create-service.dto";
-import { UpdateServiceDto } from "../../dtos/management/update-service.dto";
-import { ServiceResponseDto, serviceResponseSchema } from "../../dtos/management/service-response.dto";
+import { SupabaseClient } from '@supabase/supabase-js';
+import { CreateServiceDto } from '../../dtos/management/create-service.dto';
+import { UpdateServiceDto } from '../../dtos/management/update-service.dto';
+import { ServiceResponseDto, serviceResponseSchema } from '../../dtos/management/service-response.dto';
 
 export const createServiceCommand = (supabase: SupabaseClient) => {
   return async (data: CreateServiceDto): Promise<ServiceResponseDto> => {

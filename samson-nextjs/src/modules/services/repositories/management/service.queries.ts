@@ -1,5 +1,5 @@
-import { SupabaseClient } from "@supabase/supabase-js";
-import { ServiceResponseDto, serviceResponseSchema } from "../../dtos/management/service-response.dto";
+import { SupabaseClient } from '@supabase/supabase-js';
+import { ServiceResponseDto, serviceResponseSchema } from '../../dtos/management/service-response.dto';
 
 export const getServicesQuery = (supabase: SupabaseClient) => {
   return async (includeInactive = false): Promise<ServiceResponseDto[]> => {

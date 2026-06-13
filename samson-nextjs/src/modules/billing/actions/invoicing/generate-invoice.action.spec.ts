@@ -1,13 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { authorizeRole } from "@/shared/auth/auth.util";
 import { createClient } from "@/shared/database/server";
-import { GenerateInvoiceUseCase, generateInvoiceUseCase } from "../../use-cases";
+import { generateInvoiceUseCase } from '../../use-cases/exports';
 import { generateInvoiceAction } from "./generate-invoice.action";
 
 vi.mock("server-only", () => ({}));
 vi.mock("@/shared/auth/auth.util");
 vi.mock("@/shared/database/server");
-vi.mock("../../use-cases");
+vi.mock('../../use-cases/exports');
 
 describe("generateInvoiceAction", () => {
   const mockExecute = vi.fn();
@@ -17,9 +17,6 @@ describe("generateInvoiceAction", () => {
     vi.mocked(authorizeRole).mockResolvedValue({ id: "staff-1" } as never);
     vi.mocked(createClient).mockResolvedValue({} as never);
     vi.mocked(generateInvoiceUseCase).mockImplementation(() => mockExecute);
-    vi.mocked(GenerateInvoiceUseCase).mockImplementation(function () {
-      return { execute: mockExecute } as unknown as GenerateInvoiceUseCase;
-    });
   });
 
   it("generates an invoice when authorized", async () => {

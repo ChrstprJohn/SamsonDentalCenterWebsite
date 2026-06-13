@@ -1,5 +1,5 @@
-import { UserProfileResponseDto } from '../../dtos';
-import { GetActiveDoctorsQueries } from '../../repositories';
+import { UserProfileResponseDto } from '../../dtos/exports';
+
 
 export const getDoctorsUseCase = (
   getActiveDoctors: (serviceId?: string) => Promise<UserProfileResponseDto[]>
@@ -8,11 +8,3 @@ export const getDoctorsUseCase = (
     return getActiveDoctors(serviceId);
   };
 };
-
-// Deprecated class for backwards compatibility
-export class GetDoctorsUseCase {
-  constructor(private readonly queries: GetActiveDoctorsQueries) {}
-  async execute(serviceId?: string): Promise<UserProfileResponseDto[]> {
-    return getDoctorsUseCase((sId) => this.queries.getActiveDoctors(sId))(serviceId);
-  }
-}

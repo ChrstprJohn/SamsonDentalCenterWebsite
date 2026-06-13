@@ -8,7 +8,7 @@ import { SubmitTreatmentDto, submitTreatmentSchema } from '../../dtos/treatment/
 import { submitTreatmentCommand } from '../../repositories/treatment/treatment.commands';
 import { generateInvoiceCommand } from '@/modules/billing/repositories/invoicing/invoice.commands';
 import { submitTreatmentUseCase } from '../../use-cases/treatment/submit-treatment.use-case';
-import { getServicesByIdsQuery } from '@/modules/services';
+import { getServicesByIdsQuery } from '@/modules/services/exports';
 
 export async function submitTreatmentAction(formData: SubmitTreatmentDto) {
   try {

@@ -1,11 +1,4 @@
-import {
-  GetAvailableDaysDto,
-  GetAvailableDaysResponseDto,
-  AppointmentResponseDto,
-  GetAvailableTimeSlotsResponseDto,
-  WorkingScheduleMonthItem,
-  AvailabilityMapDto,
-} from '../../dtos';
+import { GetAvailableDaysDto, GetAvailableDaysResponseDto, AppointmentResponseDto, GetAvailableTimeSlotsResponseDto, WorkingScheduleMonthItem, AvailabilityMapDto } from '../../dtos/exports';
 import { generateAvailableSlotsForDay } from '../../utils/availability.utils';
 
 /**

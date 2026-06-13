@@ -1,9 +1,9 @@
 "use server";
 
-import { UpdateServiceDto, updateServiceSchema } from "../../dtos/management/update-service.dto";
-import { updateServiceUseCase } from "../../use-cases/management/update-service.use-case";
-import { updateServiceCommand } from "../../repositories/management/service.commands";
-import { createClient } from "../../../../shared/database/server";
+import { UpdateServiceDto, updateServiceSchema } from '../../dtos/management/update-service.dto';
+import { updateServiceUseCase } from '../../use-cases/management/update-service.use-case';
+import { updateServiceCommand } from '../../repositories/management/service.commands';
+import { createClient } from '../../../../shared/database/server';
 
 export async function updateServiceAction(data: UpdateServiceDto) {
   try {

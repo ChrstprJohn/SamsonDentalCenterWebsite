@@ -1,5 +1,5 @@
 import { SupabaseClient } from '@supabase/supabase-js';
-import { GetAllUsersDto, UserProfileResponseDto } from '../../dtos';
+import { GetAllUsersDto, UserProfileResponseDto } from '../../dtos/exports';
 
 export const getAllUsersQuery = (supabase: SupabaseClient) => {
   return async (params?: GetAllUsersDto): Promise<UserProfileResponseDto[]> => {
@@ -32,13 +32,3 @@ export const getAllUsersQuery = (supabase: SupabaseClient) => {
     }));
   };
 };
-
-// Deprecated class for backwards compatibility
-export class UserManagementQueries {
-  constructor(private readonly supabase: SupabaseClient) {}
-  async getAllUsers(params?: GetAllUsersDto): Promise<UserProfileResponseDto[]> {
-    return getAllUsersQuery(this.supabase)(params);
-  }
-}
-
-

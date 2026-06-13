@@ -1,5 +1,4 @@
-import { CreateDependentDto, DependentProfileDto } from '../../dtos';
-import { PatientDependentsCommands } from '../../repositories';
+import { CreateDependentDto, DependentProfileDto } from '../../dtos/exports';
 
 export const createDependentUseCase = (
   addDependent: (data: CreateDependentDto) => Promise<DependentProfileDto>
@@ -8,11 +7,3 @@ export const createDependentUseCase = (
     return addDependent(data);
   };
 };
-
-// Deprecated class for backwards compatibility
-export class CreateDependentUseCase {
-  constructor(private readonly commands: PatientDependentsCommands) {}
-  async execute(data: CreateDependentDto): Promise<DependentProfileDto> {
-    return createDependentUseCase((d) => this.commands.addDependent(d))(data);
-  }
-}

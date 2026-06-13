@@ -1,9 +1,9 @@
 'use server';
 
 import { getAuthenticatedUser, authorizeRole } from '@/shared/auth/auth.util';
-import { DeactivateUserDto, deactivateUserSchema } from '../../dtos';
-import { deactivateUserUseCase } from '../../use-cases';
-import { deactivateUserCommand } from '../../repositories';
+import { DeactivateUserDto, deactivateUserSchema } from '../../dtos/exports';
+import { deactivateUserUseCase } from '../../use-cases/exports';
+import { deactivateUserCommand } from '../../repositories/exports';
 import { ValidationError, UnauthorizedError } from '@/shared/errors';
 import { createClient } from '@/shared/database/server';
 

@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 export const invoiceStatusEnum = z.enum(["DRAFT", "FINALIZED", "PAID", "VOID"]);
 export const paymentMethodEnum = z.enum(["CASH", "CARD", "HMO"]);

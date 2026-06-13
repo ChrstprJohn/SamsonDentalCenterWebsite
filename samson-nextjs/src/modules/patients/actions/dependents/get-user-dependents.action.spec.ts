@@ -8,7 +8,7 @@ vi.mock('@/shared/database/server', () => ({
   createClient: vi.fn().mockResolvedValue({}),
   createAdminClient: vi.fn().mockResolvedValue({}),
 }));
-vi.mock('../../repositories', () => ({
+vi.mock('../../repositories/exports', () => ({
   getDependentsByPatientIdQuery: () => vi.fn().mockResolvedValue([{ id: 'dep1' }]),
   PatientDependentsQueries: class {
     getDependentsByPatientId = vi.fn().mockResolvedValue([{ id: 'dep1' }]);

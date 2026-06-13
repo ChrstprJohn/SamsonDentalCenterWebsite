@@ -1,6 +1,6 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { NotFoundError } from '@/shared/errors';
-import { StaffProfileDto, staffProfileSchema } from '../../dtos';
+import { StaffProfileDto, staffProfileSchema } from '../../dtos/exports';
 
 export const getProfileByIdQuery = (supabase: SupabaseClient) => {
   return async (staffId: string): Promise<StaffProfileDto> => {
@@ -18,11 +18,3 @@ export const getProfileByIdQuery = (supabase: SupabaseClient) => {
     return staffProfileSchema.parse(staff);
   };
 };
-
-// Deprecated class for backwards compatibility
-export class StaffProfileQueries {
-  constructor(private readonly supabase: SupabaseClient) {}
-  async getProfileById(staffId: string): Promise<StaffProfileDto> {
-    return getProfileByIdQuery(this.supabase)(staffId);
-  }
-}

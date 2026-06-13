@@ -1,10 +1,4 @@
-import {
-  GetAvailableTimeSlotsDto,
-  GetAvailableTimeSlotsResponseDto,
-  AvailableSlotDto,
-  DoctorScheduleResponseDto,
-  AppointmentResponseDto,
-} from '../../dtos';
+import { GetAvailableTimeSlotsDto, GetAvailableTimeSlotsResponseDto, AvailableSlotDto, DoctorScheduleResponseDto, AppointmentResponseDto } from '../../dtos/exports';
 import { generateAvailableSlotsForDay } from '../../utils/availability.utils';
 
 /**

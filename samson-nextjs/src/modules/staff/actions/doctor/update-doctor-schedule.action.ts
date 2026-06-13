@@ -4,9 +4,9 @@ import { z } from 'zod';
 import { createClient } from '@/shared/database/server';
 import { authorizeRole } from '@/shared/auth/auth.util';
 import { DomainError } from '@/shared/errors';
-import { doctorScheduleSchema, DoctorScheduleDto } from '../../dtos';
-import { upsertScheduleCommand } from '../../repositories';
-import { updateDoctorScheduleUseCase } from '../../use-cases';
+import { doctorScheduleSchema, DoctorScheduleDto } from '../../dtos/exports';
+import { upsertScheduleCommand } from '../../repositories/exports';
+import { updateDoctorScheduleUseCase } from '../../use-cases/exports';
 
 export async function updateDoctorScheduleAction(formData: DoctorScheduleDto) {
     try {

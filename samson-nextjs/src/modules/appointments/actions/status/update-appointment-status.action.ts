@@ -4,9 +4,9 @@ import { z } from 'zod';
 import { createClient } from '@/shared/database/server';
 import { authorizeRole, getAuthenticatedUser } from '@/shared/auth/auth.util';
 import { DomainError } from '@/shared/errors';
-import { staffUpdateAppointmentStatusSchema, StaffUpdateAppointmentStatusDto } from '../../dtos';
-import { getAppointmentByIdQuery, updateStatusCommand, incrementUserCredibilityMetricCommand, insertLedgerEntryCommand } from '../../repositories';
-import { updateAppointmentStatusUseCase } from '../../use-cases';
+import { staffUpdateAppointmentStatusSchema, StaffUpdateAppointmentStatusDto } from '../../dtos/exports';
+import { getAppointmentByIdQuery, updateStatusCommand, incrementUserCredibilityMetricCommand, insertLedgerEntryCommand } from '../../repositories/exports';
+import { updateAppointmentStatusUseCase } from '../../use-cases/exports';
 
 /**
  * Updates an appointment status on behalf of a clinic staff member.

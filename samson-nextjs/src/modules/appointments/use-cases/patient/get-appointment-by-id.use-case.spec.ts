@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { getAppointmentByIdUseCase } from './get-appointment-by-id.use-case';
-import { AppointmentDto } from '../../dtos';
+import { AppointmentDto } from '../../dtos/exports';
 
 describe('getAppointmentByIdUseCase', () => {
   it('calls the getAppointmentById repository query with correct parameter and returns result', async () => {

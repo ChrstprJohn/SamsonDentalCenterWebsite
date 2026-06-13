@@ -1,11 +1,7 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { DomainError } from '@/shared/errors';
 import { outboxCommands } from '@/shared/outbox/outbox.commands';
-import {
-  RegisterPatientDto,
-  PatientProfileDto,
-  patientProfileSchema,
-} from '../../dtos';
+import { RegisterPatientDto, PatientProfileDto, patientProfileSchema } from '../../dtos/exports';
 
 export const createPatientCommand = (supabaseAdmin: SupabaseClient) => {
   return async (data: RegisterPatientDto): Promise<PatientProfileDto> => {
@@ -75,10 +71,4 @@ export const createPatientCommand = (supabaseAdmin: SupabaseClient) => {
   };
 };
 
-// Deprecated class for backwards compatibility
-export class PatientProfileCommands {
-  constructor(private readonly supabase: SupabaseClient) {}
-  async createPatient(data: RegisterPatientDto): Promise<PatientProfileDto> {
-    return createPatientCommand(this.supabase)(data);
-  }
-}
+

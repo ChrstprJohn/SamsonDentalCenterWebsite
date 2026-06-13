@@ -1,9 +1,9 @@
 'use server';
 
 import { getAuthenticatedUser, authorizeRole } from '@/shared/auth/auth.util';
-import { AssignDoctorServicesDto, assignDoctorServicesSchema } from '../../dtos';
-import { assignDoctorServicesUseCase } from '../../use-cases';
-import { assignDoctorServicesCommand } from '../../repositories';
+import { AssignDoctorServicesDto, assignDoctorServicesSchema } from '../../dtos/exports';
+import { assignDoctorServicesUseCase } from '../../use-cases/exports';
+import { assignDoctorServicesCommand } from '../../repositories/exports';
 import { ValidationError, UnauthorizedError, DomainError } from '@/shared/errors';
 import { createClient } from '@/shared/database/server';
 

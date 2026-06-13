@@ -1,8 +1,8 @@
 'use server';
 
 import { createClient } from '@/shared/database/server';
-import { getActiveDoctorsQuery } from '../../repositories';
-import { getDoctorsUseCase } from '../../use-cases';
+import { getActiveDoctorsQuery } from '../../repositories/exports';
+import { getDoctorsUseCase } from '../../use-cases/exports';
 
 export async function getDoctorsAction(params?: { serviceId?: string }) {
   try {

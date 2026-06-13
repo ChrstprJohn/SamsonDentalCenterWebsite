@@ -1,5 +1,5 @@
-import { PatientAppointmentsQueries } from '../../repositories';
-import { AppointmentDto } from '../../dtos';
+
+import { AppointmentDto } from '../../dtos/exports';
 
 export const getPatientAppointmentsUseCase = (
   getAppointmentsByUser: (userId: string) => Promise<AppointmentDto[]>
@@ -11,19 +11,3 @@ export const getPatientAppointmentsUseCase = (
     return getAppointmentsByUser(userId);
   };
 };
-
-/** @deprecated Use getPatientAppointmentsUseCase directly instead */
-export class GetPatientAppointmentsUseCase {
-  constructor(
-    private readonly patientAppointmentsQueries: PatientAppointmentsQueries
-  ) {}
-
-  /**
-   * Retrieves all appointments for a patient.
-   */
-  async execute(userId: string): Promise<AppointmentDto[]> {
-    return getPatientAppointmentsUseCase((uid) =>
-      this.patientAppointmentsQueries.getAppointmentsByUser(uid)
-    )(userId);
-  }
-}

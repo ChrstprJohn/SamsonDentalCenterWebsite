@@ -8,7 +8,7 @@ vi.mock('@/shared/auth/auth.util', () => ({
 vi.mock('@/shared/database/server', () => ({
   createClient: vi.fn().mockResolvedValue({}),
 }));
-vi.mock('../../repositories', () => ({
+vi.mock('../../repositories/exports', () => ({
   getAllUsersQuery: () => vi.fn().mockResolvedValue([{ id: 'user1' }]),
   UserManagementQueries: class {
     getAllUsers = vi.fn().mockResolvedValue([{ id: 'user1' }]);

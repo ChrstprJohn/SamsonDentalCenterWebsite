@@ -1,6 +1,6 @@
 import { SupabaseClient } from '@supabase/supabase-js';
-import { FinalizeInvoiceDto, InvoiceResponseDto } from '@/modules/billing/dtos';
-import { AppointmentDto } from '@/modules/appointments/dtos';
+import { FinalizeInvoiceDto, InvoiceResponseDto } from '@/modules/billing/dtos/exports';
+import { AppointmentDto } from '@/modules/appointments/dtos/exports';
 import { AuditLogResponseDto } from '@/modules/audit-logs/dtos/logs/audit-log-response.dto';
 import { DomainError } from '@/shared/errors';
 

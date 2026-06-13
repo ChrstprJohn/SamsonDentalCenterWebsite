@@ -1,5 +1,5 @@
-import { z } from "zod";
-import { invoiceStatusEnum } from "./invoice-response.dto";
+import { z } from 'zod';
+import { invoiceStatusEnum } from './invoice-response.dto';
 
 export const GenerateInvoiceSchema = z.object({
   appointmentId: z.string().uuid(),

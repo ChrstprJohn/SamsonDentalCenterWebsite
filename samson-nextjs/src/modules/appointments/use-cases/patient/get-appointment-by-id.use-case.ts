@@ -1,4 +1,4 @@
-import { AppointmentDto } from '../../dtos';
+import { AppointmentDto } from '../../dtos/exports';
 
 export const getAppointmentByIdUseCase = (
   getAppointmentById: (appointmentId: string) => Promise<AppointmentDto>

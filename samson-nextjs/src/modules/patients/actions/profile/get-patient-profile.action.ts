@@ -3,8 +3,8 @@
 import { createClient } from '@/shared/database/server';
 import { getAuthenticatedUser } from '@/shared/auth/auth.util';
 import { DomainError, NotFoundError } from '@/shared/errors';
-import { getPatientProfileByIdQuery } from '../../repositories';
-import { getPatientProfileUseCase } from '../../use-cases';
+import { getPatientProfileByIdQuery } from '../../repositories/exports';
+import { getPatientProfileUseCase } from '../../use-cases/exports';
 
 export async function getPatientProfileAction() {
   try {

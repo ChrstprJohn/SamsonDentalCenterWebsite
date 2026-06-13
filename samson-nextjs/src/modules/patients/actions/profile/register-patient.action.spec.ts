@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { registerPatientAction } from './register-patient.action';
 import { getAuthenticatedUser } from '@/shared/auth/auth.util';
 import { createAdminClient } from '@/shared/database/server';
-import { RegisterPatientUseCase } from '../../use-cases';
 
 // 1. Mocks
 vi.mock('server-only', () => ({}));
@@ -25,9 +24,6 @@ vi.mock('@/shared/outbox/outbox.dispatcher', () => ({
 vi.mock('../../use-cases/profile/register-patient.use-case', () => {
   return {
     registerPatientUseCase: () => mockExecute,
-    RegisterPatientUseCase: class {
-      execute = mockExecute;
-    },
   };
 });
 

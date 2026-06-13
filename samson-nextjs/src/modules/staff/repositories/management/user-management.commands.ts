@@ -14,12 +14,3 @@ export const deactivateUserCommand = (supabase: SupabaseClient) => {
     return true;
   };
 };
-
-// Deprecated class for backwards compatibility
-export class UserManagementCommands {
-  constructor(private readonly supabase: SupabaseClient) {}
-  async deactivateUser(userId: string, reason?: string): Promise<boolean> {
-    return deactivateUserCommand(this.supabase)(userId, reason);
-  }
-}
-

@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { SupabaseClient } from '@supabase/supabase-js';
-import { PatientAppointmentsQueries } from './patient-appointments.queries';
+import { getAppointmentsByUserQuery } from './patient-appointments.queries';
 
 describe('PatientAppointmentsQueries', () => {
-  let queries: PatientAppointmentsQueries;
+  let queryFn: ReturnType<typeof getAppointmentsByUserQuery>;
   let mockSupabase: any;
 
   beforeEach(() => {
@@ -13,7 +13,7 @@ describe('PatientAppointmentsQueries', () => {
       eq: vi.fn().mockReturnThis(),
       order: vi.fn().mockResolvedValue({ data: [], error: null }),
     };
-    queries = new PatientAppointmentsQueries(mockSupabase as unknown as SupabaseClient);
+    queryFn = getAppointmentsByUserQuery(mockSupabase as unknown as SupabaseClient);
   });
 
   describe('getAppointmentsByUser', () => {
@@ -29,7 +29,7 @@ describe('PatientAppointmentsQueries', () => {
       }];
       mockSupabase.order.mockResolvedValueOnce({ data: mockData, error: null });
 
-      const result = await queries.getAppointmentsByUser('user-123');
+      const result = await queryFn('user-123');
 
       expect(mockSupabase.from).toHaveBeenCalledWith('appointments');
       expect(mockSupabase.eq).toHaveBeenCalledWith('patient_id', 'user-123');
@@ -45,7 +45,7 @@ describe('PatientAppointmentsQueries', () => {
     it('should throw an error on database failure', async () => {
       mockSupabase.order.mockResolvedValueOnce({ data: null, error: { message: 'DB Error' } });
 
-      await expect(queries.getAppointmentsByUser('user-123')).rejects.toThrow(
+      await expect(queryFn('user-123')).rejects.toThrow(
         'Failed to fetch user appointments: DB Error'
       );
     });

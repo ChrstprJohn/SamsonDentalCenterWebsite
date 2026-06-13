@@ -1,4 +1,4 @@
-import { ServiceResponseDto } from "../../dtos/management/service-response.dto";
+import { ServiceResponseDto } from '../../dtos/management/service-response.dto';
 
 export const getServicesUseCase = (
   getServices: (includeInactive?: boolean) => Promise<ServiceResponseDto[]>

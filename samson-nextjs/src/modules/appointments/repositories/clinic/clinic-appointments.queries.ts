@@ -1,6 +1,6 @@
 import { SupabaseClient } from '@supabase/supabase-js';
-import { GetClinicAppointmentsDto } from '../../dtos';
-import { AppointmentDto, mapAppointmentRecords } from '../../dtos';
+import { GetClinicAppointmentsDto } from '../../dtos/exports';
+import { AppointmentDto, mapAppointmentRecords } from '../../dtos/exports';
 
 export const getAppointmentsByClinicQuery = (supabase: SupabaseClient) => {
   return async (filters?: GetClinicAppointmentsDto): Promise<AppointmentDto[]> => {
@@ -35,15 +35,3 @@ export const getAppointmentsByClinicQuery = (supabase: SupabaseClient) => {
     return mapAppointmentRecords((appointments || []) as Record<string, unknown>[]);
   };
 };
-
-/** @deprecated Use functional queries directly instead */
-export class ClinicAppointmentsQueries {
-  constructor(private readonly supabase: SupabaseClient) {}
-
-  /**
-   * Fetches appointments for the clinic with optional filters (Admin/Secretary Portal).
-   */
-  async getAppointmentsByClinic(filters?: GetClinicAppointmentsDto): Promise<AppointmentDto[]> {
-    return getAppointmentsByClinicQuery(this.supabase)(filters);
-  }
-}

@@ -1,6 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { SupabaseClient } from "@supabase/supabase-js";
-import { InvoiceQueriesRepository } from "./invoice.queries";
+import {
+  getInvoicesQuery,
+  getInvoiceByIdQuery,
+} from "./invoice.queries";
 
 const mockFrom = vi.fn();
 const mockSelect = vi.fn();
@@ -62,8 +65,8 @@ describe("InvoiceQueriesRepository", () => {
   });
 
   it("fetches invoices with pagination", async () => {
-    const repo = new InvoiceQueriesRepository(mockSupabase);
-    const result = await repo.getInvoices({ page: 1, limit: 20 });
+    const qry = getInvoicesQuery(mockSupabase);
+    const result = await qry({ page: 1, limit: 20 });
 
     expect(mockFrom).toHaveBeenCalledWith("invoices");
     expect(mockRange).toHaveBeenCalledWith(0, 19);
@@ -87,8 +90,8 @@ describe("InvoiceQueriesRepository", () => {
         }),
     });
 
-    const repo = new InvoiceQueriesRepository(mockSupabase);
-    const result = await repo.getInvoices({
+    const qry = getInvoicesQuery(mockSupabase);
+    const result = await qry({
       appointment_id: "1a95a63c-333e-4b68-98e3-82bdf1a07bd2",
       status: "PAID",
       page: 1,
@@ -103,8 +106,8 @@ describe("InvoiceQueriesRepository", () => {
   it("fetches invoice by id", async () => {
     mockSelect.mockReturnValue({ eq: mockEq });
 
-    const repo = new InvoiceQueriesRepository(mockSupabase);
-    const result = await repo.getInvoiceById("da95a63c-333e-4b68-98e3-82bdf1a07bd2");
+    const qry = getInvoiceByIdQuery(mockSupabase);
+    const result = await qry("da95a63c-333e-4b68-98e3-82bdf1a07bd2");
 
     expect(result?.id).toBe("da95a63c-333e-4b68-98e3-82bdf1a07bd2");
   });
@@ -112,8 +115,8 @@ describe("InvoiceQueriesRepository", () => {
   it("throws when fetch fails", async () => {
     mockRange.mockResolvedValue({ data: null, error: { message: "Fetch failed" } });
 
-    const repo = new InvoiceQueriesRepository(mockSupabase);
-    await expect(repo.getInvoices({ page: 1, limit: 20 })).rejects.toThrow(
+    const qry = getInvoicesQuery(mockSupabase);
+    await expect(qry({ page: 1, limit: 20 })).rejects.toThrow(
       "Failed to fetch invoices: Fetch failed"
     );
   });

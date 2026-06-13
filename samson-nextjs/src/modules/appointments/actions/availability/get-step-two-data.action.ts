@@ -3,17 +3,11 @@
 import { z } from 'zod';
 import { createClient } from '@/shared/database/server';
 import { DomainError } from '@/shared/errors';
-import { getAvailableDaysSchema, GetAvailableDaysDto } from '../../dtos';
-import {
-  getWorkingSchedulesForMonthQuery,
-  getDoctorSchedulesQuery,
-  getExistingAppointmentsQuery,
-  getServiceDurationQuery,
-  getExistingAppointmentsForMonthQuery,
-} from '../../repositories';
-import { getAvailableDaysUseCase, getAvailableTimeSlotsUseCase } from '../../use-cases';
-import { getActiveDoctorsQuery } from '@/modules/staff/repositories';
-import { getDoctorsUseCase } from '@/modules/staff/use-cases';
+import { getAvailableDaysSchema, GetAvailableDaysDto } from '../../dtos/exports';
+import { getWorkingSchedulesForMonthQuery, getDoctorSchedulesQuery, getExistingAppointmentsQuery, getServiceDurationQuery, getExistingAppointmentsForMonthQuery } from '../../repositories/exports';
+import { getAvailableDaysUseCase, getAvailableTimeSlotsUseCase } from '../../use-cases/exports';
+import { getActiveDoctorsQuery } from '@/modules/staff/repositories/exports';
+import { getDoctorsUseCase } from '@/modules/staff/use-cases/exports';
 
 /**
  * Consolidates step two availability and doctor preference data in a single flight.

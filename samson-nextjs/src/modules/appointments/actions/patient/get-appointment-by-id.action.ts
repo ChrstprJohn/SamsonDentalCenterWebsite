@@ -5,7 +5,7 @@ import { createClient } from '@/shared/database/server';
 import { getAuthenticatedUser } from '@/shared/auth/auth.util';
 import { DomainError } from '@/shared/errors';
 import { getAppointmentByIdSchema } from '../../dtos/patient/get-appointment-by-id.dto';
-import { getAppointmentByIdQuery } from '../../repositories';
+import { getAppointmentByIdQuery } from '../../repositories/exports';
 import { getAppointmentByIdUseCase } from '../../use-cases/patient/get-appointment-by-id.use-case';
 
 /**

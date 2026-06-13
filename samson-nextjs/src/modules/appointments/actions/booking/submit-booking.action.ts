@@ -4,17 +4,9 @@ import { z } from 'zod';
 import { createClient } from '@/shared/database/server';
 import { getAuthenticatedUser } from '@/shared/auth/auth.util';
 import { DomainError } from '@/shared/errors';
-import { submitBookingSchema, SubmitBookingDto } from '../../dtos';
-import {
-  getDoctorSchedulesQuery,
-  getExistingAppointmentsQuery,
-  getServiceDurationQuery,
-  executeBookingTransactionCommand,
-} from '../../repositories';
-import {
-  getAvailableTimeSlotsUseCase,
-  submitBookingUseCase,
-} from '../../use-cases';
+import { submitBookingSchema, SubmitBookingDto } from '../../dtos/exports';
+import { getDoctorSchedulesQuery, getExistingAppointmentsQuery, getServiceDurationQuery, executeBookingTransactionCommand } from '../../repositories/exports';
+import { getAvailableTimeSlotsUseCase, submitBookingUseCase } from '../../use-cases/exports';
 
 /**
  * Submits an appointment booking request for the authenticated user.

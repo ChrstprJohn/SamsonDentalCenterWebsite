@@ -1,5 +1,5 @@
 import { SupabaseClient } from '@supabase/supabase-js';
-import { UserProfileResponseDto } from '../../dtos';
+import { UserProfileResponseDto } from '../../dtos/exports';
 import { unstable_cache } from 'next/cache';
 
 export const getActiveDoctorsQuery = (supabase: SupabaseClient) => {
@@ -50,11 +50,3 @@ export const getActiveDoctorsQuery = (supabase: SupabaseClient) => {
   return fetchActiveDoctors;
   // To enable caching, replace with: return cachedDoctors;
 };
-
-// Deprecated class for backwards compatibility
-export class GetActiveDoctorsQueries {
-  constructor(private readonly supabase: SupabaseClient) {}
-  async getActiveDoctors(serviceId?: string): Promise<UserProfileResponseDto[]> {
-    return getActiveDoctorsQuery(this.supabase)(serviceId);
-  }
-}

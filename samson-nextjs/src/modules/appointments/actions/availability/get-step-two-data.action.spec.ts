@@ -13,7 +13,7 @@ const { mockGetAvailableDaysUseCase, mockGetDoctorsUseCase, mockGetServiceDurati
   };
 });
 
-vi.mock('../../use-cases', async (importOriginal) => {
+vi.mock('../../use-cases/exports', async (importOriginal) => {
   const original = await importOriginal<any>();
   return {
     ...original,
@@ -22,7 +22,7 @@ vi.mock('../../use-cases', async (importOriginal) => {
   };
 });
 
-vi.mock('@/modules/staff/use-cases', async (importOriginal) => {
+vi.mock('@/modules/staff/use-cases/exports', async (importOriginal) => {
   const original = await importOriginal<any>();
   return {
     ...original,
@@ -30,7 +30,7 @@ vi.mock('@/modules/staff/use-cases', async (importOriginal) => {
   };
 });
 
-vi.mock('../../repositories', async (importOriginal) => {
+vi.mock('../../repositories/exports', async (importOriginal) => {
   const original = await importOriginal<any>();
   return {
     ...original,

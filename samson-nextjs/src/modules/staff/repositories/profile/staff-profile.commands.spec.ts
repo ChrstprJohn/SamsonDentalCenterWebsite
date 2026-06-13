@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { createStaffCommand, updateStaffCommand, terminateStaffCommand } from './staff-profile.commands';
-import { CreateStaffDto } from '../../dtos';
+import { CreateStaffDto } from '../../dtos/exports';
 import { DomainError } from '@/shared/errors';
 
 describe('StaffProfileCommands (Functional)', () => {

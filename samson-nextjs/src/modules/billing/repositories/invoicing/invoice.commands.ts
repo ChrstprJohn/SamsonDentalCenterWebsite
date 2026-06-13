@@ -1,8 +1,8 @@
-import { SupabaseClient } from "@supabase/supabase-js";
-import { GenerateInvoiceDto } from "../../dtos/invoicing/generate-invoice.dto";
-import { UpdateInvoiceDto } from "../../dtos/invoicing/update-invoice.dto";
-import { FinalizeInvoiceDto } from "../../dtos/invoicing/finalize-invoice.dto";
-import { InvoiceResponseDto, mapInvoiceRecord } from "../../dtos/invoicing/invoice-response.dto";
+import { SupabaseClient } from '@supabase/supabase-js';
+import { GenerateInvoiceDto } from '../../dtos/invoicing/generate-invoice.dto';
+import { UpdateInvoiceDto } from '../../dtos/invoicing/update-invoice.dto';
+import { FinalizeInvoiceDto } from '../../dtos/invoicing/finalize-invoice.dto';
+import { InvoiceResponseDto, mapInvoiceRecord } from '../../dtos/invoicing/invoice-response.dto';
 
 export const generateInvoiceCommand = (supabase: SupabaseClient) => {
   return async (data: GenerateInvoiceDto): Promise<InvoiceResponseDto> => {
@@ -63,20 +63,3 @@ export const finalizeInvoiceCommand = (supabase: SupabaseClient) => {
     return mapInvoiceRecord(result as Record<string, unknown>);
   };
 };
-
-/** @deprecated Use functional commands directly instead */
-export class InvoiceCommandsRepository {
-  constructor(private readonly supabase: SupabaseClient) {}
-
-  async generateInvoice(data: GenerateInvoiceDto): Promise<InvoiceResponseDto> {
-    return generateInvoiceCommand(this.supabase)(data);
-  }
-
-  async updateInvoice(data: UpdateInvoiceDto): Promise<InvoiceResponseDto> {
-    return updateInvoiceCommand(this.supabase)(data);
-  }
-
-  async finalizeInvoice(data: FinalizeInvoiceDto): Promise<InvoiceResponseDto> {
-    return finalizeInvoiceCommand(this.supabase)(data);
-  }
-}

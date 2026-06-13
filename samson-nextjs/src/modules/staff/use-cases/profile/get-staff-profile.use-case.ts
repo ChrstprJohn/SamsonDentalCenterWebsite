@@ -1,5 +1,5 @@
-import { StaffProfileQueries } from '../../repositories';
-import { StaffProfileDto } from '../../dtos';
+
+import { StaffProfileDto } from '../../dtos/exports';
 
 export const getStaffProfileUseCase = (
   getProfileById: (staffId: string) => Promise<StaffProfileDto>
@@ -11,12 +11,3 @@ export const getStaffProfileUseCase = (
     return getProfileById(staffId);
   };
 };
-
-// Deprecated class for backwards compatibility
-export class GetStaffProfileUseCase {
-  constructor(private readonly staffProfileQueries: StaffProfileQueries) {}
-  async execute(staffId: string) {
-    return getStaffProfileUseCase((id) => this.staffProfileQueries.getProfileById(id))(staffId);
-  }
-}
-

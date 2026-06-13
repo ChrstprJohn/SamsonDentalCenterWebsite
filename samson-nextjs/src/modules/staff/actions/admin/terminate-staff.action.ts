@@ -4,9 +4,9 @@ import { z } from 'zod';
 import { createClient } from '@/shared/database/server';
 import { authorizeRole } from '@/shared/auth/auth.util';
 import { DomainError } from '@/shared/errors';
-import { terminateStaffSchema, TerminateStaffDto } from '../../dtos';
-import { terminateStaffCommand } from '../../repositories';
-import { terminateStaffUseCase } from '../../use-cases';
+import { terminateStaffSchema, TerminateStaffDto } from '../../dtos/exports';
+import { terminateStaffCommand } from '../../repositories/exports';
+import { terminateStaffUseCase } from '../../use-cases/exports';
 
 export async function terminateStaffAction(formData: TerminateStaffDto | string) {
     try {

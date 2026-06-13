@@ -1,6 +1,6 @@
-import { AppointmentStatusValue } from '../../repositories';
+import { AppointmentStatusValue } from '../../repositories/exports';
 import { ValidationError } from '@/shared/errors';
-import { AppointmentDto } from '../../dtos';
+import { AppointmentDto } from '../../dtos/exports';
 
 export const requestRescheduleUseCase = (deps: {
   getAppointmentById: (appointmentId: string) => Promise<AppointmentDto>;

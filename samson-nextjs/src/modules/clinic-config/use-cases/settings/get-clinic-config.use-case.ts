@@ -1,4 +1,4 @@
-import { ClinicConfigResponseDto } from "../../dtos/settings/get-clinic-config.dto";
+import { ClinicConfigResponseDto } from '../../dtos/settings/get-clinic-config.dto';
 
 const DEFAULT_CONFIG: ClinicConfigResponseDto = {
   isBookingOpen: true,

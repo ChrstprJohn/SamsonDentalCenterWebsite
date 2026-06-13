@@ -2,12 +2,12 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { getPatientProfileAction } from './get-patient-profile.action';
 import { getAuthenticatedUser } from '@/shared/auth/auth.util';
 import { createClient } from '@/shared/database/server';
-import { GetPatientProfileUseCase } from '../../use-cases';
 import { NotFoundError } from '@/shared/errors';
 
 vi.mock('server-only', () => ({}));
 vi.mock('@/shared/auth/auth.util');
 vi.mock('@/shared/database/server');
+
 const { mockExecute } = vi.hoisted(() => {
   return { mockExecute: vi.fn() };
 });
@@ -15,9 +15,6 @@ const { mockExecute } = vi.hoisted(() => {
 vi.mock('../../use-cases/profile/get-patient-profile.use-case', () => {
   return {
     getPatientProfileUseCase: () => mockExecute,
-    GetPatientProfileUseCase: class {
-      execute = mockExecute;
-    },
   };
 });
 

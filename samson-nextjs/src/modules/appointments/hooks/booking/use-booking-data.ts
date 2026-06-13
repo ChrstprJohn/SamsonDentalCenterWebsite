@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { getAvailableTimeSlotsAction } from '../../actions/availability/get-available-time-slots.action';
 import { getAvailableDaysAction } from '../../actions/availability/get-available-days.action';
 import { getDoctorsAction } from '@/modules/staff/actions/management/get-doctors.action';
-import type { AvailabilityMapDto, AvailableSlotDto } from '../../dtos';
-import type { UserProfileResponseDto } from '@/modules/staff/dtos';
+import type { AvailabilityMapDto, AvailableSlotDto } from '../../dtos/exports';
+import type { UserProfileResponseDto } from '@/modules/staff/dtos/exports';
 import type { BookingSlot } from './use-user-booking';
 
 function formatSlotsForBooking(slots: AvailableSlotDto[]): BookingSlot[] {

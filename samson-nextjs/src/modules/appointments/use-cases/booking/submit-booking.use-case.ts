@@ -1,4 +1,4 @@
-import { SubmitBookingDto, GetAvailableTimeSlotsResponseDto } from '../../dtos';
+import { SubmitBookingDto, GetAvailableTimeSlotsResponseDto } from '../../dtos/exports';
 import { ValidationError } from '@/shared/errors';
 
 export const submitBookingUseCase = (deps: {

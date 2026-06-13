@@ -45,12 +45,3 @@ export const submitTreatmentCommand = (supabase: SupabaseClient) => {
     return true;
   };
 };
-
-/** @deprecated Use functional commands directly instead */
-export class TreatmentCommands {
-  constructor(private readonly supabase: SupabaseClient) {}
-
-  async submitTreatment(appointmentId: string, clinicalNotes: string | null = null, serviceIds: string[] = []): Promise<boolean> {
-    return submitTreatmentCommand(this.supabase)(appointmentId, clinicalNotes, serviceIds);
-  }
-}

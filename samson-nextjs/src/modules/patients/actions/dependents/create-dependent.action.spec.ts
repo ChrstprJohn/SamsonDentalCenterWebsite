@@ -8,11 +8,8 @@ vi.mock('@/shared/database/server', () => ({
   createClient: vi.fn().mockResolvedValue({}),
   createAdminClient: vi.fn().mockResolvedValue({}),
 }));
-vi.mock('../../repositories', () => ({
+vi.mock('../../repositories/exports', () => ({
   addDependentCommand: () => vi.fn().mockResolvedValue({ id: '123' }),
-  PatientDependentsCommands: class {
-    addDependent = vi.fn().mockResolvedValue({ id: '123' });
-  }
 }));
 
 

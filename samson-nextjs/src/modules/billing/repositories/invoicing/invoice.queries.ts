@@ -1,6 +1,6 @@
-import { SupabaseClient } from "@supabase/supabase-js";
-import { GetInvoicesDto } from "../../dtos/invoicing/get-invoices.dto";
-import { InvoiceResponseDto, mapInvoiceRecord, mapInvoiceRecords } from "../../dtos/invoicing/invoice-response.dto";
+import { SupabaseClient } from '@supabase/supabase-js';
+import { GetInvoicesDto } from '../../dtos/invoicing/get-invoices.dto';
+import { InvoiceResponseDto, mapInvoiceRecord, mapInvoiceRecords } from '../../dtos/invoicing/invoice-response.dto';
 
 export const getInvoicesQuery = (supabase: SupabaseClient) => {
   return async (params: GetInvoicesDto): Promise<InvoiceResponseDto[]> => {
@@ -40,16 +40,3 @@ export const getInvoiceByIdQuery = (supabase: SupabaseClient) => {
     return data ? mapInvoiceRecord(data as Record<string, unknown>) : null;
   };
 };
-
-/** @deprecated Use functional queries directly instead */
-export class InvoiceQueriesRepository {
-  constructor(private readonly supabase: SupabaseClient) {}
-
-  async getInvoices(params: GetInvoicesDto): Promise<InvoiceResponseDto[]> {
-    return getInvoicesQuery(this.supabase)(params);
-  }
-
-  async getInvoiceById(id: string): Promise<InvoiceResponseDto | null> {
-    return getInvoiceByIdQuery(this.supabase)(id);
-  }
-}

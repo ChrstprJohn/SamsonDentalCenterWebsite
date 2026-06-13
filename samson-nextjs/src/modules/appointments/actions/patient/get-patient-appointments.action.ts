@@ -3,8 +3,8 @@
 import { createClient } from '@/shared/database/server';
 import { getAuthenticatedUser } from '@/shared/auth/auth.util';
 import { DomainError } from '@/shared/errors';
-import { getAppointmentsByUserQuery } from '../../repositories';
-import { getPatientAppointmentsUseCase } from '../../use-cases';
+import { getAppointmentsByUserQuery } from '../../repositories/exports';
+import { getPatientAppointmentsUseCase } from '../../use-cases/exports';
 
 /**
  * Retrieves all appointments for the currently logged-in patient.

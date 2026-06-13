@@ -1,9 +1,9 @@
 "use server";
 
-import { CreateServiceDto, createServiceSchema } from "../../dtos/management/create-service.dto";
-import { createServiceUseCase } from "../../use-cases/management/create-service.use-case";
-import { createServiceCommand } from "../../repositories/management/service.commands";
-import { createClient } from "../../../../shared/database/server";
+import { CreateServiceDto, createServiceSchema } from '../../dtos/management/create-service.dto';
+import { createServiceUseCase } from '../../use-cases/management/create-service.use-case';
+import { createServiceCommand } from '../../repositories/management/service.commands';
+import { createClient } from '../../../../shared/database/server';
 
 export async function createServiceAction(data: CreateServiceDto) {
   try {

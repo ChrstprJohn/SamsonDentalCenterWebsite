@@ -1,8 +1,8 @@
 "use server";
 
-import { getServicesUseCase } from "../../use-cases/management/get-services.use-case";
-import { getServicesQuery } from "../../repositories/management/service.queries";
-import { createClient } from "../../../../shared/database/server";
+import { getServicesUseCase } from '../../use-cases/management/get-services.use-case';
+import { getServicesQuery } from '../../repositories/management/service.queries';
+import { createClient } from '../../../../shared/database/server';
 
 export async function getServicesAction(includeInactive = false) {
   try {

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { executeBookingTransactionCommand } from './appointment-booking.commands';
-import { SubmitBookingDto } from '../../dtos';
+import { SubmitBookingDto } from '../../dtos/exports';
 
 describe('AppointmentBookingCommands', () => {
   let mockSupabase: any;

@@ -1,8 +1,8 @@
 'use server';
 
 import { getAuthenticatedUser } from '@/shared/auth/auth.util';
-import { getUserDependentsUseCase } from '../../use-cases';
-import { getDependentsByPatientIdQuery } from '../../repositories';
+import { getUserDependentsUseCase } from '../../use-cases/exports';
+import { getDependentsByPatientIdQuery } from '../../repositories/exports';
 import { UnauthorizedError } from '@/shared/errors';
 import { createAdminClient } from '@/shared/database/server';
 

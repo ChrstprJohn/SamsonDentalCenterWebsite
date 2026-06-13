@@ -30,7 +30,7 @@ const { mockSubmitBooking, mockGetServiceDuration } = vi.hoisted(() => {
   };
 });
 
-vi.mock('../../use-cases', async (importOriginal) => {
+vi.mock('../../use-cases/exports', async (importOriginal) => {
   const original = await importOriginal<any>();
   return {
     ...original,
@@ -39,7 +39,7 @@ vi.mock('../../use-cases', async (importOriginal) => {
   };
 });
 
-vi.mock('../../repositories', async (importOriginal) => {
+vi.mock('../../repositories/exports', async (importOriginal) => {
   const original = await importOriginal<any>();
   return {
     ...original,

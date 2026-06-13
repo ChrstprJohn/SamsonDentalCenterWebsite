@@ -1,5 +1,4 @@
-import { PatientProfileQueries } from '../../repositories';
-import { PatientProfileDto } from '../../dtos';
+import { PatientProfileDto } from '../../dtos/exports';
 
 export const getPatientProfileUseCase = (
   getProfileById: (patientId: string) => Promise<PatientProfileDto>
@@ -11,12 +10,4 @@ export const getPatientProfileUseCase = (
     return getProfileById(patientId);
   };
 };
-
-// Deprecated class for backwards compatibility
-export class GetPatientProfileUseCase {
-  constructor(private readonly patientProfileQueries: PatientProfileQueries) {}
-  async execute(patientId: string) {
-    return getPatientProfileUseCase((id) => this.patientProfileQueries.getProfileById(id))(patientId);
-  }
-}
 

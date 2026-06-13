@@ -1,6 +1,6 @@
 import { SubmitTreatmentDto } from '../../dtos/treatment/submit-treatment.dto';
-import { TreatmentCommands } from '../../repositories/treatment/treatment.commands';
-import { InvoiceCommandsRepository } from '@/modules/billing/repositories/invoicing/invoice.commands';
+
+
 import { DomainError } from '@/shared/errors';
 import { getServicesByIdsQuery } from '@/modules/services/repositories/management/service.queries';
 import { SupabaseClient } from '@supabase/supabase-js';
@@ -67,21 +67,3 @@ export const submitTreatmentUseCase = (deps: {
     return true;
   };
 };
-
-/** @deprecated Use submitTreatmentUseCase directly instead */
-export class SubmitTreatmentUseCase {
-  constructor(
-    private readonly treatmentCommands: TreatmentCommands,
-    private readonly invoiceCommands: InvoiceCommandsRepository,
-    private readonly supabase: SupabaseClient
-  ) {}
-
-  async execute(data: SubmitTreatmentDto): Promise<boolean> {
-    return submitTreatmentUseCase({
-      getServicesDetails: getServicesByIdsQuery(this.supabase),
-      submitTreatment: (aid, notes) => this.treatmentCommands.submitTreatment(aid, notes),
-      generateInvoice: (inv) => this.invoiceCommands.generateInvoice(inv),
-    })(data);
-  }
-}
-

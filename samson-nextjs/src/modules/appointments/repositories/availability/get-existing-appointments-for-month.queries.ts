@@ -1,6 +1,6 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { DomainError } from '@/shared/errors';
-import { appointmentResponseSchema, AppointmentResponseDto } from '../../dtos';
+import { appointmentResponseSchema, AppointmentResponseDto } from '../../dtos/exports';
 
 export const getExistingAppointmentsForMonthQuery = (supabase: SupabaseClient) => {
   return async (month: string, doctorId?: string): Promise<AppointmentResponseDto[]> => {

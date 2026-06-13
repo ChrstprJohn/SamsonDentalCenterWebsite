@@ -38,12 +38,3 @@ export const assignDoctorServicesCommand = (supabase: SupabaseClient) => {
     return true;
   };
 };
-
-// Deprecated class for backwards compatibility
-export class DoctorServicesCommands {
-  constructor(private readonly supabase: SupabaseClient) {}
-  async assignDoctorServices(doctorId: string, serviceIds: string[]): Promise<boolean> {
-    return assignDoctorServicesCommand(this.supabase)(doctorId, serviceIds);
-  }
-}
-

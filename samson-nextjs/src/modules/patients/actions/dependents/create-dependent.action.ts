@@ -1,9 +1,9 @@
 'use server';
 
 import { getAuthenticatedUser } from '@/shared/auth/auth.util';
-import { CreateDependentDto, createDependentSchema } from '../../dtos';
-import { createDependentUseCase } from '../../use-cases';
-import { addDependentCommand } from '../../repositories';
+import { CreateDependentDto, createDependentSchema } from '../../dtos/exports';
+import { createDependentUseCase } from '../../use-cases/exports';
+import { addDependentCommand } from '../../repositories/exports';
 import { ValidationError, UnauthorizedError } from '@/shared/errors';
 import { createAdminClient } from '@/shared/database/server';
 
