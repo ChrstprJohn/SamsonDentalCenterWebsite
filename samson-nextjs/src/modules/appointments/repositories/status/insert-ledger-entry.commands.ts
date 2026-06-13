@@ -1,6 +1,6 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { DomainError } from '@/shared/errors';
-import { AppointmentStatusValue } from './update-status.command';
+import { AppointmentStatusValue } from './update-status.commands';
 
 export const insertLedgerEntryCommand = (supabase: SupabaseClient) => {
   return async (

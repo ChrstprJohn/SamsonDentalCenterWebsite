@@ -1,4 +1,4 @@
-import type { AppointmentDto } from './appointment.dto';
+import type { AppointmentDto } from '../dtos/exports';
 
 export const MOCK_APPOINTMENTS: AppointmentDto[] = [
   {

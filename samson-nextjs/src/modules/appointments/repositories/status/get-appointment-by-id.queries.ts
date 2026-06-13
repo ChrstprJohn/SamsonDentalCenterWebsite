@@ -1,6 +1,6 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { DomainError } from '@/shared/errors';
-import { AppointmentDto, mapAppointmentRecord } from '../../dtos';
+import { AppointmentDto, mapAppointmentRecord } from '../../dtos/exports';
 
 export const getAppointmentByIdQuery = (supabase: SupabaseClient) => {
   return async (appointmentId: string): Promise<AppointmentDto> => {
