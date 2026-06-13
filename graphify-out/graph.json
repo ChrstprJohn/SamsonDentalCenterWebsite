@@ -719,34 +719,34 @@
       "source_file": "samson-nextjs/src/app/(portals)/user/appointments/[id]/page.tsx",
       "source_location": "L1",
       "id": "id_page",
-      "community": 62,
+      "community": 15,
       "norm_label": "page.tsx"
     },
     {
       "label": "metadata",
       "file_type": "code",
       "source_file": "samson-nextjs/src/app/(portals)/user/appointments/[id]/page.tsx",
-      "source_location": "L9",
+      "source_location": "L10",
       "id": "id_page_metadata",
-      "community": 62,
+      "community": 15,
       "norm_label": "metadata"
     },
     {
       "label": "PageProps",
       "file_type": "code",
       "source_file": "samson-nextjs/src/app/(portals)/user/appointments/[id]/page.tsx",
-      "source_location": "L14",
+      "source_location": "L15",
       "id": "id_page_pageprops",
-      "community": 62,
+      "community": 15,
       "norm_label": "pageprops"
     },
     {
       "label": "AppointmentDetailPage()",
       "file_type": "code",
       "source_file": "samson-nextjs/src/app/(portals)/user/appointments/[id]/page.tsx",
-      "source_location": "L18",
+      "source_location": "L19",
       "id": "id_page_appointmentdetailpage",
-      "community": 62,
+      "community": 15,
       "norm_label": "appointmentdetailpage()"
     },
     {
@@ -782,7 +782,7 @@
       "source_file": "samson-nextjs/src/app/(portals)/user/layout.tsx",
       "source_location": "L1",
       "id": "user_layout",
-      "community": 62,
+      "community": 238,
       "norm_label": "layout.tsx"
     },
     {
@@ -791,7 +791,7 @@
       "source_file": "samson-nextjs/src/app/(portals)/user/layout.tsx",
       "source_location": "L10",
       "id": "user_layout_userportallayout",
-      "community": 62,
+      "community": 238,
       "norm_label": "userportallayout()"
     },
     {
@@ -1268,7 +1268,7 @@
       "source_file": "samson-nextjs/src/components/ui/button.tsx",
       "source_location": "L1",
       "id": "ui_button",
-      "community": 37,
+      "community": 62,
       "norm_label": "button.tsx"
     },
     {
@@ -1277,7 +1277,7 @@
       "source_file": "samson-nextjs/src/components/ui/button.tsx",
       "source_location": "L3",
       "id": "ui_button_buttonprops",
-      "community": 37,
+      "community": 62,
       "norm_label": "buttonprops"
     },
     {
@@ -1286,7 +1286,7 @@
       "source_file": "samson-nextjs/src/components/ui/button.tsx",
       "source_location": "L8",
       "id": "ui_button_button",
-      "community": 37,
+      "community": 62,
       "norm_label": "button()"
     },
     {
@@ -1295,7 +1295,7 @@
       "source_file": "samson-nextjs/src/components/ui/footer.tsx",
       "source_location": "L1",
       "id": "ui_footer",
-      "community": 62,
+      "community": 37,
       "norm_label": "footer.tsx"
     },
     {
@@ -1313,7 +1313,7 @@
       "source_file": "samson-nextjs/src/components/ui/footer.tsx",
       "source_location": "L11",
       "id": "ui_footer_default_hours",
-      "community": 62,
+      "community": 37,
       "norm_label": "default_hours"
     },
     {
@@ -1322,7 +1322,7 @@
       "source_file": "samson-nextjs/src/components/ui/footer.tsx",
       "source_location": "L21",
       "id": "ui_footer_day_names",
-      "community": 62,
+      "community": 37,
       "norm_label": "day_names"
     },
     {
@@ -1484,7 +1484,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/actions/availability/get-available-days.action.spec.ts",
       "source_location": "L1",
       "id": "availability_get_available_days_action_spec",
-      "community": 195,
+      "community": 197,
       "norm_label": "get-available-days.action.spec.ts"
     },
     {
@@ -1493,7 +1493,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/actions/availability/get-available-days.action.spec.ts",
       "source_location": "L8",
       "id": "availability_get_available_days_action_spec_mockgetavailabledaysusecase_mockgetserviceduration",
-      "community": 195,
+      "community": 197,
       "norm_label": "{ mockgetavailabledaysusecase, mockgetserviceduration }"
     },
     {
@@ -1502,7 +1502,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/actions/availability/get-available-days.action.ts",
       "source_location": "L1",
       "id": "availability_get_available_days_action",
-      "community": 195,
+      "community": 122,
       "norm_label": "get-available-days.action.ts"
     },
     {
@@ -1511,7 +1511,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/actions/availability/get-available-days.action.ts",
       "source_location": "L19",
       "id": "availability_get_available_days_action_getavailabledaysaction",
-      "community": 195,
+      "community": 122,
       "norm_label": "getavailabledaysaction()"
     },
     {
@@ -1520,7 +1520,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/actions/availability/get-available-time-slots.action.spec.ts",
       "source_location": "L1",
       "id": "availability_get_available_time_slots_action_spec",
-      "community": 122,
+      "community": 212,
       "norm_label": "get-available-time-slots.action.spec.ts"
     },
     {
@@ -1529,7 +1529,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/actions/availability/get-available-time-slots.action.spec.ts",
       "source_location": "L8",
       "id": "availability_get_available_time_slots_action_spec_mockgetavailabletimeslotsusecase_mockgetserviceduration",
-      "community": 122,
+      "community": 212,
       "norm_label": "{ mockgetavailabletimeslotsusecase, mockgetserviceduration }"
     },
     {
@@ -1619,7 +1619,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/actions/booking/submit-booking.action.ts",
       "source_location": "L22",
       "id": "booking_submit_booking_action_submitbookingaction",
-      "community": 195,
+      "community": 122,
       "norm_label": "submitbookingaction()"
     },
     {
@@ -1628,7 +1628,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/actions/clinic/get-clinic-appointments.action.spec.ts",
       "source_location": "L1",
       "id": "clinic_get_clinic_appointments_action_spec",
-      "community": 12,
+      "community": 69,
       "norm_label": "get-clinic-appointments.action.spec.ts"
     },
     {
@@ -1637,7 +1637,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/actions/clinic/get-clinic-appointments.action.spec.ts",
       "source_location": "L11",
       "id": "clinic_get_clinic_appointments_action_spec_mockgetclinicappointments",
-      "community": 12,
+      "community": 69,
       "norm_label": "{ mockgetclinicappointments }"
     },
     {
@@ -1646,7 +1646,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/actions/clinic/get-clinic-appointments.action.ts",
       "source_location": "L1",
       "id": "clinic_get_clinic_appointments_action",
-      "community": 12,
+      "community": 69,
       "norm_label": "get-clinic-appointments.action.ts"
     },
     {
@@ -1655,7 +1655,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/actions/clinic/get-clinic-appointments.action.ts",
       "source_location": "L15",
       "id": "clinic_get_clinic_appointments_action_getclinicappointmentsaction",
-      "community": 12,
+      "community": 69,
       "norm_label": "getclinicappointmentsaction()"
     },
     {
@@ -1736,7 +1736,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/actions/status/request-reschedule.action.spec.ts",
       "source_location": "L1",
       "id": "status_request_reschedule_action_spec",
-      "community": 14,
+      "community": 12,
       "norm_label": "request-reschedule.action.spec.ts"
     },
     {
@@ -1745,7 +1745,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/actions/status/request-reschedule.action.spec.ts",
       "source_location": "L10",
       "id": "status_request_reschedule_action_spec_mockupdatestatus",
-      "community": 14,
+      "community": 12,
       "norm_label": "{ mockupdatestatus }"
     },
     {
@@ -1844,7 +1844,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/booking/add-dependent-modal.tsx",
       "source_location": "L1",
       "id": "booking_add_dependent_modal",
-      "community": 193,
+      "community": 44,
       "norm_label": "add-dependent-modal.tsx"
     },
     {
@@ -1853,7 +1853,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/booking/add-dependent-modal.tsx",
       "source_location": "L8",
       "id": "booking_add_dependent_modal_adddependentmodalprops",
-      "community": 193,
+      "community": 44,
       "norm_label": "adddependentmodalprops"
     },
     {
@@ -1862,7 +1862,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/booking/add-dependent-modal.tsx",
       "source_location": "L14",
       "id": "booking_add_dependent_modal_adddependentmodal",
-      "community": 193,
+      "community": 44,
       "norm_label": "adddependentmodal()"
     },
     {
@@ -1871,7 +1871,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/booking/booking-footer-controls.tsx",
       "source_location": "L1",
       "id": "booking_booking_footer_controls",
-      "community": 37,
+      "community": 62,
       "norm_label": "booking-footer-controls.tsx"
     },
     {
@@ -1880,7 +1880,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/booking/booking-footer-controls.tsx",
       "source_location": "L6",
       "id": "booking_booking_footer_controls_bookingfootercontrolsprops",
-      "community": 37,
+      "community": 62,
       "norm_label": "bookingfootercontrolsprops"
     },
     {
@@ -1889,7 +1889,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/booking/booking-footer-controls.tsx",
       "source_location": "L15",
       "id": "booking_booking_footer_controls_bookingfootercontrols",
-      "community": 37,
+      "community": 62,
       "norm_label": "bookingfootercontrols()"
     },
     {
@@ -2105,7 +2105,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/dashboard/appointment-history.tsx",
       "source_location": "L11",
       "id": "dashboard_appointment_history_appointmenthistory",
-      "community": 176,
+      "community": 15,
       "norm_label": "appointmenthistory()"
     },
     {
@@ -2213,7 +2213,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/dashboard/pending-approvals.tsx",
       "source_location": "L11",
       "id": "dashboard_pending_approvals_pendingapprovals",
-      "community": 176,
+      "community": 15,
       "norm_label": "pendingapprovals()"
     },
     {
@@ -2267,7 +2267,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/dashboard/upcoming-appointments.tsx",
       "source_location": "L12",
       "id": "dashboard_upcoming_appointments_upcomingappointments",
-      "community": 176,
+      "community": 15,
       "norm_label": "upcomingappointments()"
     },
     {
@@ -2330,7 +2330,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/sub-components/appointment-schedule-card.tsx",
       "source_location": "L1",
       "id": "sub_components_appointment_schedule_card",
-      "community": 15,
+      "community": 193,
       "norm_label": "appointment-schedule-card.tsx"
     },
     {
@@ -2339,7 +2339,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/sub-components/appointment-schedule-card.tsx",
       "source_location": "L5",
       "id": "sub_components_appointment_schedule_card_appointmentschedulecardprops",
-      "community": 15,
+      "community": 193,
       "norm_label": "appointmentschedulecardprops"
     },
     {
@@ -2348,7 +2348,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/sub-components/appointment-schedule-card.tsx",
       "source_location": "L9",
       "id": "sub_components_appointment_schedule_card_appointmentschedulecard",
-      "community": 15,
+      "community": 193,
       "norm_label": "appointmentschedulecard()"
     },
     {
@@ -2357,7 +2357,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/sub-components/appointment-status-hero.tsx",
       "source_location": "L1",
       "id": "sub_components_appointment_status_hero",
-      "community": 4,
+      "community": 15,
       "norm_label": "appointment-status-hero.tsx"
     },
     {
@@ -2366,7 +2366,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/sub-components/appointment-status-hero.tsx",
       "source_location": "L4",
       "id": "sub_components_appointment_status_hero_appointmentstatusheroprops",
-      "community": 4,
+      "community": 15,
       "norm_label": "appointmentstatusheroprops"
     },
     {
@@ -2375,7 +2375,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/sub-components/appointment-status-hero.tsx",
       "source_location": "L8",
       "id": "sub_components_appointment_status_hero_appointmentstatushero",
-      "community": 4,
+      "community": 15,
       "norm_label": "appointmentstatushero()"
     },
     {
@@ -2492,7 +2492,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/dtos/availability/doctor-schedule-response.dto.spec.ts",
       "source_location": "L1",
       "id": "availability_doctor_schedule_response_dto_spec",
-      "community": 233,
+      "community": 195,
       "norm_label": "doctor-schedule-response.dto.spec.ts"
     },
     {
@@ -2501,7 +2501,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/dtos/availability/doctor-schedule-response.dto.ts",
       "source_location": "L1",
       "id": "availability_doctor_schedule_response_dto",
-      "community": 233,
+      "community": 195,
       "norm_label": "doctor-schedule-response.dto.ts"
     },
     {
@@ -2510,7 +2510,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/dtos/availability/doctor-schedule-response.dto.ts",
       "source_location": "L3",
       "id": "availability_doctor_schedule_response_dto_doctorscheduledbschema",
-      "community": 233,
+      "community": 195,
       "norm_label": "doctorscheduledbschema"
     },
     {
@@ -2519,7 +2519,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/dtos/availability/doctor-schedule-response.dto.ts",
       "source_location": "L17",
       "id": "availability_doctor_schedule_response_dto_doctorscheduleresponseschema",
-      "community": 233,
+      "community": 195,
       "norm_label": "doctorscheduleresponseschema"
     },
     {
@@ -2528,7 +2528,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/dtos/availability/doctor-schedule-response.dto.ts",
       "source_location": "L30",
       "id": "availability_doctor_schedule_response_dto_doctorscheduleresponsedto",
-      "community": 233,
+      "community": 195,
       "norm_label": "doctorscheduleresponsedto"
     },
     {
@@ -2663,7 +2663,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/dtos/availability/get-available-time-slots.dto.ts",
       "source_location": "L17",
       "id": "availability_get_available_time_slots_dto_availableslotschema",
-      "community": 209,
+      "community": 220,
       "norm_label": "availableslotschema"
     },
     {
@@ -2699,7 +2699,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/dtos/booking/submit-booking.dto.spec.ts",
       "source_location": "L1",
       "id": "booking_submit_booking_dto_spec",
-      "community": 234,
+      "community": 3,
       "norm_label": "submit-booking.dto.spec.ts"
     },
     {
@@ -2708,7 +2708,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/dtos/booking/submit-booking.dto.ts",
       "source_location": "L1",
       "id": "booking_submit_booking_dto",
-      "community": 234,
+      "community": 3,
       "norm_label": "submit-booking.dto.ts"
     },
     {
@@ -2717,7 +2717,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/dtos/booking/submit-booking.dto.ts",
       "source_location": "L5",
       "id": "booking_submit_booking_dto_emptystringtoundefined",
-      "community": 234,
+      "community": 3,
       "norm_label": "emptystringtoundefined"
     },
     {
@@ -2726,7 +2726,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/dtos/booking/submit-booking.dto.ts",
       "source_location": "L6",
       "id": "booking_submit_booking_dto_cleanoptionalstring",
-      "community": 234,
+      "community": 3,
       "norm_label": "cleanoptionalstring"
     },
     {
@@ -2735,7 +2735,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/dtos/booking/submit-booking.dto.ts",
       "source_location": "L8",
       "id": "booking_submit_booking_dto_submitbookingschema",
-      "community": 234,
+      "community": 3,
       "norm_label": "submitbookingschema"
     },
     {
@@ -2753,7 +2753,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/dtos/clinic/get-clinic-appointments.dto.spec.ts",
       "source_location": "L1",
       "id": "clinic_get_clinic_appointments_dto_spec",
-      "community": 203,
+      "community": 222,
       "norm_label": "get-clinic-appointments.dto.spec.ts"
     },
     {
@@ -2762,7 +2762,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/dtos/clinic/get-clinic-appointments.dto.ts",
       "source_location": "L1",
       "id": "clinic_get_clinic_appointments_dto",
-      "community": 203,
+      "community": 222,
       "norm_label": "get-clinic-appointments.dto.ts"
     },
     {
@@ -2771,7 +2771,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/dtos/clinic/get-clinic-appointments.dto.ts",
       "source_location": "L3",
       "id": "clinic_get_clinic_appointments_dto_emptystringtoundefined",
-      "community": 203,
+      "community": 222,
       "norm_label": "emptystringtoundefined"
     },
     {
@@ -2780,7 +2780,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/dtos/clinic/get-clinic-appointments.dto.ts",
       "source_location": "L6",
       "id": "clinic_get_clinic_appointments_dto_getclinicappointmentsschema",
-      "community": 203,
+      "community": 222,
       "norm_label": "getclinicappointmentsschema"
     },
     {
@@ -2933,7 +2933,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/dtos/shared/mock-appointments.ts",
       "source_location": "L1",
       "id": "shared_mock_appointments",
-      "community": 176,
+      "community": 15,
       "norm_label": "mock-appointments.ts"
     },
     {
@@ -2942,7 +2942,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/dtos/shared/mock-appointments.ts",
       "source_location": "L3",
       "id": "shared_mock_appointments_mock_appointments",
-      "community": 176,
+      "community": 15,
       "norm_label": "mock_appointments"
     },
     {
@@ -3302,7 +3302,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/hooks/dashboard/use-user-dashboard-summary.ts",
       "source_location": "L1",
       "id": "dashboard_use_user_dashboard_summary",
-      "community": 221,
+      "community": 214,
       "norm_label": "use-user-dashboard-summary.ts"
     },
     {
@@ -3320,7 +3320,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/hooks/dashboard/use-user-dashboard-summary.ts",
       "source_location": "L15",
       "id": "dashboard_use_user_dashboard_summary_initial_mock_notifications",
-      "community": 221,
+      "community": 214,
       "norm_label": "initial_mock_notifications"
     },
     {
@@ -3338,7 +3338,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/hooks/dashboard/use-user-dashboard.spec.ts",
       "source_location": "L1",
       "id": "dashboard_use_user_dashboard_spec",
-      "community": 176,
+      "community": 15,
       "norm_label": "use-user-dashboard.spec.ts"
     },
     {
@@ -3347,7 +3347,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/hooks/dashboard/use-user-dashboard.spec.ts",
       "source_location": "L10",
       "id": "dashboard_use_user_dashboard_spec_mockpush",
-      "community": 176,
+      "community": 15,
       "norm_label": "mockpush"
     },
     {
@@ -3356,7 +3356,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/hooks/dashboard/use-user-dashboard.ts",
       "source_location": "L1",
       "id": "dashboard_use_user_dashboard",
-      "community": 176,
+      "community": 15,
       "norm_label": "use-user-dashboard.ts"
     },
     {
@@ -3365,7 +3365,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/hooks/dashboard/use-user-dashboard.ts",
       "source_location": "L8",
       "id": "dashboard_use_user_dashboard_filteroption",
-      "community": 176,
+      "community": 15,
       "norm_label": "filteroption"
     },
     {
@@ -3374,7 +3374,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/hooks/dashboard/use-user-dashboard.ts",
       "source_location": "L13",
       "id": "dashboard_use_user_dashboard_useuserdashboardreturn",
-      "community": 176,
+      "community": 15,
       "norm_label": "useuserdashboardreturn"
     },
     {
@@ -3446,7 +3446,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/repositories/availability/get-doctor-schedules.queries.ts",
       "source_location": "L5",
       "id": "availability_get_doctor_schedules_queries_getdoctorschedulesquery",
-      "community": 195,
+      "community": 122,
       "norm_label": "getdoctorschedulesquery()"
     },
     {
@@ -3455,7 +3455,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/repositories/availability/get-existing-appointments-for-month.queries.spec.ts",
       "source_location": "L1",
       "id": "availability_get_existing_appointments_for_month_queries_spec",
-      "community": 195,
+      "community": 203,
       "norm_label": "get-existing-appointments-for-month.queries.spec.ts"
     },
     {
@@ -3464,7 +3464,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/repositories/availability/get-existing-appointments-for-month.queries.ts",
       "source_location": "L1",
       "id": "availability_get_existing_appointments_for_month_queries",
-      "community": 195,
+      "community": 203,
       "norm_label": "get-existing-appointments-for-month.queries.ts"
     },
     {
@@ -3473,7 +3473,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/repositories/availability/get-existing-appointments-for-month.queries.ts",
       "source_location": "L5",
       "id": "availability_get_existing_appointments_for_month_queries_getexistingappointmentsformonthquery",
-      "community": 195,
+      "community": 122,
       "norm_label": "getexistingappointmentsformonthquery()"
     },
     {
@@ -3482,7 +3482,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/repositories/availability/get-existing-appointments.queries.spec.ts",
       "source_location": "L1",
       "id": "availability_get_existing_appointments_queries_spec",
-      "community": 122,
+      "community": 195,
       "norm_label": "get-existing-appointments.queries.spec.ts"
     },
     {
@@ -3491,7 +3491,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/repositories/availability/get-existing-appointments.queries.ts",
       "source_location": "L1",
       "id": "availability_get_existing_appointments_queries",
-      "community": 122,
+      "community": 195,
       "norm_label": "get-existing-appointments.queries.ts"
     },
     {
@@ -3527,7 +3527,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/repositories/availability/get-service-duration.queries.ts",
       "source_location": "L5",
       "id": "availability_get_service_duration_queries_getservicedurationquery",
-      "community": 195,
+      "community": 122,
       "norm_label": "getservicedurationquery()"
     },
     {
@@ -3554,7 +3554,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/repositories/availability/get-working-schedules-for-month.queries.ts",
       "source_location": "L6",
       "id": "availability_get_working_schedules_for_month_queries_getworkingschedulesformonthquery",
-      "community": 195,
+      "community": 122,
       "norm_label": "getworkingschedulesformonthquery()"
     },
     {
@@ -3608,7 +3608,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/repositories/clinic/clinic-appointments.queries.ts",
       "source_location": "L5",
       "id": "clinic_clinic_appointments_queries_getappointmentsbyclinicquery",
-      "community": 12,
+      "community": 69,
       "norm_label": "getappointmentsbyclinicquery()"
     },
     {
@@ -3678,7 +3678,7 @@
       "label": "PatientAppointmentsQueries",
       "file_type": "code",
       "source_file": "samson-nextjs/src/modules/appointments/repositories/patient/patient-appointments.queries.ts",
-      "source_location": "L27",
+      "source_location": "L29",
       "id": "patient_patient_appointments_queries_patientappointmentsqueries",
       "community": 10,
       "norm_label": "patientappointmentsqueries"
@@ -3687,7 +3687,7 @@
       "label": ".constructor()",
       "file_type": "code",
       "source_file": "samson-nextjs/src/modules/appointments/repositories/patient/patient-appointments.queries.ts",
-      "source_location": "L28",
+      "source_location": "L30",
       "id": "patient_patient_appointments_queries_patientappointmentsqueries_constructor",
       "community": 10,
       "norm_label": ".constructor()"
@@ -3696,7 +3696,7 @@
       "label": ".getAppointmentsByUser()",
       "file_type": "code",
       "source_file": "samson-nextjs/src/modules/appointments/repositories/patient/patient-appointments.queries.ts",
-      "source_location": "L34",
+      "source_location": "L36",
       "id": "patient_patient_appointments_queries_patientappointmentsqueries_getappointmentsbyuser",
       "community": 214,
       "norm_label": ".getappointmentsbyuser()"
@@ -3905,7 +3905,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/use-cases/availability/get-available-days.use-case.ts",
       "source_location": "L15",
       "id": "availability_get_available_days_use_case_getavailabledaysusecase",
-      "community": 209,
+      "community": 122,
       "norm_label": "getavailabledaysusecase()"
     },
     {
@@ -3932,7 +3932,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/use-cases/availability/get-available-time-slots.use-case.ts",
       "source_location": "L13",
       "id": "availability_get_available_time_slots_use_case_getavailabletimeslotsusecase",
-      "community": 220,
+      "community": 122,
       "norm_label": "getavailabletimeslotsusecase()"
     },
     {
@@ -4283,7 +4283,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/views/booking-view.tsx",
       "source_location": "L16",
       "id": "views_booking_view_bookingviewprops",
-      "community": 193,
+      "community": 44,
       "norm_label": "bookingviewprops"
     },
     {
@@ -4301,7 +4301,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/views/patient-appointments-view.tsx",
       "source_location": "L1",
       "id": "views_patient_appointments_view",
-      "community": 176,
+      "community": 15,
       "norm_label": "patient-appointments-view.tsx"
     },
     {
@@ -4310,7 +4310,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/views/patient-appointments-view.tsx",
       "source_location": "L12",
       "id": "views_patient_appointments_view_patientappointmentsviewprops",
-      "community": 176,
+      "community": 15,
       "norm_label": "patientappointmentsviewprops"
     },
     {
@@ -4319,7 +4319,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/views/patient-appointments-view.tsx",
       "source_location": "L17",
       "id": "views_patient_appointments_view_tabtype",
-      "community": 176,
+      "community": 15,
       "norm_label": "tabtype"
     },
     {
@@ -4328,7 +4328,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/views/patient-appointments-view.tsx",
       "source_location": "L19",
       "id": "views_patient_appointments_view_patientappointmentsview",
-      "community": 176,
+      "community": 214,
       "norm_label": "patientappointmentsview()"
     },
     {
@@ -4400,7 +4400,7 @@
       "source_file": "samson-nextjs/src/modules/audit-logs/actions/logs/get-audit-logs.action.spec.ts",
       "source_location": "L1",
       "id": "logs_get_audit_logs_action_spec",
-      "community": 69,
+      "community": 50,
       "norm_label": "get-audit-logs.action.spec.ts"
     },
     {
@@ -4409,7 +4409,7 @@
       "source_file": "samson-nextjs/src/modules/audit-logs/actions/logs/get-audit-logs.action.ts",
       "source_location": "L1",
       "id": "logs_get_audit_logs_action",
-      "community": 69,
+      "community": 50,
       "norm_label": "get-audit-logs.action.ts"
     },
     {
@@ -4418,7 +4418,7 @@
       "source_file": "samson-nextjs/src/modules/audit-logs/actions/logs/get-audit-logs.action.ts",
       "source_location": "L11",
       "id": "logs_get_audit_logs_action_getauditlogsaction",
-      "community": 69,
+      "community": 50,
       "norm_label": "getauditlogsaction()"
     },
     {
@@ -4643,7 +4643,7 @@
       "source_file": "samson-nextjs/src/modules/audit-logs/repositories/logs/audit-log.commands.ts",
       "source_location": "L6",
       "id": "logs_audit_log_commands_createauditlogcommand",
-      "community": 212,
+      "community": 50,
       "norm_label": "createauditlogcommand()"
     },
     {
@@ -4778,7 +4778,7 @@
       "source_file": "samson-nextjs/src/modules/audit-logs/use-cases/logs/get-audit-logs.use-case.ts",
       "source_location": "L4",
       "id": "logs_get_audit_logs_use_case_getauditlogsusecase",
-      "community": 69,
+      "community": 50,
       "norm_label": "getauditlogsusecase()"
     },
     {
@@ -4787,7 +4787,7 @@
       "source_file": "samson-nextjs/src/modules/billing/actions/invoicing/checkout.action.spec.ts",
       "source_location": "L1",
       "id": "invoicing_checkout_action_spec",
-      "community": 212,
+      "community": 50,
       "norm_label": "checkout.action.spec.ts"
     },
     {
@@ -4796,7 +4796,7 @@
       "source_file": "samson-nextjs/src/modules/billing/actions/invoicing/checkout.action.ts",
       "source_location": "L1",
       "id": "invoicing_checkout_action",
-      "community": 212,
+      "community": 50,
       "norm_label": "checkout.action.ts"
     },
     {
@@ -4805,7 +4805,7 @@
       "source_file": "samson-nextjs/src/modules/billing/actions/invoicing/checkout.action.ts",
       "source_location": "L23",
       "id": "invoicing_checkout_action_sendbackgroundreceipt",
-      "community": 212,
+      "community": 50,
       "norm_label": "sendbackgroundreceipt()"
     },
     {
@@ -4814,7 +4814,7 @@
       "source_file": "samson-nextjs/src/modules/billing/actions/invoicing/checkout.action.ts",
       "source_location": "L27",
       "id": "invoicing_checkout_action_checkoutaction",
-      "community": 212,
+      "community": 50,
       "norm_label": "checkoutaction()"
     },
     {
@@ -4823,7 +4823,7 @@
       "source_file": "samson-nextjs/src/modules/billing/actions/invoicing/finalize-invoice.action.spec.ts",
       "source_location": "L1",
       "id": "invoicing_finalize_invoice_action_spec",
-      "community": 212,
+      "community": 69,
       "norm_label": "finalize-invoice.action.spec.ts"
     },
     {
@@ -4832,7 +4832,7 @@
       "source_file": "samson-nextjs/src/modules/billing/actions/invoicing/finalize-invoice.action.ts",
       "source_location": "L1",
       "id": "invoicing_finalize_invoice_action",
-      "community": 212,
+      "community": 69,
       "norm_label": "finalize-invoice.action.ts"
     },
     {
@@ -4841,7 +4841,7 @@
       "source_file": "samson-nextjs/src/modules/billing/actions/invoicing/finalize-invoice.action.ts",
       "source_location": "L11",
       "id": "invoicing_finalize_invoice_action_finalizeinvoiceaction",
-      "community": 212,
+      "community": 69,
       "norm_label": "finalizeinvoiceaction()"
     },
     {
@@ -4904,7 +4904,7 @@
       "source_file": "samson-nextjs/src/modules/billing/actions/invoicing/update-invoice.action.spec.ts",
       "source_location": "L1",
       "id": "invoicing_update_invoice_action_spec",
-      "community": 69,
+      "community": 12,
       "norm_label": "update-invoice.action.spec.ts"
     },
     {
@@ -4913,7 +4913,7 @@
       "source_file": "samson-nextjs/src/modules/billing/actions/invoicing/update-invoice.action.ts",
       "source_location": "L1",
       "id": "invoicing_update_invoice_action",
-      "community": 69,
+      "community": 12,
       "norm_label": "update-invoice.action.ts"
     },
     {
@@ -4922,7 +4922,7 @@
       "source_file": "samson-nextjs/src/modules/billing/actions/invoicing/update-invoice.action.ts",
       "source_location": "L11",
       "id": "invoicing_update_invoice_action_updateinvoiceaction",
-      "community": 69,
+      "community": 12,
       "norm_label": "updateinvoiceaction()"
     },
     {
@@ -5309,7 +5309,7 @@
       "source_file": "samson-nextjs/src/modules/billing/repositories/invoicing/invoice.commands.ts",
       "source_location": "L41",
       "id": "invoicing_invoice_commands_finalizeinvoicecommand",
-      "community": 212,
+      "community": 69,
       "norm_label": "finalizeinvoicecommand()"
     },
     {
@@ -5687,7 +5687,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/actions/settings/get-clinic-config.action.spec.ts",
       "source_location": "L1",
       "id": "settings_get_clinic_config_action_spec",
-      "community": 62,
+      "community": 232,
       "norm_label": "get-clinic-config.action.spec.ts"
     },
     {
@@ -5696,7 +5696,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/actions/settings/get-clinic-config.action.spec.ts",
       "source_location": "L4",
       "id": "settings_get_clinic_config_action_spec_mocks",
-      "community": 62,
+      "community": 232,
       "norm_label": "mocks"
     },
     {
@@ -5705,7 +5705,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/actions/settings/get-clinic-config.action.ts",
       "source_location": "L1",
       "id": "settings_get_clinic_config_action",
-      "community": 62,
+      "community": 232,
       "norm_label": "get-clinic-config.action.ts"
     },
     {
@@ -5768,7 +5768,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/dtos/settings/get-clinic-config.dto.spec.ts",
       "source_location": "L1",
       "id": "settings_get_clinic_config_dto_spec",
-      "community": 19,
+      "community": 21,
       "norm_label": "get-clinic-config.dto.spec.ts"
     },
     {
@@ -5777,7 +5777,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/dtos/settings/get-clinic-config.dto.spec.ts",
       "source_location": "L8",
       "id": "settings_get_clinic_config_dto_spec_validoperatinghours",
-      "community": 19,
+      "community": 21,
       "norm_label": "validoperatinghours"
     },
     {
@@ -5786,7 +5786,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/dtos/settings/get-clinic-config.dto.spec.ts",
       "source_location": "L18",
       "id": "settings_get_clinic_config_dto_spec_validconfig",
-      "community": 19,
+      "community": 21,
       "norm_label": "validconfig"
     },
     {
@@ -5795,7 +5795,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/dtos/settings/get-clinic-config.dto.ts",
       "source_location": "L1",
       "id": "settings_get_clinic_config_dto",
-      "community": 19,
+      "community": 21,
       "norm_label": "get-clinic-config.dto.ts"
     },
     {
@@ -5804,7 +5804,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/dtos/settings/get-clinic-config.dto.ts",
       "source_location": "L3",
       "id": "settings_get_clinic_config_dto_week_days",
-      "community": 19,
+      "community": 21,
       "norm_label": "week_days"
     },
     {
@@ -5813,7 +5813,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/dtos/settings/get-clinic-config.dto.ts",
       "source_location": "L13",
       "id": "settings_get_clinic_config_dto_timestringschema",
-      "community": 19,
+      "community": 21,
       "norm_label": "timestringschema"
     },
     {
@@ -5822,7 +5822,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/dtos/settings/get-clinic-config.dto.ts",
       "source_location": "L17",
       "id": "settings_get_clinic_config_dto_operatingdayschema",
-      "community": 19,
+      "community": 21,
       "norm_label": "operatingdayschema"
     },
     {
@@ -5831,7 +5831,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/dtos/settings/get-clinic-config.dto.ts",
       "source_location": "L48",
       "id": "settings_get_clinic_config_dto_operatinghoursschema",
-      "community": 19,
+      "community": 21,
       "norm_label": "operatinghoursschema"
     },
     {
@@ -5840,7 +5840,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/dtos/settings/get-clinic-config.dto.ts",
       "source_location": "L58",
       "id": "settings_get_clinic_config_dto_sociallinkschema",
-      "community": 19,
+      "community": 21,
       "norm_label": "sociallinkschema"
     },
     {
@@ -5849,7 +5849,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/dtos/settings/get-clinic-config.dto.ts",
       "source_location": "L63",
       "id": "settings_get_clinic_config_dto_operatingdaydbschema",
-      "community": 19,
+      "community": 21,
       "norm_label": "operatingdaydbschema"
     },
     {
@@ -5858,7 +5858,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/dtos/settings/get-clinic-config.dto.ts",
       "source_location": "L69",
       "id": "settings_get_clinic_config_dto_operatinghoursdbschema",
-      "community": 19,
+      "community": 21,
       "norm_label": "operatinghoursdbschema"
     },
     {
@@ -5867,7 +5867,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/dtos/settings/get-clinic-config.dto.ts",
       "source_location": "L76",
       "id": "settings_get_clinic_config_dto_clinicconfigappschema",
-      "community": 19,
+      "community": 21,
       "norm_label": "clinicconfigappschema"
     },
     {
@@ -5876,7 +5876,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/dtos/settings/get-clinic-config.dto.ts",
       "source_location": "L90",
       "id": "settings_get_clinic_config_dto_clinicconfigdbschema",
-      "community": 19,
+      "community": 21,
       "norm_label": "clinicconfigdbschema"
     },
     {
@@ -5885,7 +5885,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/dtos/settings/get-clinic-config.dto.ts",
       "source_location": "L104",
       "id": "settings_get_clinic_config_dto_clinicconfigresponseschema",
-      "community": 19,
+      "community": 21,
       "norm_label": "clinicconfigresponseschema"
     },
     {
@@ -5948,7 +5948,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/index.ts",
       "source_location": "L1",
       "id": "clinic_config_index",
-      "community": 19,
+      "community": 232,
       "norm_label": "index.ts"
     },
     {
@@ -5957,7 +5957,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/repositories/settings/clinic-config.commands.spec.ts",
       "source_location": "L1",
       "id": "settings_clinic_config_commands_spec",
-      "community": 230,
+      "community": 19,
       "norm_label": "clinic-config.commands.spec.ts"
     },
     {
@@ -5966,7 +5966,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/repositories/settings/clinic-config.commands.spec.ts",
       "source_location": "L4",
       "id": "settings_clinic_config_commands_spec_mocksingle",
-      "community": 230,
+      "community": 19,
       "norm_label": "mocksingle"
     },
     {
@@ -5975,7 +5975,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/repositories/settings/clinic-config.commands.spec.ts",
       "source_location": "L5",
       "id": "settings_clinic_config_commands_spec_mockselect",
-      "community": 230,
+      "community": 19,
       "norm_label": "mockselect"
     },
     {
@@ -5984,7 +5984,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/repositories/settings/clinic-config.commands.spec.ts",
       "source_location": "L6",
       "id": "settings_clinic_config_commands_spec_mockeq",
-      "community": 230,
+      "community": 19,
       "norm_label": "mockeq"
     },
     {
@@ -5993,7 +5993,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/repositories/settings/clinic-config.commands.spec.ts",
       "source_location": "L7",
       "id": "settings_clinic_config_commands_spec_mockupdate",
-      "community": 230,
+      "community": 19,
       "norm_label": "mockupdate"
     },
     {
@@ -6002,7 +6002,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/repositories/settings/clinic-config.commands.spec.ts",
       "source_location": "L8",
       "id": "settings_clinic_config_commands_spec_mockfrom",
-      "community": 230,
+      "community": 19,
       "norm_label": "mockfrom"
     },
     {
@@ -6011,7 +6011,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/repositories/settings/clinic-config.commands.spec.ts",
       "source_location": "L10",
       "id": "settings_clinic_config_commands_spec_mocksupabase",
-      "community": 230,
+      "community": 19,
       "norm_label": "mocksupabase"
     },
     {
@@ -6092,7 +6092,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/repositories/settings/clinic-config.queries.ts",
       "source_location": "L1",
       "id": "settings_clinic_config_queries",
-      "community": 19,
+      "community": 232,
       "norm_label": "clinic-config.queries.ts"
     },
     {
@@ -6101,7 +6101,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/repositories/settings/clinic-config.queries.ts",
       "source_location": "L4",
       "id": "settings_clinic_config_queries_getclinicconfigquery",
-      "community": 19,
+      "community": 232,
       "norm_label": "getclinicconfigquery()"
     },
     {
@@ -6110,7 +6110,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/use-cases/settings/get-clinic-config.use-case.spec.ts",
       "source_location": "L1",
       "id": "settings_get_clinic_config_use_case_spec",
-      "community": 239,
+      "community": 232,
       "norm_label": "get-clinic-config.use-case.spec.ts"
     },
     {
@@ -6119,7 +6119,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/use-cases/settings/get-clinic-config.use-case.ts",
       "source_location": "L1",
       "id": "settings_get_clinic_config_use_case",
-      "community": 239,
+      "community": 232,
       "norm_label": "get-clinic-config.use-case.ts"
     },
     {
@@ -6128,7 +6128,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/use-cases/settings/get-clinic-config.use-case.ts",
       "source_location": "L3",
       "id": "settings_get_clinic_config_use_case_default_config",
-      "community": 239,
+      "community": 232,
       "norm_label": "default_config"
     },
     {
@@ -6137,7 +6137,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/use-cases/settings/get-clinic-config.use-case.ts",
       "source_location": "L25",
       "id": "settings_get_clinic_config_use_case_getclinicconfigusecase",
-      "community": 239,
+      "community": 232,
       "norm_label": "getclinicconfigusecase()"
     },
     {
@@ -6452,7 +6452,7 @@
       "source_file": "samson-nextjs/src/modules/patients/actions/profile/get-patient-profile.action.spec.ts",
       "source_location": "L1",
       "id": "profile_get_patient_profile_action_spec",
-      "community": 210,
+      "community": 12,
       "norm_label": "get-patient-profile.action.spec.ts"
     },
     {
@@ -6461,7 +6461,7 @@
       "source_file": "samson-nextjs/src/modules/patients/actions/profile/get-patient-profile.action.spec.ts",
       "source_location": "L11",
       "id": "profile_get_patient_profile_action_spec_mockexecute",
-      "community": 210,
+      "community": 12,
       "norm_label": "{ mockexecute }"
     },
     {
@@ -6470,7 +6470,7 @@
       "source_file": "samson-nextjs/src/modules/patients/actions/profile/get-patient-profile.action.ts",
       "source_location": "L1",
       "id": "profile_get_patient_profile_action",
-      "community": 210,
+      "community": 12,
       "norm_label": "get-patient-profile.action.ts"
     },
     {
@@ -6479,7 +6479,7 @@
       "source_file": "samson-nextjs/src/modules/patients/actions/profile/get-patient-profile.action.ts",
       "source_location": "L9",
       "id": "profile_get_patient_profile_action_getpatientprofileaction",
-      "community": 210,
+      "community": 12,
       "norm_label": "getpatientprofileaction()"
     },
     {
@@ -6488,7 +6488,7 @@
       "source_file": "samson-nextjs/src/modules/patients/actions/profile/register-patient.action.spec.ts",
       "source_location": "L1",
       "id": "profile_register_patient_action_spec",
-      "community": 49,
+      "community": 64,
       "norm_label": "register-patient.action.spec.ts"
     },
     {
@@ -6497,7 +6497,7 @@
       "source_file": "samson-nextjs/src/modules/patients/actions/profile/register-patient.action.spec.ts",
       "source_location": "L17",
       "id": "profile_register_patient_action_spec_mockexecute",
-      "community": 49,
+      "community": 64,
       "norm_label": "{ mockexecute }"
     },
     {
@@ -6506,7 +6506,7 @@
       "source_file": "samson-nextjs/src/modules/patients/actions/profile/register-patient.action.ts",
       "source_location": "L1",
       "id": "profile_register_patient_action",
-      "community": 49,
+      "community": 64,
       "norm_label": "register-patient.action.ts"
     },
     {
@@ -6515,7 +6515,7 @@
       "source_file": "samson-nextjs/src/modules/patients/actions/profile/register-patient.action.ts",
       "source_location": "L15",
       "id": "profile_register_patient_action_registerpatientaction",
-      "community": 49,
+      "community": 64,
       "norm_label": "registerpatientaction()"
     },
     {
@@ -6587,7 +6587,7 @@
       "source_file": "samson-nextjs/src/modules/patients/components/auth/notification-indicator.tsx",
       "source_location": "L1",
       "id": "auth_notification_indicator",
-      "community": 240,
+      "community": 62,
       "norm_label": "notification-indicator.tsx"
     },
     {
@@ -6596,7 +6596,7 @@
       "source_file": "samson-nextjs/src/modules/patients/components/auth/notification-indicator.tsx",
       "source_location": "L5",
       "id": "auth_notification_indicator_notificationindicatorprops",
-      "community": 240,
+      "community": 62,
       "norm_label": "notificationindicatorprops"
     },
     {
@@ -6605,7 +6605,7 @@
       "source_file": "samson-nextjs/src/modules/patients/components/auth/notification-indicator.tsx",
       "source_location": "L10",
       "id": "auth_notification_indicator_notificationindicator",
-      "community": 240,
+      "community": 62,
       "norm_label": "notificationindicator()"
     },
     {
@@ -6776,7 +6776,7 @@
       "source_file": "samson-nextjs/src/modules/patients/components/profile/profile-details-form.tsx",
       "source_location": "L1",
       "id": "profile_profile_details_form",
-      "community": 37,
+      "community": 62,
       "norm_label": "profile-details-form.tsx"
     },
     {
@@ -6785,7 +6785,7 @@
       "source_file": "samson-nextjs/src/modules/patients/components/profile/profile-details-form.tsx",
       "source_location": "L6",
       "id": "profile_profile_details_form_profiledetailsformprops",
-      "community": 37,
+      "community": 62,
       "norm_label": "profiledetailsformprops"
     },
     {
@@ -6794,7 +6794,7 @@
       "source_file": "samson-nextjs/src/modules/patients/components/profile/profile-details-form.tsx",
       "source_location": "L24",
       "id": "profile_profile_details_form_profiledetailsform",
-      "community": 37,
+      "community": 62,
       "norm_label": "profiledetailsform()"
     },
     {
@@ -6902,7 +6902,7 @@
       "source_file": "samson-nextjs/src/modules/patients/dtos/auth/sign-up.dto.spec.ts",
       "source_location": "L1",
       "id": "auth_sign_up_dto_spec",
-      "community": 64,
+      "community": 7,
       "norm_label": "sign-up.dto.spec.ts"
     },
     {
@@ -6911,7 +6911,7 @@
       "source_file": "samson-nextjs/src/modules/patients/dtos/auth/sign-up.dto.ts",
       "source_location": "L1",
       "id": "auth_sign_up_dto",
-      "community": 64,
+      "community": 7,
       "norm_label": "sign-up.dto.ts"
     },
     {
@@ -6920,7 +6920,7 @@
       "source_file": "samson-nextjs/src/modules/patients/dtos/auth/sign-up.dto.ts",
       "source_location": "L5",
       "id": "auth_sign_up_dto_signupschema",
-      "community": 64,
+      "community": 7,
       "norm_label": "signupschema"
     },
     {
@@ -6938,7 +6938,7 @@
       "source_file": "samson-nextjs/src/modules/patients/dtos/dependents/create-dependent.dto.spec.ts",
       "source_location": "L1",
       "id": "dependents_create_dependent_dto_spec",
-      "community": 222,
+      "community": 3,
       "norm_label": "create-dependent.dto.spec.ts"
     },
     {
@@ -6947,7 +6947,7 @@
       "source_file": "samson-nextjs/src/modules/patients/dtos/dependents/create-dependent.dto.ts",
       "source_location": "L1",
       "id": "dependents_create_dependent_dto",
-      "community": 222,
+      "community": 3,
       "norm_label": "create-dependent.dto.ts"
     },
     {
@@ -6956,7 +6956,7 @@
       "source_file": "samson-nextjs/src/modules/patients/dtos/dependents/create-dependent.dto.ts",
       "source_location": "L3",
       "id": "dependents_create_dependent_dto_dependentrelationshipenum",
-      "community": 222,
+      "community": 3,
       "norm_label": "dependentrelationshipenum"
     },
     {
@@ -6965,7 +6965,7 @@
       "source_file": "samson-nextjs/src/modules/patients/dtos/dependents/create-dependent.dto.ts",
       "source_location": "L4",
       "id": "dependents_create_dependent_dto_dependentrelationship",
-      "community": 222,
+      "community": 3,
       "norm_label": "dependentrelationship"
     },
     {
@@ -6974,7 +6974,7 @@
       "source_file": "samson-nextjs/src/modules/patients/dtos/dependents/create-dependent.dto.ts",
       "source_location": "L6",
       "id": "dependents_create_dependent_dto_createdependentschema",
-      "community": 222,
+      "community": 3,
       "norm_label": "createdependentschema"
     },
     {
@@ -6983,7 +6983,7 @@
       "source_file": "samson-nextjs/src/modules/patients/dtos/dependents/create-dependent.dto.ts",
       "source_location": "L16",
       "id": "dependents_create_dependent_dto_createdependentdto",
-      "community": 197,
+      "community": 3,
       "norm_label": "createdependentdto"
     },
     {
@@ -6992,7 +6992,7 @@
       "source_file": "samson-nextjs/src/modules/patients/dtos/dependents/dependent-profile.dto.spec.ts",
       "source_location": "L1",
       "id": "dependents_dependent_profile_dto_spec",
-      "community": 222,
+      "community": 3,
       "norm_label": "dependent-profile.dto.spec.ts"
     },
     {
@@ -7001,7 +7001,7 @@
       "source_file": "samson-nextjs/src/modules/patients/dtos/dependents/dependent-profile.dto.ts",
       "source_location": "L1",
       "id": "dependents_dependent_profile_dto",
-      "community": 222,
+      "community": 3,
       "norm_label": "dependent-profile.dto.ts"
     },
     {
@@ -7010,7 +7010,7 @@
       "source_file": "samson-nextjs/src/modules/patients/dtos/dependents/dependent-profile.dto.ts",
       "source_location": "L4",
       "id": "dependents_dependent_profile_dto_dependentprofileschema",
-      "community": 222,
+      "community": 3,
       "norm_label": "dependentprofileschema"
     },
     {
@@ -7028,7 +7028,7 @@
       "source_file": "samson-nextjs/src/modules/patients/dtos/dependents/dependent-profile.dto.ts",
       "source_location": "L38",
       "id": "dependents_dependent_profile_dto_mayberecord",
-      "community": 222,
+      "community": 3,
       "norm_label": "mayberecord"
     },
     {
@@ -7037,7 +7037,7 @@
       "source_file": "samson-nextjs/src/modules/patients/dtos/dependents/dependent-profile.dto.ts",
       "source_location": "L40",
       "id": "dependents_dependent_profile_dto_mapdependentprofile",
-      "community": 222,
+      "community": 3,
       "norm_label": "mapdependentprofile()"
     },
     {
@@ -7046,7 +7046,7 @@
       "source_file": "samson-nextjs/src/modules/patients/dtos/dependents/dependent-profile.dto.ts",
       "source_location": "L44",
       "id": "dependents_dependent_profile_dto_mapdependentprofiles",
-      "community": 222,
+      "community": 3,
       "norm_label": "mapdependentprofiles()"
     },
     {
@@ -7055,7 +7055,7 @@
       "source_file": "samson-nextjs/src/modules/patients/dtos/index.ts",
       "source_location": "L1",
       "id": "samson_nextjs_src_modules_patients_dtos_index_ts_dtos_index",
-      "community": 64,
+      "community": 7,
       "norm_label": "index.ts"
     },
     {
@@ -7064,7 +7064,7 @@
       "source_file": "samson-nextjs/src/modules/patients/dtos/profile/patient-profile.dto.spec.ts",
       "source_location": "L1",
       "id": "profile_patient_profile_dto_spec",
-      "community": 81,
+      "community": 49,
       "norm_label": "patient-profile.dto.spec.ts"
     },
     {
@@ -7073,7 +7073,7 @@
       "source_file": "samson-nextjs/src/modules/patients/dtos/profile/patient-profile.dto.ts",
       "source_location": "L1",
       "id": "profile_patient_profile_dto",
-      "community": 81,
+      "community": 49,
       "norm_label": "patient-profile.dto.ts"
     },
     {
@@ -7082,7 +7082,7 @@
       "source_file": "samson-nextjs/src/modules/patients/dtos/profile/patient-profile.dto.ts",
       "source_location": "L3",
       "id": "profile_patient_profile_dto_patientprofileschema",
-      "community": 81,
+      "community": 49,
       "norm_label": "patientprofileschema"
     },
     {
@@ -7091,7 +7091,7 @@
       "source_file": "samson-nextjs/src/modules/patients/dtos/profile/patient-profile.dto.ts",
       "source_location": "L39",
       "id": "profile_patient_profile_dto_patientprofiledto",
-      "community": 81,
+      "community": 49,
       "norm_label": "patientprofiledto"
     },
     {
@@ -7100,7 +7100,7 @@
       "source_file": "samson-nextjs/src/modules/patients/dtos/profile/patient-profile.dto.ts",
       "source_location": "L41",
       "id": "profile_patient_profile_dto_mayberecord",
-      "community": 81,
+      "community": 49,
       "norm_label": "mayberecord"
     },
     {
@@ -7109,7 +7109,7 @@
       "source_file": "samson-nextjs/src/modules/patients/dtos/profile/patient-profile.dto.ts",
       "source_location": "L43",
       "id": "profile_patient_profile_dto_mappatientprofile",
-      "community": 81,
+      "community": 49,
       "norm_label": "mappatientprofile()"
     },
     {
@@ -7118,7 +7118,7 @@
       "source_file": "samson-nextjs/src/modules/patients/dtos/profile/register-patient.dto.spec.ts",
       "source_location": "L1",
       "id": "profile_register_patient_dto_spec",
-      "community": 64,
+      "community": 7,
       "norm_label": "register-patient.dto.spec.ts"
     },
     {
@@ -7127,7 +7127,7 @@
       "source_file": "samson-nextjs/src/modules/patients/dtos/profile/register-patient.dto.ts",
       "source_location": "L1",
       "id": "profile_register_patient_dto",
-      "community": 64,
+      "community": 7,
       "norm_label": "register-patient.dto.ts"
     },
     {
@@ -7136,7 +7136,7 @@
       "source_file": "samson-nextjs/src/modules/patients/dtos/profile/register-patient.dto.ts",
       "source_location": "L3",
       "id": "profile_register_patient_dto_registerpatientschema",
-      "community": 64,
+      "community": 7,
       "norm_label": "registerpatientschema"
     },
     {
@@ -7424,7 +7424,7 @@
       "source_file": "samson-nextjs/src/modules/patients/hooks/auth/sign-up/use-sign-up-view.hook.spec.ts",
       "source_location": "L1",
       "id": "sign_up_use_sign_up_view_hook_spec",
-      "community": 64,
+      "community": 7,
       "norm_label": "use-sign-up-view.hook.spec.ts"
     },
     {
@@ -7433,7 +7433,7 @@
       "source_file": "samson-nextjs/src/modules/patients/hooks/auth/sign-up/use-sign-up-view.hook.spec.ts",
       "source_location": "L5",
       "id": "sign_up_use_sign_up_view_hook_spec_mockpush",
-      "community": 64,
+      "community": 7,
       "norm_label": "mockpush"
     },
     {
@@ -7442,7 +7442,7 @@
       "source_file": "samson-nextjs/src/modules/patients/hooks/auth/sign-up/use-sign-up-view.hook.spec.ts",
       "source_location": "L6",
       "id": "sign_up_use_sign_up_view_hook_spec_mockaddtoast",
-      "community": 64,
+      "community": 7,
       "norm_label": "mockaddtoast"
     },
     {
@@ -7451,7 +7451,7 @@
       "source_file": "samson-nextjs/src/modules/patients/hooks/auth/sign-up/use-sign-up-view.hook.spec.ts",
       "source_location": "L28",
       "id": "sign_up_use_sign_up_view_hook_spec_simulatesignupsubmit",
-      "community": 64,
+      "community": 7,
       "norm_label": "simulatesignupsubmit()"
     },
     {
@@ -7460,7 +7460,7 @@
       "source_file": "samson-nextjs/src/modules/patients/hooks/auth/sign-up/use-sign-up-view.hook.spec.ts",
       "source_location": "L37",
       "id": "sign_up_use_sign_up_view_hook_spec_validdata",
-      "community": 64,
+      "community": 7,
       "norm_label": "validdata"
     },
     {
@@ -7694,7 +7694,7 @@
       "source_file": "samson-nextjs/src/modules/patients/repositories/dependents/patient-dependents.commands.spec.ts",
       "source_location": "L1",
       "id": "dependents_patient_dependents_commands_spec",
-      "community": 197,
+      "community": 3,
       "norm_label": "patient-dependents.commands.spec.ts"
     },
     {
@@ -7703,7 +7703,7 @@
       "source_file": "samson-nextjs/src/modules/patients/repositories/dependents/patient-dependents.commands.ts",
       "source_location": "L1",
       "id": "dependents_patient_dependents_commands",
-      "community": 197,
+      "community": 3,
       "norm_label": "patient-dependents.commands.ts"
     },
     {
@@ -7712,7 +7712,7 @@
       "source_file": "samson-nextjs/src/modules/patients/repositories/dependents/patient-dependents.commands.ts",
       "source_location": "L4",
       "id": "dependents_patient_dependents_commands_adddependentcommand",
-      "community": 197,
+      "community": 3,
       "norm_label": "adddependentcommand()"
     },
     {
@@ -7721,7 +7721,7 @@
       "source_file": "samson-nextjs/src/modules/patients/repositories/dependents/patient-dependents.commands.ts",
       "source_location": "L29",
       "id": "dependents_patient_dependents_commands_patientdependentscommands",
-      "community": 197,
+      "community": 3,
       "norm_label": "patientdependentscommands"
     },
     {
@@ -7730,7 +7730,7 @@
       "source_file": "samson-nextjs/src/modules/patients/repositories/dependents/patient-dependents.commands.ts",
       "source_location": "L30",
       "id": "dependents_patient_dependents_commands_patientdependentscommands_constructor",
-      "community": 197,
+      "community": 3,
       "norm_label": ".constructor()"
     },
     {
@@ -7739,7 +7739,7 @@
       "source_file": "samson-nextjs/src/modules/patients/repositories/dependents/patient-dependents.commands.ts",
       "source_location": "L31",
       "id": "dependents_patient_dependents_commands_patientdependentscommands_adddependent",
-      "community": 197,
+      "community": 3,
       "norm_label": ".adddependent()"
     },
     {
@@ -7748,7 +7748,7 @@
       "source_file": "samson-nextjs/src/modules/patients/repositories/dependents/patient-dependents.queries.spec.ts",
       "source_location": "L1",
       "id": "dependents_patient_dependents_queries_spec",
-      "community": 21,
+      "community": 3,
       "norm_label": "patient-dependents.queries.spec.ts"
     },
     {
@@ -7757,7 +7757,7 @@
       "source_file": "samson-nextjs/src/modules/patients/repositories/dependents/patient-dependents.queries.ts",
       "source_location": "L1",
       "id": "dependents_patient_dependents_queries",
-      "community": 21,
+      "community": 3,
       "norm_label": "patient-dependents.queries.ts"
     },
     {
@@ -7766,7 +7766,7 @@
       "source_file": "samson-nextjs/src/modules/patients/repositories/dependents/patient-dependents.queries.ts",
       "source_location": "L4",
       "id": "dependents_patient_dependents_queries_getdependentsbypatientidquery",
-      "community": 21,
+      "community": 3,
       "norm_label": "getdependentsbypatientidquery()"
     },
     {
@@ -7775,7 +7775,7 @@
       "source_file": "samson-nextjs/src/modules/patients/repositories/dependents/patient-dependents.queries.ts",
       "source_location": "L20",
       "id": "dependents_patient_dependents_queries_patientdependentsqueries",
-      "community": 21,
+      "community": 3,
       "norm_label": "patientdependentsqueries"
     },
     {
@@ -7784,7 +7784,7 @@
       "source_file": "samson-nextjs/src/modules/patients/repositories/dependents/patient-dependents.queries.ts",
       "source_location": "L21",
       "id": "dependents_patient_dependents_queries_patientdependentsqueries_constructor",
-      "community": 21,
+      "community": 3,
       "norm_label": ".constructor()"
     },
     {
@@ -7793,7 +7793,7 @@
       "source_file": "samson-nextjs/src/modules/patients/repositories/dependents/patient-dependents.queries.ts",
       "source_location": "L22",
       "id": "dependents_patient_dependents_queries_patientdependentsqueries_getdependentsbypatientid",
-      "community": 21,
+      "community": 3,
       "norm_label": ".getdependentsbypatientid()"
     },
     {
@@ -7802,7 +7802,7 @@
       "source_file": "samson-nextjs/src/modules/patients/repositories/index.ts",
       "source_location": "L1",
       "id": "samson_nextjs_src_modules_patients_repositories_index_ts_repositories_index",
-      "community": 21,
+      "community": 3,
       "norm_label": "index.ts"
     },
     {
@@ -7811,7 +7811,7 @@
       "source_file": "samson-nextjs/src/modules/patients/repositories/profile/patient-profile.commands.spec.ts",
       "source_location": "L1",
       "id": "profile_patient_profile_commands_spec",
-      "community": 217,
+      "community": 49,
       "norm_label": "patient-profile.commands.spec.ts"
     },
     {
@@ -7820,7 +7820,7 @@
       "source_file": "samson-nextjs/src/modules/patients/repositories/profile/patient-profile.commands.ts",
       "source_location": "L1",
       "id": "profile_patient_profile_commands",
-      "community": 217,
+      "community": 49,
       "norm_label": "patient-profile.commands.ts"
     },
     {
@@ -8018,7 +8018,7 @@
       "source_file": "samson-nextjs/src/modules/patients/use-cases/dependents/create-dependent.use-case.spec.ts",
       "source_location": "L1",
       "id": "dependents_create_dependent_use_case_spec",
-      "community": 197,
+      "community": 3,
       "norm_label": "create-dependent.use-case.spec.ts"
     },
     {
@@ -8027,7 +8027,7 @@
       "source_file": "samson-nextjs/src/modules/patients/use-cases/dependents/create-dependent.use-case.ts",
       "source_location": "L1",
       "id": "dependents_create_dependent_use_case",
-      "community": 197,
+      "community": 3,
       "norm_label": "create-dependent.use-case.ts"
     },
     {
@@ -8036,7 +8036,7 @@
       "source_file": "samson-nextjs/src/modules/patients/use-cases/dependents/create-dependent.use-case.ts",
       "source_location": "L13",
       "id": "dependents_create_dependent_use_case_createdependentusecase",
-      "community": 197,
+      "community": 3,
       "norm_label": "createdependentusecase"
     },
     {
@@ -8045,7 +8045,7 @@
       "source_file": "samson-nextjs/src/modules/patients/use-cases/dependents/create-dependent.use-case.ts",
       "source_location": "L14",
       "id": "dependents_create_dependent_use_case_createdependentusecase_constructor",
-      "community": 197,
+      "community": 3,
       "norm_label": ".constructor()"
     },
     {
@@ -8054,7 +8054,7 @@
       "source_file": "samson-nextjs/src/modules/patients/use-cases/dependents/create-dependent.use-case.ts",
       "source_location": "L15",
       "id": "dependents_create_dependent_use_case_createdependentusecase_execute",
-      "community": 197,
+      "community": 3,
       "norm_label": ".execute()"
     },
     {
@@ -8063,7 +8063,7 @@
       "source_file": "samson-nextjs/src/modules/patients/use-cases/dependents/get-user-dependents.use-case.spec.ts",
       "source_location": "L1",
       "id": "dependents_get_user_dependents_use_case_spec",
-      "community": 21,
+      "community": 3,
       "norm_label": "get-user-dependents.use-case.spec.ts"
     },
     {
@@ -8072,7 +8072,7 @@
       "source_file": "samson-nextjs/src/modules/patients/use-cases/dependents/get-user-dependents.use-case.ts",
       "source_location": "L1",
       "id": "dependents_get_user_dependents_use_case",
-      "community": 21,
+      "community": 3,
       "norm_label": "get-user-dependents.use-case.ts"
     },
     {
@@ -8081,7 +8081,7 @@
       "source_file": "samson-nextjs/src/modules/patients/use-cases/dependents/get-user-dependents.use-case.ts",
       "source_location": "L13",
       "id": "dependents_get_user_dependents_use_case_getuserdependentsusecase",
-      "community": 21,
+      "community": 3,
       "norm_label": "getuserdependentsusecase"
     },
     {
@@ -8090,7 +8090,7 @@
       "source_file": "samson-nextjs/src/modules/patients/use-cases/dependents/get-user-dependents.use-case.ts",
       "source_location": "L14",
       "id": "dependents_get_user_dependents_use_case_getuserdependentsusecase_constructor",
-      "community": 21,
+      "community": 3,
       "norm_label": ".constructor()"
     },
     {
@@ -8099,7 +8099,7 @@
       "source_file": "samson-nextjs/src/modules/patients/use-cases/dependents/get-user-dependents.use-case.ts",
       "source_location": "L15",
       "id": "dependents_get_user_dependents_use_case_getuserdependentsusecase_execute",
-      "community": 21,
+      "community": 3,
       "norm_label": ".execute()"
     },
     {
@@ -8108,7 +8108,7 @@
       "source_file": "samson-nextjs/src/modules/patients/use-cases/index.ts",
       "source_location": "L1",
       "id": "samson_nextjs_src_modules_patients_use_cases_index_ts_use_cases_index",
-      "community": 21,
+      "community": 3,
       "norm_label": "index.ts"
     },
     {
@@ -9170,7 +9170,7 @@
       "source_file": "samson-nextjs/src/modules/staff/actions/doctor/update-doctor-schedule.action.spec.ts",
       "source_location": "L1",
       "id": "doctor_update_doctor_schedule_action_spec",
-      "community": 9,
+      "community": 69,
       "norm_label": "update-doctor-schedule.action.spec.ts"
     },
     {
@@ -9179,7 +9179,7 @@
       "source_file": "samson-nextjs/src/modules/staff/actions/doctor/update-doctor-schedule.action.ts",
       "source_location": "L1",
       "id": "doctor_update_doctor_schedule_action",
-      "community": 9,
+      "community": 69,
       "norm_label": "update-doctor-schedule.action.ts"
     },
     {
@@ -9188,7 +9188,7 @@
       "source_file": "samson-nextjs/src/modules/staff/actions/doctor/update-doctor-schedule.action.ts",
       "source_location": "L11",
       "id": "doctor_update_doctor_schedule_action_updatedoctorscheduleaction",
-      "community": 9,
+      "community": 69,
       "norm_label": "updatedoctorscheduleaction()"
     },
     {
@@ -9224,7 +9224,7 @@
       "source_file": "samson-nextjs/src/modules/staff/actions/management/deactivate-user.action.spec.ts",
       "source_location": "L1",
       "id": "management_deactivate_user_action_spec",
-      "community": 215,
+      "community": 12,
       "norm_label": "deactivate-user.action.spec.ts"
     },
     {
@@ -9233,7 +9233,7 @@
       "source_file": "samson-nextjs/src/modules/staff/actions/management/deactivate-user.action.ts",
       "source_location": "L1",
       "id": "management_deactivate_user_action",
-      "community": 215,
+      "community": 12,
       "norm_label": "deactivate-user.action.ts"
     },
     {
@@ -9242,7 +9242,7 @@
       "source_file": "samson-nextjs/src/modules/staff/actions/management/deactivate-user.action.ts",
       "source_location": "L10",
       "id": "management_deactivate_user_action_deactivateuseraction",
-      "community": 215,
+      "community": 12,
       "norm_label": "deactivateuseraction()"
     },
     {
@@ -9251,7 +9251,7 @@
       "source_file": "samson-nextjs/src/modules/staff/actions/management/get-all-users.action.spec.ts",
       "source_location": "L1",
       "id": "management_get_all_users_action_spec",
-      "community": 241,
+      "community": 12,
       "norm_label": "get-all-users.action.spec.ts"
     },
     {
@@ -9260,7 +9260,7 @@
       "source_file": "samson-nextjs/src/modules/staff/actions/management/get-all-users.action.ts",
       "source_location": "L1",
       "id": "management_get_all_users_action",
-      "community": 241,
+      "community": 12,
       "norm_label": "get-all-users.action.ts"
     },
     {
@@ -9269,7 +9269,7 @@
       "source_file": "samson-nextjs/src/modules/staff/actions/management/get-all-users.action.ts",
       "source_location": "L10",
       "id": "management_get_all_users_action_getallusersaction",
-      "community": 241,
+      "community": 12,
       "norm_label": "getallusersaction()"
     },
     {
@@ -9296,7 +9296,7 @@
       "source_file": "samson-nextjs/src/modules/staff/dtos/index.ts",
       "source_location": "L1",
       "id": "samson_nextjs_src_modules_staff_dtos_index_ts_dtos_index",
-      "community": 224,
+      "community": 59,
       "norm_label": "index.ts"
     },
     {
@@ -9305,7 +9305,7 @@
       "source_file": "samson-nextjs/src/modules/staff/dtos/management/assign-doctor-services.dto.spec.ts",
       "source_location": "L1",
       "id": "management_assign_doctor_services_dto_spec",
-      "community": 224,
+      "community": 59,
       "norm_label": "assign-doctor-services.dto.spec.ts"
     },
     {
@@ -9314,7 +9314,7 @@
       "source_file": "samson-nextjs/src/modules/staff/dtos/management/assign-doctor-services.dto.ts",
       "source_location": "L1",
       "id": "management_assign_doctor_services_dto",
-      "community": 224,
+      "community": 59,
       "norm_label": "assign-doctor-services.dto.ts"
     },
     {
@@ -9323,7 +9323,7 @@
       "source_file": "samson-nextjs/src/modules/staff/dtos/management/assign-doctor-services.dto.ts",
       "source_location": "L3",
       "id": "management_assign_doctor_services_dto_assigndoctorservicesschema",
-      "community": 224,
+      "community": 59,
       "norm_label": "assigndoctorservicesschema"
     },
     {
@@ -9341,7 +9341,7 @@
       "source_file": "samson-nextjs/src/modules/staff/dtos/management/deactivate-user.dto.spec.ts",
       "source_location": "L1",
       "id": "management_deactivate_user_dto_spec",
-      "community": 224,
+      "community": 39,
       "norm_label": "deactivate-user.dto.spec.ts"
     },
     {
@@ -9350,7 +9350,7 @@
       "source_file": "samson-nextjs/src/modules/staff/dtos/management/deactivate-user.dto.ts",
       "source_location": "L1",
       "id": "management_deactivate_user_dto",
-      "community": 224,
+      "community": 39,
       "norm_label": "deactivate-user.dto.ts"
     },
     {
@@ -9359,7 +9359,7 @@
       "source_file": "samson-nextjs/src/modules/staff/dtos/management/deactivate-user.dto.ts",
       "source_location": "L3",
       "id": "management_deactivate_user_dto_deactivateuserschema",
-      "community": 224,
+      "community": 39,
       "norm_label": "deactivateuserschema"
     },
     {
@@ -9467,7 +9467,7 @@
       "source_file": "samson-nextjs/src/modules/staff/dtos/profile/create-staff.dto.ts",
       "source_location": "L16",
       "id": "profile_create_staff_dto_createstaffdto",
-      "community": 235,
+      "community": 35,
       "norm_label": "createstaffdto"
     },
     {
@@ -9683,7 +9683,7 @@
       "source_file": "samson-nextjs/src/modules/staff/repositories/index.ts",
       "source_location": "L1",
       "id": "samson_nextjs_src_modules_staff_repositories_index_ts_repositories_index",
-      "community": 215,
+      "community": 39,
       "norm_label": "index.ts"
     },
     {
@@ -9836,7 +9836,7 @@
       "source_file": "samson-nextjs/src/modules/staff/repositories/management/user-management.commands.spec.ts",
       "source_location": "L1",
       "id": "management_user_management_commands_spec",
-      "community": 215,
+      "community": 39,
       "norm_label": "user-management.commands.spec.ts"
     },
     {
@@ -9845,7 +9845,7 @@
       "source_file": "samson-nextjs/src/modules/staff/repositories/management/user-management.commands.ts",
       "source_location": "L1",
       "id": "management_user_management_commands",
-      "community": 215,
+      "community": 39,
       "norm_label": "user-management.commands.ts"
     },
     {
@@ -9854,7 +9854,7 @@
       "source_file": "samson-nextjs/src/modules/staff/repositories/management/user-management.commands.ts",
       "source_location": "L3",
       "id": "management_user_management_commands_deactivateusercommand",
-      "community": 215,
+      "community": 39,
       "norm_label": "deactivateusercommand()"
     },
     {
@@ -9944,7 +9944,7 @@
       "source_file": "samson-nextjs/src/modules/staff/repositories/profile/staff-profile.commands.spec.ts",
       "source_location": "L1",
       "id": "profile_staff_profile_commands_spec",
-      "community": 69,
+      "community": 35,
       "norm_label": "staff-profile.commands.spec.ts"
     },
     {
@@ -9953,7 +9953,7 @@
       "source_file": "samson-nextjs/src/modules/staff/repositories/profile/staff-profile.commands.ts",
       "source_location": "L1",
       "id": "profile_staff_profile_commands",
-      "community": 69,
+      "community": 35,
       "norm_label": "staff-profile.commands.ts"
     },
     {
@@ -9962,7 +9962,7 @@
       "source_file": "samson-nextjs/src/modules/staff/repositories/profile/staff-profile.commands.ts",
       "source_location": "L10",
       "id": "profile_staff_profile_commands_createstaffcommand",
-      "community": 69,
+      "community": 35,
       "norm_label": "createstaffcommand()"
     },
     {
@@ -9971,7 +9971,7 @@
       "source_file": "samson-nextjs/src/modules/staff/repositories/profile/staff-profile.commands.ts",
       "source_location": "L38",
       "id": "profile_staff_profile_commands_updatestaffcommand",
-      "community": 69,
+      "community": 35,
       "norm_label": "updatestaffcommand()"
     },
     {
@@ -9980,7 +9980,7 @@
       "source_file": "samson-nextjs/src/modules/staff/repositories/profile/staff-profile.commands.ts",
       "source_location": "L67",
       "id": "profile_staff_profile_commands_terminatestaffcommand",
-      "community": 69,
+      "community": 35,
       "norm_label": "terminatestaffcommand()"
     },
     {
@@ -10034,7 +10034,7 @@
       "source_file": "samson-nextjs/src/modules/staff/repositories/profile/staff-profile.queries.spec.ts",
       "source_location": "L1",
       "id": "profile_staff_profile_queries_spec",
-      "community": 210,
+      "community": 84,
       "norm_label": "staff-profile.queries.spec.ts"
     },
     {
@@ -10043,7 +10043,7 @@
       "source_file": "samson-nextjs/src/modules/staff/repositories/profile/staff-profile.queries.ts",
       "source_location": "L1",
       "id": "profile_staff_profile_queries",
-      "community": 210,
+      "community": 84,
       "norm_label": "staff-profile.queries.ts"
     },
     {
@@ -10052,7 +10052,7 @@
       "source_file": "samson-nextjs/src/modules/staff/repositories/profile/staff-profile.queries.ts",
       "source_location": "L5",
       "id": "profile_staff_profile_queries_getprofilebyidquery",
-      "community": 210,
+      "community": 84,
       "norm_label": "getprofilebyidquery()"
     },
     {
@@ -10322,7 +10322,7 @@
       "source_file": "samson-nextjs/src/modules/staff/use-cases/profile/create-staff.use-case.spec.ts",
       "source_location": "L1",
       "id": "profile_create_staff_use_case_spec",
-      "community": 235,
+      "community": 35,
       "norm_label": "create-staff.use-case.spec.ts"
     },
     {
@@ -10331,7 +10331,7 @@
       "source_file": "samson-nextjs/src/modules/staff/use-cases/profile/create-staff.use-case.ts",
       "source_location": "L1",
       "id": "profile_create_staff_use_case",
-      "community": 235,
+      "community": 35,
       "norm_label": "create-staff.use-case.ts"
     },
     {
@@ -10340,7 +10340,7 @@
       "source_file": "samson-nextjs/src/modules/staff/use-cases/profile/create-staff.use-case.ts",
       "source_location": "L13",
       "id": "profile_create_staff_use_case_createstaffusecase",
-      "community": 235,
+      "community": 35,
       "norm_label": "createstaffusecase"
     },
     {
@@ -10358,7 +10358,7 @@
       "source_file": "samson-nextjs/src/modules/staff/use-cases/profile/create-staff.use-case.ts",
       "source_location": "L15",
       "id": "profile_create_staff_use_case_createstaffusecase_execute",
-      "community": 235,
+      "community": 35,
       "norm_label": ".execute()"
     },
     {
@@ -10412,7 +10412,7 @@
       "source_file": "samson-nextjs/src/modules/staff/use-cases/profile/terminate-staff.use-case.spec.ts",
       "source_location": "L1",
       "id": "profile_terminate_staff_use_case_spec",
-      "community": 236,
+      "community": 201,
       "norm_label": "terminate-staff.use-case.spec.ts"
     },
     {
@@ -10421,7 +10421,7 @@
       "source_file": "samson-nextjs/src/modules/staff/use-cases/profile/terminate-staff.use-case.ts",
       "source_location": "L1",
       "id": "profile_terminate_staff_use_case",
-      "community": 236,
+      "community": 201,
       "norm_label": "terminate-staff.use-case.ts"
     },
     {
@@ -10430,7 +10430,7 @@
       "source_file": "samson-nextjs/src/modules/staff/use-cases/profile/terminate-staff.use-case.ts",
       "source_location": "L12",
       "id": "profile_terminate_staff_use_case_terminatestaffusecase",
-      "community": 236,
+      "community": 201,
       "norm_label": "terminatestaffusecase"
     },
     {
@@ -10439,7 +10439,7 @@
       "source_file": "samson-nextjs/src/modules/staff/use-cases/profile/terminate-staff.use-case.ts",
       "source_location": "L13",
       "id": "profile_terminate_staff_use_case_terminatestaffusecase_constructor",
-      "community": 236,
+      "community": 201,
       "norm_label": ".constructor()"
     },
     {
@@ -10448,7 +10448,7 @@
       "source_file": "samson-nextjs/src/modules/staff/use-cases/profile/terminate-staff.use-case.ts",
       "source_location": "L14",
       "id": "profile_terminate_staff_use_case_terminatestaffusecase_execute",
-      "community": 236,
+      "community": 201,
       "norm_label": ".execute()"
     },
     {
@@ -10835,7 +10835,7 @@
       "source_file": "samson-nextjs/src/orchestrators/checkout.orchestrator.spec.ts",
       "source_location": "L1",
       "id": "orchestrators_checkout_orchestrator_spec",
-      "community": 212,
+      "community": 50,
       "norm_label": "checkout.orchestrator.spec.ts"
     },
     {
@@ -10844,7 +10844,7 @@
       "source_file": "samson-nextjs/src/orchestrators/checkout.orchestrator.ts",
       "source_location": "L1",
       "id": "orchestrators_checkout_orchestrator",
-      "community": 212,
+      "community": 50,
       "norm_label": "checkout.orchestrator.ts"
     },
     {
@@ -10862,7 +10862,7 @@
       "source_file": "samson-nextjs/src/orchestrators/checkout.orchestrator.ts",
       "source_location": "L13",
       "id": "orchestrators_checkout_orchestrator_checkoutorchestrator",
-      "community": 212,
+      "community": 50,
       "norm_label": "checkoutorchestrator()"
     },
     {
@@ -10952,7 +10952,7 @@
       "source_file": "samson-nextjs/src/shared/auth/auth.util.ts",
       "source_location": "L5",
       "id": "auth_auth_util_getauthenticateduser",
-      "community": 14,
+      "community": 12,
       "norm_label": "getauthenticateduser()"
     },
     {
@@ -11321,7 +11321,7 @@
       "source_file": "samson-nextjs/src/shared/errors/unauthorized.error.ts",
       "source_location": "L3",
       "id": "errors_unauthorized_error_unauthorizederror",
-      "community": 12,
+      "community": 210,
       "norm_label": "unauthorizederror"
     },
     {
@@ -11330,7 +11330,7 @@
       "source_file": "samson-nextjs/src/shared/errors/unauthorized.error.ts",
       "source_location": "L4",
       "id": "errors_unauthorized_error_unauthorizederror_constructor",
-      "community": 12,
+      "community": 210,
       "norm_label": ".constructor()"
     },
     {
@@ -11618,7 +11618,7 @@
       "source_file": "samson-nextjs/src/shared/utils/action-response.ts",
       "source_location": "L1",
       "id": "utils_action_response",
-      "community": 49,
+      "community": 64,
       "norm_label": "action-response.ts"
     },
     {
@@ -11627,7 +11627,7 @@
       "source_file": "samson-nextjs/src/shared/utils/action-response.ts",
       "source_location": "L1",
       "id": "utils_action_response_actionresponse",
-      "community": 49,
+      "community": 64,
       "norm_label": "actionresponse"
     },
     {
@@ -11636,7 +11636,7 @@
       "source_file": "samson-nextjs/src/shared/utils/action-response.ts",
       "source_location": "L14",
       "id": "utils_action_response_handleactionerror",
-      "community": 49,
+      "community": 64,
       "norm_label": "handleactionerror()"
     },
     {
@@ -11708,7 +11708,7 @@
       "source_file": "samson-nextjs/src/shared/utils/date.util.ts",
       "source_location": "L38",
       "id": "utils_date_util_formatclinictime",
-      "community": 15,
+      "community": 193,
       "norm_label": "formatclinictime()"
     },
     {
@@ -26188,7 +26188,7 @@
       "file_type": "code",
       "source_file": "samson-nextjs/src/modules/appointments/hooks/dashboard/use-user-dashboard.ts",
       "source_location": "L37",
-      "community": 176,
+      "community": 15,
       "norm_label": "mock_appointments",
       "id": "dashboard_use_user_dashboard_mock_appointments"
     },
@@ -26386,7 +26386,7 @@
       "file_type": "code",
       "source_file": "samson-nextjs/src/modules/appointments/actions/availability/get-available-days.action.spec.ts",
       "source_location": "L8",
-      "community": 195,
+      "community": 197,
       "norm_label": "{ mockgetavailabledaysusecase }",
       "id": "availability_get_available_days_action_spec_mockgetavailabledaysusecase"
     },
@@ -26395,7 +26395,7 @@
       "file_type": "code",
       "source_file": "samson-nextjs/src/modules/appointments/actions/availability/get-available-time-slots.action.spec.ts",
       "source_location": "L8",
-      "community": 122,
+      "community": 212,
       "norm_label": "{ mockgetavailabletimeslotsusecase }",
       "id": "availability_get_available_time_slots_action_spec_mockgetavailabletimeslotsusecase"
     },
@@ -26521,7 +26521,7 @@
       "file_type": "code",
       "source_file": "samson-nextjs/src/modules/appointments/actions/availability/get-available-days.action.spec.ts",
       "source_location": "L8",
-      "community": 195,
+      "community": 197,
       "norm_label": "{ mockgetavailabledays }",
       "id": "availability_get_available_days_action_spec_mockgetavailabledays"
     },
@@ -26530,7 +26530,7 @@
       "file_type": "code",
       "source_file": "samson-nextjs/src/modules/appointments/actions/availability/get-available-time-slots.action.spec.ts",
       "source_location": "L8",
-      "community": 122,
+      "community": 212,
       "norm_label": "{ mockgetavailabletimeslots }",
       "id": "availability_get_available_time_slots_action_spec_mockgetavailabletimeslots"
     },
@@ -26575,7 +26575,7 @@
       "file_type": "code",
       "source_file": "samson-nextjs/src/modules/appointments/repositories/availability/get-existing-appointments-for-month.queries.ts",
       "source_location": "L4",
-      "community": 195,
+      "community": 203,
       "norm_label": "monthappointment",
       "id": "availability_get_existing_appointments_for_month_queries_monthappointment"
     },
@@ -26593,7 +26593,7 @@
       "file_type": "code",
       "source_file": "samson-nextjs/src/modules/staff/repositories/management/user-management.queries.ts",
       "source_location": "L36",
-      "community": 122,
+      "community": 51,
       "norm_label": "getactivedoctorsquery()",
       "id": "management_user_management_queries_getactivedoctorsquery"
     },
@@ -28306,6 +28306,28 @@
       "target": "views_secretary_dashboard_view_secretarydashboardview"
     },
     {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "samson-nextjs/src/app/(portals)/user/appointments/[id]/page.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "id_page",
+      "target": "database_server",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "samson-nextjs/src/app/(portals)/user/appointments/[id]/page.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "id_page",
+      "target": "database_server_createclient",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "samson-nextjs/src/app/(portals)/user/appointments/[id]/page.tsx",
@@ -28358,6 +28380,17 @@
       "target": "settings_get_clinic_config_action_getclinicconfigaction"
     },
     {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "samson-nextjs/src/app/(portals)/user/appointments/[id]/page.tsx",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "id_page",
+      "target": "shared_appointment_dto_appointmentdto",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
@@ -28378,6 +28411,17 @@
       "confidence_score": 1.0,
       "source": "id_page",
       "target": "shared_mock_appointments_mock_appointments"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "samson-nextjs/src/app/(portals)/user/appointments/[id]/page.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "id_page",
+      "target": "status_get_appointment_by_id_query_getappointmentbyidquery",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -28411,6 +28455,17 @@
       "weight": 1.0,
       "source": "id_page_appointmentdetailpage",
       "target": "settings_get_clinic_config_action_getclinicconfigaction"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "samson-nextjs/src/app/(portals)/user/appointments/[id]/page.tsx",
+      "source_location": "L41",
+      "weight": 1.0,
+      "source": "id_page_appointmentdetailpage",
+      "target": "status_get_appointment_by_id_query_getappointmentbyidquery"
     },
     {
       "relation": "contains",
@@ -29610,9 +29665,9 @@
       "source_file": "samson-nextjs/src/modules/appointments/hooks/detail/use-appointment-detail.ts",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "detail_use_appointment_detail",
-      "target": "feedback_toast_container",
-      "confidence_score": 1.0
+      "target": "feedback_toast_container"
     },
     {
       "relation": "contains",
@@ -29869,9 +29924,9 @@
       "source_file": "samson-nextjs/src/modules/appointments/hooks/detail/use-appointment-detail.ts",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "detail_use_appointment_detail",
-      "target": "feedback_toast_container_usetoast",
-      "confidence_score": 1.0
+      "target": "feedback_toast_container_usetoast"
     },
     {
       "relation": "calls",
@@ -36279,9 +36334,9 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/sub-components/appointment-clinical-card.tsx",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "sub_components_appointment_clinical_card",
-      "target": "shared_appointment_dto",
-      "confidence_score": 1.0
+      "target": "shared_appointment_dto"
     },
     {
       "relation": "imports",
@@ -36290,9 +36345,9 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/sub-components/appointment-clinical-card.tsx",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "sub_components_appointment_clinical_card",
-      "target": "shared_appointment_dto_appointmentdto",
-      "confidence_score": 1.0
+      "target": "shared_appointment_dto_appointmentdto"
     },
     {
       "relation": "contains",
@@ -36300,9 +36355,9 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/sub-components/appointment-clinical-card.tsx",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "sub_components_appointment_clinical_card",
-      "target": "sub_components_appointment_clinical_card_appointmentclinicalcard",
-      "confidence_score": 1.0
+      "target": "sub_components_appointment_clinical_card_appointmentclinicalcard"
     },
     {
       "relation": "contains",
@@ -36310,9 +36365,9 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/sub-components/appointment-clinical-card.tsx",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "sub_components_appointment_clinical_card",
-      "target": "sub_components_appointment_clinical_card_appointmentclinicalcardprops",
-      "confidence_score": 1.0
+      "target": "sub_components_appointment_clinical_card_appointmentclinicalcardprops"
     },
     {
       "relation": "imports_from",
@@ -36321,9 +36376,9 @@
       "source_file": "samson-nextjs/src/modules/appointments/views/appointment-detail-view.tsx",
       "source_location": "L11",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "views_appointment_detail_view",
-      "target": "sub_components_appointment_clinical_card",
-      "confidence_score": 1.0
+      "target": "sub_components_appointment_clinical_card"
     },
     {
       "relation": "references",
@@ -36332,9 +36387,9 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/sub-components/appointment-clinical-card.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "sub_components_appointment_clinical_card_appointmentclinicalcardprops",
-      "target": "shared_appointment_dto_appointmentdto",
-      "confidence_score": 1.0
+      "target": "shared_appointment_dto_appointmentdto"
     },
     {
       "relation": "imports",
@@ -36343,9 +36398,9 @@
       "source_file": "samson-nextjs/src/modules/appointments/views/appointment-detail-view.tsx",
       "source_location": "L11",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "views_appointment_detail_view",
-      "target": "sub_components_appointment_clinical_card_appointmentclinicalcard",
-      "confidence_score": 1.0
+      "target": "sub_components_appointment_clinical_card_appointmentclinicalcard"
     },
     {
       "relation": "imports_from",
@@ -36354,9 +36409,9 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/sub-components/appointment-patient-card.tsx",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "sub_components_appointment_patient_card",
-      "target": "shared_appointment_dto",
-      "confidence_score": 1.0
+      "target": "shared_appointment_dto"
     },
     {
       "relation": "imports",
@@ -36365,9 +36420,9 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/sub-components/appointment-patient-card.tsx",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "sub_components_appointment_patient_card",
-      "target": "shared_appointment_dto_appointmentdto",
-      "confidence_score": 1.0
+      "target": "shared_appointment_dto_appointmentdto"
     },
     {
       "relation": "contains",
@@ -36375,9 +36430,9 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/sub-components/appointment-patient-card.tsx",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "sub_components_appointment_patient_card",
-      "target": "sub_components_appointment_patient_card_appointmentpatientcard",
-      "confidence_score": 1.0
+      "target": "sub_components_appointment_patient_card_appointmentpatientcard"
     },
     {
       "relation": "contains",
@@ -36385,9 +36440,9 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/sub-components/appointment-patient-card.tsx",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "sub_components_appointment_patient_card",
-      "target": "sub_components_appointment_patient_card_appointmentpatientcardprops",
-      "confidence_score": 1.0
+      "target": "sub_components_appointment_patient_card_appointmentpatientcardprops"
     },
     {
       "relation": "imports_from",
@@ -36396,9 +36451,9 @@
       "source_file": "samson-nextjs/src/modules/appointments/views/appointment-detail-view.tsx",
       "source_location": "L12",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "views_appointment_detail_view",
-      "target": "sub_components_appointment_patient_card",
-      "confidence_score": 1.0
+      "target": "sub_components_appointment_patient_card"
     },
     {
       "relation": "references",
@@ -36407,9 +36462,9 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/sub-components/appointment-patient-card.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "sub_components_appointment_patient_card_appointmentpatientcardprops",
-      "target": "shared_appointment_dto_appointmentdto",
-      "confidence_score": 1.0
+      "target": "shared_appointment_dto_appointmentdto"
     },
     {
       "relation": "imports",
@@ -36418,9 +36473,9 @@
       "source_file": "samson-nextjs/src/modules/appointments/views/appointment-detail-view.tsx",
       "source_location": "L12",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "views_appointment_detail_view",
-      "target": "sub_components_appointment_patient_card_appointmentpatientcard",
-      "confidence_score": 1.0
+      "target": "sub_components_appointment_patient_card_appointmentpatientcard"
     },
     {
       "relation": "imports_from",
@@ -36429,9 +36484,9 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/sub-components/appointment-schedule-card.tsx",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "sub_components_appointment_schedule_card",
-      "target": "shared_appointment_dto",
-      "confidence_score": 1.0
+      "target": "shared_appointment_dto"
     },
     {
       "relation": "imports",
@@ -36440,9 +36495,9 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/sub-components/appointment-schedule-card.tsx",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "sub_components_appointment_schedule_card",
-      "target": "shared_appointment_dto_appointmentdto",
-      "confidence_score": 1.0
+      "target": "shared_appointment_dto_appointmentdto"
     },
     {
       "relation": "contains",
@@ -36450,9 +36505,9 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/sub-components/appointment-schedule-card.tsx",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "sub_components_appointment_schedule_card",
-      "target": "sub_components_appointment_schedule_card_appointmentschedulecard",
-      "confidence_score": 1.0
+      "target": "sub_components_appointment_schedule_card_appointmentschedulecard"
     },
     {
       "relation": "contains",
@@ -36460,9 +36515,9 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/sub-components/appointment-schedule-card.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "sub_components_appointment_schedule_card",
-      "target": "sub_components_appointment_schedule_card_appointmentschedulecardprops",
-      "confidence_score": 1.0
+      "target": "sub_components_appointment_schedule_card_appointmentschedulecardprops"
     },
     {
       "relation": "imports_from",
@@ -36471,9 +36526,9 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/sub-components/appointment-schedule-card.tsx",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "sub_components_appointment_schedule_card",
-      "target": "utils_date_util",
-      "confidence_score": 1.0
+      "target": "utils_date_util"
     },
     {
       "relation": "imports",
@@ -36482,9 +36537,9 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/sub-components/appointment-schedule-card.tsx",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "sub_components_appointment_schedule_card",
-      "target": "utils_date_util_formatclinictime",
-      "confidence_score": 1.0
+      "target": "utils_date_util_formatclinictime"
     },
     {
       "relation": "imports",
@@ -36493,9 +36548,9 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/sub-components/appointment-schedule-card.tsx",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "sub_components_appointment_schedule_card",
-      "target": "utils_date_util_formatshortdate",
-      "confidence_score": 1.0
+      "target": "utils_date_util_formatshortdate"
     },
     {
       "relation": "imports_from",
@@ -36504,9 +36559,9 @@
       "source_file": "samson-nextjs/src/modules/appointments/views/appointment-detail-view.tsx",
       "source_location": "L10",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "views_appointment_detail_view",
-      "target": "sub_components_appointment_schedule_card",
-      "confidence_score": 1.0
+      "target": "sub_components_appointment_schedule_card"
     },
     {
       "relation": "references",
@@ -36515,9 +36570,9 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/sub-components/appointment-schedule-card.tsx",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "sub_components_appointment_schedule_card_appointmentschedulecardprops",
-      "target": "shared_appointment_dto_appointmentdto",
-      "confidence_score": 1.0
+      "target": "shared_appointment_dto_appointmentdto"
     },
     {
       "relation": "calls",
@@ -36548,9 +36603,9 @@
       "source_file": "samson-nextjs/src/modules/appointments/views/appointment-detail-view.tsx",
       "source_location": "L10",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "views_appointment_detail_view",
-      "target": "sub_components_appointment_schedule_card_appointmentschedulecard",
-      "confidence_score": 1.0
+      "target": "sub_components_appointment_schedule_card_appointmentschedulecard"
     },
     {
       "relation": "imports_from",
@@ -36559,9 +36614,9 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/sub-components/appointment-status-hero.tsx",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "sub_components_appointment_status_hero",
-      "target": "shared_appointment_dto",
-      "confidence_score": 1.0
+      "target": "shared_appointment_dto"
     },
     {
       "relation": "imports",
@@ -36570,9 +36625,9 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/sub-components/appointment-status-hero.tsx",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "sub_components_appointment_status_hero",
-      "target": "shared_appointment_dto_appointmentdto",
-      "confidence_score": 1.0
+      "target": "shared_appointment_dto_appointmentdto"
     },
     {
       "relation": "contains",
@@ -36580,9 +36635,9 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/sub-components/appointment-status-hero.tsx",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "sub_components_appointment_status_hero",
-      "target": "sub_components_appointment_status_hero_appointmentstatushero",
-      "confidence_score": 1.0
+      "target": "sub_components_appointment_status_hero_appointmentstatushero"
     },
     {
       "relation": "contains",
@@ -36590,9 +36645,9 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/sub-components/appointment-status-hero.tsx",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "sub_components_appointment_status_hero",
-      "target": "sub_components_appointment_status_hero_appointmentstatusheroprops",
-      "confidence_score": 1.0
+      "target": "sub_components_appointment_status_hero_appointmentstatusheroprops"
     },
     {
       "relation": "imports_from",
@@ -36601,9 +36656,9 @@
       "source_file": "samson-nextjs/src/modules/appointments/views/appointment-detail-view.tsx",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "views_appointment_detail_view",
-      "target": "sub_components_appointment_status_hero",
-      "confidence_score": 1.0
+      "target": "sub_components_appointment_status_hero"
     },
     {
       "relation": "references",
@@ -36612,9 +36667,9 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/sub-components/appointment-status-hero.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "sub_components_appointment_status_hero_appointmentstatusheroprops",
-      "target": "shared_appointment_dto_appointmentdto",
-      "confidence_score": 1.0
+      "target": "shared_appointment_dto_appointmentdto"
     },
     {
       "relation": "imports",
@@ -36623,9 +36678,9 @@
       "source_file": "samson-nextjs/src/modules/appointments/views/appointment-detail-view.tsx",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "views_appointment_detail_view",
-      "target": "sub_components_appointment_status_hero_appointmentstatushero",
-      "confidence_score": 1.0
+      "target": "sub_components_appointment_status_hero_appointmentstatushero"
     },
     {
       "relation": "imports_from",
@@ -36634,9 +36689,9 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/sub-components/appointment-system-card.tsx",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "sub_components_appointment_system_card",
-      "target": "shared_appointment_dto",
-      "confidence_score": 1.0
+      "target": "shared_appointment_dto"
     },
     {
       "relation": "imports",
@@ -36645,9 +36700,9 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/sub-components/appointment-system-card.tsx",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "sub_components_appointment_system_card",
-      "target": "shared_appointment_dto_appointmentdto",
-      "confidence_score": 1.0
+      "target": "shared_appointment_dto_appointmentdto"
     },
     {
       "relation": "contains",
@@ -36655,9 +36710,9 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/sub-components/appointment-system-card.tsx",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "sub_components_appointment_system_card",
-      "target": "sub_components_appointment_system_card_appointmentsystemcard",
-      "confidence_score": 1.0
+      "target": "sub_components_appointment_system_card_appointmentsystemcard"
     },
     {
       "relation": "contains",
@@ -36665,9 +36720,9 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/sub-components/appointment-system-card.tsx",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "sub_components_appointment_system_card",
-      "target": "sub_components_appointment_system_card_appointmentsystemcardprops",
-      "confidence_score": 1.0
+      "target": "sub_components_appointment_system_card_appointmentsystemcardprops"
     },
     {
       "relation": "imports_from",
@@ -36676,9 +36731,9 @@
       "source_file": "samson-nextjs/src/modules/appointments/views/appointment-detail-view.tsx",
       "source_location": "L13",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "views_appointment_detail_view",
-      "target": "sub_components_appointment_system_card",
-      "confidence_score": 1.0
+      "target": "sub_components_appointment_system_card"
     },
     {
       "relation": "references",
@@ -36687,9 +36742,9 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/sub-components/appointment-system-card.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "sub_components_appointment_system_card_appointmentsystemcardprops",
-      "target": "shared_appointment_dto_appointmentdto",
-      "confidence_score": 1.0
+      "target": "shared_appointment_dto_appointmentdto"
     },
     {
       "relation": "imports",
@@ -36698,9 +36753,9 @@
       "source_file": "samson-nextjs/src/modules/appointments/views/appointment-detail-view.tsx",
       "source_location": "L13",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "views_appointment_detail_view",
-      "target": "sub_components_appointment_system_card_appointmentsystemcard",
-      "confidence_score": 1.0
+      "target": "sub_components_appointment_system_card_appointmentsystemcard"
     },
     {
       "relation": "imports_from",
@@ -37856,9 +37911,9 @@
       "source_file": "samson-nextjs/src/modules/appointments/hooks/detail/use-appointment-detail.ts",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "detail_use_appointment_detail",
-      "target": "shared_appointment_dto",
-      "confidence_score": 1.0
+      "target": "shared_appointment_dto"
     },
     {
       "relation": "contains",
@@ -38174,9 +38229,9 @@
       "source_file": "samson-nextjs/src/modules/appointments/hooks/detail/use-appointment-detail.ts",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "detail_use_appointment_detail",
-      "target": "shared_appointment_dto_appointmentdto",
-      "confidence_score": 1.0
+      "target": "shared_appointment_dto_appointmentdto"
     },
     {
       "relation": "references",
@@ -38185,9 +38240,9 @@
       "source_file": "samson-nextjs/src/modules/appointments/hooks/detail/use-appointment-detail.ts",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "detail_use_appointment_detail_useappointmentdetailprops",
-      "target": "shared_appointment_dto_appointmentdto",
-      "confidence_score": 1.0
+      "target": "shared_appointment_dto_appointmentdto"
     },
     {
       "relation": "imports",
@@ -39636,9 +39691,9 @@
       "source_file": "samson-nextjs/src/modules/appointments/hooks/detail/use-appointment-detail.ts",
       "source_location": "L13",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "detail_use_appointment_detail",
-      "target": "detail_use_appointment_detail_useappointmentdetail",
-      "confidence_score": 1.0
+      "target": "detail_use_appointment_detail_useappointmentdetail"
     },
     {
       "relation": "contains",
@@ -39646,9 +39701,9 @@
       "source_file": "samson-nextjs/src/modules/appointments/hooks/detail/use-appointment-detail.ts",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "detail_use_appointment_detail",
-      "target": "detail_use_appointment_detail_useappointmentdetailprops",
-      "confidence_score": 1.0
+      "target": "detail_use_appointment_detail_useappointmentdetailprops"
     },
     {
       "relation": "imports_from",
@@ -39657,9 +39712,9 @@
       "source_file": "samson-nextjs/src/modules/appointments/views/appointment-detail-view.tsx",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "views_appointment_detail_view",
-      "target": "detail_use_appointment_detail",
-      "confidence_score": 1.0
+      "target": "detail_use_appointment_detail"
     },
     {
       "relation": "imports",
@@ -39668,9 +39723,9 @@
       "source_file": "samson-nextjs/src/modules/appointments/views/appointment-detail-view.tsx",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "views_appointment_detail_view",
-      "target": "detail_use_appointment_detail_useappointmentdetail",
-      "confidence_score": 1.0
+      "target": "detail_use_appointment_detail_useappointmentdetail"
     },
     {
       "relation": "calls",
@@ -76342,5 +76397,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "7e3d04ca51a1cfbc25833e024bebb2f0caab2d72"
+  "built_at_commit": "ec374d1e94eabec056469cdbfc96ba37faf704df"
 }

@@ -405,9 +405,9 @@
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\appointments\\repositories\\patient\\patient-appointments.queries.ts": {
-    "mtime": 1780236643.5686283,
-    "ast_hash": "fcd8fc8565c91a2a56b66423d3247f0c",
-    "semantic_hash": "fcd8fc8565c91a2a56b66423d3247f0c"
+    "mtime": 1781365586.9246097,
+    "ast_hash": "163cbf4b7a56d160f454d758984127ec",
+    "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\appointments\\repositories\\treatment\\treatment.commands.spec.ts": {
     "mtime": 1780242918.900467,
@@ -3290,8 +3290,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\app\\(portals)\\user\\appointments\\[id]\\page.tsx": {
-    "mtime": 1781363334.4962053,
-    "ast_hash": "2ef6507264ea534634f99fc9239d6778",
+    "mtime": 1781365595.888836,
+    "ast_hash": "6458998eb5a0b0c7db45cec3fb693eb7",
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\appointments\\components\\dashboard\\appointment-teaser-card.tsx": {
@@ -3325,8 +3325,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\appointments\\repositories\\status\\get-appointment-by-id.query.ts": {
-    "mtime": 1781343008.9093478,
-    "ast_hash": "e818946531eabe940fd500cf6a547f6b",
+    "mtime": 1781365583.2257917,
+    "ast_hash": "486ea60b77a1e06931180b2246bd2beb",
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\appointments\\repositories\\status\\increment-user-credibility-metric.command.ts": {
@@ -3402,6 +3402,11 @@
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\appointments\\hooks\\detail\\use-appointment-detail.ts": {
     "mtime": 1781365086.0044222,
     "ast_hash": "6854985145a773e7d2903403d7cf41c8",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\migrations\\20260613160000_seed_patient_appointments.sql": {
+    "mtime": 1781365606.4444957,
+    "ast_hash": "eb0fc4d0deaf96067f25ce63d4a06ed2",
     "semantic_hash": ""
   }
 }
