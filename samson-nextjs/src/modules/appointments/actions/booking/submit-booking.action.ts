@@ -42,6 +42,18 @@ export async function submitBookingAction(formData: SubmitBookingDto) {
     });
 
     const appointment = await useCase(user.id, validData);
+    
+    // Non-blocking outbox processing for side effects
+    const { after } = await import('next/server');
+    const { bootstrapEventSubscribers } = await import('@/orchestrators/event-subscribers');
+    const { globalOutboxDispatcher } = await import('@/shared/outbox/outbox.dispatcher');
+    const { createAdminClient } = await import('@/shared/database/server');
+
+    after(async () => {
+      bootstrapEventSubscribers();
+      await globalOutboxDispatcher(await createAdminClient())();
+    });
+
     return { success: true, data: appointment };
   } catch (error) {
     if (error instanceof z.ZodError) {

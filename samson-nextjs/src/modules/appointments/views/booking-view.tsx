@@ -8,6 +8,7 @@ import { PatientDetailsStep } from '../components/booking/patient-details-step';
 import { ReviewStep } from '../components/booking/review-step';
 import { BookingSuccessView } from '../components/booking/booking-success-view';
 import { BookingProgressTabs } from '../components/booking/booking-progress-tabs';
+import { BookingFooterControls } from '../components/booking/booking-footer-controls';
 import { Button } from '@/components/ui/button';
 import type { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
 
@@ -125,31 +126,16 @@ export function BookingView({ services }: BookingViewProps) {
       </div>
 
       {/* footer controls */}
-      <div className="flex items-center justify-between border-t border-card-border pt-6 mt-4">
-        <Button
-          variant="secondary"
-          onClick={prevStep}
-          disabled={currentStep === 1}
-        >
-          Back
-        </Button>
-
-        {currentStep < 4 ? (
-          <Button
-            onClick={nextStep}
-            disabled={isNextDisabled()}
-          >
-            Next Step
-          </Button>
-        ) : (
-          <Button
-            onClick={handleSubmit}
-            disabled={isSubmitting || !termsAccepted || !privacyAccepted}
-          >
-            {isSubmitting ? 'Finalizing...' : 'Submit Booking'}
-          </Button>
-        )}
-      </div>
+      <BookingFooterControls
+        currentStep={currentStep}
+        isNextDisabled={isNextDisabled}
+        isSubmitting={isSubmitting}
+        termsAccepted={termsAccepted}
+        privacyAccepted={privacyAccepted}
+        prevStep={prevStep}
+        nextStep={nextStep}
+        handleSubmit={handleSubmit}
+      />
     </div>
   );
 }

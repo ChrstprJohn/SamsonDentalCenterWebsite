@@ -46,16 +46,16 @@
   - [x] Remove slot hold countdown timer, hooks, state, types, and files reference across the app (`useBookingState`, `useUserBooking`, `DateTimeStep`, `BookingView`, etc.) since slot holding is omitted from the business plan.
 
 ### Phase 3: Architectural Audit Fixes (V2 Compliance)
-- [ ] **1. Zod Transformation Blueprint Refactor (`backend/1.5-CODING-PATTERNS.md`)**
-  - [ ] Refactor `dtos/shared/appointment.dto.ts`. Remove the messy `z.preprocess()` logic.
-  - [ ] Define a strict raw DB shape (`appointmentDbSchema`) and use `.transform()` to map to `appointmentDtoSchema` to ensure pure separation of boundaries.
-- [ ] **2. Transactional Outbox Events (`1-EVENT-DRIVEN-ARCHITECTURE.md`)**
-  - [ ] Update `appointment-booking.commands.ts` (or the use-case) to emit an `APPOINTMENT_BOOKED` event into the `outbox` table as part of the booking transaction, allowing for async staff notifications.
-- [ ] **3. Deprecated OOP Wrapper Removal (`backend/1-ARCHITECTURE.md`)**
-  - [ ] Remove the `@deprecated` class wrappers from `submit-booking.use-case.ts` (`SubmitBookingUseCase`).
-  - [ ] Remove the `@deprecated` class wrappers from `appointment-booking.commands.ts` (`AppointmentBookingCommands`).
-- [ ] **4. Frontend God Component Prevention (`frontend/1-ARCHITECTURE.md`)**
-  - [ ] Extract the footer action buttons (Next, Back, Submit) from `booking-view.tsx` into a separate `BookingFooterControls` sub-component to bring the view below the 150-line threshold (currently at 152 lines).
+- [x] **1. Zod Transformation Blueprint Refactor (`backend/1.5-CODING-PATTERNS.md`)**
+  - [x] Refactor `dtos/shared/appointment.dto.ts`. Remove the messy `z.preprocess()` logic.
+  - [x] Define a strict raw DB shape (`appointmentDbSchema`) and use `.transform()` to map to `appointmentDtoSchema` to ensure pure separation of boundaries.
+- [x] **2. Transactional Outbox Events (`1-EVENT-DRIVEN-ARCHITECTURE.md`)**
+  - [x] Update `appointment-booking.commands.ts` (or the use-case) to emit an `APPOINTMENT_BOOKED` event into the `outbox` table as part of the booking transaction, allowing for async staff notifications.
+- [x] **3. Deprecated OOP Wrapper Removal (`backend/1-ARCHITECTURE.md`)**
+  - [x] Remove the `@deprecated` class wrappers from `submit-booking.use-case.ts` (`SubmitBookingUseCase`).
+  - [x] Remove the `@deprecated` class wrappers from `appointment-booking.commands.ts` (`AppointmentBookingCommands`).
+- [x] **4. Frontend God Component Prevention (`frontend/1-ARCHITECTURE.md`)**
+  - [x] Extract the footer action buttons (Next, Back, Submit) from `booking-view.tsx` into a separate `BookingFooterControls` sub-component to bring the view below the 150-line threshold (currently at 152 lines).
 - [x] **5. Server Action Data Fetching Violation (`frontend/1-ARCHITECTURE.md`)**
   - [x] Refactor `src/app/(portals)/booking/page.tsx` to stop using `getServicesAction(false)` (a Server Action) for data fetching.
   - [x] Use Functional DI directly in the React Server Component to securely fetch data via `getServicesUseCase(getServicesQuery(supabase))`.

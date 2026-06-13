@@ -1,116 +1,83 @@
 import { z } from 'zod';
 import { appointmentStatusEnum } from '../status/update-appointment-status.dto';
 
-export const appointmentDoctorSchema = z.preprocess(
-  (val: any) => {
-    if (!val || typeof val !== 'object') return val;
-    return {
-      id: val.id,
-      firstName: val.first_name ?? val.firstName,
-      lastName: val.last_name ?? val.lastName,
-      prefix: val.prefix,
-      suffix: val.suffix,
-    };
-  },
-  z.object({
-    id: z.string().uuid(),
-    firstName: z.string(),
-    lastName: z.string(),
-    prefix: z.string().nullable().optional(),
-    suffix: z.string().nullable().optional(),
-  })
-);
+const appointmentDoctorDbSchema = z.object({
+  id: z.string().uuid(),
+  first_name: z.string(),
+  last_name: z.string(),
+  prefix: z.string().nullable().optional(),
+  suffix: z.string().nullable().optional(),
+});
 
-export const appointmentServiceSchema = z.preprocess(
-  (val: any) => {
-    if (!val || typeof val !== 'object') return val;
-    return {
-      id: val.id,
-      name: val.name,
-      durationMinutes: val.duration_minutes ?? val.durationMinutes,
-    };
-  },
-  z.object({
-    id: z.string().uuid(),
-    name: z.string(),
-    durationMinutes: z.number().int().nonnegative(),
-  })
-);
+export const appointmentDoctorSchema = appointmentDoctorDbSchema.transform((data) => ({
+  id: data.id,
+  firstName: data.first_name,
+  lastName: data.last_name,
+  prefix: data.prefix,
+  suffix: data.suffix,
+}));
 
-export const appointmentPatientSchema = z.preprocess(
-  (val: any) => {
-    if (!val || typeof val !== 'object') return val;
-    return {
-      id: val.id,
-      firstName: val.first_name ?? val.firstName,
-      lastName: val.last_name ?? val.lastName,
-    };
-  },
-  z.object({
-    id: z.string().uuid(),
-    firstName: z.string(),
-    lastName: z.string(),
-  })
-);
+const appointmentServiceDbSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+  duration_minutes: z.number().int().nonnegative(),
+});
 
-export const appointmentDtoSchema = z.preprocess(
-  (record: any) => {
-    if (!record || typeof record !== 'object') return record;
-    const stringValue = (value: unknown) => (typeof value === 'string' ? value : '');
-    const nullableStringValue = (value: unknown) =>
-      typeof value === 'string' && value.length > 0 ? value : null;
-    const intValue = (value: unknown, fallback = 0) =>
-      typeof value === 'number' ? value : fallback;
+export const appointmentServiceSchema = appointmentServiceDbSchema.transform((data) => ({
+  id: data.id,
+  name: data.name,
+  durationMinutes: data.duration_minutes,
+}));
 
-    let doctorData = record.doctor;
-    if (!doctorData && (record.doctor_id || record.doctorId)) {
-      doctorData = {
-        id: record.doctor_id ?? record.doctorId,
-        firstName: '',
-        lastName: '',
-        prefix: null,
-        suffix: null,
-      };
-    }
+const appointmentPatientDbSchema = z.object({
+  id: z.string().uuid(),
+  first_name: z.string(),
+  last_name: z.string(),
+});
 
-    return {
-      id: record.id,
-      patientId: record.patient_id ?? record.patientId ?? record.user_id ?? record.userId,
-      serviceId: record.service_id ?? record.serviceId,
-      doctorId: record.doctor_id ?? record.doctorId,
-      date: stringValue(record.date),
-      startTime: stringValue(record.start_time ?? record.startTime),
-      endTime: stringValue(record.end_time ?? record.endTime),
-      status: record.status,
-      userNote: nullableStringValue(record.user_note ?? record.userNote),
-      statusReason: nullableStringValue(record.status_reason ?? record.statusReason),
-      rescheduleCount: intValue(record.reschedule_count ?? record.rescheduleCount),
-      createdAt: typeof record.created_at === 'string' ? record.created_at : record.createdAt,
-      updatedAt: typeof record.updated_at === 'string' ? record.updated_at : record.updatedAt,
-      doctor: doctorData,
-      service: record.service,
-      patient: record.patient,
-    };
-  },
-  z.object({
-    id: z.string().uuid(),
-    patientId: z.string().uuid().nullable().optional(),
-    serviceId: z.string().uuid(),
-    doctorId: z.string().uuid(),
-    date: z.string(),
-    startTime: z.string(),
-    endTime: z.string(),
-    status: appointmentStatusEnum,
-    userNote: z.string().nullable().optional(),
-    statusReason: z.string().nullable().optional(),
-    rescheduleCount: z.number().int().nonnegative().optional(),
-    createdAt: z.string().datetime().optional(),
-    updatedAt: z.string().datetime().optional(),
-    doctor: appointmentDoctorSchema.nullable().optional(),
-    service: appointmentServiceSchema.nullable().optional(),
-    patient: appointmentPatientSchema.nullable().optional(),
-  })
-);
+export const appointmentPatientSchema = appointmentPatientDbSchema.transform((data) => ({
+  id: data.id,
+  firstName: data.first_name,
+  lastName: data.last_name,
+}));
+
+const appointmentDbSchema = z.object({
+  id: z.string().uuid(),
+  patient_id: z.string().uuid().nullable().optional(),
+  service_id: z.string().uuid(),
+  doctor_id: z.string().uuid(),
+  date: z.string(),
+  start_time: z.string(),
+  end_time: z.string(),
+  status: appointmentStatusEnum,
+  user_note: z.string().nullable().optional(),
+  status_reason: z.string().nullable().optional(),
+  reschedule_count: z.number().int().nonnegative().optional().default(0),
+  created_at: z.string().optional(),
+  updated_at: z.string().optional(),
+  doctor: appointmentDoctorDbSchema.nullable().optional(),
+  service: appointmentServiceDbSchema.nullable().optional(),
+  patient: appointmentPatientDbSchema.nullable().optional(),
+});
+
+export const appointmentDtoSchema = appointmentDbSchema.transform((data) => ({
+  id: data.id,
+  patientId: data.patient_id,
+  serviceId: data.service_id,
+  doctorId: data.doctor_id,
+  date: data.date,
+  startTime: data.start_time,
+  endTime: data.end_time,
+  status: data.status,
+  userNote: data.user_note || null,
+  statusReason: data.status_reason || null,
+  rescheduleCount: data.reschedule_count ?? 0,
+  createdAt: data.created_at,
+  updatedAt: data.updated_at,
+  doctor: data.doctor ? appointmentDoctorSchema.parse(data.doctor) : null,
+  service: data.service ? appointmentServiceSchema.parse(data.service) : null,
+  patient: data.patient ? appointmentPatientSchema.parse(data.patient) : null,
+}));
 
 export type AppointmentDto = z.infer<typeof appointmentDtoSchema>;
 
@@ -122,4 +89,5 @@ export const mapAppointmentRecord = (record: MaybeRecord): AppointmentDto => {
 
 export const mapAppointmentRecords = (records: MaybeRecord[]): AppointmentDto[] =>
   records.map((record) => mapAppointmentRecord(record));
+
 

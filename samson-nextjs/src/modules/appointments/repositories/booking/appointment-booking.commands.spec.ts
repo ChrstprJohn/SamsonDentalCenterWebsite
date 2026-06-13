@@ -1,16 +1,22 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { SupabaseClient } from '@supabase/supabase-js';
-import { AppointmentBookingCommands } from './appointment-booking.commands';
+import { createAppointmentCommand } from './appointment-booking.commands';
 import { SubmitBookingDto } from '../../dtos';
+import * as outboxCommandsModule from '@/shared/outbox/outbox.commands';
 
 describe('AppointmentBookingCommands', () => {
-  let commands: AppointmentBookingCommands;
   let mockSupabase: any;
+  let mockEmitEvent: any;
   const validApptId = 'da95a63c-333e-4b68-98e3-82bdf1a07bd2';
   const validServiceId = 'da95a63c-333e-4b68-98e3-82bdf1a07bd3';
   const validDoctorId = 'da95a63c-333e-4b68-98e3-82bdf1a07bd4';
 
   beforeEach(() => {
+    mockEmitEvent = vi.fn().mockResolvedValue(undefined);
+    vi.spyOn(outboxCommandsModule, 'outboxCommands').mockReturnValue({
+      emitEvent: mockEmitEvent,
+    } as any);
+
     mockSupabase = {
       from: vi.fn().mockReturnThis(),
       insert: vi.fn().mockReturnThis(),
@@ -21,11 +27,13 @@ describe('AppointmentBookingCommands', () => {
           service_id: validServiceId,
           doctor_id: validDoctorId,
           status: 'PENDING',
+          date: '2024-12-25',
+          start_time: '2024-12-25T10:00:00Z',
+          end_time: '2024-12-25T10:30:00Z',
         },
         error: null,
       }),
     };
-    commands = new AppointmentBookingCommands(mockSupabase as unknown as SupabaseClient);
   });
 
   describe('createAppointment', () => {
@@ -42,7 +50,8 @@ describe('AppointmentBookingCommands', () => {
     };
 
     it('should successfully insert a pending appointment', async () => {
-      const result = await commands.createAppointment('user-123', mockDto);
+      const command = createAppointmentCommand(mockSupabase as unknown as SupabaseClient);
+      const result = await command('user-123', mockDto);
 
       expect(mockSupabase.from).toHaveBeenCalledWith('appointments');
       expect(mockSupabase.insert).toHaveBeenCalledWith(
@@ -58,13 +67,15 @@ describe('AppointmentBookingCommands', () => {
           user_note: mockDto.userNote,
         })
       );
+      expect(mockEmitEvent).toHaveBeenCalledWith('APPOINTMENT_BOOKED', expect.any(Object));
       expect(result).toMatchObject({ id: validApptId });
     });
 
     it('should throw DomainError on database error', async () => {
       mockSupabase.single.mockResolvedValueOnce({ data: null, error: { message: 'Insert failed' } });
 
-      await expect(commands.createAppointment('user-123', mockDto)).rejects.toThrow(
+      const command = createAppointmentCommand(mockSupabase as unknown as SupabaseClient);
+      await expect(command('user-123', mockDto)).rejects.toThrow(
         'Failed to create appointment: Insert failed'
       );
     });
