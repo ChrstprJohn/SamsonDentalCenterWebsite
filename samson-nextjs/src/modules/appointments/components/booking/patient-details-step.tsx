@@ -5,6 +5,7 @@ import { AddDependentModal } from './add-dependent-modal';
 import { ExistingDependentSelector } from './existing-dependent-selector';
 import type { NewDependentInput } from '../../hooks/booking/use-user-booking';
 import type { DependentProfileDto } from '@/modules/patients/dtos';
+import { formatShortDate } from '@/shared/utils/date.util';
 
 interface PatientDetailsStepProps {
   patientType: 'SELF' | 'EXISTING_DEPENDENT' | 'NEW_DEPENDENT';
@@ -52,8 +53,6 @@ export function PatientDetailsStep({
           type="button"
           onClick={() => {
             onSetPatientType('SELF');
-            onSelectDependent(null);
-            onSetNewDependent(null);
           }}
           className={`p-3 rounded-xl border text-center font-semibold text-xs md:text-sm cursor-pointer transition-all ${
             patientType === 'SELF'
@@ -67,11 +66,13 @@ export function PatientDetailsStep({
         <button
           type="button"
           onClick={() => {
-            // Default to EXIST_DEPENDENT even if list is empty, we handle adding there
-            onSetPatientType('EXISTING_DEPENDENT');
-            onSetNewDependent(null);
-            if (userDependents.length > 0 && !selectedDependentId) {
-              onSelectDependent(userDependents[0].id);
+            if (newDependentData) {
+              onSetPatientType('NEW_DEPENDENT');
+            } else {
+              onSetPatientType('EXISTING_DEPENDENT');
+              if (userDependents.length > 0 && !selectedDependentId) {
+                onSelectDependent(userDependents[0].id);
+              }
             }
           }}
           className={`p-3 rounded-xl border text-center font-semibold text-xs md:text-sm cursor-pointer transition-all ${
@@ -87,15 +88,29 @@ export function PatientDetailsStep({
       {/* Recipient Details Block */}
       {patientType === 'SELF' && (
         <div className="p-4 rounded-2xl border border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-slate-900/40 text-xs flex flex-col gap-3">
-          <div className="flex flex-col gap-1">
-            <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Recipient Name</span>
-            <span className="font-semibold text-sm text-slate-700 dark:text-slate-250">
-              {userProfile 
-                ? [userProfile.firstName, userProfile.middleName, userProfile.lastName, userProfile.suffix].filter(Boolean).join(' ') 
-                : 'Patient (Self)'}
-            </span>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="flex flex-col gap-1">
+               <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">First Name</span>
+               <span className="text-slate-700 dark:text-slate-250 font-semibold">{userProfile?.firstName || 'N/A'}</span>
+            </div>
+            <div className="flex flex-col gap-1">
+               <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Middle Name</span>
+               <span className="text-slate-700 dark:text-slate-250 font-semibold">{userProfile?.middleName || 'N/A'}</span>
+            </div>
+            <div className="flex flex-col gap-1">
+               <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Last Name</span>
+               <span className="text-slate-700 dark:text-slate-250 font-semibold">{userProfile?.lastName || 'N/A'}</span>
+            </div>
+            <div className="flex flex-col gap-1">
+               <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Suffix</span>
+               <span className="text-slate-700 dark:text-slate-250 font-semibold">{userProfile?.suffix || 'N/A'}</span>
+            </div>
           </div>
           <div className="flex flex-col sm:flex-row gap-4 pt-3 border-t border-slate-200 dark:border-white/5">
+            <div className="flex flex-col gap-1">
+               <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Date of Birth</span>
+               <span className="text-slate-600 dark:text-slate-300 font-medium">{userProfile?.dateOfBirth ? formatShortDate(userProfile.dateOfBirth) : 'N/A'}</span>
+            </div>
             <div className="flex flex-col gap-1">
                <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Contact Email</span>
                <span className="text-slate-600 dark:text-slate-300 font-medium">{userProfile?.email || 'N/A'}</span>
@@ -103,10 +118,6 @@ export function PatientDetailsStep({
             <div className="flex flex-col gap-1">
                <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Phone Number</span>
                <span className="text-slate-600 dark:text-slate-300 font-medium">{userProfile?.phoneNumber || 'N/A'}</span>
-            </div>
-            <div className="flex flex-col gap-1">
-               <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Date of Birth</span>
-               <span className="text-slate-600 dark:text-slate-300 font-medium">{userProfile?.dateOfBirth || 'N/A'}</span>
             </div>
           </div>
           <p className="text-[10px] text-slate-500 mt-2 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 p-2 rounded-lg">
@@ -126,6 +137,7 @@ export function PatientDetailsStep({
               onSelectDependent(id);
             }}
             onAddNew={() => setIsModalOpen(true)}
+            showAddNew={!(patientType === 'NEW_DEPENDENT' && newDependentData !== null)}
           />
           
           {patientType === 'NEW_DEPENDENT' && newDependentData && (
@@ -141,9 +153,9 @@ export function PatientDetailsStep({
             </button>
           </div>
           <div className="flex flex-col gap-1 mt-1 font-semibold text-slate-700 dark:text-slate-250">
-            <span>Name: {newDependentData.firstName} {newDependentData.lastName}</span>
+            <span>Name: {[newDependentData.firstName, newDependentData.middleName, newDependentData.lastName, newDependentData.suffix].filter(Boolean).join(' ')}</span>
             <span>Relationship: {newDependentData.relationship}</span>
-            <span>DOB: {newDependentData.birthday}</span>
+            <span>DOB: {formatShortDate(newDependentData.birthday)}</span>
           </div>
         </div>
       )}

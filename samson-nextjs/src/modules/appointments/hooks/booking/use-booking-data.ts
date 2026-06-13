@@ -36,12 +36,12 @@ export function useBookingData(
   const [isLoadingAvailability, setIsLoadingAvailability] = useState(false);
   const [isLoadingDoctors, setIsLoadingDoctors] = useState(false);
 
-  // Effect 1: Fetch Doctors when Service is selected or entering Step 2
+  // Effect 1: Fetch Doctors when Service is selected
   useEffect(() => {
     let active = true;
     const controller = new AbortController();
 
-    if (!selectedServiceId || currentStep < 2) {
+    if (!selectedServiceId) {
       setDoctors([]);
       return;
     }
@@ -76,14 +76,14 @@ export function useBookingData(
       active = false;
       controller.abort();
     };
-  }, [selectedServiceId, currentStep]);
+  }, [selectedServiceId]);
 
-  // Effect 2: Fetch Availability (Available Dates) when Service/Doctor is selected or entering Step 2
+  // Effect 2: Fetch Availability (Available Dates) when Service/Doctor is selected
   useEffect(() => {
     let active = true;
     const controller = new AbortController();
 
-    if (!selectedServiceId || currentStep < 2) {
+    if (!selectedServiceId) {
       setAvailableDates([]);
       setAvailabilityMap({});
       return;
@@ -130,7 +130,7 @@ export function useBookingData(
       controller.abort();
       clearTimeout(timer);
     };
-  }, [selectedServiceId, selectedDoctorId, currentStep]);
+  }, [selectedServiceId, selectedDoctorId]);
 
   // Effect 3: Fetch Available Slots when Date/Doctor is selected
   useEffect(() => {
@@ -138,7 +138,7 @@ export function useBookingData(
     const controller = new AbortController();
 
     async function fetchSlots() {
-      if (!selectedServiceId || !selectedDate || currentStep < 2) {
+      if (!selectedServiceId || !selectedDate) {
         setAvailableSlots([]);
         return;
       }
@@ -181,7 +181,7 @@ export function useBookingData(
       active = false;
       controller.abort();
     };
-  }, [selectedServiceId, selectedDate, selectedDoctorId, currentStep, availabilityMap]);
+  }, [selectedServiceId, selectedDate, selectedDoctorId]);
 
   return {
     availableDates,

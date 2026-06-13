@@ -126,6 +126,7 @@ export function BookingView({ services, userProfile, userDependents }: BookingVi
             privacyAccepted={privacyAccepted}
             onSetTermsAccepted={setTermsAccepted}
             onSetPrivacyAccepted={setPrivacyAccepted}
+            onEditStep={goToStep}
           />
         )}
       </div>

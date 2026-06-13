@@ -2,19 +2,22 @@
 
 import React from 'react';
 import type { DependentProfileDto } from '@/modules/patients/dtos';
+import { formatShortDate } from '@/shared/utils/date.util';
 
 interface ExistingDependentSelectorProps {
   dependents: DependentProfileDto[];
   selectedDependentId: string | null;
   onSelectDependent: (id: string | null) => void;
   onAddNew: () => void;
+  showAddNew?: boolean;
 }
 
 export function ExistingDependentSelector({ 
   dependents, 
   selectedDependentId, 
   onSelectDependent, 
-  onAddNew 
+  onAddNew,
+  showAddNew = true,
 }: ExistingDependentSelectorProps) {
   return (
     <div className="flex flex-col gap-3">
@@ -38,18 +41,22 @@ export function ExistingDependentSelector({
                 </span>
                 <span className="text-[10px] text-slate-500 mt-0.5">{dep.relationship}</span>
               </div>
-              <span className="text-[10px] text-slate-400">📅 {dep.dateOfBirth}</span>
+              <span className="text-[10px] text-slate-400">📅 {formatShortDate(dep.dateOfBirth)}</span>
             </div>
           );
         })}
 
-        {/* Add New Button Card */}
-        <div
-          onClick={onAddNew}
-          className="p-4 rounded-xl border border-dashed border-slate-300 dark:border-white/20 hover:border-blue-500 hover:bg-blue-50/20 dark:hover:bg-blue-500/10 cursor-pointer flex items-center justify-center transition-all text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 min-h-[72px]"
-        >
-          <span className="text-xs font-semibold">+ Add New Member</span>
-        </div>
+        {/* Add New Button */}
+        {showAddNew && (
+          <button
+            type="button"
+            onClick={onAddNew}
+            className="h-full min-h-[70px] border-2 border-dashed border-blue-200 dark:border-blue-900/50 bg-blue-50/50 dark:bg-blue-900/10 rounded-xl hover:bg-blue-50 hover:border-blue-300 dark:hover:bg-blue-900/20 transition-all flex flex-col items-center justify-center gap-1 group"
+          >
+            <span className="text-xl group-hover:scale-110 transition-transform">➕</span>
+            <span className="text-xs font-semibold text-blue-600 dark:text-blue-400">Add New Member</span>
+          </button>
+        )}
       </div>
     </div>
   );

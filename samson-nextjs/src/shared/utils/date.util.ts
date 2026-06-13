@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Formats a Date object or ISO string into a standard clinic date string.
  * Example: 'May 27, 2026'
  */
@@ -7,6 +7,23 @@ export function formatClinicDate(date: Date | string): string {
   
   return new Intl.DateTimeFormat('en-US', {
     month: 'long',
+    day: 'numeric',
+    year: 'numeric'
+  }).format(d);
+}
+
+/**
+ * Formats a Date object or ISO string into a short standard string.
+ * Example: 'Dec 1, 2026'
+ */
+export function formatShortDate(date: Date | string): string {
+  if (!date) return '';
+  const d = typeof date === 'string' ? new Date(date) : date;
+  // If date parsing fails, return original string (e.g., 'N/A')
+  if (isNaN(d.getTime())) return typeof date === 'string' ? date : '';
+
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'short',
     day: 'numeric',
     year: 'numeric'
   }).format(d);
