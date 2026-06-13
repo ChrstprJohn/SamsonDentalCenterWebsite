@@ -41,7 +41,7 @@ export function createBookingPayload({
     payload.dependentLastName = newDependentData.lastName;
     payload.dependentMiddleName = newDependentData.middleName;
     payload.dependentSuffix = newDependentData.suffix;
-    payload.dependentRelationship = newDependentData.relationship;
+    payload.dependentRelationship = newDependentData.relationship as any;
     payload.dependentBirthday = newDependentData.birthday;
   }
 

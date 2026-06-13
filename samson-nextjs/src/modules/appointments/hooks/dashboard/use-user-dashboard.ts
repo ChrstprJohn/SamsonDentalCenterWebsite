@@ -90,9 +90,19 @@ export function useUserDashboard(
     closeCancelModal();
   };
 
-  const scheduled = appointments.filter((a) => a.status === 'APPROVED');
+  const scheduled = appointments.filter(
+    (a) => a.status === 'APPROVED' || a.status === 'RESCHEDULE_REQUESTED' || a.status === 'CHECKED_IN'
+  );
   const pending = appointments.filter((a) => a.status === 'PENDING');
-  const history = appointments.filter((a) => a.status === 'COMPLETED' || a.status === 'CANCELLED');
+  const history = appointments.filter(
+    (a) =>
+      a.status === 'COMPLETED' ||
+      a.status === 'CANCELLED' ||
+      a.status === 'REJECTED' ||
+      a.status === 'DISPLACED' ||
+      a.status === 'NO_SHOW' ||
+      a.status === 'TREATMENT_RENDERED'
+  );
 
   return {
     scheduled,

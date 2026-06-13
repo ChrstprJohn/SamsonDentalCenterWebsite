@@ -10,50 +10,41 @@ The user portal is the private dashboard for authenticated and verified patients
 
 | Page | Description |
 |---|---|
-| **Dashboard** | Overview of upcoming appointments and recent activity |
-| **Upcoming Appointments** | List of approved and pending future appointments |
-| **Appointment History** | Past and completed appointments |
-| **My Requests** | All submitted booking requests and their current statuses |
+| **Dashboard** | High-level summary of upcoming appointments, recent activity, and shortcuts |
+| **My Appointments** | Deep-dive page with sub-tabs for Upcoming, Pending, and History |
 | **Notifications** | In-app notification center |
-| **Profile** | View and edit personal information and avatar |
-| **Account Settings** | Email, password, notification preferences |
-
----
-
-## Profile
-
-- Displays the user's registered identity fields (first, middle, last name, suffix, contact number, email).
-- **Avatar** field is available for customization — editable and optional.
-- Users can update their profile information at any time.
+| **Account Settings** | Manage profile details, avatar, credentials, and notification preferences, Security|
 
 ---
 
 ## Dashboard
 
-- Prioritizes **upcoming appointments** and **pending requests** at a glance.
-- Shows a quick summary of recent notification activity.
-- Provides direct action shortcuts (e.g., "Book an Appointment", "View History").
+- High-level landing page offering an immediate overview.
+- **Next Appointment Widget**: Highlights the single next upcoming appointment (service, date/time, doctor, countdown/status).
+- **Recent Notifications Summary**: Displays the latest 3-5 notifications with a quick link to "View All".
+- **Quick Action Shortcuts**: Prominent links for "Book New Appointment", "Manage Appointments", and "Update Profile".
 
 ---
 
-## Appointments
+## My Appointments
 
-### Upcoming Appointments
-- Lists all appointments with status: **Approved** or **Pending**.
-- Each appointment row shows: service, date/time, doctor, status badge.
-- Available actions per appointment:
-  - **Cancel** (if pending or approved, with a reason).
-  - **Reschedule** (if approved and reschedule limit not yet reached).
-  - If reschedule limit is reached, a UI indicator is shown with a message to contact staff.
+The appointments panel is located on its own dedicated page (`/user/appointments`) with three sub-tabs:
 
-### Appointment History
-- Lists completed, cancelled, rejected, and displaced appointments.
-- Read-only; no actions available.
-- Useful for tracking past visits and outcomes.
+### 1. Upcoming Tab
+- **Statuses**: `Approved`, `Reschedule Requested`, `Checked-In`
+- **Actions**:
+  - **Cancel**: Available for approved appointments. Prompts for a mandatory reason, warns of excessive cancellations if `cancelCount` is high, and registers reliability penalty.
+  - **Reschedule Request**: Available for approved appointments. Users cannot reschedule directly; they submit a request with a reason (limited to **ONE** reschedule request per appointment). Re-enters the staff review queue as `Reschedule Requested`.
 
-### My Requests
-- All submitted booking requests regardless of status.
-- Provides a unified view of the user's full appointment lifecycle.
+### 2. Pending Requests Tab
+- **Statuses**: `Pending`
+- **Actions**:
+  - **Cancel**: Available at any time. Prompts for a mandatory reason.
+
+### 3. History Tab
+- **Statuses**: `Rejected`, `Cancelled`, `Displaced`, `Completed`, `No-Show`, `Treatment Rendered`
+- **Actions**: None (Read-only view).
+- **Details**: Displays reasons for cancellation/rejection, displacement cause, and credibility indicators if flagged as a No-Show.
 
 ---
 
@@ -82,9 +73,17 @@ The user portal is the private dashboard for authenticated and verified patients
 
 ## Account Settings
 
+The profile page is embedded inside Account Settings (`/user/settings`) to unify personal metadata and security credentials:
+
+### Profile Details
+- Displays the user's registered identity fields (first, middle, last name, suffix, contact number, email).
+- **Avatar**: Customizable, optional avatar image upload/selector.
+- Profile changes can be updated and saved at any time.
+
+### Security & Preferences
 - Change email address.
 - Change password.
-- Manage notification preferences (email, in-app).
+- Manage notification preferences (email, in-app toggles).
 - Deactivate account (optional, can be added later).
 
 ---
