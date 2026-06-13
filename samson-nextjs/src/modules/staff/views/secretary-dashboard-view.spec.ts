@@ -1,10 +1,5 @@
 import { describe, it, expect } from 'vitest';
-
-// Pure logic helper extracted from SecretaryDashboardView for isolated node unit testing
-function calculateFinalPrice(basePrice: number, discount: number): number {
-  const final = basePrice - (basePrice * (discount / 100));
-  return Math.max(0, parseFloat(final.toFixed(2)));
-}
+import { calculateFinalPrice } from '../hooks/use-secretary-dashboard';
 
 describe('SecretaryDashboardView Dynamic Invoicing calculations', () => {
   it('should apply discount percentages correctly to base prices', () => {
