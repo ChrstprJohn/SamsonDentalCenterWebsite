@@ -18,6 +18,7 @@ export async function getPatientAppointmentsAction() {
 
     const appointments = await useCase(user.id);
     return { success: true, data: appointments };
+
   } catch (error) {
     if (error instanceof DomainError) {
       return { success: false, error: error.message };

@@ -41,20 +41,16 @@ interface UseUserDashboardReturn {
   setBlockedRescheduleAppt: (appt: AppointmentDto | null) => void;
 }
 
-import { MOCK_APPOINTMENTS } from '../../dtos/shared/mock-appointments';
-
 export function useUserDashboard(
   initialAppointments: AppointmentDto[],
   maxReschedules: number
 ): UseUserDashboardReturn {
-  // Use mock data fallback if no initial database records are loaded yet
-  const resolvedInitial = initialAppointments.length > 0 ? initialAppointments : MOCK_APPOINTMENTS;
-  const [appointments, setAppointments] = useState<AppointmentDto[]>(resolvedInitial);
+  const [appointments, setAppointments] = useState<AppointmentDto[]>(initialAppointments);
   const [selectedAppt, setSelectedAppt] = useState<AppointmentDto | null>(null);
   const [filterValue, setFilterValue] = useState<string>('ALL');
 
   // Derive filter options dynamically from appointments
-  const patientObj = resolvedInitial.find((a) => a.patient)?.patient;
+  const patientObj = initialAppointments.find((a) => a.patient)?.patient;
   const mainUserName = patientObj ? `${patientObj.firstName} ${patientObj.lastName}` : 'Christopher Picardo';
 
   const filterOptions: FilterOption[] = [
@@ -64,7 +60,7 @@ export function useUserDashboard(
 
   // Map to collect unique dependents
   const dependentMap = new Map<string, string>();
-  resolvedInitial.forEach((appt) => {
+  initialAppointments.forEach((appt) => {
     if (appt.dependent) {
       const fullName = `${appt.dependent.firstName} ${appt.dependent.lastName}`;
       dependentMap.set(appt.dependent.id, fullName);

@@ -16,6 +16,9 @@
   - [x] Update booking portal page config `/booking/page.tsx` to pass `reschedulingAppointment`
   - [x] Update `booking-view.tsx` to handle reschedule headers and lock service step
   - [x] Update `use-user-booking.ts` to use `requestRescheduleAction` in submit handler
+- [x] Fix remote database access:
+  - [x] Create migration `20260613170000_add_appointments_rls_policies.sql` to enable RLS policies on the `appointments` table.
+  - [x] Remove mock data fallbacks in `use-user-dashboard.ts` and `/user/appointments/[id]/page.tsx` so the application strictly runs on database-backed data.
 
 ## ⏳ In Progress
 - None (All tasks successfully completed)

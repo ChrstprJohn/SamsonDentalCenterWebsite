@@ -2,7 +2,6 @@ import React from 'react';
 import { notFound } from 'next/navigation';
 import { AppointmentDetailView } from '@/modules/appointments/views/appointment-detail-view';
 import { getClinicConfigAction } from '@/modules/clinic-config/actions/settings/get-clinic-config.action';
-import { MOCK_APPOINTMENTS } from '@/modules/appointments/dtos/shared/mock-appointments';
 import { AppointmentDto } from '@/modules/appointments/dtos';
 import { getAppointmentByIdAction } from '@/modules/appointments/actions/patient/get-appointment-by-id.action';
 
@@ -47,11 +46,7 @@ export default async function AppointmentDetailPage({ params }: PageProps) {
     }
   }
 
-  // Fallback to mock data if database fetch did not succeed or was skipped
-  if (!appt) {
-    appt = MOCK_APPOINTMENTS.find((a) => a.id === id);
-  }
-
+  // Remove mock data fallback so we only rely on the database
   if (!appt) {
     notFound();
   }
