@@ -53,52 +53,6 @@ describe('useBookingData', () => {
     expect(getAvailableDaysAction).toHaveBeenCalled();
   });
 
-  it.skip('should use cached monthly slots before falling back to the server action (SKIPPED: client-side cache disabled)', async () => {
-    (getDoctorsAction as any).mockResolvedValue({
-      success: true,
-      data: [{ id: 'doc-1', firstName: 'Jane', lastName: 'Doe' }],
-    });
-    (getAvailableDaysAction as any).mockResolvedValue({
-      success: true,
-      data: {
-        availableDates: ['2025-01-01'],
-        availabilityMap: {
-          '2025-01-01': [
-            {
-              startTime: '2025-01-01T09:00:00.000Z',
-              endTime: '2025-01-01T09:30:00.000Z',
-              doctorId: 'doc-1',
-              doctorName: 'Dr. Jane Doe',
-            },
-          ],
-        },
-      },
-    });
-
-    const { result, rerender } = renderHook(
-      ({ selectedDate }: { selectedDate: string | null }) =>
-        useBookingData('s1', selectedDate, undefined),
-      { initialProps: { selectedDate: null as string | null } }
-    );
-
-    await waitFor(() => {
-      expect(result.current.availableDates).toEqual(['2025-01-01']);
-    });
-
-    rerender({ selectedDate: '2025-01-01' });
-
-    await waitFor(() => {
-      expect(result.current.availableSlots).toEqual([
-        {
-          time: '09:00 AM',
-          doctorId: 'doc-1',
-          doctorName: 'Dr. Jane Doe',
-        },
-      ]);
-    });
-
-    expect(getAvailableTimeSlotsAction).not.toHaveBeenCalled();
-  });
 
   it('should fetch available slots when serviceId and date are provided', async () => {
     (getDoctorsAction as any).mockResolvedValue({

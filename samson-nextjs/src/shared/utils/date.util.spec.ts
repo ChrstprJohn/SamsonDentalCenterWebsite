@@ -1,4 +1,4 @@
-﻿import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { formatClinicDate, formatClinicTime } from './date.util';
 
 describe('Date Utilities', () => {
@@ -17,9 +17,7 @@ describe('Date Utilities', () => {
   });
 
   it('formats time correctly', () => {
-    const date = new Date('2026-05-27T14:30:00'); // Local time dependent
-    const formatted = formatClinicTime(date);
-    expect(typeof formatted).toBe('string');
-    expect(formatted).toMatch(/AM|PM/i);
+    const formatted = formatClinicTime('2026-05-27T14:30:00Z');
+    expect(formatted).toBe('2:30 PM');
   });
 });

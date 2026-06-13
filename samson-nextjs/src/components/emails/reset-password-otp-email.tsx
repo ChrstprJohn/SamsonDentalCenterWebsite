@@ -21,10 +21,10 @@ export const ResetPasswordOtpEmail = ({
   otpCode = '123456',
 }: ResetPasswordOtpEmailProps) => {
   return (
-    <Html>
-      <Head />
-      <Preview>Your Samson Dental Center Password Reset Code</Preview>
-      <Tailwind>
+    <Tailwind>
+      <Html>
+        <Head />
+        <Preview>Your Samson Dental Center Password Reset Code</Preview>
         <Body className="bg-slate-50 my-auto mx-auto font-sans px-2">
           <Container className="border border-solid border-[#eaeaea] rounded my-[40px] mx-auto p-[20px] max-w-[465px] bg-white">
             <Heading className="text-black text-[24px] font-normal text-center p-0 my-[30px] mx-0">
@@ -49,8 +49,8 @@ export const ResetPasswordOtpEmail = ({
             </Text>
           </Container>
         </Body>
-      </Tailwind>
-    </Html>
+      </Html>
+    </Tailwind>
   );
 };
 

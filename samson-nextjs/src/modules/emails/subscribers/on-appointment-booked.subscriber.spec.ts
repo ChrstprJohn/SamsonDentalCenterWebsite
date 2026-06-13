@@ -20,7 +20,7 @@ describe('onAppointmentBookedSubscriber', () => {
     vi.mocked(createAdminClient).mockResolvedValue(mockSupabase);
   });
 
-  it('queries database and dispatches templated email on valid payload', async () => {
+  it('queries database and dispatches email for a SELF booking (no dependentId)', async () => {
     const validPayload = {
       appointmentId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd1',
       patientId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd2',
@@ -29,22 +29,22 @@ describe('onAppointmentBookedSubscriber', () => {
       date: '2026-06-04',
       startTime: '2026-06-04T09:00:00.000Z',
       durationMinutes: 30,
+      // dependentId omitted — self booking
     };
 
-    // Return different mock values based on table name queried:
     mockSingle
       .mockResolvedValueOnce({
         data: { email: 'patient@example.com', first_name: 'John', last_name: 'Doe' },
         error: null,
-      }) // patient details
+      }) // patient
       .mockResolvedValueOnce({
         data: { name: 'Teeth Cleaning' },
         error: null,
-      }) // service details
+      }) // service
       .mockResolvedValueOnce({
         data: { first_name: 'Jane', last_name: 'Smith' },
         error: null,
-      }); // doctor details
+      }); // doctor
 
     const start = new Date(validPayload.startTime);
     const end = new Date(start.getTime() + validPayload.durationMinutes * 60000);
@@ -53,16 +53,73 @@ describe('onAppointmentBookedSubscriber', () => {
     await onAppointmentBookedSubscriber.handle(validPayload);
 
     expect(createAdminClient).toHaveBeenCalled();
-    expect(mockSupabase.from).toHaveBeenCalledWith('users');
-    expect(mockSupabase.from).toHaveBeenCalledWith('services');
     expect(ResendService.sendTemplatedEmail).toHaveBeenCalledWith(
       'patient@example.com',
-      'We Received Your Appointment Request',
-      'appointment_booked',
+      'Appointment Request Received – Samson Dental Center',
+      'appointment_request_received',
       expect.objectContaining({
+        accountHolderFirstName: 'John',
+        patientType: 'SELF',
         patientName: 'John Doe',
+        bookedByName: undefined,
+        relationship: undefined,
         serviceName: 'Teeth Cleaning',
         doctorName: 'Dr. Jane Smith',
+        dateStr: 'Jun 4, 2026',
+        timeRangeStr: expectedTimeRange,
+        appointmentId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd1',
+      })
+    );
+  });
+
+  it('queries database and dispatches email for a DEPENDENT booking (with dependentId)', async () => {
+    const validPayload = {
+      appointmentId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd1',
+      patientId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd2',
+      serviceId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd3',
+      doctorId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd4',
+      date: '2026-06-04',
+      startTime: '2026-06-04T09:00:00.000Z',
+      durationMinutes: 30,
+      dependentId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd5',
+    };
+
+    mockSingle
+      .mockResolvedValueOnce({
+        data: { email: 'patient@example.com', first_name: 'Christopher', last_name: 'Picardo' },
+        error: null,
+      }) // patient (account holder)
+      .mockResolvedValueOnce({
+        data: { name: 'Composite Filling' },
+        error: null,
+      }) // service
+      .mockResolvedValueOnce({
+        data: { first_name: 'John', last_name: 'Smith' },
+        error: null,
+      }) // doctor
+      .mockResolvedValueOnce({
+        data: { first_name: 'Maria', last_name: 'Picardo', relationship: 'SPOUSE' },
+        error: null,
+      }); // dependent
+
+    const start = new Date(validPayload.startTime);
+    const end = new Date(start.getTime() + validPayload.durationMinutes * 60000);
+    const expectedTimeRange = `${formatClinicTime(start)} - ${formatClinicTime(end)}`;
+
+    await onAppointmentBookedSubscriber.handle(validPayload);
+
+    expect(ResendService.sendTemplatedEmail).toHaveBeenCalledWith(
+      'patient@example.com',
+      'Family Member Appointment Request Received – Samson Dental Center',
+      'appointment_request_received',
+      expect.objectContaining({
+        accountHolderFirstName: 'Christopher',
+        patientType: 'DEPENDENT',
+        patientName: 'Maria Picardo',
+        relationship: 'Spouse',
+        bookedByName: 'Christopher Picardo',
+        serviceName: 'Composite Filling',
+        doctorName: 'Dr. John Smith',
         dateStr: 'Jun 4, 2026',
         timeRangeStr: expectedTimeRange,
         appointmentId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd1',

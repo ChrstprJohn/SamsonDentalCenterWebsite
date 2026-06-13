@@ -8,6 +8,7 @@ export const appointmentBookedEventSchema = z.object({
   date: z.string(),
   startTime: z.string(),
   durationMinutes: z.number().int().positive(),
+  dependentId: z.string().uuid().nullable().optional(),
 });
 
 export type AppointmentBookedEventDto = z.infer<typeof appointmentBookedEventSchema>;

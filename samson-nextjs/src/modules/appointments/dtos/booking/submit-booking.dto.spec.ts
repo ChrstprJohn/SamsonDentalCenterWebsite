@@ -76,7 +76,7 @@ describe('submitBookingSchema', () => {
                 dependentLastName: 'Doe',
                 dependentBirthday: '2010-01-01',
                 dependentSex: 'MALE',
-                dependentRelationship: 'Child',
+                dependentRelationship: 'CHILD',
             }).success
         ).toBe(true);
     });
@@ -89,7 +89,7 @@ describe('submitBookingSchema', () => {
             dependentLastName: 'Doe',
             dependentBirthday: '2010-01-01',
             dependentSex: 'MALE',
-            dependentRelationship: 'Child',
+            dependentRelationship: 'CHILD',
         });
         expect(result.success).toBe(false);
     });

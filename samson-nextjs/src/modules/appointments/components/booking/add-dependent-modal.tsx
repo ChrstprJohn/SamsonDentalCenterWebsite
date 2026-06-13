@@ -17,7 +17,7 @@ export function AddDependentModal({ isOpen, onClose, onSubmit }: AddDependentMod
   const [lastName, setLastName] = useState('');
   const [suffix, setSuffix] = useState('');
   const [dob, setDob] = useState('');
-  const [relationship, setRelationship] = useState('Child');
+  const [relationship, setRelationship] = useState('CHILD');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +38,7 @@ export function AddDependentModal({ isOpen, onClose, onSubmit }: AddDependentMod
     setLastName('');
     setSuffix('');
     setDob('');
-    setRelationship('Child');
+    setRelationship('CHILD');
   };
 
   return (
@@ -112,10 +112,11 @@ export function AddDependentModal({ isOpen, onClose, onSubmit }: AddDependentMod
               onChange={(e) => setRelationship(e.target.value)}
               className="px-3 py-2 rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-950 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800 dark:text-white"
             >
-              <option value="Spouse">Spouse</option>
-              <option value="Child">Child</option>
-              <option value="Parent">Parent</option>
-              <option value="Sibling">Sibling</option>
+              <option value="SPOUSE">Spouse</option>
+              <option value="CHILD">Child</option>
+              <option value="PARENT">Parent</option>
+              <option value="SIBLING">Sibling</option>
+              <option value="OTHER">Other</option>
             </select>
           </div>
         </div>

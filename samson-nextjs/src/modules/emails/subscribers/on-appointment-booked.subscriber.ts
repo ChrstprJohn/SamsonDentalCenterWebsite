@@ -7,16 +7,16 @@ import { getBaseUrl } from '@/shared/utils/get-base-url.util';
 export const onAppointmentBookedSubscriber = {
   /**
    * Handles the APPOINTMENT_BOOKED event by sending a confirmation request email.
-   * Resolves patient, service, and doctor info before mailing out.
+   * Resolves patient, service, doctor, and (if applicable) dependent info before mailing out.
    */
   async handle(payload: Record<string, any>): Promise<void> {
     // Contract Validation
     const parsed = appointmentBookedEventSchema.parse(payload);
-    const { appointmentId, patientId, serviceId, doctorId, date, startTime, durationMinutes } = parsed;
+    const { appointmentId, patientId, serviceId, doctorId, date, startTime, durationMinutes, dependentId } = parsed;
 
     const supabaseAdmin = await createAdminClient();
 
-    // 1. Fetch Patient details
+    // 1. Fetch account holder (patient) details
     const { data: patient, error: patientError } = await supabaseAdmin
       .from('users')
       .select('email, first_name, last_name')
@@ -49,24 +49,57 @@ export const onAppointmentBookedSubscriber = {
       throw new Error(`Failed to fetch doctor for outbox email: ${doctorError?.message || 'Not found'}`);
     }
 
+    // 4. Resolve patient identity — account holder vs. dependent
+    const accountHolderFirstName = patient.first_name;
+    const bookedByName = `${patient.first_name} ${patient.last_name}`.trim();
+
+    let patientType: 'SELF' | 'DEPENDENT' = 'SELF';
+    let patientName = bookedByName;
+    let relationship: string | undefined;
+
+    if (dependentId) {
+      // Dependent booking — fetch the dependent's name and relationship
+      const { data: dependent, error: dependentError } = await supabaseAdmin
+        .from('dependents')
+        .select('first_name, last_name, relationship')
+        .eq('id', dependentId)
+        .single();
+
+      if (dependentError || !dependent) {
+        throw new Error(`Failed to fetch dependent for outbox email: ${dependentError?.message || 'Not found'}`);
+      }
+
+      patientType = 'DEPENDENT';
+      patientName = `${dependent.first_name} ${dependent.last_name}`.trim();
+      // Capitalize for display — DB stores as uppercase enum e.g. 'SPOUSE' → 'Spouse'
+      relationship = dependent.relationship.charAt(0).toUpperCase() + dependent.relationship.slice(1).toLowerCase();
+    }
+
     // Calculations & Formats
-    const patientName = `${patient.first_name} ${patient.last_name}`.trim();
     const doctorName = `Dr. ${doctor.first_name} ${doctor.last_name}`;
     const dateStr = formatShortDate(date);
-    
+
     const start = new Date(startTime);
     const end = calculateEndTimeFromIso(startTime, durationMinutes);
     const timeRangeStr = `${formatClinicTime(start)} - ${formatClinicTime(end)}`;
 
     const baseUrl = getBaseUrl();
 
+    const subject = patientType === 'DEPENDENT'
+      ? 'Family Member Appointment Request Received – Samson Dental Center'
+      : 'Appointment Request Received – Samson Dental Center';
+
     // Send email using Resend
     await ResendService.sendTemplatedEmail(
       patient.email,
-      'We Received Your Appointment Request',
-      'appointment_booked',
+      subject,
+      'appointment_request_received',
       {
+        accountHolderFirstName,
+        patientType,
         patientName,
+        relationship,
+        bookedByName: patientType === 'DEPENDENT' ? bookedByName : undefined,
         serviceName: service.name,
         doctorName,
         dateStr,

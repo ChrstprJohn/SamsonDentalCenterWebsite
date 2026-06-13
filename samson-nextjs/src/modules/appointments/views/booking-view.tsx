@@ -54,6 +54,40 @@ export function BookingView({ services, userProfile, userDependents }: BookingVi
     handleSubmit,
   } = useUserBooking(services, userProfile, userDependents);
 
+  const getPatientName = () => {
+    if (patientType === 'SELF') {
+      const first = userProfile?.firstName || '';
+      const last = userProfile?.lastName || '';
+      return `${first} ${last}`.trim() || 'Patient';
+    }
+    if (patientType === 'NEW_DEPENDENT' && newDependentData) {
+      const first = newDependentData.firstName || '';
+      const last = newDependentData.lastName || '';
+      return `${first} ${last}`.trim() || 'Family Member';
+    }
+    if (patientType === 'EXISTING_DEPENDENT' && selectedDependentId) {
+      const dep = userDependents?.find((d) => d.id === selectedDependentId);
+      if (dep) {
+        const first = dep.firstName || '';
+        const last = dep.lastName || '';
+        return `${first} ${last}`.trim() || 'Family Member';
+      }
+    }
+    return 'Patient';
+  };
+
+  const getPatientRelationship = () => {
+    if (patientType === 'SELF') return null;
+    if (patientType === 'NEW_DEPENDENT' && newDependentData) {
+      return newDependentData.relationship || 'Dependent';
+    }
+    if (patientType === 'EXISTING_DEPENDENT' && selectedDependentId) {
+      const dep = userDependents?.find((d) => d.id === selectedDependentId);
+      return dep?.relationship || 'Dependent';
+    }
+    return 'Dependent';
+  };
+
   if (isSuccess) {
     return (
       <BookingSuccessView 
@@ -61,6 +95,9 @@ export function BookingView({ services, userProfile, userDependents }: BookingVi
         service={selectedService}
         slot={selectedSlot}
         date={selectedDate}
+        patientName={getPatientName()}
+        patientType={patientType}
+        relationship={getPatientRelationship()}
       />
     );
   }

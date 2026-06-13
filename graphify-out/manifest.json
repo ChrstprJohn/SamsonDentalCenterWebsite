@@ -40,8 +40,8 @@
     "semantic_hash": "239f3ebf717465dc636818a1a619398d"
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\schema.sql": {
-    "mtime": 1781323972.6601956,
-    "ast_hash": "3a7638ec61c9182584f05b7507d8a97a",
+    "mtime": 1781327876.9447353,
+    "ast_hash": "6c11773470f1e8b31aabda631af73298",
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\app\\(portals)\\admin\\layout.tsx": {
@@ -140,9 +140,9 @@
     "semantic_hash": "df709e7948065a4f990844aa3596d493"
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\components\\emails\\signup-otp-email.tsx": {
-    "mtime": 1780302478.6439912,
-    "ast_hash": "9299eeb44f0ca6c96b61a2b18f45095d",
-    "semantic_hash": "9299eeb44f0ca6c96b61a2b18f45095d"
+    "mtime": 1781324423.4818282,
+    "ast_hash": "6e16a5ebd86ff4d47f8c393d985f04ca",
+    "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\components\\feedback\\toast-container.tsx": {
     "mtime": 1780213871.9717765,
@@ -300,13 +300,13 @@
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\appointments\\dtos\\booking\\submit-booking.dto.spec.ts": {
-    "mtime": 1779950386.7923794,
-    "ast_hash": "54793133221dc005a6bfc46ddefa761d",
-    "semantic_hash": "54793133221dc005a6bfc46ddefa761d"
+    "mtime": 1781326895.8295186,
+    "ast_hash": "2c03618b48c5d8dae277666594483c4f",
+    "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\appointments\\dtos\\booking\\submit-booking.dto.ts": {
-    "mtime": 1781313850.3642836,
-    "ast_hash": "431a47cca2cdbff0279a5792183db28c",
+    "mtime": 1781326851.2604878,
+    "ast_hash": "828cad0a359d4363c3a0a42a73a80927",
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\appointments\\dtos\\clinic\\get-clinic-appointments.dto.spec.ts": {
@@ -485,8 +485,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\appointments\\views\\booking-view.tsx": {
-    "mtime": 1781322597.70241,
-    "ast_hash": "c2d521e45ed671a170f0e75d72e33c10",
+    "mtime": 1781326222.0265305,
+    "ast_hash": "49557b7f3d13d84dd8229aec6d8c8f4b",
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\appointments\\views\\user-dashboard-view.tsx": {
@@ -2085,8 +2085,8 @@
     "semantic_hash": "4327d6be3935ea87745a3e39a4e2d6de"
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\shared\\services\\email\\resend.service.ts": {
-    "mtime": 1781324004.0809033,
-    "ast_hash": "4088b4605a063d2ca07a18ace631cc0c",
+    "mtime": 1781327394.7985113,
+    "ast_hash": "618c29de93fb2ae49c06ce8146a9b0d8",
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\shared\\utils\\action-response.ts": {
@@ -2105,13 +2105,13 @@
     "semantic_hash": "a022bcdeba2b8d6056b283987090c952"
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\shared\\utils\\date.util.spec.ts": {
-    "mtime": 1779875542.9630847,
-    "ast_hash": "39d7586fe15eb169ec32a29fa0cc26d7",
-    "semantic_hash": "39d7586fe15eb169ec32a29fa0cc26d7"
+    "mtime": 1781325307.6729627,
+    "ast_hash": "756b462809568beb88b629399bd6b5f8",
+    "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\shared\\utils\\date.util.ts": {
-    "mtime": 1781318768.2259827,
-    "ast_hash": "941b5a4aca94038f01adafa4d4d275bb",
+    "mtime": 1781325302.8950355,
+    "ast_hash": "ceb4225cc27cd08ee50f790903ea733c",
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\shared\\utils\\get-base-url.util.spec.ts": {
@@ -2855,8 +2855,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\appointments\\components\\booking\\add-dependent-modal.tsx": {
-    "mtime": 1781313920.4525707,
-    "ast_hash": "8eee196d69616351e012892fa51f5de1",
+    "mtime": 1781326839.9508233,
+    "ast_hash": "0d5f888d67647d1c73f8ace5e9b66173",
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\appointments\\components\\booking\\booking-progress-tabs.tsx": {
@@ -2865,8 +2865,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\appointments\\components\\booking\\booking-success-view.tsx": {
-    "mtime": 1781322722.2959285,
-    "ast_hash": "8b0ebfee04050eadf46ce0490bf98605",
+    "mtime": 1781326217.0221705,
+    "ast_hash": "ec231a99e9d6f787a44dfd8e2ee31dde",
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\appointments\\components\\booking\\existing-dependent-selector.tsx": {
@@ -2910,8 +2910,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\appointments\\hooks\\booking\\use-booking-data.spec.ts": {
-    "mtime": 1781311413.9519672,
-    "ast_hash": "31cdaaae93450a92c0954b84a2fa924b",
+    "mtime": 1781326288.7137868,
+    "ast_hash": "3fc5c90540975b29be78f550abfc165b",
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\appointments\\hooks\\booking\\use-booking-data.ts": {
@@ -3185,33 +3185,48 @@
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\migrations\\20260613110000_add_submit_booking_rpc.sql": {
-    "mtime": 1781323832.3862917,
-    "ast_hash": "0987a3364977b4539193d78512d3b746",
-    "semantic_hash": ""
-  },
-  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\components\\emails\\appointment-booked-email.tsx": {
-    "mtime": 1781323987.9167936,
-    "ast_hash": "4177148a169f03b47699f16d9b33d064",
+    "mtime": 1781327891.3491607,
+    "ast_hash": "6a11dd1e41a73c643abd9bb941194488",
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\emails\\dtos\\events\\appointment-booked.event.dto.ts": {
-    "mtime": 1781323996.8622007,
-    "ast_hash": "e9a14bf5df3daa693fe21ef90e175462",
+    "mtime": 1781327901.4791553,
+    "ast_hash": "87bc40e5b93131df43630a79589daf5b",
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\emails\\subscribers\\on-appointment-booked.subscriber.spec.ts": {
-    "mtime": 1781324038.8756895,
-    "ast_hash": "f26481f5267a5ddceefb2e84bca60aea",
+    "mtime": 1781327956.3610816,
+    "ast_hash": "15918c8471ce97795da86d974c55688c",
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\emails\\subscribers\\on-appointment-booked.subscriber.ts": {
-    "mtime": 1781324012.1472676,
-    "ast_hash": "41c6e3056eaa9be50922589881c27f05",
+    "mtime": 1781327924.805926,
+    "ast_hash": "665c4a999673158139ad0d73d61af658",
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\TASK\\task-booking-details.md": {
     "mtime": 1781312896.4379733,
     "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\components\\emails\\appointment-request-received-email.tsx": {
+    "mtime": 1781327378.0985923,
+    "ast_hash": "d70718ecf7d2b5ed7659f0880ae843b5",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\components\\emails\\emails.spec.tsx": {
+    "mtime": 1781327428.4957054,
+    "ast_hash": "adf2cb4488c73d359f95cd406ca72b18",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\TASK\\task-booking-email.md": {
+    "mtime": 1781326549.365824,
+    "ast_hash": "811a622bcd05d4ea875a3be1579d6b89",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\TASK\\task-email-retry-polish.md": {
+    "mtime": 1781324853.5747612,
+    "ast_hash": "e9d0d7e9d9f508ce12b01aa287708243",
     "semantic_hash": ""
   }
 }

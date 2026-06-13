@@ -8,7 +8,8 @@ export function formatClinicDate(date: Date | string): string {
   return new Intl.DateTimeFormat('en-US', {
     month: 'long',
     day: 'numeric',
-    year: 'numeric'
+    year: 'numeric',
+    timeZone: 'UTC'
   }).format(d);
 }
 
@@ -25,7 +26,8 @@ export function formatShortDate(date: Date | string): string {
   return new Intl.DateTimeFormat('en-US', {
     month: 'short',
     day: 'numeric',
-    year: 'numeric'
+    year: 'numeric',
+    timeZone: 'UTC'
   }).format(d);
 }
 
@@ -39,7 +41,8 @@ export function formatClinicTime(date: Date | string): string {
   return new Intl.DateTimeFormat('en-US', {
     hour: 'numeric',
     minute: '2-digit',
-    hour12: true
+    hour12: true,
+    timeZone: 'UTC'
   }).format(d);
 }
 

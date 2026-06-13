@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { dependentRelationshipEnum } from '@/modules/patients/dtos/dependents/create-dependent.dto';
 
 // Utility helper to intercept empty form fields and strip them down to undefined for Supabase NULL insertion
 const emptyStringToUndefined = z.literal('').transform(() => undefined);
@@ -35,7 +36,7 @@ export const submitBookingSchema = z
             .optional()
             .or(emptyStringToUndefined)
             .optional(),
-        dependentRelationship: z.string().trim().optional(),
+        dependentRelationship: dependentRelationshipEnum.optional(),
     })
     .superRefine((data, ctx) => {
         // 1. Chronological Ordering Boundary Guard

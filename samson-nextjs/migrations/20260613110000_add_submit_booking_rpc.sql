@@ -76,7 +76,8 @@ BEGIN
         'doctorId', p_doctor_id,
         'date', p_date,
         'startTime', p_start_time,
-        'durationMinutes', v_duration
+        'durationMinutes', v_duration,
+        'dependentId', v_dependent_id
     );
 
     INSERT INTO outbox (event_type, payload, status)
