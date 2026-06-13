@@ -6,7 +6,7 @@ export const auditLogDbSchema = z.object({
   action: z.string(),
   target_id: z.string().uuid(),
   reason: z.string().nullable().optional(),
-  created_at: z.string().datetime().optional(),
+  created_at: z.string().datetime({ offset: true }).optional(),
 });
 
 export const auditLogResponseSchema = auditLogDbSchema.transform((record) => ({

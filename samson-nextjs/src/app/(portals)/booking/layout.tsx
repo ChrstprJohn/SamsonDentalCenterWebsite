@@ -1,9 +1,7 @@
 import React from 'react';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/shared/database/server';
-import { getClinicConfigAction } from '@/modules/clinic-config/actions/settings/get-clinic-config.action';
 import { Navbar } from '@/components/ui/navbar';
-import { Footer } from '@/components/ui/footer';
 import type { AuthHeaderUser } from '@/modules/patients/hooks/auth/header/use-auth-header.hook';
 
 export default async function BookingLayout({
@@ -33,17 +31,6 @@ export default async function BookingLayout({
     redirect('/auth/login?redirect=/booking');
   }
 
-  // Fetch clinic config
-  let clinicConfig = null;
-  try {
-    const response = await getClinicConfigAction();
-    if (response && 'data' in response && response.data) {
-      clinicConfig = response.data;
-    }
-  } catch (err) {
-    console.error('Failed to load clinic config in portal:', err);
-  }
-
   return (
     <div className="flex flex-col min-h-screen bg-background transition-colors duration-300">
       <Navbar user={headerUser} />
@@ -52,8 +39,6 @@ export default async function BookingLayout({
       <div className="flex-1 w-full pt-[100px] flex flex-col">
         {children}
       </div>
-
-      <Footer config={clinicConfig} />
     </div>
   );
 }

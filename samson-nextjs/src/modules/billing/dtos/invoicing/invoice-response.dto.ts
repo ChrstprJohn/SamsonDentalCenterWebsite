@@ -37,8 +37,8 @@ export const invoiceResponseSchema = z.preprocess(
     status: invoiceStatusEnum,
     paymentMethod: paymentMethodEnum.nullable().optional(),
     discountApplied: z.number().nonnegative().nullable().optional(),
-    createdAt: z.string().datetime().optional(),
-    updatedAt: z.string().datetime().optional(),
+    createdAt: z.string().datetime({ offset: true }).optional(),
+    updatedAt: z.string().datetime({ offset: true }).optional(),
   })
 );
 

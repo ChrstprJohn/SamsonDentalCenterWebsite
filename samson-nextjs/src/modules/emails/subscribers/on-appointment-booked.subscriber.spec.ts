@@ -34,7 +34,7 @@ describe('onAppointmentBookedSubscriber', () => {
 
     mockSingle
       .mockResolvedValueOnce({
-        data: { email: 'patient@example.com', first_name: 'John', last_name: 'Doe' },
+        data: { email: 'patient@example.com', first_name: 'John', middle_name: 'A.', last_name: 'Doe', suffix: 'Jr.' },
         error: null,
       }) // patient
       .mockResolvedValueOnce({
@@ -58,9 +58,9 @@ describe('onAppointmentBookedSubscriber', () => {
       'Appointment Request Received – Samson Dental Center',
       'appointment_request_received',
       expect.objectContaining({
-        accountHolderFirstName: 'John',
+        accountHolderName: 'John A. Doe Jr.',
         patientType: 'SELF',
-        patientName: 'John Doe',
+        patientName: 'John A. Doe Jr.',
         bookedByName: undefined,
         relationship: undefined,
         serviceName: 'Teeth Cleaning',
@@ -86,7 +86,7 @@ describe('onAppointmentBookedSubscriber', () => {
 
     mockSingle
       .mockResolvedValueOnce({
-        data: { email: 'patient@example.com', first_name: 'Christopher', last_name: 'Picardo' },
+        data: { email: 'patient@example.com', first_name: 'Christopher', middle_name: 'John', last_name: 'Picardo', suffix: 'Sr.' },
         error: null,
       }) // patient (account holder)
       .mockResolvedValueOnce({
@@ -98,7 +98,7 @@ describe('onAppointmentBookedSubscriber', () => {
         error: null,
       }) // doctor
       .mockResolvedValueOnce({
-        data: { first_name: 'Maria', last_name: 'Picardo', relationship: 'SPOUSE' },
+        data: { first_name: 'Maria', middle_name: 'Elena', last_name: 'Picardo', suffix: 'Jr.', relationship: 'SPOUSE' },
         error: null,
       }); // dependent
 
@@ -113,11 +113,11 @@ describe('onAppointmentBookedSubscriber', () => {
       'Family Member Appointment Request Received – Samson Dental Center',
       'appointment_request_received',
       expect.objectContaining({
-        accountHolderFirstName: 'Christopher',
+        accountHolderName: 'Christopher John Picardo Sr.',
         patientType: 'DEPENDENT',
-        patientName: 'Maria Picardo',
+        patientName: 'Maria Elena Picardo Jr.',
         relationship: 'Spouse',
-        bookedByName: 'Christopher Picardo',
+        bookedByName: 'Christopher John Picardo Sr.',
         serviceName: 'Composite Filling',
         doctorName: 'Dr. John Smith',
         dateStr: 'Jun 4, 2026',

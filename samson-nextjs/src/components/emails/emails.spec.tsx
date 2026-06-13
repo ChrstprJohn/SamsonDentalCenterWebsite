@@ -31,7 +31,7 @@ describe('Email Templates Rendering', () => {
   it('renders AppointmentRequestReceivedEmail without crashing (self booking)', async () => {
     const html = await render(
       React.createElement(AppointmentRequestReceivedEmail, {
-        accountHolderFirstName: 'Bob',
+        accountHolderName: 'Bob Smith',
         patientType: 'SELF',
         patientName: 'Bob Smith',
         serviceName: 'Teeth Cleaning',
@@ -51,7 +51,7 @@ describe('Email Templates Rendering', () => {
   it('renders AppointmentRequestReceivedEmail without crashing (dependent booking)', async () => {
     const html = await render(
       React.createElement(AppointmentRequestReceivedEmail, {
-        accountHolderFirstName: 'Christopher',
+        accountHolderName: 'Christopher Picardo',
         patientType: 'DEPENDENT',
         patientName: 'Maria Picardo',
         relationship: 'Spouse',

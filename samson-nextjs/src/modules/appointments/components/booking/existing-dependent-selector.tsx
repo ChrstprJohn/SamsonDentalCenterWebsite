@@ -29,10 +29,10 @@ export function ExistingDependentSelector({
             <div
               key={dep.id}
               onClick={() => onSelectDependent(dep.id)}
-              className={`p-4 rounded-xl border cursor-pointer flex justify-between items-center transition-all ${
+              className={`p-4 rounded-2xl border cursor-pointer flex justify-between items-center transition-all duration-300 hover:scale-[1.01] active:scale-[0.99] ${
                 isSelected
-                  ? 'border-blue-500 bg-blue-50/40 dark:bg-blue-500/10 ring-2 ring-blue-500/20'
-                  : 'border-slate-200/80 dark:border-white/5 bg-white dark:bg-slate-900/30 hover:border-slate-350'
+                  ? 'border-blue-500 bg-blue-500/10 ring-2 ring-blue-500/20 shadow-sm'
+                  : 'border-slate-200 dark:border-white/10 bg-card/50 dark:bg-slate-900/30 hover:border-slate-300 dark:hover:border-white/20'
               }`}
             >
               <div className="flex flex-col">
@@ -51,7 +51,7 @@ export function ExistingDependentSelector({
           <button
             type="button"
             onClick={onAddNew}
-            className="h-full min-h-[70px] border-2 border-dashed border-blue-200 dark:border-blue-900/50 bg-blue-50/50 dark:bg-blue-900/10 rounded-xl hover:bg-blue-50 hover:border-blue-300 dark:hover:bg-blue-900/20 transition-all flex flex-col items-center justify-center gap-1 group"
+            className="h-full min-h-[70px] border-2 border-dashed border-blue-200 dark:border-blue-900/50 bg-blue-50/50 dark:bg-blue-900/10 rounded-2xl hover:bg-blue-50 hover:border-blue-300 dark:hover:bg-blue-900/20 transition-all flex flex-col items-center justify-center gap-1 group"
           >
             <span className="text-xl group-hover:scale-110 transition-transform">➕</span>
             <span className="text-xs font-semibold text-blue-600 dark:text-blue-400">Add New Member</span>

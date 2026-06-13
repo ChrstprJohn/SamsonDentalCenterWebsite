@@ -31,7 +31,7 @@ export function CancelAppointmentModal({
       title="Cancel Appointment"
       size="sm"
     >
-      <form onSubmit={onSubmit} className="flex flex-col gap-4 text-sm text-slate-750 dark:text-slate-350 py-1">
+      <form onSubmit={onSubmit} className="flex flex-col gap-4 text-sm text-slate-700 dark:text-slate-300 py-1">
         <p className="leading-relaxed">
           Are you sure you want to cancel your <strong>{selectedAppt?.service?.name}</strong> appointment?
         </p>

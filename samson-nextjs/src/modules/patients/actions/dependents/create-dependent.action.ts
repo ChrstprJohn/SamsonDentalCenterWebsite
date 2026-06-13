@@ -5,7 +5,7 @@ import { CreateDependentDto, createDependentSchema } from '../../dtos';
 import { createDependentUseCase } from '../../use-cases';
 import { addDependentCommand } from '../../repositories';
 import { ValidationError, UnauthorizedError } from '@/shared/errors';
-import { createClient } from '@/shared/database/server';
+import { createAdminClient } from '@/shared/database/server';
 
 export async function createDependentAction(data: CreateDependentDto) {
   try {
@@ -19,7 +19,13 @@ export async function createDependentAction(data: CreateDependentDto) {
       throw new ValidationError(parsed.error.issues[0].message);
     }
 
-    const supabase = await createClient();
+    const userRole = user.user_metadata?.role || (user as any).role;
+    const isStaff = userRole === 'DOCTOR' || userRole === 'SECRETARY' || userRole === 'ADMIN';
+    if (parsed.data.patientId !== user.id && !isStaff) {
+      throw new UnauthorizedError('You are not authorized to add a dependent for another patient.');
+    }
+
+    const supabase = await createAdminClient();
     const repo = addDependentCommand(supabase);
     const useCase = createDependentUseCase(repo);
     const dependent = await useCase(parsed.data);

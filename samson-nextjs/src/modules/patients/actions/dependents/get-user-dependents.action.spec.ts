@@ -2,10 +2,11 @@ import { describe, it, expect, vi } from 'vitest';
 import { getUserDependentsAction } from './get-user-dependents.action';
 
 vi.mock('@/shared/auth/auth.util', () => ({
-  getAuthenticatedUser: vi.fn().mockResolvedValue({ id: 'user1', role: 'PATIENT' }),
+  getAuthenticatedUser: vi.fn().mockResolvedValue({ id: '123e4567-e89b-12d3-a456-426614174000', role: 'PATIENT' }),
 }));
 vi.mock('@/shared/database/server', () => ({
   createClient: vi.fn().mockResolvedValue({}),
+  createAdminClient: vi.fn().mockResolvedValue({}),
 }));
 vi.mock('../../repositories', () => ({
   getDependentsByPatientIdQuery: () => vi.fn().mockResolvedValue([{ id: 'dep1' }]),

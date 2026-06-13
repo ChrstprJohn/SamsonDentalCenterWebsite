@@ -30,8 +30,8 @@ export const staffProfileSchema = z.preprocess(
     suffix: z.string().nullable().optional(),
     phoneNumber: z.string().regex(/^\+?[1-9]\d{1,14}$/, "Must be a valid E.164 phone number").nullable().optional(),
     role: StaffRoleEnum,
-    createdAt: z.string().datetime().optional(),
-    updatedAt: z.string().datetime().optional(),
+    createdAt: z.string().datetime({ offset: true }).optional(),
+    updatedAt: z.string().datetime({ offset: true }).optional(),
   })
 );
 

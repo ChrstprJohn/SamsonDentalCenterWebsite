@@ -18,7 +18,7 @@ type EmailTemplates = {
   'signup_otp': { firstName: string; otpCode: string };
   'reset_password_otp': { firstName: string; otpCode: string };
   'appointment_request_received': {
-    accountHolderFirstName: string;
+    accountHolderName: string;
     patientType: 'SELF' | 'DEPENDENT';
     patientName: string;
     relationship?: string;
@@ -71,7 +71,7 @@ export const ResendService = {
       case 'appointment_request_received': {
         const reqPayload = payload as EmailTemplates['appointment_request_received'];
         html = await render(React.createElement(AppointmentRequestReceivedEmail, {
-          accountHolderFirstName: reqPayload.accountHolderFirstName,
+          accountHolderName: reqPayload.accountHolderName,
           patientType: reqPayload.patientType,
           patientName: reqPayload.patientName,
           relationship: reqPayload.relationship,

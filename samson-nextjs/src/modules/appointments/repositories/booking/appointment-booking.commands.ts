@@ -18,6 +18,8 @@ export const executeBookingTransactionCommand = (supabase: SupabaseClient) => {
       p_new_dependent_last_name: data.patientType === 'NEW_DEPENDENT' ? data.dependentLastName : null,
       p_new_dependent_date_of_birth: data.patientType === 'NEW_DEPENDENT' ? data.dependentBirthday : null,
       p_new_dependent_relationship: data.patientType === 'NEW_DEPENDENT' ? data.dependentRelationship : null,
+      p_new_dependent_middle_name: data.patientType === 'NEW_DEPENDENT' ? data.dependentMiddleName : null,
+      p_new_dependent_suffix: data.patientType === 'NEW_DEPENDENT' ? data.dependentSuffix : null,
     });
 
     if (error || !appointmentId) {

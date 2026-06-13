@@ -20,8 +20,8 @@ export function AppointmentHistory({ history }: AppointmentHistoryProps) {
                   <div className="flex flex-col">
                     <span className={`inline-flex self-start px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide ${
                       appt.status === 'COMPLETED'
-                        ? 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-650 dark:text-emerald-450'
-                        : 'bg-rose-100 dark:bg-rose-500/10 text-rose-650 dark:text-rose-450'
+                        ? 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+                        : 'bg-rose-100 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400'
                     }`}>
                       {appt.status}
                     </span>
@@ -39,14 +39,14 @@ export function AppointmentHistory({ history }: AppointmentHistoryProps) {
                 </div>
 
                 {appt.userNote && appt.status === 'COMPLETED' && (
-                  <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-xl text-xs border border-slate-100 dark:border-white/5 text-slate-550 dark:text-slate-400 mt-1 leading-relaxed">
-                    <span className="font-bold block text-slate-700 dark:text-slate-350 mb-1">👩‍⚕️ Treatment remarks:</span>
+                  <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-xl text-xs border border-slate-100 dark:border-white/5 text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+                    <span className="font-bold block text-slate-700 dark:text-slate-300 mb-1">👩‍⚕️ Treatment remarks:</span>
                     {appt.userNote}
                   </div>
                 )}
 
                 {appt.statusReason && appt.status === 'CANCELLED' && (
-                  <div className="bg-rose-500/5 p-4 rounded-xl text-xs border border-rose-500/10 text-slate-550 dark:text-slate-400 mt-1 leading-relaxed">
+                  <div className="bg-rose-500/5 p-4 rounded-xl text-xs border border-rose-500/10 text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
                     <span className="font-bold block text-rose-500 dark:text-rose-400 mb-1">❌ Cancellation Reason:</span>
                     {appt.statusReason}
                   </div>

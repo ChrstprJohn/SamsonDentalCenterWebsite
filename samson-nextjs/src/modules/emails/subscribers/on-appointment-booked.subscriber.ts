@@ -19,7 +19,7 @@ export const onAppointmentBookedSubscriber = {
     // 1. Fetch account holder (patient) details
     const { data: patient, error: patientError } = await supabaseAdmin
       .from('users')
-      .select('email, first_name, last_name')
+      .select('email, first_name, middle_name, last_name, suffix')
       .eq('id', patientId)
       .single();
 
@@ -50,8 +50,10 @@ export const onAppointmentBookedSubscriber = {
     }
 
     // 4. Resolve patient identity — account holder vs. dependent
-    const accountHolderFirstName = patient.first_name;
-    const bookedByName = `${patient.first_name} ${patient.last_name}`.trim();
+    const bookedByName = [patient.first_name, patient.middle_name, patient.last_name, patient.suffix]
+      .filter(Boolean)
+      .join(' ')
+      .trim();
 
     let patientType: 'SELF' | 'DEPENDENT' = 'SELF';
     let patientName = bookedByName;
@@ -61,7 +63,7 @@ export const onAppointmentBookedSubscriber = {
       // Dependent booking — fetch the dependent's name and relationship
       const { data: dependent, error: dependentError } = await supabaseAdmin
         .from('dependents')
-        .select('first_name, last_name, relationship')
+        .select('first_name, middle_name, last_name, suffix, relationship')
         .eq('id', dependentId)
         .single();
 
@@ -70,7 +72,10 @@ export const onAppointmentBookedSubscriber = {
       }
 
       patientType = 'DEPENDENT';
-      patientName = `${dependent.first_name} ${dependent.last_name}`.trim();
+      patientName = [dependent.first_name, dependent.middle_name, dependent.last_name, dependent.suffix]
+        .filter(Boolean)
+        .join(' ')
+        .trim();
       // Capitalize for display — DB stores as uppercase enum e.g. 'SPOUSE' → 'Spouse'
       relationship = dependent.relationship.charAt(0).toUpperCase() + dependent.relationship.slice(1).toLowerCase();
     }
@@ -95,7 +100,7 @@ export const onAppointmentBookedSubscriber = {
       subject,
       'appointment_request_received',
       {
-        accountHolderFirstName,
+        accountHolderName: bookedByName,
         patientType,
         patientName,
         relationship,

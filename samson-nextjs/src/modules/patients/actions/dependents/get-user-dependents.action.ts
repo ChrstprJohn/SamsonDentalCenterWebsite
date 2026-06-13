@@ -4,7 +4,7 @@ import { getAuthenticatedUser } from '@/shared/auth/auth.util';
 import { getUserDependentsUseCase } from '../../use-cases';
 import { getDependentsByPatientIdQuery } from '../../repositories';
 import { UnauthorizedError } from '@/shared/errors';
-import { createClient } from '@/shared/database/server';
+import { createAdminClient } from '@/shared/database/server';
 
 export async function getUserDependentsAction(patientId: string) {
   try {
@@ -13,10 +13,17 @@ export async function getUserDependentsAction(patientId: string) {
       throw new UnauthorizedError('You must be logged in to view dependents.');
     }
 
-    const supabase = await createClient();
+    const userRole = user.user_metadata?.role || (user as any).role;
+    const isStaff = userRole === 'DOCTOR' || userRole === 'SECRETARY' || userRole === 'ADMIN';
+    if (user.id !== patientId && !isStaff) {
+      throw new UnauthorizedError('You are not authorized to view these dependents.');
+    }
+
+    const supabase = await createAdminClient();
     const repo = getDependentsByPatientIdQuery(supabase);
     const useCase = getUserDependentsUseCase(repo);
     const dependents = await useCase(patientId);
+    console.log(dependents)
     return { success: true, data: dependents };
   } catch (error: any) {
     return { success: false, error: error.message };

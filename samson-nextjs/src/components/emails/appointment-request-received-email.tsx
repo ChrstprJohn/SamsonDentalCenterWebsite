@@ -14,8 +14,8 @@ import {
 import * as React from 'react';
 
 interface AppointmentRequestReceivedEmailProps {
-  /** Account holder's first name — used for the greeting */
-  accountHolderFirstName: string;
+  /** Account holder's full name — used for the greeting */
+  accountHolderName: string;
   /** Whether the booking is for the account holder or a family member */
   patientType: 'SELF' | 'DEPENDENT';
   /** The patient's full name (self or dependent) */
@@ -50,7 +50,7 @@ const row = (label: string, value: React.ReactNode) => (
 );
 
 export const AppointmentRequestReceivedEmail = ({
-  accountHolderFirstName = 'Patient',
+  accountHolderName = 'Patient',
   patientType = 'SELF',
   patientName = 'Patient Name',
   relationship,
@@ -95,7 +95,7 @@ export const AppointmentRequestReceivedEmail = ({
 
               {/* Greeting */}
               <Text style={{ fontSize: '14px', color: '#374151', lineHeight: '22px', margin: '0 0 8px' }}>
-                Dear {accountHolderFirstName},
+                Dear {accountHolderName},
               </Text>
               <Text style={{ fontSize: '14px', color: '#374151', lineHeight: '22px', margin: '0 0 28px' }}>
                 {openingBody}

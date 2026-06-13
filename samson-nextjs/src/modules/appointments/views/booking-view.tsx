@@ -56,21 +56,30 @@ export function BookingView({ services, userProfile, userDependents }: BookingVi
 
   const getPatientName = () => {
     if (patientType === 'SELF') {
-      const first = userProfile?.firstName || '';
-      const last = userProfile?.lastName || '';
-      return `${first} ${last}`.trim() || 'Patient';
+      return [
+        userProfile?.firstName,
+        userProfile?.middleName,
+        userProfile?.lastName,
+        userProfile?.suffix
+      ].filter(Boolean).join(' ').trim() || 'Patient';
     }
     if (patientType === 'NEW_DEPENDENT' && newDependentData) {
-      const first = newDependentData.firstName || '';
-      const last = newDependentData.lastName || '';
-      return `${first} ${last}`.trim() || 'Family Member';
+      return [
+        newDependentData.firstName,
+        newDependentData.middleName,
+        newDependentData.lastName,
+        newDependentData.suffix
+      ].filter(Boolean).join(' ').trim() || 'Family Member';
     }
     if (patientType === 'EXISTING_DEPENDENT' && selectedDependentId) {
       const dep = userDependents?.find((d) => d.id === selectedDependentId);
       if (dep) {
-        const first = dep.firstName || '';
-        const last = dep.lastName || '';
-        return `${first} ${last}`.trim() || 'Family Member';
+        return [
+          dep.firstName,
+          dep.middleName,
+          dep.lastName,
+          dep.suffix
+        ].filter(Boolean).join(' ').trim() || 'Family Member';
       }
     }
     return 'Patient';

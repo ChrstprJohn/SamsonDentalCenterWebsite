@@ -276,6 +276,52 @@ WITH CHECK (
 );
 
 
+-- Enable RLS on dependents table
+ALTER TABLE public.dependents ENABLE ROW LEVEL SECURITY;
+
+-- Create policies for dependents table
+CREATE POLICY "Allow select for owners and staff"
+ON public.dependents
+FOR SELECT
+TO authenticated
+USING (
+  auth.uid() = patient_id OR
+  ((auth.jwt() -> 'user_metadata'::text) ->> 'role'::text) IN ('DOCTOR', 'SECRETARY', 'ADMIN')
+);
+
+CREATE POLICY "Allow insert for owners and staff"
+ON public.dependents
+FOR INSERT
+TO authenticated
+WITH CHECK (
+  auth.uid() = patient_id OR
+  ((auth.jwt() -> 'user_metadata'::text) ->> 'role'::text) IN ('SECRETARY', 'ADMIN')
+);
+
+CREATE POLICY "Allow update for owners and staff"
+ON public.dependents
+FOR UPDATE
+TO authenticated
+USING (
+  auth.uid() = patient_id OR
+  ((auth.jwt() -> 'user_metadata'::text) ->> 'role'::text) IN ('SECRETARY', 'ADMIN')
+)
+WITH CHECK (
+  auth.uid() = patient_id OR
+  ((auth.jwt() -> 'user_metadata'::text) ->> 'role'::text) IN ('SECRETARY', 'ADMIN')
+);
+
+CREATE POLICY "Allow delete for owners and staff"
+ON public.dependents
+FOR DELETE
+TO authenticated
+USING (
+  auth.uid() = patient_id OR
+  ((auth.jwt() -> 'user_metadata'::text) ->> 'role'::text) IN ('SECRETARY', 'ADMIN')
+);
+
+
+
 -- ============================================================================
 -- 8. Atomic Transaction for Booking Submission
 -- ============================================================================
@@ -293,7 +339,9 @@ CREATE OR REPLACE FUNCTION submit_booking_transaction(
     p_new_dependent_first_name TEXT DEFAULT NULL,
     p_new_dependent_last_name TEXT DEFAULT NULL,
     p_new_dependent_date_of_birth DATE DEFAULT NULL,
-    p_new_dependent_relationship dependent_relationship DEFAULT NULL
+    p_new_dependent_relationship dependent_relationship DEFAULT NULL,
+    p_new_dependent_middle_name TEXT DEFAULT NULL,
+    p_new_dependent_suffix TEXT DEFAULT NULL
 ) RETURNS UUID
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -310,13 +358,17 @@ BEGIN
         INSERT INTO dependents (
             patient_id, 
             first_name, 
+            middle_name,
             last_name, 
+            suffix,
             date_of_birth, 
             relationship
         ) VALUES (
             p_patient_id, 
             p_new_dependent_first_name, 
+            p_new_dependent_middle_name,
             p_new_dependent_last_name, 
+            p_new_dependent_suffix,
             p_new_dependent_date_of_birth, 
             p_new_dependent_relationship
         ) RETURNING id INTO v_dependent_id;

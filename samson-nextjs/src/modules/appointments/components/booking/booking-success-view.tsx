@@ -90,7 +90,7 @@ export function BookingSuccessView({ appointmentId, service, slot, date, patient
         <div className="flex gap-3 items-start">
           <span className="text-base leading-none">🔍</span>
           <div className="flex flex-col gap-0.5">
-            <strong className="text-slate-805 dark:text-slate-195 font-semibold">Staff Review</strong>
+            <strong className="text-slate-800 dark:text-slate-200 font-semibold">Staff Review</strong>
             <span className="text-slate-500 leading-relaxed">Our clinic secretary will verify the slot (usually takes less than 2 hours during regular operational hours).</span>
           </div>
         </div>
@@ -98,7 +98,7 @@ export function BookingSuccessView({ appointmentId, service, slot, date, patient
         <div className="flex gap-3 items-start">
           <span className="text-base leading-none">📧</span>
           <div className="flex flex-col gap-0.5">
-            <strong className="text-slate-805 dark:text-slate-195 font-semibold">Notification</strong>
+            <strong className="text-slate-800 dark:text-slate-200 font-semibold">Notification</strong>
             <span className="text-slate-500 leading-relaxed">You will receive a final confirmation email the moment your status updates to active.</span>
           </div>
         </div>

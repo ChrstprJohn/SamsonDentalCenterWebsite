@@ -18,7 +18,7 @@ export function BookingProgressTabs({ currentStep, goToStep, isNextDisabled }: B
 
   return (
     <div className="flex items-center justify-between relative">
-      <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-slate-150 dark:bg-white/5 -translate-y-1/2 z-0" />
+      <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-slate-200 dark:bg-white/5 -translate-y-1/2 z-0" />
       {steps.map((step) => {
         const isCompleted = currentStep > step.num;
         const isActive = currentStep === step.num;
@@ -39,7 +39,7 @@ export function BookingProgressTabs({ currentStep, goToStep, isNextDisabled }: B
               {isCompleted ? '✓' : step.num}
             </div>
             <span className={`text-[10px] md:text-xs font-semibold ${
-              isActive ? 'text-blue-550 dark:text-blue-450' : 'text-slate-400'
+              isActive ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400'
             }`}>
               {step.label}
             </span>

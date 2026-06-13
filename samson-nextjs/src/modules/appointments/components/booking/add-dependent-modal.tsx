@@ -48,7 +48,7 @@ export function AddDependentModal({ isOpen, onClose, onSubmit }: AddDependentMod
       title="Add Family Member / Dependent"
       size="md"
     >
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4 py-2 text-slate-700 dark:text-slate-350 text-sm">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4 py-2 text-slate-700 dark:text-slate-300 text-sm">
         <div className="grid grid-cols-2 gap-4">
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-semibold text-slate-500">First Name</label>

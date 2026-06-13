@@ -6,6 +6,7 @@ vi.mock('@/shared/auth/auth.util', () => ({
 }));
 vi.mock('@/shared/database/server', () => ({
   createClient: vi.fn().mockResolvedValue({}),
+  createAdminClient: vi.fn().mockResolvedValue({}),
 }));
 vi.mock('../../repositories', () => ({
   addDependentCommand: () => vi.fn().mockResolvedValue({ id: '123' }),

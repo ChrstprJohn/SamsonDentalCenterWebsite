@@ -28,8 +28,8 @@ export const dependentProfileSchema = z.preprocess(
     suffix: z.string().optional().nullable(),
     dateOfBirth: z.string(),
     relationship: dependentRelationshipEnum,
-    createdAt: z.string().datetime().optional(),
-    updatedAt: z.string().datetime().optional(),
+    createdAt: z.string().datetime({ offset: true }).optional(),
+    updatedAt: z.string().datetime({ offset: true }).optional(),
   })
 );
 

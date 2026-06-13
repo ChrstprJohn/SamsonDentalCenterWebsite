@@ -49,6 +49,8 @@ describe('AppointmentBookingCommands', () => {
         p_new_dependent_last_name: null,
         p_new_dependent_date_of_birth: null,
         p_new_dependent_relationship: null,
+        p_new_dependent_middle_name: null,
+        p_new_dependent_suffix: null,
       });
       expect(result).toMatchObject({ appointmentId: validApptId });
     });
