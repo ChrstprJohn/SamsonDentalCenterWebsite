@@ -5,13 +5,19 @@ import { useRouter } from 'next/navigation';
 import { useToast } from '@/components/feedback/toast-container';
 import type { AppointmentDto } from '../../dtos/shared/appointment.dto';
 
+interface FilterOption {
+  id: string;
+  label: string;
+}
+
 interface UseUserDashboardReturn {
   scheduled: AppointmentDto[];
   pending: AppointmentDto[];
   history: AppointmentDto[];
   
-  filterRole: 'ALL' | 'SELF' | 'FAMILY';
-  setFilterRole: (role: 'ALL' | 'SELF' | 'FAMILY') => void;
+  filterValue: string;
+  setFilterValue: (val: string) => void;
+  filterOptions: FilterOption[];
   
   selectedAppt: AppointmentDto | null;
   isCancelModalOpen: boolean;
@@ -34,169 +40,7 @@ interface UseUserDashboardReturn {
   setBlockedRescheduleAppt: (appt: AppointmentDto | null) => void;
 }
 
-const MOCK_APPOINTMENTS: AppointmentDto[] = [
-  {
-    id: 'a-1',
-    patientId: 'p-1',
-    serviceId: 's-1',
-    doctorId: 'd-1',
-    date: '2026-06-24',
-    startTime: '2026-06-24T10:00:00Z',
-    endTime: '2026-06-24T10:45:00Z',
-    status: 'APPROVED',
-    userNote: 'Orthodontic checkup',
-    statusReason: 'Confirmed slot availability.',
-    rescheduleCount: 0,
-    doctor: { id: 'd-1', firstName: 'Christopher', lastName: 'Samson', prefix: 'Dr.', suffix: 'DDS' },
-    service: { id: 's-1', name: 'Orthodontic Consultation', durationMinutes: 45 }
-  },
-  {
-    id: 'a-2',
-    patientId: 'p-1',
-    serviceId: 's-2',
-    doctorId: 'd-1',
-    date: '2026-06-28',
-    startTime: '2026-06-28T14:00:00Z',
-    endTime: '2026-06-28T14:30:00Z',
-    status: 'RESCHEDULE_REQUESTED',
-    userNote: 'Routine cleaning',
-    statusReason: 'Patient requested reschedule: change of work hours.',
-    rescheduleCount: 1,
-    doctor: { id: 'd-1', firstName: 'Christopher', lastName: 'Samson', prefix: 'Dr.', suffix: 'DDS' },
-    service: { id: 's-2', name: 'Teeth Cleaning', durationMinutes: 30 }
-  },
-  {
-    id: 'a-3',
-    patientId: 'p-1',
-    serviceId: 's-3',
-    doctorId: 'd-2',
-    date: '2026-06-20',
-    startTime: '2026-06-20T11:00:00Z',
-    endTime: '2026-06-20T12:00:00Z',
-    status: 'CHECKED_IN',
-    userNote: 'Severe tooth pain',
-    statusReason: 'Patient checked-in at reception.',
-    rescheduleCount: 0,
-    doctor: { id: 'd-2', firstName: 'Jane', lastName: 'Doe', prefix: 'Dr.', suffix: 'DMD' },
-    service: { id: 's-3', name: 'Root Canal Therapy', durationMinutes: 60 }
-  },
-  {
-    id: 'a-4',
-    patientId: 'p-1',
-    serviceId: 's-4',
-    doctorId: 'd-1',
-    date: '2026-06-30',
-    startTime: '2026-06-30T09:00:00Z',
-    endTime: '2026-06-30T10:00:00Z',
-    status: 'PENDING',
-    userNote: 'New whitening treatment request',
-    statusReason: null,
-    rescheduleCount: 0,
-    doctor: { id: 'd-1', firstName: 'Christopher', lastName: 'Samson', prefix: 'Dr.', suffix: 'DDS' },
-    service: { id: 's-4', name: 'Laser Teeth Whitening', durationMinutes: 60 }
-  },
-  {
-    id: 'a-5',
-    patientId: 'p-1',
-    serviceId: 's-2',
-    doctorId: 'd-2',
-    date: '2026-06-05',
-    startTime: '2026-06-05T15:00:00Z',
-    endTime: '2026-06-05T15:30:00Z',
-    status: 'COMPLETED',
-    userNote: 'General scaling',
-    statusReason: 'Checkout complete, invoice paid.',
-    rescheduleCount: 0,
-    doctor: { id: 'd-2', firstName: 'Jane', lastName: 'Doe', prefix: 'Dr.', suffix: 'DMD' },
-    service: { id: 's-2', name: 'Teeth Cleaning', durationMinutes: 30 }
-  },
-  {
-    id: 'a-6',
-    patientId: 'p-1',
-    serviceId: 's-1',
-    doctorId: 'd-1',
-    date: '2026-06-01',
-    startTime: '2026-06-01T10:00:00Z',
-    endTime: '2026-06-01T10:45:00Z',
-    status: 'CANCELLED',
-    userNote: 'Initial alignment check',
-    statusReason: 'Cancelled by user: Family emergency.',
-    rescheduleCount: 0,
-    doctor: { id: 'd-1', firstName: 'Christopher', lastName: 'Samson', prefix: 'Dr.', suffix: 'DDS' },
-    service: { id: 's-1', name: 'Orthodontic Consultation', durationMinutes: 45 }
-  },
-  {
-    id: 'a-7',
-    patientId: 'p-1',
-    serviceId: 's-3',
-    doctorId: 'd-2',
-    date: '2026-05-25',
-    startTime: '2026-05-25T13:00:00Z',
-    endTime: '2026-05-25T14:00:00Z',
-    status: 'REJECTED',
-    userNote: 'Emergency checkup',
-    statusReason: 'Rejected by staff: Roster conflict / doctor unavailable.',
-    rescheduleCount: 0,
-    doctor: { id: 'd-2', firstName: 'Jane', lastName: 'Doe', prefix: 'Dr.', suffix: 'DMD' },
-    service: { id: 's-3', name: 'Root Canal Therapy', durationMinutes: 60 }
-  },
-  {
-    id: 'a-8',
-    patientId: 'p-1',
-    serviceId: 's-4',
-    doctorId: 'd-1',
-    date: '2026-05-20',
-    startTime: '2026-05-20T09:00:00Z',
-    endTime: '2026-05-20T10:00:00Z',
-    status: 'DISPLACED',
-    userNote: 'Teeth whitening',
-    statusReason: 'Displaced: Clinic closed on holiday schedule.',
-    rescheduleCount: 0,
-    doctor: { id: 'd-1', firstName: 'Christopher', lastName: 'Samson', prefix: 'Dr.', suffix: 'DDS' },
-    service: { id: 's-4', name: 'Laser Teeth Whitening', durationMinutes: 60 }
-  },
-  {
-    id: 'a-9',
-    patientId: 'p-1',
-    serviceId: 's-2',
-    doctorId: 'd-2',
-    date: '2026-05-15',
-    startTime: '2026-05-15T10:00:00Z',
-    endTime: '2026-05-15T10:30:00Z',
-    status: 'NO_SHOW',
-    userNote: 'Routine scaling',
-    statusReason: 'No-show recorded: Patient failed to attend.',
-    rescheduleCount: 0,
-    doctor: { id: 'd-2', firstName: 'Jane', lastName: 'Doe', prefix: 'Dr.', suffix: 'DMD' },
-    service: { id: 's-2', name: 'Teeth Cleaning', durationMinutes: 30 }
-  },
-  {
-    id: 'a-10',
-    patientId: 'p-1',
-    serviceId: 's-1',
-    doctorId: 'd-1',
-    date: '2026-06-12',
-    startTime: '2026-06-12T16:00:00Z',
-    endTime: '2026-06-12T16:45:00Z',
-    status: 'TREATMENT_RENDERED',
-    userNote: 'Braces adjust',
-    statusReason: 'Treatment submitted by doctor; draft invoice created.',
-    rescheduleCount: 0,
-    doctor: { id: 'd-1', firstName: 'Christopher', lastName: 'Samson', prefix: 'Dr.', suffix: 'DDS' },
-    service: { id: 's-1', name: 'Orthodontic Consultation', durationMinutes: 45 }
-  }
-].map((a) => ({
-  ...a,
-  createdAt: undefined,
-  updatedAt: undefined,
-  patient: { id: 'p-1', firstName: 'Christopher', lastName: 'Picardo' },
-  dependent: a.id === 'a-2' || a.id === 'a-7' ? {
-    id: 'dep-1',
-    firstName: 'test2 test2',
-    lastName: 'test2 test2',
-    relationship: 'Sibling',
-  } : null,
-} as unknown as AppointmentDto));
+import { MOCK_APPOINTMENTS } from '../../dtos/shared/mock-appointments';
 
 export function useUserDashboard(
   initialAppointments: AppointmentDto[],
@@ -206,8 +50,29 @@ export function useUserDashboard(
   const resolvedInitial = initialAppointments.length > 0 ? initialAppointments : MOCK_APPOINTMENTS;
   const [appointments, setAppointments] = useState<AppointmentDto[]>(resolvedInitial);
   const [selectedAppt, setSelectedAppt] = useState<AppointmentDto | null>(null);
-  
-  const [filterRole, setFilterRole] = useState<'ALL' | 'SELF' | 'FAMILY'>('ALL');
+  const [filterValue, setFilterValue] = useState<string>('ALL');
+
+  // Derive filter options dynamically from appointments
+  const patientObj = resolvedInitial.find((a) => a.patient)?.patient;
+  const mainUserName = patientObj ? `${patientObj.firstName} ${patientObj.lastName}` : 'Christopher Picardo';
+
+  const filterOptions: FilterOption[] = [
+    { id: 'ALL', label: 'All' },
+    { id: 'SELF', label: mainUserName },
+  ];
+
+  // Map to collect unique dependents
+  const dependentMap = new Map<string, string>();
+  resolvedInitial.forEach((appt) => {
+    if (appt.dependent) {
+      const fullName = `${appt.dependent.firstName} ${appt.dependent.lastName}`;
+      dependentMap.set(appt.dependent.id, fullName);
+    }
+  });
+
+  dependentMap.forEach((name, depId) => {
+    filterOptions.push({ id: depId, label: name });
+  });
   
   // Reliability Metrics State (mocked for demo purposes)
   const [cancelCount] = useState(3);
@@ -273,10 +138,9 @@ export function useUserDashboard(
   };
 
   const filteredAppointments = appointments.filter((a) => {
-    if (filterRole === 'ALL') return true;
-    if (filterRole === 'SELF') return !a.dependent;
-    if (filterRole === 'FAMILY') return !!a.dependent;
-    return true;
+    if (filterValue === 'ALL') return true;
+    if (filterValue === 'SELF') return !a.dependent;
+    return a.dependent?.id === filterValue;
   });
 
   const scheduled = filteredAppointments.filter(
@@ -298,8 +162,9 @@ export function useUserDashboard(
     pending,
     history,
     
-    filterRole,
-    setFilterRole,
+    filterValue,
+    setFilterValue,
+    filterOptions,
 
     selectedAppt,
     isCancelModalOpen,

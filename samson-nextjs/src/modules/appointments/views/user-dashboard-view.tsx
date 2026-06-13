@@ -51,13 +51,10 @@ export function UserDashboardView({ initialAppointments, maxReschedules }: UserD
       <UpcomingAppointments 
         scheduled={scheduled} 
         maxReschedules={maxReschedules}
-        onCancelClick={handleCancelClick}
-        onRescheduleClick={handleRescheduleClick}
       />
 
       <PendingApprovals 
         pending={pending}
-        onCancelClick={handleCancelClick}
       />
 
       <AppointmentHistory history={history} />

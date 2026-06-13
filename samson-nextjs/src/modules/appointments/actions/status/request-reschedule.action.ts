@@ -4,17 +4,17 @@ import { z } from 'zod';
 import { createClient } from '@/shared/database/server';
 import { getAuthenticatedUser } from '@/shared/auth/auth.util';
 import { DomainError } from '@/shared/errors';
-import { userUpdateAppointmentStatusSchema, UserUpdateAppointmentStatusDto } from '../../dtos';
-import { getAppointmentByIdQuery, updateStatusCommand, incrementUserCredibilityMetricCommand } from '../../repositories';
-import { updateAppointmentStatusUseCase } from '../../use-cases';
+import { requestRescheduleSchema, RequestRescheduleDto } from '../../dtos/status/request-reschedule.dto';
+import { getAppointmentByIdQuery, updateStatusCommand, incrementUserCredibilityMetricCommand, insertLedgerEntryCommand } from '../../repositories';
+import { requestRescheduleUseCase } from '../../use-cases/status/request-reschedule.use-case';
 
 /**
  * Requests a reschedule for an appointment on behalf of the patient.
  * Verifies ownership of the appointment prior to execution.
  */
-export async function requestRescheduleAction(formData: UserUpdateAppointmentStatusDto) {
+export async function requestRescheduleAction(formData: RequestRescheduleDto) {
   try {
-    const validData = userUpdateAppointmentStatusSchema.parse(formData);
+    const validData = requestRescheduleSchema.parse(formData);
     if (validData.status !== 'RESCHEDULE_REQUESTED') {
       return { success: false, error: 'Invalid action for reschedule request endpoint' };
     }
@@ -29,16 +29,24 @@ export async function requestRescheduleAction(formData: UserUpdateAppointmentSta
       return { success: false, error: 'You are not authorized to reschedule this appointment' };
     }
 
-    const useCase = updateAppointmentStatusUseCase({
+    const useCase = requestRescheduleUseCase({
       getAppointmentById,
       updateStatus: updateStatusCommand(supabase),
       incrementUserCredibilityMetric: incrementUserCredibilityMetricCommand(supabase),
+      insertLedgerEntry: insertLedgerEntryCommand(supabase),
     });
 
     const result = await useCase(
       validData.appointmentId,
-      'RESCHEDULE_REQUESTED',
-      validData.statusReason
+      user.id,
+      'PATIENT',
+      validData.statusReason,
+      {
+        date: validData.newDate,
+        startTime: validData.newStartTime,
+        endTime: validData.newEndTime,
+        doctorId: validData.newDoctorId,
+      }
     );
 
     return { success: true, data: result };

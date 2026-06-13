@@ -11,12 +11,9 @@ const { mockUpdateStatus } = vi.hoisted(() => {
   return { mockUpdateStatus: vi.fn() };
 });
 
-vi.mock('../../use-cases/status/update-appointment-status.use-case', () => {
+vi.mock('../../use-cases/status/cancel-appointment.use-case', () => {
   return {
-    updateAppointmentStatusUseCase: () => mockUpdateStatus,
-    UpdateAppointmentStatusUseCase: class {
-      execute = mockUpdateStatus;
-    },
+    cancelAppointmentUseCase: () => mockUpdateStatus,
   };
 });
 
@@ -60,7 +57,8 @@ describe('cancelAppointmentAction', () => {
     expect(result).toEqual({ success: true, data: { id: 'appt_123', status: 'CANCELLED' } });
     expect(mockUpdateStatus).toHaveBeenCalledWith(
       'da95a63c-333e-4b68-98e3-82bdf1a07bd2',
-      'CANCELLED',
+      validUserId,
+      'PATIENT',
       'Cannot make it'
     );
   });

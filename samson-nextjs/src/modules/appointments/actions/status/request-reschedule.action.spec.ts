@@ -11,12 +11,9 @@ const { mockUpdateStatus } = vi.hoisted(() => {
   return { mockUpdateStatus: vi.fn() };
 });
 
-vi.mock('../../use-cases/status/update-appointment-status.use-case', () => {
+vi.mock('../../use-cases/status/request-reschedule.use-case', () => {
   return {
-    updateAppointmentStatusUseCase: () => mockUpdateStatus,
-    UpdateAppointmentStatusUseCase: class {
-      execute = mockUpdateStatus;
-    },
+    requestRescheduleUseCase: () => mockUpdateStatus,
   };
 });
 
@@ -53,6 +50,10 @@ describe('requestRescheduleAction', () => {
       appointmentId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd2',
       status: 'RESCHEDULE_REQUESTED',
       statusReason: 'Conflict in schedule',
+      newDate: '2026-06-01',
+      newStartTime: '2026-06-01T09:00:00Z',
+      newEndTime: '2026-06-01T09:30:00Z',
+      newDoctorId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd2',
     };
 
     const result = await requestRescheduleAction(payload as any);
@@ -60,8 +61,15 @@ describe('requestRescheduleAction', () => {
     expect(result).toEqual({ success: true, data: { id: 'appt_123', status: 'RESCHEDULE_REQUESTED' } });
     expect(mockUpdateStatus).toHaveBeenCalledWith(
       'da95a63c-333e-4b68-98e3-82bdf1a07bd2',
-      'RESCHEDULE_REQUESTED',
-      'Conflict in schedule'
+      validUserId,
+      'PATIENT',
+      'Conflict in schedule',
+      {
+        date: '2026-06-01',
+        startTime: '2026-06-01T09:00:00Z',
+        endTime: '2026-06-01T09:30:00Z',
+        doctorId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd2',
+      }
     );
   });
 
@@ -70,10 +78,14 @@ describe('requestRescheduleAction', () => {
       appointmentId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd2',
       status: 'CANCELLED',
       statusReason: 'Test',
+      newDate: '2026-06-01',
+      newStartTime: '2026-06-01T09:00:00Z',
+      newEndTime: '2026-06-01T09:30:00Z',
+      newDoctorId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd2',
     };
 
     const result = await requestRescheduleAction(payload as any);
     expect(result.success).toBe(false);
-    expect(result.error).toContain('Invalid action for reschedule request endpoint');
+    expect(result.error).toContain('Validation failed');
   });
 });

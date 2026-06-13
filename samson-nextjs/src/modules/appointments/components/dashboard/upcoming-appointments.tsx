@@ -1,51 +1,25 @@
 'use client';
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { AppointmentSummaryCard } from './appointment-summary-card';
+import { AppointmentTeaserCard } from './appointment-teaser-card';
 import type { AppointmentDto } from '../../dtos/shared/appointment.dto';
 
 interface UpcomingAppointmentsProps {
   scheduled: AppointmentDto[];
   maxReschedules: number;
-  onCancelClick: (appt: AppointmentDto) => void;
-  onRescheduleClick: (appt: AppointmentDto) => void;
 }
 
 export function UpcomingAppointments({
   scheduled,
   maxReschedules,
-  onCancelClick,
-  onRescheduleClick,
 }: UpcomingAppointmentsProps) {
   return (
     <section className="flex flex-col gap-4">
       <h3 className="text-sm font-bold uppercase tracking-wider text-slate-400">Upcoming Reservations</h3>
       {scheduled.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="flex flex-col gap-4">
           {scheduled.map((appt) => (
-            <div
-              key={appt.id}
-              className="p-6 rounded-3xl border border-slate-200 dark:border-white/5 bg-white dark:bg-slate-900/40 shadow-lg flex flex-col justify-between gap-6 hover:shadow-xl transition-all duration-350"
-            >
-              <div className="flex flex-col gap-2">
-                <div className="flex justify-between items-start mb-2">
-                  <span className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 dark:bg-emerald-500/10 text-emerald-650 dark:text-emerald-450 uppercase tracking-wide">
-                    Scheduled
-                  </span>
-                  <span className="text-[10px] text-slate-400">Reschedules: {appt.rescheduleCount}/{maxReschedules}</span>
-                </div>
-                <AppointmentSummaryCard appt={appt} />
-              </div>
-              <div className="flex gap-3 justify-end border-t border-slate-100 dark:border-white/5 pt-4">
-                <Button variant="secondary" size="sm" onClick={() => onCancelClick(appt)}>
-                  Cancel
-                </Button>
-                <Button size="sm" onClick={() => onRescheduleClick(appt)}>
-                  Reschedule
-                </Button>
-              </div>
-            </div>
+            <AppointmentTeaserCard key={appt.id} appt={appt} />
           ))}
         </div>
       ) : (

@@ -31,6 +31,7 @@ CREATE TABLE users (
     is_active BOOLEAN DEFAULT true NOT NULL,
     cancel_count INT DEFAULT 0 NOT NULL,
     no_show_count INT DEFAULT 0 NOT NULL,
+    reschedule_count INT DEFAULT 0 NOT NULL,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
@@ -117,6 +118,10 @@ CREATE TABLE appointments (
     user_note TEXT,
     status_reason TEXT,
     clinical_notes TEXT, 
+    proposed_date DATE,
+    proposed_start_time TIMESTAMPTZ,
+    proposed_end_time TIMESTAMPTZ,
+    proposed_doctor_id UUID REFERENCES users(id) ON DELETE SET NULL,
     reschedule_count INT DEFAULT 0 NOT NULL,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -127,6 +132,18 @@ CREATE TABLE appointments (
         tstzrange(start_time, end_time) WITH &&
     ),
     CONSTRAINT valid_appointment_time CHECK (start_time < end_time)
+);
+
+-- APPOINTMENT_STATUS_HISTORY (Ledger for status changes)
+CREATE TABLE appointment_status_history (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    appointment_id UUID REFERENCES appointments(id) ON DELETE CASCADE NOT NULL,
+    changed_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    actor_role TEXT NOT NULL,
+    previous_status appointment_status,
+    new_status appointment_status NOT NULL,
+    reason TEXT,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 -- APPOINTMENT_TREATMENTS (Actual services performed)
@@ -414,6 +431,23 @@ BEGIN
 
     INSERT INTO outbox (event_type, payload, status)
     VALUES ('APPOINTMENT_BOOKED', v_outbox_payload, 'PENDING');
+
+    -- 4. Insert initial PENDING ledger entry
+    INSERT INTO appointment_status_history (
+        appointment_id, 
+        changed_by, 
+        actor_role,
+        previous_status, 
+        new_status, 
+        reason
+    ) VALUES (
+        v_appointment_id,
+        p_patient_id,
+        'PATIENT',
+        NULL,
+        'PENDING',
+        'Initial booking request submitted'
+    );
 
     RETURN v_appointment_id;
 END;

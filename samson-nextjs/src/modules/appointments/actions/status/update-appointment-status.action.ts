@@ -2,10 +2,10 @@
 
 import { z } from 'zod';
 import { createClient } from '@/shared/database/server';
-import { authorizeRole } from '@/shared/auth/auth.util';
+import { authorizeRole, getAuthenticatedUser } from '@/shared/auth/auth.util';
 import { DomainError } from '@/shared/errors';
 import { staffUpdateAppointmentStatusSchema, StaffUpdateAppointmentStatusDto } from '../../dtos';
-import { getAppointmentByIdQuery, updateStatusCommand, incrementUserCredibilityMetricCommand } from '../../repositories';
+import { getAppointmentByIdQuery, updateStatusCommand, incrementUserCredibilityMetricCommand, insertLedgerEntryCommand } from '../../repositories';
 import { updateAppointmentStatusUseCase } from '../../use-cases';
 
 /**
@@ -16,6 +16,7 @@ export async function updateAppointmentStatusAction(formData: StaffUpdateAppoint
   try {
     // Assert SECRETARY or above role
     await authorizeRole('SECRETARY');
+    const user = await getAuthenticatedUser();
 
     const validData = staffUpdateAppointmentStatusSchema.parse(formData);
     const supabase = await createClient();
@@ -24,6 +25,7 @@ export async function updateAppointmentStatusAction(formData: StaffUpdateAppoint
       getAppointmentById: getAppointmentByIdQuery(supabase),
       updateStatus: updateStatusCommand(supabase),
       incrementUserCredibilityMetric: incrementUserCredibilityMetricCommand(supabase),
+      insertLedgerEntry: insertLedgerEntryCommand(supabase),
     });
 
     // Format optional reschedule metadata
@@ -39,6 +41,8 @@ export async function updateAppointmentStatusAction(formData: StaffUpdateAppoint
 
     const result = await useCase(
       validData.appointmentId,
+      user.id,
+      'STAFF',
       validData.status,
       validData.statusReason || undefined,
       rescheduleMetadata

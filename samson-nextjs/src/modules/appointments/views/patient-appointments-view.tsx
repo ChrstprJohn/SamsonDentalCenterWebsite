@@ -7,8 +7,6 @@ import { useUserDashboard } from '../hooks/dashboard/use-user-dashboard';
 import { UpcomingAppointments } from '../components/dashboard/upcoming-appointments';
 import { PendingApprovals } from '../components/dashboard/pending-approvals';
 import { AppointmentHistory } from '../components/dashboard/appointment-history';
-import { CancelAppointmentModal } from '../components/dashboard/cancel-appointment-modal';
-import { RescheduleBlockedModal } from '../components/dashboard/reschedule-blocked-modal';
 import type { AppointmentDto } from '../dtos/shared/appointment.dto';
 
 interface PatientAppointmentsViewProps {
@@ -26,20 +24,9 @@ export function PatientAppointmentsView({ initialAppointments, maxReschedules }:
     scheduled,
     pending,
     history,
-    selectedAppt,
-    isCancelModalOpen,
-    cancelReason,
-    isCancelling,
-    blockedRescheduleAppt,
-    warnExcessiveCancellations,
-    handleRescheduleClick,
-    handleCancelClick,
-    handleCancelSubmit,
-    closeCancelModal,
-    setCancelReason,
-    setBlockedRescheduleAppt,
-    filterRole,
-    setFilterRole,
+    filterValue,
+    setFilterValue,
+    filterOptions,
   } = useUserDashboard(initialAppointments, maxReschedules);
 
   return (
@@ -124,39 +111,19 @@ export function PatientAppointmentsView({ initialAppointments, maxReschedules }:
           </div>
 
           <div className="flex items-center gap-2 pb-2 md:pb-0 shrink-0">
-            <span className="text-xs font-semibold text-slate-500">Filter:</span>
-            <div className="flex bg-slate-100 dark:bg-slate-800/50 rounded-lg p-1">
-              <button
-                onClick={() => setFilterRole('ALL')}
-                className={`px-3 py-1 text-xs font-bold rounded-md transition-colors ${
-                  filterRole === 'ALL'
-                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
-                    : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
-                }`}
-              >
-                All
-              </button>
-              <button
-                onClick={() => setFilterRole('SELF')}
-                className={`px-3 py-1 text-xs font-bold rounded-md transition-colors ${
-                  filterRole === 'SELF'
-                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
-                    : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
-                }`}
-              >
-                Self
-              </button>
-              <button
-                onClick={() => setFilterRole('FAMILY')}
-                className={`px-3 py-1 text-xs font-bold rounded-md transition-colors ${
-                  filterRole === 'FAMILY'
-                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
-                    : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
-                }`}
-              >
-                Family
-              </button>
-            </div>
+            <label htmlFor="patient-filter" className="text-xs font-semibold text-slate-500">Filter:</label>
+            <select
+              id="patient-filter"
+              value={filterValue}
+              onChange={(e) => setFilterValue(e.target.value)}
+              className="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-semibold rounded-lg px-3 py-1.5 border border-slate-200 dark:border-white/5 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer shadow-sm hover:bg-slate-50 dark:hover:bg-slate-750 transition-colors"
+            >
+              {filterOptions.map((option) => (
+                <option key={option.id} value={option.id} className="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200">
+                  {option.label}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 
@@ -166,15 +133,12 @@ export function PatientAppointmentsView({ initialAppointments, maxReschedules }:
             <UpcomingAppointments 
               scheduled={scheduled} 
               maxReschedules={maxReschedules}
-              onCancelClick={handleCancelClick}
-              onRescheduleClick={handleRescheduleClick}
             />
           )}
 
           {activeTab === 'pending' && (
             <PendingApprovals 
               pending={pending}
-              onCancelClick={handleCancelClick}
             />
           )}
 
@@ -183,24 +147,6 @@ export function PatientAppointmentsView({ initialAppointments, maxReschedules }:
           )}
         </div>
       </div>
-
-      {/* Modals */}
-      <RescheduleBlockedModal
-        isOpen={blockedRescheduleAppt !== null}
-        maxReschedules={maxReschedules}
-        onClose={() => setBlockedRescheduleAppt(null)}
-      />
-
-      <CancelAppointmentModal
-        isOpen={isCancelModalOpen}
-        selectedAppt={selectedAppt}
-        cancelReason={cancelReason}
-        isCancelling={isCancelling}
-        warnExcessiveCancellations={warnExcessiveCancellations}
-        onReasonChange={setCancelReason}
-        onClose={closeCancelModal}
-        onSubmit={handleCancelSubmit}
-      />
     </div>
   );
 }

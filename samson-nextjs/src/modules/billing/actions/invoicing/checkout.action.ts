@@ -13,7 +13,8 @@ import {
   getAppointmentByIdQuery,
   updateStatusCommand,
   incrementUserCredibilityMetricCommand,
-} from "@/modules/appointments/repositories/status/appointment-status.commands";
+  insertLedgerEntryCommand
+} from "@/modules/appointments/repositories/status";
 import { createAuditLogUseCase } from "@/modules/audit-logs/use-cases";
 import { createAuditLogCommand } from "@/modules/audit-logs/repositories/logs/audit-log.commands";
 import { checkoutOrchestrator } from "@/orchestrators/checkout.orchestrator";
@@ -34,12 +35,15 @@ export async function checkoutAction(data: FinalizeInvoiceDto) {
     const orchestratorDeps = {
       supabase,
       finalizeInvoice: finalizeInvoiceUseCase(finalizeInvoiceCommand(supabase)),
-      updateAppointmentStatus: (id: string, status: 'COMPLETED', reason?: string) =>
-        updateAppointmentStatusUseCase({
+      updateAppointmentStatus: async (id: string, status: any, reason?: string) => {
+        const user = await getAuthenticatedUser();
+        return updateAppointmentStatusUseCase({
           getAppointmentById: getAppointmentByIdQuery(supabase),
           updateStatus: updateStatusCommand(supabase),
           incrementUserCredibilityMetric: incrementUserCredibilityMetricCommand(supabase),
-        })(id, status, reason),
+          insertLedgerEntry: insertLedgerEntryCommand(supabase),
+        })(id, user?.id || null, 'STAFF', status, reason);
+      },
       createAuditLog: createAuditLogUseCase(createAuditLogCommand(supabase)),
       getCurrentUser: async () => {
         try {

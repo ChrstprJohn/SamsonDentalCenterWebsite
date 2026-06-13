@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { updateAppointmentStatusAction } from './update-appointment-status.action';
-import { authorizeRole } from '@/shared/auth/auth.util';
+import { authorizeRole, getAuthenticatedUser } from '@/shared/auth/auth.util';
 import { createClient } from '@/shared/database/server';
 import { UnauthorizedError } from '@/shared/errors';
 
@@ -29,6 +29,7 @@ describe('updateAppointmentStatusAction', () => {
 
   it('successfully updates appointment status when authorized', async () => {
     vi.mocked(authorizeRole).mockResolvedValue({ id: 'staff_1' } as any);
+    vi.mocked(getAuthenticatedUser).mockResolvedValue({ id: 'staff_1' } as any);
     mockUpdateStatus.mockResolvedValue({ id: 'appt_123', status: 'APPROVED' });
 
     const payload = {
@@ -42,6 +43,8 @@ describe('updateAppointmentStatusAction', () => {
     expect(authorizeRole).toHaveBeenCalledWith('SECRETARY');
     expect(mockUpdateStatus).toHaveBeenCalledWith(
       'da95a63c-333e-4b68-98e3-82bdf1a07bd2',
+      'staff_1',
+      'STAFF',
       'APPROVED',
       undefined,
       undefined
@@ -50,6 +53,7 @@ describe('updateAppointmentStatusAction', () => {
 
   it('maps reschedule metadata correctly when all fields provided', async () => {
     vi.mocked(authorizeRole).mockResolvedValue({ id: 'staff_1' } as any);
+    vi.mocked(getAuthenticatedUser).mockResolvedValue({ id: 'staff_1' } as any);
     mockUpdateStatus.mockResolvedValue({ id: 'appt_123', status: 'APPROVED' });
 
     const payload = {
@@ -65,6 +69,8 @@ describe('updateAppointmentStatusAction', () => {
 
     expect(mockUpdateStatus).toHaveBeenCalledWith(
       'da95a63c-333e-4b68-98e3-82bdf1a07bd2',
+      'staff_1',
+      'STAFF',
       'APPROVED',
       undefined,
       {
@@ -78,6 +84,7 @@ describe('updateAppointmentStatusAction', () => {
 
   it('returns validation error when REJECTED has no reason', async () => {
     vi.mocked(authorizeRole).mockResolvedValue({ id: 'staff_1' } as any);
+    vi.mocked(getAuthenticatedUser).mockResolvedValue({ id: 'staff_1' } as any);
 
     const payload = {
       appointmentId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd2',

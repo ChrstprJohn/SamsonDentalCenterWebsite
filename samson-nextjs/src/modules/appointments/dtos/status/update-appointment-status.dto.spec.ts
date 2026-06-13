@@ -1,47 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
     staffUpdateAppointmentStatusSchema,
-    userUpdateAppointmentStatusSchema,
 } from './update-appointment-status.dto';
 
 const VALID_APPOINTMENT_ID = '123e4567-e89b-12d3-a456-426614174000';
 const VALID_DOCTOR_ID = '823e4567-e89b-12d3-a456-426614174001';
-
-// ==========================================
-// USER ACTION SCHEMA TESTS
-// ==========================================
-describe('userUpdateAppointmentStatusSchema', () => {
-    const baseValidData = { appointmentId: VALID_APPOINTMENT_ID };
-
-    it('should validate user CANCELLED status with reason', () => {
-        expect(
-            userUpdateAppointmentStatusSchema.safeParse({
-                ...baseValidData,
-                status: 'CANCELLED',
-                statusReason: 'I cannot make it anymore.',
-            }).success
-        ).toBe(true);
-    });
-
-    it('should reject user CANCELLED status without reason', () => {
-        expect(
-            userUpdateAppointmentStatusSchema.safeParse({
-                ...baseValidData,
-                status: 'CANCELLED',
-            }).success
-        ).toBe(false);
-    });
-
-    it('should reject user CANCELLED status if reason is only whitespace strings', () => {
-        expect(
-            userUpdateAppointmentStatusSchema.safeParse({
-                ...baseValidData,
-                status: 'CANCELLED',
-                statusReason: '     ',
-            }).success
-        ).toBe(false);
-    });
-});
 
 // ==========================================
 // STAFF ACTION SCHEMA TESTS

@@ -28,23 +28,9 @@ The user portal is the private dashboard for authenticated and verified patients
 
 ## My Appointments
 
-The appointments panel is located on its own dedicated page (`/user/appointments`) with three sub-tabs:
+The appointments panel is located on its own dedicated page (`/user/appointments`) with three sub-tabs (Upcoming, Pending, History).
 
-### 1. Upcoming Tab
-- **Statuses**: `Approved`, `Reschedule Requested`, `Checked-In`
-- **Actions**:
-  - **Cancel**: Available for approved appointments. Prompts for a mandatory reason, warns of excessive cancellations if `cancelCount` is high, and registers reliability penalty.
-  - **Reschedule Request**: Available for approved appointments. Users cannot reschedule directly; they submit a request with a reason (limited to **ONE** reschedule request per appointment). Re-enters the staff review queue as `Reschedule Requested`.
-
-### 2. Pending Requests Tab
-- **Statuses**: `Pending`
-- **Actions**:
-  - **Cancel**: Available at any time. Prompts for a mandatory reason.
-
-### 3. History Tab
-- **Statuses**: `Rejected`, `Cancelled`, `Displaced`, `Completed`, `No-Show`, `Treatment Rendered`
-- **Actions**: None (Read-only view).
-- **Details**: Displays reasons for cancellation/rejection, displacement cause, and credibility indicators if flagged as a No-Show.
+**➡️ [Read the detailed My Appointments Documentation](file:///c:/Users/picar/Desktop/samson-website/.CORE_DOCUMENTATION/SERVERLESS_ARCHI/1-BUSSINESS-PLAN/4-USER-PORTAL/2-MY-APPOINTMENTS.md)**
 
 ---
 

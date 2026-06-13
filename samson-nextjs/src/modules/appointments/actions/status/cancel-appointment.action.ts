@@ -4,17 +4,17 @@ import { z } from 'zod';
 import { createClient } from '@/shared/database/server';
 import { getAuthenticatedUser } from '@/shared/auth/auth.util';
 import { DomainError } from '@/shared/errors';
-import { userUpdateAppointmentStatusSchema, UserUpdateAppointmentStatusDto } from '../../dtos';
-import { getAppointmentByIdQuery, updateStatusCommand, incrementUserCredibilityMetricCommand } from '../../repositories';
-import { updateAppointmentStatusUseCase } from '../../use-cases';
+import { cancelAppointmentSchema, CancelAppointmentDto } from '../../dtos/status/cancel-appointment.dto';
+import { getAppointmentByIdQuery, updateStatusCommand, incrementUserCredibilityMetricCommand, insertLedgerEntryCommand } from '../../repositories';
+import { cancelAppointmentUseCase } from '../../use-cases/status/cancel-appointment.use-case';
 
 /**
  * Cancels an appointment on behalf of the patient.
  * Verifies ownership of the appointment prior to execution.
  */
-export async function cancelAppointmentAction(formData: UserUpdateAppointmentStatusDto) {
+export async function cancelAppointmentAction(formData: CancelAppointmentDto) {
   try {
-    const validData = userUpdateAppointmentStatusSchema.parse(formData);
+    const validData = cancelAppointmentSchema.parse(formData);
     if (validData.status !== 'CANCELLED') {
       return { success: false, error: 'Invalid action for cancellation endpoint' };
     }
@@ -29,15 +29,17 @@ export async function cancelAppointmentAction(formData: UserUpdateAppointmentSta
       return { success: false, error: 'You are not authorized to cancel this appointment' };
     }
 
-    const useCase = updateAppointmentStatusUseCase({
+    const useCase = cancelAppointmentUseCase({
       getAppointmentById,
       updateStatus: updateStatusCommand(supabase),
       incrementUserCredibilityMetric: incrementUserCredibilityMetricCommand(supabase),
+      insertLedgerEntry: insertLedgerEntryCommand(supabase),
     });
 
     const result = await useCase(
       validData.appointmentId,
-      'CANCELLED',
+      user.id,
+      'PATIENT',
       validData.statusReason
     );
 

@@ -1,6 +1,5 @@
 import { z } from 'zod';
 
-// Reusable utility to convert empty form inputs into undefined, forcing DB NULL values
 const emptyStringToUndefined = z.literal('').transform(() => undefined);
 const cleanOptionalString = z.string().trim().optional().transform(val => val === '' ? undefined : val);
 
@@ -16,22 +15,6 @@ export const appointmentStatusEnum = z.enum([
     'COMPLETED',
     'NO_SHOW',
 ]);
-
-// ==========================================
-// USER ACTION SCHEMA
-// ==========================================
-
-export const userUpdateAppointmentStatusSchema = z.object({
-    appointmentId: z.string().uuid('Invalid Appointment ID format'),
-    status: z.enum(['CANCELLED', 'RESCHEDULE_REQUESTED']),
-    statusReason: z.string().trim().min(1, 'Reason is strictly required for your action.'),
-});
-
-export type UserUpdateAppointmentStatusDto = z.infer<typeof userUpdateAppointmentStatusSchema>;
-
-// ==========================================
-// STAFF ACTION SCHEMA
-// ==========================================
 
 export const staffUpdateAppointmentStatusSchema = z
     .object({
@@ -136,3 +119,4 @@ export const staffUpdateAppointmentStatusSchema = z
     });
 
 export type StaffUpdateAppointmentStatusDto = z.infer<typeof staffUpdateAppointmentStatusSchema>;
+
