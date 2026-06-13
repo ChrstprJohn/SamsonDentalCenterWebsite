@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
+import { AppointmentSummaryCard } from './appointment-summary-card';
 import type { AppointmentDto } from '../../dtos/shared/appointment.dto';
 
 interface UpcomingAppointmentsProps {
@@ -28,21 +29,13 @@ export function UpcomingAppointments({
               className="p-6 rounded-3xl border border-slate-200 dark:border-white/5 bg-white dark:bg-slate-900/40 shadow-lg flex flex-col justify-between gap-6 hover:shadow-xl transition-all duration-350"
             >
               <div className="flex flex-col gap-2">
-                <div className="flex justify-between items-start">
+                <div className="flex justify-between items-start mb-2">
                   <span className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 dark:bg-emerald-500/10 text-emerald-650 dark:text-emerald-450 uppercase tracking-wide">
                     Scheduled
                   </span>
                   <span className="text-[10px] text-slate-400">Reschedules: {appt.rescheduleCount}/{maxReschedules}</span>
                 </div>
-                <h4 className="text-lg font-bold text-slate-800 dark:text-white mt-1">
-                  {appt.service?.name || 'Unknown Service'}
-                </h4>
-                <p className="text-xs text-slate-500">
-                  👨‍⚕️ Dr. {appt.doctor?.firstName} {appt.doctor?.lastName}
-                </p>
-                <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 mt-2">
-                  ⏳ {appt.date} at {appt.startTime}
-                </p>
+                <AppointmentSummaryCard appt={appt} />
               </div>
               <div className="flex gap-3 justify-end border-t border-slate-100 dark:border-white/5 pt-4">
                 <Button variant="secondary" size="sm" onClick={() => onCancelClick(appt)}>

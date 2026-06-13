@@ -44,6 +44,7 @@ export const appointmentPatientSchema = appointmentPatientDbSchema.transform((da
 const appointmentDbSchema = z.object({
   id: z.string().uuid(),
   patient_id: z.string().uuid().nullable().optional(),
+  dependent_id: z.string().uuid().nullable().optional(),
   service_id: z.string().uuid(),
   doctor_id: z.string().uuid(),
   date: z.string(),
@@ -58,11 +59,18 @@ const appointmentDbSchema = z.object({
   doctor: appointmentDoctorDbSchema.nullable().optional(),
   service: appointmentServiceDbSchema.nullable().optional(),
   patient: appointmentPatientDbSchema.nullable().optional(),
+  dependent: z.object({
+    id: z.string(),
+    first_name: z.string(),
+    last_name: z.string(),
+    relationship: z.string(),
+  }).nullable().optional(),
 });
 
 export const appointmentDtoSchema = appointmentDbSchema.transform((data) => ({
   id: data.id,
   patientId: data.patient_id,
+  dependentId: data.dependent_id || null,
   serviceId: data.service_id,
   doctorId: data.doctor_id,
   date: data.date,
@@ -77,6 +85,12 @@ export const appointmentDtoSchema = appointmentDbSchema.transform((data) => ({
   doctor: data.doctor ? appointmentDoctorSchema.parse(data.doctor) : null,
   service: data.service ? appointmentServiceSchema.parse(data.service) : null,
   patient: data.patient ? appointmentPatientSchema.parse(data.patient) : null,
+  dependent: data.dependent ? {
+    id: data.dependent.id,
+    firstName: data.dependent.first_name,
+    lastName: data.dependent.last_name,
+    relationship: data.dependent.relationship,
+  } : null,
 }));
 
 export type AppointmentDto = z.infer<typeof appointmentDtoSchema>;

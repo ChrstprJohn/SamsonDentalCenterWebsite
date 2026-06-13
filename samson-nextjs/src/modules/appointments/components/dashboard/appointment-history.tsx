@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { AppointmentSummaryCard } from './appointment-summary-card';
 import type { AppointmentDto } from '../../dtos/shared/appointment.dto';
 
 interface AppointmentHistoryProps {
@@ -48,22 +49,13 @@ export function AppointmentHistory({ history }: AppointmentHistoryProps) {
           <div className="divide-y divide-slate-100 dark:divide-white/5">
             {history.map((appt) => (
               <div key={appt.id} className="p-6 flex flex-col gap-3 hover:bg-slate-50/20 dark:hover:bg-slate-900/10 transition-colors duration-150">
-                <div className="flex justify-between items-start">
-                  <div className="flex flex-col gap-1.5">
-                    <span className={`inline-flex self-start px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${getStatusStyle(appt.status)}`}>
-                      {getStatusLabel(appt.status)}
-                    </span>
-                    <h4 className="text-lg font-bold text-slate-850 dark:text-white mt-1">
-                      {appt.service?.name || 'Dental Service'}
-                    </h4>
-                    <span className="text-xs text-slate-500">
-                      📅 {appt.date} at {appt.startTime} • Dr. {appt.doctor?.firstName} {appt.doctor?.lastName}
-                    </span>
-                  </div>
-                  <span className="text-[10px] text-slate-400">
-                    ID: #{appt.id.slice(0, 8)}
+                <div className="flex justify-between items-start mb-2">
+                  <span className={`inline-flex self-start px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${getStatusStyle(appt.status)}`}>
+                    {getStatusLabel(appt.status)}
                   </span>
                 </div>
+                
+                <AppointmentSummaryCard appt={appt} />
 
                 {/* Status-specific banners and notes */}
                 {appt.status === 'COMPLETED' && appt.statusReason && (

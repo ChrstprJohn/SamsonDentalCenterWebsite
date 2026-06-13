@@ -10,6 +10,9 @@ interface UseUserDashboardReturn {
   pending: AppointmentDto[];
   history: AppointmentDto[];
   
+  filterRole: 'ALL' | 'SELF' | 'FAMILY';
+  setFilterRole: (role: 'ALL' | 'SELF' | 'FAMILY') => void;
+  
   selectedAppt: AppointmentDto | null;
   isCancelModalOpen: boolean;
   cancelReason: string;
@@ -186,7 +189,13 @@ const MOCK_APPOINTMENTS: AppointmentDto[] = [
   ...a,
   createdAt: undefined,
   updatedAt: undefined,
-  patient: null,
+  patient: { id: 'p-1', firstName: 'Christopher', lastName: 'Picardo' },
+  dependent: a.id === 'a-2' || a.id === 'a-7' ? {
+    id: 'dep-1',
+    firstName: 'test2 test2',
+    lastName: 'test2 test2',
+    relationship: 'Sibling',
+  } : null,
 } as unknown as AppointmentDto));
 
 export function useUserDashboard(
@@ -197,6 +206,8 @@ export function useUserDashboard(
   const resolvedInitial = initialAppointments.length > 0 ? initialAppointments : MOCK_APPOINTMENTS;
   const [appointments, setAppointments] = useState<AppointmentDto[]>(resolvedInitial);
   const [selectedAppt, setSelectedAppt] = useState<AppointmentDto | null>(null);
+  
+  const [filterRole, setFilterRole] = useState<'ALL' | 'SELF' | 'FAMILY'>('ALL');
   
   // Reliability Metrics State (mocked for demo purposes)
   const [cancelCount] = useState(3);
@@ -261,11 +272,18 @@ export function useUserDashboard(
     closeCancelModal();
   };
 
-  const scheduled = appointments.filter(
+  const filteredAppointments = appointments.filter((a) => {
+    if (filterRole === 'ALL') return true;
+    if (filterRole === 'SELF') return !a.dependent;
+    if (filterRole === 'FAMILY') return !!a.dependent;
+    return true;
+  });
+
+  const scheduled = filteredAppointments.filter(
     (a) => a.status === 'APPROVED' || a.status === 'RESCHEDULE_REQUESTED' || a.status === 'CHECKED_IN'
   );
-  const pending = appointments.filter((a) => a.status === 'PENDING');
-  const history = appointments.filter(
+  const pending = filteredAppointments.filter((a) => a.status === 'PENDING');
+  const history = filteredAppointments.filter(
     (a) =>
       a.status === 'COMPLETED' ||
       a.status === 'CANCELLED' ||
@@ -280,6 +298,9 @@ export function useUserDashboard(
     pending,
     history,
     
+    filterRole,
+    setFilterRole,
+
     selectedAppt,
     isCancelModalOpen,
     cancelReason,

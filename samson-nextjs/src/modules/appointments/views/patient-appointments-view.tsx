@@ -38,6 +38,8 @@ export function PatientAppointmentsView({ initialAppointments, maxReschedules }:
     closeCancelModal,
     setCancelReason,
     setBlockedRescheduleAppt,
+    filterRole,
+    setFilterRole,
   } = useUserDashboard(initialAppointments, maxReschedules);
 
   return (
@@ -55,7 +57,8 @@ export function PatientAppointmentsView({ initialAppointments, maxReschedules }:
 
       {/* Tabs Layout */}
       <div className="flex flex-col gap-6">
-        <div className="flex border-b border-slate-200 dark:border-white/10 gap-6">
+        <div className="flex flex-col md:flex-row md:justify-between border-b border-slate-200 dark:border-white/10 gap-4 md:gap-6">
+          <div className="flex gap-6 overflow-x-auto">
           <button
             onClick={() => setActiveTab('upcoming')}
             className={`py-3.5 px-1 relative text-sm font-semibold transition-all duration-200 cursor-pointer flex items-center gap-2 ${
@@ -118,6 +121,43 @@ export function PatientAppointmentsView({ initialAppointments, maxReschedules }:
               <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-slate-500 dark:bg-slate-400 rounded-full" />
             )}
           </button>
+          </div>
+
+          <div className="flex items-center gap-2 pb-2 md:pb-0 shrink-0">
+            <span className="text-xs font-semibold text-slate-500">Filter:</span>
+            <div className="flex bg-slate-100 dark:bg-slate-800/50 rounded-lg p-1">
+              <button
+                onClick={() => setFilterRole('ALL')}
+                className={`px-3 py-1 text-xs font-bold rounded-md transition-colors ${
+                  filterRole === 'ALL'
+                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
+                    : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                }`}
+              >
+                All
+              </button>
+              <button
+                onClick={() => setFilterRole('SELF')}
+                className={`px-3 py-1 text-xs font-bold rounded-md transition-colors ${
+                  filterRole === 'SELF'
+                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
+                    : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                }`}
+              >
+                Self
+              </button>
+              <button
+                onClick={() => setFilterRole('FAMILY')}
+                className={`px-3 py-1 text-xs font-bold rounded-md transition-colors ${
+                  filterRole === 'FAMILY'
+                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
+                    : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                }`}
+              >
+                Family
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* Tab Panels */}

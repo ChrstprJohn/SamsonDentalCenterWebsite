@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
+import { AppointmentSummaryCard } from './appointment-summary-card';
 import type { AppointmentDto } from '../../dtos/shared/appointment.dto';
 
 interface PendingApprovalsProps {
@@ -18,22 +19,19 @@ export function PendingApprovals({ pending, onCancelClick }: PendingApprovalsPro
           {pending.map((appt) => (
             <div
               key={appt.id}
-              className="p-5 rounded-2xl border border-slate-200 dark:border-white/5 bg-white dark:bg-slate-900/40 flex flex-col sm:flex-row justify-between sm:items-center gap-4 hover:shadow-md transition-shadow"
+              className="p-6 rounded-2xl border border-slate-200 dark:border-white/5 bg-white dark:bg-slate-900/40 flex flex-col gap-4 hover:shadow-md transition-shadow"
             >
-              <div className="flex flex-col gap-1">
-                <span className="inline-flex self-start px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-150/10 text-amber-600 dark:text-amber-450 uppercase tracking-wide">
+              <div className="flex flex-col gap-2 w-full">
+                <span className="inline-flex self-start mb-2 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 dark:bg-amber-500/10 text-amber-650 dark:text-amber-450 uppercase tracking-wide">
                   Awaiting Approval
                 </span>
-                <h4 className="text-base font-bold text-slate-800 dark:text-white mt-1">
-                  {appt.service?.name || 'Unknown Service'}
-                </h4>
-                <p className="text-xs text-slate-550 dark:text-slate-400">
-                  📅 {appt.date} at {appt.startTime} with Dr. {appt.doctor?.lastName}
-                </p>
+                <AppointmentSummaryCard appt={appt} />
               </div>
-              <Button variant="secondary" size="sm" className="sm:self-center" onClick={() => onCancelClick(appt)}>
-                Cancel Request
-              </Button>
+              <div className="flex justify-end border-t border-slate-100 dark:border-white/5 pt-4 mt-2">
+                <Button variant="secondary" size="sm" onClick={() => onCancelClick(appt)}>
+                  Cancel Request
+                </Button>
+              </div>
             </div>
           ))}
         </div>
