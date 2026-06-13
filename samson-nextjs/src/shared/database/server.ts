@@ -1,7 +1,8 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+import { cache } from 'react'
 
-export async function createClient() {
+export const createClient = cache(async () => {
     const cookieStore = await cookies()
 
     return createServerClient(
@@ -26,13 +27,22 @@ export async function createClient() {
             },
         }
     )
-}
+})
+
+let adminClient: ReturnType<typeof createServerClient> | null = null;
 
 export async function createAdminClient() {
-    return createServerClient(
+    if (adminClient) return adminClient;
+    
+    adminClient = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.SUPABASE_SERVICE_ROLE_KEY!,
         {
+            auth: {
+                persistSession: false,
+                autoRefreshToken: false,
+                detectSessionInUrl: false,
+            },
             cookies: {
                 getAll() {
                     return []
@@ -43,4 +53,5 @@ export async function createAdminClient() {
             },
         }
     )
-}
+    return adminClient;
+}

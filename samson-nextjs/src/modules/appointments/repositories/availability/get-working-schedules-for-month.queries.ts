@@ -1,9 +1,10 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { DomainError } from '@/shared/errors';
 import { doctorScheduleResponseSchema } from '../../dtos';
+import { unstable_cache } from 'next/cache';
 
 export const getWorkingSchedulesForMonthQuery = (supabase: SupabaseClient) => {
-  return async (month: string, doctorId?: string, serviceId?: string) => {
+  const fetchSchedules = async (month: string, doctorId?: string, serviceId?: string) => {
     // month is format YYYY-MM
     let selectFields = 'id, day_of_week, doctor_id, start_time, end_time, break_start_time, break_end_time, doctor:doctor_id!inner(first_name, last_name)';
 
@@ -66,4 +67,16 @@ export const getWorkingSchedulesForMonthQuery = (supabase: SupabaseClient) => {
 
     return generatedSchedules;
   };
+
+  // Server-side caching for monthly working schedules (5 minutes)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const cachedSchedules = unstable_cache(
+    async (mStr: string, docId?: string, srvId?: string) => fetchSchedules(mStr, docId, srvId),
+    ['working-schedules'],
+    { revalidate: 300, tags: ['schedules', 'working-schedules'] }
+  );
+
+  // Caching disabled for now: return direct database fetch
+  return fetchSchedules;
+  // To enable caching, replace with: return cachedSchedules;
 };

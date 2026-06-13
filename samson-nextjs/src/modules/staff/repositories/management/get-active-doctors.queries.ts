@@ -1,8 +1,9 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { UserProfileResponseDto } from '../../dtos';
+import { unstable_cache } from 'next/cache';
 
 export const getActiveDoctorsQuery = (supabase: SupabaseClient) => {
-  return async (serviceId?: string): Promise<UserProfileResponseDto[]> => {
+  const fetchActiveDoctors = async (serviceId?: string): Promise<UserProfileResponseDto[]> => {
     let query = supabase
       .from('users')
       .select('*')
@@ -36,6 +37,18 @@ export const getActiveDoctorsQuery = (supabase: SupabaseClient) => {
       isActive: d.is_active ?? true,
     }));
   };
+
+  // Server-side caching for active doctors (5 minutes)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const cachedDoctors = unstable_cache(
+    async (srvId?: string) => fetchActiveDoctors(srvId),
+    ['active-doctors'],
+    { revalidate: 300, tags: ['doctors', 'active-doctors'] }
+  );
+
+  // Caching disabled for now: return direct database fetch
+  return fetchActiveDoctors;
+  // To enable caching, replace with: return cachedDoctors;
 };
 
 // Deprecated class for backwards compatibility

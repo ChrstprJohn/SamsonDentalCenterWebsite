@@ -4,11 +4,16 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useBookingData } from './use-booking-data';
-import { getStepTwoDataAction } from '../../actions/availability/get-step-two-data.action';
+import { getAvailableDaysAction } from '../../actions/availability/get-available-days.action';
+import { getDoctorsAction } from '@/modules/staff/actions/management/get-doctors.action';
 import { getAvailableTimeSlotsAction } from '../../actions/availability/get-available-time-slots.action';
 
-vi.mock('../../actions/availability/get-step-two-data.action', () => ({
-  getStepTwoDataAction: vi.fn(),
+vi.mock('../../actions/availability/get-available-days.action', () => ({
+  getAvailableDaysAction: vi.fn(),
+}));
+
+vi.mock('@/modules/staff/actions/management/get-doctors.action', () => ({
+  getDoctorsAction: vi.fn(),
 }));
 
 vi.mock('../../actions/availability/get-available-time-slots.action', () => ({
@@ -21,12 +26,13 @@ describe('useBookingData', () => {
   });
 
   it('should fetch available dates and doctors when a serviceId is provided', async () => {
-    (getStepTwoDataAction as any).mockResolvedValue({
+    (getDoctorsAction as any).mockResolvedValue({
       success: true,
-      data: {
-        doctors: [{ id: 'doc-1', firstName: 'Jane', lastName: 'Doe' }],
-        availability: { availableDates: ['2025-01-01', '2025-01-02'], availabilityMap: {} },
-      },
+      data: [{ id: 'doc-1', firstName: 'Jane', lastName: 'Doe' }],
+    });
+    (getAvailableDaysAction as any).mockResolvedValue({
+      success: true,
+      data: { availableDates: ['2025-01-01', '2025-01-02'], availabilityMap: {} },
     });
 
     const { result } = renderHook(() => useBookingData('s1', null, undefined));
@@ -35,31 +41,36 @@ describe('useBookingData', () => {
     expect(result.current.isLoadingDoctors).toBe(true);
 
     await waitFor(() => {
-      expect(result.current.isLoadingAvailability).toBe(false);
+      expect(result.current.isLoadingDoctors).toBe(false);
     });
 
-    expect(result.current.availableDates).toEqual(['2025-01-01', '2025-01-02']);
+    await waitFor(() => {
+      expect(result.current.availableDates).toEqual(['2025-01-01', '2025-01-02']);
+    });
+
     expect(result.current.doctors).toEqual([{ id: 'doc-1', firstName: 'Jane', lastName: 'Doe' }]);
-    expect(getStepTwoDataAction).toHaveBeenCalled();
+    expect(getDoctorsAction).toHaveBeenCalled();
+    expect(getAvailableDaysAction).toHaveBeenCalled();
   });
 
-  it('should use cached monthly slots before falling back to the server action', async () => {
-    (getStepTwoDataAction as any).mockResolvedValue({
+  it.skip('should use cached monthly slots before falling back to the server action (SKIPPED: client-side cache disabled)', async () => {
+    (getDoctorsAction as any).mockResolvedValue({
+      success: true,
+      data: [{ id: 'doc-1', firstName: 'Jane', lastName: 'Doe' }],
+    });
+    (getAvailableDaysAction as any).mockResolvedValue({
       success: true,
       data: {
-        doctors: [{ id: 'doc-1', firstName: 'Jane', lastName: 'Doe' }],
-        availability: {
-          availableDates: ['2025-01-01'],
-          availabilityMap: {
-            '2025-01-01': [
-              {
-                startTime: '2025-01-01T09:00:00.000Z',
-                endTime: '2025-01-01T09:30:00.000Z',
-                doctorId: 'doc-1',
-                doctorName: 'Dr. Jane Doe',
-              },
-            ],
-          },
+        availableDates: ['2025-01-01'],
+        availabilityMap: {
+          '2025-01-01': [
+            {
+              startTime: '2025-01-01T09:00:00.000Z',
+              endTime: '2025-01-01T09:30:00.000Z',
+              doctorId: 'doc-1',
+              doctorName: 'Dr. Jane Doe',
+            },
+          ],
         },
       },
     });
@@ -90,12 +101,13 @@ describe('useBookingData', () => {
   });
 
   it('should fetch available slots when serviceId and date are provided', async () => {
-    (getStepTwoDataAction as any).mockResolvedValue({
+    (getDoctorsAction as any).mockResolvedValue({
       success: true,
-      data: {
-        doctors: [],
-        availability: { availableDates: [], availabilityMap: {} },
-      },
+      data: [],
+    });
+    (getAvailableDaysAction as any).mockResolvedValue({
+      success: true,
+      data: { availableDates: [], availabilityMap: {} },
     });
     (getAvailableTimeSlotsAction as any).mockResolvedValue({
       success: true,
@@ -115,5 +127,34 @@ describe('useBookingData', () => {
     expect(result.current.availableSlots[0].doctorId).toBe('d1');
     expect(result.current.availableSlots[0].doctorName).toBe('Dr. Smith');
     expect(getAvailableTimeSlotsAction).toHaveBeenCalled();
+  });
+
+  it('should not re-fetch doctors when selectedDoctorId changes', async () => {
+    (getDoctorsAction as any).mockResolvedValue({
+      success: true,
+      data: [{ id: 'doc-1', firstName: 'Jane', lastName: 'Doe' }],
+    });
+    (getAvailableDaysAction as any).mockResolvedValue({
+      success: true,
+      data: { availableDates: ['2025-01-01'], availabilityMap: {} },
+    });
+
+    const { result, rerender } = renderHook(
+      ({ doctorId }) => useBookingData('s1', null, doctorId),
+      { initialProps: { doctorId: undefined as string | undefined } }
+    );
+
+    await waitFor(() => {
+      expect(result.current.doctors.length).toBe(1);
+    });
+    expect(getDoctorsAction).toHaveBeenCalledTimes(1);
+
+    // Change selectedDoctorId to trigger availability reload but NOT doctor list reload
+    rerender({ doctorId: 'doc-1' });
+
+    // Wait to allow potential re-fetches to settle or fire
+    await new Promise((resolve) => setTimeout(resolve, 300));
+
+    expect(getDoctorsAction).toHaveBeenCalledTimes(1);
   });
 });

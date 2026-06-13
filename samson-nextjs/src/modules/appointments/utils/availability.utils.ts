@@ -1,5 +1,11 @@
 import { GeneratedSlot, GenerateSlotsParams } from '../dtos';
 
+function parseTimeToMs(date: string, timeString: string): number {
+  const normalizedTime = timeString.includes(':') ? timeString : `${timeString}:00`;
+  const timeWithSeconds = normalizedTime.length === 5 ? `${normalizedTime}:00` : normalizedTime;
+  return new Date(`${date}T${timeWithSeconds}Z`).getTime();
+}
+
 /**
  * Computes the available time slots for a single date based on working schedules and appointments.
  * Handles lunches, duration-slicing, and overlapping calculations entirely in-memory.
@@ -7,76 +13,52 @@ import { GeneratedSlot, GenerateSlotsParams } from '../dtos';
 export function generateAvailableSlotsForDay(params: GenerateSlotsParams): GeneratedSlot[] {
   const { date, duration, schedules, appointments } = params;
   const availableSlots: GeneratedSlot[] = [];
+  const durationMs = duration * 60 * 1000;
 
   for (const schedule of schedules) {
     const docId = schedule.doctorId;
     if (!docId) continue;
 
-    const docAppointments = appointments.filter(
-      (appt) => appt.doctorId === docId && appt.date === date
-    );
+    // Pre-parse appointments for this doctor to avoid parsing inside the loop
+    const docAppointmentsMs = appointments
+      .filter((appt) => appt.doctorId === docId && appt.date === date)
+      .map((appt) => ({
+        startMs: new Date(appt.startTime).getTime(),
+        endMs: new Date(appt.endTime).getTime(),
+      }));
 
-    const schedStartStr = schedule.startTime.includes(':')
-      ? schedule.startTime
-      : `${schedule.startTime}:00`;
-    const schedEndStr = schedule.endTime.includes(':')
-      ? schedule.endTime
-      : `${schedule.endTime}:00`;
+    const dayStartMs = parseTimeToMs(date, schedule.startTime);
+    const dayEndMs = parseTimeToMs(date, schedule.endTime);
 
-    const dayStart = new Date(
-      `${date}T${schedStartStr.length === 5 ? `${schedStartStr}:00` : schedStartStr}Z`
-    );
-    const dayEnd = new Date(
-      `${date}T${schedEndStr.length === 5 ? `${schedEndStr}:00` : schedEndStr}Z`
-    );
-
-    let breakStart: Date | null = null;
-    let breakEnd: Date | null = null;
+    let breakStartMs: number | null = null;
+    let breakEndMs: number | null = null;
     if (schedule.breakStartTime && schedule.breakEndTime) {
-      const bStartStr = schedule.breakStartTime.includes(':')
-        ? schedule.breakStartTime
-        : `${schedule.breakStartTime}:00`;
-      const bEndStr = schedule.breakEndTime.includes(':')
-        ? schedule.breakEndTime
-        : `${schedule.breakEndTime}:00`;
-      breakStart = new Date(
-        `${date}T${bStartStr.length === 5 ? `${bStartStr}:00` : bStartStr}Z`
-      );
-      breakEnd = new Date(
-        `${date}T${bEndStr.length === 5 ? `${bEndStr}:00` : bEndStr}Z`
-      );
+      breakStartMs = parseTimeToMs(date, schedule.breakStartTime);
+      breakEndMs = parseTimeToMs(date, schedule.breakEndTime);
     }
 
-    let currentStart = new Date(dayStart.getTime());
-    while (currentStart.getTime() + duration * 60 * 1000 <= dayEnd.getTime()) {
-      const currentEnd = new Date(currentStart.getTime() + duration * 60 * 1000);
+    for (let currentStartMs = dayStartMs; currentStartMs + durationMs <= dayEndMs; currentStartMs += durationMs) {
+      const currentEndMs = currentStartMs + durationMs;
 
       const fallsInBreak =
-        breakStart &&
-        breakEnd &&
-        currentStart.getTime() < breakEnd.getTime() &&
-        currentEnd.getTime() > breakStart.getTime();
+        breakStartMs !== null &&
+        breakEndMs !== null &&
+        currentStartMs < breakEndMs &&
+        currentEndMs > breakStartMs;
 
       if (!fallsInBreak) {
-        const hasOverlap = docAppointments.some((appt) => {
-          const apptStart = new Date(appt.startTime);
-          const apptEnd = new Date(appt.endTime);
-          return (
-            currentStart.getTime() < apptEnd.getTime() &&
-            currentEnd.getTime() > apptStart.getTime()
-          );
-        });
+        const hasOverlap = docAppointmentsMs.some(
+          (appt) => currentStartMs < appt.endMs && currentEndMs > appt.startMs
+        );
 
         if (!hasOverlap) {
           availableSlots.push({
-            startTime: currentStart.toISOString(),
-            endTime: currentEnd.toISOString(),
+            startTime: new Date(currentStartMs).toISOString(),
+            endTime: new Date(currentEndMs).toISOString(),
             doctorId: docId,
           });
         }
       }
-
-      currentStart = new Date(currentStart.getTime() + duration * 60 * 1000);
     }
   }
 
