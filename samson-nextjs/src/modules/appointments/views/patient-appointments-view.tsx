@@ -31,6 +31,7 @@ export function PatientAppointmentsView({ initialAppointments, maxReschedules }:
     cancelReason,
     isCancelling,
     blockedRescheduleAppt,
+    warnExcessiveCancellations,
     handleRescheduleClick,
     handleCancelClick,
     handleCancelSubmit,
@@ -155,6 +156,7 @@ export function PatientAppointmentsView({ initialAppointments, maxReschedules }:
         selectedAppt={selectedAppt}
         cancelReason={cancelReason}
         isCancelling={isCancelling}
+        warnExcessiveCancellations={warnExcessiveCancellations}
         onReasonChange={setCancelReason}
         onClose={closeCancelModal}
         onSubmit={handleCancelSubmit}

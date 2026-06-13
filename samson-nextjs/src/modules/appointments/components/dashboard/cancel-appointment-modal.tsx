@@ -10,6 +10,7 @@ interface CancelAppointmentModalProps {
   selectedAppt: AppointmentDto | null;
   cancelReason: string;
   isCancelling: boolean;
+  warnExcessiveCancellations?: boolean;
   onClose: () => void;
   onReasonChange: (reason: string) => void;
   onSubmit: (e: React.FormEvent) => Promise<void>;
@@ -20,6 +21,7 @@ export function CancelAppointmentModal({
   selectedAppt,
   cancelReason,
   isCancelling,
+  warnExcessiveCancellations,
   onClose,
   onReasonChange,
   onSubmit,
@@ -32,6 +34,14 @@ export function CancelAppointmentModal({
       size="sm"
     >
       <form onSubmit={onSubmit} className="flex flex-col gap-4 text-sm text-slate-700 dark:text-slate-300 py-1">
+        {warnExcessiveCancellations && (
+          <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-xs leading-relaxed flex gap-2">
+            <span>⚠️</span>
+            <p>
+              <strong>Excessive Cancellation Warning</strong>: You have cancelled multiple appointments recently. Repeated cancellations impact your booking reliability and may limit future reservation capabilities.
+            </p>
+          </div>
+        )}
         <p className="leading-relaxed">
           Are you sure you want to cancel your <strong>{selectedAppt?.service?.name}</strong> appointment?
         </p>

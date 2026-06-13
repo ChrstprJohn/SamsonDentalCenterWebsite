@@ -16,6 +16,12 @@ interface UseUserDashboardReturn {
   isCancelling: boolean;
   blockedRescheduleAppt: AppointmentDto | null;
   
+  // Reliability Metrics
+  cancelCount: number;
+  noShowCount: number;
+  rescheduleCount: number;
+  warnExcessiveCancellations: boolean;
+
   handleRescheduleClick: (appt: AppointmentDto) => void;
   handleCancelClick: (appt: AppointmentDto) => void;
   handleCancelSubmit: (e: React.FormEvent) => Promise<void>;
@@ -25,13 +31,179 @@ interface UseUserDashboardReturn {
   setBlockedRescheduleAppt: (appt: AppointmentDto | null) => void;
 }
 
+const MOCK_APPOINTMENTS: AppointmentDto[] = [
+  {
+    id: 'a-1',
+    patientId: 'p-1',
+    serviceId: 's-1',
+    doctorId: 'd-1',
+    date: '2026-06-24',
+    startTime: '10:00',
+    endTime: '10:45',
+    status: 'APPROVED',
+    userNote: 'Orthodontic checkup',
+    statusReason: 'Confirmed slot availability.',
+    rescheduleCount: 0,
+    doctor: { id: 'd-1', firstName: 'Christopher', lastName: 'Samson', prefix: 'Dr.', suffix: 'DDS' },
+    service: { id: 's-1', name: 'Orthodontic Consultation', durationMinutes: 45 }
+  },
+  {
+    id: 'a-2',
+    patientId: 'p-1',
+    serviceId: 's-2',
+    doctorId: 'd-1',
+    date: '2026-06-28',
+    startTime: '14:00',
+    endTime: '14:30',
+    status: 'RESCHEDULE_REQUESTED',
+    userNote: 'Routine cleaning',
+    statusReason: 'Patient requested reschedule: change of work hours.',
+    rescheduleCount: 1,
+    doctor: { id: 'd-1', firstName: 'Christopher', lastName: 'Samson', prefix: 'Dr.', suffix: 'DDS' },
+    service: { id: 's-2', name: 'Teeth Cleaning', durationMinutes: 30 }
+  },
+  {
+    id: 'a-3',
+    patientId: 'p-1',
+    serviceId: 's-3',
+    doctorId: 'd-2',
+    date: '2026-06-20',
+    startTime: '11:00',
+    endTime: '12:00',
+    status: 'CHECKED_IN',
+    userNote: 'Severe tooth pain',
+    statusReason: 'Patient checked-in at reception.',
+    rescheduleCount: 0,
+    doctor: { id: 'd-2', firstName: 'Jane', lastName: 'Doe', prefix: 'Dr.', suffix: 'DMD' },
+    service: { id: 's-3', name: 'Root Canal Therapy', durationMinutes: 60 }
+  },
+  {
+    id: 'a-4',
+    patientId: 'p-1',
+    serviceId: 's-4',
+    doctorId: 'd-1',
+    date: '2026-06-30',
+    startTime: '09:00',
+    endTime: '10:00',
+    status: 'PENDING',
+    userNote: 'New whitening treatment request',
+    statusReason: null,
+    rescheduleCount: 0,
+    doctor: { id: 'd-1', firstName: 'Christopher', lastName: 'Samson', prefix: 'Dr.', suffix: 'DDS' },
+    service: { id: 's-4', name: 'Laser Teeth Whitening', durationMinutes: 60 }
+  },
+  {
+    id: 'a-5',
+    patientId: 'p-1',
+    serviceId: 's-2',
+    doctorId: 'd-2',
+    date: '2026-06-05',
+    startTime: '15:00',
+    endTime: '15:30',
+    status: 'COMPLETED',
+    userNote: 'General scaling',
+    statusReason: 'Checkout complete, invoice paid.',
+    rescheduleCount: 0,
+    doctor: { id: 'd-2', firstName: 'Jane', lastName: 'Doe', prefix: 'Dr.', suffix: 'DMD' },
+    service: { id: 's-2', name: 'Teeth Cleaning', durationMinutes: 30 }
+  },
+  {
+    id: 'a-6',
+    patientId: 'p-1',
+    serviceId: 's-1',
+    doctorId: 'd-1',
+    date: '2026-06-01',
+    startTime: '10:00',
+    endTime: '10:45',
+    status: 'CANCELLED',
+    userNote: 'Initial alignment check',
+    statusReason: 'Cancelled by user: Family emergency.',
+    rescheduleCount: 0,
+    doctor: { id: 'd-1', firstName: 'Christopher', lastName: 'Samson', prefix: 'Dr.', suffix: 'DDS' },
+    service: { id: 's-1', name: 'Orthodontic Consultation', durationMinutes: 45 }
+  },
+  {
+    id: 'a-7',
+    patientId: 'p-1',
+    serviceId: 's-3',
+    doctorId: 'd-2',
+    date: '2026-05-25',
+    startTime: '13:00',
+    endTime: '14:00',
+    status: 'REJECTED',
+    userNote: 'Emergency checkup',
+    statusReason: 'Rejected by staff: Roster conflict / doctor unavailable.',
+    rescheduleCount: 0,
+    doctor: { id: 'd-2', firstName: 'Jane', lastName: 'Doe', prefix: 'Dr.', suffix: 'DMD' },
+    service: { id: 's-3', name: 'Root Canal Therapy', durationMinutes: 60 }
+  },
+  {
+    id: 'a-8',
+    patientId: 'p-1',
+    serviceId: 's-4',
+    doctorId: 'd-1',
+    date: '2026-05-20',
+    startTime: '09:00',
+    endTime: '10:00',
+    status: 'DISPLACED',
+    userNote: 'Teeth whitening',
+    statusReason: 'Displaced: Clinic closed on holiday schedule.',
+    rescheduleCount: 0,
+    doctor: { id: 'd-1', firstName: 'Christopher', lastName: 'Samson', prefix: 'Dr.', suffix: 'DDS' },
+    service: { id: 's-4', name: 'Laser Teeth Whitening', durationMinutes: 60 }
+  },
+  {
+    id: 'a-9',
+    patientId: 'p-1',
+    serviceId: 's-2',
+    doctorId: 'd-2',
+    date: '2026-05-15',
+    startTime: '10:00',
+    endTime: '10:30',
+    status: 'NO_SHOW',
+    userNote: 'Routine scaling',
+    statusReason: 'No-show recorded: Patient failed to attend.',
+    rescheduleCount: 0,
+    doctor: { id: 'd-2', firstName: 'Jane', lastName: 'Doe', prefix: 'Dr.', suffix: 'DMD' },
+    service: { id: 's-2', name: 'Teeth Cleaning', durationMinutes: 30 }
+  },
+  {
+    id: 'a-10',
+    patientId: 'p-1',
+    serviceId: 's-1',
+    doctorId: 'd-1',
+    date: '2026-06-12',
+    startTime: '16:00',
+    endTime: '16:45',
+    status: 'TREATMENT_RENDERED',
+    userNote: 'Braces adjust',
+    statusReason: 'Treatment submitted by doctor; draft invoice created.',
+    rescheduleCount: 0,
+    doctor: { id: 'd-1', firstName: 'Christopher', lastName: 'Samson', prefix: 'Dr.', suffix: 'DDS' },
+    service: { id: 's-1', name: 'Orthodontic Consultation', durationMinutes: 45 }
+  }
+].map((a) => ({
+  ...a,
+  createdAt: undefined,
+  updatedAt: undefined,
+  patient: null,
+} as unknown as AppointmentDto));
+
 export function useUserDashboard(
   initialAppointments: AppointmentDto[],
   maxReschedules: number
 ): UseUserDashboardReturn {
-  const [appointments, setAppointments] = useState<AppointmentDto[]>(initialAppointments);
+  // Use mock data fallback if no initial database records are loaded yet
+  const resolvedInitial = initialAppointments.length > 0 ? initialAppointments : MOCK_APPOINTMENTS;
+  const [appointments, setAppointments] = useState<AppointmentDto[]>(resolvedInitial);
   const [selectedAppt, setSelectedAppt] = useState<AppointmentDto | null>(null);
   
+  // Reliability Metrics State (mocked for demo purposes)
+  const [cancelCount] = useState(3);
+  const [noShowCount] = useState(1);
+  const [rescheduleCount] = useState(1);
+  const warnExcessiveCancellations = cancelCount >= 3;
+
   // Cancellation Modal states
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [cancelReason, setCancelReason] = useState('');
@@ -70,8 +242,7 @@ export function useUserDashboard(
     if (!selectedAppt || !cancelReason) return;
 
     setIsCancelling(true);
-    // Simulate API cancellation trigger (Wait for proper patient cancel action later)
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    await new Promise((resolve) => setTimeout(resolve, 1200));
     setIsCancelling(false);
 
     const updated = appointments.map((a) => {
@@ -79,7 +250,7 @@ export function useUserDashboard(
         return {
           ...a,
           status: 'CANCELLED' as const,
-          statusReason: cancelReason, // using standard field
+          statusReason: cancelReason,
         };
       }
       return a;
@@ -114,6 +285,11 @@ export function useUserDashboard(
     cancelReason,
     isCancelling,
     blockedRescheduleAppt,
+
+    cancelCount,
+    noShowCount,
+    rescheduleCount,
+    warnExcessiveCancellations,
     
     handleRescheduleClick,
     handleCancelClick,

@@ -27,6 +27,9 @@ Separate the Patient Portal into distinct pages: Dashboard, My Appointments (tab
   - **Upcoming Tab**: Active confirmed appointments (`APPROVED`, `RESCHEDULE_REQUESTED`, `CHECKED_IN`).
   - **Pending Requests Tab**: Awaiting review (`PENDING`).
   - **History Tab**: Terminal states (`COMPLETED`, `CANCELLED`, `REJECTED`, `DISPLACED`, `NO_SHOW`, `TREATMENT_RENDERED`).
+- [x] Refactor hook to serve robust mock appointments covering all business states:
+  - Include cancel reasons, rejection reasons, displacement reasons, and no-show states.
+  - Track user reliability metrics (`cancelCount`, `noShowCount`, `rescheduleCount`) and display excessive cancellation warnings in the UI if `cancelCount` is high (e.g. >= 3).
 - [x] Support rescheduling requests and cancellations with modal confirmations.
 
 ### Phase 4: Notifications Hub Scaffold
@@ -35,7 +38,7 @@ Separate the Patient Portal into distinct pages: Dashboard, My Appointments (tab
 - [x] Implement filter tabs (All, Unread, Read) and mock actions (Mark as read, Delete, Mark all as read).
 
 ### Phase 5: Account Settings Consolidation
-- [ ] Ensure the `/user/settings` route features both Profile Details (name, avatar, details) and Security/Preferences in a unified layout.
+- [X] Ensure the `/user/settings` route features both Profile Details (name, avatar, details) and Security/Preferences in a unified layout.
 
 ### Phase 6: Verification
 - [x] Verify page transitions, layouts, and responsiveness using the local development server.
