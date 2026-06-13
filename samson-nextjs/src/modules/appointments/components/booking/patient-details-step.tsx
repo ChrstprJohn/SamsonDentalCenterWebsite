@@ -2,14 +2,17 @@
 
 import React, { useState } from 'react';
 import { AddDependentModal } from './add-dependent-modal';
-import { ExistingDependentSelector, MOCK_DEPENDENTS } from './existing-dependent-selector';
+import { ExistingDependentSelector } from './existing-dependent-selector';
 import type { NewDependentInput } from '../../hooks/booking/use-user-booking';
+import type { DependentProfileDto } from '@/modules/patients/dtos';
 
 interface PatientDetailsStepProps {
   patientType: 'SELF' | 'EXISTING_DEPENDENT' | 'NEW_DEPENDENT';
   selectedDependentId: string | null;
   newDependentData: NewDependentInput | null;
   userNote: string;
+  userProfile?: any;
+  userDependents?: DependentProfileDto[];
   onSetPatientType: (type: 'SELF' | 'EXISTING_DEPENDENT' | 'NEW_DEPENDENT') => void;
   onSelectDependent: (id: string | null) => void;
   onSetNewDependent: (data: NewDependentInput | null) => void;
@@ -21,6 +24,8 @@ export function PatientDetailsStep({
   selectedDependentId,
   newDependentData,
   userNote,
+  userProfile,
+  userDependents = [],
   onSetPatientType,
   onSelectDependent,
   onSetNewDependent,
@@ -42,7 +47,7 @@ export function PatientDetailsStep({
       </div>
 
       {/* Recipient Toggles */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 gap-3">
         <button
           type="button"
           onClick={() => {
@@ -62,53 +67,68 @@ export function PatientDetailsStep({
         <button
           type="button"
           onClick={() => {
+            // Default to EXIST_DEPENDENT even if list is empty, we handle adding there
             onSetPatientType('EXISTING_DEPENDENT');
             onSetNewDependent(null);
-            if (MOCK_DEPENDENTS.length > 0 && !selectedDependentId) {
-              onSelectDependent(MOCK_DEPENDENTS[0].id);
+            if (userDependents.length > 0 && !selectedDependentId) {
+              onSelectDependent(userDependents[0].id);
             }
           }}
           className={`p-3 rounded-xl border text-center font-semibold text-xs md:text-sm cursor-pointer transition-all ${
-            patientType === 'EXISTING_DEPENDENT'
+            patientType === 'EXISTING_DEPENDENT' || patientType === 'NEW_DEPENDENT'
               ? 'border-blue-500 bg-blue-50/40 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400'
               : 'border-slate-200/85 dark:border-white/5 bg-white dark:bg-slate-900/30 text-slate-650 dark:text-slate-350'
           }`}
         >
           My Family
         </button>
-
-        <button
-          type="button"
-          onClick={() => setIsModalOpen(true)}
-          className={`p-3 rounded-xl border text-center font-semibold text-xs md:text-sm cursor-pointer transition-all border-dashed ${
-            patientType === 'NEW_DEPENDENT'
-              ? 'border-blue-500 bg-blue-50/40 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400'
-              : 'border-slate-200/85 dark:border-white/5 bg-white dark:bg-slate-900/30 text-slate-650 dark:text-slate-350'
-          }`}
-        >
-          + Add New
-        </button>
       </div>
 
       {/* Recipient Details Block */}
       {patientType === 'SELF' && (
-        <div className="p-4 rounded-2xl border border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-slate-900/40 text-xs flex flex-col gap-2">
-          <div className="flex justify-between">
-            <span className="text-slate-400">Recipient Name</span>
-            <span className="font-semibold text-slate-700 dark:text-slate-250">Patient (Self)</span>
+        <div className="p-4 rounded-2xl border border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-slate-900/40 text-xs flex flex-col gap-3">
+          <div className="flex flex-col gap-1">
+            <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Recipient Name</span>
+            <span className="font-semibold text-sm text-slate-700 dark:text-slate-250">
+              {userProfile 
+                ? [userProfile.firstName, userProfile.middleName, userProfile.lastName, userProfile.suffix].filter(Boolean).join(' ') 
+                : 'Patient (Self)'}
+            </span>
           </div>
-          <p className="text-[10px] text-slate-500 mt-1">Profile contact details are auto-loaded securely from your credential session records.</p>
+          <div className="flex flex-col sm:flex-row gap-4 pt-3 border-t border-slate-200 dark:border-white/5">
+            <div className="flex flex-col gap-1">
+               <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Contact Email</span>
+               <span className="text-slate-600 dark:text-slate-300 font-medium">{userProfile?.email || 'N/A'}</span>
+            </div>
+            <div className="flex flex-col gap-1">
+               <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Phone Number</span>
+               <span className="text-slate-600 dark:text-slate-300 font-medium">{userProfile?.phoneNumber || 'N/A'}</span>
+            </div>
+            <div className="flex flex-col gap-1">
+               <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Date of Birth</span>
+               <span className="text-slate-600 dark:text-slate-300 font-medium">{userProfile?.dateOfBirth || 'N/A'}</span>
+            </div>
+          </div>
+          <p className="text-[10px] text-slate-500 mt-2 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 p-2 rounded-lg">
+            ℹ️ All booking confirmations and clinical updates will be securely sent to these contact details. They cannot be edited here.
+          </p>
         </div>
       )}
 
-      {patientType === 'EXISTING_DEPENDENT' && (
-        <ExistingDependentSelector
-          selectedDependentId={selectedDependentId}
-          onSelectDependent={onSelectDependent}
-        />
-      )}
-
-      {patientType === 'NEW_DEPENDENT' && newDependentData && (
+      {(patientType === 'EXISTING_DEPENDENT' || patientType === 'NEW_DEPENDENT') && (
+        <div className="flex flex-col gap-4">
+          <ExistingDependentSelector
+            dependents={userDependents}
+            selectedDependentId={patientType === 'EXISTING_DEPENDENT' ? selectedDependentId : null}
+            onSelectDependent={(id) => {
+              onSetPatientType('EXISTING_DEPENDENT');
+              onSetNewDependent(null);
+              onSelectDependent(id);
+            }}
+            onAddNew={() => setIsModalOpen(true)}
+          />
+          
+          {patientType === 'NEW_DEPENDENT' && newDependentData && (
         <div className="p-4 rounded-2xl border border-blue-200/50 bg-blue-500/5 text-xs flex flex-col gap-2">
           <div className="flex justify-between items-center">
             <span className="text-blue-500 font-bold">New Family Member Attached</span>
@@ -126,6 +146,8 @@ export function PatientDetailsStep({
             <span>DOB: {newDependentData.birthday}</span>
           </div>
         </div>
+      )}
+      </div>
       )}
 
       {/* Booking Notes */}

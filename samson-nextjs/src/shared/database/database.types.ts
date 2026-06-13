@@ -1,4 +1,4 @@
-﻿export type Json =
+export type Json =
   | string
   | number
   | boolean
@@ -227,33 +227,36 @@ export type Database = {
           created_at: string
           date_of_birth: string
           first_name: string
-          gender: Database["public"]["Enums"]["gender"] | null
           id: string
           last_name: string
+          middle_name: string | null
           patient_id: string
           relationship: Database["public"]["Enums"]["dependent_relationship"]
+          suffix: string | null
           updated_at: string
         }
         Insert: {
           created_at?: string
           date_of_birth: string
           first_name: string
-          gender?: Database["public"]["Enums"]["gender"] | null
           id?: string
           last_name: string
+          middle_name?: string | null
           patient_id: string
           relationship?: Database["public"]["Enums"]["dependent_relationship"]
+          suffix?: string | null
           updated_at?: string
         }
         Update: {
           created_at?: string
           date_of_birth?: string
           first_name?: string
-          gender?: Database["public"]["Enums"]["gender"] | null
           id?: string
           last_name?: string
+          middle_name?: string | null
           patient_id?: string
           relationship?: Database["public"]["Enums"]["dependent_relationship"]
+          suffix?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -496,7 +499,6 @@ export type Database = {
         | "PARENT"
         | "SIBLING"
         | "OTHER"
-      gender: "MALE" | "FEMALE"
       invoice_status: "DRAFT" | "FINALIZED" | "PAID" | "VOID"
       payment_method: "CASH" | "CARD" | "HMO"
       service_type: "GENERAL" | "SPECIALIZED"
@@ -641,7 +643,6 @@ export const Constants = {
         "NO_SHOW",
       ],
       dependent_relationship: ["CHILD", "SPOUSE", "PARENT", "SIBLING", "OTHER"],
-      gender: ["MALE", "FEMALE"],
       invoice_status: ["DRAFT", "FINALIZED", "PAID", "VOID"],
       payment_method: ["CASH", "CARD", "HMO"],
       service_type: ["GENERAL", "SPECIALIZED"],

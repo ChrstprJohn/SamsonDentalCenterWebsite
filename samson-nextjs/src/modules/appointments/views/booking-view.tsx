@@ -11,12 +11,15 @@ import { BookingProgressTabs } from '../components/booking/booking-progress-tabs
 import { BookingFooterControls } from '../components/booking/booking-footer-controls';
 import { Button } from '@/components/ui/button';
 import type { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
+import type { DependentProfileDto } from '@/modules/patients/dtos';
 
 interface BookingViewProps {
   services: ServiceResponseDto[];
+  userProfile?: any;
+  userDependents?: DependentProfileDto[];
 }
 
-export function BookingView({ services }: BookingViewProps) {
+export function BookingView({ services, userProfile, userDependents }: BookingViewProps) {
   const {
     currentStep,
     selectedService,
@@ -52,7 +55,7 @@ export function BookingView({ services }: BookingViewProps) {
     setTermsAccepted,
     setPrivacyAccepted,
     handleSubmit,
-  } = useUserBooking(services);
+  } = useUserBooking(services, userProfile, userDependents);
 
   if (isSuccess) {
     return (
@@ -102,6 +105,8 @@ export function BookingView({ services }: BookingViewProps) {
             selectedDependentId={selectedDependentId}
             newDependentData={newDependentData}
             userNote={userNote}
+            userProfile={userProfile}
+            userDependents={userDependents}
             onSetPatientType={setPatientType}
             onSelectDependent={setSelectedDependentId}
             onSetNewDependent={setNewDependentData}

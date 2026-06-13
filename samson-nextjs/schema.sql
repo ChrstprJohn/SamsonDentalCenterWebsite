@@ -9,7 +9,6 @@ CREATE EXTENSION IF NOT EXISTS "btree_gist"; -- Required for overlapping time-ra
 -- 2. ENUMS
 CREATE TYPE user_role AS ENUM ('PATIENT', 'SECRETARY', 'DOCTOR', 'ADMIN');
 CREATE TYPE dependent_relationship AS ENUM ('CHILD', 'SPOUSE', 'PARENT', 'SIBLING', 'OTHER');
-CREATE TYPE gender AS ENUM ('MALE', 'FEMALE');
 CREATE TYPE service_type AS ENUM ('GENERAL', 'SPECIALIZED');
 CREATE TYPE appointment_status AS ENUM ('PENDING', 'APPROVED', 'REJECTED', 'CANCELLED', 'RESCHEDULE_REQUESTED', 'DISPLACED', 'CHECKED_IN', 'TREATMENT_RENDERED', 'COMPLETED', 'NO_SHOW');
 CREATE TYPE invoice_status AS ENUM ('DRAFT', 'FINALIZED', 'PAID', 'VOID');
@@ -41,9 +40,10 @@ CREATE TABLE dependents (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     patient_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
     first_name TEXT NOT NULL,
+    middle_name TEXT,
     last_name TEXT NOT NULL,
+    suffix TEXT,
     date_of_birth DATE NOT NULL,
-    gender gender,
     relationship dependent_relationship DEFAULT 'OTHER'::dependent_relationship NOT NULL,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL

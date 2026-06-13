@@ -35,7 +35,6 @@ export const submitBookingSchema = z
             .optional()
             .or(emptyStringToUndefined)
             .optional(),
-        dependentSex: z.enum(['MALE', 'FEMALE']).optional(),
         dependentRelationship: z.string().trim().optional(),
     })
     .superRefine((data, ctx) => {
@@ -85,13 +84,6 @@ export const submitBookingSchema = z
                     code: z.ZodIssueCode.custom,
                     message: 'Dependent birthday is required',
                     path: ['dependentBirthday'],
-                });
-            }
-            if (!data.dependentSex) {
-                ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    message: 'Dependent sex is required',
-                    path: ['dependentSex'],
                 });
             }
         }

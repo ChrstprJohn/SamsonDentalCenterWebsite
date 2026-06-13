@@ -25,7 +25,6 @@ export interface NewDependentInput {
   lastName: string;
   suffix?: string;
   birthday: string;
-  sex: 'MALE' | 'FEMALE';
   relationship: string;
   clinicalNotes?: string;
 }
@@ -71,7 +70,11 @@ interface UseUserBookingReturn {
   handleSubmit: () => Promise<void>;
 }
 
-export function useUserBooking(services: ServiceResponseDto[] = []): UseUserBookingReturn {
+export function useUserBooking(
+  services: ServiceResponseDto[] = [],
+  userProfile?: any,
+  userDependents?: any[]
+): UseUserBookingReturn {
   const searchParams = useSearchParams();
   const { addToast } = useToast();
 

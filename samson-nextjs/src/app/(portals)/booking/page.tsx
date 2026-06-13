@@ -5,6 +5,9 @@ import { createClient } from '@/shared/database/server';
 import { getClinicConfigAction } from '@/modules/clinic-config/actions/settings/get-clinic-config.action';
 import { BookingView } from '@/modules/appointments/views/booking-view';
 import type { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
+import { getPatientProfileAction } from '@/modules/patients/actions/profile/get-patient-profile.action';
+import { getUserDependentsAction } from '@/modules/patients/actions/dependents/get-user-dependents.action';
+import { getAuthenticatedUser } from '@/shared/auth/auth.util';
 
 export const metadata = {
   title: 'Book Appointment | Patient Portal',
@@ -14,6 +17,8 @@ export const metadata = {
 export default async function BookingPage() {
   let services: ServiceResponseDto[] = [];
   let clinicConfig = null;
+  let userProfile: any = null;
+  let userDependents: any[] = [];
 
   try {
     const supabase = await createClient();
@@ -31,6 +36,21 @@ export default async function BookingPage() {
     
     if (configRes && 'data' in configRes && configRes.data) {
       clinicConfig = configRes.data;
+    }
+
+    const user = await getAuthenticatedUser();
+    if (user) {
+      const [profileRes, dependentsRes] = await Promise.all([
+        getPatientProfileAction(),
+        getUserDependentsAction(user.id)
+      ]);
+
+      if (profileRes.success && profileRes.data) {
+        userProfile = profileRes.data;
+      }
+      if (dependentsRes.success && dependentsRes.data) {
+        userDependents = dependentsRes.data;
+      }
     }
   } catch (err) {
     console.error('Failed to load data on booking portal page:', err);
@@ -59,7 +79,11 @@ export default async function BookingPage() {
 
   return (
     <main className="flex-1 flex items-center justify-center p-6 bg-gradient-to-br from-background to-secondary-bg min-h-[80vh]">
-      <BookingView services={services} />
+      <BookingView 
+        services={services} 
+        userProfile={userProfile} 
+        userDependents={userDependents} 
+      />
     </main>
   );
 }

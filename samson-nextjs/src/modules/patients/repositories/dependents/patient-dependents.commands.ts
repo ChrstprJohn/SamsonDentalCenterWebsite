@@ -8,7 +8,9 @@ export const addDependentCommand = (supabase: SupabaseClient) => {
       .insert({
         patient_id: data.patientId,
         first_name: data.firstName,
+        middle_name: data.middleName || null,
         last_name: data.lastName,
+        suffix: data.suffix || null,
         date_of_birth: data.dateOfBirth,
         relationship: data.relationship,
       })

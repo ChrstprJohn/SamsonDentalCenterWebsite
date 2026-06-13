@@ -15,8 +15,8 @@ export function AddDependentModal({ isOpen, onClose, onSubmit }: AddDependentMod
   const [firstName, setFirstName] = useState('');
   const [middleName, setMiddleName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [suffix, setSuffix] = useState('');
   const [dob, setDob] = useState('');
-  const [sex, setSex] = useState<'MALE' | 'FEMALE'>('MALE');
   const [relationship, setRelationship] = useState('Child');
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -27,8 +27,8 @@ export function AddDependentModal({ isOpen, onClose, onSubmit }: AddDependentMod
       firstName,
       middleName: middleName || undefined,
       lastName,
+      suffix: suffix || undefined,
       birthday: dob,
-      sex,
       relationship,
     });
     
@@ -36,8 +36,8 @@ export function AddDependentModal({ isOpen, onClose, onSubmit }: AddDependentMod
     setFirstName('');
     setMiddleName('');
     setLastName('');
+    setSuffix('');
     setDob('');
-    setSex('MALE');
     setRelationship('Child');
   };
 
@@ -96,6 +96,16 @@ export function AddDependentModal({ isOpen, onClose, onSubmit }: AddDependentMod
 
         <div className="grid grid-cols-2 gap-4">
           <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-semibold text-slate-500">Suffix (Opt)</label>
+            <input
+              type="text"
+              value={suffix}
+              onChange={(e) => setSuffix(e.target.value)}
+              placeholder="e.g. Jr, Sr, III"
+              className="px-3 py-2 rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-950 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800 dark:text-white"
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
             <label className="text-xs font-semibold text-slate-500">Relationship</label>
             <select
               value={relationship}
@@ -107,30 +117,6 @@ export function AddDependentModal({ isOpen, onClose, onSubmit }: AddDependentMod
               <option value="Parent">Parent</option>
               <option value="Sibling">Sibling</option>
             </select>
-          </div>
-
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-slate-500">Biological Sex</label>
-            <div className="flex gap-4 mt-2">
-              <label className="flex items-center gap-1.5 cursor-pointer">
-                <input
-                  type="radio"
-                  name="sex"
-                  checked={sex === 'MALE'}
-                  onChange={() => setSex('MALE')}
-                />
-                Male
-              </label>
-              <label className="flex items-center gap-1.5 cursor-pointer">
-                <input
-                  type="radio"
-                  name="sex"
-                  checked={sex === 'FEMALE'}
-                  onChange={() => setSex('FEMALE')}
-                />
-                Female
-              </label>
-            </div>
           </div>
         </div>
 
