@@ -20,19 +20,8 @@ export function AppointmentSummaryCard({ appt }: AppointmentSummaryCardProps) {
   
   // Try parsing date/time
   const dateStr = formatShortDate(appt.date);
-  // Reconstruct an ISO string to get time window
-  const safeFormatTime = (timeStr: string) => {
-    try {
-      if (!timeStr) return '';
-      // Create a dummy ISO string so formatClinicTime works correctly (e.g. 2026-06-24T10:00:00Z)
-      const dummyIso = `${appt.date || '1970-01-01'}T${timeStr.includes(':') && timeStr.length === 5 ? timeStr + ':00' : timeStr}Z`;
-      return formatClinicTime(dummyIso);
-    } catch {
-      return timeStr;
-    }
-  };
-
-  const timeWindow = `${safeFormatTime(appt.startTime)} - ${safeFormatTime(appt.endTime)}`;
+  // Use standard clinic time utility
+  const timeWindow = `${formatClinicTime(appt.startTime)} - ${formatClinicTime(appt.endTime)}`;
 
   const getStatusLabel = (status: string) => {
     switch (status) {
