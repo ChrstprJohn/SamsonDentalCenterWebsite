@@ -10,3 +10,4 @@ export * from './status/request-reschedule.dto';
 export * from './status/update-appointment-status.dto';
 export * from './clinic/get-clinic-appointments.dto';
 export * from './treatment/submit-treatment.dto';
+export * from './patient/get-appointment-by-id.dto';

@@ -3,9 +3,8 @@ import { notFound } from 'next/navigation';
 import { AppointmentDetailView } from '@/modules/appointments/views/appointment-detail-view';
 import { getClinicConfigAction } from '@/modules/clinic-config/actions/settings/get-clinic-config.action';
 import { MOCK_APPOINTMENTS } from '@/modules/appointments/dtos/shared/mock-appointments';
-import { createClient } from '@/shared/database/server';
-import { getAppointmentByIdQuery } from '@/modules/appointments/repositories';
 import { AppointmentDto } from '@/modules/appointments/dtos';
+import { getAppointmentByIdAction } from '@/modules/appointments/actions/patient/get-appointment-by-id.action';
 
 export const metadata = {
   title: 'Appointment Details | Samson Dental Center',
@@ -37,9 +36,12 @@ export default async function AppointmentDetailPage({ params }: PageProps) {
 
   if (isUuid) {
     try {
-      const supabase = await createClient();
-      const getAppointmentById = getAppointmentByIdQuery(supabase);
-      appt = await getAppointmentById(id);
+      const res = await getAppointmentByIdAction(id);
+      if (res.success && res.data) {
+        appt = res.data;
+      } else {
+        console.warn(`getAppointmentByIdAction failed to fetch: ${res.error}`);
+      }
     } catch (err) {
       console.warn(`Could not fetch appointment with id ${id} from database, attempting fallback:`, err);
     }

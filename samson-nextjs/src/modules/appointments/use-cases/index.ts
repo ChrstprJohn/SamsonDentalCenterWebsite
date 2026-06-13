@@ -7,5 +7,6 @@ export * from './status/update-appointment-status.use-case';
 export * from './patient/get-patient-appointments.use-case';
 export * from './clinic/get-clinic-appointments.use-case';
 export * from './treatment/submit-treatment.use-case';
+export * from './patient/get-appointment-by-id.use-case';
 
 
