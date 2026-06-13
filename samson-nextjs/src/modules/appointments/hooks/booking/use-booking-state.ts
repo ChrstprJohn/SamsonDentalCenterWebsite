@@ -14,8 +14,6 @@ export function useBookingState() {
   const [newDependentData, setNewDependentData] = useState<NewDependentInput | null>(null);
   
   const [userNote, setUserNote] = useState<string>('');
-  const [termsAccepted, setTermsAccepted] = useState<boolean>(false);
-  const [privacyAccepted, setPrivacyAccepted] = useState<boolean>(false);
 
   const resetState = () => {
     setCurrentStep(1);
@@ -27,8 +25,6 @@ export function useBookingState() {
     setSelectedDependentId(null);
     setNewDependentData(null);
     setUserNote('');
-    setTermsAccepted(false);
-    setPrivacyAccepted(false);
   };
 
   return {
@@ -41,8 +37,6 @@ export function useBookingState() {
     selectedDependentId, setSelectedDependentId,
     newDependentData, setNewDependentData,
     userNote, setUserNote,
-    termsAccepted, setTermsAccepted,
-    privacyAccepted, setPrivacyAccepted,
     resetState,
   };
 }

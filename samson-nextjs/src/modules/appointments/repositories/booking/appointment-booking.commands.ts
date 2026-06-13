@@ -1,43 +1,32 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { DomainError } from '@/shared/errors';
 import { SubmitBookingDto, AppointmentDto, mapAppointmentRecord } from '../../dtos';
-import { outboxCommands } from '@/shared/outbox/outbox.commands';
 
-export const createAppointmentCommand = (supabase: SupabaseClient) => {
-  return async (userId: string, data: SubmitBookingDto & { resolvedDependentId?: string }): Promise<AppointmentDto> => {
-    const { data: appointment, error } = await supabase
-      .from('appointments')
-      .insert({
-        patient_id: userId,
-        status: 'PENDING',
-        service_id: data.serviceId,
-        doctor_id: data.doctorId,
-        dependent_id: data.resolvedDependentId || data.dependentId || null,
-        date: data.date,
-        start_time: data.startTime,
-        end_time: data.endTime,
-        user_note: data.userNote || null,
-      })
-      .select('*')
-      .single();
+export const executeBookingTransactionCommand = (supabase: SupabaseClient) => {
+  return async (userId: string, data: SubmitBookingDto): Promise<{ appointmentId: string }> => {
+    
+    const { data: appointmentId, error } = await supabase.rpc('submit_booking_transaction', {
+      p_patient_id: userId,
+      p_service_id: data.serviceId,
+      p_doctor_id: data.doctorId,
+      p_date: data.date,
+      p_start_time: data.startTime,
+      p_end_time: data.endTime,
+      p_user_note: data.userNote || null,
+      p_existing_dependent_id: data.patientType === 'EXISTING_DEPENDENT' ? data.dependentId : null,
+      p_new_dependent_first_name: data.patientType === 'NEW_DEPENDENT' ? data.dependentFirstName : null,
+      p_new_dependent_last_name: data.patientType === 'NEW_DEPENDENT' ? data.dependentLastName : null,
+      p_new_dependent_date_of_birth: data.patientType === 'NEW_DEPENDENT' ? data.dependentBirthday : null,
+      p_new_dependent_relationship: data.patientType === 'NEW_DEPENDENT' ? data.dependentRelationship : null,
+    });
 
-    if (error || !appointment) {
+    if (error || !appointmentId) {
       throw new DomainError(
-        `Failed to create appointment: ${error?.message || 'Unknown database error'}`,
+        `Failed to submit booking: ${error?.message || 'Unknown database error'}`,
         'DATABASE_ERROR'
       );
     }
 
-    // Emit domain event for async side effects (like email notifications)
-    await outboxCommands(supabase).emitEvent('APPOINTMENT_BOOKED', {
-      appointmentId: appointment.id,
-      patientId: appointment.patient_id,
-      serviceId: appointment.service_id,
-      doctorId: appointment.doctor_id,
-      date: appointment.date,
-      startTime: appointment.start_time,
-    });
-
-    return mapAppointmentRecord(appointment as Record<string, unknown>);
+    return { appointmentId: appointmentId as string };
   };
 };

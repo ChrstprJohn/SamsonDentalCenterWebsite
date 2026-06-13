@@ -41,6 +41,9 @@ describe('requestRescheduleAction', () => {
         doctor_id: 'da95a63c-333e-4b68-98e3-82bdf1a07bd4',
         status: 'PENDING',
         patient_id: validUserId,
+        date: '2025-01-01',
+        start_time: '2025-01-01T10:00:00Z',
+        end_time: '2025-01-01T10:30:00Z',
       },
       error: null,
     });

@@ -23,7 +23,9 @@ describe('PatientAppointmentsQueries', () => {
         service_id: '2a95a63c-333e-4b68-98e3-82bdf1a07bd2',
         doctor_id: '3a95a63c-333e-4b68-98e3-82bdf1a07bd2',
         status: 'PENDING',
-        start_time: '2023-10-10T10:00:00Z'
+        date: '2023-10-10',
+        start_time: '2023-10-10T10:00:00Z',
+        end_time: '2023-10-10T10:30:00Z'
       }];
       mockSupabase.order.mockResolvedValueOnce({ data: mockData, error: null });
 

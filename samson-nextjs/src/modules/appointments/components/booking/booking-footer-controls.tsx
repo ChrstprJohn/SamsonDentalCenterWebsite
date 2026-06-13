@@ -7,8 +7,6 @@ interface BookingFooterControlsProps {
   currentStep: number;
   isNextDisabled: () => boolean;
   isSubmitting: boolean;
-  termsAccepted: boolean;
-  privacyAccepted: boolean;
   prevStep: () => void;
   nextStep: () => void;
   handleSubmit: () => void;
@@ -18,8 +16,6 @@ export function BookingFooterControls({
   currentStep,
   isNextDisabled,
   isSubmitting,
-  termsAccepted,
-  privacyAccepted,
   prevStep,
   nextStep,
   handleSubmit,
@@ -44,7 +40,7 @@ export function BookingFooterControls({
       ) : (
         <Button
           onClick={handleSubmit}
-          disabled={isSubmitting || !termsAccepted || !privacyAccepted}
+          disabled={isSubmitting}
         >
           {isSubmitting ? 'Finalizing...' : 'Submit Booking'}
         </Button>

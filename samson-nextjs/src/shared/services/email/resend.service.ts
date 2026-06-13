@@ -4,6 +4,7 @@ import { render } from '@react-email/components';
 import React from 'react';
 import SignupOtpEmail from '@/components/emails/signup-otp-email';
 import ResetPasswordOtpEmail from '@/components/emails/reset-password-otp-email';
+import AppointmentBookedEmail from '@/components/emails/appointment-booked-email';
 
 if (!process.env.RESEND_API_KEY) {
   // We don't throw an error at boot, but we will throw when attempting to send if missing.
@@ -16,6 +17,15 @@ const resend = new Resend(process.env.RESEND_API_KEY || 're_test_123');
 type EmailTemplates = {
   'signup_otp': { firstName: string; otpCode: string };
   'reset_password_otp': { firstName: string; otpCode: string };
+  'appointment_booked': {
+    patientName: string;
+    serviceName: string;
+    doctorName: string;
+    dateStr: string;
+    timeRangeStr: string;
+    appointmentId: string;
+    dashboardUrl: string;
+  };
 };
 
 export const ResendService = {
@@ -51,6 +61,19 @@ export const ResendService = {
         html = await render(React.createElement(ResetPasswordOtpEmail, { 
           firstName: resetPayload.firstName, 
           otpCode: resetPayload.otpCode 
+        }));
+        break;
+      }
+      case 'appointment_booked': {
+        const bookedPayload = payload as EmailTemplates['appointment_booked'];
+        html = await render(React.createElement(AppointmentBookedEmail, { 
+          patientName: bookedPayload.patientName,
+          serviceName: bookedPayload.serviceName,
+          doctorName: bookedPayload.doctorName,
+          dateStr: bookedPayload.dateStr,
+          timeRangeStr: bookedPayload.timeRangeStr,
+          appointmentId: bookedPayload.appointmentId,
+          dashboardUrl: bookedPayload.dashboardUrl,
         }));
         break;
       }

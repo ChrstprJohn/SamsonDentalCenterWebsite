@@ -50,6 +50,7 @@ describe('BookingView', () => {
     userNote: '',
     isSubmitting: false,
     isSuccess: false,
+    createdAppointmentId: null,
     
     setCurrentStep: vi.fn(),
     setSelectedService: vi.fn(),

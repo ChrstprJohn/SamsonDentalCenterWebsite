@@ -16,7 +16,8 @@ describe('createBookingPayload Mapper', () => {
   } as ServiceResponseDto;
 
   const mockSlot = {
-    time: '10:00:00',
+    time: '10:00 AM',
+    originalStartTime: '2025-01-01T10:00:00.000Z',
     doctorId: 'doc-1',
     doctorName: 'Dr. John',
     isPreferred: true,
@@ -41,8 +42,8 @@ describe('createBookingPayload Mapper', () => {
     expect(payload.dependentId).toBeUndefined();
     
     // Check time mappings
-    expect(payload.startTime).toBe(new Date('2025-01-01 10:00:00').toISOString());
-    expect(payload.endTime).toBe(new Date(new Date('2025-01-01 10:00:00').getTime() + 30 * 60000).toISOString());
+    expect(payload.startTime).toBe('2025-01-01T10:00:00.000Z');
+    expect(payload.endTime).toBe('2025-01-01T10:30:00.000Z');
   });
 
   it('should map dependent fields for NEW_DEPENDENT', () => {
@@ -57,7 +58,7 @@ describe('createBookingPayload Mapper', () => {
         lastName: 'Doe',
         middleName: '',
         suffix: '',
-        sex: 'FEMALE',
+
         relationship: 'DAUGHTER',
         birthday: '2015-01-01',
       },
@@ -67,7 +68,6 @@ describe('createBookingPayload Mapper', () => {
     expect(payload.patientType).toBe('NEW_DEPENDENT');
     expect(payload.dependentFirstName).toBe('Jane');
     expect(payload.dependentLastName).toBe('Doe');
-    expect(payload.dependentSex).toBe('FEMALE');
   });
 
   it('should map dependent ID for EXISTING_DEPENDENT', () => {

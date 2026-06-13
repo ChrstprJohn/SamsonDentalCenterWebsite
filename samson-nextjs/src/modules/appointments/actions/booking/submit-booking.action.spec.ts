@@ -6,6 +6,9 @@ import { createClient } from '@/shared/database/server';
 vi.mock('server-only', () => ({}));
 vi.mock('@/shared/auth/auth.util');
 vi.mock('@/shared/database/server');
+vi.mock('next/server', () => ({
+  after: vi.fn(),
+}));
 
 vi.mock('../../use-cases/availability/get-availability.use-case', () => {
   return {
@@ -43,7 +46,7 @@ vi.mock('../../repositories', async (importOriginal) => {
     getServiceDurationQuery: () => mockGetServiceDuration,
     getDoctorSchedulesQuery: () => vi.fn(),
     getExistingAppointmentsQuery: () => vi.fn(),
-    createAppointmentCommand: () => vi.fn(),
+    executeBookingTransactionCommand: () => vi.fn(),
   };
 });
 

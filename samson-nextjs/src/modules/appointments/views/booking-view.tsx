@@ -30,8 +30,6 @@ export function BookingView({ services, userProfile, userDependents }: BookingVi
     selectedDependentId,
     newDependentData,
     userNote,
-    termsAccepted,
-    privacyAccepted,
     availableDates,
     availableSlots,
     doctors,
@@ -39,6 +37,7 @@ export function BookingView({ services, userProfile, userDependents }: BookingVi
     isLoadingDoctors,
     isSubmitting,
     isSuccess,
+    createdAppointmentId,
     isNextDisabled,
 
     nextStep,
@@ -52,14 +51,13 @@ export function BookingView({ services, userProfile, userDependents }: BookingVi
     setSelectedDependentId,
     setNewDependentData,
     setUserNote,
-    setTermsAccepted,
-    setPrivacyAccepted,
     handleSubmit,
   } = useUserBooking(services, userProfile, userDependents);
 
   if (isSuccess) {
     return (
       <BookingSuccessView 
+        appointmentId={createdAppointmentId}
         service={selectedService}
         slot={selectedSlot}
         date={selectedDate}
@@ -121,11 +119,9 @@ export function BookingView({ services, userProfile, userDependents }: BookingVi
             patientType={patientType}
             selectedDependentId={selectedDependentId}
             newDependentData={newDependentData}
+            userProfile={userProfile}
+            userDependents={userDependents}
             userNote={userNote}
-            termsAccepted={termsAccepted}
-            privacyAccepted={privacyAccepted}
-            onSetTermsAccepted={setTermsAccepted}
-            onSetPrivacyAccepted={setPrivacyAccepted}
             onEditStep={goToStep}
           />
         )}
@@ -136,8 +132,6 @@ export function BookingView({ services, userProfile, userDependents }: BookingVi
         currentStep={currentStep}
         isNextDisabled={isNextDisabled}
         isSubmitting={isSubmitting}
-        termsAccepted={termsAccepted}
-        privacyAccepted={privacyAccepted}
         prevStep={prevStep}
         nextStep={nextStep}
         handleSubmit={handleSubmit}

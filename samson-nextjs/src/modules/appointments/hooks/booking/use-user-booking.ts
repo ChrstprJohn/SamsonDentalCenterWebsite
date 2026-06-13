@@ -40,8 +40,6 @@ interface UseUserBookingReturn {
   selectedDependentId: string | null;
   newDependentData: NewDependentInput | null;
   userNote: string;
-  termsAccepted: boolean;
-  privacyAccepted: boolean;
   
   availableDates: string[];
   availableSlots: BookingSlot[];
@@ -51,6 +49,7 @@ interface UseUserBookingReturn {
 
   isSubmitting: boolean;
   isSuccess: boolean;
+  createdAppointmentId: string | null;
   isNextDisabled: () => boolean;
 
   nextStep: () => void;
@@ -64,8 +63,6 @@ interface UseUserBookingReturn {
   setSelectedDependentId: (id: string | null) => void;
   setNewDependentData: (data: NewDependentInput | null) => void;
   setUserNote: (note: string) => void;
-  setTermsAccepted: (accepted: boolean) => void;
-  setPrivacyAccepted: (accepted: boolean) => void;
   validateAbuse: () => { valid: boolean; message?: string };
   resetWizard: () => void;
   handleSubmit: () => Promise<void>;
@@ -84,6 +81,7 @@ export function useUserBooking(
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [createdAppointmentId, setCreatedAppointmentId] = useState<string | null>(null);
 
   // Auto-select service if passed in query param
   useEffect(() => {
@@ -161,6 +159,7 @@ export function useUserBooking(
     data.setAvailableDates([]);
     data.setAvailableSlots([]);
     setIsSuccess(false);
+    setCreatedAppointmentId(null);
     setIsSubmitting(false);
   };
 
@@ -173,13 +172,7 @@ export function useUserBooking(
     }
     return false;
   };
-
   const handleSubmit = async () => {
-    if (!state.termsAccepted || !state.privacyAccepted) {
-      addToast('Please accept both terms and privacy policies.', 'error');
-      return;
-    }
-
     if (!state.selectedService || !state.selectedDate || !state.selectedSlot) {
       addToast('Missing booking details.', 'error');
       return;
@@ -206,6 +199,7 @@ export function useUserBooking(
     try {
       const response = await submitBookingAction(payload);
       if (response.success) {
+        setCreatedAppointmentId(response.data?.appointmentId || null);
         setIsSuccess(true);
         addToast('Appointment scheduled successfully!', 'success');
       } else {
@@ -223,6 +217,7 @@ export function useUserBooking(
     ...data,
     isSubmitting,
     isSuccess,
+    createdAppointmentId,
     isNextDisabled,
     nextStep,
     prevStep,

@@ -21,7 +21,10 @@ describe('ClinicAppointmentsQueries', () => {
         id: '1a95a63c-333e-4b68-98e3-82bdf1a07bd2',
         service_id: '2a95a63c-333e-4b68-98e3-82bdf1a07bd2',
         doctor_id: '3a95a63c-333e-4b68-98e3-82bdf1a07bd2',
-        status: 'PENDING'
+        status: 'PENDING',
+        date: '2025-01-01',
+        start_time: '2025-01-01T10:00:00.000Z',
+        end_time: '2025-01-01T10:30:00.000Z',
       }];
       mockSupabase.order = vi.fn().mockReturnValue(Promise.resolve({ data: mockData, error: null }));
 

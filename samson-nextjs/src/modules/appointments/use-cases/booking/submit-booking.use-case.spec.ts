@@ -4,7 +4,7 @@ import { SubmitBookingDto } from '../../dtos/booking/submit-booking.dto';
 import { ValidationError } from '@/shared/errors';
 
 describe('submitBookingUseCase', () => {
-  let mockCreateAppointment: any;
+  let mockExecuteBookingTransaction: any;
   let mockGetAvailableTimeSlots: any;
 
   const mockDto: SubmitBookingDto = {
@@ -20,7 +20,7 @@ describe('submitBookingUseCase', () => {
   };
 
   beforeEach(() => {
-    mockCreateAppointment = vi.fn();
+    mockExecuteBookingTransaction = vi.fn();
     mockGetAvailableTimeSlots = vi.fn();
   });
 
@@ -39,18 +39,18 @@ describe('submitBookingUseCase', () => {
       ],
     });
 
-    const mockCreatedAppt = { id: 'appt-123', status: 'PENDING' };
-    mockCreateAppointment.mockResolvedValueOnce(mockCreatedAppt);
+    const mockCreatedAppt = { appointmentId: 'appt-123' };
+    mockExecuteBookingTransaction.mockResolvedValueOnce(mockCreatedAppt);
 
     const useCase = submitBookingUseCase({
-      createAppointment: mockCreateAppointment,
+      executeBookingTransaction: mockExecuteBookingTransaction,
       getAvailableTimeSlots: mockGetAvailableTimeSlots,
     });
 
     const result = await useCase('user-123', mockDto);
 
     expect(result).toEqual(mockCreatedAppt);
-    expect(mockCreateAppointment).toHaveBeenCalledWith('user-123', mockDto);
+    expect(mockExecuteBookingTransaction).toHaveBeenCalledWith('user-123', mockDto);
   });
 
   it('should throw ValidationError if the requested slot is not in the list of available slots', async () => {
@@ -62,7 +62,7 @@ describe('submitBookingUseCase', () => {
     });
 
     const useCase = submitBookingUseCase({
-      createAppointment: mockCreateAppointment,
+      executeBookingTransaction: mockExecuteBookingTransaction,
       getAvailableTimeSlots: mockGetAvailableTimeSlots,
     });
 
@@ -70,7 +70,7 @@ describe('submitBookingUseCase', () => {
       ValidationError
     );
 
-    expect(mockCreateAppointment).not.toHaveBeenCalled();
+    expect(mockExecuteBookingTransaction).not.toHaveBeenCalled();
   });
 
   it('should throw ValidationError if a database unique constraint violation occurs', async () => {
@@ -91,10 +91,10 @@ describe('submitBookingUseCase', () => {
     // Mock DB unique constraint violation
     const dbError = new Error('duplicate key value violates unique constraint') as any;
     dbError.code = '23P01';
-    mockCreateAppointment.mockRejectedValueOnce(dbError);
+    mockExecuteBookingTransaction.mockRejectedValueOnce(dbError);
 
     const useCase = submitBookingUseCase({
-      createAppointment: mockCreateAppointment,
+      executeBookingTransaction: mockExecuteBookingTransaction,
       getAvailableTimeSlots: mockGetAvailableTimeSlots,
     });
 

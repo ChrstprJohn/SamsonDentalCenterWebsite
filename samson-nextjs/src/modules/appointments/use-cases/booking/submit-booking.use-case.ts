@@ -1,14 +1,12 @@
 import { SubmitBookingDto, GetAvailableTimeSlotsResponseDto } from '../../dtos';
-import { CreateDependentDto, DependentRelationship } from '@/modules/patients/dtos';
 import { ValidationError } from '@/shared/errors';
 
 export const submitBookingUseCase = (deps: {
-  createAppointment: (userId: string, data: SubmitBookingDto & { resolvedDependentId?: string }) => Promise<any>;
-  createDependent?: (data: CreateDependentDto) => Promise<{ id: string }>;
+  executeBookingTransaction: (userId: string, data: SubmitBookingDto) => Promise<{ appointmentId: string }>;
   getAvailableTimeSlots: (dto: { serviceId: string; doctorId?: string; date: string }) => Promise<GetAvailableTimeSlotsResponseDto>;
 }) => {
   return async (userId: string, dto: SubmitBookingDto) => {
-    const { serviceId, doctorId, date, startTime, endTime, patientType } = dto;
+    const { serviceId, doctorId, date, startTime, endTime } = dto;
 
     const availability = await deps.getAvailableTimeSlots({
       serviceId,
@@ -27,22 +25,8 @@ export const submitBookingUseCase = (deps: {
       );
     }
 
-    let resolvedDependentId = dto.dependentId;
-
-    // Handle dynamic dependent creation if patient type is NEW_DEPENDENT
-    if (patientType === 'NEW_DEPENDENT' && deps.createDependent) {
-      const newDependent = await deps.createDependent({
-        patientId: userId,
-        firstName: dto.dependentFirstName!,
-        lastName: dto.dependentLastName!,
-        dateOfBirth: dto.dependentBirthday!,
-        relationship: dto.dependentRelationship! as DependentRelationship
-      });
-      resolvedDependentId = newDependent.id;
-    }
-
     try {
-      return await deps.createAppointment(userId, { ...dto, resolvedDependentId });
+      return await deps.executeBookingTransaction(userId, dto);
     } catch (error: unknown) {
       // Catch Postgres Exclusion Constraint violation (23P01) for overlapping appointments
       if (
