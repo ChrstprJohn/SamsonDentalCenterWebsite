@@ -67,7 +67,9 @@ export function AppointmentSummaryCard({ appt }: AppointmentSummaryCardProps) {
             <div className="flex flex-col">
               <span className="text-[10px] text-slate-400 uppercase tracking-wide">Relationship</span>
               <span className="font-medium text-slate-800 dark:text-slate-200">
-                {appt.dependent?.relationship}
+                {appt.dependent?.relationship
+                  ? appt.dependent.relationship.charAt(0).toUpperCase() + appt.dependent.relationship.slice(1).toLowerCase()
+                  : 'N/A'}
               </span>
             </div>
             <div className="flex flex-col">

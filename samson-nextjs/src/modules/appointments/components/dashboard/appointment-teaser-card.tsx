@@ -80,7 +80,13 @@ export function AppointmentTeaserCard({ appt }: AppointmentTeaserCardProps) {
           <span className="text-[10px] text-slate-400 uppercase tracking-wide">Patient</span>
           <span className="font-medium text-slate-700 dark:text-slate-300 flex items-center gap-1">
             {patientName}
-            {isFamily && <span className="text-[9px] bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 px-1.5 rounded-full ml-1">Family</span>}
+            {isFamily && (
+              <span className="text-[9px] bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 px-1.5 rounded-full ml-1">
+                {appt.dependent?.relationship
+                  ? appt.dependent.relationship.charAt(0).toUpperCase() + appt.dependent.relationship.slice(1).toLowerCase()
+                  : 'Family'}
+              </span>
+            )}
           </span>
         </div>
       </div>

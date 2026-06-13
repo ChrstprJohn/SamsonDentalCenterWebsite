@@ -32,7 +32,11 @@ export function AppointmentPatientCard({ appt }: AppointmentPatientCardProps) {
           <>
             <div className="flex flex-col gap-0.5 border-t border-slate-100 dark:border-white/5 pt-2">
               <span className="text-[10px] text-slate-400 uppercase tracking-wide block">Relationship</span>
-              <span className="text-sm font-semibold text-slate-700 dark:text-slate-350">{appt.dependent?.relationship}</span>
+              <span className="text-sm font-semibold text-slate-700 dark:text-slate-350">
+                {appt.dependent?.relationship
+                  ? appt.dependent.relationship.charAt(0).toUpperCase() + appt.dependent.relationship.slice(1).toLowerCase()
+                  : 'N/A'}
+              </span>
             </div>
             <div className="flex flex-col gap-0.5 border-t border-slate-100 dark:border-white/5 pt-2">
               <span className="text-[10px] text-slate-400 uppercase tracking-wide block">Booked By</span>
