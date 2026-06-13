@@ -15,41 +15,37 @@ interface PageProps {
 }
 
 export default async function AppointmentDetailPage({ params }: PageProps) {
-  let maxReschedules = 1;
-
-  try {
-    const configResponse = await getClinicConfigAction();
-    if (configResponse && 'data' in configResponse && configResponse.data) {
-      maxReschedules = configResponse.data.maxReschedules;
-    }
-  } catch (err) {
-    console.error('Failed to load clinic config:', err);
-  }
-
   const { id } = await params;
-
-  // Find appointment: check DB first if it looks like a UUID, otherwise check mock data
-  let appt: AppointmentDto | undefined;
 
   const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id);
 
-  if (isUuid) {
-    try {
-      const res = await getAppointmentByIdAction(id);
-      if (res.success && res.data) {
-        appt = res.data;
-      } else {
-        console.warn(`getAppointmentByIdAction failed to fetch: ${res.error}`);
-      }
-    } catch (err) {
-      console.warn(`Could not fetch appointment with id ${id} from database, attempting fallback:`, err);
-    }
-  }
-
-  // Remove mock data fallback so we only rely on the database
-  if (!appt) {
+  if (!isUuid) {
     notFound();
   }
+
+  // Fetch clinic config and appointment data concurrently
+  const [configResponse, apptRes] = await Promise.all([
+    getClinicConfigAction().catch((err) => {
+      console.error('Failed to load clinic config:', err);
+      return null;
+    }),
+    getAppointmentByIdAction(id).catch((err) => {
+      console.warn(`Could not fetch appointment with id ${id} from database:`, err);
+      return { success: false, error: err?.message, data: null };
+    }),
+  ]);
+
+  let maxReschedules = 1;
+  if (configResponse && 'data' in configResponse && configResponse.data) {
+    maxReschedules = configResponse.data.maxReschedules;
+  }
+
+  if (!apptRes || !apptRes.success || !apptRes.data) {
+    console.warn(`getAppointmentByIdAction failed to fetch: ${apptRes?.error}`);
+    notFound();
+  }
+
+  const appt: AppointmentDto = apptRes.data;
 
   return <AppointmentDetailView appt={appt} maxReschedules={maxReschedules} />;
 }
