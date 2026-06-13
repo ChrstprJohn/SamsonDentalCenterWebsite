@@ -16,6 +16,10 @@ vi.mock('@/components/feedback/toast-container', () => ({
   useToast: () => ({ addToast: vi.fn() }),
 }));
 
+vi.mock('../../actions/status/cancel-appointment.action', () => ({
+  cancelAppointmentAction: vi.fn(),
+}));
+
 describe('useUserDashboard', () => {
   beforeEach(() => {
     vi.clearAllMocks();

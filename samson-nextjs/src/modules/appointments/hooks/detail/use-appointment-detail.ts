@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/components/feedback/toast-container';
 import type { AppointmentDto } from '../../dtos/shared/appointment.dto';
+import { cancelAppointmentAction } from '../../actions/status/cancel-appointment.action';
 
 interface UseAppointmentDetailProps {
   appt: AppointmentDto;
@@ -39,13 +40,26 @@ export function useAppointmentDetail({ appt, maxReschedules }: UseAppointmentDet
     }
     setIsCancelling(true);
     
-    // Simulate API call and redirect
-    setTimeout(() => {
+    try {
+      const res = await cancelAppointmentAction({
+        appointmentId: appt.id,
+        status: 'CANCELLED',
+        statusReason: cancelReason,
+      });
+
+      if (res.success) {
+        addToast('Appointment cancelled successfully.', 'success');
+        setIsCancelModalOpen(false);
+        router.push('/user/appointments');
+        router.refresh();
+      } else {
+        addToast(res.error || 'Failed to cancel appointment.', 'error');
+      }
+    } catch (err) {
+      addToast('An unexpected error occurred.', 'error');
+    } finally {
       setIsCancelling(false);
-      setIsCancelModalOpen(false);
-      addToast('Appointment cancelled successfully.', 'success');
-      router.push('/user/appointments');
-    }, 1000);
+    }
   };
 
   return {

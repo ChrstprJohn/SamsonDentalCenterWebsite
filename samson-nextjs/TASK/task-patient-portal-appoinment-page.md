@@ -5,10 +5,17 @@
 - [x] Update `getAppointmentByIdQuery` to fetch nested relation joins for `doctor`, `service`, `patient`, and `dependent`.
 - [x] Update `getAppointmentsByUserQuery` to fetch nested relation joins for `doctor`, `service`, `patient`, and `dependent`.
 - [x] Refactor Detailed Appointment Fetching to abide by Clean Architecture / Modulith rules:
-  - [x] Create `GetAppointmentByIdDto` validation schema in [get-appointment-by-id.dto.ts](file:///c:/Users/picar/Desktop/samson-website/samson-nextjs/src/modules/appointments/dtos/patient/get-appointment-by-id.dto.ts).
-  - [x] Create `get-appointment-by-id.use-case.ts` and its spec file in [get-appointment-by-id.use-case.ts](file:///c:/Users/picar/Desktop/samson-website/samson-nextjs/src/modules/appointments/use-cases/patient/get-appointment-by-id.use-case.ts).
-  - [x] Create `get-appointment-by-id.action.ts` and its spec file in [get-appointment-by-id.action.ts](file:///c:/Users/picar/Desktop/samson-website/samson-nextjs/src/modules/appointments/actions/patient/get-appointment-by-id.action.ts).
-  - [x] Update `/user/appointments/[id]/page.tsx` to invoke the Server Action rather than querying the database repository directly in [page.tsx](file:///c:/Users/picar/Desktop/samson-website/samson-nextjs/src/app/(portals)/user/appointments/[id]/page.tsx).
+  - [x] Create `GetAppointmentByIdDto` validation schema.
+  - [x] Create `get-appointment-by-id.use-case.ts` and its spec file.
+  - [x] Create `get-appointment-by-id.action.ts` and its spec file.
+  - [x] Update `/user/appointments/[id]/page.tsx` to invoke the Server Action rather than querying the database repository directly.
+- [x] Wire up Cancel Appointment action on frontend:
+  - [x] Update `use-user-dashboard.ts` to call `cancelAppointmentAction`
+  - [x] Update `use-appointment-detail.ts` to call `cancelAppointmentAction`
+- [x] Wire up Reschedule Request action on frontend:
+  - [x] Update booking portal page config `/booking/page.tsx` to pass `reschedulingAppointment`
+  - [x] Update `booking-view.tsx` to handle reschedule headers and lock service step
+  - [x] Update `use-user-booking.ts` to use `requestRescheduleAction` in submit handler
 
 ## ⏳ In Progress
 - None (All tasks successfully completed)

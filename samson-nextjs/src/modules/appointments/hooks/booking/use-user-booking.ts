@@ -9,6 +9,8 @@ import { submitBookingAction } from '../../actions/booking/submit-booking.action
 import { useBookingState } from './use-booking-state';
 import { useBookingData } from './use-booking-data';
 import { createBookingPayload } from './submit-booking-payload.mapper';
+import { requestRescheduleAction } from '../../actions/status/request-reschedule.action';
+import { calculateEndTimeFromIso } from '@/shared/utils/date.util';
 
 export type BookingStep = 1 | 2 | 3 | 4;
 
@@ -71,7 +73,8 @@ interface UseUserBookingReturn {
 export function useUserBooking(
   services: ServiceResponseDto[] = [],
   userProfile?: any,
-  userDependents?: any[]
+  userDependents?: any[],
+  reschedulingAppointment?: any
 ): UseUserBookingReturn {
   const searchParams = useSearchParams();
   const { addToast } = useToast();
@@ -93,6 +96,24 @@ export function useUserBooking(
       }
     }
   }, [searchParams, services, state.selectedService]);
+
+  // Reschedule Mode Initialization
+  useEffect(() => {
+    if (reschedulingAppointment && services.length > 0) {
+      const origService = services.find((s) => s.id === reschedulingAppointment.serviceId);
+      if (origService) {
+        state.setSelectedService(origService);
+      }
+      if (reschedulingAppointment.dependentId) {
+        state.setPatientType('EXISTING_DEPENDENT');
+        state.setSelectedDependentId(reschedulingAppointment.dependentId);
+      } else {
+        state.setPatientType('SELF');
+      }
+      state.setUserNote(reschedulingAppointment.userNote || '');
+      state.setCurrentStep(2);
+    }
+  }, [reschedulingAppointment, services]);
 
   const nextStep = () => {
     if (state.currentStep === 1 && !state.selectedService) return;
@@ -123,6 +144,7 @@ export function useUserBooking(
   };
 
   const selectService = (service: ServiceResponseDto) => {
+    if (reschedulingAppointment) return;
     state.setSelectedService(service);
     state.setSelectedDate(null);
     state.setSelectedSlot(null);
@@ -186,6 +208,39 @@ export function useUserBooking(
 
     setIsSubmitting(true);
     
+    if (reschedulingAppointment) {
+      try {
+        const endTime = calculateEndTimeFromIso(
+          state.selectedSlot.originalStartTime,
+          state.selectedService.durationMinutes
+        ).toISOString();
+
+        const response = await requestRescheduleAction({
+          appointmentId: reschedulingAppointment.id,
+          status: 'RESCHEDULE_REQUESTED',
+          statusReason: state.userNote || 'Patient requested reschedule.',
+          newDate: state.selectedDate,
+          newStartTime: state.selectedSlot.originalStartTime,
+          newEndTime: endTime,
+          newDoctorId: state.selectedSlot.doctorId,
+        });
+
+        if (response.success) {
+          setCreatedAppointmentId(reschedulingAppointment.id);
+          setIsSuccess(true);
+          addToast('Reschedule request submitted successfully!', 'success');
+        } else {
+          addToast(response.error || 'Failed to request reschedule.', 'error');
+        }
+      } catch (err: any) {
+        console.error('RESCHEDULE SUBMIT ERROR:', err);
+        addToast(err.message || 'An unexpected error occurred.', 'error');
+      } finally {
+        setIsSubmitting(false);
+      }
+      return;
+    }
+
     const payload = createBookingPayload({
       selectedService: state.selectedService,
       selectedSlot: state.selectedSlot,

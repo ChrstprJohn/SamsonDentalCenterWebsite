@@ -8,17 +8,22 @@ import type { ServiceResponseDto } from '@/modules/services/dtos/management/serv
 import { getPatientProfileAction } from '@/modules/patients/actions/profile/get-patient-profile.action';
 import { getUserDependentsAction } from '@/modules/patients/actions/dependents/get-user-dependents.action';
 import { getAuthenticatedUser } from '@/shared/auth/auth.util';
+import { getAppointmentByIdQuery } from '@/modules/appointments/repositories';
 
 export const metadata = {
   title: 'Book Appointment | Patient Portal',
   description: 'Select services, book dates, and schedule clinical dental treatment appointments online at Samson Dental Center.',
 };
 
-export default async function BookingPage() {
+export default async function BookingPage({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
   let services: ServiceResponseDto[] = [];
   let clinicConfig = null;
   let userProfile: any = null;
   let userDependents: any[] = [];
+  let reschedulingAppointment: any = null;
+
+  const params = await searchParams;
+  const rescheduleId = typeof params.reschedule === 'string' ? params.reschedule : undefined;
 
   try {
     const supabase = await createClient();
@@ -50,6 +55,15 @@ export default async function BookingPage() {
       }
       if (dependentsRes.success && dependentsRes.data) {
         userDependents = dependentsRes.data;
+      }
+
+      if (rescheduleId) {
+        const getAppointmentById = getAppointmentByIdQuery(supabase);
+        try {
+          reschedulingAppointment = await getAppointmentById(rescheduleId);
+        } catch (err) {
+          console.error(`Failed to fetch rescheduling appointment ${rescheduleId}:`, err);
+        }
       }
     }
   } catch (err) {
@@ -83,6 +97,7 @@ export default async function BookingPage() {
         services={services} 
         userProfile={userProfile} 
         userDependents={userDependents} 
+        reschedulingAppointment={reschedulingAppointment}
       />
     </main>
   );

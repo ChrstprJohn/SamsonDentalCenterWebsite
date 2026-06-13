@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/components/feedback/toast-container';
 import type { AppointmentDto } from '../../dtos/shared/appointment.dto';
+import { cancelAppointmentAction } from '../../actions/status/cancel-appointment.action';
 
 interface FilterOption {
   id: string;
@@ -118,23 +119,35 @@ export function useUserDashboard(
     if (!selectedAppt || !cancelReason) return;
 
     setIsCancelling(true);
-    await new Promise((resolve) => setTimeout(resolve, 1200));
-    setIsCancelling(false);
+    try {
+      const res = await cancelAppointmentAction({
+        appointmentId: selectedAppt.id,
+        status: 'CANCELLED',
+        statusReason: cancelReason,
+      });
 
-    const updated = appointments.map((a) => {
-      if (a.id === selectedAppt.id) {
-        return {
-          ...a,
-          status: 'CANCELLED' as const,
-          statusReason: cancelReason,
-        };
+      if (res.success) {
+        const updated = appointments.map((a) => {
+          if (a.id === selectedAppt.id) {
+            return {
+              ...a,
+              status: 'CANCELLED' as const,
+              statusReason: cancelReason,
+            };
+          }
+          return a;
+        });
+        setAppointments(updated);
+        addToast('Appointment cancelled successfully.', 'success');
+        closeCancelModal();
+      } else {
+        addToast(res.error || 'Failed to cancel appointment.', 'error');
       }
-      return a;
-    });
-    setAppointments(updated);
-
-    addToast('Appointment cancelled successfully.', 'success');
-    closeCancelModal();
+    } catch (err) {
+      addToast('An unexpected error occurred.', 'error');
+    } finally {
+      setIsCancelling(false);
+    }
   };
 
   const filteredAppointments = appointments.filter((a) => {

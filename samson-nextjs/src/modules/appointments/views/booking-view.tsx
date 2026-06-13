@@ -17,9 +17,10 @@ interface BookingViewProps {
   services: ServiceResponseDto[];
   userProfile?: any;
   userDependents?: DependentProfileDto[];
+  reschedulingAppointment?: any;
 }
 
-export function BookingView({ services, userProfile, userDependents }: BookingViewProps) {
+export function BookingView({ services, userProfile, userDependents, reschedulingAppointment }: BookingViewProps) {
   const {
     currentStep,
     selectedService,
@@ -52,7 +53,7 @@ export function BookingView({ services, userProfile, userDependents }: BookingVi
     setNewDependentData,
     setUserNote,
     handleSubmit,
-  } = useUserBooking(services, userProfile, userDependents);
+  } = useUserBooking(services, userProfile, userDependents, reschedulingAppointment);
 
   const getPatientName = () => {
     if (patientType === 'SELF') {
@@ -113,6 +114,14 @@ export function BookingView({ services, userProfile, userDependents }: BookingVi
 
   return (
     <div className="w-full max-w-2xl mx-auto p-6 md:p-10 rounded-3xl border border-card-border bg-card/75 backdrop-blur-2xl shadow-2xl flex flex-col gap-8">
+      {reschedulingAppointment && (
+        <div className="bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 p-4 rounded-2xl text-xs font-semibold flex items-center gap-3">
+          <span>⚠️</span>
+          <div>
+            <strong>Reschedule Request Mode:</strong> You are requesting a reschedule for appointment Ref ID: <code className="font-mono text-[10px] bg-amber-500/10 px-1 py-0.5 rounded">{reschedulingAppointment.id.slice(0, 8)}</code>. The treatment service cannot be altered.
+          </div>
+        </div>
+      )}
       <BookingProgressTabs 
         currentStep={currentStep}
         goToStep={goToStep}
