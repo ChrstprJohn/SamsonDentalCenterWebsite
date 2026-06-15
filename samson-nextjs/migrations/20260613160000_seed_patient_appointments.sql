@@ -131,7 +131,9 @@ BEGIN
     proposed_start_time,
     proposed_end_time,
     proposed_doctor_id,
-    reschedule_count
+    reschedule_count,
+    created_at,
+    updated_at
   ) VALUES
   (
     'b3b07384-d113-4ec2-a5e6-ec083b0f5cc1',
@@ -146,7 +148,9 @@ BEGIN
     'Orthodontic checkup',
     'Confirmed slot availability.',
     NULL, NULL, NULL, NULL,
-    0
+    0,
+    '2026-06-14 09:00:00+00',
+    '2026-06-14 14:30:00+00'
   ),
   (
     'b3b07384-d113-4ec2-a5e6-ec083b0f5cc2',
@@ -164,7 +168,9 @@ BEGIN
     '2026-07-05 09:00:00+00',
     '2026-07-05 09:30:00+00',
     '5f89c670-8b1e-4505-8854-3e9a593e82d1',
-    1
+    1,
+    '2026-06-12 10:00:00+00',
+    '2026-06-15 08:30:00+00'
   ),
   (
     'b3b07384-d113-4ec2-a5e6-ec083b0f5cc3',
@@ -179,7 +185,9 @@ BEGIN
     'Severe tooth pain',
     'Patient checked-in at reception.',
     NULL, NULL, NULL, NULL,
-    0
+    0,
+    '2026-06-10 09:00:00+00',
+    '2026-06-20 10:45:00+00'
   ),
   (
     'b3b07384-d113-4ec2-a5e6-ec083b0f5cc4',
@@ -194,7 +202,9 @@ BEGIN
     'New whitening treatment request',
     NULL,
     NULL, NULL, NULL, NULL,
-    0
+    0,
+    '2026-06-15 06:00:00+00',
+    '2026-06-15 06:00:00+00'
   ),
   (
     'b3b07384-d113-4ec2-a5e6-ec083b0f5cc5',
@@ -209,7 +219,9 @@ BEGIN
     'General scaling',
     'Checkout complete, invoice paid.',
     NULL, NULL, NULL, NULL,
-    0
+    0,
+    '2026-06-01 09:00:00+00',
+    '2026-06-05 15:40:00+00'
   ),
   (
     'b3b07384-d113-4ec2-a5e6-ec083b0f5cc6',
@@ -224,7 +236,9 @@ BEGIN
     'Initial alignment check',
     'Cancelled by user: Family emergency.',
     NULL, NULL, NULL, NULL,
-    0
+    0,
+    '2026-05-28 09:00:00+00',
+    '2026-05-30 14:00:00+00'
   ),
   (
     'b3b07384-d113-4ec2-a5e6-ec083b0f5cc7',
@@ -239,7 +253,9 @@ BEGIN
     'Emergency checkup',
     'Rejected by staff: Roster conflict / doctor unavailable.',
     NULL, NULL, NULL, NULL,
-    0
+    0,
+    '2026-05-20 10:00:00+00',
+    '2026-05-20 15:00:00+00'
   ),
   (
     'b3b07384-d113-4ec2-a5e6-ec083b0f5cc8',
@@ -254,7 +270,9 @@ BEGIN
     'Teeth whitening',
     'Displaced: Clinic closed on holiday schedule.',
     NULL, NULL, NULL, NULL,
-    0
+    0,
+    '2026-05-10 09:00:00+00',
+    '2026-05-18 08:00:00+00'
   ),
   (
     'b3b07384-d113-4ec2-a5e6-ec083b0f5cc9',
@@ -269,7 +287,9 @@ BEGIN
     'Routine scaling',
     'No-show recorded: Patient failed to attend.',
     NULL, NULL, NULL, NULL,
-    0
+    0,
+    '2026-05-10 09:00:00+00',
+    '2026-05-15 11:00:00+00'
   ),
   (
     'b3b07384-d113-4ec2-a5e6-ec083b0f5cd0',
@@ -284,7 +304,9 @@ BEGIN
     'Braces adjust',
     'Treatment submitted by doctor; draft invoice created.',
     NULL, NULL, NULL, NULL,
-    0
+    0,
+    '2026-06-08 09:00:00+00',
+    '2026-06-12 16:30:00+00'
   ),
   (
     'b3b07384-d113-4ec2-a5e6-ec083b0f5cd1',
@@ -299,7 +321,9 @@ BEGIN
     'Follow-up root canal',
     'Previously requested reschedule was rejected due to full schedule.',
     NULL, NULL, NULL, NULL,
-    1
+    1,
+    '2026-06-10 09:00:00+00',
+    '2026-06-13 09:00:00+00'
   ),
   (
     'b3b07384-d113-4ec2-a5e6-ec083b0f5cd2',
@@ -314,7 +338,9 @@ BEGIN
     'Routine checkup (moved)',
     'Your reschedule request was approved by the staff. Your appointment has been successfully moved to this new date.',
     NULL, NULL, NULL, NULL,
-    1
+    1,
+    '2026-06-10 09:00:00+00',
+    '2026-06-13 09:00:00+00'
   );
 
   -- 6. Seed Status History Ledger for Audit Timelines
