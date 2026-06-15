@@ -74,13 +74,20 @@ export function useUserBooking(
   services: ServiceResponseDto[] = [],
   userProfile?: any,
   userDependents?: any[],
-  reschedulingAppointment?: any
+  reschedulingAppointment?: any,
+  clinicConfig?: any
 ): UseUserBookingReturn {
   const searchParams = useSearchParams();
   const { addToast } = useToast();
 
   const state = useBookingState();
-  const data = useBookingData(state.selectedService?.id, state.selectedDate, state.selectedDoctorId, state.currentStep);
+  const data = useBookingData(
+    state.selectedService?.id,
+    state.selectedDate,
+    state.selectedDoctorId,
+    state.currentStep,
+    clinicConfig
+  );
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);

@@ -98,6 +98,7 @@ export default async function BookingPage({ searchParams }: { searchParams: Prom
         userProfile={userProfile} 
         userDependents={userDependents} 
         reschedulingAppointment={reschedulingAppointment}
+        clinicConfig={clinicConfig}
       />
     </main>
   );

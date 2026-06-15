@@ -18,9 +18,10 @@ interface BookingViewProps {
   userProfile?: any;
   userDependents?: DependentProfileDto[];
   reschedulingAppointment?: any;
+  clinicConfig?: any;
 }
 
-export function BookingView({ services, userProfile, userDependents, reschedulingAppointment }: BookingViewProps) {
+export function BookingView({ services, userProfile, userDependents, reschedulingAppointment, clinicConfig }: BookingViewProps) {
   const {
     currentStep,
     selectedService,
@@ -53,7 +54,7 @@ export function BookingView({ services, userProfile, userDependents, reschedulin
     setNewDependentData,
     setUserNote,
     handleSubmit,
-  } = useUserBooking(services, userProfile, userDependents, reschedulingAppointment);
+  } = useUserBooking(services, userProfile, userDependents, reschedulingAppointment, clinicConfig);
 
   if (isSuccess) {
     return (

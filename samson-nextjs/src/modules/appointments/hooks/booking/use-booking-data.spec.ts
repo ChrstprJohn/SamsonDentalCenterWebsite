@@ -2,7 +2,7 @@
  * @vitest-environment jsdom
  */
 import { renderHook, waitFor } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { useBookingData } from './use-booking-data';
 import { getAvailableDaysAction } from '../../actions/availability/get-available-days.action';
 import { getDoctorsAction } from '@/modules/staff/actions/management/get-doctors.action';
@@ -21,8 +21,29 @@ vi.mock('../../actions/availability/get-available-time-slots.action', () => ({
 }));
 
 describe('useBookingData', () => {
+  let realDate: typeof Date;
+
   beforeEach(() => {
     vi.resetAllMocks();
+    realDate = global.Date;
+    const mockDateInstance = new realDate('2025-01-01T00:00:00Z');
+    
+    const MockDate = function(this: any, ...args: any[]) {
+      if (args.length === 0) {
+        return mockDateInstance;
+      }
+      return Reflect.construct(realDate, args);
+    };
+    MockDate.prototype = realDate.prototype;
+    MockDate.now = () => mockDateInstance.getTime();
+    MockDate.UTC = realDate.UTC;
+    MockDate.parse = realDate.parse;
+    
+    global.Date = MockDate as any;
+  });
+
+  afterEach(() => {
+    global.Date = realDate;
   });
 
   it('should fetch available dates and doctors when a serviceId is provided', async () => {
