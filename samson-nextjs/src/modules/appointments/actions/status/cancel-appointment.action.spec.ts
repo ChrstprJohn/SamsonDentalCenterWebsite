@@ -7,13 +7,13 @@ vi.mock('server-only', () => ({}));
 vi.mock('@/shared/auth/auth.util');
 vi.mock('@/shared/database/server');
 
-const { mockUpdateStatus } = vi.hoisted(() => {
-  return { mockUpdateStatus: vi.fn() };
+const { mockExecuteAtomicCancel } = vi.hoisted(() => {
+  return { mockExecuteAtomicCancel: vi.fn() };
 });
 
 vi.mock('../../use-cases/status/cancel-appointment.use-case', () => {
   return {
-    cancelAppointmentUseCase: () => mockUpdateStatus,
+    cancelAppointmentUseCase: () => mockExecuteAtomicCancel,
   };
 });
 
@@ -44,7 +44,7 @@ describe('cancelAppointmentAction', () => {
       },
       error: null,
     });
-    mockUpdateStatus.mockResolvedValue({ id: 'appt_123', status: 'CANCELLED' });
+    mockExecuteAtomicCancel.mockResolvedValue({ id: 'appt_123', status: 'CANCELLED' });
 
     const payload = {
       appointmentId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd2',
@@ -55,7 +55,7 @@ describe('cancelAppointmentAction', () => {
     const result = await cancelAppointmentAction(payload as any);
 
     expect(result).toEqual({ success: true, data: { id: 'appt_123', status: 'CANCELLED' } });
-    expect(mockUpdateStatus).toHaveBeenCalledWith(
+    expect(mockExecuteAtomicCancel).toHaveBeenCalledWith(
       'da95a63c-333e-4b68-98e3-82bdf1a07bd2',
       validUserId,
       'PATIENT',
@@ -89,6 +89,6 @@ describe('cancelAppointmentAction', () => {
 
     expect(result.success).toBe(false);
     expect(result.error).toContain('not authorized to cancel');
-    expect(mockUpdateStatus).not.toHaveBeenCalled();
+    expect(mockExecuteAtomicCancel).not.toHaveBeenCalled();
   });
 });

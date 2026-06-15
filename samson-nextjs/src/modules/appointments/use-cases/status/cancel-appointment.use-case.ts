@@ -3,29 +3,12 @@ import { ValidationError } from '@/shared/errors';
 import { AppointmentDto } from '../../dtos/exports';
 
 export const cancelAppointmentUseCase = (deps: {
-  getAppointmentById: (appointmentId: string) => Promise<AppointmentDto>;
-  updateStatus: (
+  executeAtomicCancel: (
     appointmentId: string,
-    status: AppointmentStatusValue,
-    reason?: string,
-    rescheduleMetadata?: undefined,
-    rescheduleCount?: undefined,
-    proposedRescheduleMetadata?: undefined,
-    clearProposedMetadata?: undefined,
-    expectedCurrentStatus?: AppointmentStatusValue | AppointmentStatusValue[]
-  ) => Promise<AppointmentDto>;
-  incrementUserCredibilityMetric: (
-    userId: string,
-    metric: 'cancel_count' | 'no_show_count' | 'reschedule_count'
-  ) => Promise<{ success: boolean }>;
-  insertLedgerEntry: (
-    appointmentId: string,
-    changedBy: string | null,
+    actorId: string,
     actorRole: string,
-    previousStatus: AppointmentStatusValue | null,
-    newStatus: AppointmentStatusValue,
     reason?: string
-  ) => Promise<{ success: boolean }>;
+  ) => Promise<AppointmentDto>;
 }) => {
   return async (
     appointmentId: string,
@@ -33,44 +16,12 @@ export const cancelAppointmentUseCase = (deps: {
     actorRole: string,
     reason?: string
   ) => {
-    const appointment = await deps.getAppointmentById(appointmentId);
-    const currentStatus = appointment.status;
-
-    const terminalStates = ['CANCELLED', 'REJECTED', 'COMPLETED', 'NO_SHOW'] as const;
-    if (terminalStates.includes(currentStatus as (typeof terminalStates)[number])) {
-      throw new ValidationError(
-        `Cannot cancel appointment from terminal status: ${currentStatus}`,
-        'INVALID_STATUS_TRANSITION'
-      );
-    }
-
-    const updatedAppointment = await deps.updateStatus(
+    const updatedAppointment = await deps.executeAtomicCancel(
       appointmentId,
-      'CANCELLED',
-      reason,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      currentStatus
+      actorId || '',
+      actorRole,
+      reason
     );
-
-    // Append to Ledger
-    if (currentStatus !== 'CANCELLED') {
-      await deps.insertLedgerEntry(
-        appointmentId,
-        actorId,
-        actorRole,
-        currentStatus,
-        'CANCELLED',
-        reason
-      );
-    }
-
-    const userId = appointment.patientId;
-    if (userId) {
-      await deps.incrementUserCredibilityMetric(userId, 'cancel_count');
-    }
 
     return updatedAppointment;
   };

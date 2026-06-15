@@ -5,7 +5,7 @@ import { createClient } from '@/shared/database/server';
 import { getAuthenticatedUser } from '@/shared/auth/auth.util';
 import { DomainError } from '@/shared/errors';
 import { cancelAppointmentSchema, CancelAppointmentDto } from '../../dtos/status/cancel-appointment.dto';
-import { getAppointmentByIdQuery, updateStatusCommand, incrementUserCredibilityMetricCommand, insertLedgerEntryCommand } from '../../repositories/exports';
+import { getAppointmentByIdQuery, cancelAppointmentAtomicCommand } from '../../repositories/exports';
 import { cancelAppointmentUseCase } from '../../use-cases/status/cancel-appointment.use-case';
 
 /**
@@ -30,10 +30,7 @@ export async function cancelAppointmentAction(formData: CancelAppointmentDto) {
     }
 
     const useCase = cancelAppointmentUseCase({
-      getAppointmentById,
-      updateStatus: updateStatusCommand(supabase),
-      incrementUserCredibilityMetric: incrementUserCredibilityMetricCommand(supabase),
-      insertLedgerEntry: insertLedgerEntryCommand(supabase),
+      executeAtomicCancel: cancelAppointmentAtomicCommand(supabase),
     });
 
     const result = await useCase(
