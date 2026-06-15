@@ -69,6 +69,14 @@ const appointmentDbSchema = z.object({
     last_name: z.string(),
     relationship: z.string(),
   }).nullable().optional(),
+  status_history: z.array(z.object({
+    id: z.string(),
+    previous_status: z.string().nullable().optional(),
+    new_status: z.string(),
+    reason: z.string().nullable().optional(),
+    created_at: z.string(),
+    actor_role: z.string(),
+  })).nullable().optional(),
 });
 
 export const appointmentDtoSchema = appointmentDbSchema.transform((data) => ({
@@ -99,6 +107,14 @@ export const appointmentDtoSchema = appointmentDbSchema.transform((data) => ({
     lastName: data.dependent.last_name,
     relationship: data.dependent.relationship,
   } : null,
+  statusHistory: data.status_history ? data.status_history.map((h) => ({
+    id: h.id,
+    previousStatus: h.previous_status || null,
+    newStatus: h.new_status,
+    reason: h.reason || null,
+    createdAt: h.created_at,
+    actorRole: h.actor_role,
+  })) : [],
 }));
 
 export type AppointmentDto = z.infer<typeof appointmentDtoSchema>;

@@ -20,6 +20,10 @@ export function useAppointmentDetail({ appt, maxReschedules }: UseAppointmentDet
   const [isCancelling, setIsCancelling] = useState(false);
   const [isRescheduleBlockedModalOpen, setIsRescheduleBlockedModalOpen] = useState(false);
 
+  const [currentStatus, setCurrentStatus] = useState<AppointmentDto['status']>(appt.status);
+  const [currentStatusReason, setCurrentStatusReason] = useState<string | null>(appt.statusReason);
+  const [currentStatusHistory, setCurrentStatusHistory] = useState<AppointmentDto['statusHistory']>(appt.statusHistory || []);
+
   const handleCancelClick = () => {
     setIsCancelModalOpen(true);
     setCancelReason('');
@@ -30,10 +34,11 @@ export function useAppointmentDetail({ appt, maxReschedules }: UseAppointmentDet
       setIsRescheduleBlockedModalOpen(true);
       return;
     }
-    router.push(`/booking?reschedule=${appt.id}`);
+    addToast('Online rescheduling is temporarily under maintenance. Please contact clinic staff to move your slot.', 'info');
   };
 
-  const handleCancelSubmit = async () => {
+  const handleCancelSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (!cancelReason.trim()) {
       addToast('Cancellation reason is required.', 'error');
       return;
@@ -50,7 +55,20 @@ export function useAppointmentDetail({ appt, maxReschedules }: UseAppointmentDet
       if (res.success) {
         addToast('Appointment cancelled successfully.', 'success');
         setIsCancelModalOpen(false);
-        router.push('/user/appointments');
+        
+        setCurrentStatus('CANCELLED');
+        setCurrentStatusReason(cancelReason);
+
+        const newHistoryItem = {
+          id: `local-cancel-${Date.now()}`,
+          previousStatus: currentStatus,
+          newStatus: 'CANCELLED' as const,
+          reason: cancelReason,
+          createdAt: new Date().toISOString(),
+          actorRole: 'PATIENT',
+        };
+        setCurrentStatusHistory((prev) => [...prev, newHistoryItem]);
+
         router.refresh();
       } else {
         addToast(res.error || 'Failed to cancel appointment.', 'error');
@@ -70,6 +88,9 @@ export function useAppointmentDetail({ appt, maxReschedules }: UseAppointmentDet
     isCancelling,
     isRescheduleBlockedModalOpen,
     setIsRescheduleBlockedModalOpen,
+    currentStatus,
+    currentStatusReason,
+    currentStatusHistory,
     handleCancelClick,
     handleRescheduleClick,
     handleCancelSubmit,

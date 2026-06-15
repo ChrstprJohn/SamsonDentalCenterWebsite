@@ -12,7 +12,15 @@ export const getAppointmentByIdQuery = (supabase: SupabaseClient) => {
         doctor:users!appointments_doctor_id_fkey (id, first_name, last_name, suffix),
         service:services!appointments_service_id_fkey (id, name, duration_minutes),
         patient:users!appointments_patient_id_fkey (id, first_name, last_name),
-        dependent:dependents!appointments_dependent_id_fkey (id, first_name, last_name, relationship)
+        dependent:dependents!appointments_dependent_id_fkey (id, first_name, last_name, relationship),
+        status_history:appointment_status_history (
+          id,
+          previous_status,
+          new_status,
+          reason,
+          created_at,
+          actor_role
+        )
       `
       )
       .eq('id', appointmentId)
