@@ -9,7 +9,7 @@ interface RescheduleDetailsProps {
 }
 
 export function RescheduleDetails({ appt, dateStr, timeWindow }: RescheduleDetailsProps) {
-  if (!appt.proposedDate || !appt.proposedStartTime || !appt.proposedEndTime) {
+  if (!appt.proposedDate || !appt.proposedStartTime || !appt.proposedEndTime || ['CANCELLED', 'REJECTED', 'COMPLETED', 'NO_SHOW'].includes(appt.status)) {
     return (
       <>
         <div className="flex flex-col">
