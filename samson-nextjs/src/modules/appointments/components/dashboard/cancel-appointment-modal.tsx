@@ -26,6 +26,31 @@ export function CancelAppointmentModal({
   onReasonChange,
   onSubmit,
 }: CancelAppointmentModalProps) {
+  const [selectedOption, setSelectedOption] = React.useState('Scheduling conflict');
+  const [customReason, setCustomReason] = React.useState('');
+
+  React.useEffect(() => {
+    if (isOpen) {
+      setSelectedOption('Scheduling conflict');
+      setCustomReason('');
+      onReasonChange('Scheduling conflict');
+    }
+  }, [isOpen, onReasonChange]);
+
+  const handleOptionChange = (val: string) => {
+    setSelectedOption(val);
+    if (val === 'OTHER') {
+      onReasonChange(customReason);
+    } else {
+      onReasonChange(val);
+    }
+  };
+
+  const handleCustomReasonChange = (val: string) => {
+    setCustomReason(val);
+    onReasonChange(val);
+  };
+
   return (
     <Modal
       isOpen={isOpen}
@@ -45,16 +70,35 @@ export function CancelAppointmentModal({
         <p className="leading-relaxed">
           Are you sure you want to cancel your <strong>{selectedAppt?.service?.name}</strong> appointment?
         </p>
-        <div className="flex flex-col gap-1.5 mt-1">
-          <label className="text-xs font-semibold text-slate-500">Provide Cancellation Reason</label>
-          <textarea
-            required
-            value={cancelReason}
-            onChange={(e) => onReasonChange(e.target.value)}
-            placeholder="Please let us know why you need to cancel (e.g. scheduling conflict)..."
-            rows={3}
-            className="px-3 py-2 rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-950 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800 dark:text-white"
-          />
+        
+        <div className="flex flex-col gap-3.5 mt-1">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Cancellation Reason</label>
+            <select
+              value={selectedOption}
+              onChange={(e) => handleOptionChange(e.target.value)}
+              className="px-3 py-2.5 rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-950 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800 dark:text-white font-medium cursor-pointer"
+            >
+              <option value="Scheduling conflict">Scheduling conflict</option>
+              <option value="Personal / Family emergency">Personal / Family emergency</option>
+              <option value="Feeling unwell / Sick">Feeling unwell / Sick</option>
+              <option value="OTHER">Other (please specify below)</option>
+            </select>
+          </div>
+
+          {selectedOption === 'OTHER' && (
+            <div className="flex flex-col gap-1.5 animate-in fade-in slide-in-from-top-1 duration-200">
+              <label className="text-xs font-semibold text-slate-500">Custom Reason details</label>
+              <textarea
+                required
+                value={customReason}
+                onChange={(e) => handleCustomReasonChange(e.target.value)}
+                placeholder="Please describe your reason for cancellation..."
+                rows={3}
+                className="px-3 py-2 rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-950 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800 dark:text-white"
+              />
+            </div>
+          )}
         </div>
 
         <div className="flex gap-3 justify-end border-t border-slate-100 dark:border-white/5 pt-4 mt-3">

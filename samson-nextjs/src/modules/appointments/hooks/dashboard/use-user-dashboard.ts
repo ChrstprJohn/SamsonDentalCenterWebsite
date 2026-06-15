@@ -95,8 +95,7 @@ export function useUserDashboard(
       return;
     }
 
-    addToast('Redirecting to scheduler page...', 'info');
-    router.push(`/booking?service=${appt.serviceId}&reschedule=true`);
+    addToast('Online rescheduling is temporarily under maintenance. Please contact clinic staff to move your slot.', 'info');
   };
 
   const handleCancelClick = (appt: AppointmentDto) => {

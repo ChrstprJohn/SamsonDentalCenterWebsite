@@ -12,8 +12,9 @@ vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
 }));
 
+const mockAddToast = vi.fn();
 vi.mock('@/components/feedback/toast-container', () => ({
-  useToast: () => ({ addToast: vi.fn() }),
+  useToast: () => ({ addToast: mockAddToast }),
 }));
 
 vi.mock('../../actions/status/cancel-appointment.action', () => ({
@@ -51,14 +52,18 @@ describe('useUserDashboard', () => {
     expect(result.current.history).toHaveLength(1);
   });
 
-  it('should allow rescheduling if under max limit', () => {
+  it('should notify that rescheduling is under maintenance if under max limit', () => {
     const { result } = renderHook(() => useUserDashboard([mockAppt], 2));
 
     act(() => {
       result.current.handleRescheduleClick(mockAppt);
     });
 
-    expect(mockPush).toHaveBeenCalledWith(`/booking?service=${mockAppt.serviceId}&reschedule=true`);
+    expect(mockAddToast).toHaveBeenCalledWith(
+      'Online rescheduling is temporarily under maintenance. Please contact clinic staff to move your slot.',
+      'info'
+    );
+    expect(mockPush).not.toHaveBeenCalled();
     expect(result.current.blockedRescheduleAppt).toBeNull();
   });
 
