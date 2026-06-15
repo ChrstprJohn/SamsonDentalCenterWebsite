@@ -22,7 +22,8 @@ export const updateStatusCommand = (supabase: SupabaseClient) => {
       endTime: string;
       doctorId: string;
     },
-    clearProposedMetadata?: boolean
+    clearProposedMetadata?: boolean,
+    expectedCurrentStatus?: AppointmentStatusValue | AppointmentStatusValue[]
   ): Promise<AppointmentDto> => {
     const payload: Record<string, string | number | null> = {
       status,
@@ -55,14 +56,27 @@ export const updateStatusCommand = (supabase: SupabaseClient) => {
       payload.proposed_doctor_id = null;
     }
 
-    const { data: appointment, error } = await supabase
+    let query = supabase
       .from('appointments')
       .update(payload)
-      .eq('id', appointmentId)
+      .eq('id', appointmentId);
+
+    if (expectedCurrentStatus) {
+      if (Array.isArray(expectedCurrentStatus)) {
+        query = query.in('status', expectedCurrentStatus);
+      } else {
+        query = query.eq('status', expectedCurrentStatus);
+      }
+    }
+
+    const { data: appointment, error } = await query
       .select('*')
       .single();
 
     if (error || !appointment) {
+      if (error?.code === 'PGRST116') {
+        throw new DomainError('Appointment state has changed. Please refresh and try again.', 'STATE_CONFLICT');
+      }
       throw new DomainError(
         `Failed to update appointment status: ${error?.message || 'Unknown database error'}`,
         'DATABASE_ERROR'

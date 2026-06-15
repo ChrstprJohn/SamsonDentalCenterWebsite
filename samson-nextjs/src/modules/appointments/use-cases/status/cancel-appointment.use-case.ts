@@ -7,7 +7,12 @@ export const cancelAppointmentUseCase = (deps: {
   updateStatus: (
     appointmentId: string,
     status: AppointmentStatusValue,
-    reason?: string
+    reason?: string,
+    rescheduleMetadata?: undefined,
+    rescheduleCount?: undefined,
+    proposedRescheduleMetadata?: undefined,
+    clearProposedMetadata?: undefined,
+    expectedCurrentStatus?: AppointmentStatusValue | AppointmentStatusValue[]
   ) => Promise<AppointmentDto>;
   incrementUserCredibilityMetric: (
     userId: string,
@@ -42,7 +47,12 @@ export const cancelAppointmentUseCase = (deps: {
     const updatedAppointment = await deps.updateStatus(
       appointmentId,
       'CANCELLED',
-      reason
+      reason,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      currentStatus
     );
 
     // Append to Ledger

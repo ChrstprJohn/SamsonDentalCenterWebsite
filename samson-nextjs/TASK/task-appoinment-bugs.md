@@ -54,3 +54,6 @@ This checklist tracks the identified bugs and enhancements in the user portal ap
 - [x] **Dependent Validation**:
   - Verify that wizard step validation prevents proceeding if a user selects "My Family" but has not chosen an existing dependent or entered new dependent details.
 
+## 7. Atomic Cancellation (Prevent Multiple Cancellations)
+- [x] **Fix Non-Atomic Cancellation**:
+  - Ensure the database or use-case code prevents an already-cancelled appointment from being cancelled again. Currently, cancelling an already cancelled appointment goes through or throws "Cannot cancel appointment from terminal status: CANCELLED" but doesn't correctly block the state change atomically. Use a guard like `WHERE status != 'CANCELLED'` during the state update.
