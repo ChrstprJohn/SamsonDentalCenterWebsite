@@ -62,7 +62,7 @@ export function NavbarMobileDrawer({
           ) : (
             <>
               <Link href="/auth/login" onClick={onClose} className="w-full">
-                <button className="w-full py-2.5 text-[14px] font-semibold uppercase tracking-[0.2em] hover:text-[#D94E4E] transition-colors cursor-pointer border border-gray-300 rounded-full">
+                <button className="w-full py-2.5 text-[14px] font-semibold uppercase tracking-[0.2em] text-[#1D1E1E] hover:text-[#D94E4E] transition-colors cursor-pointer border border-gray-300 rounded-full">
                   Log In
                 </button>
               </Link>
