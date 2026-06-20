@@ -77,10 +77,10 @@ export function LandingView({ services, config, isAuthenticated }: LandingViewPr
   const activeServices = services.length > 0 ? services : DEFAULT_SERVICES;
 
   return (
-    <div className="flex flex-col w-full overflow-hidden bg-background transition-colors duration-300">
+    <div className="flex flex-col w-full overflow-hidden" style={{ background: '#031c14' }}>
       <HeroSection onBookClick={() => handleBookingCTA()} />
-      <ServicesSection services={activeServices} onSelectService={setSelectedService} />
       <AboutSection />
+      <ServicesSection services={activeServices} onSelectService={setSelectedService} />
       <GallerySection />
       <ContactSection config={config} contactForm={contactForm} />
 

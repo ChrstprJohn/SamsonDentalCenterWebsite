@@ -3250,8 +3250,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\migrations\\20260613160000_seed_patient_appointments.sql": {
-    "mtime": 1781365766.0366523,
-    "ast_hash": "a081e65a762af9527ad7120f0d052582",
+    "mtime": 1781562386.2946446,
+    "ast_hash": "0675b2a6aafacf68dcf84f1f7e1092d9",
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\appointments\\actions\\patient\\get-appointment-by-id.action.spec.ts": {
@@ -3622,6 +3622,11 @@
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\TASK\\task-appoinment-bugs.md": {
     "mtime": 1781374345.1855104,
     "ast_hash": "f3aabd75ffa2c372d279c59587e020a6",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\migrations\\20260613180000_add_status_history_rls_policies.sql": {
+    "mtime": 1781562852.8394878,
+    "ast_hash": "837a5b88f3ad5eead0145a53d342837a",
     "semantic_hash": ""
   }
 }

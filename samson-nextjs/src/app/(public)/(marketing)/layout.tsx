@@ -42,7 +42,7 @@ export default async function MarketingLayout({
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar user={headerUser} />
-      <main className="flex-1 flex flex-col pt-[80px]">
+      <main className="flex-1 flex flex-col">
         {children}
       </main>
       <Footer config={clinicConfig} />
