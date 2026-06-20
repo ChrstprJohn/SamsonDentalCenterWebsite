@@ -91,7 +91,7 @@ export function ServicesSection({ services, onSelectService }: ServicesSectionPr
           </div>
 
           {/* Bento Grid */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 relative z-10">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 relative z-10">
             {CARD_SERVICES.map((svc, idx) => {
               const words = svc.title.split(' ');
               return (
