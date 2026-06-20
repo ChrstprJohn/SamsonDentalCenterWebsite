@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { useLandingView } from '../hooks/landing/use-landing-view.hook';
 import { HeroSection } from '../components/landing/hero-section';
 import { ServicesSection } from '../components/landing/services-section';
+import { JourneySection } from '../components/landing/journey-section';
 import { AboutSection } from '../components/landing/about-section';
 import { GallerySection } from '../components/landing/gallery-section';
 import { ContactSection } from '../components/landing/contact-section';
@@ -77,10 +78,11 @@ export function LandingView({ services, config, isAuthenticated }: LandingViewPr
   const activeServices = services.length > 0 ? services : DEFAULT_SERVICES;
 
   return (
-    <div className="flex flex-col w-full overflow-hidden" style={{ background: '#031c14' }}>
+    <div className="flex flex-col w-full bg-[#FDFDFD] text-[#1D1E1E]">
       <HeroSection onBookClick={() => handleBookingCTA()} />
-      <AboutSection />
       <ServicesSection services={activeServices} onSelectService={setSelectedService} />
+      <AboutSection />
+      <JourneySection />
       <GallerySection />
       <ContactSection config={config} contactForm={contactForm} />
 

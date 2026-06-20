@@ -1,8 +1,7 @@
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
-import { motion } from 'framer-motion';
+import { MoveRight } from 'lucide-react';
 import type { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
 
 interface ServicesSectionProps {
@@ -10,53 +9,34 @@ interface ServicesSectionProps {
   onSelectService: (service: ServiceResponseDto) => void;
 }
 
-/* Arrow icon matching LAVA's diagonal arrow button */
-function ArrowIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 60 60">
-      <path
-        fill="currentColor"
-        d="M36.657 24.343a1 1 0 0 0-1-1h-9a1 1 0 0 0 0 2h8v8a1 1 0 1 0 2 0v-9ZM24.344 35.656l.707.707L36.365 25.05l-.708-.707-.707-.708L23.637 34.95l.707.707Z"
-      />
-    </svg>
-  );
-}
-
-/* Featured card services (with image) — top 5 matching LAVA layout */
 const CARD_SERVICES = [
   {
     nr: '01',
     title: 'Complex Diagnostics',
     image: '/images/svc-diagnostics.png',
-    wide: true, // first card spans full width
   },
   {
     nr: '02',
     title: 'Professional Hygiene',
     image: '/images/svc-hygiene.png',
-    wide: false,
   },
   {
     nr: '03',
     title: 'Veneers',
     image: '/images/svc-veneers.png',
-    wide: false,
   },
   {
     nr: '04',
     title: 'Dental Implants',
     image: '/images/svc-implants.png',
-    wide: false,
   },
   {
     nr: '05',
     title: 'ALL-ON-X',
     image: '/images/svc-aligners.png',
-    wide: false,
   },
 ];
 
-/* List services (no image) — remaining services */
 const LIST_SERVICES = [
   { nr: '06', title: 'Sedation & Anaesthesia' },
   { nr: '07', title: 'Therapy' },
@@ -65,166 +45,126 @@ const LIST_SERVICES = [
   { nr: '10', title: 'Aligners' },
 ];
 
-const HEADING_FONT = '"Josefin Sans", "Jost", sans-serif';
+export function ServicesSection({ services, onSelectService }: ServicesSectionProps) {
+  const getCardColSpan = (index: number) => {
+    if (index === 0) return 'col-span-2 lg:col-span-4';
+    return 'col-span-1 lg:col-span-1';
+  };
 
-export function ServicesSection({ services: _services, onSelectService: _onSelect }: ServicesSectionProps) {
+  const handleItemClick = (title: string) => {
+    // Try to find a matching service in the database payload
+    const matched = services.find(
+      (s) =>
+        s.name.toLowerCase().includes(title.toLowerCase()) ||
+        title.toLowerCase().includes(s.name.toLowerCase())
+    );
+
+    if (matched) {
+      onSelectService(matched);
+    } else if (services.length > 0) {
+      // Fallback to first available service with updated title name
+      onSelectService({
+        ...services[0],
+        name: title,
+      });
+    }
+  };
+
   return (
-    <section id="services">
-      {/* ── Section Header — cream bg ─────────────────── */}
-      <div style={{ background: '#ddefde' }}>
-        <div
-          style={{
-            width: 'min(1290px, 100% - clamp(1.5rem,1.3636rem + 0.6061vw,1.875rem) * 2)',
-            marginInline: 'auto',
-            paddingTop: 'clamp(3rem,2.7273rem + 1.2121vw,3.75rem)',
-            paddingBottom: 'clamp(3rem,2.7273rem + 1.2121vw,3.75rem)',
-          }}
-        >
-          <h2
-            className="text-[#031c14]"
-            style={{
-              fontFamily: HEADING_FONT,
-              fontSize: 'clamp(1.9531rem,1.5867rem + 1.6285vw,2.9607rem)',
-              fontWeight: 700,
-              lineHeight: 1.1,
-            }}
-          >
-            Services
-          </h2>
-        </div>
-      </div>
-
-      {/* ── Card Grid — cream bg ─────────────────────── */}
-      <div style={{ background: '#ddefde' }}>
-        <div
-          style={{
-            width: 'min(1290px, 100% - clamp(1.5rem,1.3636rem + 0.6061vw,1.875rem) * 2)',
-            marginInline: 'auto',
-          }}
-        >
-          {/* Row 1: wide card (diagnostics) */}
-          <motion.div
-            className="group relative overflow-hidden rounded-2xl cursor-pointer mb-4"
-            style={{ background: '#031c14', minHeight: '220px' }}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            whileHover={{ scale: 1.005 }}
-          >
-            <Image
-              src={CARD_SERVICES[0].image}
-              alt={CARD_SERVICES[0].title}
-              fill
-              className="object-cover object-center transition-transform duration-700 group-hover:scale-105"
-            />
-            <div className="absolute inset-0 bg-[#031c14]/50 group-hover:bg-[#031c14]/40 transition-colors duration-300" />
-            <div className="relative z-10 flex items-end justify-between p-6 h-full min-h-[220px]">
-              <div className="flex flex-col gap-1">
-                <span
-                  className="text-[#ddefde]/60"
-                  style={{ fontFamily: HEADING_FONT, fontSize: 'clamp(1rem,0.9091rem + 0.404vw,1.25rem)', fontWeight: 400 }}
-                >
-                  {CARD_SERVICES[0].nr}
-                </span>
-                <h3
-                  className="text-[#ddefde]"
-                  style={{ fontFamily: HEADING_FONT, fontSize: 'clamp(1.25rem,1.0986rem + 0.6727vw,1.6663rem)', fontWeight: 700 }}
-                >
-                  {CARD_SERVICES[0].title}
-                </h3>
-              </div>
-              <div className="rounded-full bg-[#ddefde] text-[#031c14] w-12 h-12 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300">
-                <ArrowIcon />
-              </div>
+    <section id="services" className="bg-[#FDFDFD] relative overflow-hidden w-full">
+      {/* Upper Part: Header and Bento Image Grid */}
+      <div className="relative z-10 pt-24 sm:pt-32 pb-0">
+        <div className="max-w-7xl mx-auto px-6 sm:px-12">
+          {/* Header Layout */}
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 sm:mb-24 gap-6">
+            <div className="max-w-xl">
+              <span className="text-[10px] tracking-[0.34em] text-[#D94E4E] uppercase font-bold block mb-4">
+                Clinical Expertise
+              </span>
+              <h2 className="font-serif text-3xl sm:text-5xl font-bold tracking-tight text-[#1D1E1E]">
+                Bespoke Treatment Programs
+              </h2>
             </div>
-          </motion.div>
+            <p className="text-sm font-light text-gray-500 max-w-sm leading-relaxed">
+              We approach every patient’s anatomy as a clinical masterpiece, designing custom therapeutic strategies that balance structural health and perfect facial balance.
+            </p>
+          </div>
 
-          {/* Row 2–3: 2x2 grid of remaining card services */}
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            {CARD_SERVICES.slice(1).map((svc, i) => (
-              <motion.div
-                key={svc.nr}
-                className="group relative overflow-hidden rounded-2xl cursor-pointer"
-                style={{ background: '#031c14', minHeight: '340px' }}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-                whileHover={{ scale: 1.005 }}
-              >
-                <Image
-                  src={svc.image}
-                  alt={svc.title}
-                  fill
-                  className="object-cover object-center transition-transform duration-700 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-[#031c14]/50 group-hover:bg-[#031c14]/40 transition-colors duration-300" />
-                <div className="relative z-10 flex items-end justify-between p-6 h-full min-h-[340px]">
-                  <div className="flex flex-col gap-1">
-                    <span
-                      className="text-[#ddefde]/60"
-                      style={{ fontFamily: HEADING_FONT, fontSize: 'clamp(1rem,0.9091rem + 0.404vw,1.25rem)', fontWeight: 400 }}
-                    >
-                      {svc.nr}
-                    </span>
-                    <h3
-                      className="text-[#ddefde]"
-                      style={{ fontFamily: HEADING_FONT, fontSize: 'clamp(1.25rem,1.0986rem + 0.6727vw,1.6663rem)', fontWeight: 700 }}
-                    >
-                      {svc.title}
+          {/* Bento Grid */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 relative z-10">
+            {CARD_SERVICES.map((svc, idx) => {
+              const words = svc.title.split(' ');
+              return (
+                <div
+                  key={svc.nr}
+                  onClick={() => handleItemClick(svc.title)}
+                  className={`group relative h-[250px] xs:h-[300px] sm:h-[380px] md:h-[400px] lg:h-[480px] rounded-[16px] sm:rounded-[24px] overflow-hidden shadow-md block ${getCardColSpan(idx)} bg-[#141515] cursor-pointer`}
+                >
+                  <img
+                    src={svc.image}
+                    alt={svc.title}
+                    className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-[1.025] transition-transform duration-700 ease-out filter brightness-[0.75] saturate-[0.95] contrast-[1.01]"
+                  />
+                  <div className="absolute inset-0 bg-[#1D1E1E]/20 z-5 transition-opacity duration-300 group-hover:opacity-10" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent z-10" />
+
+                  {/* Top Details */}
+                  <span className="absolute top-3 left-3 sm:top-6 sm:left-6 text-white font-josefin font-bold text-[18px] xs:text-[22px] sm:text-[26px] md:text-[30px] z-15">
+                    {svc.nr}
+                  </span>
+                  <div className="absolute top-3 right-3 sm:top-6 sm:right-6 w-7 h-7 sm:w-12 sm:h-12 bg-white text-[#141515] group-hover:bg-[#D94E4E] group-hover:text-white rounded-full flex items-center justify-center font-semibold shadow-md z-15 transition-all duration-300">
+                    <MoveRight className="w-3.5 h-3.5 sm:w-5 sm:h-5 transition-transform duration-500 ease-out rotate-[-45deg] group-hover:rotate-0" />
+                  </div>
+
+                  {/* Title */}
+                  <div className="absolute bottom-3 left-3 sm:bottom-6 sm:left-6 z-15 max-w-[85%]">
+                    <h3 className="font-josefin text-left text-[18px] xs:text-[22px] sm:text-[26px] md:text-[30px] font-bold text-white tracking-tight leading-tight">
+                      {words.length === 2 ? (
+                        <>
+                          {words[0]}
+                          <br />
+                          {words[1]}
+                        </>
+                      ) : (
+                        svc.title
+                      )}
                     </h3>
                   </div>
-                  <div className="rounded-full bg-[#ddefde] text-[#031c14] w-12 h-12 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300">
-                    <ArrowIcon />
-                  </div>
                 </div>
-              </motion.div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
 
-      {/* ── List Grid — dark green bg ─────────────────── */}
-      <div style={{ background: '#031c14' }}>
-        <div
-          style={{
-            width: 'min(1290px, 100% - clamp(1.5rem,1.3636rem + 0.6061vw,1.875rem) * 2)',
-            marginInline: 'auto',
-            paddingTop: 'clamp(1.5rem,1.1364rem + 1.6162vw,2.5rem)',
-            paddingBottom: 'clamp(3rem,2.7273rem + 1.2121vw,3.75rem)',
-          }}
-        >
-          <div className="flex flex-col">
-            {LIST_SERVICES.map((svc, i) => (
-              <motion.div
+      {/* Lower Part / Background Switch: Deep cohesive dark charcoal */}
+      <div className="bg-[#141515] relative pt-20 pb-24 sm:pb-32 mt-[-45px] z-0">
+        <div className="max-w-7xl mx-auto px-6 sm:px-12 relative z-10">
+          <div className="mb-8 border-b border-[#D94E4E]/15" />
+          <div className="divide-y divide-[#D94E4E]/10">
+            {LIST_SERVICES.map((svc, idx) => (
+              <div
                 key={svc.nr}
-                className="group flex items-center justify-between py-5 border-b border-[#ddefde]/15 cursor-pointer hover:border-[#ddefde]/40 transition-colors duration-300"
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.08 }}
+                onClick={() => handleItemClick(svc.title)}
+                className="group flex items-center justify-between py-6 sm:py-8 transition-colors duration-300 hover:bg-[#1C1D1D]/70 px-4 sm:px-6 rounded-2xl cursor-pointer"
               >
-                <div className="flex items-center gap-6">
-                  <span
-                    className="text-[#ddefde]/40 group-hover:text-[#ddefde]/70 transition-colors duration-300"
-                    style={{ fontFamily: HEADING_FONT, fontSize: 'clamp(1rem,0.9091rem + 0.404vw,1.25rem)', fontWeight: 400 }}
-                  >
-                    {svc.nr}
-                  </span>
-                  <h3
-                    className="text-[#ddefde] group-hover:text-white transition-colors duration-300"
-                    style={{ fontFamily: HEADING_FONT, fontSize: 'clamp(1.25rem,1.0986rem + 0.6727vw,1.6663rem)', fontWeight: 700 }}
-                  >
-                    {svc.title}
-                  </h3>
+                {/* Index Left */}
+                <span className="text-2xl sm:text-3xl font-josefin font-bold text-white/90 group-hover:text-white transition-colors w-12 sm:w-24 text-left">
+                  {svc.nr}
+                </span>
+
+                {/* Title Center */}
+                <h4 className="font-josefin text-lg sm:text-[30px] font-semibold tracking-tight text-white/95 group-hover:text-white transition-colors flex-1 text-center font-josefin">
+                  {svc.title}
+                </h4>
+
+                {/* Right container matching width of left container */}
+                <div className="w-12 sm:w-24 flex justify-end">
+                  <div className="w-11 h-11 bg-white/5 group-hover:bg-[#D94E4E] rounded-full border border-white/10 flex items-center justify-center text-white/80 group-hover:text-white transition-all duration-300">
+                    <MoveRight className="w-5 h-5 transition-transform duration-500 ease-out rotate-[-45deg] group-hover:rotate-0" />
+                  </div>
                 </div>
-                <div className="rounded-full bg-[#ddefde] text-[#031c14] w-10 h-10 flex items-center justify-center shrink-0 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all duration-300">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 60 60">
-                    <path fill="currentColor" d="M36.657 24.343a1 1 0 0 0-1-1h-9a1 1 0 0 0 0 2h8v8a1 1 0 1 0 2 0v-9ZM24.344 35.656l.707.707L36.365 25.05l-.708-.707-.707-.708L23.637 34.95l.707.707Z" />
-                  </svg>
-                </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
