@@ -27,7 +27,7 @@ export function HeroSection({ onBookClick }: HeroSectionProps) {
         <div className="absolute inset-0 z-0 pointer-events-none">
           <picture>
             <img
-              src="https://images.unsplash.com/photo-1629909613654-28e377c37b09?q=80&w=2070&auto=format&fit=crop"
+              src="/images/hero-bg.png"
               alt="Luxury modern architectural dental treatment facility, ambient warm light"
               className="w-full h-full object-cover object-center filter brightness-[0.65] saturate-[0.9] contrast-[1.02]"
             />
@@ -103,10 +103,10 @@ export function HeroSection({ onBookClick }: HeroSectionProps) {
           >
             <button
               onClick={onBookClick}
-              className="w-full sm:w-auto px-8 py-4 bg-white text-emerald-950 rounded-full hover:bg-emerald-50 transition-all duration-300 shadow-md flex items-center justify-center gap-2 cursor-pointer text-[13px] sm:text-[14px] font-sans font-semibold uppercase tracking-widest"
+              className="w-full sm:w-auto px-8 py-4 bg-white text-[#141515] rounded-full hover:bg-gray-100 transition-all duration-300 shadow-md flex items-center justify-center gap-2 cursor-pointer text-[13px] sm:text-[14px] font-sans font-semibold uppercase tracking-widest"
             >
               Book Appointment
-              <ArrowRight className="w-4 h-4 text-emerald-950" />
+              <ArrowRight className="w-4 h-4 text-[#141515]" />
             </button>
             <a
               href="#services"
