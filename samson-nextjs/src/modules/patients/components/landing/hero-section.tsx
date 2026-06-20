@@ -36,13 +36,13 @@ export function HeroSection({ onBookClick }: HeroSectionProps) {
         </div>
 
         {/* Content Container */}
-        <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-12 text-center text-white mt-10 lg:mt-2">
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-12 text-left text-white mt-10 lg:mt-2">
           {!mounted ? (
             <h1
-              className="font-serif text-[38px] sm:text-[48px] md:text-[60px] lg:text-[75px] font-semibold tracking-tight text-center leading-tight lg:leading-[74.8px] max-w-4xl mx-auto"
-              style={{ marginRight: '16px', fontWeight: '600', fontStyle: 'normal' }}
+              className="font-serif text-[38px] sm:text-[48px] md:text-[60px] lg:text-[75px] font-semibold tracking-tight leading-tight lg:leading-[74.8px] max-w-4xl"
+              style={{ fontWeight: '600', fontStyle: 'normal' }}
             >
-              <span className="block whitespace-nowrap">Unlock a World of</span>
+              <span className="block">Unlock a World of</span>
               <span className="relative inline-block italic mt-1 sm:mt-2 lg:mt-[8px] lg:font-semibold lg:text-[75px] text-white" id="hero-radiant-smiles">
                 Radiant Smiles
                 <svg
@@ -64,10 +64,10 @@ export function HeroSection({ onBookClick }: HeroSectionProps) {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1.2, delay: 0.2, ease: 'easeOut' }}
-              className="font-serif text-[38px] sm:text-[48px] md:text-[60px] lg:text-[75px] font-semibold tracking-tight text-center leading-tight lg:leading-[74.8px] max-w-4xl mx-auto"
-              style={{ marginRight: '16px', fontWeight: '600', fontStyle: 'normal' }}
+              className="font-serif text-[38px] sm:text-[48px] md:text-[60px] lg:text-[75px] font-semibold tracking-tight leading-tight lg:leading-[74.8px] max-w-4xl"
+              style={{ fontWeight: '600', fontStyle: 'normal' }}
             >
-              <span className="block whitespace-nowrap">Unlock a World of</span>
+              <span className="block">Unlock a World of</span>
               <span className="relative inline-block italic mt-1 sm:mt-2 lg:mt-[8px] lg:font-semibold lg:text-[75px] text-white" id="hero-radiant-smiles">
                 Radiant Smiles
                 <svg
@@ -90,7 +90,7 @@ export function HeroSection({ onBookClick }: HeroSectionProps) {
             initial={{ opacity: 0, y: 35 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.2, delay: 0.4, ease: 'easeOut' }}
-            className="mt-4 sm:mt-5 lg:mt-[38px] text-[15px] sm:text-base md:text-lg lg:text-[18px] leading-[26px] sm:leading-relaxed lg:leading-[32.5px] lg:font-normal lg:not-italic text-center text-white/95 max-w-2xl mx-auto font-light tracking-wide"
+            className="mt-4 sm:mt-5 lg:mt-[38px] text-[15px] sm:text-base md:text-lg lg:text-[18px] leading-[26px] sm:leading-relaxed lg:leading-[32.5px] lg:font-normal lg:not-italic text-white/95 max-w-2xl font-light tracking-wide"
           >
             Exceptional Dental Care Powered by Expertise, Innovation and Advanced Technology. Trusted by companies and individuals for over 60 years.
           </motion.p>
@@ -99,7 +99,7 @@ export function HeroSection({ onBookClick }: HeroSectionProps) {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.2, delay: 0.6, ease: 'easeOut' }}
-            className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 text-[13px] sm:text-[14px] font-sans font-semibold uppercase tracking-widest"
+            className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-start gap-4 text-[13px] sm:text-[14px] font-sans font-semibold uppercase tracking-widest"
           >
             <button
               onClick={onBookClick}
