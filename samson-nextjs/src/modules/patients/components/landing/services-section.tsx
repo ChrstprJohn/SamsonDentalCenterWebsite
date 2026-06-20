@@ -81,7 +81,7 @@ export function ServicesSection({ services, onSelectService }: ServicesSectionPr
               <span className="text-[10px] tracking-[0.34em] text-[#D94E4E] uppercase font-bold block mb-4">
                 Clinical Expertise
               </span>
-              <h2 className="font-serif text-3xl sm:text-5xl font-bold tracking-tight text-[#1D1E1E]">
+              <h2 className="font-serif text-3xl sm:text-5xl font-light tracking-tight text-[#1D1E1E]">
                 Bespoke Treatment Programs
               </h2>
             </div>
@@ -109,7 +109,7 @@ export function ServicesSection({ services, onSelectService }: ServicesSectionPr
                   <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent z-10" />
 
                   {/* Top Details */}
-                  <span className="absolute top-3 left-3 sm:top-6 sm:left-6 text-white font-josefin font-bold text-[18px] xs:text-[22px] sm:text-[26px] md:text-[30px] z-15">
+                  <span className="absolute top-3 left-3 sm:top-6 sm:left-6 text-white font-josefin font-bold text-[18px] sm:text-[22px] md:text-[26px] lg:text-[30px] z-15">
                     {svc.nr}
                   </span>
                   <div className="absolute top-3 right-3 sm:top-6 sm:right-6 w-7 h-7 sm:w-12 sm:h-12 bg-white text-[#141515] group-hover:bg-[#D94E4E] group-hover:text-white rounded-full flex items-center justify-center font-semibold shadow-md z-15 transition-all duration-300">
@@ -118,7 +118,7 @@ export function ServicesSection({ services, onSelectService }: ServicesSectionPr
 
                   {/* Title */}
                   <div className="absolute bottom-3 left-3 sm:bottom-6 sm:left-6 z-15 max-w-[85%]">
-                    <h3 className="font-josefin text-left text-[18px] xs:text-[22px] sm:text-[26px] md:text-[30px] font-bold text-white tracking-tight leading-tight">
+                    <h3 className="font-josefin text-left text-[18px] sm:text-[22px] md:text-[26px] lg:text-[30px] font-bold text-white tracking-tight leading-tight">
                       {words.length === 2 ? (
                         <>
                           {words[0]}
@@ -142,30 +142,47 @@ export function ServicesSection({ services, onSelectService }: ServicesSectionPr
         <div className="max-w-7xl mx-auto px-6 sm:px-12 relative z-10">
           <div className="mb-8 border-b border-[#D94E4E]/15" />
           <div className="divide-y divide-[#D94E4E]/10">
-            {LIST_SERVICES.map((svc, idx) => (
-              <div
-                key={svc.nr}
-                onClick={() => handleItemClick(svc.title)}
-                className="group flex items-center justify-between py-6 sm:py-8 transition-colors duration-300 hover:bg-[#1C1D1D]/70 px-4 sm:px-6 rounded-2xl cursor-pointer"
-              >
-                {/* Index Left */}
-                <span className="text-2xl sm:text-3xl font-josefin font-bold text-white/90 group-hover:text-white transition-colors w-12 sm:w-24 text-left">
-                  {svc.nr}
-                </span>
+            {LIST_SERVICES.map((svc, idx) => {
+              const words = svc.title.split(' ');
+              return (
+                <div
+                  key={svc.nr}
+                  onClick={() => handleItemClick(svc.title)}
+                  className="group flex items-center justify-between py-6 sm:py-8 transition-colors duration-300 hover:bg-[#1C1D1D]/70 px-4 sm:px-6 rounded-2xl cursor-pointer"
+                >
+                  {/* Index Left */}
+                  <span className="font-josefin font-bold text-white/90 group-hover:text-white transition-colors w-12 sm:w-24 text-left text-[18px] sm:text-[22px] md:text-[26px] lg:text-[30px]">
+                    {svc.nr}
+                  </span>
 
-                {/* Title Center */}
-                <h4 className="font-josefin text-lg sm:text-[30px] font-semibold tracking-tight text-white/95 group-hover:text-white transition-colors flex-1 text-center font-josefin">
-                  {svc.title}
-                </h4>
+                  {/* Title Center */}
+                  <h4 className="font-josefin font-semibold tracking-tight text-white/95 group-hover:text-white transition-colors flex-1 text-center text-[18px] sm:text-[22px] md:text-[26px] lg:text-[30px] leading-tight">
+                    {words.length === 2 ? (
+                      <>
+                        {words[0]}
+                        <br />
+                        {words[1]}
+                      </>
+                    ) : words.length === 3 && words[1] === '&' ? (
+                      <>
+                        {words[0]} &
+                        <br />
+                        {words[2]}
+                      </>
+                    ) : (
+                      svc.title
+                    )}
+                  </h4>
 
-                {/* Right container matching width of left container */}
-                <div className="w-12 sm:w-24 flex justify-end">
-                  <div className="w-11 h-11 bg-white/5 group-hover:bg-[#D94E4E] rounded-full border border-white/10 flex items-center justify-center text-white/80 group-hover:text-white transition-all duration-300">
-                    <MoveRight className="w-5 h-5 transition-transform duration-500 ease-out rotate-[-45deg] group-hover:rotate-0" />
+                  {/* Right container matching width of left container */}
+                  <div className="w-12 sm:w-24 flex justify-end">
+                    <div className="w-11 h-11 bg-white/5 group-hover:bg-[#D94E4E] rounded-full border border-white/10 flex items-center justify-center text-white/80 group-hover:text-white transition-all duration-300">
+                      <MoveRight className="w-5 h-5 transition-transform duration-500 ease-out rotate-[-45deg] group-hover:rotate-0" />
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>

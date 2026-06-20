@@ -21,8 +21,8 @@ export function AboutSection() {
             </div>
 
             {/* Overlay architectural detail badge */}
-            <div className="absolute -bottom-6 -right-4 sm:right-6 bg-emerald-950 text-white p-6 rounded-2xl max-w-xs shadow-xl font-sans">
-              <p className="font-serif text-2xl font-light tracking-tight leading-none text-[#ddefde]">
+            <div className="absolute -bottom-6 -right-4 sm:right-6 bg-[#141515] text-white p-6 rounded-2xl max-w-xs shadow-xl font-sans">
+              <p className="font-serif text-2xl font-light tracking-tight leading-none text-[#D94E4E]">
                 15+ Years
               </p>
               <p className="text-[10px] tracking-widest font-semibold uppercase mt-2 text-white/80">
@@ -33,7 +33,7 @@ export function AboutSection() {
 
           {/* Content Column */}
           <div className="lg:col-span-6">
-            <span className="text-[10px] tracking-[0.34em] text-emerald-800 uppercase font-bold block mb-4">
+            <span className="text-[10px] tracking-[0.34em] text-[#D94E4E] uppercase font-bold block mb-4">
               Redefined Sanctuary
             </span>
             <h2 className="font-serif text-3xl sm:text-5xl font-light tracking-tight text-[#1D1E1E] leading-tight">

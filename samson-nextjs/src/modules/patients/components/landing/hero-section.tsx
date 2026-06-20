@@ -39,11 +39,10 @@ export function HeroSection({ onBookClick }: HeroSectionProps) {
         <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-12 text-center text-white mt-10 lg:mt-2">
           {!mounted ? (
             <h1
-              className="font-serif text-[37px] md:text-[60px] lg:text-[75px] font-semibold tracking-tight text-center leading-tight lg:leading-[74.8px] max-w-4xl mx-auto"
+              className="font-serif text-[38px] sm:text-[48px] md:text-[60px] lg:text-[75px] font-semibold tracking-tight text-center leading-tight lg:leading-[74.8px] max-w-4xl mx-auto"
               style={{ marginRight: '16px', fontWeight: '600', fontStyle: 'normal' }}
             >
-              Unlock a World of
-              <br />
+              <span className="block whitespace-nowrap">Unlock a World of</span>
               <span className="relative inline-block italic mt-1 sm:mt-2 lg:mt-[8px] lg:font-semibold lg:text-[75px] text-white" id="hero-radiant-smiles">
                 Radiant Smiles
                 <svg
@@ -65,11 +64,10 @@ export function HeroSection({ onBookClick }: HeroSectionProps) {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1.2, delay: 0.2, ease: 'easeOut' }}
-              className="font-serif text-[37px] md:text-[60px] lg:text-[75px] font-semibold tracking-tight text-center leading-tight lg:leading-[74.8px] max-w-4xl mx-auto"
+              className="font-serif text-[38px] sm:text-[48px] md:text-[60px] lg:text-[75px] font-semibold tracking-tight text-center leading-tight lg:leading-[74.8px] max-w-4xl mx-auto"
               style={{ marginRight: '16px', fontWeight: '600', fontStyle: 'normal' }}
             >
-              Unlock a World of
-              <br />
+              <span className="block whitespace-nowrap">Unlock a World of</span>
               <span className="relative inline-block italic mt-1 sm:mt-2 lg:mt-[8px] lg:font-semibold lg:text-[75px] text-white" id="hero-radiant-smiles">
                 Radiant Smiles
                 <svg
@@ -92,7 +90,7 @@ export function HeroSection({ onBookClick }: HeroSectionProps) {
             initial={{ opacity: 0, y: 35 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.2, delay: 0.4, ease: 'easeOut' }}
-            className="mt-4 sm:mt-5 lg:mt-[38px] text-[13px] sm:text-sm md:text-base lg:text-[18px] leading-[23px] sm:leading-relaxed lg:leading-[32.5px] lg:font-normal lg:not-italic text-center text-white/95 max-w-2xl mx-auto font-light tracking-wide"
+            className="mt-4 sm:mt-5 lg:mt-[38px] text-[15px] sm:text-base md:text-lg lg:text-[18px] leading-[26px] sm:leading-relaxed lg:leading-[32.5px] lg:font-normal lg:not-italic text-center text-white/95 max-w-2xl mx-auto font-light tracking-wide"
           >
             Exceptional Dental Care Powered by Expertise, Innovation and Advanced Technology. Trusted by companies and individuals for over 60 years.
           </motion.p>
@@ -101,18 +99,18 @@ export function HeroSection({ onBookClick }: HeroSectionProps) {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.2, delay: 0.6, ease: 'easeOut' }}
-            className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 text-xs lg:text-[14px] font-semibold uppercase tracking-widest"
+            className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 text-[13px] sm:text-[14px] font-sans font-semibold uppercase tracking-widest"
           >
             <button
               onClick={onBookClick}
-              className="w-full sm:w-auto px-8 py-4 bg-white text-emerald-950 rounded-full hover:bg-emerald-50 transition-all duration-300 shadow-md flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full sm:w-auto px-8 py-4 bg-white text-emerald-950 rounded-full hover:bg-emerald-50 transition-all duration-300 shadow-md flex items-center justify-center gap-2 cursor-pointer text-[13px] sm:text-[14px] font-sans font-semibold uppercase tracking-widest"
             >
               Book Appointment
               <ArrowRight className="w-4 h-4 text-emerald-950" />
             </button>
             <a
               href="#services"
-              className="w-full sm:w-auto px-8 py-4 bg-transparent text-white border border-white/20 rounded-full hover:bg-white/10 transition-all duration-300 backdrop-blur-xs flex items-center justify-center"
+              className="w-full sm:w-auto px-8 py-4 bg-transparent text-white border border-white/20 rounded-full hover:bg-white/10 transition-all duration-300 backdrop-blur-xs flex items-center justify-center text-[13px] sm:text-[14px] font-sans font-semibold uppercase tracking-widest"
             >
               Explore Services
             </a>

@@ -6,27 +6,27 @@ import { motion, AnimatePresence, useScroll } from 'framer-motion';
 const journeySlides = [
   {
     header: 'More personal than personal',
-    text: 'After a complex diagnosis, each patient is assigned a Treatment Plan Coordinator, or Personal Concierge. He or she takes care to ensure that the entire process is flawless and personalised — from scheduling appointments to the tiniest details that make your experience enjoyable and give you peace of mind.',
+    text: 'Your personal concierge manages every aspect of your treatment timeline, ensuring a flawless process from booking to follow-up care.',
   },
   {
     header: 'Complete privacy',
-    text: 'Treatment takes place in quiet, enclosed premises. Here you can feel safe, free and comfortable, away from the gaze of others or any disturbance.',
+    text: 'We conduct every procedure within private, quiet treatment suites designed to shield you from standard clinical activity and noise.',
   },
   {
     header: 'Complete Sensory Calming',
-    text: 'Through micro-diffusion of specialized organic essential oils and high-performance noise-canceling headsets, we neutralize standard clinical triggers. Enjoy heated herbal neck wraps, calming light therapy, and custom tea blends.',
+    text: 'Organic essential oil aromatherapy and custom noise-cancelling headphones actively neutralize standard dental anxiety triggers.',
   },
   {
     header: 'Microscopic Engineering',
-    text: 'Utilizing dental operating microscopes, our prosthodontists achieve sub-micron accuracy. Every restoration is crafted for a flush margin, preserving valuable tooth structure and guaranteeing longevity.',
+    text: 'Advanced operating microscopes enable sub-micron precision, allowing us to preserve structural tooth integrity and secure longevity.',
   },
   {
     header: 'Bespoke Biological Materials',
-    text: 'We exclusively select premium biocompatible, metals-free ceramics and premium composite restorations that naturally mimic the visual refraction and structural elasticity of biological tooth tissue.',
+    text: 'We select metals-free biocompatible ceramics that perfectly mirror the organic light refraction and elasticity of real teeth.',
   },
   {
     header: 'Facial Harmonization',
-    text: 'Each individual veneer layout is meticulously balanced with your facial structural vectors, lip mobility, and natural alignment axes. We reject generic templates to build cohesive oral masterpieces.',
+    text: 'We customize every restoration in balance with your unique facial geometry, natural lip mobility, and individual aesthetic alignment.',
   },
 ];
 
@@ -76,27 +76,35 @@ export function JourneySection() {
         </div>
 
         {/* Central Semicircle / Wheel and Content Assembly */}
-        <div className="relative w-full max-w-7xl mx-auto flex flex-col justify-between items-center overflow-hidden pb-0 px-6 sm:px-12 h-full pt-16 sm:pt-20 lg:pt-24">
-          {/* Header Block */}
-          <div className="w-full relative z-30 pt-4 sm:pt-6">
-            <h2 className="font-serif text-3xl sm:text-5xl font-bold tracking-tight text-[#FDFDFD] leading-tight text-center lg:text-left mt-2 sm:mt-0">
-              Your smile starts here
-            </h2>
+        <div className="relative w-full max-w-7xl mx-auto flex flex-col justify-between items-center overflow-hidden pb-0 px-6 sm:px-12 h-full max-h-[820px] pt-20 sm:pt-24 lg:pt-28">
+          {/* Header Block with responsive layout */}
+          <div className="w-full relative z-30 pt-8 sm:pt-12 flex flex-col md:flex-row md:items-end justify-between gap-6 mb-6 md:mb-10">
+            <div className="max-w-xl">
+              <span className="text-[10px] tracking-[0.34em] text-[#D94E4E] uppercase font-bold block mb-4">
+                Sanctuary Journey
+              </span>
+              <h2 className="font-serif text-3xl sm:text-5xl font-light tracking-tight text-[#FDFDFD] leading-tight">
+                Your smile starts here
+              </h2>
+            </div>
+            <p className="text-sm font-light text-white/70 max-w-sm leading-relaxed">
+              Follow our structured clinical pathway designed to deliver flawless personal care, absolute sensory calming, and microscopic cosmetic precision.
+            </p>
           </div>
 
           {/* Semicircle parent container */}
-          <div className="relative w-[340px] h-[136px] sm:w-[660px] sm:h-[264px] md:w-[850px] md:h-[340px] lg:w-full lg:max-w-7xl lg:h-auto lg:aspect-[5/2] overflow-visible z-10">
+          <div className="relative w-[92vw] h-[64.4vw] xs:w-[450px] xs:h-[315px] sm:w-[660px] sm:h-[264px] md:w-[850px] md:h-[340px] lg:w-full lg:max-w-7xl lg:h-auto lg:aspect-[5/2] overflow-visible z-10">
             {/* Static Semicircle Arc Reference Line */}
-            <div className="absolute bottom-[-204px] sm:bottom-[-396px] md:bottom-[-510px] lg:bottom-auto lg:top-0 left-0 w-[340px] h-[340px] sm:w-[660px] sm:h-[660px] md:w-[850px] md:h-[850px] lg:w-full lg:h-auto lg:aspect-square rounded-full border border-white/10 pointer-events-none z-0" />
+            <div className="absolute bottom-[-27.6vw] xs:bottom-[-135px] sm:bottom-[-396px] md:bottom-[-510px] lg:bottom-auto lg:top-0 left-0 w-[92vw] h-[92vw] xs:w-[450px] xs:h-[450px] sm:w-[660px] sm:h-[660px] md:w-[850px] md:h-[850px] lg:w-full lg:h-auto lg:aspect-square rounded-full border border-white/10 pointer-events-none z-0" />
 
             {/* The Active Top Vertical Connection Line */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1.5px] h-12 sm:h-20 bg-gradient-to-b from-[#D94E4E] to-[#D94E4E]/10 z-20 pointer-events-none" />
+            <div className="absolute left-1/2 -translate-x-1/2 w-[3px] h-16 bg-gradient-to-t from-[#D94E4E] to-[#D94E4E]/10 z-20 pointer-events-none bottom-[calc(100%+6.43%-60px)] sm:bottom-[calc(100%+11.25%-84px)]" />
 
             {/* Rotating Wheel Container */}
             <motion.div
               animate={{ rotate: -activeStep * 60 }}
               transition={{ type: 'spring', stiffness: 50, damping: 15 }}
-              className="absolute bottom-[-204px] sm:bottom-[-396px] md:bottom-[-510px] lg:bottom-auto lg:top-0 left-0 w-[340px] h-[340px] sm:w-[660px] sm:h-[660px] md:w-[850px] md:h-[850px] lg:w-full lg:h-auto lg:aspect-square rounded-full z-10"
+              className="absolute bottom-[-27.6vw] xs:bottom-[-135px] sm:bottom-[-396px] md:bottom-[-510px] lg:bottom-auto lg:top-0 left-0 w-[92vw] h-[92vw] xs:w-[450px] xs:h-[450px] sm:w-[660px] sm:h-[660px] md:w-[850px] md:h-[850px] lg:w-full lg:h-auto lg:aspect-square rounded-full z-10"
             >
               {journeySlides.map((_, idx) => {
                 const angleDeg = 270 + idx * 60;
@@ -154,7 +162,7 @@ export function JourneySection() {
             </motion.div>
 
             {/* Content Display */}
-            <div className="absolute bottom-[calc(110px+8vh)] sm:bottom-[calc(185px+8vh)] md:bottom-[calc(240px+8vh)] lg:bottom-[80px] left-1/2 -translate-x-1/2 w-full max-w-[90%] sm:max-w-xl md:max-w-2xl px-6 text-center z-20 h-[330px] sm:h-auto">
+            <div className="absolute inset-x-0 bottom-6 top-auto sm:inset-auto sm:top-auto sm:bottom-[40px] md:bottom-[60px] lg:bottom-[80px] sm:left-1/2 sm:-translate-x-1/2 w-full sm:max-w-lg md:max-w-xl lg:max-w-3xl px-6 pb-4 sm:pb-6 md:pb-8 lg:pb-10 text-center z-20 flex flex-col justify-center items-center">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={activeStep}
@@ -162,12 +170,12 @@ export function JourneySection() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -15 }}
                   transition={{ duration: 0.4, ease: 'easeOut' }}
-                  className="flex flex-col items-center h-full sm:h-auto md:h-[500px] lg:h-auto justify-center"
+                  className="flex flex-col items-center justify-center"
                 >
-                  <h3 className="font-serif text-2xl sm:text-3.5xl md:text-[34px] lg:text-[42px] text-[#D94E4E] font-medium tracking-wide leading-tight mb-4 sm:mb-6 max-w-lg sm:max-w-xl md:max-w-2xl">
+                  <h3 className="font-serif text-[24px] sm:text-[30px] md:text-[36px] lg:text-[42px] text-[#D94E4E] font-medium tracking-wide leading-tight mb-4 sm:mb-6 max-w-[280px] xs:max-w-[340px] sm:max-w-xl md:max-w-2xl">
                     {journeySlides[activeStep].header}
                   </h3>
-                  <p className="text-gray-300 font-sans text-xs sm:text-sm md:text-[21px] lg:text-[18px] font-light leading-relaxed max-w-lg sm:max-w-xl md:max-w-3xl">
+                  <p className="text-gray-300 font-sans text-[13px] sm:text-[14px] md:text-[16px] lg:text-[18px] font-light leading-relaxed max-w-[280px] xs:max-w-[340px] sm:max-w-xl md:max-w-3xl">
                     {journeySlides[activeStep].text}
                   </p>
                 </motion.div>
