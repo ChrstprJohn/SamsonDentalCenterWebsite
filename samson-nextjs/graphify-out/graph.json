@@ -675,7 +675,7 @@
       "source_file": "src/app/(portals)/admin/layout.tsx",
       "source_location": "L11",
       "id": "admin_layout_adminportallayout",
-      "community": 15,
+      "community": 5,
       "norm_label": "adminportallayout()"
     },
     {
@@ -684,7 +684,7 @@
       "source_file": "src/app/(portals)/admin/page.tsx",
       "source_location": "L1",
       "id": "admin_page",
-      "community": 15,
+      "community": 5,
       "norm_label": "page.tsx"
     },
     {
@@ -693,7 +693,7 @@
       "source_file": "src/app/(portals)/admin/page.tsx",
       "source_location": "L6",
       "id": "admin_page_metadata",
-      "community": 15,
+      "community": 5,
       "norm_label": "metadata"
     },
     {
@@ -702,7 +702,7 @@
       "source_file": "src/app/(portals)/admin/page.tsx",
       "source_location": "L11",
       "id": "admin_page_default_config",
-      "community": 15,
+      "community": 5,
       "norm_label": "default_config"
     },
     {
@@ -711,7 +711,7 @@
       "source_file": "src/app/(portals)/admin/page.tsx",
       "source_location": "L33",
       "id": "admin_page_admindashboardpage",
-      "community": 15,
+      "community": 5,
       "norm_label": "admindashboardpage()"
     },
     {
@@ -729,7 +729,7 @@
       "source_file": "src/app/(portals)/booking/layout.tsx",
       "source_location": "L7",
       "id": "booking_layout_bookinglayout",
-      "community": 15,
+      "community": 5,
       "norm_label": "bookinglayout()"
     },
     {
@@ -774,7 +774,7 @@
       "source_file": "src/app/(portals)/doctor/layout.tsx",
       "source_location": "L11",
       "id": "doctor_layout_doctorportallayout",
-      "community": 15,
+      "community": 5,
       "norm_label": "doctorportallayout()"
     },
     {
@@ -819,7 +819,7 @@
       "source_file": "src/app/(portals)/secretary/layout.tsx",
       "source_location": "L11",
       "id": "secretary_layout_secretaryportallayout",
-      "community": 15,
+      "community": 5,
       "norm_label": "secretaryportallayout()"
     },
     {
@@ -828,7 +828,7 @@
       "source_file": "src/app/(portals)/secretary/page.tsx",
       "source_location": "L1",
       "id": "secretary_page",
-      "community": 24,
+      "community": 66,
       "norm_label": "page.tsx"
     },
     {
@@ -837,7 +837,7 @@
       "source_file": "src/app/(portals)/secretary/page.tsx",
       "source_location": "L4",
       "id": "secretary_page_metadata",
-      "community": 24,
+      "community": 66,
       "norm_label": "metadata"
     },
     {
@@ -846,7 +846,7 @@
       "source_file": "src/app/(portals)/secretary/page.tsx",
       "source_location": "L9",
       "id": "secretary_page_secretarydashboardpage",
-      "community": 24,
+      "community": 66,
       "norm_label": "secretarydashboardpage()"
     },
     {
@@ -873,7 +873,7 @@
       "source_file": "src/app/(portals)/user/appointments/[id]/page.tsx",
       "source_location": "L1",
       "id": "id_page",
-      "community": 59,
+      "community": 5,
       "norm_label": "page.tsx"
     },
     {
@@ -882,7 +882,7 @@
       "source_file": "src/app/(portals)/user/appointments/[id]/page.tsx",
       "source_location": "L8",
       "id": "id_page_metadata",
-      "community": 59,
+      "community": 5,
       "norm_label": "metadata"
     },
     {
@@ -891,7 +891,7 @@
       "source_file": "src/app/(portals)/user/appointments/[id]/page.tsx",
       "source_location": "L13",
       "id": "id_page_pageprops",
-      "community": 59,
+      "community": 5,
       "norm_label": "pageprops"
     },
     {
@@ -900,7 +900,7 @@
       "source_file": "src/app/(portals)/user/appointments/[id]/page.tsx",
       "source_location": "L17",
       "id": "id_page_appointmentdetailpage",
-      "community": 59,
+      "community": 5,
       "norm_label": "appointmentdetailpage()"
     },
     {
@@ -909,7 +909,7 @@
       "source_file": "src/app/(portals)/user/appointments/page.tsx",
       "source_location": "L1",
       "id": "appointments_page",
-      "community": 50,
+      "community": 5,
       "norm_label": "page.tsx"
     },
     {
@@ -918,7 +918,7 @@
       "source_file": "src/app/(portals)/user/appointments/page.tsx",
       "source_location": "L6",
       "id": "appointments_page_metadata",
-      "community": 50,
+      "community": 5,
       "norm_label": "metadata"
     },
     {
@@ -927,7 +927,7 @@
       "source_file": "src/app/(portals)/user/appointments/page.tsx",
       "source_location": "L11",
       "id": "appointments_page_patientappointmentspage",
-      "community": 50,
+      "community": 5,
       "norm_label": "patientappointmentspage()"
     },
     {
@@ -945,7 +945,7 @@
       "source_file": "src/app/(portals)/user/layout.tsx",
       "source_location": "L10",
       "id": "user_layout_userportallayout",
-      "community": 15,
+      "community": 5,
       "norm_label": "userportallayout()"
     },
     {
@@ -954,7 +954,7 @@
       "source_file": "src/app/(portals)/user/notifications/page.tsx",
       "source_location": "L1",
       "id": "notifications_page",
-      "community": 45,
+      "community": 50,
       "norm_label": "page.tsx"
     },
     {
@@ -963,7 +963,7 @@
       "source_file": "src/app/(portals)/user/notifications/page.tsx",
       "source_location": "L4",
       "id": "notifications_page_metadata",
-      "community": 45,
+      "community": 50,
       "norm_label": "metadata"
     },
     {
@@ -972,7 +972,7 @@
       "source_file": "src/app/(portals)/user/notifications/page.tsx",
       "source_location": "L9",
       "id": "notifications_page_notificationspage",
-      "community": 45,
+      "community": 50,
       "norm_label": "notificationspage()"
     },
     {
@@ -981,7 +981,7 @@
       "source_file": "src/app/(portals)/user/page.tsx",
       "source_location": "L1",
       "id": "user_page",
-      "community": 50,
+      "community": 5,
       "norm_label": "page.tsx"
     },
     {
@@ -990,7 +990,7 @@
       "source_file": "src/app/(portals)/user/page.tsx",
       "source_location": "L7",
       "id": "user_page_metadata",
-      "community": 50,
+      "community": 5,
       "norm_label": "metadata"
     },
     {
@@ -999,7 +999,7 @@
       "source_file": "src/app/(portals)/user/page.tsx",
       "source_location": "L12",
       "id": "user_page_userdashboardpage",
-      "community": 50,
+      "community": 5,
       "norm_label": "userdashboardpage()"
     },
     {
@@ -1044,7 +1044,7 @@
       "source_file": "src/app/(public)/(marketing)/layout.tsx",
       "source_location": "L8",
       "id": "marketing_layout_marketinglayout",
-      "community": 15,
+      "community": 5,
       "norm_label": "marketinglayout()"
     },
     {
@@ -1246,10 +1246,37 @@
       "norm_label": "geistmono"
     },
     {
-      "label": "metadata",
+      "label": "playfair",
       "file_type": "code",
       "source_file": "src/app/layout.tsx",
       "source_location": "L17",
+      "id": "app_layout_playfair",
+      "community": 32,
+      "norm_label": "playfair"
+    },
+    {
+      "label": "josefinSans",
+      "file_type": "code",
+      "source_file": "src/app/layout.tsx",
+      "source_location": "L23",
+      "id": "app_layout_josefinsans",
+      "community": 32,
+      "norm_label": "josefinsans"
+    },
+    {
+      "label": "jost",
+      "file_type": "code",
+      "source_file": "src/app/layout.tsx",
+      "source_location": "L29",
+      "id": "app_layout_jost",
+      "community": 32,
+      "norm_label": "jost"
+    },
+    {
+      "label": "metadata",
+      "file_type": "code",
+      "source_file": "src/app/layout.tsx",
+      "source_location": "L35",
       "id": "app_layout_metadata",
       "community": 32,
       "norm_label": "metadata"
@@ -1258,7 +1285,7 @@
       "label": "RootLayout()",
       "file_type": "code",
       "source_file": "src/app/layout.tsx",
-      "source_location": "L22",
+      "source_location": "L40",
       "id": "app_layout_rootlayout",
       "community": 32,
       "norm_label": "rootlayout()"
@@ -1377,7 +1404,7 @@
       "source_file": "src/components/feedback/toast-container.tsx",
       "source_location": "L17",
       "id": "feedback_toast_container_toastprovider",
-      "community": 32,
+      "community": 118,
       "norm_label": "toastprovider()"
     },
     {
@@ -1543,6 +1570,69 @@
       "norm_label": "modal()"
     },
     {
+      "label": "navbar-mobile-drawer.tsx",
+      "file_type": "code",
+      "source_file": "src/components/ui/navbar-mobile-drawer.tsx",
+      "source_location": "L1",
+      "id": "ui_navbar_mobile_drawer",
+      "community": 15,
+      "norm_label": "navbar-mobile-drawer.tsx"
+    },
+    {
+      "label": "NavbarMobileDrawerProps",
+      "file_type": "code",
+      "source_file": "src/components/ui/navbar-mobile-drawer.tsx",
+      "source_location": "L10",
+      "id": "ui_navbar_mobile_drawer_navbarmobiledrawerprops",
+      "community": 15,
+      "norm_label": "navbarmobiledrawerprops"
+    },
+    {
+      "label": "NavbarMobileDrawer()",
+      "file_type": "code",
+      "source_file": "src/components/ui/navbar-mobile-drawer.tsx",
+      "source_location": "L18",
+      "id": "ui_navbar_mobile_drawer_navbarmobiledrawer",
+      "community": 15,
+      "norm_label": "navbarmobiledrawer()"
+    },
+    {
+      "label": "navbar-v1.tsx",
+      "file_type": "code",
+      "source_file": "src/components/ui/navbar-v1.tsx",
+      "source_location": "L1",
+      "id": "ui_navbar_v1",
+      "community": 15,
+      "norm_label": "navbar-v1.tsx"
+    },
+    {
+      "label": "NavbarProps",
+      "file_type": "code",
+      "source_file": "src/components/ui/navbar-v1.tsx",
+      "source_location": "L12",
+      "id": "ui_navbar_v1_navbarprops",
+      "community": 15,
+      "norm_label": "navbarprops"
+    },
+    {
+      "label": "NAV_ITEMS",
+      "file_type": "code",
+      "source_file": "src/components/ui/navbar-v1.tsx",
+      "source_location": "L16",
+      "id": "ui_navbar_v1_nav_items",
+      "community": 15,
+      "norm_label": "nav_items"
+    },
+    {
+      "label": "NavbarV1()",
+      "file_type": "code",
+      "source_file": "src/components/ui/navbar-v1.tsx",
+      "source_location": "L24",
+      "id": "ui_navbar_v1_navbarv1",
+      "community": 15,
+      "norm_label": "navbarv1()"
+    },
+    {
       "label": "navbar.tsx",
       "file_type": "code",
       "source_file": "src/components/ui/navbar.tsx",
@@ -1555,7 +1645,7 @@
       "label": "NavbarProps",
       "file_type": "code",
       "source_file": "src/components/ui/navbar.tsx",
-      "source_location": "L10",
+      "source_location": "L12",
       "id": "ui_navbar_navbarprops",
       "community": 15,
       "norm_label": "navbarprops"
@@ -1564,7 +1654,7 @@
       "label": "NAV_ITEMS",
       "file_type": "code",
       "source_file": "src/components/ui/navbar.tsx",
-      "source_location": "L14",
+      "source_location": "L16",
       "id": "ui_navbar_nav_items",
       "community": 15,
       "norm_label": "nav_items"
@@ -1573,7 +1663,7 @@
       "label": "Navbar()",
       "file_type": "code",
       "source_file": "src/components/ui/navbar.tsx",
-      "source_location": "L22",
+      "source_location": "L24",
       "id": "ui_navbar_navbar",
       "community": 15,
       "norm_label": "navbar()"
@@ -1710,7 +1800,7 @@
       "source_file": "src/modules/appointments/actions/availability/get-step-two-data.action.spec.ts",
       "source_location": "L1",
       "id": "availability_get_step_two_data_action_spec",
-      "community": 8,
+      "community": 37,
       "norm_label": "get-step-two-data.action.spec.ts"
     },
     {
@@ -1719,7 +1809,7 @@
       "source_file": "src/modules/appointments/actions/availability/get-step-two-data.action.spec.ts",
       "source_location": "L8",
       "id": "availability_get_step_two_data_action_spec_mockgetavailabledaysusecase_mockgetdoctorsusecase_mockgetserviceduration",
-      "community": 8,
+      "community": 37,
       "norm_label": "{ mockgetavailabledaysusecase, mockgetdoctorsusecase, mockgetserviceduration }"
     },
     {
@@ -1728,7 +1818,7 @@
       "source_file": "src/modules/appointments/actions/availability/get-step-two-data.action.ts",
       "source_location": "L1",
       "id": "availability_get_step_two_data_action",
-      "community": 8,
+      "community": 36,
       "norm_label": "get-step-two-data.action.ts"
     },
     {
@@ -1737,7 +1827,7 @@
       "source_file": "src/modules/appointments/actions/availability/get-step-two-data.action.ts",
       "source_location": "L15",
       "id": "availability_get_step_two_data_action_getsteptwodataaction",
-      "community": 8,
+      "community": 36,
       "norm_label": "getsteptwodataaction()"
     },
     {
@@ -1746,7 +1836,7 @@
       "source_file": "src/modules/appointments/actions/booking/submit-booking.action.spec.ts",
       "source_location": "L1",
       "id": "booking_submit_booking_action_spec",
-      "community": 94,
+      "community": 37,
       "norm_label": "submit-booking.action.spec.ts"
     },
     {
@@ -1755,7 +1845,7 @@
       "source_file": "src/modules/appointments/actions/booking/submit-booking.action.spec.ts",
       "source_location": "L26",
       "id": "booking_submit_booking_action_spec_mocksubmitbooking_mockgetserviceduration",
-      "community": 94,
+      "community": 37,
       "norm_label": "{ mocksubmitbooking, mockgetserviceduration }"
     },
     {
@@ -1854,7 +1944,7 @@
       "source_file": "src/modules/appointments/actions/patient/get-patient-appointments.action.spec.ts",
       "source_location": "L1",
       "id": "patient_get_patient_appointments_action_spec",
-      "community": 4,
+      "community": 37,
       "norm_label": "get-patient-appointments.action.spec.ts"
     },
     {
@@ -1863,7 +1953,7 @@
       "source_file": "src/modules/appointments/actions/patient/get-patient-appointments.action.spec.ts",
       "source_location": "L10",
       "id": "patient_get_patient_appointments_action_spec_mockexecute",
-      "community": 4,
+      "community": 37,
       "norm_label": "{ mockexecute }"
     },
     {
@@ -1872,7 +1962,7 @@
       "source_file": "src/modules/appointments/actions/patient/get-patient-appointments.action.ts",
       "source_location": "L1",
       "id": "patient_get_patient_appointments_action",
-      "community": 4,
+      "community": 37,
       "norm_label": "get-patient-appointments.action.ts"
     },
     {
@@ -1881,7 +1971,7 @@
       "source_file": "src/modules/appointments/actions/patient/get-patient-appointments.action.ts",
       "source_location": "L12",
       "id": "patient_get_patient_appointments_action_getpatientappointmentsaction",
-      "community": 50,
+      "community": 5,
       "norm_label": "getpatientappointmentsaction()"
     },
     {
@@ -1998,7 +2088,7 @@
       "source_file": "src/modules/appointments/actions/treatment/submit-treatment.action.spec.ts",
       "source_location": "L1",
       "id": "treatment_submit_treatment_action_spec",
-      "community": 4,
+      "community": 14,
       "norm_label": "submit-treatment.action.spec.ts"
     },
     {
@@ -2007,7 +2097,7 @@
       "source_file": "src/modules/appointments/actions/treatment/submit-treatment.action.spec.ts",
       "source_location": "L10",
       "id": "treatment_submit_treatment_action_spec_mockexecute",
-      "community": 4,
+      "community": 14,
       "norm_label": "{ mockexecute }"
     },
     {
@@ -2142,7 +2232,7 @@
       "source_file": "src/modules/appointments/components/booking/date-time-step.tsx",
       "source_location": "L1",
       "id": "booking_date_time_step",
-      "community": 13,
+      "community": 100,
       "norm_label": "date-time-step.tsx"
     },
     {
@@ -2160,7 +2250,7 @@
       "source_file": "src/modules/appointments/components/booking/date-time-step.tsx",
       "source_location": "L23",
       "id": "booking_date_time_step_datetimestep",
-      "community": 13,
+      "community": 100,
       "norm_label": "datetimestep()"
     },
     {
@@ -2322,7 +2412,7 @@
       "source_file": "src/modules/appointments/components/booking/sub-components/doctor-preference-selector.tsx",
       "source_location": "L11",
       "id": "sub_components_doctor_preference_selector_doctorpreferenceselector",
-      "community": 13,
+      "community": 100,
       "norm_label": "doctorpreferenceselector()"
     },
     {
@@ -2340,7 +2430,7 @@
       "source_file": "src/modules/appointments/components/booking/sub-components/review-appointment-details.tsx",
       "source_location": "L5",
       "id": "sub_components_review_appointment_details_reviewappointmentdetailsprops",
-      "community": 41,
+      "community": 100,
       "norm_label": "reviewappointmentdetailsprops"
     },
     {
@@ -2385,7 +2475,7 @@
       "source_file": "src/modules/appointments/components/booking/sub-components/review-patient-details.tsx",
       "source_location": "L1",
       "id": "sub_components_review_patient_details",
-      "community": 34,
+      "community": 41,
       "norm_label": "review-patient-details.tsx"
     },
     {
@@ -2403,7 +2493,7 @@
       "source_file": "src/modules/appointments/components/booking/sub-components/review-patient-details.tsx",
       "source_location": "L13",
       "id": "sub_components_review_patient_details_reviewpatientdetails",
-      "community": 34,
+      "community": 41,
       "norm_label": "reviewpatientdetails()"
     },
     {
@@ -2466,7 +2556,7 @@
       "source_file": "src/modules/appointments/components/booking/sub-components/step-patient-self.tsx",
       "source_location": "L1",
       "id": "sub_components_step_patient_self",
-      "community": 34,
+      "community": 41,
       "norm_label": "step-patient-self.tsx"
     },
     {
@@ -2475,7 +2565,7 @@
       "source_file": "src/modules/appointments/components/booking/sub-components/step-patient-self.tsx",
       "source_location": "L4",
       "id": "sub_components_step_patient_self_steppatientselfprops",
-      "community": 34,
+      "community": 41,
       "norm_label": "steppatientselfprops"
     },
     {
@@ -2484,7 +2574,7 @@
       "source_file": "src/modules/appointments/components/booking/sub-components/step-patient-self.tsx",
       "source_location": "L8",
       "id": "sub_components_step_patient_self_steppatientself",
-      "community": 34,
+      "community": 41,
       "norm_label": "steppatientself()"
     },
     {
@@ -2520,7 +2610,7 @@
       "source_file": "src/modules/appointments/components/dashboard/appointment-summary-card.tsx",
       "source_location": "L1",
       "id": "dashboard_appointment_summary_card",
-      "community": 93,
+      "community": 28,
       "norm_label": "appointment-summary-card.tsx"
     },
     {
@@ -2529,7 +2619,7 @@
       "source_file": "src/modules/appointments/components/dashboard/appointment-summary-card.tsx",
       "source_location": "L9",
       "id": "dashboard_appointment_summary_card_appointmentsummarycardprops",
-      "community": 93,
+      "community": 28,
       "norm_label": "appointmentsummarycardprops"
     },
     {
@@ -2538,7 +2628,7 @@
       "source_file": "src/modules/appointments/components/dashboard/appointment-summary-card.tsx",
       "source_location": "L13",
       "id": "dashboard_appointment_summary_card_appointmentsummarycard",
-      "community": 93,
+      "community": 28,
       "norm_label": "appointmentsummarycard()"
     },
     {
@@ -2772,7 +2862,7 @@
       "source_file": "src/modules/appointments/components/dashboard/sub-components/reschedule-details.tsx",
       "source_location": "L1",
       "id": "sub_components_reschedule_details",
-      "community": 93,
+      "community": 28,
       "norm_label": "reschedule-details.tsx"
     },
     {
@@ -2781,7 +2871,7 @@
       "source_file": "src/modules/appointments/components/dashboard/sub-components/reschedule-details.tsx",
       "source_location": "L5",
       "id": "sub_components_reschedule_details_rescheduledetailsprops",
-      "community": 93,
+      "community": 28,
       "norm_label": "rescheduledetailsprops"
     },
     {
@@ -2790,7 +2880,7 @@
       "source_file": "src/modules/appointments/components/dashboard/sub-components/reschedule-details.tsx",
       "source_location": "L11",
       "id": "sub_components_reschedule_details_rescheduledetails",
-      "community": 93,
+      "community": 28,
       "norm_label": "rescheduledetails()"
     },
     {
@@ -2799,7 +2889,7 @@
       "source_file": "src/modules/appointments/components/dashboard/sub-components/status-reason-banners.tsx",
       "source_location": "L1",
       "id": "sub_components_status_reason_banners",
-      "community": 93,
+      "community": 28,
       "norm_label": "status-reason-banners.tsx"
     },
     {
@@ -2808,7 +2898,7 @@
       "source_file": "src/modules/appointments/components/dashboard/sub-components/status-reason-banners.tsx",
       "source_location": "L4",
       "id": "sub_components_status_reason_banners_statusreasonbannersprops",
-      "community": 93,
+      "community": 28,
       "norm_label": "statusreasonbannersprops"
     },
     {
@@ -2817,7 +2907,7 @@
       "source_file": "src/modules/appointments/components/dashboard/sub-components/status-reason-banners.tsx",
       "source_location": "L8",
       "id": "sub_components_status_reason_banners_statusreasonbanners",
-      "community": 93,
+      "community": 28,
       "norm_label": "statusreasonbanners()"
     },
     {
@@ -2907,7 +2997,7 @@
       "source_file": "src/modules/appointments/components/sub-components/appointment-schedule-card.tsx",
       "source_location": "L1",
       "id": "sub_components_appointment_schedule_card",
-      "community": 93,
+      "community": 28,
       "norm_label": "appointment-schedule-card.tsx"
     },
     {
@@ -2916,7 +3006,7 @@
       "source_file": "src/modules/appointments/components/sub-components/appointment-schedule-card.tsx",
       "source_location": "L5",
       "id": "sub_components_appointment_schedule_card_appointmentschedulecardprops",
-      "community": 93,
+      "community": 28,
       "norm_label": "appointmentschedulecardprops"
     },
     {
@@ -2925,7 +3015,7 @@
       "source_file": "src/modules/appointments/components/sub-components/appointment-schedule-card.tsx",
       "source_location": "L9",
       "id": "sub_components_appointment_schedule_card_appointmentschedulecard",
-      "community": 93,
+      "community": 28,
       "norm_label": "appointmentschedulecard()"
     },
     {
@@ -2988,7 +3078,7 @@
       "source_file": "src/modules/appointments/dtos/availability/appointment-response.dto.spec.ts",
       "source_location": "L1",
       "id": "availability_appointment_response_dto_spec",
-      "community": 88,
+      "community": 47,
       "norm_label": "appointment-response.dto.spec.ts"
     },
     {
@@ -2997,7 +3087,7 @@
       "source_file": "src/modules/appointments/dtos/availability/appointment-response.dto.ts",
       "source_location": "L1",
       "id": "availability_appointment_response_dto",
-      "community": 88,
+      "community": 47,
       "norm_label": "appointment-response.dto.ts"
     },
     {
@@ -3006,7 +3096,7 @@
       "source_file": "src/modules/appointments/dtos/availability/appointment-response.dto.ts",
       "source_location": "L3",
       "id": "availability_appointment_response_dto_appointmentdbschema",
-      "community": 88,
+      "community": 47,
       "norm_label": "appointmentdbschema"
     },
     {
@@ -3015,7 +3105,7 @@
       "source_file": "src/modules/appointments/dtos/availability/appointment-response.dto.ts",
       "source_location": "L12",
       "id": "availability_appointment_response_dto_appointmentresponseschema",
-      "community": 88,
+      "community": 47,
       "norm_label": "appointmentresponseschema"
     },
     {
@@ -3024,7 +3114,7 @@
       "source_file": "src/modules/appointments/dtos/availability/appointment-response.dto.ts",
       "source_location": "L21",
       "id": "availability_appointment_response_dto_appointmentresponsedto",
-      "community": 88,
+      "community": 47,
       "norm_label": "appointmentresponsedto"
     },
     {
@@ -3033,7 +3123,7 @@
       "source_file": "src/modules/appointments/dtos/availability/availability-internal.dto.ts",
       "source_location": "L1",
       "id": "availability_availability_internal_dto",
-      "community": 88,
+      "community": 47,
       "norm_label": "availability-internal.dto.ts"
     },
     {
@@ -3051,7 +3141,7 @@
       "source_file": "src/modules/appointments/dtos/availability/availability-internal.dto.ts",
       "source_location": "L9",
       "id": "availability_availability_internal_dto_generateslotsparams",
-      "community": 88,
+      "community": 47,
       "norm_label": "generateslotsparams"
     },
     {
@@ -3060,7 +3150,7 @@
       "source_file": "src/modules/appointments/dtos/availability/availability-internal.dto.ts",
       "source_location": "L22",
       "id": "availability_availability_internal_dto_workingschedulemonthitem",
-      "community": 88,
+      "community": 47,
       "norm_label": "workingschedulemonthitem"
     },
     {
@@ -3168,7 +3258,7 @@
       "source_file": "src/modules/appointments/dtos/availability/get-available-days.dto.ts",
       "source_location": "L23",
       "id": "availability_get_available_days_dto_availabilitymapdto",
-      "community": 106,
+      "community": 0,
       "norm_label": "availabilitymapdto"
     },
     {
@@ -3195,7 +3285,7 @@
       "source_file": "src/modules/appointments/dtos/availability/get-available-time-slots.dto.spec.ts",
       "source_location": "L1",
       "id": "availability_get_available_time_slots_dto_spec",
-      "community": 0,
+      "community": 106,
       "norm_label": "get-available-time-slots.dto.spec.ts"
     },
     {
@@ -3204,7 +3294,7 @@
       "source_file": "src/modules/appointments/dtos/availability/get-available-time-slots.dto.ts",
       "source_location": "L1",
       "id": "availability_get_available_time_slots_dto",
-      "community": 0,
+      "community": 106,
       "norm_label": "get-available-time-slots.dto.ts"
     },
     {
@@ -3213,7 +3303,7 @@
       "source_file": "src/modules/appointments/dtos/availability/get-available-time-slots.dto.ts",
       "source_location": "L3",
       "id": "availability_get_available_time_slots_dto_emptystringtoundefined",
-      "community": 0,
+      "community": 106,
       "norm_label": "emptystringtoundefined"
     },
     {
@@ -3222,7 +3312,7 @@
       "source_file": "src/modules/appointments/dtos/availability/get-available-time-slots.dto.ts",
       "source_location": "L6",
       "id": "availability_get_available_time_slots_dto_getavailabletimeslotsschema",
-      "community": 0,
+      "community": 106,
       "norm_label": "getavailabletimeslotsschema"
     },
     {
@@ -3231,7 +3321,7 @@
       "source_file": "src/modules/appointments/dtos/availability/get-available-time-slots.dto.ts",
       "source_location": "L14",
       "id": "availability_get_available_time_slots_dto_getavailabletimeslotsdto",
-      "community": 0,
+      "community": 106,
       "norm_label": "getavailabletimeslotsdto"
     },
     {
@@ -3249,7 +3339,7 @@
       "source_file": "src/modules/appointments/dtos/availability/get-available-time-slots.dto.ts",
       "source_location": "L26",
       "id": "availability_get_available_time_slots_dto_getavailabletimeslotsresponseschema",
-      "community": 0,
+      "community": 106,
       "norm_label": "getavailabletimeslotsresponseschema"
     },
     {
@@ -3267,7 +3357,7 @@
       "source_file": "src/modules/appointments/dtos/availability/get-available-time-slots.dto.ts",
       "source_location": "L33",
       "id": "availability_get_available_time_slots_dto_getavailabletimeslotsresponsedto",
-      "community": 88,
+      "community": 106,
       "norm_label": "getavailabletimeslotsresponsedto"
     },
     {
@@ -3420,7 +3510,7 @@
       "source_file": "src/modules/appointments/dtos/shared/appointment.dto.spec.ts",
       "source_location": "L1",
       "id": "shared_appointment_dto_spec",
-      "community": 98,
+      "community": 71,
       "norm_label": "appointment.dto.spec.ts"
     },
     {
@@ -3429,7 +3519,7 @@
       "source_file": "src/modules/appointments/dtos/shared/appointment.dto.ts",
       "source_location": "L1",
       "id": "shared_appointment_dto",
-      "community": 98,
+      "community": 71,
       "norm_label": "appointment.dto.ts"
     },
     {
@@ -3438,7 +3528,7 @@
       "source_file": "src/modules/appointments/dtos/shared/appointment.dto.ts",
       "source_location": "L4",
       "id": "shared_appointment_dto_appointmentdoctordbschema",
-      "community": 98,
+      "community": 71,
       "norm_label": "appointmentdoctordbschema"
     },
     {
@@ -3447,7 +3537,7 @@
       "source_file": "src/modules/appointments/dtos/shared/appointment.dto.ts",
       "source_location": "L12",
       "id": "shared_appointment_dto_appointmentdoctorschema",
-      "community": 98,
+      "community": 71,
       "norm_label": "appointmentdoctorschema"
     },
     {
@@ -3456,7 +3546,7 @@
       "source_file": "src/modules/appointments/dtos/shared/appointment.dto.ts",
       "source_location": "L20",
       "id": "shared_appointment_dto_appointmentservicedbschema",
-      "community": 98,
+      "community": 71,
       "norm_label": "appointmentservicedbschema"
     },
     {
@@ -3465,7 +3555,7 @@
       "source_file": "src/modules/appointments/dtos/shared/appointment.dto.ts",
       "source_location": "L26",
       "id": "shared_appointment_dto_appointmentserviceschema",
-      "community": 98,
+      "community": 71,
       "norm_label": "appointmentserviceschema"
     },
     {
@@ -3474,7 +3564,7 @@
       "source_file": "src/modules/appointments/dtos/shared/appointment.dto.ts",
       "source_location": "L32",
       "id": "shared_appointment_dto_appointmentpatientdbschema",
-      "community": 98,
+      "community": 71,
       "norm_label": "appointmentpatientdbschema"
     },
     {
@@ -3483,7 +3573,7 @@
       "source_file": "src/modules/appointments/dtos/shared/appointment.dto.ts",
       "source_location": "L38",
       "id": "shared_appointment_dto_appointmentpatientschema",
-      "community": 98,
+      "community": 71,
       "norm_label": "appointmentpatientschema"
     },
     {
@@ -3492,7 +3582,7 @@
       "source_file": "src/modules/appointments/dtos/shared/appointment.dto.ts",
       "source_location": "L44",
       "id": "shared_appointment_dto_appointmentdbschema",
-      "community": 98,
+      "community": 71,
       "norm_label": "appointmentdbschema"
     },
     {
@@ -3501,7 +3591,7 @@
       "source_file": "src/modules/appointments/dtos/shared/appointment.dto.ts",
       "source_location": "L82",
       "id": "shared_appointment_dto_appointmentdtoschema",
-      "community": 98,
+      "community": 71,
       "norm_label": "appointmentdtoschema"
     },
     {
@@ -3510,7 +3600,7 @@
       "source_file": "src/modules/appointments/dtos/shared/appointment.dto.ts",
       "source_location": "L120",
       "id": "shared_appointment_dto_appointmentdto",
-      "community": 93,
+      "community": 28,
       "norm_label": "appointmentdto"
     },
     {
@@ -3519,7 +3609,7 @@
       "source_file": "src/modules/appointments/dtos/shared/appointment.dto.ts",
       "source_location": "L122",
       "id": "shared_appointment_dto_mayberecord",
-      "community": 98,
+      "community": 71,
       "norm_label": "mayberecord"
     },
     {
@@ -3528,7 +3618,7 @@
       "source_file": "src/modules/appointments/dtos/shared/appointment.dto.ts",
       "source_location": "L124",
       "id": "shared_appointment_dto_mapappointmentrecord",
-      "community": 47,
+      "community": 21,
       "norm_label": "mapappointmentrecord()"
     },
     {
@@ -3618,7 +3708,7 @@
       "source_file": "src/modules/appointments/dtos/status/update-appointment-status.dto.spec.ts",
       "source_location": "L1",
       "id": "status_update_appointment_status_dto_spec",
-      "community": 17,
+      "community": 99,
       "norm_label": "update-appointment-status.dto.spec.ts"
     },
     {
@@ -3627,7 +3717,7 @@
       "source_file": "src/modules/appointments/dtos/status/update-appointment-status.dto.ts",
       "source_location": "L1",
       "id": "status_update_appointment_status_dto",
-      "community": 17,
+      "community": 99,
       "norm_label": "update-appointment-status.dto.ts"
     },
     {
@@ -3636,7 +3726,7 @@
       "source_file": "src/modules/appointments/dtos/status/update-appointment-status.dto.ts",
       "source_location": "L3",
       "id": "status_update_appointment_status_dto_emptystringtoundefined",
-      "community": 17,
+      "community": 99,
       "norm_label": "emptystringtoundefined"
     },
     {
@@ -3645,7 +3735,7 @@
       "source_file": "src/modules/appointments/dtos/status/update-appointment-status.dto.ts",
       "source_location": "L4",
       "id": "status_update_appointment_status_dto_cleanoptionalstring",
-      "community": 17,
+      "community": 99,
       "norm_label": "cleanoptionalstring"
     },
     {
@@ -3654,7 +3744,7 @@
       "source_file": "src/modules/appointments/dtos/status/update-appointment-status.dto.ts",
       "source_location": "L6",
       "id": "status_update_appointment_status_dto_appointmentstatusenum",
-      "community": 17,
+      "community": 99,
       "norm_label": "appointmentstatusenum"
     },
     {
@@ -3663,7 +3753,7 @@
       "source_file": "src/modules/appointments/dtos/status/update-appointment-status.dto.ts",
       "source_location": "L19",
       "id": "status_update_appointment_status_dto_staffupdateappointmentstatusschema",
-      "community": 17,
+      "community": 99,
       "norm_label": "staffupdateappointmentstatusschema"
     },
     {
@@ -3672,7 +3762,7 @@
       "source_file": "src/modules/appointments/dtos/status/update-appointment-status.dto.ts",
       "source_location": "L121",
       "id": "status_update_appointment_status_dto_staffupdateappointmentstatusdto",
-      "community": 17,
+      "community": 99,
       "norm_label": "staffupdateappointmentstatusdto"
     },
     {
@@ -3771,7 +3861,7 @@
       "source_file": "src/modules/appointments/hooks/booking/use-booking-data.spec.ts",
       "source_location": "L1",
       "id": "booking_use_booking_data_spec",
-      "community": 106,
+      "community": 8,
       "norm_label": "use-booking-data.spec.ts"
     },
     {
@@ -3780,7 +3870,7 @@
       "source_file": "src/modules/appointments/hooks/booking/use-booking-data.ts",
       "source_location": "L1",
       "id": "booking_use_booking_data",
-      "community": 106,
+      "community": 8,
       "norm_label": "use-booking-data.ts"
     },
     {
@@ -3789,7 +3879,7 @@
       "source_file": "src/modules/appointments/hooks/booking/use-booking-data.ts",
       "source_location": "L9",
       "id": "booking_use_booking_data_formatslotsforbooking",
-      "community": 106,
+      "community": 8,
       "norm_label": "formatslotsforbooking()"
     },
     {
@@ -3798,7 +3888,7 @@
       "source_file": "src/modules/appointments/hooks/booking/use-booking-data.ts",
       "source_location": "L27",
       "id": "booking_use_booking_data_usebookingdata",
-      "community": 106,
+      "community": 8,
       "norm_label": "usebookingdata()"
     },
     {
@@ -3807,7 +3897,7 @@
       "source_file": "src/modules/appointments/hooks/booking/use-booking-state.spec.ts",
       "source_location": "L1",
       "id": "booking_use_booking_state_spec",
-      "community": 1,
+      "community": 100,
       "norm_label": "use-booking-state.spec.ts"
     },
     {
@@ -3816,7 +3906,7 @@
       "source_file": "src/modules/appointments/hooks/booking/use-booking-state.ts",
       "source_location": "L1",
       "id": "booking_use_booking_state",
-      "community": 1,
+      "community": 100,
       "norm_label": "use-booking-state.ts"
     },
     {
@@ -3825,7 +3915,7 @@
       "source_file": "src/modules/appointments/hooks/booking/use-booking-state.ts",
       "source_location": "L5",
       "id": "booking_use_booking_state_usebookingstate",
-      "community": 1,
+      "community": 100,
       "norm_label": "usebookingstate()"
     },
     {
@@ -3834,8 +3924,26 @@
       "source_file": "src/modules/appointments/hooks/booking/use-user-booking.spec.ts",
       "source_location": "L1",
       "id": "booking_use_user_booking_spec",
-      "community": 1,
+      "community": 118,
       "norm_label": "use-user-booking.spec.ts"
+    },
+    {
+      "label": "mockGet",
+      "file_type": "code",
+      "source_file": "src/modules/appointments/hooks/booking/use-user-booking.spec.ts",
+      "source_location": "L12",
+      "id": "booking_use_user_booking_spec_mockget",
+      "community": 118,
+      "norm_label": "mockget"
+    },
+    {
+      "label": "mockAddToast",
+      "file_type": "code",
+      "source_file": "src/modules/appointments/hooks/booking/use-user-booking.spec.ts",
+      "source_location": "L20",
+      "id": "booking_use_user_booking_spec_mockaddtoast",
+      "community": 118,
+      "norm_label": "mockaddtoast"
     },
     {
       "label": "use-user-booking.ts",
@@ -3843,7 +3951,7 @@
       "source_file": "src/modules/appointments/hooks/booking/use-user-booking.ts",
       "source_location": "L1",
       "id": "booking_use_user_booking",
-      "community": 1,
+      "community": 100,
       "norm_label": "use-user-booking.ts"
     },
     {
@@ -3852,7 +3960,7 @@
       "source_file": "src/modules/appointments/hooks/booking/use-user-booking.ts",
       "source_location": "L15",
       "id": "booking_use_user_booking_bookingstep",
-      "community": 1,
+      "community": 100,
       "norm_label": "bookingstep"
     },
     {
@@ -3933,7 +4041,7 @@
       "source_file": "src/modules/appointments/hooks/dashboard/use-user-dashboard.spec.ts",
       "source_location": "L1",
       "id": "dashboard_use_user_dashboard_spec",
-      "community": 98,
+      "community": 12,
       "norm_label": "use-user-dashboard.spec.ts"
     },
     {
@@ -3942,7 +4050,7 @@
       "source_file": "src/modules/appointments/hooks/dashboard/use-user-dashboard.spec.ts",
       "source_location": "L10",
       "id": "dashboard_use_user_dashboard_spec_mockpush",
-      "community": 98,
+      "community": 12,
       "norm_label": "mockpush"
     },
     {
@@ -3951,7 +4059,7 @@
       "source_file": "src/modules/appointments/hooks/dashboard/use-user-dashboard.spec.ts",
       "source_location": "L15",
       "id": "dashboard_use_user_dashboard_spec_mockaddtoast",
-      "community": 98,
+      "community": 12,
       "norm_label": "mockaddtoast"
     },
     {
@@ -3996,7 +4104,7 @@
       "source_file": "src/modules/appointments/hooks/detail/use-appointment-detail.ts",
       "source_location": "L1",
       "id": "detail_use_appointment_detail",
-      "community": 118,
+      "community": 59,
       "norm_label": "use-appointment-detail.ts"
     },
     {
@@ -4005,7 +4113,7 @@
       "source_file": "src/modules/appointments/hooks/detail/use-appointment-detail.ts",
       "source_location": "L9",
       "id": "detail_use_appointment_detail_useappointmentdetailprops",
-      "community": 118,
+      "community": 59,
       "norm_label": "useappointmentdetailprops"
     },
     {
@@ -4023,7 +4131,7 @@
       "source_file": "src/modules/appointments/mocks/mock-appointments.ts",
       "source_location": "L1",
       "id": "mocks_mock_appointments",
-      "community": 93,
+      "community": 28,
       "norm_label": "mock-appointments.ts"
     },
     {
@@ -4032,7 +4140,7 @@
       "source_file": "src/modules/appointments/mocks/mock-appointments.ts",
       "source_location": "L3",
       "id": "mocks_mock_appointments_mock_appointments",
-      "community": 93,
+      "community": 28,
       "norm_label": "mock_appointments"
     },
     {
@@ -4041,7 +4149,7 @@
       "source_file": "src/modules/appointments/repositories/availability/get-doctor-schedules.queries.spec.ts",
       "source_location": "L1",
       "id": "availability_get_doctor_schedules_queries_spec",
-      "community": 47,
+      "community": 94,
       "norm_label": "get-doctor-schedules.queries.spec.ts"
     },
     {
@@ -4050,7 +4158,7 @@
       "source_file": "src/modules/appointments/repositories/availability/get-doctor-schedules.queries.ts",
       "source_location": "L1",
       "id": "availability_get_doctor_schedules_queries",
-      "community": 47,
+      "community": 21,
       "norm_label": "get-doctor-schedules.queries.ts"
     },
     {
@@ -4059,7 +4167,7 @@
       "source_file": "src/modules/appointments/repositories/availability/get-doctor-schedules.queries.ts",
       "source_location": "L5",
       "id": "availability_get_doctor_schedules_queries_getdoctorschedulesquery",
-      "community": 8,
+      "community": 94,
       "norm_label": "getdoctorschedulesquery()"
     },
     {
@@ -4086,7 +4194,7 @@
       "source_file": "src/modules/appointments/repositories/availability/get-existing-appointments-for-month.queries.ts",
       "source_location": "L5",
       "id": "availability_get_existing_appointments_for_month_queries_getexistingappointmentsformonthquery",
-      "community": 8,
+      "community": 47,
       "norm_label": "getexistingappointmentsformonthquery()"
     },
     {
@@ -4095,7 +4203,7 @@
       "source_file": "src/modules/appointments/repositories/availability/get-existing-appointments.queries.spec.ts",
       "source_location": "L1",
       "id": "availability_get_existing_appointments_queries_spec",
-      "community": 47,
+      "community": 8,
       "norm_label": "get-existing-appointments.queries.spec.ts"
     },
     {
@@ -4104,7 +4212,7 @@
       "source_file": "src/modules/appointments/repositories/availability/get-existing-appointments.queries.ts",
       "source_location": "L1",
       "id": "availability_get_existing_appointments_queries",
-      "community": 47,
+      "community": 21,
       "norm_label": "get-existing-appointments.queries.ts"
     },
     {
@@ -4122,7 +4230,7 @@
       "source_file": "src/modules/appointments/repositories/availability/get-service-duration.queries.spec.ts",
       "source_location": "L1",
       "id": "availability_get_service_duration_queries_spec",
-      "community": 47,
+      "community": 94,
       "norm_label": "get-service-duration.queries.spec.ts"
     },
     {
@@ -4131,7 +4239,7 @@
       "source_file": "src/modules/appointments/repositories/availability/get-service-duration.queries.ts",
       "source_location": "L1",
       "id": "availability_get_service_duration_queries",
-      "community": 47,
+      "community": 21,
       "norm_label": "get-service-duration.queries.ts"
     },
     {
@@ -4140,7 +4248,7 @@
       "source_file": "src/modules/appointments/repositories/availability/get-service-duration.queries.ts",
       "source_location": "L5",
       "id": "availability_get_service_duration_queries_getservicedurationquery",
-      "community": 8,
+      "community": 94,
       "norm_label": "getservicedurationquery()"
     },
     {
@@ -4149,7 +4257,7 @@
       "source_file": "src/modules/appointments/repositories/availability/get-working-schedules-for-month.queries.spec.ts",
       "source_location": "L1",
       "id": "availability_get_working_schedules_for_month_queries_spec",
-      "community": 47,
+      "community": 8,
       "norm_label": "get-working-schedules-for-month.queries.spec.ts"
     },
     {
@@ -4158,7 +4266,7 @@
       "source_file": "src/modules/appointments/repositories/availability/get-working-schedules-for-month.queries.ts",
       "source_location": "L1",
       "id": "availability_get_working_schedules_for_month_queries",
-      "community": 47,
+      "community": 21,
       "norm_label": "get-working-schedules-for-month.queries.ts"
     },
     {
@@ -4230,7 +4338,7 @@
       "source_file": "src/modules/appointments/repositories/exports.ts",
       "source_location": "L1",
       "id": "src_modules_appointments_repositories_exports_ts_repositories_exports",
-      "community": 47,
+      "community": 21,
       "norm_label": "exports.ts"
     },
     {
@@ -4239,7 +4347,7 @@
       "source_file": "src/modules/appointments/repositories/patient/patient-appointments.queries.spec.ts",
       "source_location": "L1",
       "id": "patient_patient_appointments_queries_spec",
-      "community": 105,
+      "community": 64,
       "norm_label": "patient-appointments.queries.spec.ts"
     },
     {
@@ -4248,7 +4356,7 @@
       "source_file": "src/modules/appointments/repositories/patient/patient-appointments.queries.ts",
       "source_location": "L1",
       "id": "patient_patient_appointments_queries",
-      "community": 105,
+      "community": 64,
       "norm_label": "patient-appointments.queries.ts"
     },
     {
@@ -4257,7 +4365,7 @@
       "source_file": "src/modules/appointments/repositories/patient/patient-appointments.queries.ts",
       "source_location": "L4",
       "id": "patient_patient_appointments_queries_getappointmentsbyuserquery",
-      "community": 105,
+      "community": 64,
       "norm_label": "getappointmentsbyuserquery()"
     },
     {
@@ -4266,7 +4374,7 @@
       "source_file": "src/modules/appointments/repositories/status/cancel-appointment.commands.ts",
       "source_location": "L1",
       "id": "status_cancel_appointment_commands",
-      "community": 47,
+      "community": 21,
       "norm_label": "cancel-appointment.commands.ts"
     },
     {
@@ -4284,7 +4392,7 @@
       "source_file": "src/modules/appointments/repositories/status/exports.ts",
       "source_location": "L1",
       "id": "status_exports",
-      "community": 47,
+      "community": 21,
       "norm_label": "exports.ts"
     },
     {
@@ -4293,7 +4401,7 @@
       "source_file": "src/modules/appointments/repositories/status/get-appointment-by-id.queries.ts",
       "source_location": "L1",
       "id": "status_get_appointment_by_id_queries",
-      "community": 47,
+      "community": 21,
       "norm_label": "get-appointment-by-id.queries.ts"
     },
     {
@@ -4311,7 +4419,7 @@
       "source_file": "src/modules/appointments/repositories/status/increment-user-credibility-metric.commands.ts",
       "source_location": "L1",
       "id": "status_increment_user_credibility_metric_commands",
-      "community": 47,
+      "community": 21,
       "norm_label": "increment-user-credibility-metric.commands.ts"
     },
     {
@@ -4329,7 +4437,7 @@
       "source_file": "src/modules/appointments/repositories/status/insert-ledger-entry.commands.ts",
       "source_location": "L1",
       "id": "status_insert_ledger_entry_commands",
-      "community": 47,
+      "community": 21,
       "norm_label": "insert-ledger-entry.commands.ts"
     },
     {
@@ -4347,7 +4455,7 @@
       "source_file": "src/modules/appointments/repositories/status/update-status.commands.ts",
       "source_location": "L1",
       "id": "status_update_status_commands",
-      "community": 47,
+      "community": 21,
       "norm_label": "update-status.commands.ts"
     },
     {
@@ -4356,7 +4464,7 @@
       "source_file": "src/modules/appointments/repositories/status/update-status.commands.ts",
       "source_location": "L5",
       "id": "status_update_status_commands_appointmentstatusvalue",
-      "community": 47,
+      "community": 21,
       "norm_label": "appointmentstatusvalue"
     },
     {
@@ -4437,7 +4545,7 @@
       "source_file": "src/modules/appointments/use-cases/availability/get-available-days.use-case.spec.ts",
       "source_location": "L1",
       "id": "availability_get_available_days_use_case_spec",
-      "community": 8,
+      "community": 0,
       "norm_label": "get-available-days.use-case.spec.ts"
     },
     {
@@ -4446,7 +4554,7 @@
       "source_file": "src/modules/appointments/use-cases/availability/get-available-days.use-case.ts",
       "source_location": "L1",
       "id": "availability_get_available_days_use_case",
-      "community": 88,
+      "community": 0,
       "norm_label": "get-available-days.use-case.ts"
     },
     {
@@ -4455,7 +4563,7 @@
       "source_file": "src/modules/appointments/use-cases/availability/get-available-days.use-case.ts",
       "source_location": "L8",
       "id": "availability_get_available_days_use_case_getavailabledaysusecase",
-      "community": 8,
+      "community": 0,
       "norm_label": "getavailabledaysusecase()"
     },
     {
@@ -4464,7 +4572,7 @@
       "source_file": "src/modules/appointments/use-cases/availability/get-available-time-slots.use-case.spec.ts",
       "source_location": "L1",
       "id": "availability_get_available_time_slots_use_case_spec",
-      "community": 94,
+      "community": 106,
       "norm_label": "get-available-time-slots.use-case.spec.ts"
     },
     {
@@ -4473,7 +4581,7 @@
       "source_file": "src/modules/appointments/use-cases/availability/get-available-time-slots.use-case.ts",
       "source_location": "L1",
       "id": "availability_get_available_time_slots_use_case",
-      "community": 88,
+      "community": 106,
       "norm_label": "get-available-time-slots.use-case.ts"
     },
     {
@@ -4482,7 +4590,7 @@
       "source_file": "src/modules/appointments/use-cases/availability/get-available-time-slots.use-case.ts",
       "source_location": "L7",
       "id": "availability_get_available_time_slots_use_case_getavailabletimeslotsusecase",
-      "community": 94,
+      "community": 106,
       "norm_label": "getavailabletimeslotsusecase()"
     },
     {
@@ -4545,7 +4653,7 @@
       "source_file": "src/modules/appointments/use-cases/exports.ts",
       "source_location": "L1",
       "id": "src_modules_appointments_use_cases_exports_ts_use_cases_exports",
-      "community": 47,
+      "community": 17,
       "norm_label": "exports.ts"
     },
     {
@@ -4581,7 +4689,7 @@
       "source_file": "src/modules/appointments/use-cases/patient/get-patient-appointments.use-case.spec.ts",
       "source_location": "L1",
       "id": "patient_get_patient_appointments_use_case_spec",
-      "community": 105,
+      "community": 64,
       "norm_label": "get-patient-appointments.use-case.spec.ts"
     },
     {
@@ -4590,7 +4698,7 @@
       "source_file": "src/modules/appointments/use-cases/patient/get-patient-appointments.use-case.ts",
       "source_location": "L1",
       "id": "patient_get_patient_appointments_use_case",
-      "community": 105,
+      "community": 64,
       "norm_label": "get-patient-appointments.use-case.ts"
     },
     {
@@ -4599,7 +4707,7 @@
       "source_file": "src/modules/appointments/use-cases/patient/get-patient-appointments.use-case.ts",
       "source_location": "L4",
       "id": "patient_get_patient_appointments_use_case_getpatientappointmentsusecase",
-      "community": 105,
+      "community": 64,
       "norm_label": "getpatientappointmentsusecase()"
     },
     {
@@ -4608,7 +4716,7 @@
       "source_file": "src/modules/appointments/use-cases/status/cancel-appointment.use-case.ts",
       "source_location": "L1",
       "id": "status_cancel_appointment_use_case",
-      "community": 47,
+      "community": 17,
       "norm_label": "cancel-appointment.use-case.ts"
     },
     {
@@ -4626,7 +4734,7 @@
       "source_file": "src/modules/appointments/use-cases/status/request-reschedule.use-case.ts",
       "source_location": "L1",
       "id": "status_request_reschedule_use_case",
-      "community": 47,
+      "community": 17,
       "norm_label": "request-reschedule.use-case.ts"
     },
     {
@@ -4644,7 +4752,7 @@
       "source_file": "src/modules/appointments/use-cases/status/update-appointment-status.use-case.ts",
       "source_location": "L1",
       "id": "status_update_appointment_status_use_case",
-      "community": 47,
+      "community": 17,
       "norm_label": "update-appointment-status.use-case.ts"
     },
     {
@@ -4662,7 +4770,7 @@
       "source_file": "src/modules/appointments/use-cases/treatment/submit-treatment.use-case.spec.ts",
       "source_location": "L1",
       "id": "treatment_submit_treatment_use_case_spec",
-      "community": 102,
+      "community": 14,
       "norm_label": "submit-treatment.use-case.spec.ts"
     },
     {
@@ -5337,7 +5445,7 @@
       "source_file": "src/modules/billing/actions/invoicing/finalize-invoice.action.spec.ts",
       "source_location": "L1",
       "id": "invoicing_finalize_invoice_action_spec",
-      "community": 4,
+      "community": 35,
       "norm_label": "finalize-invoice.action.spec.ts"
     },
     {
@@ -5346,7 +5454,7 @@
       "source_file": "src/modules/billing/actions/invoicing/finalize-invoice.action.ts",
       "source_location": "L1",
       "id": "invoicing_finalize_invoice_action",
-      "community": 4,
+      "community": 35,
       "norm_label": "finalize-invoice.action.ts"
     },
     {
@@ -5355,7 +5463,7 @@
       "source_file": "src/modules/billing/actions/invoicing/finalize-invoice.action.ts",
       "source_location": "L11",
       "id": "invoicing_finalize_invoice_action_finalizeinvoiceaction",
-      "community": 4,
+      "community": 35,
       "norm_label": "finalizeinvoiceaction()"
     },
     {
@@ -5391,7 +5499,7 @@
       "source_file": "src/modules/billing/actions/invoicing/get-invoices.action.spec.ts",
       "source_location": "L1",
       "id": "invoicing_get_invoices_action_spec",
-      "community": 4,
+      "community": 37,
       "norm_label": "get-invoices.action.spec.ts"
     },
     {
@@ -5400,7 +5508,7 @@
       "source_file": "src/modules/billing/actions/invoicing/get-invoices.action.ts",
       "source_location": "L1",
       "id": "invoicing_get_invoices_action",
-      "community": 4,
+      "community": 37,
       "norm_label": "get-invoices.action.ts"
     },
     {
@@ -5409,7 +5517,7 @@
       "source_file": "src/modules/billing/actions/invoicing/get-invoices.action.ts",
       "source_location": "L11",
       "id": "invoicing_get_invoices_action_getinvoicesaction",
-      "community": 4,
+      "community": 37,
       "norm_label": "getinvoicesaction()"
     },
     {
@@ -5445,7 +5553,7 @@
       "source_file": "src/modules/billing/dtos/exports.ts",
       "source_location": "L1",
       "id": "src_modules_billing_dtos_exports_ts_dtos_exports",
-      "community": 28,
+      "community": 2,
       "norm_label": "exports.ts"
     },
     {
@@ -5454,7 +5562,7 @@
       "source_file": "src/modules/billing/dtos/invoicing/finalize-invoice.dto.spec.ts",
       "source_location": "L1",
       "id": "invoicing_finalize_invoice_dto_spec",
-      "community": 101,
+      "community": 2,
       "norm_label": "finalize-invoice.dto.spec.ts"
     },
     {
@@ -5463,7 +5571,7 @@
       "source_file": "src/modules/billing/dtos/invoicing/finalize-invoice.dto.ts",
       "source_location": "L1",
       "id": "invoicing_finalize_invoice_dto",
-      "community": 101,
+      "community": 2,
       "norm_label": "finalize-invoice.dto.ts"
     },
     {
@@ -5472,7 +5580,7 @@
       "source_file": "src/modules/billing/dtos/invoicing/finalize-invoice.dto.ts",
       "source_location": "L4",
       "id": "invoicing_finalize_invoice_dto_finalizeinvoiceschema",
-      "community": 101,
+      "community": 2,
       "norm_label": "finalizeinvoiceschema"
     },
     {
@@ -5481,7 +5589,7 @@
       "source_file": "src/modules/billing/dtos/invoicing/finalize-invoice.dto.ts",
       "source_location": "L11",
       "id": "invoicing_finalize_invoice_dto_finalizeinvoicedto",
-      "community": 101,
+      "community": 2,
       "norm_label": "finalizeinvoicedto"
     },
     {
@@ -5490,7 +5598,7 @@
       "source_file": "src/modules/billing/dtos/invoicing/generate-invoice.dto.spec.ts",
       "source_location": "L1",
       "id": "invoicing_generate_invoice_dto_spec",
-      "community": 28,
+      "community": 2,
       "norm_label": "generate-invoice.dto.spec.ts"
     },
     {
@@ -5499,7 +5607,7 @@
       "source_file": "src/modules/billing/dtos/invoicing/generate-invoice.dto.ts",
       "source_location": "L1",
       "id": "invoicing_generate_invoice_dto",
-      "community": 28,
+      "community": 2,
       "norm_label": "generate-invoice.dto.ts"
     },
     {
@@ -5508,7 +5616,7 @@
       "source_file": "src/modules/billing/dtos/invoicing/generate-invoice.dto.ts",
       "source_location": "L4",
       "id": "invoicing_generate_invoice_dto_generateinvoiceschema",
-      "community": 28,
+      "community": 2,
       "norm_label": "generateinvoiceschema"
     },
     {
@@ -5526,7 +5634,7 @@
       "source_file": "src/modules/billing/dtos/invoicing/get-invoices.dto.spec.ts",
       "source_location": "L1",
       "id": "invoicing_get_invoices_dto_spec",
-      "community": 28,
+      "community": 2,
       "norm_label": "get-invoices.dto.spec.ts"
     },
     {
@@ -5535,7 +5643,7 @@
       "source_file": "src/modules/billing/dtos/invoicing/get-invoices.dto.ts",
       "source_location": "L1",
       "id": "invoicing_get_invoices_dto",
-      "community": 28,
+      "community": 2,
       "norm_label": "get-invoices.dto.ts"
     },
     {
@@ -5544,7 +5652,7 @@
       "source_file": "src/modules/billing/dtos/invoicing/get-invoices.dto.ts",
       "source_location": "L4",
       "id": "invoicing_get_invoices_dto_getinvoicesschema",
-      "community": 28,
+      "community": 2,
       "norm_label": "getinvoicesschema"
     },
     {
@@ -5553,7 +5661,7 @@
       "source_file": "src/modules/billing/dtos/invoicing/get-invoices.dto.ts",
       "source_location": "L11",
       "id": "invoicing_get_invoices_dto_getinvoicesdto",
-      "community": 5,
+      "community": 2,
       "norm_label": "getinvoicesdto"
     },
     {
@@ -5562,7 +5670,7 @@
       "source_file": "src/modules/billing/dtos/invoicing/invoice-response.dto.spec.ts",
       "source_location": "L1",
       "id": "invoicing_invoice_response_dto_spec",
-      "community": 28,
+      "community": 2,
       "norm_label": "invoice-response.dto.spec.ts"
     },
     {
@@ -5571,7 +5679,7 @@
       "source_file": "src/modules/billing/dtos/invoicing/invoice-response.dto.ts",
       "source_location": "L1",
       "id": "invoicing_invoice_response_dto",
-      "community": 28,
+      "community": 2,
       "norm_label": "invoice-response.dto.ts"
     },
     {
@@ -5580,7 +5688,7 @@
       "source_file": "src/modules/billing/dtos/invoicing/invoice-response.dto.ts",
       "source_location": "L3",
       "id": "invoicing_invoice_response_dto_invoicestatusenum",
-      "community": 28,
+      "community": 2,
       "norm_label": "invoicestatusenum"
     },
     {
@@ -5589,7 +5697,7 @@
       "source_file": "src/modules/billing/dtos/invoicing/invoice-response.dto.ts",
       "source_location": "L4",
       "id": "invoicing_invoice_response_dto_paymentmethodenum",
-      "community": 101,
+      "community": 2,
       "norm_label": "paymentmethodenum"
     },
     {
@@ -5598,7 +5706,7 @@
       "source_file": "src/modules/billing/dtos/invoicing/invoice-response.dto.ts",
       "source_location": "L6",
       "id": "invoicing_invoice_response_dto_invoiceresponseschema",
-      "community": 28,
+      "community": 2,
       "norm_label": "invoiceresponseschema"
     },
     {
@@ -5607,7 +5715,7 @@
       "source_file": "src/modules/billing/dtos/invoicing/invoice-response.dto.ts",
       "source_location": "L45",
       "id": "invoicing_invoice_response_dto_invoicestatus",
-      "community": 28,
+      "community": 2,
       "norm_label": "invoicestatus"
     },
     {
@@ -5616,7 +5724,7 @@
       "source_file": "src/modules/billing/dtos/invoicing/invoice-response.dto.ts",
       "source_location": "L46",
       "id": "invoicing_invoice_response_dto_paymentmethod",
-      "community": 28,
+      "community": 2,
       "norm_label": "paymentmethod"
     },
     {
@@ -5625,7 +5733,7 @@
       "source_file": "src/modules/billing/dtos/invoicing/invoice-response.dto.ts",
       "source_location": "L47",
       "id": "invoicing_invoice_response_dto_invoiceresponsedto",
-      "community": 5,
+      "community": 2,
       "norm_label": "invoiceresponsedto"
     },
     {
@@ -5634,7 +5742,7 @@
       "source_file": "src/modules/billing/dtos/invoicing/invoice-response.dto.ts",
       "source_location": "L49",
       "id": "invoicing_invoice_response_dto_mayberecord",
-      "community": 28,
+      "community": 2,
       "norm_label": "mayberecord"
     },
     {
@@ -5643,7 +5751,7 @@
       "source_file": "src/modules/billing/dtos/invoicing/invoice-response.dto.ts",
       "source_location": "L51",
       "id": "invoicing_invoice_response_dto_mapinvoicerecord",
-      "community": 28,
+      "community": 2,
       "norm_label": "mapinvoicerecord()"
     },
     {
@@ -5652,7 +5760,7 @@
       "source_file": "src/modules/billing/dtos/invoicing/invoice-response.dto.ts",
       "source_location": "L55",
       "id": "invoicing_invoice_response_dto_mapinvoicerecords",
-      "community": 28,
+      "community": 2,
       "norm_label": "mapinvoicerecords()"
     },
     {
@@ -5715,7 +5823,7 @@
       "source_file": "src/modules/billing/repositories/invoicing/invoice.commands.spec.ts",
       "source_location": "L1",
       "id": "invoicing_invoice_commands_spec",
-      "community": 113,
+      "community": 2,
       "norm_label": "invoice.commands.spec.ts"
     },
     {
@@ -5724,7 +5832,7 @@
       "source_file": "src/modules/billing/repositories/invoicing/invoice.commands.spec.ts",
       "source_location": "L9",
       "id": "invoicing_invoice_commands_spec_mockfrom",
-      "community": 113,
+      "community": 2,
       "norm_label": "mockfrom"
     },
     {
@@ -5733,7 +5841,7 @@
       "source_file": "src/modules/billing/repositories/invoicing/invoice.commands.spec.ts",
       "source_location": "L10",
       "id": "invoicing_invoice_commands_spec_mockinsert",
-      "community": 113,
+      "community": 2,
       "norm_label": "mockinsert"
     },
     {
@@ -5742,7 +5850,7 @@
       "source_file": "src/modules/billing/repositories/invoicing/invoice.commands.spec.ts",
       "source_location": "L11",
       "id": "invoicing_invoice_commands_spec_mockupdate",
-      "community": 113,
+      "community": 2,
       "norm_label": "mockupdate"
     },
     {
@@ -5751,7 +5859,7 @@
       "source_file": "src/modules/billing/repositories/invoicing/invoice.commands.spec.ts",
       "source_location": "L12",
       "id": "invoicing_invoice_commands_spec_mockeq",
-      "community": 113,
+      "community": 2,
       "norm_label": "mockeq"
     },
     {
@@ -5760,7 +5868,7 @@
       "source_file": "src/modules/billing/repositories/invoicing/invoice.commands.spec.ts",
       "source_location": "L13",
       "id": "invoicing_invoice_commands_spec_mockselect",
-      "community": 113,
+      "community": 2,
       "norm_label": "mockselect"
     },
     {
@@ -5769,7 +5877,7 @@
       "source_file": "src/modules/billing/repositories/invoicing/invoice.commands.spec.ts",
       "source_location": "L14",
       "id": "invoicing_invoice_commands_spec_mocksingle",
-      "community": 113,
+      "community": 2,
       "norm_label": "mocksingle"
     },
     {
@@ -5778,7 +5886,7 @@
       "source_file": "src/modules/billing/repositories/invoicing/invoice.commands.spec.ts",
       "source_location": "L16",
       "id": "invoicing_invoice_commands_spec_mocksupabase",
-      "community": 113,
+      "community": 2,
       "norm_label": "mocksupabase"
     },
     {
@@ -5796,7 +5904,7 @@
       "source_file": "src/modules/billing/repositories/invoicing/invoice.commands.ts",
       "source_location": "L7",
       "id": "invoicing_invoice_commands_generateinvoicecommand",
-      "community": 14,
+      "community": 4,
       "norm_label": "generateinvoicecommand()"
     },
     {
@@ -5814,7 +5922,7 @@
       "source_file": "src/modules/billing/repositories/invoicing/invoice.commands.ts",
       "source_location": "L41",
       "id": "invoicing_invoice_commands_finalizeinvoicecommand",
-      "community": 4,
+      "community": 35,
       "norm_label": "finalizeinvoicecommand()"
     },
     {
@@ -5823,7 +5931,7 @@
       "source_file": "src/modules/billing/repositories/invoicing/invoice.queries.spec.ts",
       "source_location": "L1",
       "id": "invoicing_invoice_queries_spec",
-      "community": 5,
+      "community": 2,
       "norm_label": "invoice.queries.spec.ts"
     },
     {
@@ -5832,7 +5940,7 @@
       "source_file": "src/modules/billing/repositories/invoicing/invoice.queries.spec.ts",
       "source_location": "L8",
       "id": "invoicing_invoice_queries_spec_mockfrom",
-      "community": 5,
+      "community": 2,
       "norm_label": "mockfrom"
     },
     {
@@ -5841,7 +5949,7 @@
       "source_file": "src/modules/billing/repositories/invoicing/invoice.queries.spec.ts",
       "source_location": "L9",
       "id": "invoicing_invoice_queries_spec_mockselect",
-      "community": 5,
+      "community": 2,
       "norm_label": "mockselect"
     },
     {
@@ -5850,7 +5958,7 @@
       "source_file": "src/modules/billing/repositories/invoicing/invoice.queries.spec.ts",
       "source_location": "L10",
       "id": "invoicing_invoice_queries_spec_mockorder",
-      "community": 5,
+      "community": 2,
       "norm_label": "mockorder"
     },
     {
@@ -5859,7 +5967,7 @@
       "source_file": "src/modules/billing/repositories/invoicing/invoice.queries.spec.ts",
       "source_location": "L11",
       "id": "invoicing_invoice_queries_spec_mockrange",
-      "community": 5,
+      "community": 2,
       "norm_label": "mockrange"
     },
     {
@@ -5868,7 +5976,7 @@
       "source_file": "src/modules/billing/repositories/invoicing/invoice.queries.spec.ts",
       "source_location": "L12",
       "id": "invoicing_invoice_queries_spec_mockeq",
-      "community": 5,
+      "community": 2,
       "norm_label": "mockeq"
     },
     {
@@ -5877,7 +5985,7 @@
       "source_file": "src/modules/billing/repositories/invoicing/invoice.queries.spec.ts",
       "source_location": "L13",
       "id": "invoicing_invoice_queries_spec_mockmaybesingle",
-      "community": 5,
+      "community": 2,
       "norm_label": "mockmaybesingle"
     },
     {
@@ -5886,7 +5994,7 @@
       "source_file": "src/modules/billing/repositories/invoicing/invoice.queries.spec.ts",
       "source_location": "L15",
       "id": "invoicing_invoice_queries_spec_mocksupabase",
-      "community": 5,
+      "community": 2,
       "norm_label": "mocksupabase"
     },
     {
@@ -5895,7 +6003,7 @@
       "source_file": "src/modules/billing/repositories/invoicing/invoice.queries.ts",
       "source_location": "L1",
       "id": "invoicing_invoice_queries",
-      "community": 5,
+      "community": 2,
       "norm_label": "invoice.queries.ts"
     },
     {
@@ -5904,7 +6012,7 @@
       "source_file": "src/modules/billing/repositories/invoicing/invoice.queries.ts",
       "source_location": "L5",
       "id": "invoicing_invoice_queries_getinvoicesquery",
-      "community": 5,
+      "community": 2,
       "norm_label": "getinvoicesquery()"
     },
     {
@@ -5913,7 +6021,7 @@
       "source_file": "src/modules/billing/repositories/invoicing/invoice.queries.ts",
       "source_location": "L31",
       "id": "invoicing_invoice_queries_getinvoicebyidquery",
-      "community": 5,
+      "community": 2,
       "norm_label": "getinvoicebyidquery()"
     },
     {
@@ -5922,7 +6030,7 @@
       "source_file": "src/modules/billing/use-cases/exports.ts",
       "source_location": "L1",
       "id": "src_modules_billing_use_cases_exports_ts_use_cases_exports",
-      "community": 101,
+      "community": 2,
       "norm_label": "exports.ts"
     },
     {
@@ -5931,7 +6039,7 @@
       "source_file": "src/modules/billing/use-cases/invoicing/finalize-invoice.use-case.spec.ts",
       "source_location": "L1",
       "id": "invoicing_finalize_invoice_use_case_spec",
-      "community": 101,
+      "community": 2,
       "norm_label": "finalize-invoice.use-case.spec.ts"
     },
     {
@@ -5940,7 +6048,7 @@
       "source_file": "src/modules/billing/use-cases/invoicing/finalize-invoice.use-case.ts",
       "source_location": "L1",
       "id": "invoicing_finalize_invoice_use_case",
-      "community": 101,
+      "community": 2,
       "norm_label": "finalize-invoice.use-case.ts"
     },
     {
@@ -5949,7 +6057,7 @@
       "source_file": "src/modules/billing/use-cases/invoicing/finalize-invoice.use-case.ts",
       "source_location": "L5",
       "id": "invoicing_finalize_invoice_use_case_finalizeinvoiceusecase",
-      "community": 101,
+      "community": 2,
       "norm_label": "finalizeinvoiceusecase()"
     },
     {
@@ -5985,7 +6093,7 @@
       "source_file": "src/modules/billing/use-cases/invoicing/get-invoices.use-case.spec.ts",
       "source_location": "L1",
       "id": "invoicing_get_invoices_use_case_spec",
-      "community": 5,
+      "community": 2,
       "norm_label": "get-invoices.use-case.spec.ts"
     },
     {
@@ -5994,7 +6102,7 @@
       "source_file": "src/modules/billing/use-cases/invoicing/get-invoices.use-case.ts",
       "source_location": "L1",
       "id": "invoicing_get_invoices_use_case",
-      "community": 5,
+      "community": 2,
       "norm_label": "get-invoices.use-case.ts"
     },
     {
@@ -6003,7 +6111,7 @@
       "source_file": "src/modules/billing/use-cases/invoicing/get-invoices.use-case.ts",
       "source_location": "L5",
       "id": "invoicing_get_invoices_use_case_getinvoicesusecase",
-      "community": 5,
+      "community": 2,
       "norm_label": "getinvoicesusecase()"
     },
     {
@@ -6039,7 +6147,7 @@
       "source_file": "src/modules/clinic-config/actions/settings/get-clinic-config.action.spec.ts",
       "source_location": "L1",
       "id": "settings_get_clinic_config_action_spec",
-      "community": 15,
+      "community": 5,
       "norm_label": "get-clinic-config.action.spec.ts"
     },
     {
@@ -6048,7 +6156,7 @@
       "source_file": "src/modules/clinic-config/actions/settings/get-clinic-config.action.spec.ts",
       "source_location": "L4",
       "id": "settings_get_clinic_config_action_spec_mocks",
-      "community": 15,
+      "community": 5,
       "norm_label": "mocks"
     },
     {
@@ -6057,7 +6165,7 @@
       "source_file": "src/modules/clinic-config/actions/settings/get-clinic-config.action.ts",
       "source_location": "L1",
       "id": "settings_get_clinic_config_action",
-      "community": 15,
+      "community": 5,
       "norm_label": "get-clinic-config.action.ts"
     },
     {
@@ -6066,7 +6174,7 @@
       "source_file": "src/modules/clinic-config/actions/settings/get-clinic-config.action.ts",
       "source_location": "L7",
       "id": "settings_get_clinic_config_action_getclinicconfigaction",
-      "community": 15,
+      "community": 5,
       "norm_label": "getclinicconfigaction()"
     },
     {
@@ -6237,7 +6345,7 @@
       "source_file": "src/modules/clinic-config/dtos/settings/get-clinic-config.dto.ts",
       "source_location": "L104",
       "id": "settings_get_clinic_config_dto_clinicconfigresponseschema",
-      "community": 109,
+      "community": 33,
       "norm_label": "clinicconfigresponseschema"
     },
     {
@@ -6300,7 +6408,7 @@
       "source_file": "src/modules/clinic-config/repositories/settings/clinic-config.commands.spec.ts",
       "source_location": "L1",
       "id": "settings_clinic_config_commands_spec",
-      "community": 116,
+      "community": 98,
       "norm_label": "clinic-config.commands.spec.ts"
     },
     {
@@ -6309,7 +6417,7 @@
       "source_file": "src/modules/clinic-config/repositories/settings/clinic-config.commands.spec.ts",
       "source_location": "L4",
       "id": "settings_clinic_config_commands_spec_mocksingle",
-      "community": 116,
+      "community": 98,
       "norm_label": "mocksingle"
     },
     {
@@ -6318,7 +6426,7 @@
       "source_file": "src/modules/clinic-config/repositories/settings/clinic-config.commands.spec.ts",
       "source_location": "L5",
       "id": "settings_clinic_config_commands_spec_mockselect",
-      "community": 116,
+      "community": 98,
       "norm_label": "mockselect"
     },
     {
@@ -6327,7 +6435,7 @@
       "source_file": "src/modules/clinic-config/repositories/settings/clinic-config.commands.spec.ts",
       "source_location": "L6",
       "id": "settings_clinic_config_commands_spec_mockeq",
-      "community": 116,
+      "community": 98,
       "norm_label": "mockeq"
     },
     {
@@ -6336,7 +6444,7 @@
       "source_file": "src/modules/clinic-config/repositories/settings/clinic-config.commands.spec.ts",
       "source_location": "L7",
       "id": "settings_clinic_config_commands_spec_mockupdate",
-      "community": 116,
+      "community": 98,
       "norm_label": "mockupdate"
     },
     {
@@ -6345,7 +6453,7 @@
       "source_file": "src/modules/clinic-config/repositories/settings/clinic-config.commands.spec.ts",
       "source_location": "L8",
       "id": "settings_clinic_config_commands_spec_mockfrom",
-      "community": 116,
+      "community": 98,
       "norm_label": "mockfrom"
     },
     {
@@ -6354,7 +6462,7 @@
       "source_file": "src/modules/clinic-config/repositories/settings/clinic-config.commands.spec.ts",
       "source_location": "L10",
       "id": "settings_clinic_config_commands_spec_mocksupabase",
-      "community": 116,
+      "community": 98,
       "norm_label": "mocksupabase"
     },
     {
@@ -6381,7 +6489,7 @@
       "source_file": "src/modules/clinic-config/repositories/settings/clinic-config.queries.spec.ts",
       "source_location": "L1",
       "id": "settings_clinic_config_queries_spec",
-      "community": 109,
+      "community": 102,
       "norm_label": "clinic-config.queries.spec.ts"
     },
     {
@@ -6390,7 +6498,7 @@
       "source_file": "src/modules/clinic-config/repositories/settings/clinic-config.queries.spec.ts",
       "source_location": "L4",
       "id": "settings_clinic_config_queries_spec_mockmaybesingle",
-      "community": 109,
+      "community": 102,
       "norm_label": "mockmaybesingle"
     },
     {
@@ -6399,7 +6507,7 @@
       "source_file": "src/modules/clinic-config/repositories/settings/clinic-config.queries.spec.ts",
       "source_location": "L5",
       "id": "settings_clinic_config_queries_spec_mockeq",
-      "community": 109,
+      "community": 102,
       "norm_label": "mockeq"
     },
     {
@@ -6408,7 +6516,7 @@
       "source_file": "src/modules/clinic-config/repositories/settings/clinic-config.queries.spec.ts",
       "source_location": "L6",
       "id": "settings_clinic_config_queries_spec_mockselect",
-      "community": 109,
+      "community": 102,
       "norm_label": "mockselect"
     },
     {
@@ -6417,7 +6525,7 @@
       "source_file": "src/modules/clinic-config/repositories/settings/clinic-config.queries.spec.ts",
       "source_location": "L7",
       "id": "settings_clinic_config_queries_spec_mockfrom",
-      "community": 109,
+      "community": 102,
       "norm_label": "mockfrom"
     },
     {
@@ -6426,7 +6534,7 @@
       "source_file": "src/modules/clinic-config/repositories/settings/clinic-config.queries.spec.ts",
       "source_location": "L9",
       "id": "settings_clinic_config_queries_spec_mocksupabase",
-      "community": 109,
+      "community": 102,
       "norm_label": "mocksupabase"
     },
     {
@@ -6435,7 +6543,7 @@
       "source_file": "src/modules/clinic-config/repositories/settings/clinic-config.queries.ts",
       "source_location": "L1",
       "id": "settings_clinic_config_queries",
-      "community": 109,
+      "community": 5,
       "norm_label": "clinic-config.queries.ts"
     },
     {
@@ -6444,7 +6552,7 @@
       "source_file": "src/modules/clinic-config/repositories/settings/clinic-config.queries.ts",
       "source_location": "L4",
       "id": "settings_clinic_config_queries_getclinicconfigquery",
-      "community": 109,
+      "community": 5,
       "norm_label": "getclinicconfigquery()"
     },
     {
@@ -6453,7 +6561,7 @@
       "source_file": "src/modules/clinic-config/use-cases/settings/get-clinic-config.use-case.spec.ts",
       "source_location": "L1",
       "id": "settings_get_clinic_config_use_case_spec",
-      "community": 71,
+      "community": 5,
       "norm_label": "get-clinic-config.use-case.spec.ts"
     },
     {
@@ -6462,7 +6570,7 @@
       "source_file": "src/modules/clinic-config/use-cases/settings/get-clinic-config.use-case.ts",
       "source_location": "L1",
       "id": "settings_get_clinic_config_use_case",
-      "community": 71,
+      "community": 5,
       "norm_label": "get-clinic-config.use-case.ts"
     },
     {
@@ -6471,7 +6579,7 @@
       "source_file": "src/modules/clinic-config/use-cases/settings/get-clinic-config.use-case.ts",
       "source_location": "L3",
       "id": "settings_get_clinic_config_use_case_default_config",
-      "community": 71,
+      "community": 5,
       "norm_label": "default_config"
     },
     {
@@ -6480,7 +6588,7 @@
       "source_file": "src/modules/clinic-config/use-cases/settings/get-clinic-config.use-case.ts",
       "source_location": "L25",
       "id": "settings_get_clinic_config_use_case_getclinicconfigusecase",
-      "community": 71,
+      "community": 5,
       "norm_label": "getclinicconfigusecase()"
     },
     {
@@ -6669,7 +6777,7 @@
       "source_file": "src/modules/patients/actions/auth/logout.action.spec.ts",
       "source_location": "L1",
       "id": "auth_logout_action_spec",
-      "community": 16,
+      "community": 3,
       "norm_label": "logout.action.spec.ts"
     },
     {
@@ -6678,7 +6786,7 @@
       "source_file": "src/modules/patients/actions/auth/logout.action.ts",
       "source_location": "L1",
       "id": "auth_logout_action",
-      "community": 16,
+      "community": 3,
       "norm_label": "logout.action.ts"
     },
     {
@@ -6687,7 +6795,7 @@
       "source_file": "src/modules/patients/actions/auth/logout.action.ts",
       "source_location": "L6",
       "id": "auth_logout_action_logoutaction",
-      "community": 16,
+      "community": 3,
       "norm_label": "logoutaction()"
     },
     {
@@ -6831,7 +6939,7 @@
       "source_file": "src/modules/patients/actions/profile/register-patient.action.spec.ts",
       "source_location": "L1",
       "id": "profile_register_patient_action_spec",
-      "community": 16,
+      "community": 37,
       "norm_label": "register-patient.action.spec.ts"
     },
     {
@@ -6840,7 +6948,7 @@
       "source_file": "src/modules/patients/actions/profile/register-patient.action.spec.ts",
       "source_location": "L16",
       "id": "profile_register_patient_action_spec_mockexecute",
-      "community": 16,
+      "community": 37,
       "norm_label": "{ mockexecute }"
     },
     {
@@ -6867,7 +6975,7 @@
       "source_file": "src/modules/patients/components/auth/authenticated-user-header.tsx",
       "source_location": "L1",
       "id": "auth_authenticated_user_header",
-      "community": 107,
+      "community": 15,
       "norm_label": "authenticated-user-header.tsx"
     },
     {
@@ -6876,7 +6984,7 @@
       "source_file": "src/modules/patients/components/auth/authenticated-user-header.tsx",
       "source_location": "L10",
       "id": "auth_authenticated_user_header_authenticateduserheaderprops",
-      "community": 107,
+      "community": 15,
       "norm_label": "authenticateduserheaderprops"
     },
     {
@@ -6885,7 +6993,7 @@
       "source_file": "src/modules/patients/components/auth/authenticated-user-header.tsx",
       "source_location": "L15",
       "id": "auth_authenticated_user_header_nav_links",
-      "community": 107,
+      "community": 15,
       "norm_label": "nav_links"
     },
     {
@@ -6894,7 +7002,7 @@
       "source_file": "src/modules/patients/components/auth/authenticated-user-header.tsx",
       "source_location": "L21",
       "id": "auth_authenticated_user_header_authenticateduserheader",
-      "community": 107,
+      "community": 15,
       "norm_label": "authenticateduserheader()"
     },
     {
@@ -6930,7 +7038,7 @@
       "source_file": "src/modules/patients/components/auth/notification-indicator.tsx",
       "source_location": "L1",
       "id": "auth_notification_indicator",
-      "community": 107,
+      "community": 15,
       "norm_label": "notification-indicator.tsx"
     },
     {
@@ -6939,7 +7047,7 @@
       "source_file": "src/modules/patients/components/auth/notification-indicator.tsx",
       "source_location": "L5",
       "id": "auth_notification_indicator_notificationindicatorprops",
-      "community": 107,
+      "community": 15,
       "norm_label": "notificationindicatorprops"
     },
     {
@@ -6948,7 +7056,7 @@
       "source_file": "src/modules/patients/components/auth/notification-indicator.tsx",
       "source_location": "L10",
       "id": "auth_notification_indicator_notificationindicator",
-      "community": 107,
+      "community": 15,
       "norm_label": "notificationindicator()"
     },
     {
@@ -7009,7 +7117,7 @@
       "label": "ContactSectionProps",
       "file_type": "code",
       "source_file": "src/modules/patients/components/landing/contact-section.tsx",
-      "source_location": "L7",
+      "source_location": "L8",
       "id": "landing_contact_section_contactsectionprops",
       "community": 114,
       "norm_label": "contactsectionprops"
@@ -7018,9 +7126,9 @@
       "label": "ContactSection()",
       "file_type": "code",
       "source_file": "src/modules/patients/components/landing/contact-section.tsx",
-      "source_location": "L21",
+      "source_location": "L22",
       "id": "landing_contact_section_contactsection",
-      "community": 10,
+      "community": 114,
       "norm_label": "contactsection()"
     },
     {
@@ -7033,40 +7141,103 @@
       "norm_label": "gallery-section.tsx"
     },
     {
-      "label": "GallerySection()",
+      "label": "galleryItems",
       "file_type": "code",
       "source_file": "src/modules/patients/components/landing/gallery-section.tsx",
       "source_location": "L6",
+      "id": "landing_gallery_section_galleryitems",
+      "community": 10,
+      "norm_label": "galleryitems"
+    },
+    {
+      "label": "GallerySection()",
+      "file_type": "code",
+      "source_file": "src/modules/patients/components/landing/gallery-section.tsx",
+      "source_location": "L39",
       "id": "landing_gallery_section_gallerysection",
       "community": 10,
       "norm_label": "gallerysection()"
     },
     {
-      "label": "hero-section.tsx",
+      "label": "hero-section-v1.tsx",
       "file_type": "code",
-      "source_file": "src/modules/patients/components/landing/hero-section.tsx",
+      "source_file": "src/modules/patients/components/landing/hero-section-v1.tsx",
       "source_location": "L1",
-      "id": "landing_hero_section",
+      "id": "landing_hero_section_v1",
       "community": 10,
-      "norm_label": "hero-section.tsx"
+      "norm_label": "hero-section-v1.tsx"
     },
     {
       "label": "HeroSectionProps",
       "file_type": "code",
-      "source_file": "src/modules/patients/components/landing/hero-section.tsx",
+      "source_file": "src/modules/patients/components/landing/hero-section-v1.tsx",
       "source_location": "L8",
-      "id": "landing_hero_section_herosectionprops",
+      "id": "landing_hero_section_v1_herosectionprops",
       "community": 10,
       "norm_label": "herosectionprops"
     },
     {
-      "label": "HeroSection()",
+      "label": "HeroSectionV1()",
       "file_type": "code",
-      "source_file": "src/modules/patients/components/landing/hero-section.tsx",
+      "source_file": "src/modules/patients/components/landing/hero-section-v1.tsx",
       "source_location": "L12",
-      "id": "landing_hero_section_herosection",
+      "id": "landing_hero_section_v1_herosectionv1",
       "community": 10,
-      "norm_label": "herosection()"
+      "norm_label": "herosectionv1()"
+    },
+    {
+      "label": "hero-section-v2.tsx",
+      "file_type": "code",
+      "source_file": "src/modules/patients/components/landing/hero-section-v2.tsx",
+      "source_location": "L1",
+      "id": "landing_hero_section_v2",
+      "community": 10,
+      "norm_label": "hero-section-v2.tsx"
+    },
+    {
+      "label": "HeroSectionProps",
+      "file_type": "code",
+      "source_file": "src/modules/patients/components/landing/hero-section-v2.tsx",
+      "source_location": "L8",
+      "id": "landing_hero_section_v2_herosectionprops",
+      "community": 10,
+      "norm_label": "herosectionprops"
+    },
+    {
+      "label": "HeroSectionV2()",
+      "file_type": "code",
+      "source_file": "src/modules/patients/components/landing/hero-section-v2.tsx",
+      "source_location": "L12",
+      "id": "landing_hero_section_v2_herosectionv2",
+      "community": 10,
+      "norm_label": "herosectionv2()"
+    },
+    {
+      "label": "journey-section.tsx",
+      "file_type": "code",
+      "source_file": "src/modules/patients/components/landing/journey-section.tsx",
+      "source_location": "L1",
+      "id": "landing_journey_section",
+      "community": 10,
+      "norm_label": "journey-section.tsx"
+    },
+    {
+      "label": "journeySlides",
+      "file_type": "code",
+      "source_file": "src/modules/patients/components/landing/journey-section.tsx",
+      "source_location": "L6",
+      "id": "landing_journey_section_journeyslides",
+      "community": 10,
+      "norm_label": "journeyslides"
+    },
+    {
+      "label": "JourneySection()",
+      "file_type": "code",
+      "source_file": "src/modules/patients/components/landing/journey-section.tsx",
+      "source_location": "L33",
+      "id": "landing_journey_section_journeysection",
+      "community": 10,
+      "norm_label": "journeysection()"
     },
     {
       "label": "services-section.tsx",
@@ -7087,13 +7258,49 @@
       "norm_label": "servicessectionprops"
     },
     {
-      "label": "ServicesSection()",
+      "label": "CARD_SERVICES",
       "file_type": "code",
       "source_file": "src/modules/patients/components/landing/services-section.tsx",
       "source_location": "L12",
+      "id": "landing_services_section_card_services",
+      "community": 103,
+      "norm_label": "card_services"
+    },
+    {
+      "label": "LIST_SERVICES",
+      "file_type": "code",
+      "source_file": "src/modules/patients/components/landing/services-section.tsx",
+      "source_location": "L40",
+      "id": "landing_services_section_list_services",
+      "community": 103,
+      "norm_label": "list_services"
+    },
+    {
+      "label": "ServicesSection()",
+      "file_type": "code",
+      "source_file": "src/modules/patients/components/landing/services-section.tsx",
+      "source_location": "L48",
       "id": "landing_services_section_servicessection",
-      "community": 10,
+      "community": 103,
       "norm_label": "servicessection()"
+    },
+    {
+      "label": "trust-and-stats.tsx",
+      "file_type": "code",
+      "source_file": "src/modules/patients/components/landing/trust-and-stats.tsx",
+      "source_location": "L1",
+      "id": "landing_trust_and_stats",
+      "community": 10,
+      "norm_label": "trust-and-stats.tsx"
+    },
+    {
+      "label": "TrustAndStats()",
+      "file_type": "code",
+      "source_file": "src/modules/patients/components/landing/trust-and-stats.tsx",
+      "source_location": "L5",
+      "id": "landing_trust_and_stats_trustandstats",
+      "community": 10,
+      "norm_label": "trustandstats()"
     },
     {
       "label": "notifications-view.tsx",
@@ -7101,7 +7308,7 @@
       "source_file": "src/modules/patients/components/notifications/notifications-view.tsx",
       "source_location": "L1",
       "id": "notifications_notifications_view",
-      "community": 45,
+      "community": 50,
       "norm_label": "notifications-view.tsx"
     },
     {
@@ -7110,7 +7317,7 @@
       "source_file": "src/modules/patients/components/notifications/notifications-view.tsx",
       "source_location": "L10",
       "id": "notifications_notifications_view_notificationsview",
-      "community": 45,
+      "community": 50,
       "norm_label": "notificationsview()"
     },
     {
@@ -7119,7 +7326,7 @@
       "source_file": "src/modules/patients/components/notifications/sub-components/notification-item-card.tsx",
       "source_location": "L1",
       "id": "sub_components_notification_item_card",
-      "community": 45,
+      "community": 50,
       "norm_label": "notification-item-card.tsx"
     },
     {
@@ -7128,7 +7335,7 @@
       "source_file": "src/modules/patients/components/notifications/sub-components/notification-item-card.tsx",
       "source_location": "L3",
       "id": "sub_components_notification_item_card_notificationdata",
-      "community": 45,
+      "community": 50,
       "norm_label": "notificationdata"
     },
     {
@@ -7137,7 +7344,7 @@
       "source_file": "src/modules/patients/components/notifications/sub-components/notification-item-card.tsx",
       "source_location": "L12",
       "id": "sub_components_notification_item_card_notificationitemcardprops",
-      "community": 45,
+      "community": 50,
       "norm_label": "notificationitemcardprops"
     },
     {
@@ -7146,7 +7353,7 @@
       "source_file": "src/modules/patients/components/notifications/sub-components/notification-item-card.tsx",
       "source_location": "L19",
       "id": "sub_components_notification_item_card_notificationitemcard",
-      "community": 45,
+      "community": 50,
       "norm_label": "notificationitemcard()"
     },
     {
@@ -7155,7 +7362,7 @@
       "source_file": "src/modules/patients/components/notifications/sub-components/notifications-empty-state.tsx",
       "source_location": "L1",
       "id": "sub_components_notifications_empty_state",
-      "community": 45,
+      "community": 50,
       "norm_label": "notifications-empty-state.tsx"
     },
     {
@@ -7164,7 +7371,7 @@
       "source_file": "src/modules/patients/components/notifications/sub-components/notifications-empty-state.tsx",
       "source_location": "L3",
       "id": "sub_components_notifications_empty_state_notificationsemptystateprops",
-      "community": 45,
+      "community": 50,
       "norm_label": "notificationsemptystateprops"
     },
     {
@@ -7173,7 +7380,7 @@
       "source_file": "src/modules/patients/components/notifications/sub-components/notifications-empty-state.tsx",
       "source_location": "L7",
       "id": "sub_components_notifications_empty_state_notificationsemptystate",
-      "community": 45,
+      "community": 50,
       "norm_label": "notificationsemptystate()"
     },
     {
@@ -7182,7 +7389,7 @@
       "source_file": "src/modules/patients/components/notifications/sub-components/notifications-tabs.tsx",
       "source_location": "L1",
       "id": "sub_components_notifications_tabs",
-      "community": 45,
+      "community": 50,
       "norm_label": "notifications-tabs.tsx"
     },
     {
@@ -7191,7 +7398,7 @@
       "source_file": "src/modules/patients/components/notifications/sub-components/notifications-tabs.tsx",
       "source_location": "L3",
       "id": "sub_components_notifications_tabs_notificationstabsprops",
-      "community": 45,
+      "community": 50,
       "norm_label": "notificationstabsprops"
     },
     {
@@ -7200,7 +7407,7 @@
       "source_file": "src/modules/patients/components/notifications/sub-components/notifications-tabs.tsx",
       "source_location": "L9",
       "id": "sub_components_notifications_tabs_notificationstabs",
-      "community": 45,
+      "community": 50,
       "norm_label": "notificationstabs()"
     },
     {
@@ -7209,7 +7416,7 @@
       "source_file": "src/modules/patients/components/profile/profile-details-form.tsx",
       "source_location": "L1",
       "id": "profile_profile_details_form",
-      "community": 57,
+      "community": 23,
       "norm_label": "profile-details-form.tsx"
     },
     {
@@ -7218,7 +7425,7 @@
       "source_file": "src/modules/patients/components/profile/profile-details-form.tsx",
       "source_location": "L6",
       "id": "profile_profile_details_form_profiledetailsformprops",
-      "community": 57,
+      "community": 23,
       "norm_label": "profiledetailsformprops"
     },
     {
@@ -7263,7 +7470,7 @@
       "source_file": "src/modules/patients/components/profile/user-sidebar.tsx",
       "source_location": "L1",
       "id": "profile_user_sidebar",
-      "community": 117,
+      "community": 105,
       "norm_label": "user-sidebar.tsx"
     },
     {
@@ -7272,7 +7479,7 @@
       "source_file": "src/modules/patients/components/profile/user-sidebar.tsx",
       "source_location": "L7",
       "id": "profile_user_sidebar_sidebarlink",
-      "community": 117,
+      "community": 105,
       "norm_label": "sidebarlink"
     },
     {
@@ -7281,7 +7488,7 @@
       "source_file": "src/modules/patients/components/profile/user-sidebar.tsx",
       "source_location": "L13",
       "id": "profile_user_sidebar_sidebar_links",
-      "community": 117,
+      "community": 105,
       "norm_label": "sidebar_links"
     },
     {
@@ -7290,7 +7497,7 @@
       "source_file": "src/modules/patients/components/profile/user-sidebar.tsx",
       "source_location": "L20",
       "id": "profile_user_sidebar_usersidebar",
-      "community": 117,
+      "community": 105,
       "norm_label": "usersidebar()"
     },
     {
@@ -7488,7 +7695,7 @@
       "source_file": "src/modules/patients/dtos/exports.ts",
       "source_location": "L1",
       "id": "src_modules_patients_dtos_exports_ts_dtos_exports",
-      "community": 3,
+      "community": 7,
       "norm_label": "exports.ts"
     },
     {
@@ -7551,7 +7758,7 @@
       "source_file": "src/modules/patients/dtos/profile/register-patient.dto.spec.ts",
       "source_location": "L1",
       "id": "profile_register_patient_dto_spec",
-      "community": 3,
+      "community": 16,
       "norm_label": "register-patient.dto.spec.ts"
     },
     {
@@ -7560,7 +7767,7 @@
       "source_file": "src/modules/patients/dtos/profile/register-patient.dto.ts",
       "source_location": "L1",
       "id": "profile_register_patient_dto",
-      "community": 3,
+      "community": 16,
       "norm_label": "register-patient.dto.ts"
     },
     {
@@ -7569,7 +7776,7 @@
       "source_file": "src/modules/patients/dtos/profile/register-patient.dto.ts",
       "source_location": "L3",
       "id": "profile_register_patient_dto_registerpatientschema",
-      "community": 3,
+      "community": 16,
       "norm_label": "registerpatientschema"
     },
     {
@@ -7605,7 +7812,7 @@
       "source_file": "src/modules/patients/hooks/auth/header/use-auth-header.hook.spec.ts",
       "source_location": "L9",
       "id": "header_use_auth_header_hook_spec_getinitials",
-      "community": 107,
+      "community": 15,
       "norm_label": "getinitials()"
     },
     {
@@ -7641,7 +7848,7 @@
       "source_file": "src/modules/patients/hooks/auth/header/use-auth-header.hook.ts",
       "source_location": "L25",
       "id": "header_use_auth_header_hook_useauthheader",
-      "community": 107,
+      "community": 15,
       "norm_label": "useauthheader()"
     },
     {
@@ -7983,7 +8190,7 @@
       "source_file": "src/modules/patients/hooks/notifications/use-notifications.ts",
       "source_location": "L41",
       "id": "notifications_use_notifications_usenotifications",
-      "community": 45,
+      "community": 50,
       "norm_label": "usenotifications()"
     },
     {
@@ -8415,7 +8622,7 @@
       "source_file": "src/modules/patients/use-cases/profile/get-patient-profile.use-case.ts",
       "source_location": "L3",
       "id": "profile_get_patient_profile_use_case_getpatientprofileusecase",
-      "community": 37,
+      "community": 7,
       "norm_label": "getpatientprofileusecase()"
     },
     {
@@ -8467,7 +8674,7 @@
       "label": "LandingViewProps",
       "file_type": "code",
       "source_file": "src/modules/patients/views/landing-view.tsx",
-      "source_location": "L16",
+      "source_location": "L18",
       "id": "views_landing_view_landingviewprops",
       "community": 10,
       "norm_label": "landingviewprops"
@@ -8476,7 +8683,7 @@
       "label": "DEFAULT_SERVICES",
       "file_type": "code",
       "source_file": "src/modules/patients/views/landing-view.tsx",
-      "source_location": "L22",
+      "source_location": "L24",
       "id": "views_landing_view_default_services",
       "community": 10,
       "norm_label": "default_services"
@@ -8485,7 +8692,7 @@
       "label": "LandingView()",
       "file_type": "code",
       "source_file": "src/modules/patients/views/landing-view.tsx",
-      "source_location": "L69",
+      "source_location": "L71",
       "id": "views_landing_view_landingview",
       "community": 10,
       "norm_label": "landingview()"
@@ -9405,7 +9612,7 @@
       "source_file": "src/modules/staff/actions/doctor/update-doctor-schedule.action.spec.ts",
       "source_location": "L1",
       "id": "doctor_update_doctor_schedule_action_spec",
-      "community": 21,
+      "community": 4,
       "norm_label": "update-doctor-schedule.action.spec.ts"
     },
     {
@@ -9414,7 +9621,7 @@
       "source_file": "src/modules/staff/actions/doctor/update-doctor-schedule.action.ts",
       "source_location": "L1",
       "id": "doctor_update_doctor_schedule_action",
-      "community": 21,
+      "community": 4,
       "norm_label": "update-doctor-schedule.action.ts"
     },
     {
@@ -9423,7 +9630,7 @@
       "source_file": "src/modules/staff/actions/doctor/update-doctor-schedule.action.ts",
       "source_location": "L11",
       "id": "doctor_update_doctor_schedule_action_updatedoctorscheduleaction",
-      "community": 21,
+      "community": 4,
       "norm_label": "updatedoctorscheduleaction()"
     },
     {
@@ -9459,7 +9666,7 @@
       "source_file": "src/modules/staff/actions/management/deactivate-user.action.spec.ts",
       "source_location": "L1",
       "id": "management_deactivate_user_action_spec",
-      "community": 4,
+      "community": 37,
       "norm_label": "deactivate-user.action.spec.ts"
     },
     {
@@ -9468,7 +9675,7 @@
       "source_file": "src/modules/staff/actions/management/deactivate-user.action.ts",
       "source_location": "L1",
       "id": "management_deactivate_user_action",
-      "community": 4,
+      "community": 37,
       "norm_label": "deactivate-user.action.ts"
     },
     {
@@ -9477,7 +9684,7 @@
       "source_file": "src/modules/staff/actions/management/deactivate-user.action.ts",
       "source_location": "L10",
       "id": "management_deactivate_user_action_deactivateuseraction",
-      "community": 4,
+      "community": 37,
       "norm_label": "deactivateuseraction()"
     },
     {
@@ -9513,7 +9720,7 @@
       "source_file": "src/modules/staff/actions/management/get-doctors.action.ts",
       "source_location": "L1",
       "id": "management_get_doctors_action",
-      "community": 106,
+      "community": 36,
       "norm_label": "get-doctors.action.ts"
     },
     {
@@ -9522,7 +9729,7 @@
       "source_file": "src/modules/staff/actions/management/get-doctors.action.ts",
       "source_location": "L7",
       "id": "management_get_doctors_action_getdoctorsaction",
-      "community": 106,
+      "community": 36,
       "norm_label": "getdoctorsaction()"
     },
     {
@@ -10035,7 +10242,7 @@
       "source_file": "src/modules/staff/dtos/management/assign-doctor-services.dto.spec.ts",
       "source_location": "L1",
       "id": "management_assign_doctor_services_dto_spec",
-      "community": 29,
+      "community": 43,
       "norm_label": "assign-doctor-services.dto.spec.ts"
     },
     {
@@ -10044,7 +10251,7 @@
       "source_file": "src/modules/staff/dtos/management/assign-doctor-services.dto.ts",
       "source_location": "L1",
       "id": "management_assign_doctor_services_dto",
-      "community": 29,
+      "community": 43,
       "norm_label": "assign-doctor-services.dto.ts"
     },
     {
@@ -10053,7 +10260,7 @@
       "source_file": "src/modules/staff/dtos/management/assign-doctor-services.dto.ts",
       "source_location": "L3",
       "id": "management_assign_doctor_services_dto_assigndoctorservicesschema",
-      "community": 29,
+      "community": 43,
       "norm_label": "assigndoctorservicesschema"
     },
     {
@@ -10260,7 +10467,7 @@
       "source_file": "src/modules/staff/dtos/profile/terminate-staff.dto.spec.ts",
       "source_location": "L1",
       "id": "profile_terminate_staff_dto_spec",
-      "community": 64,
+      "community": 29,
       "norm_label": "terminate-staff.dto.spec.ts"
     },
     {
@@ -10269,7 +10476,7 @@
       "source_file": "src/modules/staff/dtos/profile/terminate-staff.dto.ts",
       "source_location": "L1",
       "id": "profile_terminate_staff_dto",
-      "community": 64,
+      "community": 29,
       "norm_label": "terminate-staff.dto.ts"
     },
     {
@@ -10278,7 +10485,7 @@
       "source_file": "src/modules/staff/dtos/profile/terminate-staff.dto.ts",
       "source_location": "L3",
       "id": "profile_terminate_staff_dto_terminatestaffschema",
-      "community": 64,
+      "community": 29,
       "norm_label": "terminatestaffschema"
     },
     {
@@ -10287,7 +10494,7 @@
       "source_file": "src/modules/staff/dtos/profile/terminate-staff.dto.ts",
       "source_location": "L7",
       "id": "profile_terminate_staff_dto_terminatestaffdto",
-      "community": 64,
+      "community": 29,
       "norm_label": "terminatestaffdto"
     },
     {
@@ -10656,7 +10863,7 @@
       "source_file": "src/modules/staff/hooks/use-secretary-dashboard.ts",
       "source_location": "L81",
       "id": "hooks_use_secretary_dashboard_usesecretarydashboard",
-      "community": 24,
+      "community": 66,
       "norm_label": "usesecretarydashboard()"
     },
     {
@@ -10665,7 +10872,7 @@
       "source_file": "src/modules/staff/repositories/exports.ts",
       "source_location": "L1",
       "id": "src_modules_staff_repositories_exports_ts_repositories_exports",
-      "community": 36,
+      "community": 30,
       "norm_label": "exports.ts"
     },
     {
@@ -10674,7 +10881,7 @@
       "source_file": "src/modules/staff/repositories/management/doctor-services.commands.spec.ts",
       "source_location": "L1",
       "id": "management_doctor_services_commands_spec",
-      "community": 126,
+      "community": 43,
       "norm_label": "doctor-services.commands.spec.ts"
     },
     {
@@ -10683,7 +10890,7 @@
       "source_file": "src/modules/staff/repositories/management/doctor-services.commands.spec.ts",
       "source_location": "L4",
       "id": "management_doctor_services_commands_spec_mockfrom",
-      "community": 126,
+      "community": 43,
       "norm_label": "mockfrom"
     },
     {
@@ -10692,7 +10899,7 @@
       "source_file": "src/modules/staff/repositories/management/doctor-services.commands.spec.ts",
       "source_location": "L5",
       "id": "management_doctor_services_commands_spec_mockdelete",
-      "community": 126,
+      "community": 43,
       "norm_label": "mockdelete"
     },
     {
@@ -10701,7 +10908,7 @@
       "source_file": "src/modules/staff/repositories/management/doctor-services.commands.spec.ts",
       "source_location": "L6",
       "id": "management_doctor_services_commands_spec_mockeq",
-      "community": 126,
+      "community": 43,
       "norm_label": "mockeq"
     },
     {
@@ -10710,7 +10917,7 @@
       "source_file": "src/modules/staff/repositories/management/doctor-services.commands.spec.ts",
       "source_location": "L7",
       "id": "management_doctor_services_commands_spec_mockinsert",
-      "community": 126,
+      "community": 43,
       "norm_label": "mockinsert"
     },
     {
@@ -10719,7 +10926,7 @@
       "source_file": "src/modules/staff/repositories/management/doctor-services.commands.spec.ts",
       "source_location": "L9",
       "id": "management_doctor_services_commands_spec_mocksupabase",
-      "community": 126,
+      "community": 43,
       "norm_label": "mocksupabase"
     },
     {
@@ -10728,7 +10935,7 @@
       "source_file": "src/modules/staff/repositories/management/doctor-services.commands.ts",
       "source_location": "L1",
       "id": "management_doctor_services_commands",
-      "community": 21,
+      "community": 43,
       "norm_label": "doctor-services.commands.ts"
     },
     {
@@ -10737,7 +10944,7 @@
       "source_file": "src/modules/staff/repositories/management/doctor-services.commands.ts",
       "source_location": "L4",
       "id": "management_doctor_services_commands_assigndoctorservicescommand",
-      "community": 21,
+      "community": 43,
       "norm_label": "assigndoctorservicescommand()"
     },
     {
@@ -10755,7 +10962,7 @@
       "source_file": "src/modules/staff/repositories/management/get-active-doctors.queries.ts",
       "source_location": "L5",
       "id": "management_get_active_doctors_queries_getactivedoctorsquery",
-      "community": 106,
+      "community": 36,
       "norm_label": "getactivedoctorsquery()"
     },
     {
@@ -10917,7 +11124,7 @@
       "source_file": "src/modules/staff/use-cases/exports.ts",
       "source_location": "L1",
       "id": "src_modules_staff_use_cases_exports_ts_use_cases_exports",
-      "community": 119,
+      "community": 40,
       "norm_label": "exports.ts"
     },
     {
@@ -11007,7 +11214,7 @@
       "source_file": "src/modules/staff/use-cases/management/get-doctors.use-case.ts",
       "source_location": "L1",
       "id": "management_get_doctors_use_case",
-      "community": 119,
+      "community": 40,
       "norm_label": "get-doctors.use-case.ts"
     },
     {
@@ -11016,7 +11223,7 @@
       "source_file": "src/modules/staff/use-cases/management/get-doctors.use-case.ts",
       "source_location": "L4",
       "id": "management_get_doctors_use_case_getdoctorsusecase",
-      "community": 106,
+      "community": 36,
       "norm_label": "getdoctorsusecase()"
     },
     {
@@ -11079,7 +11286,7 @@
       "source_file": "src/modules/staff/use-cases/profile/terminate-staff.use-case.spec.ts",
       "source_location": "L1",
       "id": "profile_terminate_staff_use_case_spec",
-      "community": 119,
+      "community": 40,
       "norm_label": "terminate-staff.use-case.spec.ts"
     },
     {
@@ -11088,7 +11295,7 @@
       "source_file": "src/modules/staff/use-cases/profile/terminate-staff.use-case.ts",
       "source_location": "L1",
       "id": "profile_terminate_staff_use_case",
-      "community": 119,
+      "community": 40,
       "norm_label": "terminate-staff.use-case.ts"
     },
     {
@@ -11097,7 +11304,7 @@
       "source_file": "src/modules/staff/use-cases/profile/terminate-staff.use-case.ts",
       "source_location": "L3",
       "id": "profile_terminate_staff_use_case_terminatestaffusecase",
-      "community": 119,
+      "community": 40,
       "norm_label": "terminatestaffusecase()"
     },
     {
@@ -11241,7 +11448,7 @@
       "source_file": "src/modules/staff/views/secretary-dashboard-view.tsx",
       "source_location": "L1",
       "id": "views_secretary_dashboard_view",
-      "community": 24,
+      "community": 66,
       "norm_label": "secretary-dashboard-view.tsx"
     },
     {
@@ -11250,7 +11457,7 @@
       "source_file": "src/modules/staff/views/secretary-dashboard-view.tsx",
       "source_location": "L14",
       "id": "views_secretary_dashboard_view_secretarydashboardview",
-      "community": 24,
+      "community": 66,
       "norm_label": "secretarydashboardview()"
     },
     {
@@ -11358,7 +11565,7 @@
       "source_file": "src/shared/auth/auth.util.spec.ts",
       "source_location": "L1",
       "id": "auth_auth_util_spec",
-      "community": 4,
+      "community": 37,
       "norm_label": "auth.util.spec.ts"
     },
     {
@@ -11403,7 +11610,7 @@
       "source_file": "src/shared/constants/design.ts",
       "source_location": "L1",
       "id": "constants_design",
-      "community": 10,
+      "community": 93,
       "norm_label": "design.ts"
     },
     {
@@ -11412,7 +11619,7 @@
       "source_file": "src/shared/constants/design.ts",
       "source_location": "L6",
       "id": "constants_design_design_tokens",
-      "community": 10,
+      "community": 93,
       "norm_label": "design_tokens"
     },
     {
@@ -11628,7 +11835,7 @@
       "source_file": "src/shared/database/server.spec.ts",
       "source_location": "L1",
       "id": "database_server_spec",
-      "community": 4,
+      "community": 37,
       "norm_label": "server.spec.ts"
     },
     {
@@ -11637,7 +11844,7 @@
       "source_file": "src/shared/database/server.ts",
       "source_location": "L1",
       "id": "database_server",
-      "community": 4,
+      "community": 37,
       "norm_label": "server.ts"
     },
     {
@@ -11646,7 +11853,7 @@
       "source_file": "src/shared/database/server.ts",
       "source_location": "L5",
       "id": "database_server_createclient",
-      "community": 4,
+      "community": 37,
       "norm_label": "createclient"
     },
     {
@@ -11700,7 +11907,7 @@
       "source_file": "src/shared/errors/index.ts",
       "source_location": "L1",
       "id": "errors_index",
-      "community": 47,
+      "community": 21,
       "norm_label": "index.ts"
     },
     {
@@ -12078,7 +12285,7 @@
       "source_file": "src/shared/utils/action-response.ts",
       "source_location": "L1",
       "id": "utils_action_response",
-      "community": 16,
+      "community": 3,
       "norm_label": "action-response.ts"
     },
     {
@@ -12087,7 +12294,7 @@
       "source_file": "src/shared/utils/action-response.ts",
       "source_location": "L1",
       "id": "utils_action_response_actionresponse",
-      "community": 16,
+      "community": 3,
       "norm_label": "actionresponse"
     },
     {
@@ -12132,7 +12339,7 @@
       "source_file": "src/shared/utils/date.util.spec.ts",
       "source_location": "L1",
       "id": "utils_date_util_spec",
-      "community": 34,
+      "community": 28,
       "norm_label": "date.util.spec.ts"
     },
     {
@@ -12141,7 +12348,7 @@
       "source_file": "src/shared/utils/date.util.ts",
       "source_location": "L1",
       "id": "utils_date_util",
-      "community": 34,
+      "community": 41,
       "norm_label": "date.util.ts"
     },
     {
@@ -12150,7 +12357,7 @@
       "source_file": "src/shared/utils/date.util.ts",
       "source_location": "L5",
       "id": "utils_date_util_formatclinicdate",
-      "community": 34,
+      "community": 28,
       "norm_label": "formatclinicdate()"
     },
     {
@@ -12159,7 +12366,7 @@
       "source_file": "src/shared/utils/date.util.ts",
       "source_location": "L20",
       "id": "utils_date_util_formatshortdate",
-      "community": 34,
+      "community": 41,
       "norm_label": "formatshortdate()"
     },
     {
@@ -12168,7 +12375,7 @@
       "source_file": "src/shared/utils/date.util.ts",
       "source_location": "L38",
       "id": "utils_date_util_formatclinictime",
-      "community": 93,
+      "community": 28,
       "norm_label": "formatclinictime()"
     },
     {
@@ -12674,6 +12881,15 @@
       "id": "readme_deploy_on_vercel",
       "community": 65,
       "norm_label": "deploy on vercel"
+    },
+    {
+      "label": "gege.md",
+      "file_type": "document",
+      "source_file": "TASK/gege.md",
+      "source_location": "L1",
+      "id": "task_gege",
+      "community": 101,
+      "norm_label": "gege.md"
     },
     {
       "label": "task-appoinement-details-perpormance.md",
@@ -14732,7 +14948,7 @@
       "file_type": "code",
       "source_file": "src/modules/appointments/dtos/status/update-appointment-status.dto.ts",
       "source_location": "L24",
-      "community": 17,
+      "community": 99,
       "norm_label": "userupdateappointmentstatusschema",
       "id": "status_update_appointment_status_dto_userupdateappointmentstatusschema"
     },
@@ -14777,7 +14993,7 @@
       "file_type": "code",
       "source_file": "src/modules/appointments/repositories/patient/patient-appointments.queries.ts",
       "source_location": "L27",
-      "community": 105,
+      "community": 64,
       "norm_label": "patientappointmentsqueries",
       "id": "patient_patient_appointments_queries_patientappointmentsqueries"
     },
@@ -14786,7 +15002,7 @@
       "file_type": "code",
       "source_file": "src/modules/appointments/repositories/patient/patient-appointments.queries.ts",
       "source_location": "L28",
-      "community": 105,
+      "community": 64,
       "norm_label": ".constructor()",
       "id": "patient_patient_appointments_queries_patientappointmentsqueries_constructor"
     },
@@ -14795,7 +15011,7 @@
       "file_type": "code",
       "source_file": "src/modules/appointments/repositories/patient/patient-appointments.queries.ts",
       "source_location": "L34",
-      "community": 105,
+      "community": 64,
       "norm_label": ".getappointmentsbyuser()",
       "id": "patient_patient_appointments_queries_patientappointmentsqueries_getappointmentsbyuser"
     },
@@ -14849,7 +15065,7 @@
       "file_type": "code",
       "source_file": "src/modules/appointments/use-cases/patient/get-patient-appointments.use-case.ts",
       "source_location": "L17",
-      "community": 105,
+      "community": 64,
       "norm_label": ".constructor()",
       "id": "patient_get_patient_appointments_use_case_getpatientappointmentsusecase_constructor"
     },
@@ -14858,7 +15074,7 @@
       "file_type": "code",
       "source_file": "src/modules/appointments/use-cases/patient/get-patient-appointments.use-case.ts",
       "source_location": "L24",
-      "community": 105,
+      "community": 64,
       "norm_label": ".execute()",
       "id": "patient_get_patient_appointments_use_case_getpatientappointmentsusecase_execute"
     },
@@ -14885,7 +15101,7 @@
       "file_type": "code",
       "source_file": "src/modules/appointments/use-cases/treatment/submit-treatment.use-case.spec.ts",
       "source_location": "L4",
-      "community": 102,
+      "community": 14,
       "norm_label": "mockin",
       "id": "treatment_submit_treatment_use_case_spec_mockin"
     },
@@ -14894,7 +15110,7 @@
       "file_type": "code",
       "source_file": "src/modules/appointments/use-cases/treatment/submit-treatment.use-case.spec.ts",
       "source_location": "L5",
-      "community": 102,
+      "community": 14,
       "norm_label": "mockselect",
       "id": "treatment_submit_treatment_use_case_spec_mockselect"
     },
@@ -14903,7 +15119,7 @@
       "file_type": "code",
       "source_file": "src/modules/appointments/use-cases/treatment/submit-treatment.use-case.spec.ts",
       "source_location": "L6",
-      "community": 102,
+      "community": 14,
       "norm_label": "mockfrom",
       "id": "treatment_submit_treatment_use_case_spec_mockfrom"
     },
@@ -14912,7 +15128,7 @@
       "file_type": "code",
       "source_file": "src/modules/appointments/use-cases/treatment/submit-treatment.use-case.spec.ts",
       "source_location": "L8",
-      "community": 102,
+      "community": 14,
       "norm_label": "mocksupabase",
       "id": "treatment_submit_treatment_use_case_spec_mocksupabase"
     },
@@ -14921,7 +15137,7 @@
       "file_type": "code",
       "source_file": "src/modules/appointments/use-cases/treatment/submit-treatment.use-case.ts",
       "source_location": "L73",
-      "community": 2,
+      "community": 14,
       "norm_label": ".constructor()",
       "id": "treatment_submit_treatment_use_case_submittreatmentusecase_constructor"
     },
@@ -14975,7 +15191,7 @@
       "file_type": "code",
       "source_file": "src/modules/billing/repositories/invoicing/invoice.commands.ts",
       "source_location": "L79",
-      "community": 101,
+      "community": 2,
       "norm_label": ".finalizeinvoice()",
       "id": "invoicing_invoice_commands_invoicecommandsrepository_finalizeinvoice"
     },
@@ -14984,7 +15200,7 @@
       "file_type": "code",
       "source_file": "src/modules/billing/repositories/invoicing/invoice.queries.ts",
       "source_location": "L45",
-      "community": 5,
+      "community": 2,
       "norm_label": "invoicequeriesrepository",
       "id": "invoicing_invoice_queries_invoicequeriesrepository"
     },
@@ -14993,7 +15209,7 @@
       "file_type": "code",
       "source_file": "src/modules/billing/repositories/invoicing/invoice.queries.ts",
       "source_location": "L46",
-      "community": 5,
+      "community": 2,
       "norm_label": ".constructor()",
       "id": "invoicing_invoice_queries_invoicequeriesrepository_constructor"
     },
@@ -15002,7 +15218,7 @@
       "file_type": "code",
       "source_file": "src/modules/billing/repositories/invoicing/invoice.queries.ts",
       "source_location": "L48",
-      "community": 5,
+      "community": 2,
       "norm_label": ".getinvoices()",
       "id": "invoicing_invoice_queries_invoicequeriesrepository_getinvoices"
     },
@@ -15011,7 +15227,7 @@
       "file_type": "code",
       "source_file": "src/modules/billing/repositories/invoicing/invoice.queries.ts",
       "source_location": "L52",
-      "community": 5,
+      "community": 2,
       "norm_label": ".getinvoicebyid()",
       "id": "invoicing_invoice_queries_invoicequeriesrepository_getinvoicebyid"
     },
@@ -15020,7 +15236,7 @@
       "file_type": "code",
       "source_file": "src/modules/billing/use-cases/invoicing/finalize-invoice.use-case.ts",
       "source_location": "L15",
-      "community": 101,
+      "community": 2,
       "norm_label": ".constructor()",
       "id": "invoicing_finalize_invoice_use_case_finalizeinvoiceusecase_constructor"
     },
@@ -15029,7 +15245,7 @@
       "file_type": "code",
       "source_file": "src/modules/billing/use-cases/invoicing/finalize-invoice.use-case.ts",
       "source_location": "L17",
-      "community": 101,
+      "community": 2,
       "norm_label": ".execute()",
       "id": "invoicing_finalize_invoice_use_case_finalizeinvoiceusecase_execute"
     },
@@ -15056,7 +15272,7 @@
       "file_type": "code",
       "source_file": "src/modules/billing/use-cases/invoicing/get-invoices.use-case.ts",
       "source_location": "L15",
-      "community": 5,
+      "community": 2,
       "norm_label": ".constructor()",
       "id": "invoicing_get_invoices_use_case_getinvoicesusecase_constructor"
     },
@@ -15065,7 +15281,7 @@
       "file_type": "code",
       "source_file": "src/modules/billing/use-cases/invoicing/get-invoices.use-case.ts",
       "source_location": "L17",
-      "community": 5,
+      "community": 2,
       "norm_label": ".execute()",
       "id": "invoicing_get_invoices_use_case_getinvoicesusecase_execute"
     },
@@ -15245,7 +15461,7 @@
       "file_type": "code",
       "source_file": "src/modules/patients/use-cases/profile/get-patient-profile.use-case.ts",
       "source_location": "L18",
-      "community": 37,
+      "community": 7,
       "norm_label": ".execute()",
       "id": "profile_get_patient_profile_use_case_getpatientprofileusecase_execute"
     },
@@ -15542,7 +15758,7 @@
       "file_type": "code",
       "source_file": "src/modules/staff/use-cases/management/get-doctors.use-case.ts",
       "source_location": "L15",
-      "community": 106,
+      "community": 13,
       "norm_label": ".execute()",
       "id": "management_get_doctors_use_case_getdoctorsusecase_execute"
     },
@@ -15587,7 +15803,7 @@
       "file_type": "code",
       "source_file": "src/modules/staff/use-cases/profile/terminate-staff.use-case.ts",
       "source_location": "L13",
-      "community": 119,
+      "community": 40,
       "norm_label": ".constructor()",
       "id": "profile_terminate_staff_use_case_terminatestaffusecase_constructor"
     },
@@ -15596,7 +15812,7 @@
       "file_type": "code",
       "source_file": "src/modules/staff/use-cases/profile/terminate-staff.use-case.ts",
       "source_location": "L14",
-      "community": 119,
+      "community": 40,
       "norm_label": ".execute()",
       "id": "profile_terminate_staff_use_case_terminatestaffusecase_execute"
     },
@@ -15731,7 +15947,7 @@
       "file_type": "code",
       "source_file": "src/modules/staff/views/secretary-dashboard-view.spec.ts",
       "source_location": "L4",
-      "community": 24,
+      "community": 66,
       "norm_label": "calculatefinalprice()",
       "id": "views_secretary_dashboard_view_spec_calculatefinalprice"
     },
@@ -15740,7 +15956,7 @@
       "file_type": "code",
       "source_file": "src/modules/staff/views/secretary-dashboard-view.tsx",
       "source_location": "L8",
-      "community": 24,
+      "community": 66,
       "norm_label": "pendingbooking",
       "id": "views_secretary_dashboard_view_pendingbooking"
     },
@@ -15749,7 +15965,7 @@
       "file_type": "code",
       "source_file": "src/modules/staff/views/secretary-dashboard-view.tsx",
       "source_location": "L18",
-      "community": 24,
+      "community": 66,
       "norm_label": "upcomingappointment",
       "id": "views_secretary_dashboard_view_upcomingappointment"
     },
@@ -15758,7 +15974,7 @@
       "file_type": "code",
       "source_file": "src/modules/staff/views/secretary-dashboard-view.tsx",
       "source_location": "L28",
-      "community": 24,
+      "community": 66,
       "norm_label": "draftinvoice",
       "id": "views_secretary_dashboard_view_draftinvoice"
     },
@@ -15767,7 +15983,7 @@
       "file_type": "code",
       "source_file": "src/modules/staff/views/secretary-dashboard-view.tsx",
       "source_location": "L37",
-      "community": 24,
+      "community": 66,
       "norm_label": "auditrecord",
       "id": "views_secretary_dashboard_view_auditrecord"
     },
@@ -15776,7 +15992,7 @@
       "file_type": "code",
       "source_file": "src/modules/staff/views/secretary-dashboard-view.tsx",
       "source_location": "L44",
-      "community": 24,
+      "community": 66,
       "norm_label": "emaillog",
       "id": "views_secretary_dashboard_view_emaillog"
     },
@@ -15785,7 +16001,7 @@
       "file_type": "code",
       "source_file": "src/modules/staff/views/secretary-dashboard-view.tsx",
       "source_location": "L51",
-      "community": 24,
+      "community": 66,
       "norm_label": "initial_pending",
       "id": "views_secretary_dashboard_view_initial_pending"
     },
@@ -15794,7 +16010,7 @@
       "file_type": "code",
       "source_file": "src/modules/staff/views/secretary-dashboard-view.tsx",
       "source_location": "L58",
-      "community": 24,
+      "community": 66,
       "norm_label": "initial_upcoming",
       "id": "views_secretary_dashboard_view_initial_upcoming"
     },
@@ -15803,7 +16019,7 @@
       "file_type": "code",
       "source_file": "src/modules/staff/views/secretary-dashboard-view.tsx",
       "source_location": "L63",
-      "community": 24,
+      "community": 66,
       "norm_label": "initial_drafts",
       "id": "views_secretary_dashboard_view_initial_drafts"
     },
@@ -15812,7 +16028,7 @@
       "file_type": "code",
       "source_file": "src/modules/staff/views/secretary-dashboard-view.tsx",
       "source_location": "L68",
-      "community": 24,
+      "community": 66,
       "norm_label": "initial_audits",
       "id": "views_secretary_dashboard_view_initial_audits"
     },
@@ -15821,7 +16037,7 @@
       "file_type": "code",
       "source_file": "src/modules/staff/views/secretary-dashboard-view.tsx",
       "source_location": "L73",
-      "community": 24,
+      "community": 66,
       "norm_label": "initial_emails",
       "id": "views_secretary_dashboard_view_initial_emails"
     },
@@ -15848,7 +16064,7 @@
       "file_type": "code",
       "source_file": "src/modules/appointments/actions/booking/submit-booking.action.spec.ts",
       "source_location": "L23",
-      "community": 94,
+      "community": 37,
       "norm_label": "{ mocksubmitbooking }",
       "id": "booking_submit_booking_action_spec_mocksubmitbooking"
     },
@@ -18979,11 +19195,41 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/app/layout.tsx",
+      "source_location": "L23",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "app_layout",
+      "target": "app_layout_josefinsans"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/layout.tsx",
+      "source_location": "L29",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "app_layout",
+      "target": "app_layout_jost"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/layout.tsx",
       "source_location": "L17",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "app_layout",
       "target": "app_layout_metadata"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/layout.tsx",
+      "source_location": "L17",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "app_layout",
+      "target": "app_layout_playfair"
     },
     {
       "relation": "contains",
@@ -19153,6 +19399,17 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "booking_use_user_booking",
+      "target": "feedback_toast_container"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/modules/appointments/hooks/booking/use-user-booking.spec.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "booking_use_user_booking_spec",
       "target": "feedback_toast_container"
     },
     {
@@ -19390,6 +19647,17 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "booking_use_user_booking",
+      "target": "feedback_toast_container_usetoast"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/modules/appointments/hooks/booking/use-user-booking.spec.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "booking_use_user_booking_spec",
       "target": "feedback_toast_container_usetoast"
     },
     {
@@ -19878,17 +20146,6 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "src/modules/patients/components/landing/hero-section.tsx",
-      "source_location": "L5",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "landing_hero_section",
-      "target": "ui_button"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
       "source_file": "src/modules/patients/components/notifications/notifications-view.tsx",
       "source_location": "L4",
       "weight": 1.0,
@@ -20353,17 +20610,6 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "landing_contact_section",
-      "target": "ui_button_button"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/modules/patients/components/landing/hero-section.tsx",
-      "source_location": "L5",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "landing_hero_section",
       "target": "ui_button_button"
     },
     {
@@ -21028,6 +21274,221 @@
       "confidence_score": 1.0,
       "source": "views_secretary_dashboard_view",
       "target": "ui_modal_modal"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/ui/navbar.tsx",
+      "source_location": "L10",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ui_navbar",
+      "target": "ui_navbar_mobile_drawer"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/ui/navbar-mobile-drawer.tsx",
+      "source_location": "L8",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ui_navbar_mobile_drawer",
+      "target": "auth_authenticated_user_header"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/ui/navbar-mobile-drawer.tsx",
+      "source_location": "L8",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ui_navbar_mobile_drawer",
+      "target": "auth_authenticated_user_header_authenticateduserheader"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/ui/navbar-mobile-drawer.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ui_navbar_mobile_drawer",
+      "target": "header_use_auth_header_hook"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/ui/navbar-mobile-drawer.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ui_navbar_mobile_drawer",
+      "target": "header_use_auth_header_hook_authheaderuser"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/ui/navbar-mobile-drawer.tsx",
+      "source_location": "L18",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ui_navbar_mobile_drawer",
+      "target": "ui_navbar_mobile_drawer_navbarmobiledrawer"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/ui/navbar-mobile-drawer.tsx",
+      "source_location": "L10",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ui_navbar_mobile_drawer",
+      "target": "ui_navbar_mobile_drawer_navbarmobiledrawerprops"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/ui/navbar-mobile-drawer.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ui_navbar_mobile_drawer",
+      "target": "ui_navbar_nav_items"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/ui/navbar-v1.tsx",
+      "source_location": "L10",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ui_navbar_v1",
+      "target": "ui_navbar_mobile_drawer"
+    },
+    {
+      "relation": "references",
+      "context": "field",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/ui/navbar-mobile-drawer.tsx",
+      "source_location": "L11",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ui_navbar_mobile_drawer_navbarmobiledrawerprops",
+      "target": "header_use_auth_header_hook_authheaderuser"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/ui/navbar.tsx",
+      "source_location": "L10",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ui_navbar",
+      "target": "ui_navbar_mobile_drawer_navbarmobiledrawer"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/ui/navbar-v1.tsx",
+      "source_location": "L10",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ui_navbar_v1",
+      "target": "ui_navbar_mobile_drawer_navbarmobiledrawer"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/ui/navbar-v1.tsx",
+      "source_location": "L8",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ui_navbar_v1",
+      "target": "auth_authenticated_user_header"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/ui/navbar-v1.tsx",
+      "source_location": "L8",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ui_navbar_v1",
+      "target": "auth_authenticated_user_header_authenticateduserheader"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/ui/navbar-v1.tsx",
+      "source_location": "L9",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ui_navbar_v1",
+      "target": "header_use_auth_header_hook"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/ui/navbar-v1.tsx",
+      "source_location": "L9",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ui_navbar_v1",
+      "target": "header_use_auth_header_hook_authheaderuser"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/ui/navbar-v1.tsx",
+      "source_location": "L16",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ui_navbar_v1",
+      "target": "ui_navbar_v1_nav_items"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/ui/navbar-v1.tsx",
+      "source_location": "L12",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ui_navbar_v1",
+      "target": "ui_navbar_v1_navbarprops"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/ui/navbar-v1.tsx",
+      "source_location": "L24",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ui_navbar_v1",
+      "target": "ui_navbar_v1_navbarv1"
+    },
+    {
+      "relation": "references",
+      "context": "field",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/ui/navbar-v1.tsx",
+      "source_location": "L13",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ui_navbar_v1_navbarprops",
+      "target": "header_use_auth_header_hook_authheaderuser"
     },
     {
       "relation": "imports_from",
@@ -22365,6 +22826,17 @@
       "target": "booking_submit_booking_action"
     },
     {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/modules/appointments/hooks/booking/use-user-booking.spec.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "booking_use_user_booking_spec",
+      "target": "booking_submit_booking_action"
+    },
+    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
@@ -22505,6 +22977,17 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "booking_use_user_booking",
+      "target": "booking_submit_booking_action_submitbookingaction"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/modules/appointments/hooks/booking/use-user-booking.spec.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "booking_use_user_booking_spec",
       "target": "booking_submit_booking_action_submitbookingaction"
     },
     {
@@ -23656,6 +24139,17 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "src/modules/appointments/hooks/booking/use-user-booking.spec.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "booking_use_user_booking_spec",
+      "target": "status_request_reschedule_action"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "src/modules/appointments/actions/status/request-reschedule.action.ts",
       "source_location": "L5",
       "weight": 1.0,
@@ -23869,6 +24363,17 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "booking_use_user_booking",
+      "target": "status_request_reschedule_action_requestrescheduleaction"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/modules/appointments/hooks/booking/use-user-booking.spec.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "booking_use_user_booking_spec",
       "target": "status_request_reschedule_action_requestrescheduleaction"
     },
     {
@@ -30331,6 +30836,26 @@
       "confidence_score": 1.0,
       "source": "booking_use_user_booking_spec",
       "target": "booking_use_user_booking"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/modules/appointments/hooks/booking/use-user-booking.spec.ts",
+      "source_location": "L20",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "booking_use_user_booking_spec",
+      "target": "booking_use_user_booking_spec_mockaddtoast"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/modules/appointments/hooks/booking/use-user-booking.spec.ts",
+      "source_location": "L12",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "booking_use_user_booking_spec",
+      "target": "booking_use_user_booking_spec_mockget"
     },
     {
       "relation": "imports",
@@ -40903,6 +41428,16 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "landing_gallery_section",
+      "target": "landing_gallery_section_galleryitems"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/modules/patients/components/landing/gallery-section.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "landing_gallery_section",
       "target": "landing_gallery_section_gallerysection"
     },
     {
@@ -40928,68 +41463,174 @@
       "target": "landing_gallery_section_gallerysection"
     },
     {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/modules/patients/components/landing/hero-section-v1.tsx",
+      "source_location": "L8",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "landing_hero_section_v1",
+      "target": "landing_hero_section_v1_herosectionprops"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/modules/patients/components/landing/hero-section-v1.tsx",
+      "source_location": "L12",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "landing_hero_section_v1",
+      "target": "landing_hero_section_v1_herosectionv1"
+    },
+    {
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "src/modules/patients/components/landing/hero-section.tsx",
-      "source_location": "L7",
+      "source_file": "src/modules/patients/components/landing/hero-section-v1.tsx",
+      "source_location": "L6",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "landing_hero_section",
-      "target": "constants_design"
+      "source": "landing_hero_section_v1",
+      "target": "landing_trust_and_stats"
     },
     {
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "src/modules/patients/components/landing/hero-section.tsx",
-      "source_location": "L7",
+      "source_file": "src/modules/patients/components/landing/hero-section-v1.tsx",
+      "source_location": "L6",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "landing_hero_section",
-      "target": "constants_design_design_tokens"
+      "source": "landing_hero_section_v1",
+      "target": "landing_trust_and_stats_trustandstats"
     },
     {
-      "relation": "contains",
+      "relation": "imports_from",
+      "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "src/modules/patients/components/landing/hero-section.tsx",
+      "source_file": "src/modules/patients/views/landing-view.tsx",
       "source_location": "L11",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "landing_hero_section",
-      "target": "landing_hero_section_herosection"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/modules/patients/components/landing/hero-section.tsx",
-      "source_location": "L7",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "landing_hero_section",
-      "target": "landing_hero_section_herosectionprops"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/modules/patients/views/landing-view.tsx",
-      "source_location": "L10",
-      "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "views_landing_view",
-      "target": "landing_hero_section"
+      "target": "landing_hero_section_v1"
     },
     {
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/modules/patients/views/landing-view.tsx",
-      "source_location": "L10",
+      "source_location": "L11",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "views_landing_view",
-      "target": "landing_hero_section_herosection"
+      "target": "landing_hero_section_v1_herosectionv1"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/modules/patients/components/landing/hero-section-v2.tsx",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "landing_hero_section_v2",
+      "target": "landing_hero_section_v2_herosectionprops",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/modules/patients/components/landing/hero-section-v2.tsx",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "landing_hero_section_v2",
+      "target": "landing_hero_section_v2_herosectionv2",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/modules/patients/components/landing/hero-section-v2.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "landing_hero_section_v2",
+      "target": "landing_trust_and_stats",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/modules/patients/components/landing/hero-section-v2.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "landing_hero_section_v2",
+      "target": "landing_trust_and_stats_trustandstats",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/modules/patients/views/landing-view.tsx",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "views_landing_view",
+      "target": "landing_hero_section_v2",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/modules/patients/views/landing-view.tsx",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "views_landing_view",
+      "target": "landing_hero_section_v2_herosectionv2",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/modules/patients/components/landing/journey-section.tsx",
+      "source_location": "L33",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "landing_journey_section",
+      "target": "landing_journey_section_journeysection"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/modules/patients/components/landing/journey-section.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "landing_journey_section",
+      "target": "landing_journey_section_journeyslides"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/modules/patients/views/landing-view.tsx",
+      "source_location": "L13",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_landing_view",
+      "target": "landing_journey_section"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/modules/patients/views/landing-view.tsx",
+      "source_location": "L13",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_landing_view",
+      "target": "landing_journey_section_journeysection"
     },
     {
       "relation": "imports_from",
@@ -41012,6 +41653,26 @@
       "confidence_score": 1.0,
       "source": "landing_services_section",
       "target": "components_service_card_servicecard"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/modules/patients/components/landing/services-section.tsx",
+      "source_location": "L12",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "landing_services_section",
+      "target": "landing_services_section_card_services"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/modules/patients/components/landing/services-section.tsx",
+      "source_location": "L40",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "landing_services_section",
+      "target": "landing_services_section_list_services"
     },
     {
       "relation": "contains",
@@ -41087,6 +41748,16 @@
       "confidence_score": 1.0,
       "source": "views_landing_view",
       "target": "landing_services_section_servicessection"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/modules/patients/components/landing/trust-and-stats.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "landing_trust_and_stats",
+      "target": "landing_trust_and_stats_trustandstats"
     },
     {
       "relation": "contains",
@@ -57078,5 +57749,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "f836698d9fd95ba8a264f9a6e610e26d5a94b091"
+  "built_at_commit": "0f3fa6c07c52b0dbb6d76fd2320a089c7430f5a0"
 }

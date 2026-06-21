@@ -9,7 +9,7 @@ interface HeroSectionProps {
   onBookClick: () => void;
 }
 
-export function HeroSection({ onBookClick }: HeroSectionProps) {
+export function HeroSectionV1({ onBookClick }: HeroSectionProps) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {

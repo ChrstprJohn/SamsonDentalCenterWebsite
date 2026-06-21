@@ -175,8 +175,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\components\\ui\\navbar.tsx": {
-    "mtime": 1781925341.9620142,
-    "ast_hash": "aff972f6be59a66b3d753eda5660d82c",
+    "mtime": 1782005003.1142523,
+    "ast_hash": "1164f7ada505e064585ad998c3982f5a",
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\components\\ui\\select.tsx": {
@@ -920,8 +920,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\patients\\components\\landing\\hero-section.tsx": {
-    "mtime": 1781934500.9520006,
-    "ast_hash": "62ba95bdec95113bc43a0ab5e4f867aa",
+    "mtime": 1782004995.5116608,
+    "ast_hash": "286b884073c507a4da6c7f5f1a6e2647",
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\patients\\components\\landing\\services-section.tsx": {
@@ -3752,6 +3752,21 @@
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\public\\images\\hero-bg.png": {
     "mtime": 1781934313.6622763,
     "ast_hash": "f164e6fce335bbb34232adf7c0ae7964",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\components\\ui\\navbar-v1.tsx": {
+    "mtime": 1782004983.271735,
+    "ast_hash": "94854a9cd3c76e5cc61be070a1beea36",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\patients\\components\\landing\\hero-section-v1.tsx": {
+    "mtime": 1782004987.3100207,
+    "ast_hash": "950dec0031d22096ab5704fd84699ed1",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\public\\images\\hero_people_clean.png": {
+    "mtime": 1782003032.7761524,
+    "ast_hash": "6573980a6bfc56c319aac6a6f3bc6fbc",
     "semantic_hash": ""
   }
 }

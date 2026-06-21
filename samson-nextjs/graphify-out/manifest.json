@@ -150,8 +150,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\app\\layout.tsx": {
-    "mtime": 1780214952.9978456,
-    "ast_hash": "df709e7948065a4f990844aa3596d493",
+    "mtime": 1781928671.4087784,
+    "ast_hash": "d77d05076f43b56338a220acc75dc663",
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\components\\emails\\signup-otp-email.tsx": {
@@ -190,8 +190,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\components\\ui\\navbar.tsx": {
-    "mtime": 1781571785.5715113,
-    "ast_hash": "cde14b00910428e8cdea72cce4f4969f",
+    "mtime": 1782005003.1142523,
+    "ast_hash": "1164f7ada505e064585ad998c3982f5a",
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\components\\ui\\select.tsx": {
@@ -455,8 +455,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\appointments\\hooks\\booking\\use-user-booking.spec.ts": {
-    "mtime": 1780228735.16756,
-    "ast_hash": "90a90763dad3c4b3b627556c6d95e4d6",
+    "mtime": 1781998075.2356465,
+    "ast_hash": "5a87142b8fe00a08a0328526bc9f57c9",
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\appointments\\hooks\\booking\\use-user-booking.ts": {
@@ -1045,28 +1045,23 @@
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\patients\\components\\landing\\about-section.tsx": {
-    "mtime": 1780332692.273272,
-    "ast_hash": "2893a2ab2a7f7b7ecd7eb1cf52502c1d",
+    "mtime": 1781932068.988181,
+    "ast_hash": "f4ca592b692c1bdcfc30fe8c28dbd563",
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\patients\\components\\landing\\contact-section.tsx": {
-    "mtime": 1780332704.2922497,
-    "ast_hash": "ff8885a0b8b15006cc92495de6a5f757",
+    "mtime": 1781927861.324216,
+    "ast_hash": "4f40b6b15c8566e2f74c57b3df9016b4",
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\patients\\components\\landing\\gallery-section.tsx": {
-    "mtime": 1780332697.3572354,
-    "ast_hash": "a06495d97500ec24a5b08eda4393dfbd",
-    "semantic_hash": ""
-  },
-  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\patients\\components\\landing\\hero-section.tsx": {
-    "mtime": 1781571769.83399,
-    "ast_hash": "8c9e5159a1e6358db2d1152669253a00",
+    "mtime": 1781927842.5042436,
+    "ast_hash": "ef0e001aa4c41c50c768c2df4468da4b",
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\patients\\components\\landing\\services-section.tsx": {
-    "mtime": 1781569566.3472416,
-    "ast_hash": "f62a5ab61b71f9ad1f676d25fc4301b4",
+    "mtime": 1781932391.3626933,
+    "ast_hash": "7b6a533ba772b2bfba420633c92de65f",
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\patients\\components\\profile\\profile-details-form.tsx": {
@@ -1365,13 +1360,13 @@
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\patients\\views\\landing-view.spec.tsx": {
-    "mtime": 1780330522.8600202,
-    "ast_hash": "091c03c51258c7aa047f5a53d85d668c",
+    "mtime": 1782005678.4716492,
+    "ast_hash": "5c172f48c5cb3f223e4fd771859e9c4e",
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\patients\\views\\landing-view.tsx": {
-    "mtime": 1780332671.4005232,
-    "ast_hash": "fc66cf0a76e62ef709a417fa729c4c41",
+    "mtime": 1782005607.9324644,
+    "ast_hash": "b18296db76de3a8d84e1fb2e9aa020e2",
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\patients\\views\\login-view.spec.tsx": {
@@ -3092,6 +3087,106 @@
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\public\\images\\Right-Hero-Image.png": {
     "mtime": 1781570405.6443462,
     "ast_hash": "ea1ad94a2c549eb7bdc7bfd2cf102bfc",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\components\\ui\\navbar-mobile-drawer.tsx": {
+    "mtime": 1781933868.0172434,
+    "ast_hash": "8a727e41f77666d12860a88bb4c99a34",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\components\\ui\\navbar-v1.tsx": {
+    "mtime": 1782004983.271735,
+    "ast_hash": "94854a9cd3c76e5cc61be070a1beea36",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\patients\\components\\landing\\hero-section-v1.tsx": {
+    "mtime": 1782004987.3100207,
+    "ast_hash": "950dec0031d22096ab5704fd84699ed1",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\patients\\components\\landing\\journey-section.tsx": {
+    "mtime": 1781931939.6313431,
+    "ast_hash": "5b5554ffeb3ac41b716c786c59f72789",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\patients\\components\\landing\\trust-and-stats.tsx": {
+    "mtime": 1781925351.6978638,
+    "ast_hash": "6a9143c2d038c2e39072db89dd211b23",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\TASK\\gege.md": {
+    "mtime": 1781935132.598397,
+    "ast_hash": "ed9ad114b8e891a9f7cd40d285bd2738",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\public\\images\\about-clinic-01.png": {
+    "mtime": 1781573793.0886571,
+    "ast_hash": "530595c2040e4ebc9272eeebf4b5c7bb",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\public\\images\\about-clinic-02.png": {
+    "mtime": 1781573851.660926,
+    "ast_hash": "8c4f064ab3e23fa223b13a569dc0fafd",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\public\\images\\about-procedure-01.png": {
+    "mtime": 1781573839.534634,
+    "ast_hash": "6e4080d1f28ab6e4bd3054204519384d",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\public\\images\\about-smile-01.png": {
+    "mtime": 1781573804.0476143,
+    "ast_hash": "32aa7acf80bf7c0e22957a4f7e8dfacc",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\public\\images\\about-team-01.png": {
+    "mtime": 1781573816.609243,
+    "ast_hash": "4a42b03a423fe9a98a4b9dc5e9bc25d0",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\public\\images\\hero-bg.png": {
+    "mtime": 1781934313.6622763,
+    "ast_hash": "f164e6fce335bbb34232adf7c0ae7964",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\public\\images\\hero_people_clean.png": {
+    "mtime": 1782003032.7761524,
+    "ast_hash": "6573980a6bfc56c319aac6a6f3bc6fbc",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\public\\images\\svc-aligners.png": {
+    "mtime": 1781574556.709437,
+    "ast_hash": "4b791053f50955f90ef52a3a880c66bf",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\public\\images\\svc-diagnostics.png": {
+    "mtime": 1781574509.9892347,
+    "ast_hash": "e77772dad411fd067940ad3c2e5fc33a",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\public\\images\\svc-hygiene.png": {
+    "mtime": 1781574519.9460354,
+    "ast_hash": "e3b98e15f5a1897d58e109cd740946d0",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\public\\images\\svc-implants.png": {
+    "mtime": 1781574544.9988277,
+    "ast_hash": "a5bec0f1d8977b180479dcb18d31c9f8",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\public\\images\\svc-veneers.png": {
+    "mtime": 1781574531.579432,
+    "ast_hash": "0730ba6f7b45a50b55151bfb00c52312",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\patients\\components\\landing\\hero-section-v2.tsx": {
+    "mtime": 1782005596.480692,
+    "ast_hash": "bab3e988e5f2e02b2e5bee41f5a6a0a0",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\public\\images\\teeth-bg.jpg": {
+    "mtime": 1782005539.568587,
+    "ast_hash": "95412461df918b55b7686bdd57f1661a",
     "semantic_hash": ""
   }
 }

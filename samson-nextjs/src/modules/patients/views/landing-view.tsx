@@ -7,7 +7,8 @@ import { Modal } from '@/components/ui/modal';
 import { Button } from '@/components/ui/button';
 
 import { useLandingView } from '../hooks/landing/use-landing-view.hook';
-import { HeroSection } from '../components/landing/hero-section';
+import { HeroSectionV1 } from '../components/landing/hero-section-v1';
+import { HeroSectionV2 } from '../components/landing/hero-section-v2';
 import { ServicesSection } from '../components/landing/services-section';
 import { JourneySection } from '../components/landing/journey-section';
 import { AboutSection } from '../components/landing/about-section';
@@ -79,7 +80,7 @@ export function LandingView({ services, config, isAuthenticated }: LandingViewPr
 
   return (
     <div className="flex flex-col w-full bg-[#FDFDFD] text-[#1D1E1E]">
-      <HeroSection onBookClick={() => handleBookingCTA()} />
+      <HeroSectionV1 onBookClick={() => handleBookingCTA()} />
       <ServicesSection services={activeServices} onSelectService={setSelectedService} />
       <AboutSection />
       <JourneySection />
