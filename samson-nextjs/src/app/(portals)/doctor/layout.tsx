@@ -8,6 +8,8 @@ import { Footer } from '@/components/ui/footer';
 import { Button } from '@/components/ui/button';
 import type { AuthHeaderUser } from '@/modules/patients/hooks/auth/header/use-auth-header.hook';
 
+export const dynamic = 'force-dynamic';
+
 export default async function DoctorPortalLayout({
   children,
 }: {

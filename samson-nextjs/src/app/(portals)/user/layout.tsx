@@ -7,6 +7,8 @@ import { Footer } from '@/components/ui/footer';
 import { UserSidebar } from '@/modules/patients/components/profile/user-sidebar';
 import type { AuthHeaderUser } from '@/modules/patients/hooks/auth/header/use-auth-header.hook';
 
+export const dynamic = 'force-dynamic';
+
 export default async function UserPortalLayout({
   children,
 }: {
