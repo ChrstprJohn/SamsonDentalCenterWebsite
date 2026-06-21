@@ -13,6 +13,7 @@ import { ServicesSection } from '../components/landing/services-section';
 import { JourneySection } from '../components/landing/journey-section';
 import { AboutSection } from '../components/landing/about-section';
 import { GallerySection } from '../components/landing/gallery-section';
+import { TestimonialsSection } from '../components/landing/testimonials-section';
 import { ContactSection } from '../components/landing/contact-section';
 
 interface LandingViewProps {
@@ -83,8 +84,9 @@ export function LandingView({ services, config, isAuthenticated }: LandingViewPr
       <HeroSectionV1 onBookClick={() => handleBookingCTA()} />
       <ServicesSection services={activeServices} onSelectService={setSelectedService} />
       <AboutSection />
-      <JourneySection />
+      {/* <JourneySection /> */}
       <GallerySection />
+      <TestimonialsSection />
       <ContactSection config={config} contactForm={contactForm} />
 
       {/* 🔍 Services Detail Popup Modal */}

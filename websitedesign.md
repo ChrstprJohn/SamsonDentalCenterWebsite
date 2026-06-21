@@ -1,8 +1,203 @@
+export interface ServiceDetail {
+  id: string;
+  title: string;
+  short: string;
+  desc: string;
+  duration: string;
+  image: string;
+  focus: string;
+  method: string;
+  extraDesc: string;
+}
+
+export const servicesData: ServiceDetail[] = [
+  {
+    id: 'diagnostics',
+    title: 'Complex diagnostics',
+    short: 'Comprehensive jaw system modeling, detailed 3D tomographic study & bite diagnostics.',
+    desc: 'Using high-definition scanning technology and digital occlusion tracking for absolute facial structure compatibility.',
+    duration: '60 Mins',
+    image: 'https://lavadental.lv/cms/api/media/file/Complex%20diagnostics-1290x300.avif',
+    focus: 'Dynamic Occlusion & Skeletal Balance',
+    method: 'Interactive 3D Digital Facial Scanning',
+    extraDesc: 'Diagnostics prepare the ultimate architectural map for dental restorations. We analyze your cranial symmetry, jaw sound dynamics, and alignment profiles to craft perfect restoration markers.'
+  },
+  {
+    id: 'hygiene',
+    title: 'Professional hygiene',
+    short: 'Supersonic biofilm extraction, deep mineral micro-therapy, and custom enzyme rinse.',
+    desc: 'Maintaining beautiful bacterial balance and restoring natural enamel light-refraction without pain.',
+    duration: '45 Mins',
+    image: 'https://lavadental.lv/cms/api/media/file/Hygien-600x820.avif',
+    focus: 'Periodontal Eco-system & Stain Clearance',
+    method: 'Advanced Supragingival Airflow Polish',
+    extraDesc: 'Our periodontal spa therapy dissolves mineralized deposits and microscopic bacteria instantly. Enjoy refreshing, natural dental defense using clean warm water technology.'
+  },
+  {
+    id: 'veneers',
+    title: 'Veneers',
+    short: 'Hand-layered microscopic porcelain veneers celebrating facial geometry.',
+    desc: 'Flawlessly customized lightweight shells with optimal custom transparency for cinematic smiles.',
+    duration: '90 Mins',
+    image: 'https://lavadental.lv/cms/api/media/file/Veneers-600x820.avif',
+    focus: 'Custom Light Diffusion & Refraction Shape',
+    method: 'Microscopic Veneer Layer Crafting',
+    extraDesc: 'We treat veneers as true artwork, aligning translucent porcelain segments to your natural tooth orientation. Highly customized surfaces allow natural light to blend flawlessly.'
+  },
+  {
+    id: 'implants',
+    title: 'Dental implants',
+    short: 'Biocompatible titanium & zirconia roots restoring perfect chewing forces.',
+    desc: 'High-precision micro-surgical implants engineered under absolute guidance to preserve jaw health.',
+    duration: '90 Mins',
+    image: 'https://lavadental.lv/cms/api/media/file/Implants-600x820.avif',
+    focus: 'Bio-integrated Osseointegration Align',
+    method: 'Computer-Planned Micro-Surgical Pathway',
+    extraDesc: 'Zirconia restorations merge naturally with structural bone, ensuring lifelong biting comfort and preventing bone reduction. Completely guided treatment is extremely calm.'
+  },
+  {
+    id: 'allonx',
+    title: 'ALL-ON-X',
+    short: 'Full-arch fixed biological structural bridge attached to dedicated points.',
+    desc: 'Complete aesthetic rehabilitation restoration of the chewing system in single-visit sequences.',
+    duration: '180 Mins',
+    image: 'https://lavadental.lv/cms/api/media/file/Aligners-600x820.avif',
+    focus: 'Total System Rehabilitation Support',
+    method: 'Static Computer Dental Pathway Guide',
+    extraDesc: 'Enjoy reliable, full-jaw restoration using beautifully styled titanium-backed premium bridge arches that return full chewing power, youthful contours, and effortless confidence.'
+  },
+  {
+    id: 'sedation',
+    title: 'Sedation and anaesthesia',
+    short: 'Stress-free treatment options using personalized, safe sleep solutions.',
+    desc: 'Absolute peace of mind for delicate procedures under qualified medical supervision and dynamic biosensors.',
+    duration: 'Custom Duration',
+    image: 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?q=80&w=1200&auto=format&fit=crop',
+    focus: 'Absolute Stress Dissolution Protocol',
+    method: 'Fully Monitored Intravenous Comfort',
+    extraDesc: 'Sleep through complex rehabilitation procedures. Feel entirely relaxed and wake up with your completed smiles, bypass clinical anxiety completely.'
+  },
+  {
+    id: 'therapy',
+    title: 'Therapy',
+    short: 'Biomimetic dental fillings, anatomical shape restoration, and custom tooth sealing.',
+    desc: 'Meticulous cavity care using state-of-the-art biological composite matrices matching native dental enamel.',
+    duration: '60 Mins',
+    image: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?q=80&w=1200&auto=format&fit=crop',
+    focus: 'Invisible Restorative Structural Integrity',
+    method: 'Layered Biomimetic Composite Placement',
+    extraDesc: 'Rebuild biological dental geometry utilizing microscopic compound curing. Your updated teeth preserve all visual micro-texture details to behave as real enamel.'
+  },
+  {
+    id: 'endodontics',
+    title: 'Endodontics',
+    short: 'Microscopic root canal treatment preserving vital biological elements.',
+    desc: 'Detailed clinical treatment under 3D computer optical guidance to save structural tooth roots.',
+    duration: '75 Mins',
+    image: 'https://images.unsplash.com/photo-1579684389782-64d84b5e901a?q=80&w=1200&auto=format&fit=crop',
+    focus: 'Microscopic Debridement & Sealing Care',
+    method: 'Continuous Wave 3.2x Microscope Clean',
+    extraDesc: 'Our endodontic team handles micron-level spaces under optical magnification. Eliminating infections from delicate nerve tubules ensures structural permanence.'
+  },
+  {
+    id: 'surgery',
+    title: 'Surgery',
+    short: 'Advanced soft tissue reconstruction, gentle extractions, and guided bone grafting.',
+    desc: 'Minimally invasive biological procedures supporting ideal tissue structure for future restorations.',
+    duration: '90 Mins',
+    image: 'https://images.unsplash.com/photo-1551076805-e1869033e561?q=80&w=1200&auto=format&fit=crop',
+    focus: 'Guided Tissue Generation & Integration',
+    method: 'Platelet-Rich Fibrin Biological Recovery',
+    extraDesc: 'State-of-the-art microsurgery supports optimal cellular recovery times. We apply highly bio-compatible protein matrices to generate rich natural tissues safely.'
+  },
+  {
+    id: 'aligners',
+    title: 'Aligners',
+    short: 'Computerized orthodontic alignment pathways utilizing thin transparent structures.',
+    desc: 'Straighten occlusive channels using invisible computerized aligners prioritizing facial symmetry.',
+    duration: '30 Mins (Consult)',
+    image: 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?q=80&w=1200&auto=format&fit=crop',
+    focus: 'Clear Occlusions & Facial Harmonization',
+    method: 'Computer-Guided Virtual Shifting Models',
+    extraDesc: 'Enjoy dental alignment without clumsy wiring. Computer-calculated teeth shifting increments guarantee predictable paths while keeping you incredibly comfortable.'
+  }
+];
+
+@import "tailwindcss";
+
+@theme {
+  --font-serif: var(--font-serif);
+  --font-sans: var(--font-sans);
+  --font-josefin: var(--font-josefin);
+}
+
+/* Custom minimal utility for smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Luxury Marquee Animation */
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 25s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+import type { Metadata } from 'next';
+import { Inter, Playfair_Display, Josefin_Sans } from 'next/font/google';
+import './globals.css'; // Global styles
+
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-sans',
+  display: 'swap',
+});
+
+const playfair = Playfair_Display({
+  subsets: ['latin'],
+  variable: '--font-serif',
+  display: 'swap',
+});
+
+const josefin = Josefin_Sans({
+  subsets: ['latin'],
+  variable: '--font-josefin',
+  display: 'swap',
+});
+
+export const metadata: Metadata = {
+  title: 'Samson Dental Center | Modern & Minimalistic Dental Care',
+  description: 'Sculpting radiant smiles with architectural precision. Experience top-tier aesthetic dentistry, preventive care, and bespoke restorative treatments at Samson Dental Center.',
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en" className={`${inter.variable} ${playfair.variable} ${josefin.variable}`}>
+      <body suppressHydrationWarning className="bg-[#FCFCFB] text-[#1B1D1D] font-sans antialiased overflow-x-hidden">
+        {children}
+      </body>
+    </html>
+  );
+}
+
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Inter, Playfair_Display, Josefin_Sans } from 'next/font/google';
-import { motion, AnimatePresence, useScroll } from 'motion/react';
+import { motion, AnimatePresence, useScroll, useTransform } from 'motion/react';
 import Link from 'next/link';
 
 const inter = Inter({
@@ -27,7 +222,7 @@ import { servicesData } from './services/data';
 import { 
   Menu, X, Phone, MapPin, Clock, Calendar, Check,
   ShieldCheck, ArrowRight, ArrowUpRight, MoveRight, Sparkles, Heart, Activity,
-  Instagram, Facebook, Map, Star, Award
+  Instagram, Facebook, Map, Star, Award, ChevronLeft, ChevronRight, Maximize2, Mail
 } from 'lucide-react';
 
 // Custom Type for Form Submissions
@@ -67,6 +262,146 @@ const journeySlides = [
   }
 ];
 
+const portfolioItems = [
+  {
+    id: 1,
+    type: 'video',
+    src: 'https://lavadental.lv/cms/api/media/file/v1.webm',
+    tags: ['Dental implants', 'Veneers'],
+    title: 'Precision Implant & Veneer Restoration'
+  },
+  {
+    id: 2,
+    type: 'image',
+    src: 'https://lavadental.lv/cms/api/media/file/2p%C4%93c-7-960x635.avif',
+    tags: ['Veneers'],
+    title: 'Aesthetic Porcelain Veneers Transformation'
+  },
+  {
+    id: 3,
+    type: 'image',
+    src: 'https://lavadental.lv/cms/api/media/file/3p%C4%93c-1-960x635.avif',
+    tags: ['Veneers'],
+    title: 'Custom Shaded Anterior Veneers'
+  },
+  {
+    id: 4,
+    type: 'image',
+    src: 'https://lavadental.lv/cms/api/media/file/1p%C4%93c-2-960x635.avif',
+    tags: ['ALL-ON-X'],
+    title: 'Full Arch ALL-ON-X Rejuvenation'
+  },
+  {
+    id: 5,
+    type: 'image',
+    src: 'https://lavadental.lv/cms/api/media/file/1p%C4%93c-3-960x635.avif',
+    tags: ['ALL-ON-X'],
+    title: 'Comprehensive ALL-ON-X Rehabilitation'
+  },
+  {
+    id: 6,
+    type: 'image',
+    src: 'https://lavadental.lv/cms/api/media/file/2p%C4%93c-1-960x635.avif',
+    tags: ['Endodontics', 'Veneers'],
+    title: 'Integrated Endodontic & Veneer Restoration'
+  },
+  {
+    id: 7,
+    type: 'image',
+    src: 'https://lavadental.lv/cms/api/media/file/3p%C4%93c-2-960x635.avif',
+    tags: ['Veneers'],
+    title: 'Full Smile Veneer Perfecting'
+  },
+  {
+    id: 8,
+    type: 'image',
+    src: 'https://lavadental.lv/cms/api/media/file/3p%C4%93c-3-960x635.avif',
+    tags: ['Veneers', 'Therapy'],
+    title: 'Combined Veneers & Functional Therapy'
+  },
+  {
+    id: 9,
+    type: 'image',
+    src: 'https://lavadental.lv/cms/api/media/file/4p%C4%93c-960x635.avif',
+    tags: ['Endodontics', 'Dental implants'],
+    title: 'Advanced Implantology & Endodontics'
+  },
+  {
+    id: 10,
+    type: 'image',
+    src: 'https://lavadental.lv/cms/api/media/file/1p%C4%93c-8-960x635.avif',
+    tags: ['Professional hygiene', 'Veneers'],
+    title: 'Professional Hygiene & Veneer Finish'
+  }
+];
+
+// Dynamically generate a repeating chain of portfolio items (50 items total, 10 complete sets)
+const repeatedPortfolioItems = Array.from({ length: 50 }, (_, index) => {
+  const baseItem = portfolioItems[index % portfolioItems.length];
+  return {
+    ...baseItem,
+    id: index + 1, // unique ID
+    title: baseItem.title,
+  };
+});
+
+interface PortfolioCardProps {
+  item: typeof repeatedPortfolioItems[0];
+  globalIndex: number;
+  aspectClass: string;
+  onSelect: (index: number) => void;
+}
+
+const PortfolioCard = ({ 
+  item, 
+  globalIndex, 
+  aspectClass, 
+  onSelect 
+}: PortfolioCardProps) => {
+  return (
+    <div 
+      className={`relative w-full overflow-hidden cursor-pointer ${aspectClass} group bg-[#161818]`}
+      onClick={() => onSelect(globalIndex)}
+    >
+      {item.type === 'video' ? (
+        <video
+          src={item.src}
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.02]"
+        />
+      ) : (
+        <img
+          src={item.src}
+          alt={item.title}
+          loading="lazy"
+          className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.02]"
+        />
+      )}
+      
+      {/* Light highlight overlay on hover */}
+      <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+
+      {/* Floating clean sharp tags at bottom-left */}
+      <div 
+        id={`card-tags-${globalIndex}`}
+        className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 z-20 hidden md:flex flex-wrap gap-[6px] sm:gap-2 pointer-events-none"
+      >
+        {item.tags.map(tag => (
+          <span 
+            key={tag}
+            className="bg-[#F5F5F7] text-[#1D1E1E] text-[8px] sm:text-[10px] md:text-[11px] font-sans font-bold uppercase tracking-wider px-2 sm:px-3 py-1 sm:py-1.5 shadow-sm rounded-[1px] select-none"
+          >
+            {tag}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 export default function Home() {
   const [mounted, setMounted] = useState(false);
   // Navigation scroll state
@@ -74,9 +409,7 @@ export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
   
-  // Gallery Filtering
-  const [activeTab, setActiveTab] = useState<'all' | 'clinic' | 'smiles' | 'lounge'>('all');
-  
+
   // Custom Form Booking states
   const [bookingForm, setBookingForm] = useState<BookingInquiry>({
     name: '',
@@ -110,6 +443,17 @@ export default function Home() {
   });
   const [activeStep, setActiveStep] = useState(0);
 
+  // Gallery Parallax scroll references
+  const galleryRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress: galleryScrollYProgress } = useScroll({
+    target: galleryRef,
+    offset: ["start 80px", "end start"]
+  });
+
+  const translateFirst = useTransform(galleryScrollYProgress, [0, 1], [0, -420]);
+  const translateSecond = useTransform(galleryScrollYProgress, [0, 1], [0, 110]);
+  const translateThird = useTransform(galleryScrollYProgress, [0, 1], [0, -420]);
+
   useEffect(() => {
     if (!scrollYProgress) return;
     const unsubscribe = scrollYProgress.on("change", (latest) => {
@@ -118,6 +462,10 @@ export default function Home() {
     });
     return () => unsubscribe();
   }, [scrollYProgress]);
+
+  // Portfolio States
+  const [portfolioVisibleSets, setPortfolioVisibleSets] = useState(3); // Start with 3 sets (15 items) by default
+  const [selectedPortfolioIndex, setSelectedPortfolioIndex] = useState<number | null>(null);
 
   // Monitor desktop scrolling
   useEffect(() => {
@@ -196,48 +544,7 @@ export default function Home() {
   // Services list helper
   const services = servicesData;
 
-  // Gallery images with architectural aesthetics
-  const galleryItems = [
-    {
-      id: 1,
-      category: 'clinic',
-      title: 'Architectural Treatment Suite',
-      img: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?q=80&w=800&auto=format&fit=crop',
-      size: 'span-2 col-span-1'
-    },
-    {
-      id: 2,
-      category: 'lounge',
-      title: 'Therapeutic Quiet Lounge',
-      img: 'https://images.unsplash.com/photo-1606811971618-4486d14f3f99?q=80&w=800&auto=format&fit=crop',
-      size: 'col-span-1'
-    },
-    {
-      id: 3,
-      category: 'clinic',
-      title: 'Micro-surgical Operatory',
-      img: 'https://images.unsplash.com/photo-1513412583855-8d64eb019787?q=80&w=800&auto=format&fit=crop',
-      size: 'col-span-1'
-    },
-    {
-      id: 4,
-      category: 'smiles',
-      title: 'Artisanal Natural Veneers',
-      img: 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?q=80&w=800&auto=format&fit=crop',
-      size: 'col-span-1'
-    },
-    {
-      id: 5,
-      category: 'lounge',
-      title: 'Scent-infused Entry Chamber',
-      img: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=800&auto=format&fit=crop',
-      size: 'col-span-1'
-    }
-  ];
 
-  const filteredGallery = activeTab === 'all' 
-    ? galleryItems 
-    : galleryItems.filter(item => item.category === activeTab);
 
   return (
     <div className={`relative min-h-screen bg-[#FDFDFD] text-[#1D1E1E] ${inter.variable} ${playfair.variable} ${josefin.variable}`}>
@@ -695,55 +1002,59 @@ export default function Home() {
           
           {/* Header Layout */}
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 sm:mb-24 gap-6">
-            <div className="max-w-xl">
-              <span className="text-[10px] tracking-[0.34em] text-[#D94E4E] uppercase font-bold block mb-4">
+            <div className="max-w-[800px]">
+              <span className="text-[11px] sm:text-[12px] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-4 font-sans">
                 Clinical Expertise
               </span>
-              <h2 className="font-serif text-3xl sm:text-5xl font-bold tracking-tight text-[#1D1E1E]">
-                Bespoke Treatment Programs
+              <h2 className="font-sans text-[28px] xs:text-[32px] sm:text-[36px] md:text-[38px] lg:text-[40px] xl:text-[40px] font-normal tracking-[-0.04em] text-[#141515] leading-[1.05]">
+                Dental is a modern practice dedicated to exceptional care in a welcoming environment.
               </h2>
             </div>
-            <p className="text-sm font-light text-gray-500 max-w-sm leading-relaxed">
-              We approach every patient’s anatomy as a clinical masterpiece, designing custom therapeutic strategies that balance structural health and perfect facial balance.
+            <p className="text-[14px] sm:text-[15px] font-normal text-gray-500 max-w-sm leading-[1.65] font-sans pt-2">
+              Our clinic is equipped with the latest technology and staffed by highly trained professionals who prioritize your comfort and well-being.
             </p>
           </div>
 
           {/* First Block: Gorgeous Bento Grid (01 to 05) overlap section */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 relative z-10">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 relative z-10">
               
               {/* Unified Service Cards - Consistent Size & Styling */}
               {services.slice(0, 5).map((svc, idx) => {
                 const words = svc.title.split(' ');
                 const getCardColSpan = (index: number) => {
-                  if (index === 0) return "col-span-2 lg:col-span-4";
-                  return "col-span-1 lg:col-span-1";
+                  if (index === 0) return "col-span-2 md:col-span-4";
+                  return "col-span-1 md:col-span-1";
+                };
+                const getCardHeightClass = (index: number) => {
+                  if (index === 0) return "h-[195px] xs:h-[235px] sm:h-[275px] md:h-[220px] lg:h-[315px]";
+                  return "h-[240px] xs:h-[275px] sm:h-[315px] md:h-[250px] lg:h-[365px]";
                 };
                 return (
                   <Link 
                     key={svc.id} 
                     href={`/services/${svc.id}`}
-                    className={`group relative h-[250px] xs:h-[300px] sm:h-[380px] md:h-[400px] lg:h-[480px] rounded-[16px] sm:rounded-[24px] overflow-hidden shadow-md block ${getCardColSpan(idx)} bg-[#141515]`}
+                    className={`group relative ${getCardHeightClass(idx)} rounded-none overflow-hidden block ${getCardColSpan(idx)} bg-[#141515]`}
                   >
                     <img 
                       src={svc.image} 
                       alt={svc.title}
-                      className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-[1.025] transition-transform duration-750 ease-out filter brightness-[0.75] saturate-[0.95] contrast-[1.01]"
+                      className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-[1.025] transition-transform duration-750 ease-out filter brightness-[0.9] saturate-[0.95] contrast-[1.01]"
                     />
                     {/* Consistent Light-Dark overlay and contrast enhancement */}
-                    <div className="absolute inset-0 bg-[#1D1E1E]/20 z-5 transition-opacity duration-350 group-hover:opacity-10" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent z-10" />
+                    <div className="absolute inset-0 bg-[#1D1E1E]/5 z-5 transition-opacity duration-350 group-hover:opacity-10" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent z-10" />
                     
                     {/* Top Details */}
-                    <span className="absolute top-3 left-3 sm:top-6 sm:left-6 text-white font-josefin font-bold text-[18px] xs:text-[22px] sm:text-[26px] md:text-[30px] z-15">
+                    <span className="absolute top-3 left-3 sm:top-6 sm:left-6 text-white font-josefin font-normal text-[18px] xs:text-[22px] sm:text-[26px] md:text-[26px] z-15">
                       0{idx + 1}
                     </span>
-                    <div className="absolute top-3 right-3 sm:top-6 sm:right-6 w-7 h-7 sm:w-12 sm:h-12 bg-white text-[#141515] group-hover:bg-[#D94E4E] group-hover:text-white rounded-full flex items-center justify-center font-semibold shadow-md z-15 transition-all duration-300">
-                      <MoveRight className="w-3.5 h-3.5 sm:w-5 sm:h-5 transition-transform duration-500 ease-out rotate-[-45deg] group-hover:rotate-0" />
+                    <div className="absolute top-3 right-3 sm:top-6 sm:right-6 w-11 h-11 sm:w-[54px] sm:h-[54px] bg-white text-[#141515] group-hover:bg-[#D94E4E] group-hover:text-white rounded-full flex items-center justify-center font-normal shadow-md z-15 transition-all duration-300">
+                      <MoveRight className="w-5 h-5 sm:w-6 sm:h-6 transition-transform duration-500 ease-out rotate-[-45deg] group-hover:rotate-0" />
                     </div>
 
                     {/* Title (Bottom Left) - Pure White Font consistent with Hero */}
                     <div className="absolute bottom-3 left-3 sm:bottom-6 sm:left-6 z-15 max-w-[85%]">
-                      <h3 className="font-josefin text-left text-[18px] xs:text-[22px] sm:text-[26px] md:text-[30px] font-bold text-white tracking-tight leading-tight">
+                      <h3 className="font-josefin text-left text-[18px] xs:text-[22px] sm:text-[26px] md:text-[35px] font-normal text-white tracking-tight leading-tight">
                         {words.length === 2 ? (
                           <>
                             {words[0]}
@@ -765,11 +1076,9 @@ export default function Home() {
 
         {/* Lower Part / Background Switch: Deep cohesive dark charcoal match to the marquee */}
         {/* Negative margins allow the image grid cards to gorgeously overlap onto the dark section by ~12.5% (45px) */}
-        <div className="bg-[#141515] relative pt-20 pb-24 sm:pb-32 mt-[-45px] z-0">
+        <div className="bg-[#141515] relative pt-[115px] sm:pt-[135px] pb-24 sm:pb-32 mt-[-85px] z-0">
           <div className="max-w-7xl mx-auto px-6 sm:px-12 relative z-10">
             
-            <div className="mb-8 border-b border-[#D94E4E]/15" />
-
             <div className="divide-y divide-[#D94E4E]/10">
               {services.slice(5, 10).map((svc, idx) => (
                 <Link 
@@ -778,20 +1087,32 @@ export default function Home() {
                   className="group flex items-center justify-between py-6 sm:py-8 transition-colors duration-300 hover:bg-[#1C1D1D]/70 px-4 sm:px-6 rounded-2xl block"
                 >
                   {/* Index Left */}
-                  <span className="text-2xl sm:text-3xl font-josefin font-bold text-white/90 group-hover:text-white transition-colors w-12 sm:w-24 text-left">
+                  <span className="text-2xl sm:text-[26px] font-josefin font-normal text-white/75 group-hover:text-white transition-colors w-12 sm:w-24 text-left">
                     {idx + 6 < 10 ? `0${idx + 6}` : idx + 6}
                   </span>
 
                   {/* Title Center - Consistent with Hero typography */}
-                  <h4 className="font-josefin text-lg sm:text-[30px] font-semibold tracking-tight text-white/95 group-hover:text-white transition-colors flex-1 text-center font-josefin">
-                    {svc.title}
+                  <h4 className="font-josefin text-lg sm:text-[35px] font-normal tracking-tight text-white/90 group-hover:text-white transition-colors flex-1 text-center leading-[1.1]">
+                    {(() => {
+                      const listWords = svc.title.split(' ');
+                      if (listWords.length === 2) {
+                        return (
+                          <>
+                            {listWords[0]}
+                            <br />
+                            {listWords[1]}
+                          </>
+                        );
+                      }
+                      return svc.title;
+                    })()}
                   </h4>
 
                   {/* Right container matching width of left container to guarantee true centering of the title */}
                   <div className="w-12 sm:w-24 flex justify-end">
                     {/* Circular Arrow Button (pointing North-East initially, clockwise rot to East under hover) */}
-                    <div className="w-11 h-11 bg-white/5 group-hover:bg-[#D94E4E] rounded-full border border-white/10 flex items-center justify-center text-white/80 group-hover:text-white transition-all duration-300">
-                      <MoveRight className="w-5 h-5 transition-transform duration-500 ease-out rotate-[-45deg] group-hover:rotate-0" />
+                    <div className="w-11 h-11 sm:w-[54px] sm:h-[54px] bg-white/5 group-hover:bg-[#D94E4E] rounded-full border border-white/10 flex items-center justify-center text-white/80 group-hover:text-white transition-all duration-305">
+                      <MoveRight className="w-5 h-5 sm:w-6 sm:h-6 transition-transform duration-500 ease-out rotate-[-45deg] group-hover:rotate-0" />
                     </div>
                   </div>
                 </Link>
@@ -804,7 +1125,7 @@ export default function Home() {
       </section>
 
       {/* 4. About Us / Our Philosophy Section */}
-      <section id="about" className="py-24 sm:py-32 bg-[#FDFDFD] relative">
+      <section id="about" className="py-24 sm:py-32 bg-[#FDFDFD] relative mt-[-85px] z-10">
         <div className="max-w-7xl mx-auto px-6 sm:px-12">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-center">
             
@@ -822,9 +1143,9 @@ export default function Home() {
               </div>
               
               {/* Overlay architectural detail badge */}
-              <div className="absolute -bottom-6 -right-4 sm:right-6 bg-emerald-950 text-white p-6 rounded-2xl max-w-xs shadow-xl font-sans">
-                <p className="font-serif text-2xl font-light tracking-tight leading-none text-emerald-300">
-                  15+ Years
+              <div className="absolute -bottom-6 -right-4 sm:right-6 bg-[#141515] border border-white/10 text-white p-6 rounded-2xl max-w-xs shadow-xl font-sans">
+                <p className="font-serif text-2xl font-light tracking-tight leading-none text-[#D94E4E]">
+                  60+ Years
                 </p>
                 <p className="text-[10px] tracking-widest font-semibold uppercase mt-2 text-white/80">
                   of biological dentistry excellence
@@ -834,10 +1155,10 @@ export default function Home() {
 
             {/* Content Column */}
             <div className="lg:col-span-6">
-              <span className="text-[10px] tracking-[0.34em] text-emerald-800 uppercase font-bold block mb-4">
+              <span className="text-[11px] sm:text-[12px] tracking-[0.25em] text-[#D94E4E] uppercase font-medium block mb-4 font-sans">
                 Redefined Sanctuary
               </span>
-              <h2 className="font-serif text-3xl sm:text-5xl font-light tracking-tight text-[#1D1E1E] leading-tight">
+              <h2 className="font-sans text-3xl sm:text-[44px] lg:text-[48px] font-normal tracking-[-0.03em] text-[#141515] leading-[1.05]">
                 Dental craftsmanship without anxiety.
               </h2>
               
@@ -1009,78 +1330,338 @@ export default function Home() {
       </section>
 
       {/* 5. Pure Visual Gallery Section */}
-      <section id="gallery" className="py-24 bg-[#F3F3EF]/40 relative overflow-hidden">
+      <section 
+        id="gallery" 
+        className="relative bg-[#F5F5F7] overflow-hidden z-20 py-16 md:py-24"
+      >
         <div className="max-w-7xl mx-auto px-6 sm:px-12">
           
-          <div className="flex flex-col items-center text-center mb-16">
-            <span className="text-[10px] tracking-[0.34em] text-emerald-800 uppercase font-bold block mb-4">
-              Modern Portfolio
-            </span>
-            <h2 className="font-serif text-3xl sm:text-5xl font-light tracking-tight text-[#1D1E1E] max-w-2xl">
-              Inside Our Sanctuary
-            </h2>
-            
-            {/* Filter Pills with gentle animation */}
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-2 font-sans text-[11px] tracking-widest font-semibold uppercase">
-              {[
-                { id: 'all', label: 'All Spaces' },
-                { id: 'clinic', label: 'Treatment Suites' },
-                { id: 'smiles', label: 'Artisan Veneers' },
-                { id: 'lounge', label: 'Reception Lounge' }
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
-                  className={`px-5 py-2.5 rounded-full transition-all duration-300 focus:outline-none ${
-                    activeTab === tab.id 
-                      ? 'bg-emerald-950 text-white shadow-sm' 
-                      : 'bg-white/60 text-gray-600 hover:bg-white hover:text-emerald-950'
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
+          {/* Header Layout */}
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 sm:mb-24 gap-6">
+            <div className="max-w-[800px]">
+              <span className="text-[11px] sm:text-[12px] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-4 font-sans">
+                Transformation Gallery
+              </span>
+              <h2 className="font-sans text-[28px] xs:text-[32px] sm:text-[36px] md:text-[38px] lg:text-[40px] xl:text-[40px] font-normal tracking-[-0.04em] text-[#141515] leading-[1.05]">
+                Expert craftsmanship dedicated to restoring pristine harmony and natural smiles.
+              </h2>
             </div>
+            <p className="text-[14px] sm:text-[15px] font-normal text-gray-500 max-w-sm leading-[1.65] font-sans pt-2">
+              Witness the art and science of reconstructive facial surgery through our actual patient transformations, demonstrating pristine cosmetic harmony and clinical perfection.
+            </p>
           </div>
 
-          {/* Grid container with beautiful aspect ratios */}
-          <motion.div 
-            layout
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8"
-            id="gallery-grid"
-          >
-            <AnimatePresence mode="popLayout">
-              {filteredGallery.map((item) => (
+          {/* Image grid top container - targets parallax scroll only from here */}
+          <div ref={galleryRef} className="w-full relative overflow-hidden">
+            {/* Mobile 2-Column Responsive Layout - Contained and padded */}
+            {(() => {
+            const mobileLeft: Array<{ item: typeof repeatedPortfolioItems[0]; globalIndex: number; aspectClass: string }> = [];
+            const mobileRight: Array<{ item: typeof repeatedPortfolioItems[0]; globalIndex: number; aspectClass: string }> = [];
+
+            for (let setIdx = 0; setIdx < portfolioVisibleSets; setIdx++) {
+              const startIndex = setIdx * 5;
+              const isEven = setIdx % 2 === 0;
+              
+              if (isEven) {
+                if (startIndex + 0 < repeatedPortfolioItems.length) {
+                  mobileLeft.push({ 
+                    item: repeatedPortfolioItems[startIndex + 0], 
+                    globalIndex: startIndex + 0,
+                    aspectClass: "aspect-[960/1270]"
+                  });
+                }
+                if (startIndex + 3 < repeatedPortfolioItems.length) {
+                  mobileLeft.push({ 
+                    item: repeatedPortfolioItems[startIndex + 3], 
+                    globalIndex: startIndex + 3,
+                    aspectClass: "aspect-[960/635]"
+                  });
+                }
+
+                if (startIndex + 1 < repeatedPortfolioItems.length) {
+                  mobileRight.push({ 
+                    item: repeatedPortfolioItems[startIndex + 1], 
+                    globalIndex: startIndex + 1,
+                    aspectClass: "aspect-[960/635]"
+                  });
+                }
+                if (startIndex + 2 < repeatedPortfolioItems.length) {
+                  mobileRight.push({ 
+                    item: repeatedPortfolioItems[startIndex + 2], 
+                    globalIndex: startIndex + 2,
+                    aspectClass: "aspect-[960/635]"
+                  });
+                }
+                if (startIndex + 4 < repeatedPortfolioItems.length) {
+                  mobileRight.push({ 
+                    item: repeatedPortfolioItems[startIndex + 4], 
+                    globalIndex: startIndex + 4,
+                    aspectClass: "aspect-[960/635]"
+                  });
+                }
+              } else {
+                if (startIndex + 0 < repeatedPortfolioItems.length) {
+                  mobileLeft.push({ 
+                    item: repeatedPortfolioItems[startIndex + 0], 
+                    globalIndex: startIndex + 0,
+                    aspectClass: "aspect-[960/635]"
+                  });
+                }
+                if (startIndex + 1 < repeatedPortfolioItems.length) {
+                  mobileLeft.push({ 
+                    item: repeatedPortfolioItems[startIndex + 1], 
+                    globalIndex: startIndex + 1,
+                    aspectClass: "aspect-[960/635]"
+                  });
+                }
+                if (startIndex + 2 < repeatedPortfolioItems.length) {
+                  mobileLeft.push({ 
+                    item: repeatedPortfolioItems[startIndex + 2], 
+                    globalIndex: startIndex + 2,
+                    aspectClass: "aspect-[960/635]"
+                  });
+                }
+
+                if (startIndex + 4 < repeatedPortfolioItems.length) {
+                  mobileRight.push({ 
+                    item: repeatedPortfolioItems[startIndex + 4], 
+                    globalIndex: startIndex + 4,
+                    aspectClass: "aspect-[960/1270]"
+                  });
+                }
+                if (startIndex + 3 < repeatedPortfolioItems.length) {
+                  mobileRight.push({ 
+                    item: repeatedPortfolioItems[startIndex + 3], 
+                    globalIndex: startIndex + 3,
+                    aspectClass: "aspect-[960/635]"
+                  });
+                }
+              }
+            }
+
+            return (
+              <div id="mobile-gallery-cols" className="flex md:hidden w-full gap-1 bg-transparent overflow-hidden">
+                {/* Left Column of Mobile */}
+                <div className="flex-1 flex flex-col gap-1">
+                  {mobileLeft.map(({ item, globalIndex, aspectClass }) => (
+                    <PortfolioCard 
+                      key={`mob-l-${globalIndex}`}
+                      item={item} 
+                      globalIndex={globalIndex} 
+                      aspectClass={aspectClass} 
+                      onSelect={setSelectedPortfolioIndex} 
+                    />
+                  ))}
+                </div>
+
+                {/* Right Column of Mobile */}
+                <div className="flex-1 flex flex-col gap-1">
+                  {mobileRight.map(({ item, globalIndex, aspectClass }) => (
+                    <PortfolioCard 
+                      key={`mob-r-${globalIndex}`}
+                      item={item} 
+                      globalIndex={globalIndex} 
+                      aspectClass={aspectClass} 
+                      onSelect={setSelectedPortfolioIndex} 
+                    />
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* Desktop 3-Column Alternating Grid Layout */}
+          {(() => {
+            const col1Items: Array<{ item: typeof repeatedPortfolioItems[0]; globalIndex: number; aspectClass: string }> = [];
+            const col2Items: Array<{ item: typeof repeatedPortfolioItems[0]; globalIndex: number; aspectClass: string }> = [];
+            const col3Items: Array<{ item: typeof repeatedPortfolioItems[0]; globalIndex: number; aspectClass: string }> = [];
+
+            for (let setIndex = 0; setIndex < portfolioVisibleSets; setIndex++) {
+              const startIndex = setIndex * 5;
+              const setSubset = repeatedPortfolioItems.slice(startIndex, startIndex + 5);
+              
+              // Set 0 has tall on Left. Set 1 and Set 2 have tall on Right.
+              const isTallLeft = (setIndex === 0);
+
+              if (isTallLeft) {
+                if (setSubset[0]) col1Items.push({ item: setSubset[0], globalIndex: startIndex + 0, aspectClass: "aspect-[960/1270]" });
+                if (setSubset[1]) col2Items.push({ item: setSubset[1], globalIndex: startIndex + 1, aspectClass: "aspect-[960/635]" });
+                if (setSubset[3]) col2Items.push({ item: setSubset[3], globalIndex: startIndex + 3, aspectClass: "aspect-[960/635]" });
+                if (setSubset[2]) col3Items.push({ item: setSubset[2], globalIndex: startIndex + 2, aspectClass: "aspect-[960/635]" });
+                if (setSubset[4]) col3Items.push({ item: setSubset[4], globalIndex: startIndex + 4, aspectClass: "aspect-[960/635]" });
+              } else {
+                if (setSubset[0]) col1Items.push({ item: setSubset[0], globalIndex: startIndex + 0, aspectClass: "aspect-[960/635]" });
+                if (setSubset[2]) col1Items.push({ item: setSubset[2], globalIndex: startIndex + 2, aspectClass: "aspect-[960/635]" });
+                if (setSubset[1]) col2Items.push({ item: setSubset[1], globalIndex: startIndex + 1, aspectClass: "aspect-[960/635]" });
+                if (setSubset[3]) col2Items.push({ item: setSubset[3], globalIndex: startIndex + 3, aspectClass: "aspect-[960/635]" });
+                if (setSubset[4]) col3Items.push({ item: setSubset[4], globalIndex: startIndex + 4, aspectClass: "aspect-[960/1270]" });
+              }
+            }
+
+            // Append extra visual tail images to Column 1 and Column 3 to ensure they don't show blank space when shifted highly upwards.
+            const extraStartIndex = portfolioVisibleSets * 5;
+            
+            // Col 1 extra image (1 image)
+            const col1Extra = repeatedPortfolioItems[extraStartIndex % repeatedPortfolioItems.length];
+            col1Items.push({ item: col1Extra, globalIndex: extraStartIndex % repeatedPortfolioItems.length, aspectClass: "aspect-[960/635]" });
+
+            // Col 3 extra image (1 image)
+            const col3Extra = repeatedPortfolioItems[(extraStartIndex + 1) % repeatedPortfolioItems.length];
+            col3Items.push({ item: col3Extra, globalIndex: (extraStartIndex + 1) % repeatedPortfolioItems.length, aspectClass: "aspect-[960/635]" });
+
+            return (
+              <div className="hidden md:grid grid-cols-3 gap-1.5 w-full bg-transparent">
+                {/* Column 1 (Left Column) - Glides highly upwards */}
+                <motion.div style={{ y: translateFirst }} className="flex flex-col gap-1.5">
+                  {col1Items.map(({ item, globalIndex, aspectClass }, idx) => (
+                    <PortfolioCard 
+                      key={`col1-${globalIndex}-${idx}`} 
+                      item={item} 
+                      globalIndex={globalIndex} 
+                      aspectClass={aspectClass} 
+                      onSelect={setSelectedPortfolioIndex} 
+                    />
+                  ))}
+                </motion.div>
+
+                {/* Column 2 (Center Column) - Glides slightly downwards */}
+                <motion.div style={{ y: translateSecond }} className="flex flex-col gap-1.5">
+                  {col2Items.map(({ item, globalIndex, aspectClass }, idx) => (
+                    <PortfolioCard 
+                      key={`col2-${globalIndex}-${idx}`} 
+                      item={item} 
+                      globalIndex={globalIndex} 
+                      aspectClass={aspectClass} 
+                      onSelect={setSelectedPortfolioIndex} 
+                    />
+                  ))}
+                </motion.div>
+
+                {/* Column 3 (Right Column) - Glides highly upwards */}
+                <motion.div style={{ y: translateThird }} className="flex flex-col gap-1.5">
+                  {col3Items.map(({ item, globalIndex, aspectClass }, idx) => (
+                    <PortfolioCard 
+                      key={`col3-${globalIndex}-${idx}`} 
+                      item={item} 
+                      globalIndex={globalIndex} 
+                      aspectClass={aspectClass} 
+                      onSelect={setSelectedPortfolioIndex} 
+                    />
+                  ))}
+                </motion.div>
+              </div>
+            );
+          })()}
+          </div>
+
+        </div>
+
+        {/* Lightbox Modal Slider Component */}
+        <AnimatePresence>
+          {selectedPortfolioIndex !== null && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 flex items-center justify-center bg-[#070808]/95 backdrop-blur-md p-4 sm:p-10 select-none"
+            >
+              <div 
+                className="absolute inset-0 cursor-zoom-out" 
+                onClick={() => setSelectedPortfolioIndex(null)} 
+              />
+              
+              {/* Close Button */}
+              <button
+                onClick={() => setSelectedPortfolioIndex(null)}
+                className="hidden md:flex absolute top-6 right-6 z-[60] w-12 h-12 rounded-full border border-white/10 hover:border-white/30 bg-[#161818]/60 backdrop-blur-md items-center justify-center text-white hover:bg-white/10 transition-colors focus:outline-none focus:ring-1 focus:ring-[#D94E4E]"
+                aria-label="Close Lightbox"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              {/* Slider Content Wrapper */}
+              <div className="relative w-full max-w-5xl h-full max-h-[80vh] flex flex-col justify-center items-center z-10 pointer-events-none">
+                
+                {/* Inner Stage Card */}
                 <motion.div
-                  key={item.id}
-                  layout
+                  key={selectedPortfolioIndex}
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.4 }}
-                  className="group relative h-[320px] rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300"
+                  transition={{ duration: 0.3 }}
+                  className="relative w-full h-full flex flex-col items-center justify-center pointer-events-auto"
                 >
-                  <img 
-                    src={item.img} 
-                    alt={item.title}
-                    className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
-                  />
-                  {/* Minimal caption details on hover */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
-                    <div>
-                      <span className="text-[10px] uppercase font-semibold text-emerald-300 tracking-widest">
-                        {item.category}
-                      </span>
-                      <h4 className="text-white font-serif text-lg font-light tracking-wide mt-1">
-                        {item.title}
-                      </h4>
+                  {repeatedPortfolioItems[selectedPortfolioIndex].type === 'video' ? (
+                    <video
+                      src={repeatedPortfolioItems[selectedPortfolioIndex].src}
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      controls
+                      className="max-w-full max-h-full rounded-2xl object-contain shadow-2xl border border-white/10 bg-black"
+                    />
+                  ) : (
+                    <img
+                      src={repeatedPortfolioItems[selectedPortfolioIndex].src}
+                      alt={repeatedPortfolioItems[selectedPortfolioIndex].title}
+                      className="max-w-full max-h-full rounded-2xl object-contain shadow-2xl border border-white/10"
+                    />
+                  )}
+
+                  {/* Caption details at bottom */}
+                  <div className="absolute bottom-[-60px] text-center w-full px-4">
+                    <h4 className="text-white font-serif text-lg sm:text-xl font-light tracking-wide">
+                      {repeatedPortfolioItems[selectedPortfolioIndex].title}
+                    </h4>
+                    <div className="flex justify-center gap-2 mt-2">
+                      {repeatedPortfolioItems[selectedPortfolioIndex].tags.map(tag => (
+                        <span 
+                          key={tag}
+                          className="text-[9px] font-sans font-medium uppercase tracking-widest text-[#BAC1C1] bg-[#161818] border border-white/5 px-2.5 py-1 rounded"
+                        >
+                          {tag}
+                        </span>
+                      ))}
                     </div>
                   </div>
                 </motion.div>
-              ))}
-            </AnimatePresence>
-          </motion.div>
-        </div>
+
+              </div>
+
+              {/* Precise Navigation arrows */}
+              {/* Left Arrow */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedPortfolioIndex((prev) => 
+                    prev !== null ? (prev === 0 ? repeatedPortfolioItems.length - 1 : prev - 1) : 0
+                  );
+                }}
+                className="hidden md:flex absolute left-4 sm:left-8 z-[60] w-12 h-12 rounded-full border border-white/10 hover:border-white/30 bg-[#161818]/60 backdrop-blur-md items-center justify-center text-white hover:bg-white/10 transition-colors focus:outline-none focus:ring-1 focus:ring-[#D94E4E]"
+                aria-label="Previous Transformation"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+
+              {/* Right Arrow */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedPortfolioIndex((prev) => 
+                    prev !== null ? (prev === repeatedPortfolioItems.length - 1 ? 0 : prev + 1) : 0
+                  );
+                }}
+                className="hidden md:flex absolute right-4 sm:right-8 z-[60] w-12 h-12 rounded-full border border-white/10 hover:border-white/30 bg-[#161818]/60 backdrop-blur-md items-center justify-center text-white hover:bg-white/10 transition-colors focus:outline-none focus:ring-1 focus:ring-[#D94E4E]"
+                aria-label="Next Transformation"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+
+            </motion.div>
+          )}
+        </AnimatePresence>
+
       </section>
 
       {/* 6. Contact & Secure Booking Inquiry Section */}
@@ -1091,21 +1672,21 @@ export default function Home() {
             {/* Information Column */}
             <div className="lg:col-span-5 flex flex-col justify-between">
               <div>
-                <span className="text-[10px] tracking-[0.34em] text-emerald-800 uppercase font-bold block mb-4">
+                <span className="text-[11px] sm:text-[12px] tracking-[0.25em] text-[#D94E4E] uppercase font-medium block mb-4 font-sans">
                   Reservations
                 </span>
-                <h2 className="font-serif text-3xl sm:text-5xl font-light tracking-tight text-[#1D1E1E]">
+                <h2 className="font-sans text-3xl sm:text-[44px] lg:text-[48px] font-normal tracking-[-0.03em] text-[#141515] leading-[1.05]">
                   Inquire Consultation
                 </h2>
-                <p className="mt-6 text-sm sm:text-[15px] font-light text-gray-600 leading-relaxed">
+                <p className="mt-6 text-[14px] sm:text-[15px] font-normal text-gray-500 leading-[1.65] font-sans">
                   Reserve a time slot with our master clinicians for a detailed anatomical diagnostics overview. Our reservation concierges will follow up shortly to curate your bespoke visit.
                 </p>
 
                 {/* Practical coordinates */}
                 <div className="mt-10 space-y-6">
                   <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-emerald-950 border border-gray-100 shrink-0">
-                      <Phone className="w-4 h-4" />
+                    <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-[#141515] border border-gray-100 shrink-0">
+                      <Phone className="w-4 h-4 text-[#D94E4E]" />
                     </div>
                     <div>
                       <p className="text-[10px] tracking-widest uppercase font-semibold text-gray-400">Direct Desk</p>
@@ -1114,8 +1695,8 @@ export default function Home() {
                   </div>
 
                   <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-emerald-950 border border-gray-100 shrink-0">
-                      <MapPin className="w-4 h-4" />
+                    <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-[#141515] border border-gray-100 shrink-0">
+                      <MapPin className="w-4 h-4 text-[#D94E4E]" />
                     </div>
                     <div>
                       <p className="text-[10px] tracking-widest uppercase font-semibold text-gray-400">Oasis Address</p>
@@ -1124,8 +1705,8 @@ export default function Home() {
                   </div>
 
                   <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-emerald-950 border border-gray-100 shrink-0">
-                      <Clock className="w-4 h-4" />
+                    <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-[#141515] border border-gray-100 shrink-0">
+                      <Clock className="w-4 h-4 text-[#D94E4E]" />
                     </div>
                     <div>
                       <p className="text-[10px] tracking-widest uppercase font-semibold text-gray-400">Consultation Hours</p>
@@ -1138,7 +1719,7 @@ export default function Home() {
               {/* Accreditations bar */}
               <div className="mt-12 lg:mt-0 pt-8 border-t border-gray-100 flex items-center gap-6">
                 <span className="text-[9px] uppercase font-bold tracking-[0.25em] text-gray-400">Accredited Member:</span>
-                <span className="text-xs font-serif italic text-emerald-950 tracking-wider">American Academy of Cosmetic Dentistry</span>
+                <span className="text-xs font-serif italic text-gray-900 tracking-wider">American Academy of Cosmetic Dentistry</span>
               </div>
             </div>
 
@@ -1175,7 +1756,7 @@ export default function Home() {
                             value={bookingForm.name}
                             onChange={handleInputChange}
                             placeholder="Eleanor Vance"
-                            className="w-full bg-white border border-[#E4E4DC] px-4 py-3 rounded-2xl text-xs sm:text-sm focus:outline-none focus:border-emerald-800 transition-colors"
+                            className="w-full bg-white border border-[#E4E4DC] px-4 py-3 rounded-2xl text-xs sm:text-sm focus:outline-none focus:border-[#D94E4E] transition-colors"
                           />
                         </div>
                         <div className="flex flex-col gap-2">
@@ -1187,7 +1768,7 @@ export default function Home() {
                             value={bookingForm.email}
                             onChange={handleInputChange}
                             placeholder="eleanor@domain.com"
-                            className="w-full bg-white border border-[#E4E4DC] px-4 py-3 rounded-2xl text-xs sm:text-sm focus:outline-none focus:border-emerald-800 transition-colors"
+                            className="w-full bg-white border border-[#E4E4DC] px-4 py-3 rounded-2xl text-xs sm:text-sm focus:outline-none focus:border-[#D94E4E] transition-colors"
                           />
                         </div>
                       </div>
@@ -1202,7 +1783,7 @@ export default function Home() {
                             value={bookingForm.phone}
                             onChange={handleInputChange}
                             placeholder="+1 (555) 000-0000"
-                            className="w-full bg-white border border-[#E4E4DC] px-4 py-3 rounded-2xl text-xs sm:text-sm focus:outline-none focus:border-emerald-800 transition-colors"
+                            className="w-full bg-white border border-[#E4E4DC] px-4 py-3 rounded-2xl text-xs sm:text-sm focus:outline-none focus:border-[#D94E4E] transition-colors"
                           />
                         </div>
                         <div className="flex flex-col gap-2">
@@ -1211,11 +1792,11 @@ export default function Home() {
                             name="service"
                             value={bookingForm.service}
                             onChange={handleInputChange}
-                            className="w-full bg-white border border-[#E4E4DC] px-4 py-3 rounded-2xl text-xs sm:text-sm focus:outline-none focus:border-emerald-800 transition-colors appearance-none"
+                            className="w-full bg-white border border-[#E4E4DC] px-4 py-3 rounded-2xl text-xs sm:text-sm focus:outline-none focus:border-[#D94E4E] transition-colors appearance-none"
                           >
                             <option value="Cosmetic Dentistry">Aesthetic Dentistry (Porcelain / Veneers)</option>
                             <option value="Restorative Care">Restorative Care (Structural biological implants)</option>
-                            <option value="Preventative Wellness">Preventative Wellness (Therapy & Deep cleaning)</option>
+                            <option value="Preventative Wellness">Preventative Wellness (Therapy &amp; Deep cleaning)</option>
                             <option value="Clear Orthodontics">Clear Alignment pathway</option>
                           </select>
                         </div>
@@ -1229,7 +1810,7 @@ export default function Home() {
                           required
                           value={bookingForm.date}
                           onChange={handleInputChange}
-                          className="w-full bg-white border border-[#E4E4DC] px-4 py-3 rounded-2xl text-xs sm:text-sm focus:outline-none focus:border-emerald-800 transition-colors"
+                          className="w-full bg-white border border-[#E4E4DC] px-4 py-3 rounded-2xl text-xs sm:text-sm focus:outline-none focus:border-[#D94E4E] transition-colors"
                         />
                       </div>
 
@@ -1241,14 +1822,14 @@ export default function Home() {
                           value={bookingForm.message}
                           onChange={handleInputChange}
                           placeholder="Please note any sensory preferences, prior dentist notes, or targets..."
-                          className="w-full bg-white border border-[#E4E4DC] px-4 py-3 rounded-2xl text-xs sm:text-sm focus:outline-none focus:border-emerald-800 transition-colors resize-none"
+                          className="w-full bg-white border border-[#E4E4DC] px-4 py-3 rounded-2xl text-xs sm:text-sm focus:outline-none focus:border-[#D94E4E] transition-colors resize-none"
                         />
                       </div>
 
                       <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="w-full py-4 bg-emerald-950 text-white rounded-2xl text-xs font-semibold tracking-widest uppercase hover:bg-emerald-900 transition-all duration-300 shadow-md flex items-center justify-center gap-2 mt-4 cursor-pointer disabled:pointer-events-none disabled:opacity-50"
+                        className="w-full py-4 bg-[#141515] text-white rounded-2xl text-xs font-semibold tracking-widest uppercase hover:bg-[#D94E4E] transition-all duration-300 shadow-md flex items-center justify-center gap-2 mt-4 cursor-pointer disabled:pointer-events-none disabled:opacity-50"
                       >
                         {isSubmitting ? (
                           'Submitting Security Consultation...'
@@ -1267,7 +1848,7 @@ export default function Home() {
                       animate={{ opacity: 1, scale: 1 }}
                       className="text-center py-16 space-y-4"
                     >
-                      <div className="w-16 h-16 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-800 mx-auto">
+                      <div className="w-16 h-16 rounded-full bg-red-50 border border-red-100 flex items-center justify-center text-[#D94E4E] mx-auto">
                         <Check className="w-8 h-8" />
                       </div>
                       <h3 className="font-serif text-2xl font-light text-gray-900 mt-6">
@@ -1288,7 +1869,7 @@ export default function Home() {
                             message: ''
                           });
                         }}
-                        className="mt-8 px-6 py-2.5 bg-emerald-950 hover:bg-emerald-900 text-white text-xs font-semibold rounded-full uppercase tracking-widest transition-all shadow-sm cursor-pointer"
+                        className="mt-8 px-6 py-2.5 bg-[#141515] hover:bg-[#D94E4E] text-white text-xs font-semibold rounded-full uppercase tracking-widest transition-all shadow-sm cursor-pointer"
                       >
                         Submit another request
                       </button>
@@ -1302,12 +1883,47 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Bottom Primary CTA Section (Matching the mockup) */}
+      <section className="relative w-full overflow-hidden bg-black py-24 sm:py-32 flex items-center min-h-[500px] sm:min-h-[600px] z-10" id="bottom-cta">
+        {/* Background Image of Dentist clinic / friendly greeting medical specialist */}
+        <div className="absolute inset-0 z-0">
+          <picture>
+            <img 
+              src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?q=80&w=2070&auto=format&fit=crop" 
+              alt="Schedule an appointment with us today"
+              className="w-full h-full object-cover object-[center_35%] filter brightness-[0.45] contrast-[1.05]"
+            />
+          </picture>
+          <div className="absolute inset-0 bg-gradient-to-r from-[#141515]/95 via-[#141515]/75 to-transparent z-0" />
+        </div>
+
+        {/* Content Details aligned to left */}
+        <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-12 w-full text-white">
+          <div className="max-w-2xl space-y-6 sm:space-y-8">
+            <h2 className="font-sans text-[36px] xs:text-[42px] sm:text-[48px] md:text-[54px] lg:text-[60px] font-semibold tracking-[-0.038em] text-white leading-[1.05] leading-tight">
+              Schedule an appointment with us today!
+            </h2>
+            <p className="text-[14px] xs:text-[15px] sm:text-[16px] md:text-[17px] font-normal text-white/85 max-w-xl leading-[1.6] font-sans">
+              Whether you&apos;re visiting for a routine check-up or a more advanced procedure, we ensure your oral health is in the best hands, helping you achieve a confident, healthy smile.
+            </p>
+            <div className="pt-2">
+              <a 
+                href="#contact"
+                className="inline-block px-8 py-4 sm:px-9 sm:py-4.5 bg-white text-[#141515] hover:bg-[#D94E4E] hover:text-white rounded-full text-xs font-semibold tracking-widest uppercase transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] shadow-lg"
+              >
+                Schedule an appointment
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* 7. Footer */}
-      <footer className="bg-[#101915] text-[#DCE2DF]/80 border-t border-white/5 py-16 sm:py-20 font-sans text-xs">
-        <div className="max-w-7xl mx-auto px-6 sm:px-12 grid grid-cols-1 md:grid-cols-4 gap-12">
+      <footer className="bg-[#141515] text-[#DCE2DF]/80 border-t border-white/5 py-16 sm:py-20 font-sans text-xs">
+        <div className="max-w-7xl mx-auto px-6 sm:px-12 grid grid-cols-1 md:grid-cols-3 gap-12 sm:gap-16">
           
-          {/* Logo & Philosophy column */}
-          <div className="md:col-span-2 space-y-6">
+          {/* Column 1: Brand & Description */}
+          <div className="space-y-6">
             <div className="flex items-center gap-3">
               <span className="w-8 h-8 rounded-full border border-[#DCE2DF] flex items-center justify-center font-serif text-sm font-bold text-[#E6EBE7]">S</span>
               <div className="flex flex-col">
@@ -1315,8 +1931,8 @@ export default function Home() {
                 <span className="text-[8px] tracking-[0.3em] uppercase opacity-75 leading-none mt-1">Dental Center</span>
               </div>
             </div>
-            <p className="font-light text-[13px] leading-relaxed max-w-sm text-gray-300">
-              A private treatment sanctuary shaping clinical tooth care around sensory peace, architectural proportions, and world-class cosmetic craft.
+            <p className="font-light text-[13px] leading-relaxed text-gray-300 max-w-sm">
+              State-of-the-art dental care tailored around your comfort and health. Providing premier cosmetic, preventive, and surgical services.
             </p>
             <div className="flex items-center gap-4 text-emerald-300">
               <a href="#" className="p-2 hover:text-[#E6EBE7] transition-all" aria-label="Instagram"><Instagram className="w-4 h-4" /></a>
@@ -1324,44 +1940,77 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Quick links to sections */}
+          {/* Column 2: Operating Hours */}
           <div>
-            <h4 className="font-serif text-sm font-semibold text-[#E6EBE7] mb-6 tracking-wider">Navigation</h4>
-            <ul className="space-y-4 font-medium tracking-wider uppercase text-[10px]">
-              {navItems.map((item) => (
-                <li key={item.label}>
-                  <a href={item.href} className="hover:text-emerald-300 transition-colors">
-                    {item.label}
-                  </a>
-                </li>
+            <h4 className="font-serif text-sm font-semibold text-[#E6EBE7] mb-6 tracking-wider uppercase">Operating Hours</h4>
+            <div className="flex flex-col gap-2.5 font-light text-[13px] text-gray-300 max-w-sm">
+              {[
+                { day: 'Mon', hours: '9:00 AM - 5:00 PM' },
+                { day: 'Tue', hours: '9:00 AM - 5:00 PM' },
+                { day: 'Wed', hours: '9:00 AM - 5:00 PM' },
+                { day: 'Thu', hours: '9:00 AM - 5:00 PM' },
+                { day: 'Fri', hours: '9:00 AM - 5:00 PM' },
+                { day: 'Sat', hours: 'Closed' },
+                { day: 'Sun', hours: 'Closed' }
+              ].map((item) => (
+                <div key={item.day} className="flex justify-between border-b border-white/5 pb-1">
+                  <span className="font-medium text-gray-400">{item.day}</span>
+                  <span className={item.hours === 'Closed' ? 'text-gray-500 font-medium' : 'text-[#E6EBE7]'}>
+                    {item.hours}
+                  </span>
+                </div>
               ))}
-            </ul>
+            </div>
           </div>
 
-          {/* Business & Location Details */}
-          <div>
-            <h4 className="font-serif text-sm font-semibold text-[#E6EBE7] mb-6 tracking-wider">Coordinates</h4>
-            <address className="not-italic space-y-4 font-light text-gray-300 leading-relaxed">
-              <p>
-                120 Sansome Street, Suite 400<br />
-                San Francisco, CA 94104
-              </p>
-              <p>
-                info@samsondental.com<br />
-                +1 (555) 234-8890
-              </p>
-            </address>
+          {/* Column 3: Contact & Legal */}
+          <div className="space-y-6">
+            <div>
+              <h4 className="font-serif text-sm font-semibold text-[#E6EBE7] mb-6 tracking-wider uppercase">Get In Touch</h4>
+              <address className="not-italic space-y-4 font-light text-gray-300 leading-relaxed text-[13px]">
+                <p className="flex items-start gap-2.5">
+                  <MapPin className="w-4 h-4 text-[#D94E4E] shrink-0 mt-0.5" />
+                  <span>
+                    123 Dental Way, Suite A<br />
+                    San Francisco, CA 94104
+                  </span>
+                </p>
+                <p className="flex items-center gap-2.5">
+                  <Phone className="w-4 h-4 text-[#D94E4E] shrink-0" />
+                  <a href="tel:(555) 0101" className="hover:text-white transition-colors">
+                    (555) 0101
+                  </a>
+                </p>
+                <p className="flex items-center gap-2.5">
+                  <Mail className="w-4 h-4 text-[#D94E4E] shrink-0" />
+                  <a href="mailto:contact@samsondental.com" className="hover:text-white transition-colors">
+                    contact@samsondental.com
+                  </a>
+                </p>
+              </address>
+            </div>
+
+            <div className="pt-4 border-t border-white/5">
+              <div className="flex gap-4 font-sans text-[10px] font-medium tracking-wider uppercase text-gray-400">
+                <Link href="/terms" className="hover:text-[#D94E4E] transition-colors">
+                  Terms of Service
+                </Link>
+                <span className="text-white/10">•</span>
+                <Link href="/privacy" className="hover:text-[#D94E4E] transition-colors">
+                  Privacy Policy
+                </Link>
+              </div>
+            </div>
           </div>
 
         </div>
 
         {/* Bottom copyright area */}
         <div className="max-w-7xl mx-auto px-6 sm:px-12 mt-16 pt-8 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4 text-gray-400">
-          <p>© {new Date().getFullYear()} Samson Dental Center. Created with ultimate care.</p>
-          <div className="flex gap-6">
-            <a href="#" className="hover:text-white transition-all">Privacy Guideline</a>
-            <a href="#" className="hover:text-white transition-all">Terms of Sanctuary Use</a>
-          </div>
+          <p>© {new Date().getFullYear()} Samson Dental Center. All rights reserved.</p>
+          <p className="text-gray-500 font-light flex items-center gap-1.5 text-[11px]">
+            Designed for premium healthcare.
+          </p>
         </div>
       </footer>
 
@@ -1546,99 +2195,4 @@ export default function Home() {
 
     </div>
   );
-}
-
-
-import type { Metadata } from 'next';
-import { Inter, Playfair_Display, Josefin_Sans } from 'next/font/google';
-import './globals.css'; // Global styles
-
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-sans',
-  display: 'swap',
-});
-
-const playfair = Playfair_Display({
-  subsets: ['latin'],
-  variable: '--font-serif',
-  display: 'swap',
-});
-
-const josefin = Josefin_Sans({
-  subsets: ['latin'],
-  variable: '--font-josefin',
-  display: 'swap',
-});
-
-export const metadata: Metadata = {
-  title: 'Samson Dental Center | Modern & Minimalistic Dental Care',
-  description: 'Sculpting radiant smiles with architectural precision. Experience top-tier aesthetic dentistry, preventive care, and bespoke restorative treatments at Samson Dental Center.',
-};
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="en" className={`${inter.variable} ${playfair.variable} ${josefin.variable}`}>
-      <body suppressHydrationWarning className="bg-[#FCFCFB] text-[#1B1D1D] font-sans antialiased overflow-x-hidden">
-        {children}
-      </body>
-    </html>
-  );
-}
-
-
-@import "tailwindcss";
-
-@theme {
-  --font-serif: var(--font-serif);
-  --font-sans: var(--font-sans);
-  --font-josefin: var(--font-josefin);
-}
-
-/* Custom minimal utility for smooth scrolling */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Luxury Marquee Animation */
-@keyframes marquee {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
-}
-
-.animate-marquee {
-  display: flex;
-  width: max-content;
-  animation: marquee 25s linear infinite;
-}
-
-.animate-marquee:hover {
-  animation-play-state: paused;
-}
-
-
-import * as React from "react"
-
-const MOBILE_BREAKPOINT = 768
-
-export function useIsMobile() {
-  const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined)
-
-  React.useEffect(() => {
-    const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
-    const onChange = () => {
-      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
-    }
-    mql.addEventListener("change", onChange)
-    setTimeout(() => {
-      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
-    }, 0)
-    return () => mql.removeEventListener("change", onChange)
-  }, [])
-
-  return !!isMobile
 }

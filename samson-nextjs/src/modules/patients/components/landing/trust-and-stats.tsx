@@ -33,10 +33,10 @@ export function TrustAndStats({ variant = 'v1' }: TrustAndStatsProps) {
             {stats.map((stat, idx) => (
               <React.Fragment key={`mobile-1-${idx}`}>
                 <div className="flex flex-col items-center justify-center text-center shrink-0">
-                  <span className={`${isV2 ? 'text-[#0070F3]' : 'text-[#D94E4E]'} font-serif text-2xl sm:text-3xl font-light mb-1 select-none`}>
+                  <span className={`${isV2 ? 'text-[#0070F3]' : 'text-[#D94E4E]'} font-serif text-[clamp(20px,2vw+12px,28px)] font-light mb-1 select-none`}>
                     {stat.value}
                   </span>
-                  <span className={`font-sans text-[9px] sm:text-[10px] tracking-[0.16em] ${isV2 ? 'text-[#1D1E1E]/80' : 'text-white/80'} font-medium uppercase leading-relaxed max-w-[130px] sm:max-w-[160px] whitespace-normal`}>
+                  <span className={`font-sans text-[clamp(8.5px,0.5vw+7px,10px)] tracking-[0.16em] ${isV2 ? 'text-[#1D1E1E]/80' : 'text-white/80'} font-medium uppercase leading-relaxed max-w-[130px] sm:max-w-[160px] whitespace-normal`}>
                     {stat.label}
                   </span>
                 </div>
@@ -54,10 +54,10 @@ export function TrustAndStats({ variant = 'v1' }: TrustAndStatsProps) {
             {stats.map((stat, idx) => (
               <React.Fragment key={`mobile-2-${idx}`}>
                 <div className="flex flex-col items-center justify-center text-center shrink-0">
-                  <span className={`${isV2 ? 'text-[#0070F3]' : 'text-[#D94E4E]'} font-serif text-2xl sm:text-3xl font-light mb-1 select-none`}>
+                  <span className={`${isV2 ? 'text-[#0070F3]' : 'text-[#D94E4E]'} font-serif text-[clamp(20px,2vw+12px,28px)] font-light mb-1 select-none`}>
                     {stat.value}
                   </span>
-                  <span className={`font-sans text-[9px] sm:text-[10px] tracking-[0.16em] ${isV2 ? 'text-[#1D1E1E]/80' : 'text-white/80'} font-medium uppercase leading-relaxed max-w-[130px] sm:max-w-[160px] whitespace-normal`}>
+                  <span className={`font-sans text-[clamp(8.5px,0.5vw+7px,10px)] tracking-[0.16em] ${isV2 ? 'text-[#1D1E1E]/80' : 'text-white/80'} font-medium uppercase leading-relaxed max-w-[130px] sm:max-w-[160px] whitespace-normal`}>
                     {stat.label}
                   </span>
                 </div>
@@ -75,8 +75,8 @@ export function TrustAndStats({ variant = 'v1' }: TrustAndStatsProps) {
         <div className={`grid grid-cols-5 gap-4 divide-x ${isV2 ? 'divide-gray-200' : 'divide-[#D94E4E]/15'}`}>
           {stats.map((stat, idx) => (
             <div key={`desktop-${idx}`} className="flex flex-col items-center justify-center text-center px-4">
-              <span className={`${isV2 ? 'text-[#0070F3]' : 'text-[#D94E4E]'} font-serif text-4xl font-light mb-2.5`}>{stat.value}</span>
-              <span className={`font-sans text-[10.5px] tracking-[0.16em] ${isV2 ? 'text-[#1D1E1E]/80' : 'text-white/80'} font-medium uppercase leading-relaxed max-w-[180px]`}>
+              <span className={`${isV2 ? 'text-[#0070F3]' : 'text-[#D94E4E]'} font-serif text-[clamp(28px,2vw+16px,40px)] font-light mb-2.5`}>{stat.value}</span>
+              <span className={`font-sans text-[clamp(9.5px,0.2vw+9px,11px)] tracking-[0.16em] ${isV2 ? 'text-[#1D1E1E]/80' : 'text-white/80'} font-medium uppercase leading-relaxed max-w-[180px]`}>
                 {stat.label}
               </span>
             </div>
