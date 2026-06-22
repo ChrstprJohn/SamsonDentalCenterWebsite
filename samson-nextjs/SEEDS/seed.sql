@@ -8,13 +8,39 @@ INSERT INTO services (name, description, duration_minutes, price, service_type, 
 ('Tooth Extraction', 'Safe and professional tooth removal.', 45, 2000.00, 'GENERAL', true),
 ('Root Canal Therapy', 'Endodontic treatment for severely decayed or infected teeth.', 60, 8000.00, 'SPECIALIZED', true),
 ('Orthodontic Consultation', 'Assessment for braces, aligners, and dental realignment.', 30, 500.00, 'SPECIALIZED', true),
-('Composite Filling', 'Restoration of tooth decay with natural composite materials.', 30, 1200.00, 'GENERAL', true);
+('Composite Filling', 'Restoration of tooth decay with natural composite materials.', 30, 1200.00, 'GENERAL', true)
+ON CONFLICT DO NOTHING;
 
--- Note: To seed doctors, you must first create them through Supabase Auth (or insert into auth.users manually), 
--- because the `users` table has a foreign key constraint referencing `auth.users(id)`. 
--- Once users are created with role 'DOCTOR', you can map them in `doctor_services` and `doctor_schedules`.
+-- 2. Update pre-existing Admin and Secretary Accounts metadata and roles
+UPDATE auth.users 
+SET raw_user_meta_data = jsonb_set(
+      jsonb_set(
+        jsonb_set(COALESCE(raw_user_meta_data, '{}'::jsonb), '{role}', '"ADMIN"'),
+        '{firstName}', '"System"'
+      ),
+      '{lastName}', '"Admin"'
+    )
+WHERE email = 'admin@example.com';
 
--- 2. Seed Clinic Config Settings
+UPDATE auth.users 
+SET raw_user_meta_data = jsonb_set(
+      jsonb_set(
+        jsonb_set(COALESCE(raw_user_meta_data, '{}'::jsonb), '{role}', '"SECRETARY"'),
+        '{firstName}', '"Clinic"'
+      ),
+      '{lastName}', '"Secretary"'
+    )
+WHERE email = 'secretary@example.com';
+
+UPDATE public.users 
+SET role = 'ADMIN'::public.user_role
+WHERE email = 'admin@example.com';
+
+UPDATE public.users 
+SET role = 'SECRETARY'::public.user_role
+WHERE email = 'secretary@example.com';
+
+-- 3. Seed Clinic Config Settings
 INSERT INTO clinic_config (clinic_name, address, email, phone, operating_hours, is_booking_open, max_reschedules, allow_same_day_booking, calendar_render_days, social_links)
 VALUES (
     'Samson Dental Center',
@@ -38,4 +64,5 @@ VALUES (
         {"platform": "Facebook", "url": "https://facebook.com/samsondental"},
         {"platform": "Instagram", "url": "https://instagram.com/samsondental"}
     ]'::jsonb
-);
+)
+ON CONFLICT (is_singleton) DO NOTHING;
