@@ -125,6 +125,21 @@ All of the following actions must be confirmed via a **confirmation popup** befo
 - View and edit personal information (name, contact details).
 - Secretary accounts are created and managed by admins.
 
+
+---
+
+## Direct Manual Appointment Creation
+
+Secretaries and admins can schedule appointments directly from their portal dashboard for walk-ins or phone calls. The flow mirrors the step-by-step structure of the Convert Request task, but dynamically handles patient identity.
+
+### 1. Patient Identity Modes
+- **Existing Patient (Search-First):** The secretary searches for an existing registered user by Name, Email, or Phone. Selecting a user automatically populates and disables/locks their profile details (First Name, Middle Name, Last Name, Suffix, Email, Phone Number) to protect data integrity, and links the appointment to their `userId`.
+- **New Patient / Guest:** If no account exists, fields remain fully editable. The secretary manually inputs patient info (First Name, Middle Name, Last Name, Suffix, optional Email, and Phone Number) along with a `patientNote` (mapped to `user_note` in the database). The appointment is created with `userId: null` (Guest Mode). To keep guest contact info accessible, it is stored via `appointment_inquiries` marked as `CONVERTED` and linked to the appointment.
+
+### 2. Email Validation Rules
+- **Online Guest Inquiries:** Email is **Required** to protect against automated spam and ensure a reliable async notification delivery channel.
+- **Manual Secretary Booking:** Email is **Optional**. Since the secretary is coordinating in real-time (walk-in or phone call), they can skip email validation to book slots for elderly patients or urgent cases who do not have/use email. A Phone Number is collected instead.
+
 ---
 
 ## Secretary Role Capabilities Summary
@@ -138,9 +153,11 @@ All of the following actions must be confirmed via a **confirmation popup** befo
 | Reschedule appointments | ✅ (with reason + confirmation) |
 | Mark appointments as completed | ✅ (with confirmation) |
 | Check-in / Check-out patients | ✅ |
+| Direct manual booking creation | ✅ (with Search-First + Optional Email) |
 | View invoices | ✅ |
 | Finalize draft invoices | ✅ |
 | View audit logs | ✅ |
 | View email logs | ✅ |
 | Edit own profile | ✅ |
 | Create/manage other accounts | ❌ (admin only) |
+

@@ -480,13 +480,13 @@
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\appointments\\repositories\\booking\\appointment-booking.commands.spec.ts": {
-    "mtime": 1781369462.0097685,
-    "ast_hash": "5094dbf1b38adad2d838c6509a82e693",
+    "mtime": 1782107444.1318505,
+    "ast_hash": "965a1e6b6d1ac8920fadd5d7e52d5821",
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\appointments\\repositories\\booking\\appointment-booking.commands.ts": {
-    "mtime": 1781369462.0097685,
-    "ast_hash": "5041f46184ce1283a5773daeeab760b9",
+    "mtime": 1782107430.049793,
+    "ast_hash": "c817021db668e2c26289a3b7fcd394e2",
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\appointments\\repositories\\clinic\\clinic-appointments.queries.spec.ts": {
@@ -2675,8 +2675,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\appointments\\dtos\\exports.ts": {
-    "mtime": 1781366031.0178287,
-    "ast_hash": "8e8ed91b76e45b80d2e732d591b2d117",
+    "mtime": 1782107294.5223417,
+    "ast_hash": "3fe24b5fc0fd77ab360707965bd0bbe9",
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\appointments\\dtos\\patient\\get-appointment-by-id.dto.spec.ts": {
@@ -3347,6 +3347,56 @@
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\public\\images\\teeth-bg.png": {
     "mtime": 1782006533.9996994,
     "ast_hash": "50eb3ab28237903c10d2327a9f496d36",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\migrations\\20260622120000_add_manual_booking_rpc.sql": {
+    "mtime": 1782107282.5221777,
+    "ast_hash": "732cc287be51817ae199bc8db2851e01",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\appointments\\actions\\booking\\create-manual-booking.action.spec.ts": {
+    "mtime": 1782107607.7158775,
+    "ast_hash": "72bb7c249ce8f1d6d24b492d47d3a7e0",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\appointments\\actions\\booking\\create-manual-booking.action.ts": {
+    "mtime": 1782107589.0250545,
+    "ast_hash": "92c4377986501acf6ffb19c088d4ae04",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\appointments\\dtos\\booking\\create-manual-booking.dto.spec.ts": {
+    "mtime": 1782106937.4466932,
+    "ast_hash": "f33b8fbf75362f5653b141badbc0d4ee",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\appointments\\dtos\\booking\\create-manual-booking.dto.ts": {
+    "mtime": 1782106928.1891942,
+    "ast_hash": "4b9eb511b50664dafd744aa88371deb5",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\appointments\\repositories\\booking\\create-manual-booking.command.spec.ts": {
+    "mtime": 1782107451.8826263,
+    "ast_hash": "97bfdb0cf3bbb23c71249731c2f5b706",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\appointments\\repositories\\booking\\create-manual-booking.command.ts": {
+    "mtime": 1782107502.6777017,
+    "ast_hash": "f56cfe2e5630df6f6c4b333281ea5e9e",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\appointments\\use-cases\\booking\\create-manual-booking.use-case.spec.ts": {
+    "mtime": 1782107542.4924948,
+    "ast_hash": "642fd2ade1d2a924c6ee4515cd051a7f",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\appointments\\use-cases\\booking\\create-manual-booking.use-case.ts": {
+    "mtime": 1782107536.3251722,
+    "ast_hash": "eaf1d1b77a54b272710b60feaec35930",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\TASK\\task-secretarybooking.md": {
+    "mtime": 1782107637.8017037,
+    "ast_hash": "3ae1310926d48c8755ddee014b618425",
     "semantic_hash": ""
   }
 }

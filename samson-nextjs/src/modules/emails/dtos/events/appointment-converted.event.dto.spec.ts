@@ -55,4 +55,12 @@ describe('appointmentConvertedEventSchema', () => {
     const result = appointmentConvertedEventSchema.safeParse(invalidPayload);
     expect(result.success).toBe(false);
   });
+
+  it('should reject missing guestEmail', () => {
+    const payloadWithoutEmail = { ...validPayload };
+    delete (payloadWithoutEmail as any).guestEmail;
+
+    const result = appointmentConvertedEventSchema.safeParse(payloadWithoutEmail);
+    expect(result.success).toBe(false);
+  });
 });

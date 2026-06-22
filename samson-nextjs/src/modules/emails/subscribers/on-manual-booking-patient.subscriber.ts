@@ -1,21 +1,29 @@
 import { createAdminClient } from '@/shared/database/server';
 import { ResendService } from '@/shared/services/email/resend.service';
-import { appointmentConvertedEventSchema } from '../dtos/events/appointment-converted.event.dto';
+import { manualBookingPatientEventSchema } from '../dtos/events/manual-booking-patient.event.dto';
 import { formatShortDate, formatClinicTime, calculateEndTimeFromIso } from '@/shared/utils/date.util';
 
-export const onAppointmentConvertedSubscriber = {
+export const onManualBookingPatientSubscriber = {
   /**
-   * Handles the APPOINTMENT_CONVERTED_FROM_INQUIRY event by sending a confirmation email.
-   * Resolves service and doctor names before sending.
+   * Handles APPOINTMENT_MANUALLY_BOOKED_PATIENT.
+   * Registered patient always has email — fetched from users table.
    */
   async handle(payload: Record<string, any>): Promise<void> {
-    // Contract Validation
-    const parsed = appointmentConvertedEventSchema.parse(payload);
-    const { appointmentId, serviceId, doctorId, date, startTime, durationMinutes, guestName, guestEmail } = parsed;
+    const parsed = manualBookingPatientEventSchema.parse(payload);
+    const { appointmentId, patientId, serviceId, doctorId, date, startTime, durationMinutes } = parsed;
 
     const supabaseAdmin = await createAdminClient();
 
-    // 1. Fetch Service details
+    const { data: patient, error: patientError } = await supabaseAdmin
+      .from('users')
+      .select('email, first_name, middle_name, last_name, suffix')
+      .eq('id', patientId)
+      .single();
+
+    if (patientError || !patient) {
+      throw new Error(`Failed to fetch patient for outbox email: ${patientError?.message || 'Not found'}`);
+    }
+
     const { data: service, error: serviceError } = await supabaseAdmin
       .from('services')
       .select('name')
@@ -26,7 +34,6 @@ export const onAppointmentConvertedSubscriber = {
       throw new Error(`Failed to fetch service for outbox email: ${serviceError?.message || 'Not found'}`);
     }
 
-    // 2. Fetch Doctor details
     const { data: doctor, error: doctorError } = await supabaseAdmin
       .from('users')
       .select('first_name, last_name')
@@ -37,24 +44,23 @@ export const onAppointmentConvertedSubscriber = {
       throw new Error(`Failed to fetch doctor for outbox email: ${doctorError?.message || 'Not found'}`);
     }
 
-    // Calculations & Formats
+    const patientName = [patient.first_name, patient.middle_name, patient.last_name, patient.suffix]
+      .filter(Boolean)
+      .join(' ')
+      .trim();
+
     const doctorName = `Dr. ${doctor.first_name} ${doctor.last_name}`;
     const dateStr = formatShortDate(date);
-
     const start = new Date(startTime);
     const end = calculateEndTimeFromIso(startTime, durationMinutes);
     const timeRangeStr = `${formatClinicTime(start)} - ${formatClinicTime(end)}`;
 
-    const subject = 'Appointment Confirmed – Samson Dental Center';
-
-
-    // Send email using Resend
     await ResendService.sendTemplatedEmail(
-      guestEmail,
-      subject,
+      patient.email,
+      'Appointment Confirmed – Samson Dental Center',
       'appointment_confirmed',
       {
-        patientName: guestName,
+        patientName,
         serviceName: service.name,
         doctorName,
         dateStr,
@@ -62,5 +68,5 @@ export const onAppointmentConvertedSubscriber = {
         appointmentId,
       }
     );
-  }
+  },
 };

@@ -32,3 +32,4 @@ export const executeBookingTransactionCommand = (supabase: SupabaseClient) => {
     return { appointmentId: appointmentId as string };
   };
 };
+

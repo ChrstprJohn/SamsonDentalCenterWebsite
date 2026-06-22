@@ -53,6 +53,50 @@ export type Database = {
           },
         ]
       }
+      guest_contacts: {
+        Row: {
+          id: string
+          appointment_id: string
+          first_name: string
+          middle_name: string | null
+          last_name: string
+          suffix: string | null
+          phone_number: string
+          email: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          appointment_id: string
+          first_name: string
+          middle_name?: string | null
+          last_name: string
+          suffix?: string | null
+          phone_number: string
+          email?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          appointment_id?: string
+          first_name?: string
+          middle_name?: string | null
+          last_name?: string
+          suffix?: string | null
+          phone_number?: string
+          email?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guest_contacts_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: true
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       appointments: {
         Row: {
           clinical_notes: string | null
@@ -62,7 +106,7 @@ export type Database = {
           doctor_id: string
           end_time: string
           id: string
-          patient_id: string
+          patient_id: string | null
           reschedule_count: number
           service_id: string
           start_time: string
@@ -79,7 +123,7 @@ export type Database = {
           doctor_id: string
           end_time: string
           id?: string
-          patient_id: string
+          patient_id?: string | null
           reschedule_count?: number
           service_id: string
           start_time: string
@@ -96,7 +140,7 @@ export type Database = {
           doctor_id?: string
           end_time?: string
           id?: string
-          patient_id?: string
+          patient_id?: string | null
           reschedule_count?: number
           service_id?: string
           start_time?: string
