@@ -57,10 +57,18 @@ All codebase updates must strictly follow the **Functional CQRS mod-monolith pat
 
 ## 5. Notification Subscribers & Dropped Action
 
+All files created in this section must strictly follow the Mod-Monolith layer and file naming standards:
+
 ### 5.1. Conversion Email Notification
-- [ ] Create `on-appointment-converted.subscriber.ts` to email the guest patient upon successful conversion (containing confirmed Date, Time, Doctor, and Service details).
-- [ ] Register `APPOINTMENT_CONVERTED_FROM_INQUIRY` event in `src/orchestrators/event-subscribers.ts`.
+- [ ] Create `src/modules/emails/subscribers/on-appointment-converted.subscriber.ts` & `.spec.ts`
+  - Listens to outbox events and triggers Resend email delivery to guest email.
+- [ ] Register `APPOINTMENT_CONVERTED_FROM_INQUIRY` event inside `src/orchestrators/event-subscribers.ts`.
 
 ### 5.2. Dropping Inquiries (Rejections/Unreachable Guest leads)
-- [ ] Create repository command/query to update `appointment_inquiries` status to `DROPPED` and store secretary comments.
-- [ ] Create use-case & server action for `dropInquiryAction` (allowing the secretary to dismiss a lead if unreachable).
+- [ ] Create `src/modules/appointments/dtos/booking/drop-inquiry.dto.ts` & `.spec.ts`
+  - Validates payload: `inquiryId`, `secretaryNotes` (optional reason).
+- [ ] Create repository commands inside `src/modules/appointments/repositories/booking/appointment-inquiries.commands.ts`
+  - Add functional command `dropInquiryCommand(supabase)` changing status to `DROPPED` and saving notes.
+- [ ] Create `src/modules/appointments/use-cases/booking/drop-inquiry.use-case.ts` & `.spec.ts`
+- [ ] Create `src/modules/appointments/actions/booking/drop-inquiry.action.ts` & `.spec.ts`
+  - Server action wrapper restricted to `SECRETARY` or `ADMIN` roles.
