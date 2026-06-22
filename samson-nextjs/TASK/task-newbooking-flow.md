@@ -54,3 +54,13 @@ All codebase updates must strictly follow the **Functional CQRS mod-monolith pat
     - [x] `submit-booking.dto.spec.ts`
     - [x] `submit-booking.use-case.spec.ts`
     - [x] `appointment-booking.commands.spec.ts`
+
+## 5. Notification Subscribers & Dropped Action
+
+### 5.1. Conversion Email Notification
+- [ ] Create `on-appointment-converted.subscriber.ts` to email the guest patient upon successful conversion (containing confirmed Date, Time, Doctor, and Service details).
+- [ ] Register `APPOINTMENT_CONVERTED_FROM_INQUIRY` event in `src/orchestrators/event-subscribers.ts`.
+
+### 5.2. Dropping Inquiries (Rejections/Unreachable Guest leads)
+- [ ] Create repository command/query to update `appointment_inquiries` status to `DROPPED` and store secretary comments.
+- [ ] Create use-case & server action for `dropInquiryAction` (allowing the secretary to dismiss a lead if unreachable).
