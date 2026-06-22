@@ -51,6 +51,7 @@ const appointmentDbSchema = z.object({
   start_time: z.string(),
   end_time: z.string(),
   status: appointmentStatusEnum,
+  source: z.enum(['SELF_BOOKED', 'STAFF_CREATED']).optional().default('SELF_BOOKED'),
   user_note: z.string().nullable().optional(),
   status_reason: z.string().nullable().optional(),
   proposed_date: z.string().nullable().optional(),
@@ -81,7 +82,7 @@ const appointmentDbSchema = z.object({
 
 export const appointmentDtoSchema = appointmentDbSchema.transform((data) => ({
   id: data.id,
-  patientId: data.patient_id,
+  patientId: data.patient_id || null,
   dependentId: data.dependent_id || null,
   serviceId: data.service_id,
   doctorId: data.doctor_id,
@@ -89,6 +90,7 @@ export const appointmentDtoSchema = appointmentDbSchema.transform((data) => ({
   startTime: data.start_time,
   endTime: data.end_time,
   status: data.status,
+  source: data.source,
   userNote: data.user_note || null,
   statusReason: data.status_reason || null,
   proposedDate: data.proposed_date || null,

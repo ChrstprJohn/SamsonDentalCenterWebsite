@@ -21,11 +21,36 @@
 - [x] Create a new SQL RPC or database helper for Inquiry Conversion that sets the created appointment's source to `STAFF_CREATED` and status to `APPROVED` while updating the inquiry status to `CONVERTED` and storing the link.
 
 ## 4. Codebase, DTOs & Test Files
-- [ ] Update Backend/Frontend DTO models for Appointments:
-    - [ ] Update Zod schema `submitBookingSchema` in `submit-booking.dto.ts` to accommodate optional patient account IDs or staff-created properties if needed.
-    - [ ] Add `source` field mapping in the TypeScript Appointment DTO mapper.
-- [ ] Update repository command executor `executeBookingTransactionCommand` in `appointment-booking.commands.ts` to forward `source` if required.
-- [ ] Review and update Vitest specs:
-    - [ ] `submit-booking.dto.spec.ts`
-    - [ ] `submit-booking.use-case.spec.ts`
-    - [ ] `appointment-booking.commands.spec.ts`
+
+All codebase updates must strictly follow the **Functional CQRS mod-monolith patterns** defined in `1-ARCHITECTURE.md` and `1.5-CODING-PATTERNS.md`:
+- **Naming Standard:** Use double-extension kebab-case names (`*.dto.ts`, `*.use-case.ts`, `*.action.ts`, `*.commands.ts`, `*.queries.ts`) with co-located `.spec.ts` files.
+- **DTOs:** Define output mappers using Zod's `.transform()` pipeline to translate database snake_case to application camelCase.
+- **Dependency Injection:** Localized functional closures (no OOP classes or classes injection).
+
+### 4.1. Guest Inquiry Flow (Landing Page Form)
+- [x] Create `src/modules/appointments/dtos/booking/submit-inquiry.dto.ts` & `.spec.ts`
+  - Validates guest details: `firstName`, `middleName`, `lastName`, `suffix`, `phoneNumber`, `email`, `preferredServiceId`, `preferredDate`, `patientNote`.
+- [x] Create `src/modules/appointments/repositories/booking/appointment-inquiries.commands.ts` & `.spec.ts`
+  - Functional command: `createInquiryCommand(supabase)` returning a camelCased transformed DTO.
+- [x] Create `src/modules/appointments/use-cases/booking/submit-inquiry.use-case.ts` & `.spec.ts`
+- [x] Create `src/modules/appointments/actions/booking/submit-inquiry.action.ts` & `.spec.ts`
+
+### 4.2. Inquiry Conversion Flow (Secretary Dashboard Form)
+- [x] Create `src/modules/appointments/dtos/booking/convert-inquiry.dto.ts` & `.spec.ts`
+  - Validates conversion input: `inquiryId`, `serviceId`, `doctorId`, `date`, `startTime`, `endTime`, `patientNote`, `secretaryNotes`.
+- [x] Create `src/modules/appointments/repositories/booking/appointment-conversion.commands.ts` & `.spec.ts`
+  - Functional command: `convertInquiryToAppointmentCommand(supabase)` invoking database RPC `convert_inquiry_to_appointment`.
+- [x] Create `src/modules/appointments/use-cases/booking/convert-inquiry.use-case.ts` & `.spec.ts`
+  - Reuses availability query checks to dynamically prevent overlaps.
+- [x] Create `src/modules/appointments/actions/booking/convert-inquiry.action.ts` & `.spec.ts`
+
+### 4.3. Existing Appointment & DTO Schema Alignment
+- [x] Update `submit-booking.dto.ts` Zod schema to accommodate nullable account parameters if required (Verified: no changes needed).
+- [x] Add `source` field mapping in the TypeScript Appointment DTO mapper.
+- [x] Update repository command executor `executeBookingTransactionCommand` in `appointment-booking.commands.ts` to include `SELF_BOOKED` source context (Verified: handled via SQL function default).
+
+### 4.4. Testing & Validation Specs
+- [x] Review and update existing Vitest specs:
+    - [x] `submit-booking.dto.spec.ts`
+    - [x] `submit-booking.use-case.spec.ts`
+    - [x] `appointment-booking.commands.spec.ts`

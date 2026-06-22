@@ -1,0 +1,31 @@
+import { SupabaseClient } from '@supabase/supabase-js';
+import { SubmitInquiryDto, InquiryResponseDto, inquiryResponseSchema } from '../../dtos/booking/submit-inquiry.dto';
+
+export const createInquiryCommand = (supabase: SupabaseClient) => {
+  return async (data: SubmitInquiryDto): Promise<InquiryResponseDto> => {
+    const { data: result, error } = await supabase
+      .from('appointment_inquiries')
+      .insert([
+        {
+          first_name: data.firstName,
+          middle_name: data.middleName || null,
+          last_name: data.lastName,
+          suffix: data.suffix || null,
+          phone_number: data.phoneNumber,
+          email: data.email,
+          preferred_service_id: data.preferredServiceId,
+          preferred_date: data.preferredDate,
+          patient_note: data.patientNote || null,
+          status: 'NEW',
+        },
+      ])
+      .select()
+      .single();
+
+    if (error || !result) {
+      throw new Error(`Failed to create guest inquiry: ${error?.message || 'Unknown database error'}`);
+    }
+
+    return inquiryResponseSchema.parse(result);
+  };
+};
