@@ -13,6 +13,8 @@ CREATE TYPE service_type AS ENUM ('GENERAL', 'SPECIALIZED');
 CREATE TYPE appointment_status AS ENUM ('PENDING', 'APPROVED', 'REJECTED', 'CANCELLED', 'RESCHEDULE_REQUESTED', 'DISPLACED', 'CHECKED_IN', 'TREATMENT_RENDERED', 'COMPLETED', 'NO_SHOW');
 CREATE TYPE invoice_status AS ENUM ('DRAFT', 'FINALIZED', 'PAID', 'VOID');
 CREATE TYPE payment_method AS ENUM ('CASH', 'CARD', 'HMO');
+CREATE TYPE inquiry_status AS ENUM ('NEW', 'CONVERTED', 'DROPPED');
+CREATE TYPE appointment_source AS ENUM ('SELF_BOOKED', 'STAFF_CREATED');
 
 -- 3. CORE TABLES
 
@@ -107,7 +109,7 @@ CREATE TABLE clinic_config (
 -- APPOINTMENTS
 CREATE TABLE appointments (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    patient_id UUID REFERENCES users(id) ON DELETE RESTRICT NOT NULL,
+    patient_id UUID REFERENCES users(id) ON DELETE RESTRICT, -- Nullable to allow guest appointments converted from inquiries
     dependent_id UUID REFERENCES dependents(id) ON DELETE RESTRICT,
     service_id UUID REFERENCES services(id) ON DELETE RESTRICT NOT NULL,
     doctor_id UUID REFERENCES users(id) ON DELETE RESTRICT NOT NULL,
@@ -115,6 +117,7 @@ CREATE TABLE appointments (
     start_time TIMESTAMPTZ NOT NULL,
     end_time TIMESTAMPTZ NOT NULL,
     status appointment_status DEFAULT 'PENDING'::appointment_status NOT NULL,
+    source appointment_source DEFAULT 'SELF_BOOKED'::appointment_source NOT NULL,
     user_note TEXT,
     status_reason TEXT,
     clinical_notes TEXT, 
@@ -132,6 +135,25 @@ CREATE TABLE appointments (
         tstzrange(start_time, end_time) WITH &&
     ),
     CONSTRAINT valid_appointment_time CHECK (start_time < end_time)
+);
+
+-- APPOINTMENT_INQUIRIES (For landing page unauthenticated guest booking leads)
+CREATE TABLE appointment_inquiries (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    first_name TEXT NOT NULL,
+    middle_name TEXT,
+    last_name TEXT NOT NULL,
+    suffix TEXT,
+    phone_number TEXT NOT NULL,
+    email TEXT NOT NULL,
+    preferred_service_id UUID REFERENCES services(id) ON DELETE RESTRICT NOT NULL,
+    preferred_date DATE NOT NULL,
+    patient_note TEXT,
+    status inquiry_status DEFAULT 'NEW'::inquiry_status NOT NULL,
+    secretary_notes TEXT,
+    linked_appointment_id UUID REFERENCES appointments(id) ON DELETE SET NULL,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 -- APPOINTMENT_STATUS_HISTORY (Ledger for status changes)
@@ -192,6 +214,7 @@ CREATE TRIGGER update_services_modtime BEFORE UPDATE ON services FOR EACH ROW EX
 CREATE TRIGGER update_doctor_schedules_modtime BEFORE UPDATE ON doctor_schedules FOR EACH ROW EXECUTE FUNCTION update_modified_column();
 CREATE TRIGGER update_clinic_config_modtime BEFORE UPDATE ON clinic_config FOR EACH ROW EXECUTE FUNCTION update_modified_column();
 CREATE TRIGGER update_appointments_modtime BEFORE UPDATE ON appointments FOR EACH ROW EXECUTE FUNCTION update_modified_column();
+CREATE TRIGGER update_appointment_inquiries_modtime BEFORE UPDATE ON appointment_inquiries FOR EACH ROW EXECUTE FUNCTION update_modified_column();
 CREATE TRIGGER update_invoices_modtime BEFORE UPDATE ON invoices FOR EACH ROW EXECUTE FUNCTION update_modified_column();
 
 -- ============================================================================
@@ -306,6 +329,37 @@ USING (
   ((auth.jwt() -> 'user_metadata'::text) ->> 'role'::text) IN ('DOCTOR', 'SECRETARY', 'ADMIN')
 );
 
+CREATE POLICY "Allow delete for owners and staff"
+ON public.dependents
+FOR DELETE
+TO authenticated
+USING (
+  auth.uid() = patient_id OR
+  ((auth.jwt() -> 'user_metadata'::text) ->> 'role'::text) IN ('DOCTOR', 'SECRETARY', 'ADMIN')
+);
+
+
+-- Enable RLS on appointment_inquiries table
+ALTER TABLE public.appointment_inquiries ENABLE ROW LEVEL SECURITY;
+
+-- Allow public insert (unauthenticated guests submitting the landing page form)
+CREATE POLICY "Allow public insert to appointment_inquiries"
+ON public.appointment_inquiries
+FOR INSERT
+WITH CHECK (true);
+
+-- Restrict select/write access to SECRETARY and ADMIN roles
+CREATE POLICY "Allow select/write access to staff users for inquiries"
+ON public.appointment_inquiries
+FOR ALL
+TO authenticated
+USING (
+  ((auth.jwt() -> 'user_metadata'::text) ->> 'role'::text) IN ('SECRETARY', 'ADMIN')
+)
+WITH CHECK (
+  ((auth.jwt() -> 'user_metadata'::text) ->> 'role'::text) IN ('SECRETARY', 'ADMIN')
+);
+
 CREATE POLICY "Allow insert for owners and staff"
 ON public.dependents
 FOR INSERT
@@ -401,7 +455,8 @@ BEGIN
         start_time,
         end_time,
         user_note,
-        status
+        status,
+        source
     ) VALUES (
         p_patient_id,
         v_dependent_id,
@@ -411,7 +466,8 @@ BEGIN
         p_start_time,
         p_end_time,
         p_user_note,
-        'PENDING'
+        'PENDING',
+        'SELF_BOOKED'::appointment_source
     ) RETURNING id INTO v_appointment_id;
 
     -- Query duration from services
@@ -448,6 +504,120 @@ BEGIN
         'PENDING',
         'Initial booking request submitted'
     );
+
+    RETURN v_appointment_id;
+END;
+$$;
+
+-- ============================================================================
+-- 9. Inquiry Conversion RPC
+-- ============================================================================
+CREATE OR REPLACE FUNCTION convert_inquiry_to_appointment(
+    p_inquiry_id UUID,
+    p_service_id UUID,
+    p_doctor_id UUID,
+    p_date DATE,
+    p_start_time TIMESTAMPTZ,
+    p_end_time TIMESTAMPTZ,
+    p_patient_note TEXT,
+    p_secretary_notes TEXT,
+    p_secretary_user_id UUID
+) RETURNS UUID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+    v_appointment_id UUID;
+    v_outbox_payload JSONB;
+    v_duration INT;
+    v_inquiry_first_name TEXT;
+    v_inquiry_last_name TEXT;
+    v_inquiry_email TEXT;
+    v_inquiry_phone TEXT;
+BEGIN
+    -- 1. Fetch guest inquiry information to snapshot on creation
+    SELECT first_name, last_name, email, phone_number 
+    INTO v_inquiry_first_name, v_inquiry_last_name, v_inquiry_email, v_inquiry_phone
+    FROM appointment_inquiries 
+    WHERE id = p_inquiry_id AND status = 'NEW';
+
+    IF v_inquiry_first_name IS NULL THEN
+        RAISE EXCEPTION 'Inquiry not found or already converted/dropped';
+    END IF;
+
+    -- 2. Create the appointment directly in APPROVED state
+    INSERT INTO appointments (
+        patient_id, -- NULL for guest/anonymous
+        dependent_id, -- NULL
+        service_id,
+        doctor_id,
+        date,
+        start_time,
+        end_time,
+        status,
+        source,
+        user_note, -- Snapshot patient's landing page note
+        status_reason -- Secretary's conversation notes
+    ) VALUES (
+        NULL,
+        NULL,
+        p_service_id,
+        p_doctor_id,
+        p_date,
+        p_start_time,
+        p_end_time,
+        'APPROVED'::appointment_status,
+        'STAFF_CREATED'::appointment_source,
+        p_patient_note,
+        p_secretary_notes
+    ) RETURNING id INTO v_appointment_id;
+
+    -- Query duration from services
+    SELECT duration_minutes INTO v_duration FROM services WHERE id = p_service_id;
+
+    -- 3. Emit outbox event for async guest email notifications
+    v_outbox_payload := jsonb_build_object(
+        'appointmentId', v_appointment_id,
+        'serviceId', p_service_id,
+        'doctorId', p_doctor_id,
+        'date', p_date,
+        'startTime', p_start_time,
+        'durationMinutes', v_duration,
+        'inquiryId', p_inquiry_id,
+        'guestName', v_inquiry_first_name || ' ' || v_inquiry_last_name,
+        'guestEmail', v_inquiry_email,
+        'guestPhone', v_inquiry_phone
+    );
+
+    INSERT INTO outbox (event_type, payload, status)
+    VALUES ('APPOINTMENT_CONVERTED_FROM_INQUIRY', v_outbox_payload, 'PENDING');
+
+    -- 4. Insert initial APPROVED ledger entry in appointment history
+    INSERT INTO appointment_status_history (
+        appointment_id, 
+        changed_by, 
+        actor_role,
+        previous_status, 
+        new_status, 
+        reason
+    ) VALUES (
+        v_appointment_id,
+        p_secretary_user_id,
+        'SECRETARY',
+        NULL,
+        'APPROVED'::appointment_status,
+        COALESCE(p_secretary_notes, 'Inquiry converted to confirmed appointment')
+    );
+
+    -- 5. Mark inquiry as CONVERTED and link the appointment
+    UPDATE appointment_inquiries
+    SET status = 'CONVERTED'::inquiry_status,
+        linked_appointment_id = v_appointment_id,
+        patient_note = p_patient_note,
+        secretary_notes = p_secretary_notes,
+        updated_at = CURRENT_TIMESTAMP
+    WHERE id = p_inquiry_id;
 
     RETURN v_appointment_id;
 END;
