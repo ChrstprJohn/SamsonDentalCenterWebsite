@@ -5,6 +5,7 @@ import React from 'react';
 import SignupOtpEmail from '@/components/emails/signup-otp-email';
 import ResetPasswordOtpEmail from '@/components/emails/reset-password-otp-email';
 import AppointmentRequestReceivedEmail from '@/components/emails/appointment-request-received-email';
+import AppointmentConfirmedEmail from '@/components/emails/appointment-confirmed-email';
 
 if (!process.env.RESEND_API_KEY) {
   // We don't throw an error at boot, but we will throw when attempting to send if missing.
@@ -30,6 +31,14 @@ type EmailTemplates = {
     appointmentId: string;
     dashboardUrl: string;
   };
+  'appointment_confirmed': {
+    patientName: string;
+    serviceName: string;
+    doctorName: string;
+    dateStr: string;
+    timeRangeStr: string;
+    appointmentId: string;
+  };
 };
 
 export const ResendService = {
@@ -37,10 +46,10 @@ export const ResendService = {
    * Renders the requested template and sends it via Resend.
    */
   async sendTemplatedEmail<K extends keyof EmailTemplates>(
-    to: string,
-    subject: string,
-    templateName: K,
-    payload: EmailTemplates[K]
+     to: string,
+     subject: string,
+     templateName: K,
+     payload: EmailTemplates[K]
   ) {
     if (!process.env.RESEND_API_KEY) {
       throw new Error('RESEND_API_KEY is not configured');
@@ -82,6 +91,18 @@ export const ResendService = {
           timeRangeStr: reqPayload.timeRangeStr,
           appointmentId: reqPayload.appointmentId,
           dashboardUrl: reqPayload.dashboardUrl,
+        }));
+        break;
+      }
+      case 'appointment_confirmed': {
+        const reqPayload = payload as EmailTemplates['appointment_confirmed'];
+        html = await render(React.createElement(AppointmentConfirmedEmail, {
+          patientName: reqPayload.patientName,
+          serviceName: reqPayload.serviceName,
+          doctorName: reqPayload.doctorName,
+          dateStr: reqPayload.dateStr,
+          timeRangeStr: reqPayload.timeRangeStr,
+          appointmentId: reqPayload.appointmentId,
         }));
         break;
       }

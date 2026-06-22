@@ -60,15 +60,15 @@ All codebase updates must strictly follow the **Functional CQRS mod-monolith pat
 All files created in this section must strictly follow the Mod-Monolith layer and file naming standards:
 
 ### 5.1. Conversion Email Notification
-- [ ] Create `src/modules/emails/subscribers/on-appointment-converted.subscriber.ts` & `.spec.ts`
+- [x] Create `src/modules/emails/subscribers/on-appointment-converted.subscriber.ts` & `.spec.ts`
   - Listens to outbox events and triggers Resend email delivery to guest email.
-- [ ] Register `APPOINTMENT_CONVERTED_FROM_INQUIRY` event inside `src/orchestrators/event-subscribers.ts`.
+- [x] Register `APPOINTMENT_CONVERTED_FROM_INQUIRY` event inside `src/orchestrators/event-subscribers.ts`.
 
 ### 5.2. Dropping Inquiries (Rejections/Unreachable Guest leads)
-- [ ] Create `src/modules/appointments/dtos/booking/drop-inquiry.dto.ts` & `.spec.ts`
+- [x] Create `src/modules/appointments/dtos/booking/drop-inquiry.dto.ts` & `.spec.ts`
   - Validates payload: `inquiryId`, `secretaryNotes` (optional reason).
-- [ ] Create repository commands inside `src/modules/appointments/repositories/booking/appointment-inquiries.commands.ts`
+- [x] Create repository commands inside `src/modules/appointments/repositories/booking/appointment-inquiries.commands.ts`
   - Add functional command `dropInquiryCommand(supabase)` changing status to `DROPPED` and saving notes.
-- [ ] Create `src/modules/appointments/use-cases/booking/drop-inquiry.use-case.ts` & `.spec.ts`
-- [ ] Create `src/modules/appointments/actions/booking/drop-inquiry.action.ts` & `.spec.ts`
+- [x] Create `src/modules/appointments/use-cases/booking/drop-inquiry.use-case.ts` & `.spec.ts`
+- [x] Create `src/modules/appointments/actions/booking/drop-inquiry.action.ts` & `.spec.ts`
   - Server action wrapper restricted to `SECRETARY` or `ADMIN` roles.
