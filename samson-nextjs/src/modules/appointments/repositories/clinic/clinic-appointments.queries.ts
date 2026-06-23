@@ -9,9 +9,10 @@ export const getAppointmentsByClinicQuery = (supabase: SupabaseClient) => {
       .select(
         `
         *,
-        doctor:doctor_id (id, first_name, last_name, prefix, suffix),
+        doctor:doctor_id (id, first_name, last_name, suffix),
         service:service_id (id, name, duration_minutes),
-        patient:patient_id (id, first_name, last_name)
+        patient:patient_id (id, first_name, last_name),
+        dependent:dependents!appointments_dependent_id_fkey (id, first_name, last_name, relationship, date_of_birth)
       `
       )
       .order('start_time', { ascending: true });

@@ -69,6 +69,7 @@ const appointmentDbSchema = z.object({
     first_name: z.string(),
     last_name: z.string(),
     relationship: z.string(),
+    date_of_birth: z.string().optional().nullable(),
   }).nullable().optional(),
   status_history: z.array(z.object({
     id: z.string(),
@@ -108,6 +109,7 @@ export const appointmentDtoSchema = appointmentDbSchema.transform((data) => ({
     firstName: data.dependent.first_name,
     lastName: data.dependent.last_name,
     relationship: data.dependent.relationship,
+    dateOfBirth: data.dependent.date_of_birth || null,
   } : null,
   statusHistory: data.status_history ? data.status_history.map((h) => ({
     id: h.id,
