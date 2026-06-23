@@ -48,8 +48,15 @@ export function Footer({ config }: FooterProps) {
   const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
 
   return (
-    <footer className="bg-[#1D1E1E] text-[#BAC1C1]/80 border-t border-white/5 pt-20 pb-12 font-sans">
-      <div className="max-w-7xl mx-auto px-6 sm:px-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-12 sm:gap-16">
+    <footer className="bg-[#1D1E1E] text-[#BAC1C1]/80 border-t border-white/5 pt-20 pb-12 font-sans relative overflow-hidden">
+      {/* ponytail: CSS SVG noise overlay */}
+      <div 
+        className="absolute inset-0 opacity-[0.06] mix-blend-overlay pointer-events-none z-0"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`
+        }}
+      />
+      <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-12 sm:gap-16">
         
         {/* Column 1 & 2: Massive Brand & Trust Badges */}
         <div className="md:col-span-2 flex flex-col gap-6 pr-0 md:pr-8">

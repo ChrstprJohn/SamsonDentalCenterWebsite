@@ -32,6 +32,13 @@ export function HeroSectionV1({ onBookClick }: HeroSectionProps) {
               className="w-full h-full object-cover object-center filter brightness-[0.95] saturate-[0.9] contrast-[1.02]"
             />
           </picture>
+          {/* ponytail: CSS SVG noise overlay */}
+          <div 
+            className="absolute inset-0 opacity-[0.06] mix-blend-overlay pointer-events-none z-0"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`
+            }}
+          />
           <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-[#1D1E1E] z-0" />
         </div>
 
