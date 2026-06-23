@@ -81,7 +81,7 @@ export function TestimonialsSection() {
             <span className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-4 font-sans">
               Client Chronicles
             </span>
-            <h2 className="font-sans text-[clamp(20px,2vw+10px,32px)] font-normal tracking-[-0.04em] text-[#141515] leading-[1.05]">
+            <h2 className="font-sans text-[clamp(20px,2vw+10px,32px)] font-normal tracking-[-0.04em] text-[#1D1E1E] leading-[1.05]">
               Real feedback from patients who experienced our redefined sanctuary.
             </h2>
           </div>
@@ -121,7 +121,7 @@ export function TestimonialsSection() {
                       className="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover shrink-0 mr-2.5 border border-gray-100"
                     />
                     <div>
-                      <h4 className="text-[#141515] font-semibold text-xs sm:text-[13px] leading-none">
+                      <h4 className="text-[#1D1E1E] font-semibold text-xs sm:text-[13px] leading-none">
                         {item.name}
                       </h4>
                       <p className="text-gray-400 font-medium text-[8px] sm:text-[9px] tracking-wider uppercase mt-1 leading-none">
@@ -161,7 +161,7 @@ export function TestimonialsSection() {
                       className="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover shrink-0 mr-2.5 border border-gray-100"
                     />
                     <div>
-                      <h4 className="text-[#141515] font-semibold text-xs sm:text-[13px] leading-none">
+                      <h4 className="text-[#1D1E1E] font-semibold text-xs sm:text-[13px] leading-none">
                         {item.name}
                       </h4>
                       <p className="text-gray-400 font-medium text-[8px] sm:text-[9px] tracking-wider uppercase mt-1 leading-none">

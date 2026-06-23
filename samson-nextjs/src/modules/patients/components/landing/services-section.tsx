@@ -101,7 +101,7 @@ export function ServicesSection({ services, onSelectService }: ServicesSectionPr
                 <div
                   key={svc.nr}
                   onClick={() => handleItemClick(svc.title)}
-                  className={`group relative ${getCardHeightClass(idx)} rounded-none overflow-hidden block ${getCardColSpan(idx)} bg-[#141515] cursor-pointer`}
+                  className={`group relative ${getCardHeightClass(idx)} rounded-none overflow-hidden block ${getCardColSpan(idx)} bg-[#1D1E1E] cursor-pointer`}
                 >
                   <img
                     src={svc.image}
@@ -143,7 +143,7 @@ export function ServicesSection({ services, onSelectService }: ServicesSectionPr
 
       {/* Lower Part / Background Switch: Deep cohesive dark charcoal match to the marquee */}
       {/* Negative margins allow the image grid cards to gorgeously overlap onto the dark section by ~12.5% (45px) */}
-      <div className="bg-[#141515] relative pt-[115px] sm:pt-[135px] pb-24 sm:pb-32 mt-[-85px] z-0">
+      <div className="bg-[#1D1E1E] relative pt-[115px] sm:pt-[135px] pb-24 sm:pb-32 mt-[-85px] z-0">
         <div className="max-w-7xl mx-auto px-6 sm:px-12 relative z-10">
           <div className="divide-y divide-[#D94E4E]/10">
             {LIST_SERVICES.map((svc, idx) => (

@@ -74,7 +74,7 @@ export function NavbarV1({ user }: NavbarProps) {
           isMobileOpen
             ? 'bg-transparent backdrop-blur-none border-b border-transparent py-5'
             : scrolled
-            ? 'bg-[#141515]/90 backdrop-blur-sm border-b border-white/5 shadow-md py-4'
+            ? 'bg-[#1D1E1E]/90 backdrop-blur-sm border-b border-white/5 shadow-md py-4'
             : 'bg-[#1D1E1E]/15 backdrop-blur-[3px] border-b border-white/5 py-5'
         }`}
       >

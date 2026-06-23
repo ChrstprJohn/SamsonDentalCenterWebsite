@@ -170,7 +170,7 @@ export function GallerySection() {
           style={{ 
             y: useTransform(galleryScrollYProgress, [0, 1], ["-5%", "8%"]),
           }} 
-          className="absolute inset-x-0 top-0 bg-[#141515] h-[70%]"
+          className="absolute inset-x-0 top-0 bg-[#1D1E1E] h-[70%]"
         />
       </div>
 

@@ -48,8 +48,7 @@ export function Footer({ config }: FooterProps) {
   const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
 
   return (
-    <footer className="bg-[#141515] text-[#BAC1C1]/80 border-t border-white/5 pt-20 pb-12 font-sans">
-      {/* Huge Footer Grid Container */}
+    <footer className="bg-[#1D1E1E] text-[#BAC1C1]/80 border-t border-white/5 pt-20 pb-12 font-sans">
       <div className="max-w-7xl mx-auto px-6 sm:px-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-12 sm:gap-16">
         
         {/* Column 1 & 2: Massive Brand & Trust Badges */}

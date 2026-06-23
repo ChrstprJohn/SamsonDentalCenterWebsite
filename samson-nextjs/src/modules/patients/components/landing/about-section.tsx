@@ -35,7 +35,7 @@ export function AboutSection() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-center">
           {/* Visual Column */}
           <div className="lg:col-span-6 relative">
-            <div className="relative aspect-square sm:aspect-[4/3] lg:aspect-[4/5] overflow-hidden border border-white/5 bg-[#141515]">
+            <div className="relative aspect-square sm:aspect-[4/3] lg:aspect-[4/5] overflow-hidden border border-white/5 bg-[#1D1E1E]">
               <picture>
                 <img
                   src="https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?q=80&w=800&auto=format&fit=crop"
@@ -47,7 +47,7 @@ export function AboutSection() {
             </div>
 
             {/* Overlay architectural detail badge (Sharp border matching services) */}
-            <div className="absolute -bottom-6 -right-4 sm:right-6 bg-[#141515] text-white p-6 max-w-xs border border border-white/10 font-sans">
+            <div className="absolute -bottom-6 -right-4 sm:right-6 bg-[#1D1E1E] text-white p-6 max-w-xs border border border-white/10 font-sans">
               <p className="font-serif text-2xl font-light tracking-tight leading-none text-[#D94E4E]">
                 15+ Years
               </p>
@@ -62,7 +62,7 @@ export function AboutSection() {
             <span className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-4 font-sans">
               Redefined Sanctuary
             </span>
-            <h2 className="font-sans text-[clamp(22px,2vw+12px,36px)] font-normal tracking-[-0.04em] text-[#141515] leading-[1.1]">
+            <h2 className="font-sans text-[clamp(22px,2vw+12px,36px)] font-normal tracking-[-0.04em] text-[#1D1E1E] leading-[1.1]">
               Dental craftsmanship without anxiety.
             </h2>
 
@@ -101,7 +101,7 @@ export function AboutSection() {
               <span className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-4 font-sans">
                 Our Specialists
               </span>
-              <h3 className="font-sans text-[clamp(20px,2vw+10px,32px)] font-normal tracking-[-0.04em] text-[#141515] leading-[1.05]">
+              <h3 className="font-sans text-[clamp(20px,2vw+10px,32px)] font-normal tracking-[-0.04em] text-[#1D1E1E] leading-[1.05]">
                 Meet our master clinical dental practitioners.
               </h3>
             </div>
@@ -125,7 +125,7 @@ export function AboutSection() {
                       className="w-full h-full object-cover object-center filter brightness-[0.95] saturate-[0.85] contrast-[1.01] group-hover:scale-[1.02] group-hover:brightness-100 group-hover:saturate-100 transition-all duration-500"
                     />
                   </picture>
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#141515]/30 to-transparent pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#1D1E1E]/30 to-transparent pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
 
                 {/* Details Container */}
@@ -143,7 +143,7 @@ export function AboutSection() {
                   </div>
                   <div className="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between text-xs font-sans">
                     <span className="text-gray-400 font-medium uppercase tracking-wider">Practice Days</span>
-                    <span className="text-[#141515] font-semibold bg-gray-50 px-2.5 py-1 rounded-[1px] border border-gray-100">
+                    <span className="text-[#1D1E1E] font-semibold bg-gray-50 px-2.5 py-1 rounded-[1px] border border-gray-100">
                       {doc.schedule}
                     </span>
                   </div>

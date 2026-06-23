@@ -51,10 +51,10 @@ export function JourneySection() {
     <section
       id="journey"
       ref={journeyRef}
-      className="relative h-[480vh] bg-[#141515] select-none w-full"
+      className="relative h-[480vh] bg-[#1D1E1E] select-none w-full"
     >
       {/* Sticky Viewport Container */}
-      <div className="sticky top-0 h-[100dvh] w-full flex flex-col justify-end overflow-hidden bg-[#141515] text-[#FDFDFD] z-10">
+      <div className="sticky top-0 h-[100dvh] w-full flex flex-col justify-end overflow-hidden bg-[#1D1E1E] text-[#FDFDFD] z-10">
         {/* Subtle Premium Background Pattern/Illustration */}
         <div className="absolute inset-0 pointer-events-none opacity-[0.1] z-0 overflow-hidden">
           <svg className="absolute w-full h-full text-[#D94E4E]" xmlns="http://www.w3.org/2000/svg">

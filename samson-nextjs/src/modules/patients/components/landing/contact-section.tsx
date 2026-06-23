@@ -61,7 +61,7 @@ export function ContactSection({ config, contactForm }: ContactSectionProps) {
               <span className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-4 font-sans">
                 Reservations
               </span>
-              <h2 className="font-sans text-[clamp(22px,2vw+12px,38px)] font-normal tracking-[-0.04em] text-[#141515] leading-[1.1]">
+              <h2 className="font-sans text-[clamp(22px,2vw+12px,38px)] font-normal tracking-[-0.04em] text-[#1D1E1E] leading-[1.1]">
                 Inquire Consultation
               </h2>
               <p className="mt-6 text-[clamp(12px,0.3vw+11px,14px)] font-normal text-gray-500 max-w-sm leading-[1.65] font-sans">
@@ -203,7 +203,7 @@ export function ContactSection({ config, contactForm }: ContactSectionProps) {
                     <button
                       type="submit"
                       disabled={isContactSubmitting}
-                      className="w-full py-4 bg-[#141515] text-white rounded-none text-xs font-semibold tracking-widest uppercase hover:bg-[#D94E4E] transition-all duration-300 shadow-md flex items-center justify-center gap-2 mt-4 cursor-pointer disabled:pointer-events-none disabled:opacity-50"
+                      className="w-full py-4 bg-[#1D1E1E] text-white rounded-none text-xs font-semibold tracking-widest uppercase hover:bg-[#D94E4E] transition-all duration-300 shadow-md flex items-center justify-center gap-2 mt-4 cursor-pointer disabled:pointer-events-none disabled:opacity-50"
                     >
                       {isContactSubmitting ? 'Submitting Security Consultation...' : (
                         <>
@@ -237,7 +237,7 @@ export function ContactSection({ config, contactForm }: ContactSectionProps) {
                         setNotes('');
                       }}
                       type="button"
-                      className="mt-8 px-6 py-2.5 bg-[#141515] hover:bg-[#D94E4E] text-white text-xs font-semibold rounded-none uppercase tracking-widest transition-all shadow-sm cursor-pointer"
+                      className="mt-8 px-6 py-2.5 bg-[#1D1E1E] hover:bg-[#D94E4E] text-white text-xs font-semibold rounded-none uppercase tracking-widest transition-all shadow-sm cursor-pointer"
                     >
                       Submit another request
                     </button>
