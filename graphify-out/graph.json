@@ -1241,7 +1241,7 @@
       "source_file": "samson-nextjs/src/app/(portals)/user/layout.tsx",
       "source_location": "L1",
       "id": "user_layout",
-      "community": 256,
+      "community": 84,
       "norm_label": "layout.tsx"
     },
     {
@@ -1250,7 +1250,7 @@
       "source_file": "samson-nextjs/src/app/(portals)/user/layout.tsx",
       "source_location": "L12",
       "id": "user_layout_userportallayout",
-      "community": 256,
+      "community": 19,
       "norm_label": "userportallayout()"
     },
     {
@@ -1808,7 +1808,7 @@
       "source_file": "samson-nextjs/src/components/ui/button.tsx",
       "source_location": "L1",
       "id": "ui_button",
-      "community": 122,
+      "community": 0,
       "norm_label": "button.tsx"
     },
     {
@@ -1817,7 +1817,7 @@
       "source_file": "samson-nextjs/src/components/ui/button.tsx",
       "source_location": "L7",
       "id": "ui_button_buttonvariants",
-      "community": 122,
+      "community": 0,
       "norm_label": "buttonvariants"
     },
     {
@@ -1826,7 +1826,7 @@
       "source_file": "samson-nextjs/src/components/ui/button.tsx",
       "source_location": "L50",
       "id": "ui_button_button",
-      "community": 122,
+      "community": 0,
       "norm_label": "button()"
     },
     {
@@ -1844,7 +1844,7 @@
       "source_file": "samson-nextjs/src/components/ui/footer.tsx",
       "source_location": "L8",
       "id": "ui_footer_footerprops",
-      "community": 84,
+      "community": 15,
       "norm_label": "footerprops"
     },
     {
@@ -2654,7 +2654,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/booking/booking-footer-controls.tsx",
       "source_location": "L1",
       "id": "booking_booking_footer_controls",
-      "community": 122,
+      "community": 0,
       "norm_label": "booking-footer-controls.tsx"
     },
     {
@@ -2663,7 +2663,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/booking/booking-footer-controls.tsx",
       "source_location": "L6",
       "id": "booking_booking_footer_controls_bookingfootercontrolsprops",
-      "community": 122,
+      "community": 0,
       "norm_label": "bookingfootercontrolsprops"
     },
     {
@@ -2672,7 +2672,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/booking/booking-footer-controls.tsx",
       "source_location": "L15",
       "id": "booking_booking_footer_controls_bookingfootercontrols",
-      "community": 122,
+      "community": 0,
       "norm_label": "bookingfootercontrols()"
     },
     {
@@ -3167,7 +3167,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/dashboard/cancel-appointment-modal.tsx",
       "source_location": "L1",
       "id": "dashboard_cancel_appointment_modal",
-      "community": 31,
+      "community": 1,
       "norm_label": "cancel-appointment-modal.tsx"
     },
     {
@@ -3176,7 +3176,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/dashboard/cancel-appointment-modal.tsx",
       "source_location": "L8",
       "id": "dashboard_cancel_appointment_modal_cancelappointmentmodalprops",
-      "community": 31,
+      "community": 1,
       "norm_label": "cancelappointmentmodalprops"
     },
     {
@@ -3185,7 +3185,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/components/dashboard/cancel-appointment-modal.tsx",
       "source_location": "L19",
       "id": "dashboard_cancel_appointment_modal_cancelappointmentmodal",
-      "community": 31,
+      "community": 1,
       "norm_label": "cancelappointmentmodal()"
     },
     {
@@ -4229,7 +4229,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/dtos/shared/appointment.dto.spec.ts",
       "source_location": "L1",
       "id": "shared_appointment_dto_spec",
-      "community": 1,
+      "community": 31,
       "norm_label": "appointment.dto.spec.ts"
     },
     {
@@ -4238,7 +4238,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/dtos/shared/appointment.dto.ts",
       "source_location": "L1",
       "id": "shared_appointment_dto",
-      "community": 1,
+      "community": 31,
       "norm_label": "appointment.dto.ts"
     },
     {
@@ -4247,7 +4247,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/dtos/shared/appointment.dto.ts",
       "source_location": "L4",
       "id": "shared_appointment_dto_appointmentdoctordbschema",
-      "community": 1,
+      "community": 31,
       "norm_label": "appointmentdoctordbschema"
     },
     {
@@ -4256,7 +4256,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/dtos/shared/appointment.dto.ts",
       "source_location": "L12",
       "id": "shared_appointment_dto_appointmentdoctorschema",
-      "community": 1,
+      "community": 31,
       "norm_label": "appointmentdoctorschema"
     },
     {
@@ -4265,7 +4265,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/dtos/shared/appointment.dto.ts",
       "source_location": "L20",
       "id": "shared_appointment_dto_appointmentservicedbschema",
-      "community": 1,
+      "community": 31,
       "norm_label": "appointmentservicedbschema"
     },
     {
@@ -4274,7 +4274,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/dtos/shared/appointment.dto.ts",
       "source_location": "L26",
       "id": "shared_appointment_dto_appointmentserviceschema",
-      "community": 1,
+      "community": 31,
       "norm_label": "appointmentserviceschema"
     },
     {
@@ -4283,7 +4283,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/dtos/shared/appointment.dto.ts",
       "source_location": "L32",
       "id": "shared_appointment_dto_appointmentpatientdbschema",
-      "community": 1,
+      "community": 31,
       "norm_label": "appointmentpatientdbschema"
     },
     {
@@ -4292,7 +4292,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/dtos/shared/appointment.dto.ts",
       "source_location": "L38",
       "id": "shared_appointment_dto_appointmentpatientschema",
-      "community": 1,
+      "community": 31,
       "norm_label": "appointmentpatientschema"
     },
     {
@@ -4301,7 +4301,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/dtos/shared/appointment.dto.ts",
       "source_location": "L44",
       "id": "shared_appointment_dto_appointmentdbschema",
-      "community": 1,
+      "community": 31,
       "norm_label": "appointmentdbschema"
     },
     {
@@ -4310,7 +4310,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/dtos/shared/appointment.dto.ts",
       "source_location": "L83",
       "id": "shared_appointment_dto_appointmentdtoschema",
-      "community": 1,
+      "community": 31,
       "norm_label": "appointmentdtoschema"
     },
     {
@@ -4319,7 +4319,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/dtos/shared/appointment.dto.ts",
       "source_location": "L122",
       "id": "shared_appointment_dto_appointmentdto",
-      "community": 31,
+      "community": 1,
       "norm_label": "appointmentdto"
     },
     {
@@ -4328,7 +4328,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/dtos/shared/appointment.dto.ts",
       "source_location": "L124",
       "id": "shared_appointment_dto_mayberecord",
-      "community": 1,
+      "community": 31,
       "norm_label": "mayberecord"
     },
     {
@@ -4805,7 +4805,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/hooks/dashboard/use-user-dashboard.ts",
       "source_location": "L14",
       "id": "dashboard_use_user_dashboard_useuserdashboardreturn",
-      "community": 31,
+      "community": 1,
       "norm_label": "useuserdashboardreturn"
     },
     {
@@ -4832,7 +4832,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/hooks/detail/use-appointment-detail.ts",
       "source_location": "L9",
       "id": "detail_use_appointment_detail_useappointmentdetailprops",
-      "community": 31,
+      "community": 1,
       "norm_label": "useappointmentdetailprops"
     },
     {
@@ -4850,7 +4850,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/mocks/mock-appointments.ts",
       "source_location": "L1",
       "id": "mocks_mock_appointments",
-      "community": 31,
+      "community": 1,
       "norm_label": "mock-appointments.ts"
     },
     {
@@ -4859,7 +4859,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/mocks/mock-appointments.ts",
       "source_location": "L3",
       "id": "mocks_mock_appointments_mock_appointments",
-      "community": 31,
+      "community": 1,
       "norm_label": "mock_appointments"
     },
     {
@@ -5786,7 +5786,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/views/appointment-detail-view.tsx",
       "source_location": "L15",
       "id": "views_appointment_detail_view_appointmentdetailviewprops",
-      "community": 31,
+      "community": 1,
       "norm_label": "appointmentdetailviewprops"
     },
     {
@@ -5930,7 +5930,7 @@
       "source_file": "samson-nextjs/src/modules/appointments/views/user-dashboard-view.tsx",
       "source_location": "L14",
       "id": "views_user_dashboard_view_userdashboardviewprops",
-      "community": 31,
+      "community": 1,
       "norm_label": "userdashboardviewprops"
     },
     {
@@ -7082,7 +7082,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/actions/settings/get-clinic-config.action.ts",
       "source_location": "L1",
       "id": "settings_get_clinic_config_action",
-      "community": 19,
+      "community": 84,
       "norm_label": "get-clinic-config.action.ts"
     },
     {
@@ -7100,7 +7100,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/actions/settings/update-clinic-config.action.spec.ts",
       "source_location": "L1",
       "id": "settings_update_clinic_config_action_spec",
-      "community": 53,
+      "community": 217,
       "norm_label": "update-clinic-config.action.spec.ts"
     },
     {
@@ -7109,7 +7109,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/actions/settings/update-clinic-config.action.spec.ts",
       "source_location": "L4",
       "id": "settings_update_clinic_config_action_spec_mocks",
-      "community": 53,
+      "community": 217,
       "norm_label": "mocks"
     },
     {
@@ -7118,7 +7118,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/actions/settings/update-clinic-config.action.ts",
       "source_location": "L1",
       "id": "settings_update_clinic_config_action",
-      "community": 53,
+      "community": 217,
       "norm_label": "update-clinic-config.action.ts"
     },
     {
@@ -7127,7 +7127,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/actions/settings/update-clinic-config.action.ts",
       "source_location": "L8",
       "id": "settings_update_clinic_config_action_updateclinicconfigaction",
-      "community": 53,
+      "community": 217,
       "norm_label": "updateclinicconfigaction()"
     },
     {
@@ -7280,7 +7280,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/dtos/settings/update-clinic-config.dto.spec.ts",
       "source_location": "L1",
       "id": "settings_update_clinic_config_dto_spec",
-      "community": 53,
+      "community": 217,
       "norm_label": "update-clinic-config.dto.spec.ts"
     },
     {
@@ -7289,7 +7289,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/dtos/settings/update-clinic-config.dto.ts",
       "source_location": "L1",
       "id": "settings_update_clinic_config_dto",
-      "community": 53,
+      "community": 217,
       "norm_label": "update-clinic-config.dto.ts"
     },
     {
@@ -7298,7 +7298,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/dtos/settings/update-clinic-config.dto.ts",
       "source_location": "L4",
       "id": "settings_update_clinic_config_dto_updateclinicconfigschema",
-      "community": 53,
+      "community": 217,
       "norm_label": "updateclinicconfigschema"
     },
     {
@@ -7307,7 +7307,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/dtos/settings/update-clinic-config.dto.ts",
       "source_location": "L6",
       "id": "settings_update_clinic_config_dto_updateclinicconfigdto",
-      "community": 53,
+      "community": 217,
       "norm_label": "updateclinicconfigdto"
     },
     {
@@ -7388,7 +7388,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/repositories/settings/clinic-config.commands.ts",
       "source_location": "L1",
       "id": "settings_clinic_config_commands",
-      "community": 53,
+      "community": 217,
       "norm_label": "clinic-config.commands.ts"
     },
     {
@@ -7397,7 +7397,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/repositories/settings/clinic-config.commands.ts",
       "source_location": "L5",
       "id": "settings_clinic_config_commands_updateclinicconfigcommand",
-      "community": 53,
+      "community": 217,
       "norm_label": "updateclinicconfigcommand()"
     },
     {
@@ -7406,7 +7406,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/repositories/settings/clinic-config.queries.spec.ts",
       "source_location": "L1",
       "id": "settings_clinic_config_queries_spec",
-      "community": 217,
+      "community": 268,
       "norm_label": "clinic-config.queries.spec.ts"
     },
     {
@@ -7415,7 +7415,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/repositories/settings/clinic-config.queries.spec.ts",
       "source_location": "L4",
       "id": "settings_clinic_config_queries_spec_mockmaybesingle",
-      "community": 217,
+      "community": 268,
       "norm_label": "mockmaybesingle"
     },
     {
@@ -7424,7 +7424,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/repositories/settings/clinic-config.queries.spec.ts",
       "source_location": "L5",
       "id": "settings_clinic_config_queries_spec_mockeq",
-      "community": 217,
+      "community": 268,
       "norm_label": "mockeq"
     },
     {
@@ -7433,7 +7433,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/repositories/settings/clinic-config.queries.spec.ts",
       "source_location": "L6",
       "id": "settings_clinic_config_queries_spec_mockselect",
-      "community": 217,
+      "community": 268,
       "norm_label": "mockselect"
     },
     {
@@ -7442,7 +7442,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/repositories/settings/clinic-config.queries.spec.ts",
       "source_location": "L7",
       "id": "settings_clinic_config_queries_spec_mockfrom",
-      "community": 217,
+      "community": 268,
       "norm_label": "mockfrom"
     },
     {
@@ -7451,7 +7451,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/repositories/settings/clinic-config.queries.spec.ts",
       "source_location": "L9",
       "id": "settings_clinic_config_queries_spec_mocksupabase",
-      "community": 217,
+      "community": 268,
       "norm_label": "mocksupabase"
     },
     {
@@ -7460,7 +7460,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/repositories/settings/clinic-config.queries.ts",
       "source_location": "L1",
       "id": "settings_clinic_config_queries",
-      "community": 217,
+      "community": 268,
       "norm_label": "clinic-config.queries.ts"
     },
     {
@@ -7469,7 +7469,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/repositories/settings/clinic-config.queries.ts",
       "source_location": "L4",
       "id": "settings_clinic_config_queries_getclinicconfigquery",
-      "community": 217,
+      "community": 268,
       "norm_label": "getclinicconfigquery()"
     },
     {
@@ -7478,7 +7478,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/use-cases/settings/get-clinic-config.use-case.spec.ts",
       "source_location": "L1",
       "id": "settings_get_clinic_config_use_case_spec",
-      "community": 19,
+      "community": 269,
       "norm_label": "get-clinic-config.use-case.spec.ts"
     },
     {
@@ -7487,7 +7487,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/use-cases/settings/get-clinic-config.use-case.ts",
       "source_location": "L1",
       "id": "settings_get_clinic_config_use_case",
-      "community": 19,
+      "community": 269,
       "norm_label": "get-clinic-config.use-case.ts"
     },
     {
@@ -7496,7 +7496,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/use-cases/settings/get-clinic-config.use-case.ts",
       "source_location": "L3",
       "id": "settings_get_clinic_config_use_case_default_config",
-      "community": 19,
+      "community": 269,
       "norm_label": "default_config"
     },
     {
@@ -7505,7 +7505,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/use-cases/settings/get-clinic-config.use-case.ts",
       "source_location": "L25",
       "id": "settings_get_clinic_config_use_case_getclinicconfigusecase",
-      "community": 19,
+      "community": 269,
       "norm_label": "getclinicconfigusecase()"
     },
     {
@@ -7514,7 +7514,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/use-cases/settings/update-clinic-config.use-case.spec.ts",
       "source_location": "L1",
       "id": "settings_update_clinic_config_use_case_spec",
-      "community": 53,
+      "community": 217,
       "norm_label": "update-clinic-config.use-case.spec.ts"
     },
     {
@@ -7523,7 +7523,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/use-cases/settings/update-clinic-config.use-case.ts",
       "source_location": "L1",
       "id": "settings_update_clinic_config_use_case",
-      "community": 53,
+      "community": 217,
       "norm_label": "update-clinic-config.use-case.ts"
     },
     {
@@ -7532,7 +7532,7 @@
       "source_file": "samson-nextjs/src/modules/clinic-config/use-cases/settings/update-clinic-config.use-case.ts",
       "source_location": "L4",
       "id": "settings_update_clinic_config_use_case_updateclinicconfigusecase",
-      "community": 53,
+      "community": 217,
       "norm_label": "updateclinicconfigusecase()"
     },
     {
@@ -8081,7 +8081,7 @@
       "source_file": "samson-nextjs/src/modules/patients/components/auth/authenticated-user-header.tsx",
       "source_location": "L1",
       "id": "auth_authenticated_user_header",
-      "community": 84,
+      "community": 122,
       "norm_label": "authenticated-user-header.tsx"
     },
     {
@@ -8090,23 +8090,23 @@
       "source_file": "samson-nextjs/src/modules/patients/components/auth/authenticated-user-header.tsx",
       "source_location": "L10",
       "id": "auth_authenticated_user_header_authenticateduserheaderprops",
-      "community": 84,
+      "community": 122,
       "norm_label": "authenticateduserheaderprops"
     },
     {
       "label": "NAV_LINKS",
       "file_type": "code",
       "source_file": "samson-nextjs/src/modules/patients/components/auth/authenticated-user-header.tsx",
-      "source_location": "L15",
+      "source_location": "L16",
       "id": "auth_authenticated_user_header_nav_links",
-      "community": 84,
+      "community": 122,
       "norm_label": "nav_links"
     },
     {
       "label": "AuthenticatedUserHeader()",
       "file_type": "code",
       "source_file": "samson-nextjs/src/modules/patients/components/auth/authenticated-user-header.tsx",
-      "source_location": "L21",
+      "source_location": "L22",
       "id": "auth_authenticated_user_header_authenticateduserheader",
       "community": 84,
       "norm_label": "authenticateduserheader()"
@@ -8144,7 +8144,7 @@
       "source_file": "samson-nextjs/src/modules/patients/components/auth/notification-indicator.tsx",
       "source_location": "L1",
       "id": "auth_notification_indicator",
-      "community": 84,
+      "community": 122,
       "norm_label": "notification-indicator.tsx"
     },
     {
@@ -8153,16 +8153,16 @@
       "source_file": "samson-nextjs/src/modules/patients/components/auth/notification-indicator.tsx",
       "source_location": "L5",
       "id": "auth_notification_indicator_notificationindicatorprops",
-      "community": 84,
+      "community": 122,
       "norm_label": "notificationindicatorprops"
     },
     {
       "label": "NotificationIndicator()",
       "file_type": "code",
       "source_file": "samson-nextjs/src/modules/patients/components/auth/notification-indicator.tsx",
-      "source_location": "L10",
+      "source_location": "L11",
       "id": "auth_notification_indicator_notificationindicator",
-      "community": 84,
+      "community": 122,
       "norm_label": "notificationindicator()"
     },
     {
@@ -9053,7 +9053,7 @@
       "source_file": "samson-nextjs/src/modules/patients/hooks/auth/header/use-auth-header.hook.ts",
       "source_location": "L25",
       "id": "header_use_auth_header_hook_useauthheader",
-      "community": 84,
+      "community": 122,
       "norm_label": "useauthheader()"
     },
     {
@@ -11105,7 +11105,7 @@
       "source_file": "samson-nextjs/src/modules/staff/components/sub-components/booking-approval-modal.tsx",
       "source_location": "L1",
       "id": "sub_components_booking_approval_modal",
-      "community": 122,
+      "community": 0,
       "norm_label": "booking-approval-modal.tsx"
     },
     {
@@ -11114,7 +11114,7 @@
       "source_file": "samson-nextjs/src/modules/staff/components/sub-components/booking-approval-modal.tsx",
       "source_location": "L5",
       "id": "sub_components_booking_approval_modal_bookingapprovalmodalprops",
-      "community": 122,
+      "community": 0,
       "norm_label": "bookingapprovalmodalprops"
     },
     {
@@ -11123,7 +11123,7 @@
       "source_file": "samson-nextjs/src/modules/staff/components/sub-components/booking-approval-modal.tsx",
       "source_location": "L13",
       "id": "sub_components_booking_approval_modal_bookingapprovalmodal",
-      "community": 122,
+      "community": 0,
       "norm_label": "bookingapprovalmodal()"
     },
     {
@@ -11132,7 +11132,7 @@
       "source_file": "samson-nextjs/src/modules/staff/components/sub-components/booking-rejection-modal.tsx",
       "source_location": "L1",
       "id": "sub_components_booking_rejection_modal",
-      "community": 122,
+      "community": 0,
       "norm_label": "booking-rejection-modal.tsx"
     },
     {
@@ -11141,7 +11141,7 @@
       "source_file": "samson-nextjs/src/modules/staff/components/sub-components/booking-rejection-modal.tsx",
       "source_location": "L5",
       "id": "sub_components_booking_rejection_modal_bookingrejectionmodalprops",
-      "community": 122,
+      "community": 0,
       "norm_label": "bookingrejectionmodalprops"
     },
     {
@@ -11150,7 +11150,7 @@
       "source_file": "samson-nextjs/src/modules/staff/components/sub-components/booking-rejection-modal.tsx",
       "source_location": "L14",
       "id": "sub_components_booking_rejection_modal_bookingrejectionmodal",
-      "community": 122,
+      "community": 0,
       "norm_label": "bookingrejectionmodal()"
     },
     {
@@ -11294,7 +11294,7 @@
       "source_file": "samson-nextjs/src/modules/staff/components/sub-components/family-group-row.tsx",
       "source_location": "L1",
       "id": "sub_components_family_group_row",
-      "community": 122,
+      "community": 0,
       "norm_label": "family-group-row.tsx"
     },
     {
@@ -11303,7 +11303,7 @@
       "source_file": "samson-nextjs/src/modules/staff/components/sub-components/family-group-row.tsx",
       "source_location": "L5",
       "id": "sub_components_family_group_row_familygrouprowprops",
-      "community": 122,
+      "community": 0,
       "norm_label": "familygrouprowprops"
     },
     {
@@ -11312,7 +11312,7 @@
       "source_file": "samson-nextjs/src/modules/staff/components/sub-components/family-group-row.tsx",
       "source_location": "L15",
       "id": "sub_components_family_group_row_familygrouprow",
-      "community": 122,
+      "community": 0,
       "norm_label": "familygrouprow()"
     },
     {
@@ -11321,7 +11321,7 @@
       "source_file": "samson-nextjs/src/modules/staff/components/sub-components/individual-booking-row.tsx",
       "source_location": "L1",
       "id": "sub_components_individual_booking_row",
-      "community": 122,
+      "community": 0,
       "norm_label": "individual-booking-row.tsx"
     },
     {
@@ -11330,7 +11330,7 @@
       "source_file": "samson-nextjs/src/modules/staff/components/sub-components/individual-booking-row.tsx",
       "source_location": "L5",
       "id": "sub_components_individual_booking_row_individualbookingrowprops",
-      "community": 122,
+      "community": 0,
       "norm_label": "individualbookingrowprops"
     },
     {
@@ -11339,7 +11339,7 @@
       "source_file": "samson-nextjs/src/modules/staff/components/sub-components/individual-booking-row.tsx",
       "source_location": "L14",
       "id": "sub_components_individual_booking_row_individualbookingrow",
-      "community": 122,
+      "community": 0,
       "norm_label": "individualbookingrow()"
     },
     {
@@ -11348,7 +11348,7 @@
       "source_file": "samson-nextjs/src/modules/staff/components/sub-components/invoice-checkout-modal.tsx",
       "source_location": "L1",
       "id": "sub_components_invoice_checkout_modal",
-      "community": 122,
+      "community": 0,
       "norm_label": "invoice-checkout-modal.tsx"
     },
     {
@@ -11357,7 +11357,7 @@
       "source_file": "samson-nextjs/src/modules/staff/components/sub-components/invoice-checkout-modal.tsx",
       "source_location": "L5",
       "id": "sub_components_invoice_checkout_modal_activeinvoicedata",
-      "community": 122,
+      "community": 0,
       "norm_label": "activeinvoicedata"
     },
     {
@@ -11366,7 +11366,7 @@
       "source_file": "samson-nextjs/src/modules/staff/components/sub-components/invoice-checkout-modal.tsx",
       "source_location": "L12",
       "id": "sub_components_invoice_checkout_modal_invoicecheckoutmodalprops",
-      "community": 122,
+      "community": 0,
       "norm_label": "invoicecheckoutmodalprops"
     },
     {
@@ -11438,7 +11438,7 @@
       "source_file": "samson-nextjs/src/modules/staff/components/sub-components/pending-booking-queue.tsx",
       "source_location": "L1",
       "id": "sub_components_pending_booking_queue",
-      "community": 122,
+      "community": 0,
       "norm_label": "pending-booking-queue.tsx"
     },
     {
@@ -11447,7 +11447,7 @@
       "source_file": "samson-nextjs/src/modules/staff/components/sub-components/pending-booking-queue.tsx",
       "source_location": "L9",
       "id": "sub_components_pending_booking_queue_pendingbookingqueueprops",
-      "community": 122,
+      "community": 0,
       "norm_label": "pendingbookingqueueprops"
     },
     {
@@ -11456,7 +11456,7 @@
       "source_file": "samson-nextjs/src/modules/staff/components/sub-components/pending-booking-queue.tsx",
       "source_location": "L19",
       "id": "sub_components_pending_booking_queue_pendingbookingqueue",
-      "community": 122,
+      "community": 0,
       "norm_label": "pendingbookingqueue()"
     },
     {
@@ -12104,7 +12104,7 @@
       "source_file": "samson-nextjs/src/modules/staff/hooks/use-secretary-dashboard.ts",
       "source_location": "L6",
       "id": "hooks_use_secretary_dashboard_pendingbooking",
-      "community": 122,
+      "community": 0,
       "norm_label": "pendingbooking"
     },
     {
@@ -13625,7 +13625,7 @@
       "source_file": "samson-nextjs/src/shared/hooks/use-click-outside.spec.ts",
       "source_location": "L1",
       "id": "hooks_use_click_outside_spec",
-      "community": 84,
+      "community": 122,
       "norm_label": "use-click-outside.spec.ts"
     },
     {
@@ -13634,7 +13634,7 @@
       "source_file": "samson-nextjs/src/shared/hooks/use-click-outside.ts",
       "source_location": "L1",
       "id": "hooks_use_click_outside",
-      "community": 84,
+      "community": 122,
       "norm_label": "use-click-outside.ts"
     },
     {
@@ -13643,7 +13643,7 @@
       "source_file": "samson-nextjs/src/shared/hooks/use-click-outside.ts",
       "source_location": "L5",
       "id": "hooks_use_click_outside_useclickoutside",
-      "community": 84,
+      "community": 122,
       "norm_label": "useclickoutside()"
     },
     {
@@ -13868,7 +13868,7 @@
       "source_file": "samson-nextjs/src/shared/utils.ts",
       "source_location": "L1",
       "id": "shared_utils",
-      "community": 122,
+      "community": 0,
       "norm_label": "utils.ts"
     },
     {
@@ -13877,7 +13877,7 @@
       "source_file": "samson-nextjs/src/shared/utils.ts",
       "source_location": "L4",
       "id": "shared_utils_cn",
-      "community": 122,
+      "community": 0,
       "norm_label": "cn()"
     },
     {
@@ -31201,7 +31201,7 @@
       "file_type": "code",
       "source_file": "samson-nextjs/src/components/ui/button.tsx",
       "source_location": "L3",
-      "community": 122,
+      "community": 0,
       "norm_label": "buttonprops",
       "id": "ui_button_buttonprops"
     },
@@ -88190,9 +88190,9 @@
       "source_file": ".CORE_DOCUMENTATION/SERVERLESS_ARCHI/1-BUSSINESS-PLAN/5-SECRETARY-PORTAL/MASTER-SECRETARY-PORTAL.md",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "5_secretary_portal_master_secretary_portal",
-      "target": "5_secretary_portal_master_secretary_portal_master_specification_secretary_portal_samson_dental_center",
-      "confidence_score": 1.0
+      "target": "5_secretary_portal_master_secretary_portal_master_specification_secretary_portal_samson_dental_center"
     },
     {
       "relation": "contains",
@@ -88200,9 +88200,9 @@
       "source_file": ".CORE_DOCUMENTATION/SERVERLESS_ARCHI/1-BUSSINESS-PLAN/5-SECRETARY-PORTAL/MASTER-SECRETARY-PORTAL.md",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "5_secretary_portal_master_secretary_portal_master_specification_secretary_portal_samson_dental_center",
-      "target": "5_secretary_portal_master_secretary_portal_1_frontend_architecture_design_guidelines",
-      "confidence_score": 1.0
+      "target": "5_secretary_portal_master_secretary_portal_1_frontend_architecture_design_guidelines"
     },
     {
       "relation": "contains",
@@ -88210,9 +88210,9 @@
       "source_file": ".CORE_DOCUMENTATION/SERVERLESS_ARCHI/1-BUSSINESS-PLAN/5-SECRETARY-PORTAL/MASTER-SECRETARY-PORTAL.md",
       "source_location": "L19",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "5_secretary_portal_master_secretary_portal_master_specification_secretary_portal_samson_dental_center",
-      "target": "5_secretary_portal_master_secretary_portal_2_shared_data_models_types_secretary_types_ts",
-      "confidence_score": 1.0
+      "target": "5_secretary_portal_master_secretary_portal_2_shared_data_models_types_secretary_types_ts"
     },
     {
       "relation": "contains",
@@ -88220,9 +88220,9 @@
       "source_file": ".CORE_DOCUMENTATION/SERVERLESS_ARCHI/1-BUSSINESS-PLAN/5-SECRETARY-PORTAL/MASTER-SECRETARY-PORTAL.md",
       "source_location": "L126",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "5_secretary_portal_master_secretary_portal_master_specification_secretary_portal_samson_dental_center",
-      "target": "5_secretary_portal_master_secretary_portal_3_sidebar_navigation_shell_layout_tsx",
-      "confidence_score": 1.0
+      "target": "5_secretary_portal_master_secretary_portal_3_sidebar_navigation_shell_layout_tsx"
     },
     {
       "relation": "contains",
@@ -88230,9 +88230,9 @@
       "source_file": ".CORE_DOCUMENTATION/SERVERLESS_ARCHI/1-BUSSINESS-PLAN/5-SECRETARY-PORTAL/MASTER-SECRETARY-PORTAL.md",
       "source_location": "L143",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "5_secretary_portal_master_secretary_portal_master_specification_secretary_portal_samson_dental_center",
-      "target": "5_secretary_portal_master_secretary_portal_4_comprehensive_page_specifications",
-      "confidence_score": 1.0
+      "target": "5_secretary_portal_master_secretary_portal_4_comprehensive_page_specifications"
     },
     {
       "relation": "contains",
@@ -88240,9 +88240,9 @@
       "source_file": ".CORE_DOCUMENTATION/SERVERLESS_ARCHI/1-BUSSINESS-PLAN/5-SECRETARY-PORTAL/MASTER-SECRETARY-PORTAL.md",
       "source_location": "L259",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "5_secretary_portal_master_secretary_portal_4_comprehensive_page_specifications",
-      "target": "5_secretary_portal_master_secretary_portal_page_10_profile_secretary_profile",
-      "confidence_score": 1.0
+      "target": "5_secretary_portal_master_secretary_portal_page_10_profile_secretary_profile"
     },
     {
       "relation": "contains",
@@ -88250,9 +88250,9 @@
       "source_file": ".CORE_DOCUMENTATION/SERVERLESS_ARCHI/1-BUSSINESS-PLAN/5-SECRETARY-PORTAL/MASTER-SECRETARY-PORTAL.md",
       "source_location": "L145",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "5_secretary_portal_master_secretary_portal_4_comprehensive_page_specifications",
-      "target": "5_secretary_portal_master_secretary_portal_page_1_dashboard_secretary",
-      "confidence_score": 1.0
+      "target": "5_secretary_portal_master_secretary_portal_page_1_dashboard_secretary"
     },
     {
       "relation": "contains",
@@ -88260,9 +88260,9 @@
       "source_file": ".CORE_DOCUMENTATION/SERVERLESS_ARCHI/1-BUSSINESS-PLAN/5-SECRETARY-PORTAL/MASTER-SECRETARY-PORTAL.md",
       "source_location": "L156",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "5_secretary_portal_master_secretary_portal_4_comprehensive_page_specifications",
-      "target": "5_secretary_portal_master_secretary_portal_page_2_appointment_requests_secretary_pending",
-      "confidence_score": 1.0
+      "target": "5_secretary_portal_master_secretary_portal_page_2_appointment_requests_secretary_pending"
     },
     {
       "relation": "contains",
@@ -88270,9 +88270,9 @@
       "source_file": ".CORE_DOCUMENTATION/SERVERLESS_ARCHI/1-BUSSINESS-PLAN/5-SECRETARY-PORTAL/MASTER-SECRETARY-PORTAL.md",
       "source_location": "L177",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "5_secretary_portal_master_secretary_portal_4_comprehensive_page_specifications",
-      "target": "5_secretary_portal_master_secretary_portal_page_3_inquiries_queue_secretary_inquiries",
-      "confidence_score": 1.0
+      "target": "5_secretary_portal_master_secretary_portal_page_3_inquiries_queue_secretary_inquiries"
     },
     {
       "relation": "contains",
@@ -88280,9 +88280,9 @@
       "source_file": ".CORE_DOCUMENTATION/SERVERLESS_ARCHI/1-BUSSINESS-PLAN/5-SECRETARY-PORTAL/MASTER-SECRETARY-PORTAL.md",
       "source_location": "L199",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "5_secretary_portal_master_secretary_portal_4_comprehensive_page_specifications",
-      "target": "5_secretary_portal_master_secretary_portal_page_4_book_appointment_secretary_book",
-      "confidence_score": 1.0
+      "target": "5_secretary_portal_master_secretary_portal_page_4_book_appointment_secretary_book"
     },
     {
       "relation": "contains",
@@ -88290,9 +88290,9 @@
       "source_file": ".CORE_DOCUMENTATION/SERVERLESS_ARCHI/1-BUSSINESS-PLAN/5-SECRETARY-PORTAL/MASTER-SECRETARY-PORTAL.md",
       "source_location": "L216",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "5_secretary_portal_master_secretary_portal_4_comprehensive_page_specifications",
-      "target": "5_secretary_portal_master_secretary_portal_page_5_appointments_directory_secretary_appointments",
-      "confidence_score": 1.0
+      "target": "5_secretary_portal_master_secretary_portal_page_5_appointments_directory_secretary_appointments"
     },
     {
       "relation": "contains",
@@ -88300,9 +88300,9 @@
       "source_file": ".CORE_DOCUMENTATION/SERVERLESS_ARCHI/1-BUSSINESS-PLAN/5-SECRETARY-PORTAL/MASTER-SECRETARY-PORTAL.md",
       "source_location": "L227",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "5_secretary_portal_master_secretary_portal_4_comprehensive_page_specifications",
-      "target": "5_secretary_portal_master_secretary_portal_page_6_check_in_out_tracker_secretary_check_in",
-      "confidence_score": 1.0
+      "target": "5_secretary_portal_master_secretary_portal_page_6_check_in_out_tracker_secretary_check_in"
     },
     {
       "relation": "contains",
@@ -88310,9 +88310,9 @@
       "source_file": ".CORE_DOCUMENTATION/SERVERLESS_ARCHI/1-BUSSINESS-PLAN/5-SECRETARY-PORTAL/MASTER-SECRETARY-PORTAL.md",
       "source_location": "L239",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "5_secretary_portal_master_secretary_portal_4_comprehensive_page_specifications",
-      "target": "5_secretary_portal_master_secretary_portal_page_7_invoice_management_secretary_invoices",
-      "confidence_score": 1.0
+      "target": "5_secretary_portal_master_secretary_portal_page_7_invoice_management_secretary_invoices"
     },
     {
       "relation": "contains",
@@ -88320,9 +88320,9 @@
       "source_file": ".CORE_DOCUMENTATION/SERVERLESS_ARCHI/1-BUSSINESS-PLAN/5-SECRETARY-PORTAL/MASTER-SECRETARY-PORTAL.md",
       "source_location": "L246",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "5_secretary_portal_master_secretary_portal_4_comprehensive_page_specifications",
-      "target": "5_secretary_portal_master_secretary_portal_page_8_email_log_secretary_emails",
-      "confidence_score": 1.0
+      "target": "5_secretary_portal_master_secretary_portal_page_8_email_log_secretary_emails"
     },
     {
       "relation": "contains",
@@ -88330,9 +88330,9 @@
       "source_file": ".CORE_DOCUMENTATION/SERVERLESS_ARCHI/1-BUSSINESS-PLAN/5-SECRETARY-PORTAL/MASTER-SECRETARY-PORTAL.md",
       "source_location": "L253",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "5_secretary_portal_master_secretary_portal_4_comprehensive_page_specifications",
-      "target": "5_secretary_portal_master_secretary_portal_page_9_audit_log_secretary_audits",
-      "confidence_score": 1.0
+      "target": "5_secretary_portal_master_secretary_portal_page_9_audit_log_secretary_audits"
     },
     {
       "relation": "contains",
@@ -95971,5 +95971,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "6644897da1b8031d7ade5ef83863090be1253d12"
+  "built_at_commit": "7f9164c708da7d1766448be4bfbdbc9a35402e2c"
 }

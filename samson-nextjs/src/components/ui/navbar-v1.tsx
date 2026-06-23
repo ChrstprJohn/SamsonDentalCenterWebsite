@@ -135,20 +135,7 @@ export function NavbarV1({ user }: NavbarProps) {
           <div className="flex items-center gap-4 sm:gap-6">
             <div className="hidden md:flex items-center gap-5">
               {user ? (
-                <>
-                  <AuthenticatedUserHeader user={user} />
-                  <Link href="/booking">
-                    <button
-                      className={`px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-widest transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] shadow-xs cursor-pointer ${
-                        isDarkNav
-                          ? 'bg-white text-[#141515] hover:bg-[#D94E4E] hover:text-white'
-                          : 'bg-[#141515] text-white hover:bg-[#D94E4E]'
-                      }`}
-                    >
-                      Book Now
-                    </button>
-                  </Link>
-                </>
+                <AuthenticatedUserHeader user={user} isDarkNav={isDarkNav} />
               ) : (
                 <>
                   <Link

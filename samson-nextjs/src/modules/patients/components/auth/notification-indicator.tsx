@@ -5,9 +5,10 @@ import React from 'react';
 interface NotificationIndicatorProps {
   count: number;
   onClick?: () => void;
+  isDarkNav?: boolean;
 }
 
-export function NotificationIndicator({ count, onClick }: NotificationIndicatorProps) {
+export function NotificationIndicator({ count, onClick, isDarkNav = false }: NotificationIndicatorProps) {
   const displayCount = count > 99 ? '99+' : count;
   const hasNotifications = count > 0;
 
@@ -16,7 +17,11 @@ export function NotificationIndicator({ count, onClick }: NotificationIndicatorP
       id="notification-bell-btn"
       aria-label={`Notifications${hasNotifications ? `, ${displayCount} unread` : ''}`}
       onClick={onClick}
-      className="relative flex items-center justify-center w-9 h-9 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-all duration-200 cursor-pointer"
+      className={`relative flex items-center justify-center w-9 h-9 rounded-full transition-all duration-200 cursor-pointer ${
+        isDarkNav
+          ? 'text-white/85 hover:text-white hover:bg-white/10'
+          : 'text-[#1D1E1E]/75 hover:text-[#D94E4E] hover:bg-[#1D1E1E]/5'
+      }`}
     >
       {/* Bell SVG icon */}
       <svg
@@ -39,7 +44,7 @@ export function NotificationIndicator({ count, onClick }: NotificationIndicatorP
       {hasNotifications && (
         <span
           aria-hidden="true"
-          className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 flex items-center justify-center rounded-full bg-gradient-to-r from-rose-500 to-pink-500 text-white text-[9px] font-bold shadow-sm shadow-rose-500/30 animate-pulse"
+          className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 flex items-center justify-center rounded-full bg-gradient-to-r from-[#D94E4E] to-[#f47c7c] text-white text-[9px] font-bold shadow-sm shadow-[#D94E4E]/30 animate-pulse"
         >
           {displayCount}
         </span>

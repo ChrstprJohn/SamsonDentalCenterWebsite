@@ -10,6 +10,7 @@ import { NotificationIndicator } from './notification-indicator';
 interface AuthenticatedUserHeaderProps {
   user: AuthHeaderUser;
   notificationCount?: number;
+  isDarkNav?: boolean;
 }
 
 const NAV_LINKS = [
@@ -21,6 +22,7 @@ const NAV_LINKS = [
 export function AuthenticatedUserHeader({
   user,
   notificationCount = 0,
+  isDarkNav = false,
 }: AuthenticatedUserHeaderProps) {
   const { isDropdownOpen, toggleDropdown, closeDropdown, getInitials, logout, isLoading } = useAuthHeader();
   const initials = getInitials(user);
@@ -34,6 +36,7 @@ export function AuthenticatedUserHeader({
       {/* Notification Bell */}
       <NotificationIndicator
         count={notificationCount}
+        isDarkNav={isDarkNav}
         onClick={() => {
           /* future: open notification panel */
         }}
@@ -47,24 +50,28 @@ export function AuthenticatedUserHeader({
           aria-expanded={isDropdownOpen}
           aria-haspopup="true"
           onClick={toggleDropdown}
-          className="flex items-center gap-2.5 rounded-xl px-2 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-all duration-200 cursor-pointer group"
+          className={`flex items-center gap-2.5 rounded-full px-2.5 py-1.5 transition-all duration-200 cursor-pointer group ${
+            isDarkNav ? 'hover:bg-white/10' : 'hover:bg-[#1D1E1E]/5'
+          }`}
         >
           {/* Avatar */}
           {user.avatarUrl ? (
             <img
               src={user.avatarUrl}
               alt={displayName}
-              className="w-8 h-8 rounded-lg object-cover ring-2 ring-blue-500/30"
+              className="w-8 h-8 rounded-full object-cover ring-2 ring-[#D94E4E]/20"
             />
           ) : (
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold shadow-md shadow-blue-500/20 ring-2 ring-blue-500/20">
+            <div className="w-8 h-8 rounded-full bg-[#D94E4E] flex items-center justify-center text-white text-[11px] font-bold shadow-md shadow-[#D94E4E]/10 ring-2 ring-[#D94E4E]/20">
               {initials}
             </div>
           )}
 
           {/* Name */}
-          <span className="hidden sm:block text-sm font-semibold text-slate-700 dark:text-slate-200 max-w-[120px] truncate group-hover:text-slate-900 dark:group-hover:text-white transition-colors">
-            {displayName}
+          <span className={`hidden sm:block font-sans text-[13px] tracking-[0.1em] font-semibold uppercase max-w-[120px] truncate transition-colors ${
+            isDarkNav ? 'text-white/85 group-hover:text-white' : 'text-[#1D1E1E]/80 group-hover:text-[#D94E4E]'
+          }`}>
+            {user.firstName}
           </span>
 
           {/* Chevron */}
@@ -79,7 +86,9 @@ export function AuthenticatedUserHeader({
             strokeLinecap="round"
             strokeLinejoin="round"
             aria-hidden="true"
-            className={`text-slate-400 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`}
+            className={`transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''} ${
+              isDarkNav ? 'text-white/60 group-hover:text-white' : 'text-[#1D1E1E]/60 group-hover:text-[#D94E4E]'
+            }`}
           >
             <path d="m6 9 6 6 6-6" />
           </svg>

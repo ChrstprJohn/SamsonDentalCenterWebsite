@@ -53,11 +53,6 @@ export function NavbarMobileDrawer({
           {user ? (
             <div className="flex flex-col gap-4 items-center">
               <AuthenticatedUserHeader user={user} />
-              <Link href="/booking" onClick={onClose} className="w-full">
-                <button className="w-full px-6 py-3.5 bg-[#141515] text-white rounded-full text-[14px] font-semibold hover:bg-[#D94E4E] tracking-[0.2em] transition-all cursor-pointer">
-                  Book Now
-                </button>
-              </Link>
             </div>
           ) : (
             <>

@@ -885,9 +885,9 @@
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\patients\\components\\auth\\authenticated-user-header.tsx": {
-    "mtime": 1780304334.0190077,
-    "ast_hash": "48472400422200f792c61d22936f99e5",
-    "semantic_hash": "48472400422200f792c61d22936f99e5"
+    "mtime": 1782175892.8965955,
+    "ast_hash": "0250888ee06795067752b226235df177",
+    "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\patients\\components\\auth\\login-form.tsx": {
     "mtime": 1780325089.9620216,
@@ -895,9 +895,9 @@
     "semantic_hash": "23778ea88f535fd7212376dadc7a542d"
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\patients\\components\\auth\\notification-indicator.tsx": {
-    "mtime": 1780216485.6977806,
-    "ast_hash": "232d74bcf2c92437368a73ac92acd8f9",
-    "semantic_hash": "232d74bcf2c92437368a73ac92acd8f9"
+    "mtime": 1782175887.4196103,
+    "ast_hash": "1a0c9c2cf06f788ad13701fe9f4ddfb7",
+    "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\patients\\components\\auth\\signup-form.tsx": {
     "mtime": 1780325089.962528,
@@ -3720,8 +3720,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\components\\ui\\navbar-mobile-drawer.tsx": {
-    "mtime": 1781933868.0172434,
-    "ast_hash": "8a727e41f77666d12860a88bb4c99a34",
+    "mtime": 1782176189.839948,
+    "ast_hash": "9c223813fdc6d25873b1d3b2259c6142",
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\patients\\components\\landing\\trust-and-stats.tsx": {
@@ -3750,8 +3750,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\components\\ui\\navbar-v1.tsx": {
-    "mtime": 1782004983.271735,
-    "ast_hash": "94854a9cd3c76e5cc61be070a1beea36",
+    "mtime": 1782176186.1610918,
+    "ast_hash": "3bdf85ba5f8aab4e98a5d6e02c9f9a99",
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\patients\\components\\landing\\hero-section-v1.tsx": {
