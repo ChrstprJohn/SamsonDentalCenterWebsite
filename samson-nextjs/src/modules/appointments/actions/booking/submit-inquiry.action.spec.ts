@@ -3,7 +3,7 @@ import { submitInquiryAction } from './submit-inquiry.action';
 import * as dbModule from '@/shared/database/server';
 
 vi.mock('@/shared/database/server', () => ({
-  createClient: vi.fn(),
+  createAdminClient: vi.fn(),
 }));
 
 describe('submitInquiryAction', () => {
@@ -27,7 +27,7 @@ describe('submitInquiryAction', () => {
     const mockFrom = vi.fn().mockReturnValue({ insert: mockInsert });
 
     const mockSupabase = { from: mockFrom };
-    vi.spyOn(dbModule, 'createClient').mockResolvedValue(mockSupabase as any);
+    vi.spyOn(dbModule, 'createAdminClient').mockResolvedValue(mockSupabase as any);
 
     const payload = {
       firstName: 'Jane',

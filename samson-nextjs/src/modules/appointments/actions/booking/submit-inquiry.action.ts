@@ -1,6 +1,6 @@
 'use server';
 
-import { createClient } from '@/shared/database/server';
+import { createAdminClient } from '@/shared/database/server';
 import { submitInquirySchema, SubmitInquiryDto } from '../../dtos/booking/submit-inquiry.dto';
 import { createInquiryCommand } from '../../repositories/booking/appointment-inquiries.commands';
 import { submitInquiryUseCase } from '../../use-cases/booking/submit-inquiry.use-case';
@@ -11,7 +11,7 @@ export async function submitInquiryAction(data: SubmitInquiryDto) {
     const parsed = submitInquirySchema.parse(data);
 
     // 2. DI Setup (Functional)
-    const supabase = await createClient();
+    const supabase = await createAdminClient();
     const repoCommand = createInquiryCommand(supabase);
     const useCase = submitInquiryUseCase({ createInquiry: repoCommand });
 

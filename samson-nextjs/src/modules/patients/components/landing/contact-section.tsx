@@ -1,54 +1,121 @@
-'use client';
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Phone, MapPin, Clock, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { ClinicConfigResponseDto } from '@/modules/clinic-config/dtos/settings/get-clinic-config.dto';
+import type { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
+import { getAvailableDaysAction } from '@/modules/appointments/actions/availability/get-available-days.action';
 
 interface ContactSectionProps {
   config: ClinicConfigResponseDto;
+  services: ServiceResponseDto[];
   contactForm: {
-    contactName: string;
-    setContactName: (val: string) => void;
+    firstName: string;
+    setFirstName: (val: string) => void;
+    middleName: string;
+    setMiddleName: (val: string) => void;
+    lastName: string;
+    setLastName: (val: string) => void;
+    suffix: string;
+    setSuffix: (val: string) => void;
     contactEmail: string;
     setContactEmail: (val: string) => void;
     contactMessage: string;
     setContactMessage: (val: string) => void;
     isContactSubmitting: boolean;
-    handleContactSubmit: (e: React.FormEvent) => void;
+    handleRealInquirySubmit: (data: {
+      phone: string;
+      pathway: string;
+      targetDate: string;
+      notes: string;
+    }) => Promise<boolean>;
   };
 }
 
-export function ContactSection({ config, contactForm }: ContactSectionProps) {
+export function ContactSection({ config, services, contactForm }: ContactSectionProps) {
   const {
-    contactName,
-    setContactName,
+    firstName,
+    setFirstName,
+    middleName,
+    setMiddleName,
+    lastName,
+    setLastName,
+    suffix,
+    setSuffix,
     contactEmail,
     setContactEmail,
-    setContactMessage,
     isContactSubmitting,
-    handleContactSubmit,
+    handleRealInquirySubmit,
   } = contactForm;
 
   // Local state for the extra fields of the new design
   const [phone, setPhone] = useState('');
-  const [pathway, setPathway] = useState('Cosmetic Dentistry');
+  const [pathway, setPathway] = useState(services[0]?.id || '');
   const [targetDate, setTargetDate] = useState('');
   const [notes, setNotes] = useState('');
   const [submittedLocal, setSubmittedLocal] = useState(false);
 
+  // States for dynamic calendar integration
+  const [currentMonth, setCurrentMonth] = useState<Date>(() => {
+    const d = new Date();
+    // Default to July 2026 if current date is before, or dynamically initialize
+    // Let's check: the seed has schedules in June 2026. Let's default to June 2026 as in inquiries page or current date
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), 1);
+  });
+  const [availableDates, setAvailableDates] = useState<string[]>([]);
+  const [isLoadingDays, setIsLoadingDays] = useState(false);
+
+  useEffect(() => {
+    if (services.length > 0 && !pathway) {
+      setPathway(services[0].id);
+    }
+  }, [services]);
+
+  // Clear target date when service pathway changes
+  useEffect(() => {
+    setTargetDate('');
+  }, [pathway]);
+
+  // Fetch available days
+  useEffect(() => {
+    if (!pathway) {
+      setAvailableDates([]);
+      return;
+    }
+    let active = true;
+    async function loadDays() {
+      setIsLoadingDays(true);
+      const monthStr = `${currentMonth.getFullYear()}-${(currentMonth.getMonth() + 1).toString().padStart(2, '0')}`;
+      const res = await getAvailableDaysAction({
+        serviceId: pathway,
+        month: monthStr,
+      });
+      if (active) {
+        setIsLoadingDays(false);
+        if (res.success && res.data) {
+          setAvailableDates(res.data.availableDates || []);
+        } else {
+          setAvailableDates([]);
+        }
+      }
+    }
+    loadDays();
+    return () => {
+      active = false;
+    };
+  }, [pathway, currentMonth]);
+
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Construct a comprehensive inquiry description
-    const fullMessage = `Phone: ${phone}\nSpecialty Pathway: ${pathway}\nPreferred Target Date: ${targetDate}\n\nInquiry Notes:\n${notes}`;
-    setContactMessage(fullMessage);
-
-    // Call the parent handler
-    handleContactSubmit(e);
-    
-    // Check if parent successfully submitted or sets loader
-    setSubmittedLocal(true);
+    const success = await handleRealInquirySubmit({
+      phone,
+      pathway,
+      targetDate,
+      notes,
+    });
+    if (success) {
+      setSubmittedLocal(true);
+    }
   };
 
   return (
@@ -128,16 +195,53 @@ export function ContactSection({ config, contactForm }: ContactSectionProps) {
  
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                       <div className="flex flex-col gap-2 font-sans">
-                        <label className="text-[10px] tracking-wider uppercase font-semibold text-gray-500">Your Full Name *</label>
+                        <label className="text-[10px] tracking-wider uppercase font-semibold text-gray-500">First Name *</label>
                         <input
                           type="text"
                           required
-                          value={contactName}
-                          onChange={(e) => setContactName(e.target.value)}
-                          placeholder="Eleanor Vance"
+                          value={firstName}
+                          onChange={(e) => setFirstName(e.target.value)}
+                          placeholder="Eleanor"
                           className="w-full bg-white border border-[#E4E4DC] px-4 py-3 rounded-none text-xs sm:text-sm focus:outline-none focus:border-[#D94E4E] transition-colors"
                         />
                       </div>
+                      <div className="flex flex-col gap-2 font-sans">
+                        <label className="text-[10px] tracking-wider uppercase font-semibold text-gray-500">Middle Name</label>
+                        <input
+                          type="text"
+                          value={middleName}
+                          onChange={(e) => setMiddleName(e.target.value)}
+                          placeholder="Jean"
+                          className="w-full bg-white border border-[#E4E4DC] px-4 py-3 rounded-none text-xs sm:text-sm focus:outline-none focus:border-[#D94E4E] transition-colors"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      <div className="flex flex-col gap-2 font-sans">
+                        <label className="text-[10px] tracking-wider uppercase font-semibold text-gray-500">Last Name *</label>
+                        <input
+                          type="text"
+                          required
+                          value={lastName}
+                          onChange={(e) => setLastName(e.target.value)}
+                          placeholder="Vance"
+                          className="w-full bg-white border border-[#E4E4DC] px-4 py-3 rounded-none text-xs sm:text-sm focus:outline-none focus:border-[#D94E4E] transition-colors"
+                        />
+                      </div>
+                      <div className="flex flex-col gap-2 font-sans">
+                        <label className="text-[10px] tracking-wider uppercase font-semibold text-gray-500">Suffix</label>
+                        <input
+                          type="text"
+                          value={suffix}
+                          onChange={(e) => setSuffix(e.target.value)}
+                          placeholder="Jr. / III"
+                          className="w-full bg-white border border-[#E4E4DC] px-4 py-3 rounded-none text-xs sm:text-sm focus:outline-none focus:border-[#D94E4E] transition-colors"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                       <div className="flex flex-col gap-2 font-sans">
                         <label className="text-[10px] tracking-wider uppercase font-semibold text-gray-500">Email Address *</label>
                         <input
@@ -170,23 +274,82 @@ export function ContactSection({ config, contactForm }: ContactSectionProps) {
                           onChange={(e) => setPathway(e.target.value)}
                           className="w-full bg-white border border-[#E4E4DC] px-4 py-3 rounded-none text-xs sm:text-sm focus:outline-none focus:border-[#D94E4E] transition-colors appearance-none"
                         >
-                          <option value="Cosmetic Dentistry">Aesthetic Dentistry (Porcelain / Veneers)</option>
-                          <option value="Restorative Care">Restorative Care (Structural biological implants)</option>
-                          <option value="Preventative Wellness">Preventative Wellness (Therapy & Deep cleaning)</option>
-                          <option value="Clear Orthodontics">Clear Alignment pathway</option>
+                          {services.map((srv) => (
+                            <option key={srv.id} value={srv.id}>
+                              {srv.name}
+                            </option>
+                          ))}
                         </select>
                       </div>
                     </div>
  
                     <div className="flex flex-col gap-2 font-sans">
                       <label className="text-[10px] tracking-wider uppercase font-semibold text-gray-500">Preferred Target Date *</label>
-                      <input
-                        type="date"
-                        required
-                        value={targetDate}
-                        onChange={(e) => setTargetDate(e.target.value)}
-                        className="w-full bg-white border border-[#E4E4DC] px-4 py-3 rounded-none text-xs sm:text-sm focus:outline-none focus:border-[#D94E4E] transition-colors"
-                      />
+                      <div className="p-4 bg-white border border-[#E4E4DC] rounded-none">
+                        {/* Calendar Navigation Header */}
+                        <div className="flex justify-between items-center text-xs text-gray-900 mb-3 font-semibold bg-gray-50 p-2 border border-gray-100">
+                          <button
+                            type="button"
+                            onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1))}
+                            className="px-2 py-1 hover:bg-gray-100 font-bold"
+                          >
+                            ◀ Prev
+                          </button>
+                          <div className="uppercase tracking-wider font-sans font-bold">
+                            {currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1))}
+                            className="px-2 py-1 hover:bg-gray-100 font-bold"
+                          >
+                            Next ▶
+                          </button>
+                        </div>
+
+                        {isLoadingDays ? (
+                          <div className="text-center text-xs text-gray-400 py-6 animate-pulse font-sans">
+                            Scanning available dates...
+                          </div>
+                        ) : (
+                          <div className="grid grid-cols-7 gap-1 text-center text-[10px]">
+                            {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((dayName, idx) => (
+                              <div key={`${dayName}-${idx}`} className="font-bold text-gray-400 py-1 font-sans">{dayName}</div>
+                            ))}
+                            {Array.from({ length: new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1).getDay() }).map((_, idx) => (
+                              <div key={`blank-${idx}`} className="py-2" />
+                            ))}
+                            {Array.from({ length: new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0).getDate() }).map((_, idx) => {
+                              const d = idx + 1;
+                              const dateStr = `${currentMonth.getFullYear()}-${(currentMonth.getMonth() + 1).toString().padStart(2, '0')}-${d.toString().padStart(2, '0')}`;
+                              const isAvailable = availableDates.includes(dateStr);
+                              const isSelected = targetDate === dateStr;
+                              return (
+                                <button
+                                  key={d}
+                                  type="button"
+                                  disabled={!isAvailable}
+                                  onClick={() => setTargetDate(dateStr)}
+                                  className={`py-2 text-xs font-semibold transition-all border ${
+                                    isSelected
+                                      ? 'bg-[#D94E4E] text-white border-[#D94E4E] shadow-sm font-bold'
+                                      : isAvailable
+                                      ? 'text-gray-900 bg-emerald-500/5 border-emerald-500/20 hover:bg-[#D94E4E]/5 hover:border-[#D94E4E]/50 cursor-pointer font-bold'
+                                      : 'text-gray-300 border-transparent opacity-30 cursor-not-allowed'
+                                  }`}
+                                >
+                                  {d}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                      {targetDate && (
+                        <div className="text-[11px] font-sans text-emerald-600 bg-emerald-50 p-2 border border-emerald-200 mt-1">
+                          ✓ Selected: <span className="font-bold">{targetDate}</span>
+                        </div>
+                      )}
                     </div>
  
                     <div className="flex flex-col gap-2 font-sans">
@@ -227,7 +390,7 @@ export function ContactSection({ config, contactForm }: ContactSectionProps) {
                       Reservation Received
                     </h3>
                     <p className="text-sm font-light text-gray-500 max-w-md mx-auto leading-relaxed font-sans">
-                      Thank you, <span className="font-medium text-gray-900">{contactName}</span>. Your details are secure. Our cosmetic reservation desk will contact you at <span className="font-medium text-gray-900">{phone}</span> within 24 working hours to finalize our diagnostics outline.
+                      Thank you, <span className="font-medium text-gray-900">{firstName} {lastName}</span>. Your details are secure. Our cosmetic reservation desk will contact you at <span className="font-medium text-gray-900">{phone}</span> within 24 working hours to finalize our diagnostics outline.
                     </p>
                     <button
                       onClick={() => {

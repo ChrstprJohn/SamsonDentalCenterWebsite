@@ -70,14 +70,14 @@ const DEFAULT_SERVICES: ServiceResponseDto[] = [
 ];
 
 export function LandingView({ services, config, isAuthenticated }: LandingViewProps) {
+  const activeServices = services.length > 0 ? services : DEFAULT_SERVICES;
+
   const {
     selectedService,
     setSelectedService,
     contactForm,
     handleBookingCTA,
-  } = useLandingView({ isAuthenticated });
-
-  const activeServices = services.length > 0 ? services : DEFAULT_SERVICES;
+  } = useLandingView({ isAuthenticated, services: activeServices });
 
   return (
     <div className="flex flex-col w-full bg-[#FDFDFD] text-[#1D1E1E]">
@@ -87,7 +87,7 @@ export function LandingView({ services, config, isAuthenticated }: LandingViewPr
       {/* <JourneySection /> */}
       <GallerySection />
       <TestimonialsSection />
-      <ContactSection config={config} contactForm={contactForm} />
+      <ContactSection config={config} services={activeServices} contactForm={contactForm} />
 
       {/* 🔍 Services Detail Popup Modal */}
       <Modal
