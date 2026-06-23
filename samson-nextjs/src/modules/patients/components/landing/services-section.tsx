@@ -157,15 +157,22 @@ export function ServicesSection({ services, onSelectService }: ServicesSectionPr
               <div
                 key={svc.nr}
                 onClick={() => handleItemClick(svc.title)}
-                className="group flex items-center justify-between py-6 sm:py-8 transition-colors duration-300 hover:bg-[#1C1D1D]/70 px-4 sm:px-6 rounded-2xl cursor-pointer"
+                className="group relative flex items-center justify-between py-6 sm:py-8 transition-colors duration-300 hover:bg-[#1C1D1D]/70 px-4 sm:px-6 rounded-2xl cursor-pointer overflow-hidden"
               >
+                {/* ponytail: CSS SVG noise overlay visible on hover */}
+                <div 
+                  className="absolute inset-0 opacity-0 group-hover:opacity-[0.06] mix-blend-overlay pointer-events-none z-0 transition-opacity duration-300"
+                  style={{
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`
+                  }}
+                />
                 {/* Index Left */}
-                <span className="text-[clamp(18px,1vw+10px,24px)] font-josefin font-normal text-white/75 group-hover:text-white transition-colors w-12 sm:w-24 text-left">
+                <span className="relative z-10 text-[clamp(18px,1vw+10px,24px)] font-josefin font-normal text-white/75 group-hover:text-white transition-colors w-12 sm:w-24 text-left">
                   {svc.nr}
                 </span>
 
                 {/* Title Center - Consistent with Hero typography */}
-                <h4 className="font-josefin text-[clamp(16px,2vw+10px,30px)] font-normal tracking-tight text-white/90 group-hover:text-white transition-colors flex-1 text-center leading-[1.1]">
+                <h4 className="relative z-10 font-josefin text-[clamp(16px,2vw+10px,30px)] font-normal tracking-tight text-white/90 group-hover:text-white transition-colors flex-1 text-center leading-[1.1]">
                   {(() => {
                     const listWords = svc.title.split(' ');
                     if (listWords.length === 2) {
@@ -191,7 +198,7 @@ export function ServicesSection({ services, onSelectService }: ServicesSectionPr
                 </h4>
 
                 {/* Right container matching width of left container to guarantee true centering of the title */}
-                <div className="w-12 sm:w-24 flex justify-end">
+                <div className="relative z-10 w-12 sm:w-24 flex justify-end">
                   {/* Circular Arrow Button (pointing North-East initially, clockwise rot to East under hover) */}
                   <div className="w-[clamp(36px,3.5vw+12px,54px)] h-[clamp(36px,3.5vw+12px,54px)] bg-white/5 group-hover:bg-[#D94E4E] rounded-full border border-white/10 flex items-center justify-center text-white/80 group-hover:text-white transition-all duration-305">
                     <MoveRight className="w-[clamp(16px,1.2vw+6px,24px)] h-[clamp(16px,1.2vw+6px,24px)] transition-transform duration-500 ease-out rotate-[-45deg] group-hover:rotate-0" />
