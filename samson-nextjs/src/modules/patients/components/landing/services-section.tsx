@@ -144,6 +144,13 @@ export function ServicesSection({ services, onSelectService }: ServicesSectionPr
       {/* Lower Part / Background Switch: Deep cohesive dark charcoal match to the marquee */}
       {/* Negative margins allow the image grid cards to gorgeously overlap onto the dark section by ~12.5% (45px) */}
       <div className="bg-[#1D1E1E] relative pt-[115px] sm:pt-[135px] pb-24 sm:pb-32 mt-[-85px] z-0">
+        {/* ponytail: CSS SVG noise overlay */}
+        <div 
+          className="absolute inset-0 opacity-[0.06] mix-blend-overlay pointer-events-none z-0"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`
+          }}
+        />
         <div className="max-w-7xl mx-auto px-6 sm:px-12 relative z-10">
           <div className="divide-y divide-[#D94E4E]/10">
             {LIST_SERVICES.map((svc, idx) => (

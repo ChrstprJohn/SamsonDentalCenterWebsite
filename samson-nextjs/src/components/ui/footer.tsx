@@ -70,10 +70,10 @@ export function Footer({ config }: FooterProps) {
           <p className="text-[14px] text-[#BAC1C1]/75 leading-relaxed font-light max-w-sm mt-2">
             Sculpting radiant smiles with architectural precision. Experience top-tier biological restorations, premium cosmetic veneers, and expert preventive care in a calming wellness sanctuary.
           </p>
-          <div className="mt-4 w-full max-w-sm h-36 rounded-lg overflow-hidden border border-white/10 opacity-85 hover:opacity-100 transition-opacity">
+          <div className="mt-4 w-full max-w-sm h-52 rounded-lg overflow-hidden border border-white/10 opacity-85 hover:opacity-100 transition-opacity">
             <iframe
               src={`https://maps.google.com/maps?q=${encodeURIComponent("Samson Dental Center, " + address)}&output=embed`}
-              className="w-full h-full border-0 grayscale invert"
+              className="w-full h-full border-0 grayscale"
               allowFullScreen={false}
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
