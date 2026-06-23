@@ -42,6 +42,12 @@ const inquiryDbSchema = z.object({
   linked_appointment_id: z.string().uuid().nullable().optional(),
   created_at: z.string(),
   updated_at: z.string(),
+  services: z
+    .object({
+      name: z.string(),
+    })
+    .nullable()
+    .optional(),
 });
 
 // Transform DB shape (snake_case) to App shape (camelCase)
@@ -54,6 +60,7 @@ export const inquiryResponseSchema = inquiryDbSchema.transform((data) => ({
   phoneNumber: data.phone_number,
   email: data.email,
   preferredServiceId: data.preferred_service_id,
+  preferredServiceName: data.services?.name ?? 'Unknown Service',
   preferredDate: data.preferred_date,
   patientNote: data.patient_note ?? undefined,
   status: data.status,

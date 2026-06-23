@@ -17,7 +17,8 @@ export async function dropInquiryAction(data: DropInquiryDto) {
     const user = await getAuthenticatedUser();
     
     // Auth Role validation (Must be SECRETARY or ADMIN to drop inquiry)
-    if (user.role !== 'SECRETARY' && user.role !== 'ADMIN') {
+    const role = user.user_metadata?.role || user.role;
+    if (role !== 'SECRETARY' && role !== 'ADMIN') {
       throw new DomainError('Unauthorized: Access restricted to clinic staff.', 'UNAUTHORIZED_ACCESS');
     }
 
