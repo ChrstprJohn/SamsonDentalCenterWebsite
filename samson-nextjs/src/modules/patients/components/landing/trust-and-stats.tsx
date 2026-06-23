@@ -19,13 +19,13 @@ export function TrustAndStats({ variant = 'v1' }: TrustAndStatsProps) {
     <section
       id="trust-and-stats"
       className={`relative w-full overflow-hidden z-20 ${
-        isV2 ? 'bg-[#FDFDFD]/90 border-y border-gray-200 shadow-xs' : 'bg-[#141515] border-y border-[#D94E4E]/15'
+        isV2 ? 'bg-[#FDFDFD]/90 border-y border-gray-200 shadow-xs' : 'bg-[#1D1E1E] border-y border-[#D94E4E]/15'
       }`}
     >
       {/* Mobile View: Rotating Luxury Marquee Banner with Edge Fade Masks */}
       <div className="block lg:hidden py-6 overflow-hidden relative" id="trust-marquee-ribbon">
-        <div className={`absolute inset-y-0 left-0 w-8 bg-gradient-to-r ${isV2 ? 'from-[#FDFDFD]' : 'from-[#141515]'} to-transparent pointer-events-none z-10`} />
-        <div className={`absolute inset-y-0 right-0 w-8 bg-gradient-to-l ${isV2 ? 'from-[#FDFDFD]' : 'from-[#141515]'} to-transparent pointer-events-none z-10`} />
+        <div className={`absolute inset-y-0 left-0 w-8 bg-gradient-to-r ${isV2 ? 'from-[#FDFDFD]' : 'from-[#1D1E1E]'} to-transparent pointer-events-none z-10`} />
+        <div className={`absolute inset-y-0 right-0 w-8 bg-gradient-to-l ${isV2 ? 'from-[#FDFDFD]' : 'from-[#1D1E1E]'} to-transparent pointer-events-none z-10`} />
  
         <div className="animate-marquee flex flex-row items-center whitespace-nowrap shrink-0">
           {/* Main Loop Group */}

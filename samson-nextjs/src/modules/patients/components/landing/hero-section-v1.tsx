@@ -32,7 +32,7 @@ export function HeroSectionV1({ onBookClick }: HeroSectionProps) {
               className="w-full h-full object-cover object-center filter brightness-[0.95] saturate-[0.9] contrast-[1.02]"
             />
           </picture>
-          <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-[#141515] z-0" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-[#1D1E1E] z-0" />
         </div>
 
         {/* Content Container */}
