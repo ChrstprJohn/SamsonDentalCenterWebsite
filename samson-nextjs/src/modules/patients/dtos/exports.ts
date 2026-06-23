@@ -1,4 +1,5 @@
 export * from './profile/patient-profile.dto';
+export * from './profile/patient-profile-for-staff.dto';
 export * from './profile/register-patient.dto';
 
 export * from './dependents/create-dependent.dto';
