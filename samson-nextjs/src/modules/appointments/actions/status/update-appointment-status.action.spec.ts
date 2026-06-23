@@ -35,6 +35,7 @@ describe('updateAppointmentStatusAction', () => {
     const payload = {
       appointmentId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd2',
       status: 'APPROVED',
+      statusReason: 'Approved because calendar cleared',
     };
 
     const result = await updateAppointmentStatusAction(payload as any);
@@ -46,7 +47,7 @@ describe('updateAppointmentStatusAction', () => {
       'staff_1',
       'STAFF',
       'APPROVED',
-      undefined,
+      'Approved because calendar cleared',
       undefined
     );
   });
@@ -59,6 +60,7 @@ describe('updateAppointmentStatusAction', () => {
     const payload = {
       appointmentId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd2',
       status: 'APPROVED',
+      statusReason: 'Rescheduling requested slot',
       newDate: '2026-06-01',
       newStartTime: '2026-06-01T09:00:00Z',
       newEndTime: '2026-06-01T09:30:00Z',
@@ -72,7 +74,7 @@ describe('updateAppointmentStatusAction', () => {
       'staff_1',
       'STAFF',
       'APPROVED',
-      undefined,
+      'Rescheduling requested slot',
       {
         date: '2026-06-01',
         startTime: '2026-06-01T09:00:00Z',
@@ -82,14 +84,14 @@ describe('updateAppointmentStatusAction', () => {
     );
   });
 
-  it('returns validation error when REJECTED has no reason', async () => {
+  it('returns validation error when payload has no reason', async () => {
     vi.mocked(authorizeRole).mockResolvedValue({ id: 'staff_1' } as any);
     vi.mocked(getAuthenticatedUser).mockResolvedValue({ id: 'staff_1' } as any);
 
     const payload = {
       appointmentId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd2',
-      status: 'REJECTED',
-      // statusReason intentionally omitted — required for REJECTED
+      status: 'APPROVED',
+      // statusReason intentionally omitted
     };
 
     const result = await updateAppointmentStatusAction(payload as any);

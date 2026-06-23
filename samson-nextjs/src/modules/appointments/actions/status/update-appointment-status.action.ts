@@ -1,7 +1,7 @@
 'use server';
 
 import { z } from 'zod';
-import { createClient } from '@/shared/database/server';
+import { createClient, createAdminClient } from '@/shared/database/server';
 import { authorizeRole, getAuthenticatedUser } from '@/shared/auth/auth.util';
 import { DomainError } from '@/shared/errors';
 import { staffUpdateAppointmentStatusSchema, StaffUpdateAppointmentStatusDto } from '../../dtos/exports';
@@ -20,12 +20,13 @@ export async function updateAppointmentStatusAction(formData: StaffUpdateAppoint
 
     const validData = staffUpdateAppointmentStatusSchema.parse(formData);
     const supabase = await createClient();
+    const supabaseAdmin = await createAdminClient();
 
     const useCase = updateAppointmentStatusUseCase({
       getAppointmentById: getAppointmentByIdQuery(supabase),
       updateStatus: updateStatusCommand(supabase),
       incrementUserCredibilityMetric: incrementUserCredibilityMetricCommand(supabase),
-      insertLedgerEntry: insertLedgerEntryCommand(supabase),
+      insertLedgerEntry: insertLedgerEntryCommand(supabaseAdmin),
     });
 
     // Format optional reschedule metadata

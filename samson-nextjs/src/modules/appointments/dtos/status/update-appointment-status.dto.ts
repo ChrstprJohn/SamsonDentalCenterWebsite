@@ -29,7 +29,7 @@ export const staffUpdateAppointmentStatusSchema = z
             'COMPLETED',
             'NO_SHOW',
         ]),
-        statusReason: cleanOptionalString,
+        statusReason: z.string().trim().min(1, 'Reason/Remark is required'),
 
         // Form Sanitized Reschedule Metadata
         newDate: z
@@ -54,16 +54,7 @@ export const staffUpdateAppointmentStatusSchema = z
             .optional(),
     })
     .superRefine((data, ctx) => {
-        // 1. Audit Trail Reasoning Guard
-        const requiresReason = ['REJECTED', 'CANCELLED', 'DISPLACED'].includes(data.status);
-
-        if (requiresReason && (!data.statusReason || data.statusReason.length === 0)) {
-            ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                message: 'Reason is required when status is ' + data.status,
-                path: ['statusReason'],
-            });
-        }
+        // 1. Audit Trail Reasoning Guard - always required, handled by validation schema above.
 
         // 2. Cohesive Reschedule Block Validation
         const hasNewSchedule = !!(
