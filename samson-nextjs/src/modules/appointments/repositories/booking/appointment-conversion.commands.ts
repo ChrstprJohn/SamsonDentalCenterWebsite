@@ -13,6 +13,13 @@ export const convertInquiryToAppointmentCommand = (supabase: SupabaseClient) => 
       p_patient_note: data.patientNote || null,
       p_secretary_notes: data.secretaryNotes || null,
       p_secretary_user_id: secretaryUserId,
+      p_patient_id: data.linkedPatientId || null,
+      p_first_name: data.guestFirstName || null,
+      p_middle_name: data.guestMiddleName || null,
+      p_last_name: data.guestLastName || null,
+      p_suffix: data.guestSuffix || null,
+      p_phone_number: data.guestPhone || null,
+      p_email: data.guestEmail || null,
     });
 
     if (error || !appointmentId) {

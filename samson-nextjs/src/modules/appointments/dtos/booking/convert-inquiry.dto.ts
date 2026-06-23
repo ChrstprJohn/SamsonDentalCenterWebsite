@@ -17,6 +17,13 @@ export const convertInquirySchema = z
     endTime: z.string().datetime('Must be a valid ISO string'),
     patientNote: cleanOptionalString, // editable draft
     secretaryNotes: cleanOptionalString, // call notes
+    linkedPatientId: z.string().uuid('Invalid patient ID format').optional(),
+    guestFirstName: cleanOptionalString,
+    guestMiddleName: cleanOptionalString,
+    guestLastName: cleanOptionalString,
+    guestSuffix: cleanOptionalString,
+    guestPhone: cleanOptionalString,
+    guestEmail: cleanOptionalString,
   })
   .superRefine((data, ctx) => {
     if (new Date(data.startTime) >= new Date(data.endTime)) {

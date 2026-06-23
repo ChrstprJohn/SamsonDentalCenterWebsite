@@ -17,6 +17,7 @@ describe('convertInquiryToAppointmentCommand', () => {
       endTime: '2026-06-25T10:30:00Z',
       patientNote: 'Urgently needs checkup',
       secretaryNotes: 'Confirmed over phone',
+      linkedPatientId: '9a2f1d60-89ab-4b73-99fb-1d6c3c5a1d44',
     };
 
     const result = await command(payload, 'secretary-id');
@@ -30,7 +31,14 @@ describe('convertInquiryToAppointmentCommand', () => {
       p_end_time: '2026-06-25T10:30:00Z',
       p_patient_note: 'Urgently needs checkup',
       p_secretary_notes: 'Confirmed over phone',
+      p_patient_id: '9a2f1d60-89ab-4b73-99fb-1d6c3c5a1d44',
       p_secretary_user_id: 'secretary-id',
+      p_first_name: null,
+      p_middle_name: null,
+      p_last_name: null,
+      p_suffix: null,
+      p_phone_number: null,
+      p_email: null,
     });
     expect(result.appointmentId).toBe('new-app-uuid');
   });
