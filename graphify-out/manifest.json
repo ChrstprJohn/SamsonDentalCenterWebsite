@@ -20,8 +20,8 @@
     "semantic_hash": "ac4f578815b1a96acbe3a5cd8783de4a"
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\next-env.d.ts": {
-    "mtime": 1781993378.1715355,
-    "ast_hash": "d0f8375ae1199dc7acd3977fc33b78b8",
+    "mtime": 1782170207.9606516,
+    "ast_hash": "2a74d3909800ca5467fa83b0ab4a4890",
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\next.config.ts": {
@@ -65,8 +65,8 @@
     "semantic_hash": "0d89cce82d7ca5312df5b6aea0639472"
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\app\\(portals)\\secretary\\layout.tsx": {
-    "mtime": 1782023180.6437297,
-    "ast_hash": "c3334e0730846b5ff22e7ba63457c39b",
+    "mtime": 1782166851.7150996,
+    "ast_hash": "5fe590a88ae8fa06f0fbb34e9a2f538e",
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\app\\(portals)\\secretary\\page.tsx": {
@@ -1750,8 +1750,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\staff\\views\\secretary-dashboard-view.tsx": {
-    "mtime": 1781370836.74728,
-    "ast_hash": "9482fb91f6b7321e45f8663f7ca5c2e4",
+    "mtime": 1782166861.5060916,
+    "ast_hash": "cffe3998aa8dc5d71168d09561800419",
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\orchestrators\\checkout.orchestrator.spec.ts": {
@@ -2430,8 +2430,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\.CORE_DOCUMENTATION\\SERVERLESS_ARCHI\\1-BUSSINESS-PLAN\\5-SECRETARY-PORTAL\\1-SECRETARY-PORTAL.md": {
-    "mtime": 1782106792.661437,
-    "ast_hash": "f5ef4d134d163e8fc13144cfb7a8f41b",
+    "mtime": 1782166338.8009744,
+    "ast_hash": "12b7c8eb22c64ee32602e30b0b72d104",
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\.CORE_DOCUMENTATION\\SERVERLESS_ARCHI\\1-BUSSINESS-PLAN\\6-ADMIN-PORTAL\\1-ADMIN-PORTAL.md": {
@@ -4034,11 +4034,6 @@
     "ast_hash": "81a2d1616ea6583d8e6d42169d8ac711",
     "semantic_hash": ""
   },
-  "C:\\Users\\picar\\Desktop\\samson-website\\.CORE_DOCUMENTATION\\SERVERLESS_ARCHI\\1-BUSSINESS-PLAN\\5-SECRETARY-PORTAL\\2-COMPONENTS-DATA-MAP.md": {
-    "mtime": 1782100417.468372,
-    "ast_hash": "cd6dad75285c327c65d45081cd1f627d",
-    "semantic_hash": ""
-  },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\TASK\\task-newbooking-flow.md": {
     "mtime": 1782105120.4831183,
     "ast_hash": "bae21685bb8e8ddfb6e0ee3e1f8fa240",
@@ -4105,8 +4100,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\staff\\use-cases\\auth\\staff-login.use-case.ts": {
-    "mtime": 1782161973.5132606,
-    "ast_hash": "6eb93c476c9d966102a3d99f4ba7b93b",
+    "mtime": 1782162495.958011,
+    "ast_hash": "af6fd4f23e488ce47c8aa4be2f5285d2",
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\staff\\views\\staff-login-view.tsx": {
@@ -4117,6 +4112,126 @@
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\TASK\\task-staff-login.md": {
     "mtime": 1782161141.957791,
     "ast_hash": "80a4c090fb8bb25d5bcb0c7733ccb4ca",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\app\\(portals)\\secretary\\appointments\\page.tsx": {
+    "mtime": 1782167009.7401721,
+    "ast_hash": "630db8bdaac46065f26b4bb307338dd5",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\app\\(portals)\\secretary\\audits\\page.tsx": {
+    "mtime": 1782167018.5521016,
+    "ast_hash": "9dcbfa2a6e79eb3f16daf9c9e903a693",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\app\\(portals)\\secretary\\book\\page.tsx": {
+    "mtime": 1782167002.406086,
+    "ast_hash": "c73d17f8bfc9d7afe7f99d82193a3415",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\app\\(portals)\\secretary\\check-in\\page.tsx": {
+    "mtime": 1782167005.2226179,
+    "ast_hash": "bfcef1fbed3b7c58104b2f73ba28d145",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\app\\(portals)\\secretary\\emails\\page.tsx": {
+    "mtime": 1782166900.3858788,
+    "ast_hash": "a5bcbec879c15e51b8dcdb668df0f554",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\app\\(portals)\\secretary\\inquiries\\page.tsx": {
+    "mtime": 1782171687.7772162,
+    "ast_hash": "a7adf3b2295f4009e08f5ec019d6da4b",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\app\\(portals)\\secretary\\invoices\\page.tsx": {
+    "mtime": 1782167046.0416317,
+    "ast_hash": "b097cae640232d967bbb20a4f73b639a",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\app\\(portals)\\secretary\\pending\\page.tsx": {
+    "mtime": 1782172165.721295,
+    "ast_hash": "3a7519c392a8590685ed5f30b9609a13",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\app\\(portals)\\secretary\\profile\\page.tsx": {
+    "mtime": 1782166917.600235,
+    "ast_hash": "56de684f1109cfaad32437710cc1088e",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\staff\\hooks\\use-secretary.hook.ts": {
+    "mtime": 1782166947.5288136,
+    "ast_hash": "1ea4e4553d9689eb5be56abd8aba6a86",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\staff\\mocks\\secretary.mock.ts": {
+    "mtime": 1782172158.5250442,
+    "ast_hash": "ffbf59bffb97527ad39b2e344126c46b",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\staff\\types\\secretary.types.ts": {
+    "mtime": 1782166833.7695265,
+    "ast_hash": "68fc268e35afc4e12cf9608fce1d5153",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\.CORE_DOCUMENTATION\\SERVERLESS_ARCHI\\1-BUSSINESS-PLAN\\5-SECRETARY-PORTAL\\10-AUDIT-LOG.md": {
+    "mtime": 1782166357.990153,
+    "ast_hash": "73ce27492db9b74fe9c68a655d4516ec",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\.CORE_DOCUMENTATION\\SERVERLESS_ARCHI\\1-BUSSINESS-PLAN\\5-SECRETARY-PORTAL\\11-PROFILE.md": {
+    "mtime": 1782166361.2331023,
+    "ast_hash": "d0545b6524e3bc65dd3a54db59ad1def",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\.CORE_DOCUMENTATION\\SERVERLESS_ARCHI\\1-BUSSINESS-PLAN\\5-SECRETARY-PORTAL\\2-DASHBOARD.md": {
+    "mtime": 1782164499.327873,
+    "ast_hash": "4340ed033feb0f1146bd51cf1f265be4",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\.CORE_DOCUMENTATION\\SERVERLESS_ARCHI\\1-BUSSINESS-PLAN\\5-SECRETARY-PORTAL\\3-APPOINTMENT-REQUESTS.md": {
+    "mtime": 1782172069.8201997,
+    "ast_hash": "987c032fe50d919487bb37bed19e56a5",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\.CORE_DOCUMENTATION\\SERVERLESS_ARCHI\\1-BUSSINESS-PLAN\\5-SECRETARY-PORTAL\\4-INQUIRIES.md": {
+    "mtime": 1782171492.4160664,
+    "ast_hash": "ba355befd7939b45a2a88af27a3dd78f",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\.CORE_DOCUMENTATION\\SERVERLESS_ARCHI\\1-BUSSINESS-PLAN\\5-SECRETARY-PORTAL\\5-BOOK-APPOINTMENT.md": {
+    "mtime": 1782165625.3499303,
+    "ast_hash": "027bccde9a0b9e419a68dec900938372",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\.CORE_DOCUMENTATION\\SERVERLESS_ARCHI\\1-BUSSINESS-PLAN\\5-SECRETARY-PORTAL\\6-APPOINTMENTS.md": {
+    "mtime": 1782166343.3228264,
+    "ast_hash": "6f3055540192c81580a5bbdfff347ef3",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\.CORE_DOCUMENTATION\\SERVERLESS_ARCHI\\1-BUSSINESS-PLAN\\5-SECRETARY-PORTAL\\7-CHECK-IN-OUT.md": {
+    "mtime": 1782166347.1653574,
+    "ast_hash": "922749dec420ace11b95d4bd0eda8743",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\.CORE_DOCUMENTATION\\SERVERLESS_ARCHI\\1-BUSSINESS-PLAN\\5-SECRETARY-PORTAL\\8-INVOICE-MANAGEMENT.md": {
+    "mtime": 1782166351.516242,
+    "ast_hash": "0f02186469b9d0c385c7e5b663a3c924",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\.CORE_DOCUMENTATION\\SERVERLESS_ARCHI\\1-BUSSINESS-PLAN\\5-SECRETARY-PORTAL\\9-EMAIL-LOG.md": {
+    "mtime": 1782166354.7289383,
+    "ast_hash": "f517870ba3a7542b5658594930f406f2",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\TASK\\task-secretary-pages.md": {
+    "mtime": 1782166921.3779004,
+    "ast_hash": "b6707ee8492976ca91d7a31ec688805c",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\.CORE_DOCUMENTATION\\SERVERLESS_ARCHI\\1-BUSSINESS-PLAN\\5-SECRETARY-PORTAL\\MASTER-SECRETARY-PORTAL.md": {
+    "mtime": 1782172306.7685487,
+    "ast_hash": "539f0eb44374d05bc0d3988358f19d36",
     "semantic_hash": ""
   }
 }

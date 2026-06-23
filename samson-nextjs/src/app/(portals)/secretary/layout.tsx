@@ -82,20 +82,83 @@ export default async function SecretaryPortalLayout({
       {/* Sidebar + Main content layout */}
       <div className="flex-1 max-w-7xl mx-auto w-full px-6 py-10 pt-[100px] grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Secretary sub sidebar */}
-        <aside className="lg:col-span-3 flex flex-col gap-2">
+        <aside className="lg:col-span-3 flex flex-col gap-1.5 border-r border-card-border/50 pr-4">
+          <div className="text-[10px] font-bold text-text-muted uppercase tracking-widest px-4 mb-2">
+            Operations
+          </div>
           <Link
             href="/secretary"
-            className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold hover:bg-secondary-bg transition-colors text-text-secondary hover:text-text-primary"
+            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-secondary-bg transition-colors text-text-secondary hover:text-text-primary"
           >
             <span>🏠</span>
-            Dashboard Queue
+            Dashboard
           </Link>
           <Link
-            href="/secretary"
-            className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold hover:bg-secondary-bg transition-colors text-text-secondary hover:text-text-primary"
+            href="/secretary/pending"
+            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-secondary-bg transition-colors text-text-secondary hover:text-text-primary"
           >
             <span>📋</span>
-            Patient Records
+            Appointment Requests
+          </Link>
+          <Link
+            href="/secretary/inquiries"
+            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-secondary-bg transition-colors text-text-secondary hover:text-text-primary"
+          >
+            <span>💬</span>
+            Inquiries Queue
+          </Link>
+          <Link
+            href="/secretary/book"
+            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-secondary-bg transition-colors text-text-secondary hover:text-text-primary"
+          >
+            <span>📅</span>
+            Book Appointment
+          </Link>
+          <Link
+            href="/secretary/appointments"
+            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-secondary-bg transition-colors text-text-secondary hover:text-text-primary"
+          >
+            <span>🗂️</span>
+            Appointments Directory
+          </Link>
+          <Link
+            href="/secretary/check-in"
+            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-secondary-bg transition-colors text-text-secondary hover:text-text-primary"
+          >
+            <span>🚀</span>
+            Check-In / Out
+          </Link>
+          <Link
+            href="/secretary/invoices"
+            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-secondary-bg transition-colors text-text-secondary hover:text-text-primary"
+          >
+            <span>💵</span>
+            Invoices
+          </Link>
+          
+          <div className="text-[10px] font-bold text-text-muted uppercase tracking-widest px-4 mt-4 mb-2">
+            System & Logs
+          </div>
+          <Link
+            href="/secretary/emails"
+            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-secondary-bg transition-colors text-text-secondary hover:text-text-primary"
+          >
+            <span>✉️</span>
+            Email Logs
+          </Link>
+          <Link
+            href="/secretary/audits"
+            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-secondary-bg transition-colors text-text-secondary hover:text-text-primary"
+          >
+            <span>🛡️</span>
+            Audit Logs
+          </Link>
+          <Link
+            href="/secretary/profile"
+            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-secondary-bg transition-colors text-text-secondary hover:text-text-primary"
+          >
+            <span>👤</span>
+            Profile Settings
           </Link>
         </aside>
 

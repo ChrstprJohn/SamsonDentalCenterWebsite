@@ -9,7 +9,6 @@ export const staffLoginUseCase = (
     let result;
     try {
       result = await loginCommand(data);
-      console.log(result)
     } catch (error: any) {
       throw new DomainError(error.message || 'Login failed');
     }

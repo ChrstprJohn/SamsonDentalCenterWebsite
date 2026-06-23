@@ -1,130 +1,128 @@
+// src/modules/staff/views/secretary-dashboard-view.tsx
 'use client';
 
 import React from 'react';
-import { useSecretaryDashboard } from '../hooks/use-secretary-dashboard';
-import { PendingBookingQueue } from '../components/sub-components/pending-booking-queue';
-import { CheckInTracker } from '../components/sub-components/check-in-tracker';
-import { CheckoutQueue } from '../components/sub-components/checkout-queue';
-import { PatientNotifications } from '../components/sub-components/patient-notifications';
-import { AuditTimeline } from '../components/sub-components/audit-timeline';
-import { BookingApprovalModal } from '../components/sub-components/booking-approval-modal';
-import { BookingRejectionModal } from '../components/sub-components/booking-rejection-modal';
-import { InvoiceCheckoutModal } from '../components/sub-components/invoice-checkout-modal';
+import Link from 'next/link';
+import { useSecretary } from '../hooks/use-secretary.hook';
+import { Button } from '@/components/ui/button';
 
 export function SecretaryDashboardView() {
-  const {
-    pendingQueue,
-    upcomingList,
-    draftInvoices,
-    audits,
-    emailLogs,
-    selectedPendingIds,
-    setSelectedPendingIds,
-    activePending,
-    setActivePending,
-    isApproveOpen,
-    setIsApproveOpen,
-    approveReason,
-    setApproveReason,
-    isRejectOpen,
-    setIsRejectOpen,
-    rejectReason,
-    setRejectReason,
-    activeInvoice,
-    setActiveInvoice,
-    discountPercent,
-    setDiscountPercent,
-    paymentMethod,
-    setPaymentMethod,
-    isCheckoutSubmitting,
-    emailSearch,
-    setEmailSearch,
-    calculateFinalPrice,
-    handlePendingSelect,
-    handleApproveSubmit,
-    handleRejectSubmit,
-    handleCheckIn,
-    handleCheckoutSubmit,
-  } = useSecretaryDashboard();
+  const { appointments, inquiries, invoices } = useSecretary();
+
+  // Metrics calculations
+  const pendingCount = appointments.filter((a) => a.status === 'PENDING').length;
+  const inquiriesCount = inquiries.filter((i) => i.status === 'NEW').length;
+  const arrivalsCount = appointments.filter((a) => a.date === '2026-06-23' && a.status === 'APPROVED').length;
+  const checkoutCount = appointments.filter((a) => a.status === 'TREATMENT_RENDERED').length;
+
+  const todayApproved = appointments.filter((a) => a.date === '2026-06-23' && ['APPROVED', 'CHECKED_IN', 'COMPLETED'].includes(a.status));
 
   return (
-    <div className="flex flex-col gap-10">
-      <div className="flex flex-col gap-1">
-        <h2 className="text-2xl md:text-3xl font-extrabold text-text-primary">Secretary Dashboard</h2>
-        <p className="text-xs text-text-muted text-left">
-          Coordinate clinic schedules, batch family bookings, check-in patients, and finalize transaction checkouts.
+    <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-1.5">
+        <h1 className="text-2xl md:text-3xl font-extrabold text-text-primary tracking-tight">Secretary Dashboard</h1>
+        <p className="text-xs text-text-muted">
+          Operational summary, today's schedule flow, and quick system actions.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start text-left">
-        {/* Left Column (Approvals & Check-in) */}
-        <div className="xl:col-span-8 flex flex-col gap-8">
-          <PendingBookingQueue
-            pendingQueue={pendingQueue}
-            selectedPendingIds={selectedPendingIds}
-            setSelectedPendingIds={setSelectedPendingIds}
-            setIsApproveOpen={setIsApproveOpen}
-            setActivePending={setActivePending}
-            setIsRejectOpen={setIsRejectOpen}
-            handlePendingSelect={handlePendingSelect}
-          />
-          <CheckInTracker upcomingList={upcomingList} handleCheckIn={handleCheckIn} />
+      {/* Metrics Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="border border-card-border/60 bg-card rounded-2xl p-5 shadow-sm flex flex-col gap-1 hover:border-primary-start/40 transition-colors">
+          <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider">Arrivals Today</span>
+          <span className="text-3xl font-black text-text-primary mt-1">{arrivalsCount}</span>
+          <p className="text-[10px] text-emerald-500 mt-2">Active scheduled slots</p>
         </div>
 
-        {/* Right Column (Checkout drafts & email searchable logs) */}
-        <div className="xl:col-span-4 flex flex-col gap-8">
-          <CheckoutQueue draftInvoices={draftInvoices} setActiveInvoice={setActiveInvoice} />
-          <PatientNotifications
-            emailLogs={emailLogs}
-            emailSearch={emailSearch}
-            setEmailSearch={setEmailSearch}
-          />
+        <div className="border border-card-border/60 bg-card rounded-2xl p-5 shadow-sm flex flex-col gap-1 hover:border-primary-start/40 transition-colors">
+          <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider">Pending Requests</span>
+          <span className="text-3xl font-black text-text-primary mt-1">{pendingCount}</span>
+          <p className="text-[10px] text-text-muted mt-2">Awaiting decision review</p>
+        </div>
+
+        <div className="border border-card-border/60 bg-card rounded-2xl p-5 shadow-sm flex flex-col gap-1 hover:border-primary-start/40 transition-colors">
+          <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider">New Inquiries</span>
+          <span className="text-3xl font-black text-text-primary mt-1">{inquiriesCount}</span>
+          <p className="text-[10px] text-text-muted mt-2">Leads from contact form</p>
+        </div>
+
+        <div className="border border-card-border/60 bg-card rounded-2xl p-5 shadow-sm flex flex-col gap-1 hover:border-primary-start/40 transition-colors">
+          <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider">Checkouts Waiting</span>
+          <span className="text-3xl font-black text-text-primary mt-1">{checkoutCount}</span>
+          <p className="text-[10px] text-amber-500 mt-2">Treatment rendered by doctors</p>
         </div>
       </div>
 
-      <AuditTimeline audits={audits} />
+      {/* Main Layout Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* Today's Timeline Schedule */}
+        <div className="lg:col-span-8 border border-card-border bg-card rounded-3xl p-6 shadow-md flex flex-col gap-4">
+          <div className="flex flex-col gap-1 border-b border-card-border pb-4">
+            <h2 className="text-lg font-bold text-text-primary">Today's Timeline</h2>
+            <p className="text-xs text-text-muted">Chronological patient tracking for June 23, 2026</p>
+          </div>
 
-      {/* Approval Dialog Predefined Reasons Popup */}
-      <BookingApprovalModal
-        isOpen={isApproveOpen}
-        onClose={() => {
-          setIsApproveOpen(false);
-          setActivePending(null);
-        }}
-        approveReason={approveReason}
-        setApproveReason={setApproveReason}
-        handleApproveSubmit={handleApproveSubmit}
-      />
+          {todayApproved.length === 0 ? (
+            <div className="py-12 text-center text-xs text-text-muted border border-dashed border-card-border rounded-2xl">
+              No appointments scheduled for today.
+            </div>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {todayApproved.map((app) => (
+                <div
+                  key={app.id}
+                  className="flex items-center justify-between p-4 border border-card-border/40 rounded-xl bg-secondary-bg/20 hover:bg-secondary-bg/40 transition-colors"
+                >
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-sm font-semibold text-text-primary">{app.patientName}</span>
+                    <span className="text-[11px] text-text-muted">
+                      {app.startTime} - {app.endTime} • {app.doctorName} • <span className="italic text-primary-start">{app.serviceName}</span>
+                    </span>
+                  </div>
+                  <span
+                    className={`rounded-full px-2.5 py-0.5 text-[9px] font-bold uppercase border ${
+                      app.status === 'CHECKED_IN'
+                        ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
+                        : app.status === 'COMPLETED'
+                        ? 'bg-blue-500/10 text-blue-500 border-blue-500/20'
+                        : 'bg-card border-card-border text-text-secondary'
+                    }`}
+                  >
+                    {app.status === 'APPROVED' ? 'Scheduled' : app.status}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
 
-      {/* Rejection Dialog Mandatory Reason Popup */}
-      <BookingRejectionModal
-        isOpen={isRejectOpen}
-        onClose={() => {
-          setIsRejectOpen(false);
-          setActivePending(null);
-          setRejectReason('');
-        }}
-        patientName={activePending?.patientName}
-        rejectReason={rejectReason}
-        setRejectReason={setRejectReason}
-        handleRejectSubmit={handleRejectSubmit}
-      />
-
-      {/* Check-Out dynamic Invoice editor modal */}
-      <InvoiceCheckoutModal
-        activeInvoice={activeInvoice}
-        onClose={() => {
-          setActiveInvoice(null);
-          setDiscountPercent(0);
-        }}
-        discountPercent={discountPercent}
-        setDiscountPercent={setDiscountPercent}
-        paymentMethod={paymentMethod}
-        setPaymentMethod={setPaymentMethod}
-        calculateFinalPrice={calculateFinalPrice}
-        handleCheckoutSubmit={handleCheckoutSubmit}
-        isCheckoutSubmitting={isCheckoutSubmitting}
-      />
+        {/* Quick Action Panel */}
+        <div className="lg:col-span-4 border border-card-border bg-card rounded-3xl p-6 shadow-md flex flex-col gap-4">
+          <h2 className="text-base font-bold text-text-primary border-b border-card-border pb-3">Quick Actions</h2>
+          <div className="flex flex-col gap-2">
+            <Link href="/secretary/book" className="w-full">
+              <Button className="w-full justify-start text-xs font-semibold py-3 gap-2" variant="primary">
+                <span>📅</span> Book New Walk-In
+              </Button>
+            </Link>
+            <Link href="/secretary/pending" className="w-full">
+              <Button className="w-full justify-start text-xs font-semibold py-3 gap-2" variant="secondary">
+                <span>📋</span> Review Request Queue
+              </Button>
+            </Link>
+            <Link href="/secretary/inquiries" className="w-full">
+              <Button className="w-full justify-start text-xs font-semibold py-3 gap-2" variant="secondary">
+                <span>💬</span> Convert Guest Inquiries
+              </Button>
+            </Link>
+            <Link href="/secretary/check-in" className="w-full">
+              <Button className="w-full justify-start text-xs font-semibold py-3 gap-2" variant="secondary">
+                <span>🚀</span> Run Checkout Tracker
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
