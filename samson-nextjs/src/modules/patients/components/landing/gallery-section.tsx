@@ -164,14 +164,9 @@ export function GallerySection() {
       id="gallery" 
       className="relative overflow-hidden z-20 pt-16 pb-0 md:pt-24 md:pb-0 bg-[#FDFDFD]"
     >
-      {/* Parallax Background */}
+      {/* Background split */}
       <div className="absolute inset-0 pointer-events-none z-0">
-        <motion.div 
-          style={{ 
-            y: useTransform(galleryScrollYProgress, [0, 1], ["-5%", "8%"]),
-          }} 
-          className="absolute inset-x-0 top-0 bg-[#1D1E1E] h-[70%]"
-        />
+        <div className="absolute inset-x-0 top-0 bg-[#1D1E1E] h-[70%]" />
         {/* ponytail: static noise overlay prevents browser repainting on scroll */}
         <div 
           className="absolute inset-x-0 top-0 h-[70%] opacity-[0.06] mix-blend-overlay pointer-events-none z-0"
