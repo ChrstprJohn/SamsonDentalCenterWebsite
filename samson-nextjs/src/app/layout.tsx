@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Playfair_Display, Josefin_Sans, Jost } from "next/fo
 import "./globals.css";
 import { ThemeProvider } from "@/shared/context/theme-context";
 import { ToastProvider } from "@/components/feedback/toast-container";
+import { SmoothScroll } from "@/components/ui/smooth-scroll";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -52,6 +53,7 @@ export default function RootLayout({
         <ThemeProvider>
           <ToastProvider>
             {children}
+            <SmoothScroll />
           </ToastProvider>
         </ThemeProvider>
       </body>
