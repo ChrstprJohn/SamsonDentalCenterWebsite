@@ -58,9 +58,13 @@ export function NavbarV1({ user }: NavbarProps) {
     const element = document.getElementById(targetId);
     if (element) {
       const offset = 80;
-      const bodyRect = document.body.getBoundingClientRect().top;
-      const elementPosition = element.getBoundingClientRect().top - bodyRect;
-      window.scrollTo({ top: elementPosition - offset, behavior: 'smooth' });
+      if (typeof window !== 'undefined' && (window as any).lenis) {
+        (window as any).lenis.scrollTo(element, { offset: -offset });
+      } else {
+        const bodyRect = document.body.getBoundingClientRect().top;
+        const elementPosition = element.getBoundingClientRect().top - bodyRect;
+        window.scrollTo({ top: elementPosition - offset, behavior: 'smooth' });
+      }
     }
   };
 

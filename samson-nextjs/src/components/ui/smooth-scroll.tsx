@@ -14,6 +14,7 @@ export function SmoothScroll() {
         gestureOrientation: 'vertical',
         smoothWheel: true,
       });
+      (window as any).lenis = lenis;
 
       function raf(time: number) {
         lenis.raf(time);
@@ -35,6 +36,7 @@ export function SmoothScroll() {
           gestureOrientation: 'vertical',
           smoothWheel: true,
         });
+        (window as any).lenis = lenis;
 
         function raf(time: number) {
           lenis.raf(time);
