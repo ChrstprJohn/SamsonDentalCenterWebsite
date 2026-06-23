@@ -29,10 +29,10 @@ export function HeroSectionV1({ onBookClick }: HeroSectionProps) {
             <img
               src="/images/hero-bg.png"
               alt="Luxury modern architectural dental treatment facility, ambient warm light"
-              className="w-full h-full object-cover object-center filter brightness-[0.65] saturate-[0.9] contrast-[1.02]"
+              className="w-full h-full object-cover object-center filter brightness-[0.95] saturate-[0.9] contrast-[1.02]"
             />
           </picture>
-          <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/5 to-[#141515] z-0" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-[#141515]/80 z-0" />
         </div>
 
         {/* Content Container */}
