@@ -162,10 +162,19 @@ export function GallerySection() {
   return (
     <section 
       id="gallery" 
-      className="relative overflow-hidden z-20 pt-16 pb-0 md:pt-24 md:pb-0"
-      style={{ background: 'linear-gradient(to bottom, #141515 55%, #FDFDFD 55%)' }}
+      className="relative overflow-hidden z-20 pt-16 pb-0 md:pt-24 md:pb-0 bg-[#FDFDFD]"
     >
-      <div className="max-w-7xl mx-auto px-6 sm:px-12">
+      {/* Parallax Background */}
+      <div className="absolute inset-0 pointer-events-none z-0">
+        <motion.div 
+          style={{ 
+            y: useTransform(galleryScrollYProgress, [0, 1], ["-5%", "8%"]),
+          }} 
+          className="absolute inset-x-0 top-0 bg-[#141515] h-[70%]"
+        />
+      </div>
+
+      <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-12">
         
         {/* Header Layout */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 sm:mb-24 gap-6">
