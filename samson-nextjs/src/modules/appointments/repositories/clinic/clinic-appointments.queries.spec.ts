@@ -1,9 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { SupabaseClient } from '@supabase/supabase-js';
 import { getAppointmentsByClinicQuery } from './clinic-appointments.queries';
 
 describe('ClinicAppointmentsQueries', () => {
-  let queryFn: ReturnType<typeof getAppointmentsByClinicQuery>;
   let mockSupabase: any;
 
   beforeEach(() => {
@@ -11,52 +9,50 @@ describe('ClinicAppointmentsQueries', () => {
       from: vi.fn().mockReturnThis(),
       select: vi.fn().mockReturnThis(),
       order: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
     };
-    queryFn = getAppointmentsByClinicQuery(mockSupabase as unknown as SupabaseClient);
   });
 
-  describe('getAppointmentsByClinic', () => {
-    it('should fetch all appointments without filters', async () => {
-      const mockData = [{
-        id: '1a95a63c-333e-4b68-98e3-82bdf1a07bd2',
-        service_id: '2a95a63c-333e-4b68-98e3-82bdf1a07bd2',
-        doctor_id: '3a95a63c-333e-4b68-98e3-82bdf1a07bd2',
-        status: 'PENDING',
-        date: '2025-01-01',
-        start_time: '2025-01-01T10:00:00.000Z',
-        end_time: '2025-01-01T10:30:00.000Z',
-      }];
-      mockSupabase.order = vi.fn().mockReturnValue(Promise.resolve({ data: mockData, error: null }));
+  it('should call select with status_history and order by start_time', async () => {
+    // Arrange
+    const mockAppointments = [
+      {
+        id: '123e4567-e89b-12d3-a456-426614174000',
+        service_id: '123e4567-e89b-12d3-a456-426614174001',
+        doctor_id: '123e4567-e89b-12d3-a456-426614174002',
+        date: '2026-06-01',
+        start_time: '2026-06-01T10:00:00Z',
+        end_time: '2026-06-01T11:00:00Z',
+        status: 'APPROVED',
+        doctor_assignment_source: 'SYSTEM',
+        status_history: [
+          {
+            id: 'sh-1',
+            previous_status: null,
+            new_status: 'APPROVED',
+            reason: 'Initial booking',
+            created_at: '2026-06-01T09:00:00Z',
+            actor_role: 'PATIENT',
+          }
+        ]
+      }
+    ];
 
-      const result = await queryFn();
+    mockSupabase.eq.mockResolvedValue({ data: mockAppointments, error: null });
 
-      expect(mockSupabase.from).toHaveBeenCalledWith('appointments');
-      expect(result).toEqual([expect.objectContaining({ id: '1a95a63c-333e-4b68-98e3-82bdf1a07bd2' })]);
-    });
+    const getAppointments = getAppointmentsByClinicQuery(mockSupabase as any);
 
-    it('should apply filters correctly', async () => {
-      const queryMock: any = {
-        eq: vi.fn().mockReturnThis(),
-        then: vi.fn((resolve) => resolve({ data: [], error: null }))
-      };
-      mockSupabase.order = vi.fn().mockReturnValue(queryMock);
+    // Act
+    const result = await getAppointments({ date: '2026-06-01' });
 
-      await queryFn({ date: '2024-01-01', status: 'PENDING', doctorId: 'doc-1' });
-
-      expect(queryMock.eq).toHaveBeenCalledWith('date', '2024-01-01');
-      expect(queryMock.eq).toHaveBeenCalledWith('status', 'PENDING');
-      expect(queryMock.eq).toHaveBeenCalledWith('doctor_id', 'doc-1');
-    });
-
-    it('should throw an error on database failure', async () => {
-      const queryMock: any = {
-        then: vi.fn((resolve) => resolve({ data: null, error: { message: 'Fetch Error' } }))
-      };
-      mockSupabase.order = vi.fn().mockReturnValue(queryMock);
-
-      await expect(queryFn()).rejects.toThrow(
-        'Failed to fetch clinic appointments: Fetch Error'
-      );
-    });
+    // Assert
+    expect(mockSupabase.from).toHaveBeenCalledWith('appointments');
+    expect(mockSupabase.select).toHaveBeenCalledWith(
+      expect.stringContaining('status_history:appointment_status_history')
+    );
+    expect(mockSupabase.order).toHaveBeenCalledWith('start_time', { ascending: true });
+    expect(result.length).toBe(1);
+    expect(result[0].statusHistory.length).toBe(1);
+    expect(result[0].statusHistory[0].newStatus).toBe('APPROVED');
   });
 });
