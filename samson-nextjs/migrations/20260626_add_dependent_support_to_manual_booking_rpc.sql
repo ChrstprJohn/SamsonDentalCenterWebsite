@@ -68,7 +68,7 @@ BEGIN
             p_new_dependent_last_name,
             p_new_dependent_suffix,
             p_new_dependent_date_of_birth,
-            p_new_dependent_relationship
+            p_new_dependent_relationship::public.dependent_relationship
         ) RETURNING id INTO v_resolved_dependent_id;
 
         v_dependent_name := p_new_dependent_first_name
@@ -101,7 +101,7 @@ BEGIN
         'APPROVED'::public.appointment_status,
         'STAFF_CREATED'::public.appointment_source,
         p_patient_note,
-        p_status_reason
+        COALESCE(p_status_reason, 'Manually scheduled by staff')
     ) RETURNING id INTO v_appointment_id;
 
     -- Query duration from services
