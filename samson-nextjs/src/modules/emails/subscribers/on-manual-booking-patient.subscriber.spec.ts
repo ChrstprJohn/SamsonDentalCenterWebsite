@@ -10,11 +10,6 @@ vi.mock('@/shared/services/email/resend.service');
 vi.mock('@/shared/database/server');
 
 describe('onManualBookingPatientSubscriber', () => {
-  const mockSingle = vi.fn();
-  const mockEq = vi.fn(() => ({ single: mockSingle }));
-  const mockSelect = vi.fn(() => ({ eq: mockEq }));
-  const mockSupabase = { from: vi.fn(() => ({ select: mockSelect })) } as any;
-
   const validPayload = {
     appointmentId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd1',
     patientId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd2',
@@ -25,19 +20,25 @@ describe('onManualBookingPatientSubscriber', () => {
     durationMinutes: 30,
   };
 
+  function buildMockSupabase(singleResults: Array<{ data: any; error: any }>) {
+    let callIndex = 0;
+    const mockSingle = vi.fn().mockImplementation(() => Promise.resolve(singleResults[callIndex++] ?? { data: null, error: { message: 'Unexpected call' } }));
+    const mockEq = vi.fn(() => ({ single: mockSingle }));
+    const mockSelect = vi.fn(() => ({ eq: mockEq }));
+    return { from: vi.fn(() => ({ select: mockSelect })) } as any;
+  }
+
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(createAdminClient).mockResolvedValue(mockSupabase);
   });
 
-  it('fetches patient, service, doctor and sends confirmation email', async () => {
-    mockSingle
-      .mockResolvedValueOnce({
-        data: { email: 'john@example.com', first_name: 'John', middle_name: null, last_name: 'Doe', suffix: null },
-        error: null,
-      }) // patient
-      .mockResolvedValueOnce({ data: { name: 'Teeth Cleaning' }, error: null }) // service
-      .mockResolvedValueOnce({ data: { first_name: 'Jane', last_name: 'Smith' }, error: null }); // doctor
+  it('fetches patient, service, doctor and sends email with account holder name (self booking)', async () => {
+    const mockSupabase = buildMockSupabase([
+      { data: { email: 'john@example.com', first_name: 'John', middle_name: null, last_name: 'Doe', suffix: null }, error: null },
+      { data: { name: 'Teeth Cleaning' }, error: null },
+      { data: { first_name: 'Jane', last_name: 'Smith' }, error: null },
+    ]);
+    vi.mocked(createAdminClient).mockResolvedValue(mockSupabase);
 
     const start = new Date(validPayload.startTime);
     const end = new Date(start.getTime() + validPayload.durationMinutes * 60000);
@@ -45,7 +46,6 @@ describe('onManualBookingPatientSubscriber', () => {
 
     await onManualBookingPatientSubscriber.handle(validPayload);
 
-    expect(createAdminClient).toHaveBeenCalled();
     expect(ResendService.sendTemplatedEmail).toHaveBeenCalledWith(
       'john@example.com',
       'Appointment Confirmed – Samson Dental Center',
@@ -61,7 +61,32 @@ describe('onManualBookingPatientSubscriber', () => {
     );
   });
 
+  it('uses dependentName in email when booking is for a dependent', async () => {
+    const mockSupabase = buildMockSupabase([
+      { data: { email: 'john@example.com', first_name: 'John', middle_name: null, last_name: 'Santos', suffix: null }, error: null },
+      { data: { name: 'Teeth Cleaning' }, error: null },
+      { data: { first_name: 'Jane', last_name: 'Smith' }, error: null },
+    ]);
+    vi.mocked(createAdminClient).mockResolvedValue(mockSupabase);
+
+    const payloadWithDependent = {
+      ...validPayload,
+      dependentId: 'a1b07384-d113-4ec2-a5e6-ec083b0f5cc9',   // valid UUID v4
+      dependentName: 'Maria Santos',
+    };
+
+    await onManualBookingPatientSubscriber.handle(payloadWithDependent);
+
+    expect(ResendService.sendTemplatedEmail).toHaveBeenCalledWith(
+      'john@example.com',
+      'Appointment Confirmed – Samson Dental Center',
+      'appointment_confirmed',
+      expect.objectContaining({ patientName: 'Maria Santos' })
+    );
+  });
+
   it('throws ZodError on invalid payload', async () => {
+    vi.mocked(createAdminClient).mockResolvedValue(buildMockSupabase([]));
     await expect(
       onManualBookingPatientSubscriber.handle({ appointmentId: 'not-a-uuid' })
     ).rejects.toThrow(z.ZodError);
@@ -69,7 +94,10 @@ describe('onManualBookingPatientSubscriber', () => {
   });
 
   it('throws when patient fetch fails', async () => {
-    mockSingle.mockResolvedValueOnce({ data: null, error: { message: 'Not found' } });
+    const mockSupabase = buildMockSupabase([
+      { data: null, error: { message: 'Not found' } },
+    ]);
+    vi.mocked(createAdminClient).mockResolvedValue(mockSupabase);
 
     await expect(
       onManualBookingPatientSubscriber.handle(validPayload)
@@ -77,12 +105,11 @@ describe('onManualBookingPatientSubscriber', () => {
   });
 
   it('throws when service fetch fails', async () => {
-    mockSingle
-      .mockResolvedValueOnce({
-        data: { email: 'john@example.com', first_name: 'John', middle_name: null, last_name: 'Doe', suffix: null },
-        error: null,
-      })
-      .mockResolvedValueOnce({ data: null, error: { message: 'Not found' } });
+    const mockSupabase = buildMockSupabase([
+      { data: { email: 'john@example.com', first_name: 'John', middle_name: null, last_name: 'Doe', suffix: null }, error: null },
+      { data: null, error: { message: 'Not found' } },
+    ]);
+    vi.mocked(createAdminClient).mockResolvedValue(mockSupabase);
 
     await expect(
       onManualBookingPatientSubscriber.handle(validPayload)
@@ -90,13 +117,12 @@ describe('onManualBookingPatientSubscriber', () => {
   });
 
   it('throws when doctor fetch fails', async () => {
-    mockSingle
-      .mockResolvedValueOnce({
-        data: { email: 'john@example.com', first_name: 'John', middle_name: null, last_name: 'Doe', suffix: null },
-        error: null,
-      })
-      .mockResolvedValueOnce({ data: { name: 'Teeth Cleaning' }, error: null })
-      .mockResolvedValueOnce({ data: null, error: { message: 'Not found' } });
+    const mockSupabase = buildMockSupabase([
+      { data: { email: 'john@example.com', first_name: 'John', middle_name: null, last_name: 'Doe', suffix: null }, error: null },
+      { data: { name: 'Teeth Cleaning' }, error: null },
+      { data: null, error: { message: 'Not found' } },
+    ]);
+    vi.mocked(createAdminClient).mockResolvedValue(mockSupabase);
 
     await expect(
       onManualBookingPatientSubscriber.handle(validPayload)

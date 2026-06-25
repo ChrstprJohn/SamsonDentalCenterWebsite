@@ -96,3 +96,93 @@ All backend layers done and tested (39/39 tests pass).
 - [x] `createManualBookingAction` wired (imported directly, not via barrel)
 - [x] Success screen with "Book Another" reset
 - [x] Toast notifications (success/error)
+
+---
+
+## 6. Phase 2: Dependent Support 🔲 PLANNED
+
+### Overview
+
+When a secretary selects an existing patient account, the left column must expand to ask **"Who is this appointment for?"** — revealing the account holder, all existing dependents, and an inline "Add Dependent" form. The dependent is created **atomically with the appointment** inside the RPC on submission.
+
+### Updated Left Column Flow (Search Mode)
+
+```
+┌──────────────────────────────────────┐
+│  Patient Identity                    │
+│                                      │
+│  [🔍 Search Patient] [👤 Guest]      │
+│                                      │
+│  ─ Search results ─                  │
+│  [John Santos]  ← secretary clicks   │
+│                                      │
+│  ─ Who is this for? ─────────────── │
+│  ○ John Santos  (Account Holder)    │
+│  ○ Maria Santos · Child · 2015      │
+│  ○ + Add Dependent  ▼               │
+│    ┌──────────────────────────────┐ │
+│    │ First Name:   [           ]  │ │
+│    │ Last Name:    [           ]  │ │
+│    │ Date of Birth:[           ]  │ │
+│    │ Relationship: [ Child    ▾]  │ │
+│    └──────────────────────────────┘ │
+└──────────────────────────────────────┘
+```
+
+### Patient Identity Resolution Modes
+
+| Mode | `patientId` | `dependentId` | `guest_contacts` |
+|---|---|---|---|
+| Account holder (self) | ✅ account id | `null` | — |
+| Existing dependent | ✅ account id | ✅ dependent id | — |
+| New dependent (inline) | ✅ account id | created atomically by RPC | — |
+| Guest (no account) | `null` | `null` | ✅ created by RPC |
+
+### Key Rule: Atomicity
+
+The new dependent is **never saved before appointment submission**. All fields are held in UI state. On submit, the `create_manual_booking` RPC receives the new dependent fields and performs a single atomic transaction: creates the dependent row + creates the appointment row with `dependent_id` set.
+
+---
+
+## 7. Phase 2 — Planned Implementation Checklist
+
+### Database
+- [ ] `migrations/20260626_add_dependent_support_to_manual_booking_rpc.sql`
+  - Add params: `p_dependent_id`, `p_new_dependent_first_name`, `p_new_dependent_middle_name`, `p_new_dependent_last_name`, `p_new_dependent_suffix`, `p_new_dependent_date_of_birth`, `p_new_dependent_relationship`
+  - RPC branches: use existing dependent → or create new dependent → or no dependent
+  - Update `APPOINTMENT_MANUALLY_BOOKED_PATIENT` outbox to include `dependent_id` + `dependent_name`
+
+### Backend
+
+**DTOs**
+- [ ] `create-manual-booking.dto.ts` — add `dependentId?`, `newDependent*` fields, `.refine()` cross-field validation
+- [ ] `create-manual-booking.dto.spec.ts` — new test cases for dependent paths
+
+**Repository**
+- [ ] `create-manual-booking.command.ts` — pass 7 new `p_dependent_*` params to RPC
+- [ ] `create-manual-booking.command.spec.ts` — assert new params per booking path
+
+**Use Case**
+- [ ] `create-manual-booking.use-case.spec.ts` — add passthrough test for dependent fields
+
+**Server Action**
+- [ ] `create-manual-booking.action.spec.ts` — new test case
+- [ ] Verify/update `get-user-dependents.action.ts` allows `SECRETARY` + `ADMIN` roles
+- [ ] [If needed] `get-dependents-for-booking.action.ts` + `.spec.ts` (SECRETARY/ADMIN only)
+
+**Email**
+- [ ] `manual-booking-patient.event.dto.ts` — add `dependentId?`, `dependentName?`
+- [ ] `manual-booking-patient.event.dto.spec.ts` — new test cases
+- [ ] `on-manual-booking-patient.subscriber.ts` — use `dependentName` in email if present
+- [ ] `on-manual-booking-patient.subscriber.spec.ts` — test both paths (with/without dependent)
+
+**Shared**
+- [ ] `database.types.ts` — verify `appointments.dependent_id` column
+
+### Frontend
+- [ ] `book/page.tsx` — "Who is this for?" section after patient selected
+  - Radio list: account holder + each existing dependent + "Add Dependent"
+  - Inline form (firstName, lastName, DOB, relationship) when "Add Dependent" selected
+  - `loadDependents(patientId)` called after patient selected
+  - Updated submit payload (self / existing dep / new dep paths)
+  - Updated submit guard for all three dependent modes

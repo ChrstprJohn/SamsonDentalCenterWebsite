@@ -17,7 +17,7 @@ describe('createManualBookingCommand', () => {
     };
   });
 
-  const mockManualDto = {
+  const baseDto = {
     patientId: 'patient-uuid',
     firstName: 'Jane',
     middleName: 'M',
@@ -35,35 +35,73 @@ describe('createManualBookingCommand', () => {
     secretaryUserId: 'sec-uuid',
   };
 
-  it('should successfully call the rpc for manual booking creation', async () => {
+  it('should call RPC with null dependent params when booking for self', async () => {
     const command = createManualBookingCommand(mockSupabase as unknown as SupabaseClient);
-    const result = await command(mockManualDto);
+    const result = await command(baseDto);
 
-    expect(mockSupabase.rpc).toHaveBeenCalledWith('create_manual_booking', {
-      p_patient_id: mockManualDto.patientId,
-      p_service_id: mockManualDto.serviceId,
-      p_doctor_id: mockManualDto.doctorId,
-      p_date: mockManualDto.date,
-      p_start_time: mockManualDto.startTime,
-      p_end_time: mockManualDto.endTime,
-      p_first_name: mockManualDto.firstName,
-      p_middle_name: mockManualDto.middleName,
-      p_last_name: mockManualDto.lastName,
-      p_suffix: mockManualDto.suffix,
-      p_phone_number: mockManualDto.phoneNumber,
-      p_email: mockManualDto.email,
-      p_patient_note: mockManualDto.patientNote,
-      p_status_reason: mockManualDto.statusReason,
-      p_secretary_user_id: mockManualDto.secretaryUserId,
-    });
+    expect(mockSupabase.rpc).toHaveBeenCalledWith('create_manual_booking', expect.objectContaining({
+      p_patient_id: baseDto.patientId,
+      p_service_id: baseDto.serviceId,
+      p_doctor_id: baseDto.doctorId,
+      p_date: baseDto.date,
+      p_start_time: baseDto.startTime,
+      p_end_time: baseDto.endTime,
+      p_first_name: baseDto.firstName,
+      p_middle_name: baseDto.middleName,
+      p_last_name: baseDto.lastName,
+      p_suffix: baseDto.suffix,
+      p_phone_number: baseDto.phoneNumber,
+      p_email: baseDto.email,
+      p_patient_note: baseDto.patientNote,
+      p_status_reason: baseDto.statusReason,
+      p_secretary_user_id: baseDto.secretaryUserId,
+      p_dependent_id: null,
+      p_new_dependent_first_name: null,
+      p_new_dependent_middle_name: null,
+      p_new_dependent_last_name: null,
+      p_new_dependent_suffix: null,
+      p_new_dependent_date_of_birth: null,
+      p_new_dependent_relationship: null,
+    }));
     expect(result).toMatchObject({ appointmentId: validApptId });
+  });
+
+  it('should pass p_dependent_id when booking for existing dependent', async () => {
+    const dto = { ...baseDto, dependentId: 'dep-uuid-123' };
+    const command = createManualBookingCommand(mockSupabase as unknown as SupabaseClient);
+    await command(dto);
+
+    expect(mockSupabase.rpc).toHaveBeenCalledWith('create_manual_booking', expect.objectContaining({
+      p_dependent_id: 'dep-uuid-123',
+      p_new_dependent_first_name: null,
+    }));
+  });
+
+  it('should pass p_new_dependent_* fields when creating new dependent', async () => {
+    const dto = {
+      ...baseDto,
+      newDependentFirstName: 'Maria',
+      newDependentLastName: 'Santos',
+      newDependentDateOfBirth: '2015-03-10',
+      newDependentRelationship: 'CHILD' as const,
+    };
+    const command = createManualBookingCommand(mockSupabase as unknown as SupabaseClient);
+    await command(dto);
+
+    expect(mockSupabase.rpc).toHaveBeenCalledWith('create_manual_booking', expect.objectContaining({
+      p_dependent_id: null,
+      p_new_dependent_first_name: 'Maria',
+      p_new_dependent_last_name: 'Santos',
+      p_new_dependent_date_of_birth: '2015-03-10',
+      p_new_dependent_relationship: 'CHILD',
+    }));
   });
 
   it('should throw DomainError on database error', async () => {
     mockSupabase.rpc.mockResolvedValueOnce({ data: null, error: { message: 'Overlapping slot' } });
 
     const command = createManualBookingCommand(mockSupabase as unknown as SupabaseClient);
-    await expect(command(mockManualDto)).rejects.toThrow(
+    await expect(command(baseDto)).rejects.toThrow(
       'Failed to create manual booking: Overlapping slot'
     );
   });

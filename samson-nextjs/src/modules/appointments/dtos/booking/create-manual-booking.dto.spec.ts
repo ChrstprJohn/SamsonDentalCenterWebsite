@@ -12,7 +12,7 @@ describe('createManualBookingSchema Validation', () => {
     statusReason: 'Call-in request',
   };
 
-  it('should accept valid linked account payload', () => {
+  it('should accept valid linked account payload (self)', () => {
     const payload = {
       ...basePayload,
       patientId: 'd3b07384-d113-4ec2-a5e6-ec083b0f5cc5',
@@ -70,6 +70,63 @@ describe('createManualBookingSchema Validation', () => {
       patientId: 'd3b07384-d113-4ec2-a5e6-ec083b0f5cc5',
       startTime: '2026-06-25T10:30:00.000Z',
       endTime: '2026-06-25T10:00:00.000Z',
+    };
+    const result = createManualBookingSchema.safeParse(payload);
+    expect(result.success).toBe(false);
+  });
+
+  it('should accept payload with existing dependentId', () => {
+    const payload = {
+      ...basePayload,
+      patientId: 'd3b07384-d113-4ec2-a5e6-ec083b0f5cc5',
+      dependentId: 'a1b07384-d113-4ec2-a5e6-ec083b0f5cc2',
+    };
+    expect(createManualBookingSchema.safeParse(payload).success).toBe(true);
+  });
+
+  it('should accept payload with all new dependent fields', () => {
+    const payload = {
+      ...basePayload,
+      patientId: 'd3b07384-d113-4ec2-a5e6-ec083b0f5cc5',
+      newDependentFirstName: 'Maria',
+      newDependentLastName: 'Santos',
+      newDependentDateOfBirth: '2015-03-10',
+      newDependentRelationship: 'CHILD',
+    };
+    expect(createManualBookingSchema.safeParse(payload).success).toBe(true);
+  });
+
+  it('should reject new dependent missing lastName', () => {
+    const payload = {
+      ...basePayload,
+      patientId: 'd3b07384-d113-4ec2-a5e6-ec083b0f5cc5',
+      newDependentFirstName: 'Maria',
+      newDependentDateOfBirth: '2015-03-10',
+      newDependentRelationship: 'CHILD',
+    };
+    const result = createManualBookingSchema.safeParse(payload);
+    expect(result.success).toBe(false);
+  });
+
+  it('should reject new dependent missing dateOfBirth', () => {
+    const payload = {
+      ...basePayload,
+      patientId: 'd3b07384-d113-4ec2-a5e6-ec083b0f5cc5',
+      newDependentFirstName: 'Maria',
+      newDependentLastName: 'Santos',
+      newDependentRelationship: 'CHILD',
+    };
+    const result = createManualBookingSchema.safeParse(payload);
+    expect(result.success).toBe(false);
+  });
+
+  it('should reject new dependent missing relationship', () => {
+    const payload = {
+      ...basePayload,
+      patientId: 'd3b07384-d113-4ec2-a5e6-ec083b0f5cc5',
+      newDependentFirstName: 'Maria',
+      newDependentLastName: 'Santos',
+      newDependentDateOfBirth: '2015-03-10',
     };
     const result = createManualBookingSchema.safeParse(payload);
     expect(result.success).toBe(false);

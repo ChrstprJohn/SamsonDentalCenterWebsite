@@ -10,7 +10,10 @@ import { getAvailableDaysAction } from '@/modules/appointments/actions/availabil
 import { getAvailableDoctorsForDateAction } from '@/modules/appointments/actions/availability/get-available-doctors-for-date.action';
 import { getAvailableTimeSlotsAction } from '@/modules/appointments/actions/availability/get-available-time-slots.action';
 import { searchPatientsAction } from '@/modules/patients/actions/profile/search-patients.action';
+import { getUserDependentsAction } from '@/modules/patients/actions/dependents/get-user-dependents.action';
 import { createManualBookingAction } from '@/modules/appointments/actions/booking/create-manual-booking.action';
+
+type BookingFor = 'SELF' | 'EXISTING_DEP' | 'NEW_DEP';
 
 export default function BookAppointmentPage() {
   // Patient identity
@@ -19,6 +22,20 @@ export default function BookAppointmentPage() {
   const [patientSearchResults, setPatientSearchResults] = useState<any[]>([]);
   const [isSearchingPatients, setIsSearchingPatients] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<any | null>(null);
+
+  // Dependent resolution (only when patient account selected)
+  const [dependents, setDependents] = useState<any[]>([]);
+  const [isLoadingDependents, setIsLoadingDependents] = useState(false);
+  const [bookingFor, setBookingFor] = useState<BookingFor>('SELF');
+  const [selectedDependent, setSelectedDependent] = useState<any | null>(null);
+
+  // New dependent inline form
+  const [newDepFirstName, setNewDepFirstName] = useState('');
+  const [newDepMiddleName, setNewDepMiddleName] = useState('');
+  const [newDepLastName, setNewDepLastName] = useState('');
+  const [newDepSuffix, setNewDepSuffix] = useState('');
+  const [newDepDOB, setNewDepDOB] = useState('');
+  const [newDepRelationship, setNewDepRelationship] = useState('');
 
   // Guest form
   const [firstName, setFirstName] = useState('');
@@ -139,11 +156,38 @@ export default function BookAppointmentPage() {
     return () => { active = false; clearTimeout(timer); };
   }, [patientSearchQuery]);
 
+  // Load dependents when patient selected
+  async function loadDependents(patientId: string) {
+    setIsLoadingDependents(true);
+    setDependents([]);
+    const res = await getUserDependentsAction(patientId);
+    setIsLoadingDependents(false);
+    if (res.success && res.data) setDependents(res.data);
+  }
+
+  function selectPatient(pat: any) {
+    setSelectedPatient(pat);
+    setPatientSearchQuery('');
+    setBookingFor('SELF');
+    setSelectedDependent(null);
+    resetNewDepForm();
+    loadDependents(pat.id);
+  }
+
+  function resetNewDepForm() {
+    setNewDepFirstName(''); setNewDepMiddleName(''); setNewDepLastName('');
+    setNewDepSuffix(''); setNewDepDOB(''); setNewDepRelationship('');
+  }
+
   const resetForm = () => {
     setSelectedPatient(null);
     setPatientMode('SEARCH');
     setPatientSearchQuery('');
     setPatientSearchResults([]);
+    setDependents([]);
+    setBookingFor('SELF');
+    setSelectedDependent(null);
+    resetNewDepForm();
     setFirstName(''); setMiddleName(''); setLastName(''); setSuffix(''); setPhoneNumber(''); setEmail('');
     setSelectedService(''); setSelectedDate(''); setSelectedDoctor(''); setSelectedTime(''); setSelectedEndTime('');
     setPatientNote('');
@@ -155,25 +199,43 @@ export default function BookAppointmentPage() {
     setInlineError('');
     setIsSubmitting(true);
     try {
-      const payload = {
-        serviceId: selectedService,
-        doctorId: selectedDoctor,
-        date: selectedDate,
-        startTime: selectedTime,
-        endTime: selectedEndTime,
-        patientNote: patientNote || undefined,
-        // Patient identity
-        ...(patientMode === 'SEARCH' && selectedPatient
-          ? { patientId: selectedPatient.id }
+      const dependentPayload =
+        bookingFor === 'EXISTING_DEP' ? { dependentId: selectedDependent!.id } :
+        bookingFor === 'NEW_DEP' ? {
+          newDependentFirstName: newDepFirstName,
+          newDependentMiddleName: newDepMiddleName || undefined,
+          newDependentLastName: newDepLastName,
+          newDependentSuffix: newDepSuffix || undefined,
+          newDependentDateOfBirth: newDepDOB,
+          newDependentRelationship: newDepRelationship,
+        } : {};
+
+      const payload =
+        patientMode === 'SEARCH' && selectedPatient
+          ? {
+              patientId: selectedPatient.id,
+              serviceId: selectedService,
+              doctorId: selectedDoctor,
+              date: selectedDate,
+              startTime: selectedTime,
+              endTime: selectedEndTime,
+              patientNote: patientNote || undefined,
+              ...dependentPayload,
+            }
           : {
+              serviceId: selectedService,
+              doctorId: selectedDoctor,
+              date: selectedDate,
+              startTime: selectedTime,
+              endTime: selectedEndTime,
+              patientNote: patientNote || undefined,
               firstName,
               middleName: middleName || undefined,
               lastName,
               suffix: suffix || undefined,
               phoneNumber,
               email: email || undefined,
-            }),
-      };
+            };
 
       const res = await createManualBookingAction(payload as any);
       if (res.success) {
@@ -207,10 +269,24 @@ export default function BookAppointmentPage() {
   };
 
   const isReadyToSubmit =
-    selectedService && selectedDate && selectedDoctor && selectedTime &&
-    (patientMode === 'SEARCH'
-      ? !!selectedPatient
-      : !!(firstName && lastName && phoneNumber));
+    !!(selectedService && selectedDate && selectedDoctor && selectedTime) &&
+    (patientMode === 'GUEST'
+      ? !!(firstName && lastName && phoneNumber)
+      : selectedPatient !== null && (
+          bookingFor === 'SELF' ||
+          (bookingFor === 'EXISTING_DEP' && selectedDependent !== null) ||
+          (bookingFor === 'NEW_DEP' && !!(newDepFirstName && newDepLastName && newDepDOB && newDepRelationship))
+        ));
+
+  // Booked success screen
+  const bookedPatientLabel =
+    patientMode === 'SEARCH' && selectedPatient
+      ? (bookingFor === 'EXISTING_DEP' && selectedDependent
+          ? `${selectedDependent.firstName} ${selectedDependent.lastName} (dep. of ${selectedPatient.firstName} ${selectedPatient.lastName})`
+          : bookingFor === 'NEW_DEP'
+          ? `${newDepFirstName} ${newDepLastName} (dep. of ${selectedPatient.firstName} ${selectedPatient.lastName})`
+          : `${selectedPatient.firstName} ${selectedPatient.lastName}`)
+      : `${firstName} ${middleName ? middleName + ' ' : ''}${lastName}${suffix ? ' ' + suffix : ''}`;
 
   if (booked) {
     return (
@@ -228,24 +304,10 @@ export default function BookAppointmentPage() {
             </p>
           </div>
           <div className="bg-secondary-bg/20 border border-card-border/60 rounded-2xl p-4 text-xs flex flex-col gap-2 text-left w-full">
-            <div>
-              <span className="text-text-muted">Patient: </span>
-              <span className="font-semibold text-text-primary">
-                {patientMode === 'SEARCH' && selectedPatient
-                  ? `${selectedPatient.firstName} ${selectedPatient.lastName}`
-                  : `${firstName} ${middleName ? middleName + ' ' : ''}${lastName}${suffix ? ' ' + suffix : ''}`}
-              </span>
-            </div>
-            <div>
-              <span className="text-text-muted">Date: </span>
-              <span className="font-semibold text-text-primary">{selectedDate} @ {formatTimeLabel(selectedTime)}</span>
-            </div>
+            <div><span className="text-text-muted">Patient: </span><span className="font-semibold text-text-primary">{bookedPatientLabel}</span></div>
+            <div><span className="text-text-muted">Date: </span><span className="font-semibold text-text-primary">{selectedDate} @ {formatTimeLabel(selectedTime)}</span></div>
           </div>
-          <div className="flex gap-3">
-            <Button variant="primary" className="flex-1 text-xs font-bold py-3" onClick={resetForm}>
-              Book Another
-            </Button>
-          </div>
+          <Button variant="primary" className="flex-1 text-xs font-bold py-3" onClick={resetForm}>Book Another</Button>
         </div>
       </div>
     );
@@ -276,20 +338,21 @@ export default function BookAppointmentPage() {
           <div className="flex bg-secondary-bg/25 p-1 rounded-xl gap-1">
             <button
               type="button"
-              onClick={() => { setPatientMode('SEARCH'); setSelectedPatient(null); setPatientSearchQuery(''); }}
+              onClick={() => { setPatientMode('SEARCH'); setSelectedPatient(null); setPatientSearchQuery(''); setDependents([]); resetNewDepForm(); setBookingFor('SELF'); }}
               className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${patientMode === 'SEARCH' ? 'bg-card text-text-primary shadow-sm' : 'text-text-muted hover:text-text-primary'}`}
             >
               🔍 Search Patient
             </button>
             <button
               type="button"
-              onClick={() => { setPatientMode('GUEST'); setSelectedPatient(null); }}
+              onClick={() => { setPatientMode('GUEST'); setSelectedPatient(null); setDependents([]); }}
               className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${patientMode === 'GUEST' ? 'bg-card text-text-primary shadow-sm' : 'text-text-muted hover:text-text-primary'}`}
             >
               👤 Register Guest
             </button>
           </div>
 
+          {/* SEARCH mode */}
           {patientMode === 'SEARCH' ? (
             <div className="flex flex-col gap-3">
               {!selectedPatient ? (
@@ -306,13 +369,12 @@ export default function BookAppointmentPage() {
                       <span className="absolute right-2.5 top-2.5 text-xs text-text-muted animate-spin">⌛</span>
                     )}
                   </div>
-
                   {patientSearchResults.length > 0 ? (
                     <div className="max-h-48 overflow-y-auto border border-card-border/60 rounded-xl bg-card divide-y divide-card-border/40 text-xs">
                       {patientSearchResults.map((pat) => (
                         <div
                           key={pat.id}
-                          onClick={() => { setSelectedPatient(pat); setPatientSearchQuery(''); }}
+                          onClick={() => selectPatient(pat)}
                           className="p-2.5 hover:bg-secondary-bg/20 cursor-pointer flex justify-between items-center transition-colors"
                         >
                           <div>
@@ -330,24 +392,134 @@ export default function BookAppointmentPage() {
                   ) : null}
                 </>
               ) : (
-                <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-xl p-3 flex justify-between items-center">
-                  <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 block">🟢 Linked Account</span>
-                    <span className="text-xs font-semibold text-text-primary">{selectedPatient.firstName} {selectedPatient.lastName}</span>
-                    <span className="text-[10px] text-text-muted block">{selectedPatient.email}</span>
-                    <span className="text-[10px] text-text-muted">{selectedPatient.phoneNumber}</span>
+                <div className="flex flex-col gap-3">
+                  {/* Selected patient header */}
+                  <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-xl p-3 flex justify-between items-center">
+                    <div>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 block">🟢 Linked Account</span>
+                      <span className="text-xs font-semibold text-text-primary">{selectedPatient.firstName} {selectedPatient.lastName}</span>
+                      <span className="text-[10px] text-text-muted block">{selectedPatient.email}</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => { setSelectedPatient(null); setDependents([]); setBookingFor('SELF'); resetNewDepForm(); setSelectedDependent(null); }}
+                      className="text-xs font-bold text-rose-500 hover:text-rose-600 p-1.5 rounded-lg hover:bg-rose-500/10 transition-colors"
+                    >
+                      Clear
+                    </button>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => setSelectedPatient(null)}
-                    className="text-xs font-bold text-rose-500 hover:text-rose-600 p-1.5 rounded-lg hover:bg-rose-500/10 transition-colors"
-                  >
-                    Clear
-                  </button>
+
+                  {/* Who is this for? */}
+                  <div className="border border-card-border/60 bg-secondary-bg/10 rounded-2xl p-4 flex flex-col gap-2">
+                    <span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Who is this appointment for?</span>
+
+                    {isLoadingDependents ? (
+                      <div className="text-xs text-text-muted animate-pulse py-2">Loading dependents...</div>
+                    ) : (
+                      <div className="flex flex-col gap-1.5">
+                        {/* Account holder option */}
+                        <label className={`flex items-center gap-2.5 p-2.5 rounded-xl cursor-pointer border transition-all ${bookingFor === 'SELF' ? 'bg-primary-start/10 border-primary-start/40' : 'border-transparent hover:bg-secondary-bg/30'}`}>
+                          <input
+                            type="radio"
+                            name="bookingFor"
+                            checked={bookingFor === 'SELF'}
+                            onChange={() => { setBookingFor('SELF'); setSelectedDependent(null); resetNewDepForm(); }}
+                            className="accent-primary-start"
+                          />
+                          <div>
+                            <div className="text-xs font-semibold text-text-primary">{selectedPatient.firstName} {selectedPatient.lastName}</div>
+                            <div className="text-[10px] text-text-muted">Account Holder</div>
+                          </div>
+                        </label>
+
+                        {/* Existing dependents */}
+                        {dependents.map((dep) => (
+                          <label
+                            key={dep.id}
+                            className={`flex items-center gap-2.5 p-2.5 rounded-xl cursor-pointer border transition-all ${bookingFor === 'EXISTING_DEP' && selectedDependent?.id === dep.id ? 'bg-primary-start/10 border-primary-start/40' : 'border-transparent hover:bg-secondary-bg/30'}`}
+                          >
+                            <input
+                              type="radio"
+                              name="bookingFor"
+                              checked={bookingFor === 'EXISTING_DEP' && selectedDependent?.id === dep.id}
+                              onChange={() => { setBookingFor('EXISTING_DEP'); setSelectedDependent(dep); resetNewDepForm(); }}
+                              className="accent-primary-start"
+                            />
+                            <div>
+                              <div className="text-xs font-semibold text-text-primary">
+                                {dep.firstName}{dep.middleName ? ` ${dep.middleName}` : ''} {dep.lastName}
+                              </div>
+                              <div className="text-[10px] text-text-muted capitalize">{dep.relationship?.toLowerCase()} · {dep.dateOfBirth}</div>
+                            </div>
+                          </label>
+                        ))}
+
+                        {/* Add dependent option */}
+                        <label className={`flex items-start gap-2.5 p-2.5 rounded-xl cursor-pointer border transition-all ${bookingFor === 'NEW_DEP' ? 'bg-amber-500/10 border-amber-500/40' : 'border-transparent hover:bg-secondary-bg/30'}`}>
+                          <input
+                            type="radio"
+                            name="bookingFor"
+                            checked={bookingFor === 'NEW_DEP'}
+                            onChange={() => { setBookingFor('NEW_DEP'); setSelectedDependent(null); }}
+                            className="accent-primary-start mt-0.5"
+                          />
+                          <div className="flex-1">
+                            <div className="text-xs font-semibold text-amber-500">➕ Add Dependent</div>
+                            <div className="text-[10px] text-text-muted">Create and book for a new family member</div>
+
+                            {bookingFor === 'NEW_DEP' && (
+                              <div className="mt-3 flex flex-col gap-2">
+                                <div className="grid grid-cols-2 gap-2">
+                                  <div className="flex flex-col gap-1">
+                                    <label className="text-[9px] font-bold text-text-muted uppercase">First Name *</label>
+                                    <Input value={newDepFirstName} onChange={(e) => setNewDepFirstName(e.target.value)} className="text-xs py-1.5 px-2.5" />
+                                  </div>
+                                  <div className="flex flex-col gap-1">
+                                    <label className="text-[9px] font-bold text-text-muted uppercase">Middle Name</label>
+                                    <Input value={newDepMiddleName} onChange={(e) => setNewDepMiddleName(e.target.value)} className="text-xs py-1.5 px-2.5" />
+                                  </div>
+                                  <div className="flex flex-col gap-1">
+                                    <label className="text-[9px] font-bold text-text-muted uppercase">Last Name *</label>
+                                    <Input value={newDepLastName} onChange={(e) => setNewDepLastName(e.target.value)} className="text-xs py-1.5 px-2.5" />
+                                  </div>
+                                  <div className="flex flex-col gap-1">
+                                    <label className="text-[9px] font-bold text-text-muted uppercase">Suffix</label>
+                                    <Input value={newDepSuffix} onChange={(e) => setNewDepSuffix(e.target.value)} className="text-xs py-1.5 px-2.5" />
+                                  </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-2">
+                                  <div className="flex flex-col gap-1">
+                                    <label className="text-[9px] font-bold text-text-muted uppercase">Date of Birth *</label>
+                                    <Input type="date" value={newDepDOB} onChange={(e) => setNewDepDOB(e.target.value)} className="text-xs py-1.5 px-2.5" />
+                                  </div>
+                                  <div className="flex flex-col gap-1">
+                                    <label className="text-[9px] font-bold text-text-muted uppercase">Relationship *</label>
+                                    <select
+                                      value={newDepRelationship}
+                                      onChange={(e) => setNewDepRelationship(e.target.value)}
+                                      className="text-xs py-1.5 px-2.5 rounded-lg border border-card-border bg-card text-text-primary focus:outline-none focus:border-primary-start/50"
+                                    >
+                                      <option value="">Select...</option>
+                                      <option value="CHILD">Child</option>
+                                      <option value="SPOUSE">Spouse</option>
+                                      <option value="SIBLING">Sibling</option>
+                                      <option value="PARENT">Parent</option>
+                                      <option value="OTHER">Other</option>
+                                    </select>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </label>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
           ) : (
+            /* GUEST mode */
             <div className="border border-card-border bg-secondary-bg/10 rounded-2xl p-4 flex flex-col gap-3">
               <div className="text-[10px] font-bold text-amber-500 uppercase tracking-wider">🟡 Creating as Guest</div>
               <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">

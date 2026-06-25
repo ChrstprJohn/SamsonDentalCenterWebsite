@@ -20,6 +20,14 @@ export const createManualBookingCommand = (supabase: SupabaseClient) => {
       p_patient_note: data.patientNote || null,
       p_status_reason: data.statusReason || null,
       p_secretary_user_id: data.secretaryUserId,
+      // Dependent params
+      p_dependent_id: data.dependentId || null,
+      p_new_dependent_first_name: data.newDependentFirstName || null,
+      p_new_dependent_middle_name: data.newDependentMiddleName || null,
+      p_new_dependent_last_name: data.newDependentLastName || null,
+      p_new_dependent_suffix: data.newDependentSuffix || null,
+      p_new_dependent_date_of_birth: data.newDependentDateOfBirth || null,
+      p_new_dependent_relationship: data.newDependentRelationship || null,
     });
 
     if (error || !appointmentId) {

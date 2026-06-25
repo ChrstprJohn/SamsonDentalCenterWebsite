@@ -32,4 +32,31 @@ describe('manualBookingPatientEventSchema', () => {
     const result = manualBookingPatientEventSchema.safeParse(withoutPatient);
     expect(result.success).toBe(false);
   });
+
+  it('should validate with dependentId and dependentName present', () => {
+    const result = manualBookingPatientEventSchema.safeParse({
+      ...validPayload,
+      dependentId: 'c2a07384-d113-4ec2-a5e6-ec083b0f5cc9',
+      dependentName: 'Maria Santos',
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('should validate when dependentId and dependentName are null', () => {
+    const result = manualBookingPatientEventSchema.safeParse({
+      ...validPayload,
+      dependentId: null,
+      dependentName: null,
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('should validate when dependentId and dependentName are absent (self booking)', () => {
+    const result = manualBookingPatientEventSchema.safeParse(validPayload);
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.dependentId).toBeUndefined();
+      expect(result.data.dependentName).toBeUndefined();
+    }
+  });
 });

@@ -37,6 +37,19 @@ export const createManualBookingSchema = z
     endTime: z.string().datetime('Must be a valid ISO string'),
     patientNote: cleanOptionalString,
     statusReason: cleanOptionalString,
+    // Dependent support
+    dependentId: z.string().uuid('Invalid dependent ID format').nullable().optional(),
+    newDependentFirstName: z.string().trim().min(1).optional(),
+    newDependentMiddleName: cleanOptionalString,
+    newDependentLastName: z.string().trim().min(1).optional(),
+    newDependentSuffix: cleanOptionalString,
+    newDependentDateOfBirth: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date of birth must be YYYY-MM-DD')
+      .optional(),
+    newDependentRelationship: z
+      .enum(['CHILD', 'SPOUSE', 'SIBLING', 'PARENT', 'OTHER'])
+      .optional(),
   })
   .superRefine((data, ctx) => {
     // 1. Start time must be before end time
@@ -48,7 +61,7 @@ export const createManualBookingSchema = z
       });
     }
 
-    // 2. If patientId is null/undefined, it is Guest Mode. Guest fields are required.
+    // 2. Guest mode: firstName, lastName, phoneNumber required
     if (!data.patientId) {
       if (!data.firstName || data.firstName.length === 0) {
         ctx.addIssue({
@@ -69,6 +82,31 @@ export const createManualBookingSchema = z
           code: z.ZodIssueCode.custom,
           message: 'Phone number is required for guests',
           path: ['phoneNumber'],
+        });
+      }
+    }
+
+    // 3. New dependent: if first name provided, last name + DOB + relationship are required
+    if (data.newDependentFirstName) {
+      if (!data.newDependentLastName) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Last name is required when adding a new dependent',
+          path: ['newDependentLastName'],
+        });
+      }
+      if (!data.newDependentDateOfBirth) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Date of birth is required when adding a new dependent',
+          path: ['newDependentDateOfBirth'],
+        });
+      }
+      if (!data.newDependentRelationship) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Relationship is required when adding a new dependent',
+          path: ['newDependentRelationship'],
         });
       }
     }

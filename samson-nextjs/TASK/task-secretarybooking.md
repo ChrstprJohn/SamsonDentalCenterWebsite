@@ -212,3 +212,311 @@ All backend layers done and tested (39/39 tests pass).
 - [x] All real API actions wired (search, services, days, doctors, slots, submit)
 - [x] Guest form + linked account modes with badges
 - [x] Toast + success screen
+
+---
+
+## Phase 2: Dependent Support in Manual Booking
+
+### Overview
+
+When a secretary selects an existing patient account, the booking flow must ask **"Who is this appointment for?"** — allowing the secretary to book for the account holder themselves, an existing dependent, or a brand-new dependent added inline. The new dependent is created **atomically with the appointment** inside the RPC — never created independently before submission.
+
+### UX Flow
+
+```
+Secretary searches "Santos" → selects [John Santos] (account holder)
+        │
+        ▼
+"Who is this appointment for?"
+  ○ John Santos              ← account holder himself
+  ○ Maria Santos (Child, 2015)  ← existing dependent
+  ○ Luis Santos (Spouse)     ← existing dependent
+  [+ Add Dependent]          ← expands inline form:
+        First Name, Last Name, Date of Birth, Relationship
+        (held in state; saved ONLY when appointment is submitted)
+```
+
+- Selecting **account holder** → `patientId = john.id`, `dependentId = null`
+- Selecting **existing dependent** → `patientId = john.id`, `dependentId = dependent.id`
+- Filling **new dependent form** → `patientId = john.id` + `newDependent*` fields → RPC creates dependent + appointment atomically
+- **Guest mode unchanged:** No account → guest form → `guest_contacts` table
+
+---
+
+### Architecture Rules Reference
+
+All new files follow:
+- **1-ARCHITECTURE.md**: One file = one operation. Co-located `.spec.ts` mandatory. Aggregate subfolders from day one. No Server Action re-export via `index.ts` barrel.
+- **1.5-CODING-PATTERNS.md**: Functional CQRS repositories (`export const command = (supabase) => async (data) => ...`). Functional use-cases (pure functions, deps injected). 3-step streamlined server actions (Parse → DI → Execute).
+- **3-CLEAN_CODE.md**: `camelCase` everywhere in app layer. `snake_case` only at DB boundary via Zod `.transform()`. No raw DB row returned to client.
+- **4-TESTING_GUIDELINES.md**: 80% unit tests, `vi.mock` for all Supabase calls, co-located `.spec.ts` for every `.ts` file. No real DB in unit tests.
+- **2-NEXTJS.md**: `'use server'` at top of action file. Import server actions directly from file path in UI — never via `index.ts` barrel.
+
+---
+
+### Step 1: Database Migration
+
+#### [NEW] `migrations/20260626_add_dependent_support_to_manual_booking_rpc.sql`
+
+Update `create_manual_booking` PostgreSQL RPC to accept dependent parameters:
+
+**New RPC params:**
+- `p_dependent_id UUID DEFAULT NULL` — links to existing `dependents.id`
+- `p_new_dependent_first_name TEXT DEFAULT NULL`
+- `p_new_dependent_middle_name TEXT DEFAULT NULL`
+- `p_new_dependent_last_name TEXT DEFAULT NULL`
+- `p_new_dependent_suffix TEXT DEFAULT NULL`
+- `p_new_dependent_date_of_birth DATE DEFAULT NULL`
+- `p_new_dependent_relationship TEXT DEFAULT NULL`
+
+**RPC internal branching:**
+1. If `p_dependent_id` is not null → use existing dependent (no insert)
+2. Else if `p_new_dependent_first_name` is not null → `INSERT INTO dependents`, use new `id`
+3. Else → no dependent (booking for self or guest)
+
+Sets `appointments.dependent_id` accordingly.
+
+**Also update `APPOINTMENT_MANUALLY_BOOKED_PATIENT` outbox payload** to include `dependent_id` and `dependent_name` (nullable) so email subscriber can reference the correct name.
+
+> ⚠️ Migration must be applied to Supabase before testing.
+
+---
+
+### Step 2: DTO Layer — `src/modules/appointments/dtos/booking/`
+
+#### [MODIFY] `create-manual-booking.dto.ts`
+
+Add optional dependent fields to `createManualBookingSchema`:
+
+```ts
+dependentId: z.string().uuid().optional().nullable(),
+newDependentFirstName: z.string().min(1).optional(),
+newDependentMiddleName: z.string().optional(),
+newDependentLastName: z.string().min(1).optional(),
+newDependentSuffix: z.string().optional(),
+newDependentDateOfBirth: z.string().optional(),   // ISO date string YYYY-MM-DD
+newDependentRelationship: z.enum(['CHILD','SPOUSE','SIBLING','PARENT','OTHER']).optional(),
+```
+
+Add `.refine()`: if `newDependentFirstName` is present → `newDependentLastName`, `newDependentDateOfBirth`, `newDependentRelationship` must also be present.
+
+#### [MODIFY] `create-manual-booking.dto.spec.ts`
+
+New test cases:
+- Valid: payload with `dependentId` only
+- Valid: payload with all `newDependent*` fields
+- Fails: `newDependentFirstName` present but `newDependentLastName` absent
+- Fails: `newDependentDateOfBirth` absent when creating new dependent
+
+---
+
+### Step 3: Repository Layer — `src/modules/appointments/repositories/booking/`
+
+#### [MODIFY] `create-manual-booking.command.ts`
+
+Add new RPC params to the `supabase.rpc('create_manual_booking', {...})` call:
+
+```ts
+p_dependent_id: data.dependentId || null,
+p_new_dependent_first_name: data.newDependentFirstName || null,
+p_new_dependent_middle_name: data.newDependentMiddleName || null,
+p_new_dependent_last_name: data.newDependentLastName || null,
+p_new_dependent_suffix: data.newDependentSuffix || null,
+p_new_dependent_date_of_birth: data.newDependentDateOfBirth || null,
+p_new_dependent_relationship: data.newDependentRelationship || null,
+```
+
+#### [MODIFY] `create-manual-booking.command.spec.ts`
+
+New test cases:
+- Asserts `p_dependent_id` passed when `dependentId` provided
+- Asserts `p_new_dependent_*` params passed when new dependent fields provided
+- Asserts all dependent params are `null` when booking for self (no dependent)
+
+---
+
+### Step 4: Verify Patient Dependents Action
+
+#### Verify: `src/modules/patients/actions/dependents/get-user-dependents.action.ts`
+
+- Confirm it accepts `userId: string` (the patient account ID)
+- Confirm it returns `DependentProfileDto[]`
+- **Critical:** Confirm auth guard allows `SECRETARY` and `ADMIN` roles (not just `PATIENT`)
+- If auth guard is `PATIENT` only → create new action:
+
+#### [NEW if needed] `src/modules/patients/actions/dependents/get-dependents-for-booking.action.ts`
+
+```ts
+'use server';
+// Role check: SECRETARY | ADMIN only
+// Accepts: { patientId: string }
+// Returns: DependentProfileDto[]
+// Pattern: Parse → DI Setup + Auth → Execute (via getDependentsByPatientIdQuery)
+```
+
+#### [NEW if needed] `src/modules/patients/actions/dependents/get-dependents-for-booking.action.spec.ts`
+
+- Tests: role guard blocks PATIENT, allows SECRETARY/ADMIN
+- Tests: returns empty array when patient has no dependents
+- Tests: returns mapped DependentProfileDto[] on success
+
+---
+
+### Step 5: Use Case Layer — `src/modules/appointments/use-cases/booking/`
+
+#### [MODIFY] `create-manual-booking.use-case.spec.ts`
+
+Add test case: payload containing `newDependentFirstName` passes through unchanged to `createManualBooking` command dep.
+
+> No logic change to `create-manual-booking.use-case.ts` — the slot check is unchanged; dependent creation is inside the RPC.
+
+---
+
+### Step 6: Email — `src/modules/emails/`
+
+#### [MODIFY] `src/modules/emails/dtos/events/manual-booking-patient.event.dto.ts`
+
+Add to `manualBookingPatientEventSchema`:
+```ts
+dependentId: z.string().uuid().optional().nullable(),
+dependentName: z.string().optional().nullable(),
+```
+
+#### [MODIFY] `src/modules/emails/dtos/events/manual-booking-patient.event.dto.spec.ts`
+
+- Tests: `dependentId` and `dependentName` are optional/nullable — schema validates without them
+- Tests: schema validates with both present
+
+#### [MODIFY] `src/modules/emails/subscribers/on-manual-booking-patient.subscriber.ts`
+
+Update email rendering:
+- If payload `dependentName` present → use `dependentName` in email ("Appointment for: Maria Santos")
+- Else → use patient name fetched from `users` table (existing behavior unchanged)
+
+#### [MODIFY] `src/modules/emails/subscribers/on-manual-booking-patient.subscriber.spec.ts`
+
+New test cases:
+- Sends email addressed to `dependentName` when `dependentId` present in payload
+- Sends email addressed to account holder name when no `dependentId`
+
+---
+
+### Step 7: Frontend — `src/app/(portals)/secretary/book/page.tsx`
+
+#### [MODIFY] `book/page.tsx`
+
+**New state:**
+```ts
+type BookingFor = 'SELF' | 'EXISTING_DEP' | 'NEW_DEP';
+const [dependents, setDependents] = useState<any[]>([]);
+const [isLoadingDependents, setIsLoadingDependents] = useState(false);
+const [bookingFor, setBookingFor] = useState<BookingFor>('SELF');
+const [selectedDependent, setSelectedDependent] = useState<any | null>(null);
+const [newDepFirstName, setNewDepFirstName] = useState('');
+const [newDepMiddleName, setNewDepMiddleName] = useState('');
+const [newDepLastName, setNewDepLastName] = useState('');
+const [newDepSuffix, setNewDepSuffix] = useState('');
+const [newDepDOB, setNewDepDOB] = useState('');
+const [newDepRelationship, setNewDepRelationship] = useState('');
+```
+
+**After `setSelectedPatient(pat)`** → call `loadDependents(pat.id)` (calls `getUserDependentsAction` or the new secretary action).
+
+**New "Who is this for?" UI section** (visible only in SEARCH mode after patient selected):
+
+```
+[○] John Santos (Account Holder)
+[○] Maria Santos · Child · 2015-03-01
+[○] + Add Dependent ▼
+    First Name:   [        ]
+    Last Name:    [        ]
+    Date of Birth:[        ]
+    Relationship: [Child  ▾]
+```
+
+**Submit payload:**
+```ts
+const dependentPayload =
+  bookingFor === 'EXISTING_DEP' ? { dependentId: selectedDependent!.id } :
+  bookingFor === 'NEW_DEP' ? {
+    newDependentFirstName: newDepFirstName,
+    newDependentMiddleName: newDepMiddleName || undefined,
+    newDependentLastName: newDepLastName,
+    newDependentSuffix: newDepSuffix || undefined,
+    newDependentDateOfBirth: newDepDOB,
+    newDependentRelationship: newDepRelationship,
+  } : {};
+
+const payload = {
+  serviceId: selectedService,
+  doctorId: selectedDoctor,
+  date: selectedDate,
+  startTime: selectedTime,
+  endTime: selectedEndTime,
+  patientNote: patientNote || undefined,
+  ...(patientMode === 'SEARCH' && selectedPatient
+    ? { patientId: selectedPatient.id, ...dependentPayload }
+    : { firstName, lastName, phoneNumber, /* guest fields */ }),
+};
+```
+
+**Submit guard updated:**
+```ts
+const isReadyToSubmit =
+  selectedService && selectedDate && selectedDoctor && selectedTime &&
+  (patientMode === 'GUEST'
+    ? !!(firstName && lastName && phoneNumber)
+    : selectedPatient !== null && (
+        bookingFor === 'SELF' ||
+        (bookingFor === 'EXISTING_DEP' && selectedDependent !== null) ||
+        (bookingFor === 'NEW_DEP' && !!(newDepFirstName && newDepLastName && newDepDOB && newDepRelationship))
+      ));
+```
+
+---
+
+### Step 8: Shared Types
+
+#### [MODIFY] `src/shared/database/database.types.ts`
+
+Verify `appointments` table has `dependent_id: string | null` column. Add if missing.
+
+---
+
+### File Checklist
+
+#### Database
+- [ ] `migrations/20260626_add_dependent_support_to_manual_booking_rpc.sql`
+
+#### DTOs — Appointments
+- [ ] `src/modules/appointments/dtos/booking/create-manual-booking.dto.ts` — add dependent fields + `.refine()` validation
+- [ ] `src/modules/appointments/dtos/booking/create-manual-booking.dto.spec.ts` — new test cases
+
+#### DTOs — Emails
+- [ ] `src/modules/emails/dtos/events/manual-booking-patient.event.dto.ts` — add `dependentId`, `dependentName`
+- [ ] `src/modules/emails/dtos/events/manual-booking-patient.event.dto.spec.ts` — new test cases
+
+#### Repositories
+- [ ] `src/modules/appointments/repositories/booking/create-manual-booking.command.ts` — pass new RPC params
+- [ ] `src/modules/appointments/repositories/booking/create-manual-booking.command.spec.ts` — assert new params
+
+#### Use Cases
+- [ ] `src/modules/appointments/use-cases/booking/create-manual-booking.use-case.spec.ts` — add passthrough test
+
+#### Server Actions — Appointments
+- [ ] `src/modules/appointments/actions/booking/create-manual-booking.action.spec.ts` — new test case
+
+#### Server Actions — Patients
+- [ ] Verify `src/modules/patients/actions/dependents/get-user-dependents.action.ts` allows SECRETARY role
+- [ ] [NEW if needed] `src/modules/patients/actions/dependents/get-dependents-for-booking.action.ts`
+- [ ] [NEW if needed] `src/modules/patients/actions/dependents/get-dependents-for-booking.action.spec.ts`
+
+#### Email Subscribers
+- [ ] `src/modules/emails/subscribers/on-manual-booking-patient.subscriber.ts` — use `dependentName` in email
+- [ ] `src/modules/emails/subscribers/on-manual-booking-patient.subscriber.spec.ts` — new test cases
+
+#### Frontend
+- [ ] `src/app/(portals)/secretary/book/page.tsx` — "Who is this for?" section + inline add-dependent form
+
+#### Shared
+- [ ] `src/shared/database/database.types.ts` — verify `appointments.dependent_id` column

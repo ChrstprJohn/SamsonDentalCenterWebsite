@@ -7,10 +7,11 @@ export const onManualBookingPatientSubscriber = {
   /**
    * Handles APPOINTMENT_MANUALLY_BOOKED_PATIENT.
    * Registered patient always has email — fetched from users table.
+   * If dependentName is present in payload, uses it as the recipient name in the email.
    */
   async handle(payload: Record<string, any>): Promise<void> {
     const parsed = manualBookingPatientEventSchema.parse(payload);
-    const { appointmentId, patientId, serviceId, doctorId, date, startTime, durationMinutes } = parsed;
+    const { appointmentId, patientId, serviceId, doctorId, date, startTime, durationMinutes, dependentName } = parsed;
 
     const supabaseAdmin = await createAdminClient();
 
@@ -44,10 +45,13 @@ export const onManualBookingPatientSubscriber = {
       throw new Error(`Failed to fetch doctor for outbox email: ${doctorError?.message || 'Not found'}`);
     }
 
-    const patientName = [patient.first_name, patient.middle_name, patient.last_name, patient.suffix]
+    // Use dependent name if booking is for a dependent, otherwise account holder's name
+    const accountHolderName = [patient.first_name, patient.middle_name, patient.last_name, patient.suffix]
       .filter(Boolean)
       .join(' ')
       .trim();
+
+    const patientName = dependentName || accountHolderName;
 
     const doctorName = `Dr. ${doctor.first_name} ${doctor.last_name}`;
     const dateStr = formatShortDate(date);
