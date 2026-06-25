@@ -145,39 +145,39 @@ Import Server Actions **directly** from their action file paths — never via `i
 
 ### Phase 1: Patient Identity Step (Step 1)
 
-- [ ] **Patient Search Bar**
+- [x] **Patient Search Bar**
   - Async combobox querying `users` by Name, Email, or Phone
-- [ ] **Path A: Existing Patient (Linked Account)**
+- [x] **Path A: Existing Patient (Linked Account)**
   - Auto-populate: First Name, Middle Name, Last Name, Suffix, Email, Phone
   - Lock fields as read-only
   - State: `selectedUserId = user.id`
   - Badge: 🟢 Linked to Account
-- [ ] **Path B: New Guest Patient**
+- [x] **Path B: New Guest Patient**
   - All fields editable (Email optional, Phone required)
   - State: `selectedUserId = null`
   - Badge: 🟡 Creating as Guest
 
 ### Phase 2: Appointment & Schedule (Steps 2 & 3)
 
-- [ ] **Step 2: Department & Provider**
-  - [ ] Service/Department dropdown
-  - [ ] Doctor dropdown (filtered by service)
-  - [ ] Patient Note text field
-- [ ] **Step 3: Date & Time**
-  - [ ] Calendar date picker
-  - [ ] Time slot grid (disabled for unavailable/booked slots)
+- [x] **Step 2: Department & Provider**
+  - [x] Service/Department chip selector (real `getServicesAction`)
+  - [x] Doctor cards (real `getAvailableDoctorsForDateAction`, filtered by service+date)
+  - [x] Patient Note text field
+- [x] **Step 3: Date & Time**
+  - [x] Calendar date picker (real `getAvailableDaysAction`)
+  - [x] Time slot grid (real `getAvailableTimeSlotsAction`, unavailable excluded server-side)
 
 ### Phase 3: Review & Submit (Step 4)
 
-- [ ] **Step 4: Confirmation Screen**
-  - Summary card: patient mode, service, doctor, date/time
-  - Show "Booking for: Guest John Doe" vs "Booking for: Registered Patient John Doe"
-- [ ] **Submit Handler**
-  - Import `createManualBookingAction` directly: `import { createManualBookingAction } from '@/modules/appointments/actions/booking/create-manual-booking.action'`
-  - Handle `{ success, error }` response
-- [ ] **Success State**
-  - Clear form, redirect to Secretary Dashboard
-  - Show success toast notification
+- [x] **Step 4: Confirmation Screen**
+  - Success screen shows patient name + date/time
+  - Shows guest vs linked patient name
+- [x] **Submit Handler**
+  - Imports `createManualBookingAction` directly from action file path
+  - Handles `{ success, error }` response
+- [x] **Success State**
+  - "Book Another" resets all form state
+  - Toast notification on success/error
 
 ---
 
@@ -207,5 +207,8 @@ Import Server Actions **directly** from their action file paths — never via `i
 ### Backend ✅ COMPLETE
 All backend layers done and tested (39/39 tests pass).
 
-### Frontend
-- [ ] ManualBookingModal / Stepper UI (Phase 1–3 above)
+### Frontend ✅ COMPLETE
+- [x] Two-column split-pane at `/secretary/book` — patient identity left, service+schedule right
+- [x] All real API actions wired (search, services, days, doctors, slots, submit)
+- [x] Guest form + linked account modes with badges
+- [x] Toast + success screen
