@@ -12,6 +12,7 @@ describe('submitBookingUseCase', () => {
     serviceId: '1111f111-1111-1111-1111-111111111111',
     doctorId: '22222222-2222-2222-2222-222222222222',
     isPreferredDoctor: true,
+    doctorAssignmentSource: 'SYSTEM',
     date: '2024-12-25',
     startTime: '2024-12-25T10:00:00.000Z',
     endTime: '2024-12-25T10:30:00.000Z',

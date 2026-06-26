@@ -47,6 +47,7 @@ describe('updateAppointmentStatusTransactionCommand', () => {
       p_reschedule_start:  null,
       p_reschedule_end:    null,
       p_reschedule_doctor: null,
+      p_reschedule_service: null,
       p_clear_proposed:    false,
       p_reschedule_count:  null,
     });

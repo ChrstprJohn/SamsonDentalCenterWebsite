@@ -53,3 +53,16 @@ export function formatClinicTime(date: Date | string): string {
 export function calculateEndTimeFromIso(isoString: string, durationMinutes: number): Date {
   return new Date(new Date(isoString).getTime() + durationMinutes * 60000);
 }
+
+/**
+ * Returns today's date as a YYYY-MM-DD string in the BROWSER'S LOCAL timezone.
+ * Use this instead of new Date().toISOString().split('T')[0] which gives the UTC date
+ * and can be a day behind for UTC+8 users between midnight and 08:00 local time.
+ */
+export function getTodayLocalDateStr(): string {
+  const d = new Date();
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+}

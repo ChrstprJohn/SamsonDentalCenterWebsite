@@ -13,3 +13,6 @@ export * from './clinic/get-clinic-appointments.dto';
 export * from './treatment/submit-treatment.dto';
 export * from './patient/get-appointment-by-id.dto';
 export * from './availability/get-available-doctors-for-date.dto';
+export * from './status/check-in.dto';
+export * from './status/undo-check-in.dto';
+export * from './status/mark-no-show.dto';
