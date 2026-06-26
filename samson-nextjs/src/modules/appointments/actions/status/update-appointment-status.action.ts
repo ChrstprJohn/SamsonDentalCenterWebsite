@@ -1,35 +1,34 @@
 'use server';
 
 import { z } from 'zod';
-import { createClient, createAdminClient } from '@/shared/database/server';
+import { createClient } from '@/shared/database/server';
 import { authorizeRole, getAuthenticatedUser } from '@/shared/auth/auth.util';
 import { DomainError } from '@/shared/errors';
 import { staffUpdateAppointmentStatusSchema, StaffUpdateAppointmentStatusDto } from '../../dtos/exports';
-import { getAppointmentByIdQuery, updateStatusCommand, incrementUserCredibilityMetricCommand, insertLedgerEntryCommand } from '../../repositories/exports';
+import { getAppointmentByIdQuery, updateAppointmentStatusTransactionCommand } from '../../repositories/exports';
 import { updateAppointmentStatusUseCase } from '../../use-cases/exports';
 
 /**
  * Updates an appointment status on behalf of a clinic staff member.
  * Restricts access to SECRETARY and ADMIN roles.
+ * All DB side-effects (status update, ledger, credibility metric) run in one ACID transaction.
  */
 export async function updateAppointmentStatusAction(formData: StaffUpdateAppointmentStatusDto) {
   try {
-    // Assert SECRETARY or above role
+    // 1. Assert SECRETARY or above role
     await authorizeRole('SECRETARY');
     const user = await getAuthenticatedUser();
 
+    // 2. Parse & validate input
     const validData = staffUpdateAppointmentStatusSchema.parse(formData);
     const supabase = await createClient();
-    const supabaseAdmin = await createAdminClient();
 
+    // 3. DI setup — single ACID transaction command replaces 3 separate calls
     const useCase = updateAppointmentStatusUseCase({
       getAppointmentById: getAppointmentByIdQuery(supabase),
-      updateStatus: updateStatusCommand(supabase),
-      incrementUserCredibilityMetric: incrementUserCredibilityMetricCommand(supabase),
-      insertLedgerEntry: insertLedgerEntryCommand(supabaseAdmin),
+      updateAppointmentStatusTransaction: updateAppointmentStatusTransactionCommand(supabase),
     });
 
-    // Format optional reschedule metadata
     const rescheduleMetadata =
       validData.newDate && validData.newStartTime && validData.newEndTime && validData.newDoctorId
         ? {
@@ -40,6 +39,7 @@ export async function updateAppointmentStatusAction(formData: StaffUpdateAppoint
           }
         : undefined;
 
+    // 4. Execute
     const result = await useCase(
       validData.appointmentId,
       user.id,

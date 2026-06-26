@@ -11,6 +11,7 @@ interface PayloadMapperParams {
   selectedDependentId: string | null;
   newDependentData: NewDependentInput | null;
   userNote: string;
+  selectedDoctorId: string;
 }
 
 export function createBookingPayload({
@@ -21,12 +22,14 @@ export function createBookingPayload({
   selectedDependentId,
   newDependentData,
   userNote,
+  selectedDoctorId,
 }: PayloadMapperParams): SubmitBookingDto {
   const payload: SubmitBookingDto = {
     idempotencyKey: crypto.randomUUID(),
     serviceId: selectedService.id,
     doctorId: selectedSlot.doctorId,
     isPreferredDoctor: selectedSlot.isPreferred ?? false,
+    doctorAssignmentSource: selectedDoctorId === 'ANY' ? 'SYSTEM' : 'USER',
     date: selectedDate,
     startTime: selectedSlot.originalStartTime,
     endTime: calculateEndTimeFromIso(selectedSlot.originalStartTime, selectedService.durationMinutes).toISOString(),

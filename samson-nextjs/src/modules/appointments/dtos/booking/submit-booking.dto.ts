@@ -11,6 +11,7 @@ export const submitBookingSchema = z
         serviceId: z.string().uuid('Invalid Service ID format'),
         doctorId: z.string().uuid('Invalid Doctor ID format'), // Comes precisely from the availability slot data
         isPreferredDoctor: z.boolean().optional().default(false), // Optional tracking metric for database telemetry
+        doctorAssignmentSource: z.enum(['SYSTEM', 'USER']).optional().default('SYSTEM'),
 
         date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format'),
         startTime: z.string().datetime('Must be a valid ISO string'),

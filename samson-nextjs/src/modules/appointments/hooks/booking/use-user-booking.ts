@@ -256,6 +256,7 @@ export function useUserBooking(
       selectedDependentId: state.selectedDependentId,
       newDependentData: state.newDependentData,
       userNote: state.userNote,
+      selectedDoctorId: state.selectedDoctorId,
     });
 
     try {

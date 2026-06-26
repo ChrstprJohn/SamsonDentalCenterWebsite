@@ -4,9 +4,11 @@ import { AppointmentDto } from '../../dtos/exports';
 
 export const updateAppointmentStatusUseCase = (deps: {
   getAppointmentById: (appointmentId: string) => Promise<AppointmentDto>;
-  updateStatus: (
+  updateAppointmentStatusTransaction: (
     appointmentId: string,
-    status: AppointmentStatusValue,
+    actorId: string | null,
+    actorRole: string,
+    newStatus: AppointmentStatusValue,
     reason?: string,
     rescheduleMetadata?: {
       date: string;
@@ -14,22 +16,9 @@ export const updateAppointmentStatusUseCase = (deps: {
       endTime: string;
       doctorId: string;
     },
-    rescheduleCount?: number,
-    proposedRescheduleMetadata?: undefined,
-    clearProposedMetadata?: boolean
+    clearProposedMetadata?: boolean,
+    rescheduleCount?: number
   ) => Promise<AppointmentDto>;
-  incrementUserCredibilityMetric: (
-    userId: string,
-    metric: 'cancel_count' | 'no_show_count' | 'reschedule_count'
-  ) => Promise<{ success: boolean }>;
-  insertLedgerEntry: (
-    appointmentId: string,
-    changedBy: string | null,
-    actorRole: string,
-    previousStatus: AppointmentStatusValue | null,
-    newStatus: AppointmentStatusValue,
-    reason?: string
-  ) => Promise<{ success: boolean }>;
 }) => {
   return async (
     appointmentId: string,
@@ -56,7 +45,7 @@ export const updateAppointmentStatusUseCase = (deps: {
     }
 
     const rescheduleCount = appointment.rescheduleCount ?? 0;
-    let nextRescheduleCount = rescheduleCount;
+    let nextRescheduleCount: number | undefined = undefined;
 
     const isRescheduling = !!rescheduleMetadata;
     if (isRescheduling) {
@@ -73,10 +62,10 @@ export const updateAppointmentStatusUseCase = (deps: {
     let finalRescheduleMetadata = rescheduleMetadata;
     let clearProposedMetadata = false;
 
-    // Handle "Hold and Swap" resolution logic
+    // Hold-and-Swap resolution logic
     if (currentStatus === 'RESCHEDULE_REQUESTED') {
       if (status === 'APPROVED') {
-        // SWAP: Patient requested a reschedule, Staff approved it. Move proposed -> actual.
+        // SWAP: Staff approved patient's reschedule request → move proposed → actual
         if (
           appointment.proposedDate &&
           appointment.proposedStartTime &&
@@ -92,49 +81,23 @@ export const updateAppointmentStatusUseCase = (deps: {
         }
         clearProposedMetadata = true;
       } else if (status === 'REJECTED') {
-        // REVERT: Patient requested a reschedule, Staff rejected it.
-        // Wipe proposed data and restore the original APPROVED slot.
+        // REVERT: Staff rejected → restore original APPROVED slot, wipe proposed
         finalStatus = 'APPROVED';
         clearProposedMetadata = true;
-        // Provide default reason if staff didn't give one
         reason = reason || 'Reschedule request was denied. Your original slot is retained.';
       }
     }
 
-    const updatedAppointment = await deps.updateStatus(
+    // Single ACID transaction — all 3 writes in one Postgres call
+    return await deps.updateAppointmentStatusTransaction(
       appointmentId,
+      actorId,
+      actorRole,
       finalStatus,
       reason,
       finalRescheduleMetadata,
-      nextRescheduleCount,
-      undefined,
-      clearProposedMetadata
+      clearProposedMetadata,
+      nextRescheduleCount
     );
-
-    // Append to Ledger
-    if (currentStatus !== finalStatus || clearProposedMetadata) {
-      await deps.insertLedgerEntry(
-        appointmentId,
-        actorId,
-        actorRole,
-        currentStatus,
-        finalStatus,
-        reason
-      );
-    }
-
-    const userId = appointment.patientId;
-    if (userId) {
-      if (status === 'CANCELLED') {
-        await deps.incrementUserCredibilityMetric(userId, 'cancel_count');
-      } else if (status === 'NO_SHOW') {
-        await deps.incrementUserCredibilityMetric(userId, 'no_show_count');
-      } else if (status === 'RESCHEDULE_REQUESTED' || isRescheduling) {
-        await deps.incrementUserCredibilityMetric(userId, 'reschedule_count');
-      }
-    }
-
-    return updatedAppointment;
   };
 };
-

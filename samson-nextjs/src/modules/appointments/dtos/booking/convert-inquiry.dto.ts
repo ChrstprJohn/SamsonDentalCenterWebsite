@@ -24,6 +24,7 @@ export const convertInquirySchema = z
     guestSuffix: cleanOptionalString,
     guestPhone: cleanOptionalString,
     guestEmail: cleanOptionalString,
+    doctorAssignmentSource: z.enum(['SYSTEM', 'USER']).optional().default('SYSTEM'),
   })
   .superRefine((data, ctx) => {
     if (new Date(data.startTime) >= new Date(data.endTime)) {

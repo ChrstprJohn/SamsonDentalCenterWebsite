@@ -4,37 +4,18 @@ import { AppointmentDto } from '../../dtos/exports';
 
 export const requestRescheduleUseCase = (deps: {
   getAppointmentById: (appointmentId: string) => Promise<AppointmentDto>;
-  updateStatus: (
+  requestRescheduleTransaction: (
     appointmentId: string,
-    status: AppointmentStatusValue,
-    reason?: string,
-    rescheduleMetadata?: {
-      date: string;
-      startTime: string;
-      endTime: string;
-      doctorId: string;
-    },
-    rescheduleCount?: number,
-    proposedRescheduleMetadata?: {
-      date: string;
-      startTime: string;
-      endTime: string;
-      doctorId: string;
-    },
-    clearProposedMetadata?: boolean
-  ) => Promise<AppointmentDto>;
-  incrementUserCredibilityMetric: (
-    userId: string,
-    metric: 'cancel_count' | 'no_show_count' | 'reschedule_count'
-  ) => Promise<{ success: boolean }>;
-  insertLedgerEntry: (
-    appointmentId: string,
-    changedBy: string | null,
+    actorId: string | null,
     actorRole: string,
-    previousStatus: AppointmentStatusValue | null,
-    newStatus: AppointmentStatusValue,
-    reason?: string
-  ) => Promise<{ success: boolean }>;
+    reason: string,
+    proposedMetadata: {
+      date: string;
+      startTime: string;
+      endTime: string;
+      doctorId: string;
+    }
+  ) => Promise<AppointmentDto>;
 }) => {
   return async (
     appointmentId: string,
@@ -67,32 +48,13 @@ export const requestRescheduleUseCase = (deps: {
       );
     }
 
-    const updatedAppointment = await deps.updateStatus(
+    // Single ACID transaction — status update + ledger + credibility metric
+    return await deps.requestRescheduleTransaction(
       appointmentId,
-      'RESCHEDULE_REQUESTED',
+      actorId,
+      actorRole,
       reason,
-      undefined,
-      1,
       proposedMetadata
     );
-
-    // Append to Ledger
-    if (currentStatus !== 'RESCHEDULE_REQUESTED') {
-      await deps.insertLedgerEntry(
-        appointmentId,
-        actorId,
-        actorRole,
-        currentStatus,
-        'RESCHEDULE_REQUESTED',
-        reason
-      );
-    }
-
-    const userId = appointment.patientId;
-    if (userId) {
-      await deps.incrementUserCredibilityMetric(userId, 'reschedule_count');
-    }
-
-    return updatedAppointment;
   };
 };

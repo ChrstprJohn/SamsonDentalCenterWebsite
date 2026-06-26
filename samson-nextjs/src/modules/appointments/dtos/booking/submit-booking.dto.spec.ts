@@ -15,10 +15,33 @@ describe('submitBookingSchema', () => {
     // ==========================================
     // 1. SELF BOOKING TESTS
     // ==========================================
-    it('should validate base valid booking (Self)', () => {
-        expect(
-            submitBookingSchema.safeParse({ ...baseValidData, patientType: 'SELF' }).success
-        ).toBe(true);
+    it('should validate base valid booking (Self) and default doctorAssignmentSource to SYSTEM', () => {
+        const result = submitBookingSchema.safeParse({ ...baseValidData, patientType: 'SELF' });
+        expect(result.success).toBe(true);
+        if (result.success) {
+            expect(result.data.doctorAssignmentSource).toBe('SYSTEM');
+        }
+    });
+
+    it('should validate booking with doctorAssignmentSource set to USER', () => {
+        const result = submitBookingSchema.safeParse({
+            ...baseValidData,
+            patientType: 'SELF',
+            doctorAssignmentSource: 'USER',
+        });
+        expect(result.success).toBe(true);
+        if (result.success) {
+            expect(result.data.doctorAssignmentSource).toBe('USER');
+        }
+    });
+
+    it('should reject invalid doctorAssignmentSource value', () => {
+        const result = submitBookingSchema.safeParse({
+            ...baseValidData,
+            patientType: 'SELF',
+            doctorAssignmentSource: 'INVALID_SOURCE',
+        });
+        expect(result.success).toBe(false);
     });
 
     it('should strip empty optional strings to undefined', () => {

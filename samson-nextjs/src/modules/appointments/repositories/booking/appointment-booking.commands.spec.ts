@@ -25,6 +25,7 @@ describe('AppointmentBookingCommands', () => {
       serviceId: validServiceId,
       doctorId: validDoctorId,
       isPreferredDoctor: true,
+      doctorAssignmentSource: 'USER',
       date: '2024-12-25',
       startTime: '2024-12-25T10:00:00Z',
       endTime: '2024-12-25T10:30:00Z',
@@ -51,6 +52,7 @@ describe('AppointmentBookingCommands', () => {
         p_new_dependent_relationship: null,
         p_new_dependent_middle_name: null,
         p_new_dependent_suffix: null,
+        p_doctor_assignment_source: 'USER',
       });
       expect(result).toMatchObject({ appointmentId: validApptId });
     });

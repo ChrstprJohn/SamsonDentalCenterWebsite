@@ -33,6 +33,7 @@ describe('createManualBookingCommand', () => {
     patientNote: 'Checkup note',
     statusReason: 'Call booking reason',
     secretaryUserId: 'sec-uuid',
+    doctorAssignmentSource: 'USER' as const,
   };
 
   it('should call RPC with null dependent params when booking for self', async () => {
@@ -62,6 +63,7 @@ describe('createManualBookingCommand', () => {
       p_new_dependent_suffix: null,
       p_new_dependent_date_of_birth: null,
       p_new_dependent_relationship: null,
+      p_doctor_assignment_source: 'USER',
     }));
     expect(result).toMatchObject({ appointmentId: validApptId });
   });

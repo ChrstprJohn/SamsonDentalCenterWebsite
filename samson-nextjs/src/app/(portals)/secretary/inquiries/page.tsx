@@ -263,6 +263,7 @@ export default function InquiriesQueuePage() {
           guestSuffix: guestSuffix || undefined,
           guestPhone: guestPhone || undefined,
           guestEmail: guestEmail || undefined,
+          doctorAssignmentSource: (stagedInquiryDoctor && stagedInquiryDoctor !== 'ANY') ? 'USER' as const : 'SYSTEM' as const,
         };
 
         const res = await convertInquiryAction(payload);

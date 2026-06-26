@@ -37,6 +37,7 @@ export const createManualBookingSchema = z
     endTime: z.string().datetime('Must be a valid ISO string'),
     patientNote: cleanOptionalString,
     statusReason: cleanOptionalString,
+    doctorAssignmentSource: z.enum(['SYSTEM', 'USER']).optional().default('SYSTEM'),
     // Dependent support
     dependentId: z.string().uuid('Invalid dependent ID format').nullable().optional(),
     newDependentFirstName: z.string().trim().min(1).optional(),

@@ -9,7 +9,7 @@ import { FinalizeInvoiceDto, finalizeInvoiceSchema } from '../../dtos/exports';
 import { finalizeInvoiceCommand } from '../../repositories/exports';
 import { finalizeInvoiceUseCase } from '../../use-cases/exports';
 import { updateAppointmentStatusUseCase } from '@/modules/appointments/use-cases/exports';
-import { getAppointmentByIdQuery, updateStatusCommand, incrementUserCredibilityMetricCommand, insertLedgerEntryCommand } from '@/modules/appointments/repositories/status/exports';
+import { getAppointmentByIdQuery, updateAppointmentStatusTransactionCommand } from '@/modules/appointments/repositories/status/exports';
 import { createAuditLogUseCase } from '@/modules/audit-logs/use-cases/exports';
 import { createAuditLogCommand } from '@/modules/audit-logs/repositories/logs/audit-log.commands';
 import { checkoutOrchestrator } from '@/orchestrators/checkout.orchestrator';
@@ -34,9 +34,7 @@ export async function checkoutAction(data: FinalizeInvoiceDto) {
         const user = await getAuthenticatedUser();
         return updateAppointmentStatusUseCase({
           getAppointmentById: getAppointmentByIdQuery(supabase),
-          updateStatus: updateStatusCommand(supabase),
-          incrementUserCredibilityMetric: incrementUserCredibilityMetricCommand(supabase),
-          insertLedgerEntry: insertLedgerEntryCommand(supabase),
+          updateAppointmentStatusTransaction: updateAppointmentStatusTransactionCommand(supabase),
         })(id, user?.id || null, 'STAFF', status, reason);
       },
       createAuditLog: createAuditLogUseCase(createAuditLogCommand(supabase)),
