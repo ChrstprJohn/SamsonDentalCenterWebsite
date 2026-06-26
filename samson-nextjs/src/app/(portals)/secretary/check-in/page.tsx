@@ -20,7 +20,11 @@ import { formatClinicTime, getTodayLocalDateStr } from '@/shared/utils/date.util
 export default function CheckInOutTrackerPage() {
   const [appointments, setAppointments] = useState<AppointmentDto[]>([]);
   const [invoices, setInvoices] = useState<InvoiceResponseDto[]>([]);
-  const [currentTime, setCurrentTime] = useState<Date>(new Date());
+  // Times in DB are stored as naive-UTC (e.g. 09:00:00Z = "9 AM clinic local", not real UTC).
+  // To compare correctly, shift real UTC by the local TZ offset → naive-UTC epoch.
+  // For UTC+8: getTimezoneOffset() = -480 → offsetMs = +8h → real 04:51Z → naive 12:51Z.
+  const toNaiveUtc = (d: Date) => new Date(d.getTime() + (-d.getTimezoneOffset()) * 60000);
+  const [currentTime, setCurrentTime] = useState<Date | null>(null);
   
   // Modals state
   const [checkoutInvoice, setCheckoutInvoice] = useState<InvoiceResponseDto | null>(null);
@@ -65,12 +69,15 @@ export default function CheckInOutTrackerPage() {
     }
   };
 
+  // Set currentTime client-side only (avoids SSR mismatch) and tick every minute.
+  useEffect(() => {
+    setCurrentTime(toNaiveUtc(new Date()));
+    const tick = setInterval(() => setCurrentTime(toNaiveUtc(new Date())), 60_000);
+    return () => clearInterval(tick);
+  }, []);
+
   useEffect(() => {
     fetchData();
-
-    // Clock ticker for time-gated buttons
-    const timer = setInterval(() => setCurrentTime(new Date()), 10000);
-    return () => clearInterval(timer);
   }, []);
 
   // Supabase Realtime subscriptions
@@ -99,10 +106,20 @@ export default function CheckInOutTrackerPage() {
   }, [supabase]);
 
   // Helper check-in time window validation
+  // startTime/endTime are naive-UTC; currentTime is already in naive-UTC space (see toNaiveUtc above)
   const getCheckInStatus = (appointment: AppointmentDto) => {
+    if (!currentTime) return { enabled: false, message: 'Check In' };
     const startTime = new Date(appointment.startTime);
     const endTime = new Date(appointment.endTime);
     const windowStart = new Date(startTime.getTime() - 30 * 60 * 1000);
+    console.log('[TimeGate]', {
+      raw: appointment.startTime,
+      startTimeISO: startTime.toISOString(),
+      endTimeISO: endTime.toISOString(),
+      windowStartISO: windowStart.toISOString(),
+      currentTimeISO: currentTime.toISOString(),
+      localNow: new Date().toString(),
+    });
 
     if (currentTime < windowStart) {
       const minutesLeft = Math.ceil((windowStart.getTime() - currentTime.getTime()) / 60000);
@@ -264,7 +281,7 @@ export default function CheckInOutTrackerPage() {
           <div className="flex flex-col gap-2 overflow-y-auto max-h-[60vh]">
             {colApproved.map((appt) => {
               const checkInGate = getCheckInStatus(appt);
-              const isPastEnd = currentTime > new Date(appt.endTime);
+              const isPastEnd = !!currentTime && currentTime > new Date(appt.endTime);
               return (
                 <div key={appt.id} className="p-3 border border-card-border bg-card rounded-xl shadow-xs flex flex-col gap-2.5">
                   <div className="flex flex-col text-xs gap-0.5">

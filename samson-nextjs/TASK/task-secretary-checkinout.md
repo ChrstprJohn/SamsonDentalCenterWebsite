@@ -55,6 +55,15 @@ Implement the 5-column Kanban board at `/secretary/check-in` for managing daily 
   - `[x]` Extracted `getTodayLocalDateStr()` into `src/shared/utils/date.util.ts` — replaces `new Date().toISOString().split('T')[0]` (UTC) with a local-timezone-safe YYYY-MM-DD string. Prevents wrong-day fetches for UTC+8 users between 00:00–08:00 local time.
   - `[x]` Replaced raw `toLocaleTimeString()` calls in kanban cards with `formatClinicTime()` from shared util so all pages display times consistently in UTC (matching how `start_time` is stored as `TIMESTAMPTZ`).
 
+- `[x]` **Check-in time gate wrong timezone comparison (reported by Christopher Picardo)**
+  - `[x]` Root cause: `start_time` stored as naive-UTC (e.g. `09:00:00Z` = "9 AM clinic local", not real UTC). `new Date()` returns real UTC epoch — 8hr offset caused "Too early" all morning for UTC+8 users.
+  - `[x]` Fix: `toNaiveUtc(d)` helper — takes local clock components, builds a `Date.UTC(...)` so both sides of the comparison are in the same naive-UTC space. Applied in `page.tsx` (`getCheckInStatus`).
+  - `[x]` Fix: SSR/hydration mismatch — server TZ ≠ browser TZ caused gate to flash "Slot expired → Too early" on reload. Changed `currentTime` to init as `null`, set client-side only in `useEffect` with a 60s tick interval. Added `null` guard in `getCheckInStatus` and `isPastEnd`.
+
+- `[x]` **Duplicate rogue timer overwriting naive-UTC currentTime (reported by Christopher Picardo)**
+  - `[x]` Root cause: second `useEffect` had `setInterval(() => setCurrentTime(new Date()), 10000)` — raw `Date` with no `toNaiveUtc`. Fired every 10s and overwrote the correctly offset `currentTime` set by the first `useEffect`, reverting the gate back to real-UTC space → "Too early" persisted all morning for UTC+8.
+  - `[x]` Fix: Removed rogue `setInterval` from second `useEffect`. First `useEffect` already owns the 60s tick with `toNaiveUtc`. `currentTime` now stays in naive-UTC space permanently.
+
 ## Quality Assurance & Testing (80/15/5 Pyramid)
 
 - `[x]` **Unit Tests (Vitest)**
