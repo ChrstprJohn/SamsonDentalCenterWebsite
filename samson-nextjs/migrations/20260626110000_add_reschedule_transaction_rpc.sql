@@ -66,7 +66,7 @@ BEGIN
 
     -- 4. Increment reschedule credibility metric for the patient
     IF v_patient_id IS NOT NULL THEN
-        PERFORM public.increment_credibility_metric(v_patient_id, 'reschedule_count');
+        PERFORM public.increment_credibility_metric(p_user_id := v_patient_id, p_metric := 'reschedule_count'::text);
     END IF;
 
     RETURN NEXT v_updated_row;
