@@ -78,12 +78,12 @@ BEGIN
     -- 4. Increment credibility metric (conditional on transition type)
     IF v_patient_id IS NOT NULL THEN
         IF p_new_status = 'CANCELLED'::public.appointment_status THEN
-            PERFORM public.increment_credibility_metric(v_patient_id, 'cancel_count');
+            PERFORM public.increment_credibility_metric(p_user_id := v_patient_id, p_metric := 'cancel_count'::text);
         ELSIF p_new_status = 'NO_SHOW'::public.appointment_status THEN
-            PERFORM public.increment_credibility_metric(v_patient_id, 'no_show_count');
+            PERFORM public.increment_credibility_metric(p_user_id := v_patient_id, p_metric := 'no_show_count'::text);
         ELSIF p_reschedule_date IS NOT NULL OR p_reschedule_count IS NOT NULL THEN
             -- Secretary directly rescheduling (actual slot changed)
-            PERFORM public.increment_credibility_metric(v_patient_id, 'reschedule_count');
+            PERFORM public.increment_credibility_metric(p_user_id := v_patient_id, p_metric := 'reschedule_count'::text);
         END IF;
     END IF;
 

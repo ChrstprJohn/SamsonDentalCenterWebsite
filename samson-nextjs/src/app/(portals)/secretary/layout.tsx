@@ -101,6 +101,13 @@ export default async function SecretaryPortalLayout({
             Appointment Requests
           </Link>
           <Link
+            href="/secretary/reschedule-requests"
+            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-secondary-bg transition-colors text-text-secondary hover:text-text-primary"
+          >
+            <span>🔄</span>
+            Reschedule Requests
+          </Link>
+          <Link
             href="/secretary/inquiries"
             className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-secondary-bg transition-colors text-text-secondary hover:text-text-primary"
           >

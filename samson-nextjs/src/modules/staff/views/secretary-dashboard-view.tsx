@@ -11,6 +11,7 @@ export function SecretaryDashboardView() {
 
   // Metrics calculations
   const pendingCount = appointments.filter((a) => a.status === 'PENDING').length;
+  const rescheduleCount = appointments.filter((a) => a.status === 'RESCHEDULE_REQUESTED').length;
   const inquiriesCount = inquiries.filter((i) => i.status === 'NEW').length;
   const arrivalsCount = appointments.filter((a) => a.date === '2026-06-23' && a.status === 'APPROVED').length;
   const checkoutCount = appointments.filter((a) => a.status === 'TREATMENT_RENDERED').length;
@@ -27,7 +28,7 @@ export function SecretaryDashboardView() {
       </div>
 
       {/* Metrics Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         <div className="border border-card-border/60 bg-card rounded-2xl p-5 shadow-sm flex flex-col gap-1 hover:border-primary-start/40 transition-colors">
           <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider">Arrivals Today</span>
           <span className="text-3xl font-black text-text-primary mt-1">{arrivalsCount}</span>
@@ -35,9 +36,15 @@ export function SecretaryDashboardView() {
         </div>
 
         <div className="border border-card-border/60 bg-card rounded-2xl p-5 shadow-sm flex flex-col gap-1 hover:border-primary-start/40 transition-colors">
-          <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider">Pending Requests</span>
+          <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider">Pending Bookings</span>
           <span className="text-3xl font-black text-text-primary mt-1">{pendingCount}</span>
           <p className="text-[10px] text-text-muted mt-2">Awaiting decision review</p>
+        </div>
+
+        <div className="border border-card-border/60 bg-card rounded-2xl p-5 shadow-sm flex flex-col gap-1 hover:border-primary-start/40 transition-colors">
+          <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider">Reschedules</span>
+          <span className="text-3xl font-black text-text-primary mt-1">{rescheduleCount}</span>
+          <p className="text-[10px] text-rose-500 mt-2">Patient change requests</p>
         </div>
 
         <div className="border border-card-border/60 bg-card rounded-2xl p-5 shadow-sm flex flex-col gap-1 hover:border-primary-start/40 transition-colors">
@@ -108,6 +115,11 @@ export function SecretaryDashboardView() {
             <Link href="/secretary/pending" className="w-full">
               <Button className="w-full justify-start text-xs font-semibold py-3 gap-2" variant="secondary">
                 <span>📋</span> Review Request Queue
+              </Button>
+            </Link>
+            <Link href="/secretary/reschedule-requests" className="w-full">
+              <Button className="w-full justify-start text-xs font-semibold py-3 gap-2" variant="secondary">
+                <span>🔄</span> Reschedule Requests Queue
               </Button>
             </Link>
             <Link href="/secretary/inquiries" className="w-full">
