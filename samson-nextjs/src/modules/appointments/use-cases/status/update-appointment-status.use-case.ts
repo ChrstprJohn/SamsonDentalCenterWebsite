@@ -15,6 +15,7 @@ export const updateAppointmentStatusUseCase = (deps: {
       startTime: string;
       endTime: string;
       doctorId: string;
+      serviceId?: string;
     },
     clearProposedMetadata?: boolean,
     rescheduleCount?: number
@@ -31,6 +32,7 @@ export const updateAppointmentStatusUseCase = (deps: {
       startTime: string;
       endTime: string;
       doctorId: string;
+      serviceId?: string;
     }
   ) => {
     const appointment = await deps.getAppointmentById(appointmentId);

@@ -36,6 +36,7 @@ export async function updateAppointmentStatusAction(formData: StaffUpdateAppoint
             startTime: validData.newStartTime,
             endTime: validData.newEndTime,
             doctorId: validData.newDoctorId,
+            serviceId: validData.newServiceId,
           }
         : undefined;
 

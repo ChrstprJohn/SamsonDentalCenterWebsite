@@ -15,22 +15,24 @@ export const updateAppointmentStatusTransactionCommand = (supabase: SupabaseClie
       startTime: string;
       endTime: string;
       doctorId: string;
+      serviceId?: string;
     },
     clearProposedMetadata?: boolean,
     rescheduleCount?: number
   ): Promise<AppointmentDto> => {
     const { data, error } = await supabase.rpc('update_appointment_status_transaction', {
-      p_appointment_id:   appointmentId,
-      p_actor_id:         actorId,
-      p_actor_role:       actorRole,
-      p_new_status:       newStatus,
-      p_reason:           reason ?? null,
-      p_reschedule_date:  rescheduleMetadata?.date ?? null,
-      p_reschedule_start: rescheduleMetadata?.startTime ?? null,
-      p_reschedule_end:   rescheduleMetadata?.endTime ?? null,
+      p_appointment_id:    appointmentId,
+      p_actor_id:          actorId,
+      p_actor_role:        actorRole,
+      p_new_status:        newStatus,
+      p_reason:            reason ?? null,
+      p_reschedule_date:   rescheduleMetadata?.date ?? null,
+      p_reschedule_start:  rescheduleMetadata?.startTime ?? null,
+      p_reschedule_end:    rescheduleMetadata?.endTime ?? null,
       p_reschedule_doctor: rescheduleMetadata?.doctorId ?? null,
-      p_clear_proposed:   clearProposedMetadata ?? false,
-      p_reschedule_count: rescheduleCount ?? null,
+      p_reschedule_service: rescheduleMetadata?.serviceId ?? null,
+      p_clear_proposed:    clearProposedMetadata ?? false,
+      p_reschedule_count:  rescheduleCount ?? null,
     });
 
     if (error || !data || (Array.isArray(data) && data.length === 0)) {

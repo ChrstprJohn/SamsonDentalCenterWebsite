@@ -5,6 +5,7 @@ import {
 
 const VALID_APPOINTMENT_ID = '123e4567-e89b-12d3-a456-426614174000';
 const VALID_DOCTOR_ID = '823e4567-e89b-12d3-a456-426614174001';
+const VALID_SERVICE_ID = '923e4567-e89b-12d3-a456-426614174002';
 
 // ==========================================
 // STAFF ACTION SCHEMA TESTS
@@ -75,8 +76,23 @@ describe('staffUpdateAppointmentStatusSchema', () => {
                 newStartTime: '2026-06-01T09:00:00Z',
                 newEndTime: '2026-06-01T10:00:00Z',
                 newDoctorId: VALID_DOCTOR_ID,
+                newServiceId: VALID_SERVICE_ID,
             }).success
         ).toBe(true);
+    });
+
+    it('should reject newServiceId that is not a valid UUID', () => {
+        const result = staffUpdateAppointmentStatusSchema.safeParse({
+            ...baseValidData,
+            status: 'APPROVED',
+            statusReason: 'Rescheduling requested slot',
+            newDate: '2026-06-01',
+            newStartTime: '2026-06-01T09:00:00Z',
+            newEndTime: '2026-06-01T10:00:00Z',
+            newDoctorId: VALID_DOCTOR_ID,
+            newServiceId: 'not-a-uuid',
+        });
+        expect(result.success).toBe(false);
     });
 
     it('should reject direct reschedule if missing metadata fields like doctor assignments', () => {

@@ -52,6 +52,11 @@ export const staffUpdateAppointmentStatusSchema = z
             .uuid('Invalid Doctor ID format')
             .or(emptyStringToUndefined)
             .optional(),
+        newServiceId: z
+            .string()
+            .uuid('Invalid Service ID format')
+            .or(emptyStringToUndefined)
+            .optional(),
     })
     .superRefine((data, ctx) => {
         // 1. Audit Trail Reasoning Guard - always required, handled by validation schema above.
@@ -61,7 +66,8 @@ export const staffUpdateAppointmentStatusSchema = z
             data.newDate ||
             data.newStartTime ||
             data.newEndTime ||
-            data.newDoctorId
+            data.newDoctorId ||
+            data.newServiceId
         );
 
         if (hasNewSchedule) {

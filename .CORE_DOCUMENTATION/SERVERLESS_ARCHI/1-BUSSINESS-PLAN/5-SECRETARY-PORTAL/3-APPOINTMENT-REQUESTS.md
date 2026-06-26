@@ -92,6 +92,17 @@ A vertical chronological timeline of all clinic slots for the requested dentist 
 - **Current request slot**: Highlighted in primary brand color with a `👉 CURRENT REQUEST` label.
 - **Free slots**: Shown in dashed border with a `🟢 Free / Available` label.
 
+### 3.8 Inline Modification Option (Editable View)
+To support patient verification calls, the secretary can toggle the details section into an edit form before committing a decision. The edit flow is **service-first and cascading**:
+
+- **Toggle**: An "Edit Details" button appears at the top of the appointment detail block. Clicking it shifts fields into an editable state.
+- **Step 1 — Service Selection**: Active clinic services are rendered as **clickable pills or cards**. The currently selected/requested service is pre-selected.
+- **Step 2 — Doctor Selection**: Based on the selected service, a filtered list of eligible dentists is rendered. Defaults to **"Any Doctor"** if no specific preference is needed. Selecting a specific doctor triggers a schedule fetch.
+- **Step 3 — Date Picker**: A calendar showing **available dates dynamically based on the selected doctor's schedule**. Blocked/unavailable dates are greyed out.
+- **Step 4 — Time Slot Picker**: Available time slots are rendered based on the selected doctor + date combination.
+- **Step 5 — Secretary Note**: Editable textarea for the secretary to add an internal or patient-facing note.
+- **Commit on Approve**: If details are modified, clicking "Approve" commits the updated service, doctor, date, and timeslot to the database via the existing `update_appointment_status_transaction` RPC.
+
 ---
 
 ## 4. Staged Review Form (State-First Pattern)

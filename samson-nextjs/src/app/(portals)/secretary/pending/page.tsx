@@ -9,6 +9,10 @@ import { getClinicAppointmentsAction } from '@/modules/appointments/actions/clin
 import { getPatientDetailsForStaffAction } from '@/modules/patients/actions/profile/get-patient-details-for-staff.action';
 import { getDoctorScheduleAction } from '@/modules/appointments/actions/availability/get-doctor-schedule.action';
 import { updateAppointmentStatusAction } from '@/modules/appointments/actions/status/update-appointment-status.action';
+import { getServicesAction } from '@/modules/services/actions/management/get-services.action';
+import { getDoctorsAction } from '@/modules/staff/actions/management/get-doctors.action';
+import { getAvailableDaysAction } from '@/modules/appointments/actions/availability/get-available-days.action';
+import { getAvailableTimeSlotsAction } from '@/modules/appointments/actions/availability/get-available-time-slots.action';
 
 import { formatShortDate, formatClinicTime } from '@/shared/utils/date.util';
 
@@ -24,6 +28,22 @@ export default function AppointmentRequestsPage() {
   const [isLoading, setIsLoading] = React.useState(true);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [isLoadingDetails, setIsLoadingDetails] = React.useState(false);
+
+  // Edit mode state
+  const [isEditing, setIsEditing] = React.useState(false);
+  const [editServices, setEditServices] = React.useState<{ id: string; name: string }[]>([]);
+  const [editServiceId, setEditServiceId] = React.useState('');
+  const [editDoctors, setEditDoctors] = React.useState<{ id: string; firstName: string; lastName: string }[]>([]);
+  const [editDoctorId, setEditDoctorId] = React.useState('');
+  const [editAvailableDates, setEditAvailableDates] = React.useState<string[]>([]);
+  const [editDate, setEditDate] = React.useState('');
+  const [editCurrentMonth, setEditCurrentMonth] = React.useState(new Date());
+  const [editSlots, setEditSlots] = React.useState<{ startTime: string; endTime: string }[]>([]);
+  const [editStartTime, setEditStartTime] = React.useState('');
+  const [editEndTime, setEditEndTime] = React.useState('');
+  const [editNote, setEditNote] = React.useState('');
+  const [isLoadingEditDays, setIsLoadingEditDays] = React.useState(false);
+  const [isLoadingEditSlots, setIsLoadingEditSlots] = React.useState(false);
 
   const fetchPending = React.useCallback(async () => {
     setIsLoading(true);
@@ -89,6 +109,49 @@ export default function AppointmentRequestsPage() {
     });
   }, [selectedApp, patientDetails]);
 
+  // Load services once when edit mode opens
+  React.useEffect(() => {
+    if (!isEditing || editServices.length > 0) return;
+    getServicesAction().then((r) => { if (r.data) setEditServices(r.data); });
+  }, [isEditing, editServices.length]);
+
+  // Load doctors when service selected in edit mode
+  React.useEffect(() => {
+    if (!isEditing || !editServiceId) { setEditDoctors([]); setEditDoctorId(''); setEditAvailableDates([]); return; }
+    getDoctorsAction({ serviceId: editServiceId }).then((r) => {
+      if (r.success && r.data) setEditDoctors(r.data);
+    });
+  }, [isEditing, editServiceId]);
+
+  // Load available days when doctor/month changes in edit mode
+  React.useEffect(() => {
+    if (!isEditing || !editServiceId) { setEditAvailableDates([]); return; }
+    let active = true;
+    setIsLoadingEditDays(true);
+    const month = `${editCurrentMonth.getFullYear()}-${String(editCurrentMonth.getMonth() + 1).padStart(2, '0')}`;
+    getAvailableDaysAction({ serviceId: editServiceId, month, doctorId: editDoctorId || undefined }).then((r) => {
+      if (active) {
+        setEditAvailableDates(r.success && r.data ? r.data.availableDates || [] : []);
+        setIsLoadingEditDays(false);
+      }
+    });
+    return () => { active = false; };
+  }, [isEditing, editServiceId, editDoctorId, editCurrentMonth]);
+
+  // Load time slots when date selected in edit mode
+  React.useEffect(() => {
+    if (!isEditing || !editServiceId || !editDate || !editDoctorId) { setEditSlots([]); return; }
+    let active = true;
+    setIsLoadingEditSlots(true);
+    getAvailableTimeSlotsAction({ serviceId: editServiceId, doctorId: editDoctorId, date: editDate }).then((r) => {
+      if (active) {
+        setEditSlots(r.success && r.data ? r.data.availableSlots || [] : []);
+        setIsLoadingEditSlots(false);
+      }
+    });
+    return () => { active = false; };
+  }, [isEditing, editServiceId, editDoctorId, editDate]);
+
   const handleFinishAppointmentReview = async (appId: string) => {
     if (!stagedStatus) return alert('Please select a decision state first!');
     const finalReason = stagedReason === 'CUSTOM' ? customReason : stagedReason;
@@ -96,17 +159,35 @@ export default function AppointmentRequestsPage() {
       return alert('Please select or write a reason/remark!');
     }
     setIsSubmitting(true);
-    const res = await updateAppointmentStatusAction({
+
+    const payload: any = {
       appointmentId: appId,
       status: stagedStatus as any,
       statusReason: finalReason.trim(),
-    });
+    };
+
+    if (isEditing && editServiceId && editDoctorId && editDate && editStartTime && editEndTime) {
+      payload.newServiceId = editServiceId;
+      payload.newDoctorId = editDoctorId;
+      payload.newDate = editDate;
+      payload.newStartTime = editStartTime;
+      payload.newEndTime = editEndTime;
+    }
+
+    const res = await updateAppointmentStatusAction(payload);
     if (res.success) {
       alert('Review decision completed successfully.');
       setSelectedAppointmentId(null);
       setStagedStatus('');
       setStagedReason('');
       setCustomReason('');
+      setIsEditing(false);
+      setEditServiceId('');
+      setEditDoctorId('');
+      setEditDate('');
+      setEditStartTime('');
+      setEditEndTime('');
+      setEditNote('');
       fetchPending();
     } else {
       alert(res.error || 'Failed to update appointment status');
@@ -409,6 +490,162 @@ export default function AppointmentRequestsPage() {
                       })}
                     </div>
                   </div>
+                </div>
+
+                {/* Edit Details Toggle + Panel */}
+                <div className="border border-card-border/60 rounded-2xl overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsEditing((v) => !v);
+                      if (!isEditing) {
+                        setEditServiceId(selectedApp.serviceId || '');
+                        setEditDoctorId(selectedApp.doctorId || '');
+                        setEditDate(selectedApp.date || '');
+                        setEditNote('');
+                        setEditStartTime('');
+                        setEditEndTime('');
+                      }
+                    }}
+                    className="w-full flex items-center justify-between px-4 py-3 text-xs font-bold text-text-secondary bg-secondary-bg/20 hover:bg-secondary-bg/40 transition-colors"
+                  >
+                    <span>✏️ Edit Appointment Details Before Deciding</span>
+                    <span className="text-[10px] text-primary-start">{isEditing ? '▲ Collapse' : '▼ Expand'}</span>
+                  </button>
+
+                  {isEditing && (
+                    <div className="p-4 flex flex-col gap-4 bg-card border-t border-card-border/60">
+                      {/* Step 1: Service Pills */}
+                      <div className="flex flex-col gap-2">
+                        <span className="text-[10px] font-bold uppercase text-text-muted tracking-wider">1. Select Service</span>
+                        <div className="flex flex-wrap gap-1.5">
+                          {editServices.map((svc) => (
+                            <button
+                              key={svc.id}
+                              type="button"
+                              onClick={() => {
+                                setEditServiceId(svc.id);
+                                setEditDoctorId('');
+                                setEditDate('');
+                                setEditStartTime('');
+                                setEditEndTime('');
+                              }}
+                              className={`px-3 py-1.5 rounded-full text-[11px] font-semibold border transition-all ${
+                                editServiceId === svc.id
+                                  ? 'bg-primary-start text-white border-primary-start'
+                                  : 'bg-card border-card-border text-text-secondary hover:border-primary-start/50'
+                              }`}
+                            >
+                              {svc.name}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Step 2: Doctor */}
+                      {editServiceId && (
+                        <div className="flex flex-col gap-2">
+                          <span className="text-[10px] font-bold uppercase text-text-muted tracking-wider">2. Select Doctor</span>
+                          <div className="flex flex-wrap gap-1.5">
+                            {editDoctors.map((doc) => (
+                              <button
+                                key={doc.id}
+                                type="button"
+                                onClick={() => {
+                                  setEditDoctorId(doc.id);
+                                  setEditDate('');
+                                  setEditStartTime('');
+                                  setEditEndTime('');
+                                }}
+                                className={`px-3 py-1.5 rounded-full text-[11px] font-semibold border transition-all ${
+                                  editDoctorId === doc.id
+                                    ? 'bg-primary-start text-white border-primary-start'
+                                    : 'bg-card border-card-border text-text-secondary hover:border-primary-start/50'
+                                }`}
+                              >
+                                Dr. {doc.firstName} {doc.lastName}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Step 3: Date */}
+                      {editDoctorId && (
+                        <div className="flex flex-col gap-2">
+                          <span className="text-[10px] font-bold uppercase text-text-muted tracking-wider">
+                            3. Select Date {isLoadingEditDays && <span className="text-primary-start ml-1">Loading...</span>}
+                          </span>
+                          <div className="flex gap-2 items-center mb-1">
+                            <button type="button" onClick={() => setEditCurrentMonth((m) => { const d = new Date(m); d.setMonth(d.getMonth() - 1); return d; })} className="text-xs text-text-muted hover:text-text-primary px-1">‹</button>
+                            <span className="text-xs font-bold text-text-primary">
+                              {editCurrentMonth.toLocaleString('default', { month: 'long', year: 'numeric' })}
+                            </span>
+                            <button type="button" onClick={() => setEditCurrentMonth((m) => { const d = new Date(m); d.setMonth(d.getMonth() + 1); return d; })} className="text-xs text-text-muted hover:text-text-primary px-1">›</button>
+                          </div>
+                          <div className="flex flex-wrap gap-1.5">
+                            {editAvailableDates.length === 0 && !isLoadingEditDays && (
+                              <span className="text-[11px] text-text-muted">No available dates this month.</span>
+                            )}
+                            {editAvailableDates.map((d) => (
+                              <button
+                                key={d}
+                                type="button"
+                                onClick={() => { setEditDate(d); setEditStartTime(''); setEditEndTime(''); }}
+                                className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold border transition-all ${
+                                  editDate === d
+                                    ? 'bg-primary-start text-white border-primary-start'
+                                    : 'bg-card border-card-border text-text-secondary hover:border-primary-start/50'
+                                }`}
+                              >
+                                {formatShortDate(d)}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Step 4: Time Slots */}
+                      {editDate && (
+                        <div className="flex flex-col gap-2">
+                          <span className="text-[10px] font-bold uppercase text-text-muted tracking-wider">
+                            4. Select Time Slot {isLoadingEditSlots && <span className="text-primary-start ml-1">Loading...</span>}
+                          </span>
+                          <div className="flex flex-wrap gap-1.5">
+                            {editSlots.length === 0 && !isLoadingEditSlots && (
+                              <span className="text-[11px] text-text-muted">No available slots on this date.</span>
+                            )}
+                            {editSlots.map((slot) => (
+                              <button
+                                key={slot.startTime}
+                                type="button"
+                                onClick={() => { setEditStartTime(slot.startTime); setEditEndTime(slot.endTime); }}
+                                className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold border transition-all ${
+                                  editStartTime === slot.startTime
+                                    ? 'bg-primary-start text-white border-primary-start'
+                                    : 'bg-card border-card-border text-text-secondary hover:border-primary-start/50'
+                                }`}
+                              >
+                                {formatClinicTime(slot.startTime)}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Step 5: Secretary Note */}
+                      <div className="flex flex-col gap-1.5">
+                        <span className="text-[10px] font-bold uppercase text-text-muted tracking-wider">5. Secretary Note (Optional)</span>
+                        <textarea
+                          value={editNote}
+                          onChange={(e) => setEditNote(e.target.value)}
+                          placeholder="Add an internal note or message for the patient..."
+                          rows={2}
+                          className="text-xs border border-card-border rounded-xl px-3 py-2 bg-secondary-bg/20 text-text-primary resize-none focus:outline-none focus:border-primary-start/60"
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Inline Staged Action Form */}
