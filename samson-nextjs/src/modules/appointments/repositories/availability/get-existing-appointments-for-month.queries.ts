@@ -42,8 +42,8 @@ async function fetchMonthlyTimeBlocksAsAppointments(
         id: block.id,
         doctorId: docId,
         date: block.date,
-        startTime: new Date(`${block.date}T${block.start_time}`).toISOString(),
-        endTime: new Date(`${block.date}T${block.end_time}`).toISOString(),
+        startTime: new Date(`${block.date}T${block.start_time}Z`).toISOString(),
+        endTime: new Date(`${block.date}T${block.end_time}Z`).toISOString(),
         status: 'APPROVED',
       });
     }
