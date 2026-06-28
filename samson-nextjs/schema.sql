@@ -32,6 +32,7 @@ CREATE TABLE users (
     role user_role DEFAULT 'PATIENT'::user_role NOT NULL,
     avatar_url TEXT,
     is_active BOOLEAN DEFAULT true NOT NULL,
+    status TEXT DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE', 'HIDDEN', 'ARCHIVED')) NOT NULL,
     cancel_count INT DEFAULT 0 NOT NULL,
     no_show_count INT DEFAULT 0 NOT NULL,
     reschedule_count INT DEFAULT 0 NOT NULL,

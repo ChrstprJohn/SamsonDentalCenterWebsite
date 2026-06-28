@@ -28,8 +28,8 @@ export async function getAvailableDoctorsForDateAction(formData: GetAvailableDoc
     const supabase = await createClient();
     const fetchSchedules = getDoctorSchedulesQuery(supabase);
 
-    // 4. Execution
-    const schedules = await fetchSchedules(parsed.date, undefined, parsed.serviceId);
+    // 4. Execution — secretary can see HIDDEN doctors for internal booking
+    const schedules = await fetchSchedules(parsed.date, undefined, parsed.serviceId, true);
 
     // Deduplicate doctors
     const doctorsMap = new Map<string, string>();

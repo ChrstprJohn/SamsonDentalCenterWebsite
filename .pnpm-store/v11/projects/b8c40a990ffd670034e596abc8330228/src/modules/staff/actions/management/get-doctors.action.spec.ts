@@ -24,7 +24,7 @@ describe('getDoctorsAction', () => {
 
     const result = await getDoctorsAction({ serviceId: 'srv-1' });
 
-    expect(mockUseCase).toHaveBeenCalledWith('srv-1');
+    expect(mockUseCase).toHaveBeenCalledWith('srv-1', false);
     expect(result).toEqual({ success: true, data: [{ id: 'doc-1' }] });
   });
 

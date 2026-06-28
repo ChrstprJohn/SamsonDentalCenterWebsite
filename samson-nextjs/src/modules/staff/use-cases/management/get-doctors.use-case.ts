@@ -2,9 +2,9 @@ import { UserProfileResponseDto } from '../../dtos/exports';
 
 
 export const getDoctorsUseCase = (
-  getActiveDoctors: (serviceId?: string) => Promise<UserProfileResponseDto[]>
+  getActiveDoctors: (serviceId?: string, includeHidden?: boolean) => Promise<UserProfileResponseDto[]>
 ) => {
-  return async (serviceId?: string): Promise<UserProfileResponseDto[]> => {
-    return getActiveDoctors(serviceId);
+  return async (serviceId?: string, includeHidden = false): Promise<UserProfileResponseDto[]> => {
+    return getActiveDoctors(serviceId, includeHidden);
   };
 };

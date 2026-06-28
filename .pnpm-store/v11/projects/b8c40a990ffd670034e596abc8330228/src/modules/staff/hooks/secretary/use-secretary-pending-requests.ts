@@ -101,7 +101,7 @@ export function useSecretaryPendingRequests() {
       setEditAvailableDates([]);
       return;
     }
-    getDoctorsAction({ serviceId: editServiceId }).then((res) => {
+    getDoctorsAction({ serviceId: editServiceId, includeHidden: true }).then((res) => {
       if (res.success && res.data) setEditDoctors(res.data);
     });
   }, [isEditing, editServiceId]);

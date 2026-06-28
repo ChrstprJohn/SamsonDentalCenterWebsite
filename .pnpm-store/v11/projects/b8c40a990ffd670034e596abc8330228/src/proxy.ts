@@ -4,6 +4,7 @@ import { updateSession } from '@/shared/database/middleware'
 const ROLE_PERMISSIONS: Record<string, string[]> = {
   ADMIN: ['/admin', '/secretary', '/user'],
   SECRETARY: ['/secretary', '/user'],
+  DOCTOR: ['/doctor', '/user'],
   PATIENT: ['/user'],
 };
 
@@ -27,7 +28,7 @@ export async function proxy(request: NextRequest) {
   }
 
   // Skip other checks if public/marketing routes
-  if (!pathname.match(/\/(admin|secretary|user)/)) {
+  if (!pathname.match(/\/(admin|secretary|user|doctor)/)) {
     return supabaseResponse
   }
 
@@ -36,6 +37,11 @@ export async function proxy(request: NextRequest) {
   // 2. Unauthenticated check
   if (!user) {
     redirectUrl = new URL('/login', request.url)
+  } else if (
+    user.user_metadata?.status === 'FORCE_PASSWORD_CHANGE' &&
+    pathname !== '/auth/force-password-change'
+  ) {
+    redirectUrl = new URL('/auth/force-password-change', request.url)
   } else {
     // 3. RBAC check
     const userRole = user.user_metadata?.role || 'PATIENT'

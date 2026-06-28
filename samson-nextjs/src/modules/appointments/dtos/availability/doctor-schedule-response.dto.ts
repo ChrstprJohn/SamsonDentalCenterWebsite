@@ -11,6 +11,7 @@ export const doctorScheduleDbSchema = z.object({
   doctor: z.object({
     first_name: z.string(),
     last_name: z.string(),
+    status: z.string().optional(),
   }).nullable().optional(),
 });
 

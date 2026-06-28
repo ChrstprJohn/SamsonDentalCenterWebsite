@@ -45,7 +45,7 @@ export function useSecretaryRescheduleRequests() {
     setIsLoading(true);
     const [appRes, docListRes] = await Promise.all([
       getClinicAppointmentsAction({ status: 'RESCHEDULE_REQUESTED' }),
-      getDoctorsAction(),
+      getDoctorsAction({ includeHidden: true }),
     ]);
 
     if (appRes.success && appRes.data) {

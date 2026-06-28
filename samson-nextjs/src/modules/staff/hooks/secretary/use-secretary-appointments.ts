@@ -53,7 +53,7 @@ export function useSecretaryAppointments() {
   const fetchData = useCallback(async () => {
     setIsLoading(true);
     try {
-      const [appRes, docRes] = await Promise.all([getClinicAppointmentsAction({}), getDoctorsAction()]);
+      const [appRes, docRes] = await Promise.all([getClinicAppointmentsAction({}), getDoctorsAction({ includeHidden: true })]);
       if (appRes.success && appRes.data) setAppointments(appRes.data as AppointmentDto[]);
       if (docRes.success && docRes.data) setDoctors(docRes.data as DoctorFilterItem[]);
     } catch (err) {

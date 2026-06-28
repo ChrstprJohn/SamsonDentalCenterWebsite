@@ -13,7 +13,8 @@ describe('getWorkingSchedulesForMonthQuery', () => {
       select: vi.fn().mockReturnThis(),
       eq: vi.fn().mockReturnThis(),
       in: vi.fn().mockReturnThis(),
-      then: vi.fn((resolve) => resolve({ data: [], error: null }))
+      then: vi.fn((resolve) => resolve({ data: [], error: null })),
+      auth: { getUser: vi.fn().mockResolvedValue({ data: { user: null }, error: null }) },
     };
     mockSupabase.eq.mockReturnValue(mockSupabase);
     mockSupabase.in.mockReturnValue(mockSupabase);
@@ -28,6 +29,7 @@ describe('getWorkingSchedulesForMonthQuery', () => {
       end_time: '17:00:00',
       break_start_time: null,
       break_end_time: null,
+      doctor: { first_name: 'Jane', last_name: 'Smith', status: 'ACTIVE' },
     }];
     mockSupabase.then = vi.fn((resolve) => resolve({ data: mockData, error: null }));
 

@@ -4,12 +4,12 @@ import { doctorScheduleResponseSchema } from '../../dtos/exports';
 import { unstable_cache } from 'next/cache';
 
 export const getWorkingSchedulesForMonthQuery = (supabase: SupabaseClient) => {
-  const fetchSchedules = async (month: string, doctorId?: string, serviceId?: string) => {
+  const fetchSchedules = async (month: string, doctorId?: string, serviceId?: string, includeHidden = false) => {
     // month is format YYYY-MM
-    let selectFields = 'id, day_of_week, doctor_id, start_time, end_time, break_start_time, break_end_time, doctor:doctor_id!inner(first_name, last_name)';
+    let selectFields = 'id, day_of_week, doctor_id, start_time, end_time, break_start_time, break_end_time, doctor:doctor_id!inner(first_name, last_name, status)';
 
     if (serviceId) {
-      selectFields = 'id, day_of_week, doctor_id, start_time, end_time, break_start_time, break_end_time, doctor:doctor_id!inner(first_name, last_name, doctor_services!inner(service_id))';
+      selectFields = 'id, day_of_week, doctor_id, start_time, end_time, break_start_time, break_end_time, doctor:doctor_id!inner(first_name, last_name, status, doctor_services!inner(service_id))';
     }
 
     let query = supabase
@@ -30,7 +30,14 @@ export const getWorkingSchedulesForMonthQuery = (supabase: SupabaseClient) => {
       throw new DomainError(`Failed to fetch monthly schedules: ${error.message}`, 'DATABASE_ERROR');
     }
 
-    const mappedSchedules = schedules?.map(s => doctorScheduleResponseSchema.parse(s)) || [];
+    // ponytail: filter status in-code — PostgREST can't filter on embedded resource cols reliably
+    // null status = ACTIVE (pre-migration fallback)
+    const allowedStatuses = includeHidden ? ['ACTIVE', 'HIDDEN'] : ['ACTIVE'];
+    const filtered = (schedules || []).filter((s: any) =>
+      s.doctor && allowedStatuses.includes(s.doctor.status ?? 'ACTIVE')
+    );
+
+    const mappedSchedules = filtered.map(s => doctorScheduleResponseSchema.parse(s));
 
     // Generate dates for the month based on recurring day_of_week
     const generatedSchedules: Array<{

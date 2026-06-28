@@ -3,12 +3,19 @@ import { UserProfileResponseDto } from '../../dtos/exports';
 import { unstable_cache } from 'next/cache';
 
 export const getActiveDoctorsQuery = (supabase: SupabaseClient) => {
-  const fetchActiveDoctors = async (serviceId?: string): Promise<UserProfileResponseDto[]> => {
+  const fetchActiveDoctors = async (serviceId?: string, includeHidden = false): Promise<UserProfileResponseDto[]> => {
     let query = supabase
       .from('users')
       .select('*')
-      .eq('role', 'DOCTOR')
-      .eq('is_active', true);
+      .eq('role', 'DOCTOR');
+
+    if (includeHidden) {
+      // Staff internal: ACTIVE + HIDDEN (exclude ARCHIVED only)
+      query = query.neq('status', 'ARCHIVED');
+    } else {
+      // Public: ACTIVE only (status=ACTIVE or null pre-migration with is_active=true)
+      query = query.or('status.eq.ACTIVE,status.is.null').eq('is_active', true);
+    }
 
     if (serviceId) {
       const { data: mappings } = await supabase
