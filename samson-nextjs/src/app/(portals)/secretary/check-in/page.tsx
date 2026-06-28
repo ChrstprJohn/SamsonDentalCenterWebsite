@@ -53,6 +53,7 @@ export default function CheckInOutTrackerPage() {
   const [customQty, setCustomQty] = useState<number>(1);
 
   const [viewAppt, setViewAppt] = useState<AppointmentDto | null>(null);
+  const [viewInvoiceItems, setViewInvoiceItems] = useState<any[]>([]);
   const [rescheduleAppt, setRescheduleAppt] = useState<AppointmentDto | null>(null);
   const [rescheduleDate, setRescheduleDate] = useState<string>('');
   const [rescheduleTime, setRescheduleTime] = useState<string>('');
@@ -254,6 +255,21 @@ export default function CheckInOutTrackerPage() {
     const subtotal = getSubtotal();
     const discount = subtotal * (discountPercent / 100);
     return Math.max(0, subtotal - discount);
+  };
+
+  const handleViewApptDetails = async (appt: AppointmentDto) => {
+    setViewAppt(appt);
+    setViewInvoiceItems([]);
+    const invoice = getFinalizedInvoiceForAppt(appt.id);
+    if (invoice) {
+      const { data } = await supabase
+        .from('invoice_items')
+        .select('*')
+        .eq('invoice_id', invoice.id);
+      if (data) {
+        setViewInvoiceItems(data);
+      }
+    }
   };
 
   // Kanban Column filters
@@ -598,7 +614,7 @@ export default function CheckInOutTrackerPage() {
                     </span>
                   </div>
                   <Button
-                    onClick={() => setViewAppt(appt)}
+                    onClick={() => handleViewApptDetails(appt)}
                     variant="secondary"
                     className="w-full text-[10px] h-8 font-bold bg-secondary-bg hover:bg-secondary-bg/80 border-none rounded-xl"
                   >
@@ -952,31 +968,69 @@ export default function CheckInOutTrackerPage() {
                   <span className="font-extrabold text-text-primary">{viewAppt.patient?.firstName} {viewAppt.patient?.lastName}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-text-muted">Service Rendered:</span>
-                  <span className="font-extrabold text-text-primary">{viewAppt.service?.name}</span>
-                </div>
-                <div className="flex justify-between items-center">
                   <span className="text-text-muted">Attending Doctor:</span>
                   <span className="font-extrabold text-text-primary">Dr. {viewAppt.doctor?.firstName} {viewAppt.doctor?.lastName}</span>
                 </div>
-                {getFinalizedInvoiceForAppt(viewAppt.id) && (
-                  <div className="border-t border-card-border/40 pt-3 flex flex-col gap-2.5">
-                    <div className="flex justify-between items-center">
-                      <span className="text-text-muted">Payment Mode:</span>
-                      <span className="font-extrabold text-emerald-600 bg-emerald-500/5 px-2.5 py-0.5 rounded-md border border-emerald-500/10">
-                        {getFinalizedInvoiceForAppt(viewAppt.id)?.paymentMethod}
+
+                <div className="flex flex-col gap-2 border-t border-card-border/30 pt-3">
+                  <span className="text-[10px] text-text-muted font-bold uppercase tracking-wider">Services & Items:</span>
+                  {viewInvoiceItems.length > 0 ? (
+                    <div className="flex flex-col gap-2">
+                      {viewInvoiceItems.map((item, idx) => (
+                        <div key={item.id || idx} className="flex justify-between text-[11px] items-start">
+                          <div className="flex flex-col">
+                            <span className="font-bold text-text-primary">{item.description}</span>
+                            <span className="text-[9px] text-text-muted">{item.source === 'DOCTOR_BASELINE' ? 'Doctor Prescribed' : 'Secretary Addition'}</span>
+                          </div>
+                          <span className="font-bold text-text-primary">₱{(item.unit_price * item.quantity).toFixed(2)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="flex justify-between text-[11px]">
+                      <span className="font-bold text-text-primary">{viewAppt.service?.name || 'Treatment Service'} (x1)</span>
+                      <span className="font-bold text-text-primary">
+                        ₱{(() => {
+                          const inv = getFinalizedInvoiceForAppt(viewAppt.id);
+                          return inv ? (inv.amount + (inv.discountApplied || 0)).toFixed(2) : '0.00';
+                        })()}
                       </span>
                     </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-text-muted">Discount Applied:</span>
-                      <span className="font-extrabold text-text-primary">{getFinalizedInvoiceForAppt(viewAppt.id)?.discountApplied || 0}%</span>
+                  )}
+                </div>
+
+                {(() => {
+                  const inv = getFinalizedInvoiceForAppt(viewAppt.id);
+                  if (!inv) return null;
+                  const computedSubtotal = viewInvoiceItems.length > 0
+                    ? viewInvoiceItems.reduce((sum, i) => sum + (i.unit_price * i.quantity), 0)
+                    : (inv.amount + (inv.discountApplied || 0));
+
+                  return (
+                    <div className="border-t border-card-border/40 pt-3 flex flex-col gap-2.5">
+                      <div className="flex justify-between items-center">
+                        <span className="text-text-muted">Payment Mode:</span>
+                        <span className="font-extrabold text-emerald-600 bg-emerald-500/5 px-2.5 py-0.5 rounded-md border border-emerald-500/10">
+                          {inv.paymentMethod}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-text-muted">Subtotal:</span>
+                        <span className="font-extrabold text-text-primary">
+                          ₱{computedSubtotal.toFixed(2)}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-text-muted">Discount Applied:</span>
+                        <span className="font-extrabold text-red-500">₱{inv.discountApplied?.toFixed(2) || '0.00'}</span>
+                      </div>
+                      <div className="flex justify-between items-center border-t border-card-border/25 pt-2.5 mt-0.5">
+                        <span className="font-bold text-text-primary">Total Paid:</span>
+                        <span className="text-sm font-black text-primary-start">₱{inv.amount.toFixed(2)}</span>
+                      </div>
                     </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-text-muted">Paid Amount:</span>
-                      <span className="text-sm font-black text-primary-start">₱{getFinalizedInvoiceForAppt(viewAppt.id)?.amount?.toFixed(2)}</span>
-                    </div>
-                  </div>
-                )}
+                  );
+                })()}
               </div>
 
               <Button
