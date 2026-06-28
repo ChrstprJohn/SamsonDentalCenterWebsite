@@ -6,16 +6,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   CheckCircle2,
   Clock,
-  User,
-  Calendar,
   DollarSign,
   AlertCircle,
   Undo2,
-  Check,
-  Search,
-  Sparkles,
-  RefreshCw,
-  FileText,
   X,
   CreditCard,
   Percent,
@@ -26,6 +19,7 @@ import { undoCheckInAction } from '@/modules/appointments/actions/status/undo-ch
 import { markNoShowAction } from '@/modules/appointments/actions/status/mark-no-show.action';
 import { checkoutAction } from '@/modules/billing/actions/invoicing/checkout.action';
 import { getInvoicesAction } from '@/modules/billing/actions/invoicing/get-invoices.action';
+import { getServicesAction } from '@/modules/services/actions/management/get-services.action';
 import { updateAppointmentStatusAction } from '@/modules/appointments/actions/status/update-appointment-status.action';
 import { createClient } from '@/shared/database/client';
 import { Button } from '@/components/ui/button';
@@ -48,8 +42,15 @@ export default function CheckInOutTrackerPage() {
   const [checkoutInvoice, setCheckoutInvoice] = useState<InvoiceResponseDto | null>(null);
   const [checkoutAppt, setCheckoutAppt] = useState<AppointmentDto | null>(null);
   const [discountPercent, setDiscountPercent] = useState<number>(0);
-  const [priceOverride, setPriceOverride] = useState<string>('');
   const [paymentMethod, setPaymentMethod] = useState<'CASH' | 'CARD' | 'HMO'>('CASH');
+
+  // Dynamic Line Item Checkout builder states
+  const [servicesCatalog, setServicesCatalog] = useState<{ id: string; name: string; price: number }[]>([]);
+  const [additionalItems, setAdditionalItems] = useState<{ serviceId?: string; description: string; unitPrice: number; quantity: number }[]>([]);
+  const [selectedServiceId, setSelectedServiceId] = useState<string>('');
+  const [customDescription, setCustomDescription] = useState<string>('');
+  const [customPrice, setCustomPrice] = useState<number>(0);
+  const [customQty, setCustomQty] = useState<number>(1);
 
   const [viewAppt, setViewAppt] = useState<AppointmentDto | null>(null);
   const [rescheduleAppt, setRescheduleAppt] = useState<AppointmentDto | null>(null);
@@ -81,6 +82,15 @@ export default function CheckInOutTrackerPage() {
         console.log('Fetched appointments:', apptRes.data);
         console.log('Fetched invoices:', invRes.data);
         setInvoices(invRes.data);
+      }
+
+      const svcRes = await getServicesAction();
+      if (svcRes.data) {
+        setServicesCatalog(svcRes.data.map((s: any) => ({
+          id: s.id,
+          name: s.name,
+          price: Number(s.price || 0)
+        })));
       }
     } catch (err: any) {
       setErrorMessage(err.message || 'An unexpected error occurred');
@@ -191,8 +201,8 @@ export default function CheckInOutTrackerPage() {
       const res = await checkoutAction({
         invoiceId: checkoutInvoice.id,
         paymentMethod,
-        discountApplied: discountPercent || undefined,
-        amount: priceOverride ? parseFloat(priceOverride) : undefined,
+        discountPercent,
+        additionalItems,
       });
 
       if (!res.success) {
@@ -201,7 +211,7 @@ export default function CheckInOutTrackerPage() {
         setCheckoutInvoice(null);
         setCheckoutAppt(null);
         setDiscountPercent(0);
-        setPriceOverride('');
+        setAdditionalItems([]);
         fetchData();
       }
     });
@@ -233,12 +243,17 @@ export default function CheckInOutTrackerPage() {
   };
 
   // Pricing calculations
-  const calculateFinalPrice = () => {
+  const getSubtotal = () => {
     if (!checkoutInvoice) return 0;
-    const base = priceOverride ? parseFloat(priceOverride) : checkoutInvoice.amount;
-    if (isNaN(base)) return 0;
-    const final = base - base * (discountPercent / 100);
-    return Math.max(0, final);
+    const base = checkoutInvoice.amount;
+    const additions = additionalItems.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0);
+    return base + additions;
+  };
+
+  const calculateFinalPrice = () => {
+    const subtotal = getSubtotal();
+    const discount = subtotal * (discountPercent / 100);
+    return Math.max(0, subtotal - discount);
   };
 
   // Kanban Column filters
@@ -614,6 +629,7 @@ export default function CheckInOutTrackerPage() {
                 onClick={() => {
                   setCheckoutInvoice(null);
                   setCheckoutAppt(null);
+                  setAdditionalItems([]);
                 }}
                 className="absolute top-4 right-4 p-1.5 text-text-muted hover:text-text-primary bg-secondary-bg/30 hover:bg-secondary-bg/50 rounded-full transition-colors"
               >
@@ -625,35 +641,148 @@ export default function CheckInOutTrackerPage() {
                 <p className="text-xs text-text-muted">Finalize visit record for {checkoutAppt.patient?.firstName} {checkoutAppt.patient?.lastName}</p>
               </div>
 
-              <div className="flex flex-col gap-3 text-xs bg-secondary-bg/25 border border-card-border/30 p-4 rounded-2xl">
-                <div className="flex justify-between items-center">
-                  <span className="text-text-muted">Service:</span>
-                  <span className="font-extrabold text-text-primary">{checkoutAppt.service?.name}</span>
+              {/* Line Items Section */}
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between mb-0.5">
+                  <span className="text-[10px] font-black text-text-muted uppercase tracking-wider">Line Items</span>
+                  <span className="text-[10px] text-text-muted">Doctor Prescribed</span>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-text-muted">Assigned Doctor:</span>
-                  <span className="font-extrabold text-text-primary">Dr. {checkoutAppt.doctor?.firstName} {checkoutAppt.doctor?.lastName}</span>
+                <div className="flex flex-col gap-1.5">
+                  {/* Doctor-prescribed service row — baseline, read-only */}
+                  <div className="flex items-center justify-between px-3 py-2.5 rounded-xl bg-secondary-bg/40 border border-card-border/40">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="shrink-0 h-1.5 w-1.5 rounded-full bg-primary-start/70" />
+                      <div className="flex flex-col min-w-0">
+                        <span className="text-xs font-bold text-text-primary truncate">{checkoutAppt.service?.name ?? 'Clinical Service'}</span>
+                        <span className="text-[10px] text-text-muted">Dr. {checkoutAppt.doctor?.firstName} {checkoutAppt.doctor?.lastName}</span>
+                      </div>
+                    </div>
+                    <span className="text-xs font-black text-text-primary ml-3 shrink-0">₱{checkoutInvoice.amount.toLocaleString()}</span>
+                  </div>
+
+                  {/* Additional items rendering */}
+                  {additionalItems.map((item, idx) => (
+                    <div key={idx} className="flex items-center justify-between px-3 py-2 rounded-xl bg-indigo-500/5 border border-indigo-500/10">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="shrink-0 h-1.5 w-1.5 rounded-full bg-indigo-500" />
+                        <div className="flex flex-col min-w-0">
+                          <span className="text-xs font-bold text-text-primary truncate">{item.description}</span>
+                          <span className="text-[10px] text-text-muted">Qty: {item.quantity} × ₱{item.unitPrice.toLocaleString()}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3 shrink-0 ml-3">
+                        <span className="text-xs font-black text-text-primary">₱{(item.unitPrice * item.quantity).toLocaleString()}</span>
+                        <button
+                          type="button"
+                          onClick={() => setAdditionalItems(prev => prev.filter((_, i) => i !== idx))}
+                          className="p-1 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors cursor-pointer"
+                        >
+                          <X className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <div className="flex justify-between items-center border-t border-card-border/30 pt-2.5">
-                  <span className="text-text-muted">Base Price:</span>
-                  <span className="font-black text-text-primary">₱{checkoutInvoice.amount.toLocaleString()}</span>
+
+                {/* Add Additional Item Controls */}
+                <div className="flex flex-col gap-2 p-3 bg-secondary-bg/25 border border-dashed border-card-border rounded-2xl mt-1">
+                  <span className="text-[9px] font-black text-text-muted uppercase tracking-wider">Add Additional Service / Retail Item</span>
+                  
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="col-span-2">
+                      <Select
+                        value={selectedServiceId}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setSelectedServiceId(val);
+                          if (val === 'custom') {
+                            setCustomDescription('');
+                            setCustomPrice(0);
+                          } else {
+                            const selected = servicesCatalog.find(s => s.id === val);
+                            if (selected) {
+                              setCustomDescription(selected.name);
+                              setCustomPrice(selected.price);
+                            }
+                          }
+                        }}
+                        className="text-xs rounded-xl bg-card border border-card-border w-full"
+                        options={[
+                          { value: '', label: '-- Select Clinic Service --' },
+                          ...servicesCatalog.map(s => ({ value: s.id, label: `${s.name} (₱${s.price})` })),
+                          { value: 'custom', label: 'Custom Free-text Item...' }
+                        ]}
+                      />
+                    </div>
+
+                    {(selectedServiceId === 'custom' || selectedServiceId !== '') && (
+                      <>
+                        <div className="col-span-2">
+                          <Input
+                            type="text"
+                            placeholder="Description"
+                            value={customDescription}
+                            onChange={(e) => setCustomDescription(e.target.value)}
+                            className="text-xs rounded-xl"
+                            disabled={selectedServiceId !== 'custom'}
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[8px] font-bold text-text-muted uppercase">Unit Price (₱)</label>
+                          <Input
+                            type="number"
+                            min={0}
+                            placeholder="Price"
+                            value={customPrice || ''}
+                            onChange={(e) => setCustomPrice(Number(e.target.value))}
+                            className="text-xs rounded-xl"
+                            disabled={selectedServiceId !== 'custom'}
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[8px] font-bold text-text-muted uppercase">Quantity</label>
+                          <Input
+                            type="number"
+                            min={1}
+                            placeholder="Qty"
+                            value={customQty}
+                            onChange={(e) => setCustomQty(Math.max(1, Number(e.target.value)))}
+                            className="text-xs rounded-xl"
+                          />
+                        </div>
+                        <div className="col-span-2 flex justify-end">
+                          <Button
+                            type="button"
+                            onClick={() => {
+                              if (!customDescription.trim()) return;
+                              setAdditionalItems(prev => [
+                                ...prev,
+                                {
+                                  serviceId: selectedServiceId === 'custom' ? undefined : selectedServiceId,
+                                  description: customDescription,
+                                  unitPrice: customPrice,
+                                  quantity: customQty
+                                }
+                              ]);
+                              // Reset form
+                              setSelectedServiceId('');
+                              setCustomDescription('');
+                              setCustomPrice(0);
+                              setCustomQty(1);
+                            }}
+                            className="text-[10px] h-8 bg-indigo-500 hover:bg-indigo-600 font-bold border-none rounded-xl"
+                          >
+                            + Add Line Item
+                          </Button>
+                        </div>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
 
+
               <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[10px] font-black text-text-muted uppercase tracking-wider flex items-center gap-1">
-                    <DollarSign className="h-3 w-3 text-primary-start" />
-                    Price Override
-                  </label>
-                  <Input
-                    type="number"
-                    placeholder="Override value"
-                    value={priceOverride}
-                    onChange={(e) => setPriceOverride(e.target.value)}
-                    className="text-xs rounded-xl"
-                  />
-                </div>
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[10px] font-black text-text-muted uppercase tracking-wider flex items-center gap-1">
                     <Percent className="h-3 w-3 text-primary-start" />
@@ -669,23 +798,23 @@ export default function CheckInOutTrackerPage() {
                     className="text-xs rounded-xl"
                   />
                 </div>
-              </div>
 
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[10px] font-black text-text-muted uppercase tracking-wider flex items-center gap-1">
-                  <CreditCard className="h-3 w-3 text-primary-start" />
-                  Payment Method
-                </label>
-                <Select
-                  value={paymentMethod}
-                  onChange={(e) => setPaymentMethod(e.target.value as any)}
-                  className="text-xs rounded-xl bg-card border border-card-border"
-                  options={[
-                    { value: 'CASH', label: 'Cash Payment' },
-                    { value: 'CARD', label: 'Credit/Debit Card' },
-                    { value: 'HMO', label: 'HMO / Insurance Carrier' }
-                  ]}
-                />
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[10px] font-black text-text-muted uppercase tracking-wider flex items-center gap-1">
+                    <CreditCard className="h-3 w-3 text-primary-start" />
+                    Payment Method
+                  </label>
+                  <Select
+                    value={paymentMethod}
+                    onChange={(e) => setPaymentMethod(e.target.value as any)}
+                    className="text-xs rounded-xl bg-card border border-card-border"
+                    options={[
+                      { value: 'CASH', label: 'Cash Payment' },
+                      { value: 'CARD', label: 'Credit/Debit Card' },
+                      { value: 'HMO', label: 'HMO / Insurance Carrier' }
+                    ]}
+                  />
+                </div>
               </div>
 
               <div className="flex justify-between items-center text-xs font-bold text-text-secondary bg-primary-start/5 border border-primary-start/15 p-4 rounded-2xl">
@@ -693,11 +822,13 @@ export default function CheckInOutTrackerPage() {
                 <span className="text-lg font-black text-primary-start">₱{calculateFinalPrice().toFixed(2)}</span>
               </div>
 
+
               <div className="flex gap-3 pt-2">
                 <Button
                   onClick={() => {
                     setCheckoutInvoice(null);
                     setCheckoutAppt(null);
+                    setAdditionalItems([]);
                   }}
                   variant="secondary"
                   className="w-full text-xs font-bold h-10 border-none rounded-xl"

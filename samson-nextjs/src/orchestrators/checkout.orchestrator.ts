@@ -28,7 +28,7 @@ export const checkoutOrchestrator = (deps: {
     const completedAppointment = await deps.getAppointmentById(finalizedInvoice.appointmentId);
 
     // 4. Return the result, constructing the audit log metadata (the actual row is saved in the DB by the RPC)
-    const reason = `Invoice finalized. Payment Method: ${data.paymentMethod}. Discount: ${data.discountApplied ?? 0}.`;
+    const reason = `Invoice finalized. Payment Method: ${data.paymentMethod}. Discount: ${data.discountPercent ?? 0}%.`;
     const auditLog: AuditLogResponseDto = {
       id: 'atomic-checkout-log', // dummy ID for the response object
       actorId: user.id,

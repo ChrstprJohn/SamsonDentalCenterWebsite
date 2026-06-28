@@ -32,8 +32,15 @@ describe('completeCheckoutCommand', () => {
       {
         invoiceId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd2',
         paymentMethod: 'CARD',
-        discountApplied: 50,
-        amount: 850,
+        discountPercent: 10,
+        additionalItems: [
+          {
+            serviceId: 'ea95a63c-333e-4b68-98e3-82bdf1a07bd3',
+            description: 'Whitening Kit',
+            unitPrice: 200,
+            quantity: 1,
+          }
+        ],
       },
       'actor-uuid-123'
     );
@@ -41,14 +48,20 @@ describe('completeCheckoutCommand', () => {
     expect(mockRpc).toHaveBeenCalledWith('complete_checkout_transaction', {
       p_invoice_id: 'da95a63c-333e-4b68-98e3-82bdf1a07bd2',
       p_payment_method: 'CARD',
-      p_discount_applied: 50,
-      p_price_override: 850,
+      p_discount_percent: 10,
+      p_additional_items: [
+        {
+          serviceId: 'ea95a63c-333e-4b68-98e3-82bdf1a07bd3',
+          description: 'Whitening Kit',
+          unitPrice: 200,
+          quantity: 1,
+        }
+      ],
       p_actor_id: 'actor-uuid-123',
     });
 
     expect(result.status).toBe('FINALIZED');
     expect(result.paymentMethod).toBe('CARD');
-    expect(result.discountApplied).toBe(50);
   });
 
   it('throws DomainError when database RPC fails', async () => {
