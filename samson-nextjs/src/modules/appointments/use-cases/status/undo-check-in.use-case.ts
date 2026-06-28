@@ -9,7 +9,8 @@ export const undoCheckInUseCase = (deps: {
     actorId: string | null,
     actorRole: string,
     newStatus: AppointmentStatusValue,
-    reason?: string
+    reason?: string,
+    expectedStatus?: AppointmentStatusValue
   ) => Promise<AppointmentDto>;
 }) => {
   return async (
@@ -32,7 +33,8 @@ export const undoCheckInUseCase = (deps: {
       actorId,
       actorRole,
       'APPROVED',
-      reason
+      reason,
+      'CHECKED_IN' // ACID guard: reject if status changed since app-layer read
     );
   };
 };

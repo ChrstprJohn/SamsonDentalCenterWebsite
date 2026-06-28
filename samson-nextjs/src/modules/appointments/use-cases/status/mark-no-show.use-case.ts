@@ -10,7 +10,8 @@ export const markNoShowUseCase = (deps: {
     actorId: string | null,
     actorRole: string,
     newStatus: AppointmentStatusValue,
-    reason?: string
+    reason?: string,
+    expectedStatus?: AppointmentStatusValue
   ) => Promise<AppointmentDto>;
   getCurrentTime?: () => Date;
 }) => {
@@ -45,7 +46,8 @@ export const markNoShowUseCase = (deps: {
       actorId,
       actorRole,
       'NO_SHOW',
-      reason
+      reason,
+      'APPROVED' // ACID guard: reject if status changed since app-layer read
     );
   };
 };

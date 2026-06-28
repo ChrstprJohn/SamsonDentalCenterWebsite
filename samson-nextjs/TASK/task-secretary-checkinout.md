@@ -86,3 +86,26 @@ Implement the 5-column Kanban board at `/secretary/check-in` for managing daily 
   - `[ ]` Implement E2E test verifying state transition flow: Col 1 -> Col 3 -> Col 4 -> Col 5.
   - `[ ]` Test real-time subscription update by simulating doctor committing notes.
   - `[ ]` Test checkout pricing validations and discount limits.
+
+## ACID Atomicity Hardening
+
+> **Problem**: All status use-cases (check-in, no-show, undo-check-in) do a separate `getAppointmentById` SELECT in app-layer JS, validate status in JS, then call the RPC. Between the SELECT and the RPC call, a concurrent request can mutate the row — causing two simultaneous check-ins on the same appointment to both succeed. The Postgres RPCs did NOT re-validate `current_status` before updating, so the DB offered no protection against this race.
+>
+> **Fix**: Add `expected_status` guards inside both RPCs. The UPDATE uses `WHERE id = p_appointment_id AND status = p_expected_status`. If the row was already mutated, zero rows update → explicit RAISE EXCEPTION. Fully atomic within the DB transaction. No new round-trips needed.
+
+### `update_appointment_status_transaction` RPC
+
+- `[x]` Add `p_expected_status public.appointment_status DEFAULT NULL` parameter.
+- `[x]` Add guard: `IF p_expected_status IS NOT NULL AND v_previous_status <> p_expected_status THEN RAISE EXCEPTION ... END IF;` after the initial SELECT.
+- `[x]` Create migration [20260628020000_add_status_guard_to_appointment_rpc.sql](file:///c:/Users/picar/Desktop/samson-website/samson-nextjs/migrations/20260628020000_add_status_guard_to_appointment_rpc.sql).
+
+### `complete_checkout_transaction` RPC
+
+- `[x]` Add guard: appointment must be `TREATMENT_RENDERED` before checkout completes — `IF v_previous_status <> 'TREATMENT_RENDERED' THEN RAISE EXCEPTION ... END IF;` after fetching appointment status.
+- `[x]` Create migration [20260628030000_add_status_guard_to_checkout_rpc.sql](file:///c:/Users/picar/Desktop/samson-website/samson-nextjs/migrations/20260628030000_add_status_guard_to_checkout_rpc.sql).
+
+### App-Layer (TypeScript)
+
+- `[x]` Pass `p_expected_status` from each use-case into `updateAppointmentStatusTransactionCommand` for check-in (`APPROVED`), no-show (`APPROVED`), undo-check-in (`CHECKED_IN`).
+- `[x]` Update `updateAppointmentStatusTransactionCommand` signature to accept optional `expectedStatus`.
+- `[x]` Update use-cases to pass expected status down.

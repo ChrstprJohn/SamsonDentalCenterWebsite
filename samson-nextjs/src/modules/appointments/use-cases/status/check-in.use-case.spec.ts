@@ -52,7 +52,8 @@ describe('checkInUseCase', () => {
       'actor-id',
       'STAFF',
       'CHECKED_IN',
-      'Patient checked in'
+      'Patient checked in',
+      'APPROVED'
     );
     expect(result.status).toBe('CHECKED_IN');
   });

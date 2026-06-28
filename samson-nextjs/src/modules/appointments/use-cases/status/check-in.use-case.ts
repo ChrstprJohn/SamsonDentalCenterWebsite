@@ -10,7 +10,8 @@ export const checkInUseCase = (deps: {
     actorId: string | null,
     actorRole: string,
     newStatus: AppointmentStatusValue,
-    reason?: string
+    reason?: string,
+    expectedStatus?: AppointmentStatusValue
   ) => Promise<AppointmentDto>;
   getCurrentTime?: () => Date;
 }) => {
@@ -47,7 +48,8 @@ export const checkInUseCase = (deps: {
       actorId,
       actorRole,
       'CHECKED_IN',
-      reason
+      reason,
+      'APPROVED' // ACID guard: reject if status changed since app-layer read
     );
   };
 };

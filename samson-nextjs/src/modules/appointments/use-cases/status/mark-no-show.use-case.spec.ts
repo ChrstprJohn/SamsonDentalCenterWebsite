@@ -52,7 +52,8 @@ describe('markNoShowUseCase', () => {
       'actor-id',
       'STAFF',
       'NO_SHOW',
-      'No-show marked'
+      'No-show marked',
+      'APPROVED'
     );
     expect(result.status).toBe('NO_SHOW');
   });

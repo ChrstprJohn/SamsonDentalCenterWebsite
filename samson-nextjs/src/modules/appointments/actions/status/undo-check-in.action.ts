@@ -22,7 +22,25 @@ export async function undoCheckInAction(formData: UndoCheckInDto) {
 
     const useCase = undoCheckInUseCase({
       getAppointmentById: getAppointmentByIdQuery(supabase),
-      updateAppointmentStatusTransaction: updateAppointmentStatusTransactionCommand(supabase),
+      updateAppointmentStatusTransaction: (
+        appointmentId,
+        actorId,
+        actorRole,
+        newStatus,
+        reason,
+        expectedStatus
+      ) =>
+        updateAppointmentStatusTransactionCommand(supabase)(
+          appointmentId,
+          actorId,
+          actorRole,
+          newStatus,
+          reason,
+          undefined, // rescheduleMetadata
+          undefined, // clearProposedMetadata
+          undefined, // rescheduleCount
+          expectedStatus
+        ),
     });
 
     const result = await useCase(

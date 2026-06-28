@@ -50,6 +50,7 @@ describe('updateAppointmentStatusTransactionCommand', () => {
       p_reschedule_service: null,
       p_clear_proposed:    false,
       p_reschedule_count:  null,
+      p_expected_status:   null,
     });
 
     expect(result.id).toBe(APPT_ID);

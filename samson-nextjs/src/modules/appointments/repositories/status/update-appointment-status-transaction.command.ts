@@ -18,7 +18,11 @@ export const updateAppointmentStatusTransactionCommand = (supabase: SupabaseClie
       serviceId?: string;
     },
     clearProposedMetadata?: boolean,
-    rescheduleCount?: number
+    rescheduleCount?: number,
+    /** ACID guard: if provided, the RPC will reject the update if the current DB
+     *  status differs — preventing race conditions between the app-layer read
+     *  and the DB write. */
+    expectedStatus?: AppointmentStatusValue
   ): Promise<AppointmentDto> => {
     const { data, error } = await supabase.rpc('update_appointment_status_transaction', {
       p_appointment_id:    appointmentId,
@@ -33,6 +37,7 @@ export const updateAppointmentStatusTransactionCommand = (supabase: SupabaseClie
       p_reschedule_service: rescheduleMetadata?.serviceId ?? null,
       p_clear_proposed:    clearProposedMetadata ?? false,
       p_reschedule_count:  rescheduleCount ?? null,
+      p_expected_status:   expectedStatus ?? null,
     });
 
     if (error || !data || (Array.isArray(data) && data.length === 0)) {
@@ -46,3 +51,4 @@ export const updateAppointmentStatusTransactionCommand = (supabase: SupabaseClie
     return mapAppointmentRecord(row as Record<string, unknown>);
   };
 };
+

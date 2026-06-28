@@ -22,7 +22,25 @@ export async function checkInAction(formData: CheckInDto) {
 
     const useCase = checkInUseCase({
       getAppointmentById: getAppointmentByIdQuery(supabase),
-      updateAppointmentStatusTransaction: updateAppointmentStatusTransactionCommand(supabase),
+      updateAppointmentStatusTransaction: (
+        appointmentId,
+        actorId,
+        actorRole,
+        newStatus,
+        reason,
+        expectedStatus
+      ) =>
+        updateAppointmentStatusTransactionCommand(supabase)(
+          appointmentId,
+          actorId,
+          actorRole,
+          newStatus,
+          reason,
+          undefined, // rescheduleMetadata
+          undefined, // clearProposedMetadata
+          undefined, // rescheduleCount
+          expectedStatus
+        ),
     });
 
     const result = await useCase(

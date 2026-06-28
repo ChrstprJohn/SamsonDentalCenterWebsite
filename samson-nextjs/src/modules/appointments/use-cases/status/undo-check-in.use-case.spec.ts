@@ -40,7 +40,8 @@ describe('undoCheckInUseCase', () => {
       'actor-id',
       'STAFF',
       'APPROVED',
-      'Undo check-in (mistake)'
+      'Undo check-in (mistake)',
+      'CHECKED_IN'
     );
     expect(result.status).toBe('APPROVED');
   });
