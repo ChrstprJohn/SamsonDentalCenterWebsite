@@ -11,10 +11,10 @@ export const additionalItemSchema = z.object({
 export const finalizeInvoiceSchema = z.object({
   invoiceId: z.string().uuid("Invoice ID must be a valid UUID"),
   paymentMethod: paymentMethodEnum,
-  discountPercent: z.number().min(0).max(100).optional().default(0),
+  discountPercent: z.number().min(0).max(100).optional(),
   discountApplied: z.number().nonnegative("Discount must be non-negative").optional().nullable(),
   amount: z.number().nonnegative("Amount must be non-negative").optional(),
-  additionalItems: z.array(additionalItemSchema).optional().default([]),
+  additionalItems: z.array(additionalItemSchema).optional(),
 });
 
 export type FinalizeInvoiceDto = z.infer<typeof finalizeInvoiceSchema>;
