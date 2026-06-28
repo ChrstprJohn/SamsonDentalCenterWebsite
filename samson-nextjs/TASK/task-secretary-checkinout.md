@@ -36,18 +36,25 @@ Implement the 5-column Kanban board at `/secretary/check-in` for managing daily 
     - `[x]` Render today's awaiting arrivals.
     - `[x]` Implement client-side time-gate logic for "Check In" button (`start_time - 30min` to `end_time`).
     - `[x]` Render "No-Show" button past slot end time.
+    - `[x]` *Tested & Verified: Check-in button works and updates state in DB.*
   - `[x]` Implement Column 2: **NO-SHOW**
     - `[x]` Render today's missed slot appointments.
     - `[x]` Add "Reschedule" button pointing to reschedule modal.
+    - `[x]` *Tested & Verified: No-Show transition works and correctly flags missed appointments.*
   - `[x]` Implement Column 3: **CHECKED IN**
     - `[x]` Render ongoing appointments.
     - `[x]` Add confirmation modal for "Undo Check-In" action.
+    - `[x]` *Tested & Verified: Undo Check-In (redo/revert) works and successfully returns card to Column 1.*
   - `[x]` Implement Column 4: **READY FOR CHECKOUT**
     - `[x]` Render appointments where status is `TREATMENT_RENDERED`.
     - `[x]` Add checkout slide-over/dialog to manage draft invoice review, discounts, overrides, and payment methods.
   - `[x]` Implement Column 5: **COMPLETED**
     - `[x]` Render read-only list of today's completed visits.
     - `[x]` Add "View" button opening visit log, invoice summary, and history logs.
+
+- `[x]` **Frontend Enhancements**
+  - `[x]` Display full time range (`startTime - endTime`) on cards instead of only start time.
+  - `[x]` Investigate/Fix Checkout button in Column 4 (Ready Checkout) when `draftInvoice` is missing.
 
 ## Bug Fixes & Correctness
 
@@ -59,6 +66,13 @@ Implement the 5-column Kanban board at `/secretary/check-in` for managing daily 
   - `[x]` Solved SSR/hydration mismatch by initializing time as `null` and populating client-side only via `useEffect`.
 - `[x]` **Rogue timer removal**
   - `[x]` Deleted secondary duplicate `setInterval` that was corrupting naive-UTC comparisons.
+
+- `[x]` **Option B: Atomic Checkout Transaction (Postgres RPC)**
+  - `[x]` Create `complete_checkout_transaction` PostgreSQL RPC function (finalizes invoice, completes appointment, logs status history, writes audit logs atomically).
+  - `[x]` Implement repository command `completeCheckoutCommand` invoking the RPC.
+  - `[x]` Refactor `checkoutOrchestrator` to call `completeCheckoutCommand` instead of individual operations.
+
+
 
 ## Quality Assurance & Testing (80/15/5 Pyramid)
 

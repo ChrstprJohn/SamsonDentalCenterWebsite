@@ -1,4 +1,3 @@
-import { SupabaseClient } from '@supabase/supabase-js';
 import { FinalizeInvoiceDto, InvoiceResponseDto } from '@/modules/billing/dtos/exports';
 import { AppointmentDto } from '@/modules/appointments/dtos/exports';
 import { AuditLogResponseDto } from '@/modules/audit-logs/dtos/logs/audit-log-response.dto';
@@ -11,61 +10,34 @@ export interface CheckoutResult {
 }
 
 export const checkoutOrchestrator = (deps: {
-  supabase: SupabaseClient;
-  finalizeInvoice: (data: FinalizeInvoiceDto) => Promise<InvoiceResponseDto>;
-  updateAppointmentStatus: (
-    appointmentId: string,
-    status: 'COMPLETED',
-    reason?: string
-  ) => Promise<AppointmentDto>;
-  createAuditLog: (data: {
-    actorId: string;
-    action: string;
-    targetId: string;
-    reason?: string | null;
-  }) => Promise<AuditLogResponseDto>;
+  completeCheckout: (data: FinalizeInvoiceDto, actorId: string) => Promise<InvoiceResponseDto>;
+  getAppointmentById: (id: string) => Promise<AppointmentDto>;
   getCurrentUser: () => Promise<{ id: string } | null>;
 }) => {
   return async (data: FinalizeInvoiceDto): Promise<CheckoutResult> => {
-    // 1. Fetch the invoice to get the appointmentId
-    const { data: invoiceRecord, error: invoiceError } = await deps.supabase
-      .from('invoices')
-      .select('appointment_id')
-      .eq('id', data.invoiceId)
-      .single();
-
-    if (invoiceError || !invoiceRecord) {
-      throw new DomainError(
-        `Failed to retrieve invoice details: ${invoiceError?.message || 'Invoice not found'}`,
-        'DATABASE_ERROR'
-      );
-    }
-
-    const appointmentId = invoiceRecord.appointment_id;
-
-    // 2. Finalize the invoice
-    const finalizedInvoice = await deps.finalizeInvoice(data);
-
-    // 3. Complete the appointment status to COMPLETED
-    const reason = `Invoice finalized. Payment Method: ${data.paymentMethod}. Discount: ${data.discountApplied ?? 0}.`;
-    const completedAppointment = await deps.updateAppointmentStatus(
-      appointmentId,
-      'COMPLETED',
-      reason
-    );
-
-    // 4. Log the audit record
+    // 1. Get the authenticated user
     const user = await deps.getCurrentUser();
     if (!user) {
       throw new DomainError('Authentication required to perform checkout', 'UNAUTHORIZED');
     }
 
-    const auditLog = await deps.createAuditLog({
+    // 2. Perform checkout atomically in the DB via RPC
+    const finalizedInvoice = await deps.completeCheckout(data, user.id);
+
+    // 3. Fetch the updated appointment
+    const completedAppointment = await deps.getAppointmentById(finalizedInvoice.appointmentId);
+
+    // 4. Return the result, constructing the audit log metadata (the actual row is saved in the DB by the RPC)
+    const reason = `Invoice finalized. Payment Method: ${data.paymentMethod}. Discount: ${data.discountApplied ?? 0}.`;
+    const auditLog: AuditLogResponseDto = {
+      id: 'atomic-checkout-log', // dummy ID for the response object
       actorId: user.id,
       action: 'CHECKOUT_COMPLETED',
-      targetId: appointmentId,
+      targetId: finalizedInvoice.appointmentId,
       reason,
-    });
+      createdAt: new Date().toISOString(),
+    };
+
 
     return {
       invoice: finalizedInvoice,

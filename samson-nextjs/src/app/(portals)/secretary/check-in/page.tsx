@@ -76,8 +76,10 @@ export default function CheckInOutTrackerPage() {
         setErrorMessage(apptRes.error || 'Failed to load appointments');
       }
 
-      const invRes = await getInvoicesAction();
+      const invRes = await getInvoicesAction({ limit: 100, page: 1 });
       if (invRes.success && invRes.data) {
+        console.log('Fetched appointments:', apptRes.data);
+        console.log('Fetched invoices:', invRes.data);
         setInvoices(invRes.data);
       }
     } catch (err: any) {
@@ -352,7 +354,7 @@ export default function CheckInOutTrackerPage() {
                       </span>
                       <div className="flex items-center gap-1.5 text-[10px] text-text-muted">
                         <Clock className="h-3 w-3 text-cyan-500/80" />
-                        <span>{formatClinicTime(appt.startTime)}</span>
+                        <span>{formatClinicTime(appt.startTime)} - {formatClinicTime(appt.endTime)}</span>
                       </div>
                       <div className="text-[10px] text-text-secondary mt-0.5">
                         Dr. {appt.doctor?.firstName} {appt.doctor?.lastName}
@@ -414,7 +416,7 @@ export default function CheckInOutTrackerPage() {
                 >
                   <div className="flex flex-col gap-1 text-xs">
                     <span className="font-extrabold text-text-primary">{appt.patient?.firstName} {appt.patient?.lastName}</span>
-                    <span className="text-[10px] text-text-muted">Missed slot: {formatClinicTime(appt.startTime)}</span>
+                    <span className="text-[10px] text-text-muted">Missed slot: {formatClinicTime(appt.startTime)} - {formatClinicTime(appt.endTime)}</span>
                     <span className="text-[10px] text-text-secondary">Dr. {appt.doctor?.firstName} {appt.doctor?.lastName}</span>
                   </div>
                   <Button
@@ -460,6 +462,10 @@ export default function CheckInOutTrackerPage() {
                   <div className="flex flex-col gap-1 text-xs">
                     <span className="font-extrabold text-text-primary">{appt.patient?.firstName} {appt.patient?.lastName}</span>
                     <span className="text-[10px] text-indigo-500 font-medium">Currently in Treatment Room</span>
+                    <div className="flex items-center gap-1.5 text-[10px] text-text-muted mt-0.5">
+                      <Clock className="h-3 w-3 text-indigo-500/80" />
+                      <span>{formatClinicTime(appt.startTime)} - {formatClinicTime(appt.endTime)}</span>
+                    </div>
                     <span className="text-[10px] text-text-secondary">Dr. {appt.doctor?.firstName} {appt.doctor?.lastName}</span>
                   </div>
                   <Button
@@ -505,7 +511,11 @@ export default function CheckInOutTrackerPage() {
                   >
                     <div className="flex flex-col gap-1 text-xs">
                       <span className="font-extrabold text-text-primary">{appt.patient?.firstName} {appt.patient?.lastName}</span>
-                      <span className="text-[10px] text-text-secondary">{appt.service?.name}</span>
+                      <div className="flex items-center gap-1.5 text-[10px] text-text-muted mt-0.5">
+                        <Clock className="h-3 w-3 text-amber-500/80" />
+                        <span>{formatClinicTime(appt.startTime)} - {formatClinicTime(appt.endTime)}</span>
+                      </div>
+                      <span className="text-[10px] text-text-secondary mt-0.5">{appt.service?.name}</span>
                       {draftInvoice && (
                         <div className="flex items-center gap-1 mt-1 text-[10px] text-amber-600 font-bold">
                           <DollarSign className="h-3 w-3 shrink-0" />
@@ -513,7 +523,7 @@ export default function CheckInOutTrackerPage() {
                         </div>
                       )}
                     </div>
-                    {draftInvoice && (
+                    {draftInvoice ? (
                       <Button
                         onClick={() => {
                           setCheckoutInvoice(draftInvoice);
@@ -523,6 +533,11 @@ export default function CheckInOutTrackerPage() {
                       >
                         Checkout
                       </Button>
+                    ) : (
+                      <div className="text-[10px] text-red-500 font-semibold bg-red-500/5 p-2 rounded-xl border border-red-500/10 flex items-center gap-1.5">
+                        <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+                        <span>No draft invoice. Run database seed or complete treatment.</span>
+                      </div>
                     )}
                   </motion.div>
                 );
@@ -557,7 +572,11 @@ export default function CheckInOutTrackerPage() {
                 >
                   <div className="flex flex-col gap-1 text-xs">
                     <span className="font-extrabold text-text-primary">{appt.patient?.firstName} {appt.patient?.lastName}</span>
-                    <span className="text-[10px] text-text-secondary">{appt.service?.name}</span>
+                    <div className="flex items-center gap-1.5 text-[10px] text-text-muted mt-0.5">
+                      <Clock className="h-3 w-3 text-emerald-500/80" />
+                      <span>{formatClinicTime(appt.startTime)} - {formatClinicTime(appt.endTime)}</span>
+                    </div>
+                    <span className="text-[10px] text-text-secondary mt-0.5">{appt.service?.name}</span>
                     <span className="inline-flex self-start items-center gap-1 text-[9px] font-bold px-2 py-0.5 rounded-md bg-emerald-500/5 text-emerald-600 mt-1">
                       <CheckCircle2 className="h-3 w-3" />
                       Completed

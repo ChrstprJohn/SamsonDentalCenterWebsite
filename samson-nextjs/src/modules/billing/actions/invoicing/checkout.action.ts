@@ -6,12 +6,8 @@ import { authorizeRole, getAuthenticatedUser } from '@/shared/auth/auth.util';
 import { createClient } from '@/shared/database/server';
 import { DomainError } from '@/shared/errors';
 import { FinalizeInvoiceDto, finalizeInvoiceSchema } from '../../dtos/exports';
-import { finalizeInvoiceCommand } from '../../repositories/exports';
-import { finalizeInvoiceUseCase } from '../../use-cases/exports';
-import { updateAppointmentStatusUseCase } from '@/modules/appointments/use-cases/exports';
-import { getAppointmentByIdQuery, updateAppointmentStatusTransactionCommand } from '@/modules/appointments/repositories/status/exports';
-import { createAuditLogUseCase } from '@/modules/audit-logs/use-cases/exports';
-import { createAuditLogCommand } from '@/modules/audit-logs/repositories/logs/audit-log.commands';
+import { completeCheckoutCommand } from '../../repositories/exports';
+import { getAppointmentByIdQuery } from '@/modules/appointments/repositories/status/exports';
 import { checkoutOrchestrator } from '@/orchestrators/checkout.orchestrator';
 
 // Background task trigger (e.g. Email Receipt)
@@ -28,16 +24,8 @@ export async function checkoutAction(data: FinalizeInvoiceDto) {
     const supabase = await createClient();
 
     const orchestratorDeps = {
-      supabase,
-      finalizeInvoice: finalizeInvoiceUseCase(finalizeInvoiceCommand(supabase)),
-      updateAppointmentStatus: async (id: string, status: any, reason?: string) => {
-        const user = await getAuthenticatedUser();
-        return updateAppointmentStatusUseCase({
-          getAppointmentById: getAppointmentByIdQuery(supabase),
-          updateAppointmentStatusTransaction: updateAppointmentStatusTransactionCommand(supabase),
-        })(id, user?.id || null, 'STAFF', status, reason);
-      },
-      createAuditLog: createAuditLogUseCase(createAuditLogCommand(supabase)),
+      completeCheckout: completeCheckoutCommand(supabase),
+      getAppointmentById: getAppointmentByIdQuery(supabase),
       getCurrentUser: async () => {
         try {
           return await getAuthenticatedUser();
