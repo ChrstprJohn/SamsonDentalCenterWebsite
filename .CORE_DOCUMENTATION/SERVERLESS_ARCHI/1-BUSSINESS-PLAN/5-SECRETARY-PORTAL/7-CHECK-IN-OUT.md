@@ -65,22 +65,53 @@ This column is passive from the secretary's perspective — it reflects state se
 
 ## 5. Column 4: Ready for Checkout (Treatment Rendered)
 
-Lists appointments in `TREATMENT_RENDERED` status where the doctor has completed and submitted clinical treatment details. A `DRAFT` invoice record exists for each entry here.
+Lists appointments in `TREATMENT_RENDERED` status where the doctor has committed clinical updates. A `DRAFT` invoice populated with baseline data exists for each entry.
 
 **Card shows**: Patient name, check-in time, service, doctor, invoice draft indicator.
 
 **Actions**:
-- **Checkout** button: Opens the Checkout & Invoicing panel (inline slide-over or dialog):
+- **Checkout** button: Opens the dynamic Checkout & Invoicing panel (inline slide-over or dialog).
 
   ### Checkout & Invoicing Panel
-  - **Review Draft Invoice**: Displays service name, doctor, and base price (pulled from `services.price`).
-  - **Price Adjustments**: Enter a flat price override or a discount percentage (0–100%).
+
+  ```
+  ┌────────────────────────────────────────────────────────┐
+  │ 💳 CHECKOUT & INVOICING PANEL                          │
+  ├────────────────────────────────────────────────────────┤
+  │ CURRENT LINE ITEMS:                                    │
+  │ 📄 1. Deep Scaling & Cleaning (Dr. Santos)   $100.00   │
+  │      [Doctor Prescribed - Baseline]                    │
+  │                                                        │
+  │ ➕ ADD EXTRA ITEMS / SERVICES:                          │
+  │ ┌───────────────────────────────────────┐ ┌──────────┐ │
+  │ │ Select: [ Oral Rinse Antiseptic     ] │ │  $15.00  │ │
+  │ └───────────────────────────────────────┘ └──────────┘ │
+  │                                         [ + Add Item ] │
+  ├────────────────────────────────────────────────────────┤
+  │ ADJUSTMENTS:                                           │
+  │ Discount: [  0  ] %                      Tax/Fees: $0  │
+  ├────────────────────────────────────────────────────────┤
+  │ 💰 TOTAL DUE: $115.00                                  │
+  │ Payment Method: [ CASH ▾ ]                             │
+  │                                                        │
+  │                  [ ✓ Complete Checkout ]               │
+  └────────────────────────────────────────────────────────┘
+  ```
+
+  - **Review Doctor Line Items**: Displays the core services selected by the doctor, pulling data from the draft invoice's related `invoice_items` rows. These lines are marked visually as **clinical baselines** (read-only, locked from deletion).
+  - **Dynamic Item Addition**: A search dropdown connected to the global `services` or `inventory` tables. The secretary can select additional items (e.g., retail products, protective sealants, special materials the doctor used) to append new rows into the billing array. Each addition shows its unit price from the catalog immediately. Scenarios supported:
+    - **Retail Upgrades**: Patient asks to purchase prescription toothpaste, interdental brushes, or other retail products at the front desk.
+    - **Unplanned Clinical Additions**: Doctor informs secretary of a special material used (e.g., bone graft) that isn't on the standard template — secretary tacks it on before finalizing.
+  - **Granular Adjustments**:
+    - Overall flat discount percentage (0–100%) applied across all line items.
+    - Flat-rate manual adjustment if role permissions allow.
   - **Payment Method**: Dropdown — `CASH`, `CARD`, `HMO`.
-  - **Complete Checkout** button:
+  - **Complete Checkout** button (Atomic RPC):
+    - Pushes all active UI line items (both clinical originals and front-desk additions) into the finalized billing schema.
     - Updates `invoices` status → `FINALIZED`.
     - Updates appointment status → `COMPLETED`.
-    - Inserts a ledger entry into `appointment_status_history`.
-    - Triggers async outbox notification event (e.g., receipt email).
+    - Automatically inserts a ledger row into `appointment_status_history`.
+    - Triggers async outbox notification event (e.g., receipt email via `next/server after()`).
     - Card moves to Column 5.
 
 ---

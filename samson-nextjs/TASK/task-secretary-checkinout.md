@@ -109,3 +109,64 @@ Implement the 5-column Kanban board at `/secretary/check-in` for managing daily 
 - `[x]` Pass `p_expected_status` from each use-case into `updateAppointmentStatusTransactionCommand` for check-in (`APPROVED`), no-show (`APPROVED`), undo-check-in (`CHECKED_IN`).
 - `[x]` Update `updateAppointmentStatusTransactionCommand` signature to accept optional `expectedStatus`.
 - `[x]` Update use-cases to pass expected status down.
+
+---
+
+## Dynamic Line-Item Checkout (Invoicing Upgrade)
+
+> **Feature**: Upgrade the Checkout & Invoicing panel from a single price-override input to a full **dynamic line-item builder** that allows the secretary to append additional services/retail items on top of the doctor's initial draft. This reflects real-world clinic workflows where patients add retail purchases or the doctor verbally requests materials to be billed at the front desk.
+>
+> **Reference**: [7-CHECK-IN-OUT.md — Column 4 Checkout & Invoicing Panel](file:///c:/Users/picar/Desktop/samson-website/.CORE_DOCUMENTATION/SERVERLESS_ARCHI/1-BUSSINESS-PLAN/5-SECRETARY-PORTAL/7-CHECK-IN-OUT.md)
+
+### Database Schema
+
+- `[x]` Verify `invoice_items` table exists with columns: `id`, `invoice_id` (FK → `invoices`), `service_id` (FK → `services`, nullable for free-text items), `description`, `unit_price`, `quantity`, `source` (`DOCTOR_BASELINE` | `SECRETARY_ADDITION`), `created_at`.
+- `[x]` Ensure `invoices` table `total_amount` is recomputed or overridden at finalization time (not stored live during editing — computed from line items + discount at checkout RPC).
+- `[x]` Write migration to add `source` enum column to `invoice_items` if not already present.
+
+### Backend & Domain Layer
+
+- `[x]` **DTOs**: Extend `FinalizeInvoiceDto` in [finalize-invoice.dto.ts](file:///c:/Users/picar/Desktop/samson-website/samson-nextjs/src/modules/billing/dtos/invoicing/finalize-invoice.dto.ts):
+  - Add `additionalItems: { serviceId?: string; description: string; unitPrice: number; quantity: number }[]` (optional, defaults to `[]`).
+  - Add `discountPercent?: number` (0–100) alongside or replacing flat `discountApplied`.
+- `[x]` **Repository**: Implement `getServiceCatalogQuery(supabase)` — fetches all active services from `services` table for the dropdown search (id, name, price).
+- `[x]` **Repository**: Update `completeCheckoutCommand` / `complete_checkout_transaction` RPC to accept an array of additional line items and insert them into `invoice_items` before finalizing.
+- `[x]` **Use Case**: Update `finalizeInvoiceUseCase` to pass `additionalItems` from DTO through to the command.
+- `[x]` **Use Case**: Compute final `totalAmount = sum(baselineItems) + sum(additionalItems) - discount` inside the use-case or RPC before writing.
+
+### Checkout RPC Changes
+
+- `[x]` Update `complete_checkout_transaction` PG function to accept `p_additional_items JSONB DEFAULT '[]'`.
+- `[x]` Inside RPC: loop over `p_additional_items`, insert each as a row in `invoice_items` with `source = 'SECRETARY_ADDITION'`.
+- `[x]` Recompute `total_amount` inside the RPC from all `invoice_items` rows (baseline + additions) minus discount before setting `invoices.status = FINALIZED`.
+- `[x]` Create migration for the updated `complete_checkout_transaction` function signature.
+
+### Frontend UI — Checkout Panel Upgrade
+
+- `[x]` **Service Catalog Fetch**: On panel open, fetch available services from `services` table (via server action or query). Cache result for the session.
+- `[x]` **Line Items Display**: Replace the single price input with a dynamic list:
+  - Render doctor-prescribed service from the appointment/invoice as a structured billing row, visually labelled "Doctor Prescribed".
+  - Service name + doctor subtext on the left, price on the right — read-only baseline row.
+  - Removed flat price-override field; amount is now pulled from the invoice record directly.
+- `[x]` **Add Item UI** (future phase):
+  - Searchable dropdown (combobox) bound to the services catalog.
+  - Auto-fills unit price from catalog on selection.
+  - `+ Add Item` button appends item to local line-items array.
+  - Quantity input (default 1) per added item.
+- `[x]` **Totals Computation** (client-side live preview):
+  - `subtotal = sum(all line items × quantity)`
+  - `discount = subtotal × (discountPercent / 100)`
+  - `totalDue = subtotal - discount`
+  - Display live-updating `💰 TOTAL DUE` as items are added or removed.
+- `[x]` **Adjustments Row**: Discount percentage input (0–100). Remove the flat price-override field.
+- `[x]` **Submit**: Pass all line items (baseline ids + new additions array) and `discountPercent` into `FinalizeInvoiceDto` when calling `checkoutAction`.
+- `[x]` Handle loading and error states on the panel (spinner on submit, toast on failure).
+
+### Quality Assurance
+
+- `[x]` **Unit Tests**: Write tests for updated `finalizeInvoiceUseCase` verifying:
+  - Baseline items preserved, additional items appended.
+  - Total correctly computed with and without discount.
+  - Rejects if `discountPercent` out of 0–100 range.
+- `[x]` **Unit Tests**: Write tests for updated RPC command mock verifying additional items payload is passed through.
+- `[x]` **E2E (Playwright)**: Add a checkout flow test that adds one extra service line item, verifies total updates, and confirms checkout completes with the correct `invoice_items` count in DB.
