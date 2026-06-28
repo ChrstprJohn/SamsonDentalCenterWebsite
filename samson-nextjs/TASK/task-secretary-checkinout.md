@@ -39,8 +39,8 @@ Implement the 5-column Kanban board at `/secretary/check-in` for managing daily 
     - `[x]` *Tested & Verified: Check-in button works and updates state in DB.*
   - `[x]` Implement Column 2: **NO-SHOW**
     - `[x]` Render today's missed slot appointments.
-    - `[x]` Add "Reschedule" button pointing to reschedule modal.
-    - `[x]` *Tested & Verified: No-Show transition works and correctly flags missed appointments.*
+    - `[x]` Add "Reschedule" button pointing to reschedule modal (untested).
+    - `[x]` *Tested & Verified: No-Show transition works and correctly flags missed appointments (reschedule action flow untested).*
   - `[x]` Implement Column 3: **CHECKED IN**
     - `[x]` Render ongoing appointments.
     - `[x]` Add confirmation modal for "Undo Check-In" action.
