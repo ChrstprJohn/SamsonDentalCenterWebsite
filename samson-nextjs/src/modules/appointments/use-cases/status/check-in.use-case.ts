@@ -1,6 +1,7 @@
 import { AppointmentStatusValue } from '../../repositories/exports';
 import { ValidationError } from '@/shared/errors';
 import { AppointmentDto } from '../../dtos/exports';
+import { getClinicNaiveDate } from '@/shared/utils/date.util';
 
 export const checkInUseCase = (deps: {
   getAppointmentById: (appointmentId: string) => Promise<AppointmentDto>;
@@ -11,6 +12,7 @@ export const checkInUseCase = (deps: {
     newStatus: AppointmentStatusValue,
     reason?: string
   ) => Promise<AppointmentDto>;
+  getCurrentTime?: () => Date;
 }) => {
   return async (
     appointmentId: string,
@@ -27,7 +29,8 @@ export const checkInUseCase = (deps: {
       );
     }
 
-    const now = new Date();
+    const getCurrentTime = deps.getCurrentTime || (() => getClinicNaiveDate(new Date()));
+    const now = getCurrentTime();
     const startTime = new Date(appointment.startTime);
     const endTime = new Date(appointment.endTime);
     const windowStart = new Date(startTime.getTime() - 30 * 60 * 1000);
@@ -48,3 +51,4 @@ export const checkInUseCase = (deps: {
     );
   };
 };
+

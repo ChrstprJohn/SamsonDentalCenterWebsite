@@ -41,6 +41,7 @@ describe('markNoShowUseCase', () => {
     const useCase = markNoShowUseCase({
       getAppointmentById,
       updateAppointmentStatusTransaction,
+      getCurrentTime: () => new Date(),
     });
 
     const result = await useCase('appt-id', 'actor-id', 'STAFF');
@@ -66,6 +67,7 @@ describe('markNoShowUseCase', () => {
     const useCase = markNoShowUseCase({
       getAppointmentById,
       updateAppointmentStatusTransaction,
+      getCurrentTime: () => new Date(),
     });
 
     await expect(useCase('appt-id', 'actor-id', 'STAFF')).rejects.toThrow(
@@ -86,6 +88,7 @@ describe('markNoShowUseCase', () => {
     const useCase = markNoShowUseCase({
       getAppointmentById,
       updateAppointmentStatusTransaction,
+      getCurrentTime: () => new Date(),
     });
 
     await expect(useCase('appt-id', 'actor-id', 'STAFF')).rejects.toThrow(

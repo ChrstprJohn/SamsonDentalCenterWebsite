@@ -4,29 +4,29 @@ Implement the 5-column Kanban board at `/secretary/check-in` for managing daily 
 
 ## Backend & Domain Layer (Modulith Architecture)
 
-- `[x]` **DTOs & Validation Rules** (Satisfied by generic DTOs: `StaffUpdateAppointmentStatusDto`, `FinalizeInvoiceDto`)
-  - `[x]` Create `CheckInDto` (validate `appointment_id`, `actor_role = 'secretary'`).
-  - `[x]` Create `NoShowDto` (validate `appointment_id`, `actor_role = 'secretary'`).
-  - `[x]` Create `UndoCheckInDto` (validate `appointment_id`, `actor_role = 'secretary'`).
-  - `[x]` Create `CheckoutInvoiceDto` (validate `appointment_id`, flat override, discount %, payment method).
+- `[x]` **DTOs & Validation Rules** (Dedicated schema per operation in aggregate subfolders)
+  - `[x]` Create `CheckInDto` in [check-in.dto.ts](file:///c:/Users/picar/Desktop/samson-website/samson-nextjs/src/modules/appointments/dtos/status/check-in.dto.ts) (validate `appointmentId`).
+  - `[x]` Create `MarkNoShowDto` in [mark-no-show.dto.ts](file:///c:/Users/picar/Desktop/samson-website/samson-nextjs/src/modules/appointments/dtos/status/mark-no-show.dto.ts) (validate `appointmentId`).
+  - `[x]` Create `UndoCheckInDto` in [undo-check-in.dto.ts](file:///c:/Users/picar/Desktop/samson-website/samson-nextjs/src/modules/appointments/dtos/status/undo-check-in.dto.ts) (validate `appointmentId`).
+  - `[x]` Create `FinalizeInvoiceDto` in [finalize-invoice.dto.ts](file:///c:/Users/picar/Desktop/samson-website/samson-nextjs/src/modules/billing/dtos/invoicing/finalize-invoice.dto.ts) (validate `invoiceId`, `paymentMethod`, optional `discountApplied`, optional `amount` override).
 
-- `[x]` **Repository Layer (Supabase Queries / Commands)** (Satisfied by existing repositories)
+- `[x]` **Repository Layer (Supabase Queries & Commands)** (Functional queries/commands in resource subfolders)
   - `[x]` Implement query to fetch today's appointments (filter `appointment_date = today` only).
-  - `[x]` Implement query/command to update appointment status.
-  - `[x]` Implement query/command to write to `appointment_status_history` using admin client (bypassing RLS).
-  - `[x]` Implement invoice queries (fetch draft, finalize status).
+  - `[x]` Implement command to update appointment status with ledger writes.
+  - `[x]` Implement `updateAppointmentStatusTransactionCommand` using admin client to bypass RLS.
+  - `[x]` Implement invoice queries/commands to fetch draft and finalize status.
 
-- `[x]` **Use Case Layer** (Satisfied by existing use cases)
-  - `[x]` Create `CheckInUseCase` (updates status, inserts ledger log).
-  - `[x]` Create `UndoCheckInUseCase` (reverts status, inserts ledger log).
-  - `[x]` Create `MarkNoShowUseCase` (updates status, inserts ledger log).
-  - `[x]` Create `CheckoutInvoiceUseCase` (orchestrates completing appointment, finalizing invoice, writing history).
+- `[x]` **Use Case Layer** (Dedicated use-case per operation)
+  - `[x]` Create `checkInUseCase` in [check-in.use-case.ts](file:///c:/Users/picar/Desktop/samson-website/samson-nextjs/src/modules/appointments/use-cases/status/check-in.use-case.ts) (updates status to `CHECKED_IN`, writes history log).
+  - `[x]` Create `undoCheckInUseCase` in [undo-check-in.use-case.ts](file:///c:/Users/picar/Desktop/samson-website/samson-nextjs/src/modules/appointments/use-cases/status/undo-check-in.use-case.ts) (reverts status to `APPROVED`, writes history log).
+  - `[x]` Create `markNoShowUseCase` in [mark-no-show.use-case.ts](file:///c:/Users/picar/Desktop/samson-website/samson-nextjs/src/modules/appointments/use-cases/status/mark-no-show.use-case.ts) (updates status to `NO_SHOW`, writes history log).
+  - `[x]` Create `finalizeInvoiceUseCase` in [finalize-invoice.use-case.ts](file:///c:/Users/picar/Desktop/samson-website/samson-nextjs/src/modules/billing/use-cases/invoicing/finalize-invoice.use-case.ts) and orchestrate checkout via `checkoutOrchestrator` in [checkout.orchestrator.ts](file:///c:/Users/picar/Desktop/samson-website/samson-nextjs/src/orchestrators/checkout.orchestrator.ts).
 
-- `[x]` **Server Actions Layer** (Satisfied by existing server actions: `updateAppointmentStatusAction`, `checkoutAction`)
-  - `[x]` Implement `checkInAction` (revalidate path `/secretary/check-in`).
-  - `[x]` Implement `undoCheckInAction` (revalidate path `/secretary/check-in`).
-  - `[x]` Implement `markNoShowAction` (revalidate path `/secretary/check-in`).
-  - `[x]` Implement `checkoutInvoiceAction` (revalidate path `/secretary/check-in`).
+- `[x]` **Server Actions Layer** (Dedicated server action file per operation)
+  - `[x]` Implement `checkInAction` in [check-in.action.ts](file:///c:/Users/picar/Desktop/samson-website/samson-nextjs/src/modules/appointments/actions/status/check-in.action.ts).
+  - `[x]` Implement `undoCheckInAction` in [undo-check-in.action.ts](file:///c:/Users/picar/Desktop/samson-website/samson-nextjs/src/modules/appointments/actions/status/undo-check-in.action.ts).
+  - `[x]` Implement `markNoShowAction` in [mark-no-show.action.ts](file:///c:/Users/picar/Desktop/samson-website/samson-nextjs/src/modules/appointments/actions/status/mark-no-show.action.ts).
+  - `[x]` Implement `checkoutAction` in [checkout.action.ts](file:///c:/Users/picar/Desktop/samson-website/samson-nextjs/src/modules/billing/actions/invoicing/checkout.action.ts) (triggers `checkoutOrchestrator` and uses Next.js `after` for async receipts).
 
 ## Frontend UI Components & Views
 
@@ -52,27 +52,23 @@ Implement the 5-column Kanban board at `/secretary/check-in` for managing daily 
 ## Bug Fixes & Correctness
 
 - `[x]` **Timezone-safe date handling**
-  - `[x]` Extracted `getTodayLocalDateStr()` into `src/shared/utils/date.util.ts` — replaces `new Date().toISOString().split('T')[0]` (UTC) with a local-timezone-safe YYYY-MM-DD string. Prevents wrong-day fetches for UTC+8 users between 00:00–08:00 local time.
-  - `[x]` Replaced raw `toLocaleTimeString()` calls in kanban cards with `formatClinicTime()` from shared util so all pages display times consistently in UTC (matching how `start_time` is stored as `TIMESTAMPTZ`).
-
-- `[x]` **Check-in time gate wrong timezone comparison (reported by Christopher Picardo)**
-  - `[x]` Root cause: `start_time` stored as naive-UTC (e.g. `09:00:00Z` = "9 AM clinic local", not real UTC). `new Date()` returns real UTC epoch — 8hr offset caused "Too early" all morning for UTC+8 users.
-  - `[x]` Fix: `toNaiveUtc(d)` helper — takes local clock components, builds a `Date.UTC(...)` so both sides of the comparison are in the same naive-UTC space. Applied in `page.tsx` (`getCheckInStatus`).
-  - `[x]` Fix: SSR/hydration mismatch — server TZ ≠ browser TZ caused gate to flash "Slot expired → Too early" on reload. Changed `currentTime` to init as `null`, set client-side only in `useEffect` with a 60s tick interval. Added `null` guard in `getCheckInStatus` and `isPastEnd`.
-
-- `[x]` **Duplicate rogue timer overwriting naive-UTC currentTime (reported by Christopher Picardo)**
-  - `[x]` Root cause: second `useEffect` had `setInterval(() => setCurrentTime(new Date()), 10000)` — raw `Date` with no `toNaiveUtc`. Fired every 10s and overwrote the correctly offset `currentTime` set by the first `useEffect`, reverting the gate back to real-UTC space → "Too early" persisted all morning for UTC+8.
-  - `[x]` Fix: Removed rogue `setInterval` from second `useEffect`. First `useEffect` already owns the 60s tick with `toNaiveUtc`. `currentTime` now stays in naive-UTC space permanently.
+  - `[x]` Extracted `getTodayLocalDateStr()` into `src/shared/utils/date.util.ts` — YYYY-MM-DD local string instead of UTC mismatch.
+  - `[x]` Replaced raw `toLocaleTimeString()` calls with `formatClinicTime()` from shared util for consistent timezone display.
+- `[x]` **Check-in time gate timezone and SSR/hydration fixes**
+  - `[x]` Created `toNaiveUtc(d)` helper so time comparisons use the same timezone offset.
+  - `[x]` Solved SSR/hydration mismatch by initializing time as `null` and populating client-side only via `useEffect`.
+- `[x]` **Rogue timer removal**
+  - `[x]` Deleted secondary duplicate `setInterval` that was corrupting naive-UTC comparisons.
 
 ## Quality Assurance & Testing (80/15/5 Pyramid)
 
-- `[x]` **Unit Tests (Vitest)**
+- `[x]` **Unit Tests (Vitest)** (Co-located `*.spec.ts` files next to source files)
   - `[x]` Write tests for DTO validation (`check-in.dto.spec.ts`, `undo-check-in.dto.spec.ts`, `mark-no-show.dto.spec.ts`).
-  - `[x]` Write tests for use-cases (`CheckInUseCase`, `UndoCheckInUseCase`, `MarkNoShowUseCase`) mocking repository layers.
+  - `[x]` Write tests for use-cases (`check-in.use-case.spec.ts`, `undo-check-in.use-case.spec.ts`, `mark-no-show.use-case.spec.ts`) mocking repositories.
   - `[x]` Write tests for server actions (`check-in.action.spec.ts`, `undo-check-in.action.spec.ts`, `mark-no-show.action.spec.ts`).
   - `[x]` Fix stale test mocks across booking specs missing `doctorAssignmentSource` field (TS2345/TS2741).
 
-- `[ ]` **E2E & Integration Tests (Playwright)**
-  - `[ ]` Implement test verifying state transition flow: Col 1 -> Col 3 -> Col 4 -> Col 5.
+- `[ ]` **E2E & Integration Tests (Playwright)** (Located in root `e2e/` folder)
+  - `[ ]` Implement E2E test verifying state transition flow: Col 1 -> Col 3 -> Col 4 -> Col 5.
   - `[ ]` Test real-time subscription update by simulating doctor committing notes.
   - `[ ]` Test checkout pricing validations and discount limits.

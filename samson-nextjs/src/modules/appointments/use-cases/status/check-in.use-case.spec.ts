@@ -41,6 +41,7 @@ describe('checkInUseCase', () => {
     const useCase = checkInUseCase({
       getAppointmentById,
       updateAppointmentStatusTransaction,
+      getCurrentTime: () => new Date(),
     });
 
     const result = await useCase('appt-id', 'actor-id', 'STAFF');
@@ -66,6 +67,7 @@ describe('checkInUseCase', () => {
     const useCase = checkInUseCase({
       getAppointmentById,
       updateAppointmentStatusTransaction,
+      getCurrentTime: () => new Date(),
     });
 
     await expect(useCase('appt-id', 'actor-id', 'STAFF')).rejects.toThrow(
@@ -84,6 +86,7 @@ describe('checkInUseCase', () => {
     const useCase = checkInUseCase({
       getAppointmentById,
       updateAppointmentStatusTransaction,
+      getCurrentTime: () => new Date(),
     });
 
     await expect(useCase('appt-id', 'actor-id', 'STAFF')).rejects.toThrow(
@@ -102,6 +105,7 @@ describe('checkInUseCase', () => {
     const useCase = checkInUseCase({
       getAppointmentById,
       updateAppointmentStatusTransaction,
+      getCurrentTime: () => new Date(),
     });
 
     await expect(useCase('appt-id', 'actor-id', 'STAFF')).rejects.toThrow(

@@ -1,6 +1,7 @@
 import { AppointmentStatusValue } from '../../repositories/exports';
 import { ValidationError } from '@/shared/errors';
 import { AppointmentDto } from '../../dtos/exports';
+import { getClinicNaiveDate } from '@/shared/utils/date.util';
 
 export const markNoShowUseCase = (deps: {
   getAppointmentById: (appointmentId: string) => Promise<AppointmentDto>;
@@ -11,6 +12,7 @@ export const markNoShowUseCase = (deps: {
     newStatus: AppointmentStatusValue,
     reason?: string
   ) => Promise<AppointmentDto>;
+  getCurrentTime?: () => Date;
 }) => {
   return async (
     appointmentId: string,
@@ -27,7 +29,8 @@ export const markNoShowUseCase = (deps: {
       );
     }
 
-    const now = new Date();
+    const getCurrentTime = deps.getCurrentTime || (() => getClinicNaiveDate(new Date()));
+    const now = getCurrentTime();
     const endTime = new Date(appointment.endTime);
 
     if (now <= endTime) {
@@ -46,3 +49,4 @@ export const markNoShowUseCase = (deps: {
     );
   };
 };
+

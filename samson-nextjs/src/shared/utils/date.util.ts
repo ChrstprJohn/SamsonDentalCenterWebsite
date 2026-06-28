@@ -66,3 +66,13 @@ export function getTodayLocalDateStr(): string {
   const dd = String(d.getDate()).padStart(2, '0');
   return `${yyyy}-${mm}-${dd}`;
 }
+
+/**
+ * Returns the current date/time shifted to the clinic's naive-UTC space.
+ * Assuming clinic is in Asia/Manila (UTC+8).
+ */
+export function getClinicNaiveDate(d: Date = new Date()): Date {
+  const clinicOffsetMinutes = -480; // UTC+8
+  return new Date(d.getTime() - clinicOffsetMinutes * 60 * 1000);
+}
+
