@@ -17,10 +17,12 @@ export async function updateDoctorAction(
     const supabaseAdmin = await createAdminClient();
     const doctorId = validatedData.id;
 
-    // 1. Update Auth user metadata
+    // 1. Update Auth user metadata & email
     const { error: authUpdateError } = await supabaseAdmin.auth.admin.updateUserById(
       doctorId,
       {
+        email: validatedData.email,
+        email_confirm: true,
         user_metadata: {
           first_name: validatedData.firstName,
           last_name: validatedData.lastName,
@@ -29,6 +31,11 @@ export async function updateDoctorAction(
           phone: validatedData.phoneNumber,
           specialization: validatedData.specialization,
           is_active: validatedData.isActive,
+          // Trigger compatibility keys:
+          firstName: validatedData.firstName,
+          lastName: validatedData.lastName,
+          middleName: validatedData.middleName || null,
+          phoneNumber: validatedData.phoneNumber,
         },
       }
     );
@@ -44,6 +51,7 @@ export async function updateDoctorAction(
     const { error: userUpdateError } = await supabaseAdmin
       .from('users')
       .update({
+        email: validatedData.email,
         first_name: validatedData.firstName,
         last_name: validatedData.lastName,
         middle_name: validatedData.middleName || null,

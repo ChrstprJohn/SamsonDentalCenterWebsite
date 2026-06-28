@@ -31,14 +31,9 @@ export function ForcePasswordChangeForm() {
     try {
       const response = await forcePasswordChangeAction({ password });
       if (response.success) {
-        addToast('Password updated successfully! Please log in again.', 'success');
-        
-        // Log out user to clear session
-        const { createClient } = await import('@/shared/database/client');
-        const supabase = createClient();
-        await supabase.auth.signOut();
-        
-        router.push('/login');
+        addToast('Password updated successfully! Welcome to your dashboard.', 'success');
+        router.push('/doctor');
+        router.refresh();
       } else {
         setError(response.error || 'Failed to update password');
         addToast(response.error || 'Failed to update password', 'error');
