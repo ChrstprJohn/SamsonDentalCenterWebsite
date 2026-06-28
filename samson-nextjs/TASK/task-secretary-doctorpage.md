@@ -78,3 +78,28 @@ Implementing the Doctor Management page at `/secretary/doctors` adhering strictl
   - [x] Verify adding a doctor copies Layer 1 baseline schedules (Mon-Fri 8am-5pm) to Layer 2 shifts.
   - [x] Verify adding and removing service pills updates the junction table.
   - [ ] Verify first login intercept works correctly and forces redirection.
+
+---
+
+## 🔄 6. Doctor Status States (Active, Hidden, Archived)
+
+- [ ] **Database & Schema Configuration**:
+  - [ ] Run a migration or execute DDL to add a `status` column to the `users` table with type `TEXT` and constraint `CHECK (status IN ('ACTIVE', 'HIDDEN', 'ARCHIVED'))` defaulting to `'ACTIVE'`.
+  - [ ] Ensure any seed files or existing doctor profiles are populated with `'ACTIVE'` status.
+- [ ] **Server Actions & Schemas (Backend)**:
+  - [ ] Update `use-doctor-form-schema.ts` to replace the `isActive` boolean with `status: z.enum(['ACTIVE', 'HIDDEN', 'ARCHIVED'])`.
+  - [ ] Update `create-doctor.action.ts` to write the selected status (default `'ACTIVE'`) to both the database `users.status` column and Auth `user_metadata.status`.
+  - [ ] Update `update-doctor.action.ts` to handle updating the `status` column in `users` and `user_metadata`.
+- [ ] **Frontend Integration (Secretary Portal)**:
+  - [ ] Update `doctor-edit-form.tsx` to replace the operational status checkbox with a dropdown selector or radio option group for `ACTIVE`, `HIDDEN`, and `ARCHIVED`.
+  - [ ] Update `doctor-card.tsx` to show status badges: `ACTIVE` (Green), `HIDDEN` (Amber/Orange - "Hidden on Website"), and `ARCHIVED` (Red - "Retired/Inactive").
+  - [ ] Update quick status selector in `doctor-details-pane.tsx` to support the three statuses.
+  - [ ] Update roster search and status filter options in `use-doctor-management.ts` and `doctor-list.tsx` to handle the new states.
+- [ ] **Booking Availability Rules**:
+  - [ ] **Online Booking (Public)**: Filter out doctors with status `HIDDEN` or `ARCHIVED` from the public availability and booking paths.
+  - [ ] **Manual Booking (Secretary)**: Filter out `ARCHIVED` doctors from the booking selectors, but keep `HIDDEN` doctors select-able for internal bookings.
+  - [ ] Update corresponding queries and actions returning doctor rosters (e.g. `getAvailableDoctors`, `getAvailableDays`, or related RPCs).
+- [ ] **Verification**:
+  - [ ] Write/update unit tests in `use-doctor-form.spec.ts` for status Zod validations.
+  - [ ] Manually verify `HIDDEN` doctors cannot be seen/booked online but can be selected internally.
+  - [ ] Manually verify `ARCHIVED` doctors cannot be seen or booked anywhere.
