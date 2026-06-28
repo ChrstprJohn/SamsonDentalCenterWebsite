@@ -2,9 +2,9 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { updateSession } from '@/shared/database/middleware'
 
 const ROLE_PERMISSIONS: Record<string, string[]> = {
-  ADMIN: ['/admin', '/secretary', '/user'],
-  SECRETARY: ['/secretary', '/user'],
-  DOCTOR: ['/doctor', '/user'],
+  ADMIN: ['/admin'],
+  SECRETARY: ['/secretary'],
+  DOCTOR: ['/doctor'],
   PATIENT: ['/user'],
 };
 
