@@ -1,0 +1,149 @@
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { SupabaseClient } from "@supabase/supabase-js";
+import {
+  generateInvoiceCommand,
+  updateInvoiceCommand,
+  finalizeInvoiceCommand,
+} from "./invoice.commands";
+
+const mockFrom = vi.fn();
+const mockInsert = vi.fn();
+const mockUpdate = vi.fn();
+const mockEq = vi.fn();
+const mockSelect = vi.fn();
+const mockSingle = vi.fn();
+
+const mockSupabase = {
+  from: mockFrom,
+} as unknown as SupabaseClient;
+
+describe("InvoiceCommandsRepository", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+
+    mockFrom.mockReturnValue({
+      insert: mockInsert,
+      update: mockUpdate,
+    });
+    mockInsert.mockReturnValue({ select: mockSelect });
+    mockUpdate.mockReturnValue({ eq: mockEq });
+    mockEq.mockReturnValue({ select: mockSelect });
+    mockSelect.mockReturnValue({ single: mockSingle });
+  });
+
+  it("generates an invoice", async () => {
+    mockSingle.mockResolvedValue({
+      data: {
+        id: "da95a63c-333e-4b68-98e3-82bdf1a07bd2",
+        appointment_id: "1a95a63c-333e-4b68-98e3-82bdf1a07bd2",
+        amount: "900",
+        status: "DRAFT",
+      },
+      error: null,
+    });
+
+    const cmd = generateInvoiceCommand(mockSupabase);
+    const result = await cmd({
+      appointmentId: "1a95a63c-333e-4b68-98e3-82bdf1a07bd2",
+      amount: 900,
+      status: "DRAFT",
+    });
+
+    expect(mockFrom).toHaveBeenCalledWith("invoices");
+    expect(result.amount).toBe(900);
+  });
+
+  it("throws when invoice generation fails", async () => {
+    mockSingle.mockResolvedValue({ data: null, error: { message: "DB error" } });
+
+    const cmd = generateInvoiceCommand(mockSupabase);
+    await expect(
+      cmd({
+        appointmentId: "1a95a63c-333e-4b68-98e3-82bdf1a07bd2",
+        amount: 900,
+        status: "DRAFT",
+      })
+    ).rejects.toThrow("Failed to generate invoice: DB error");
+  });
+
+  it("updates an invoice", async () => {
+    mockSingle.mockResolvedValue({
+      data: {
+        id: "da95a63c-333e-4b68-98e3-82bdf1a07bd2",
+        appointment_id: "1a95a63c-333e-4b68-98e3-82bdf1a07bd2",
+        amount: 1200,
+        status: "FINALIZED",
+      },
+      error: null,
+    });
+
+    const cmd = updateInvoiceCommand(mockSupabase);
+    const result = await cmd({
+      id: "da95a63c-333e-4b68-98e3-82bdf1a07bd2",
+      amount: 1200,
+      status: "FINALIZED",
+    });
+
+    expect(result.status).toBe("FINALIZED");
+  });
+
+  it("throws when invoice update fails", async () => {
+    mockSingle.mockResolvedValue({ data: null, error: { message: "Update failed" } });
+
+    const cmd = updateInvoiceCommand(mockSupabase);
+    await expect(
+      cmd({
+        id: "da95a63c-333e-4b68-98e3-82bdf1a07bd2",
+        status: "VOID",
+      })
+    ).rejects.toThrow("Failed to update invoice: Update failed");
+  });
+
+  describe("finalizeInvoice", () => {
+    it("finalizes an invoice successfully", async () => {
+      mockSingle.mockResolvedValue({
+        data: {
+          id: "da95a63c-333e-4b68-98e3-82bdf1a07bd2",
+          appointment_id: "1a95a63c-333e-4b68-98e3-82bdf1a07bd2",
+          amount: 1400,
+          status: "FINALIZED",
+          payment_method: "CASH",
+          discount_applied: 100,
+        },
+        error: null,
+      });
+
+      const cmd = finalizeInvoiceCommand(mockSupabase);
+      const result = await cmd({
+        invoiceId: "da95a63c-333e-4b68-98e3-82bdf1a07bd2",
+        paymentMethod: "CASH",
+        discountApplied: 100,
+        amount: 1400,
+      });
+
+      expect(result.status).toBe("FINALIZED");
+      expect(result.paymentMethod).toBe("CASH");
+      expect(result.discountApplied).toBe(100);
+      expect(mockFrom).toHaveBeenCalledWith("invoices");
+      expect(mockUpdate).toHaveBeenCalledWith({
+        status: "FINALIZED",
+        payment_method: "CASH",
+        discount_applied: 100,
+        amount: 1400,
+      });
+    });
+
+    it("throws when finalization database query fails", async () => {
+      mockSingle.mockResolvedValue({ data: null, error: { message: "Finalization failed" } });
+
+      const cmd = finalizeInvoiceCommand(mockSupabase);
+      await expect(
+        cmd({
+          invoiceId: "da95a63c-333e-4b68-98e3-82bdf1a07bd2",
+          paymentMethod: "CARD",
+        })
+      ).rejects.toThrow("Failed to finalize invoice: Finalization failed");
+    });
+  });
+});
+
