@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Doctor } from '../hooks/use-doctor-management';
+import { formatTimeString } from '@/shared/utils/date.util';
 
 interface DoctorReadPaneProps {
   doctor: Doctor | null;
@@ -59,14 +60,7 @@ export function DoctorReadPane({ doctor }: DoctorReadPaneProps) {
         </h4>
         <div className="flex flex-col gap-1.5 text-[11px] text-text-muted">
           {(() => {
-            const formatTime = (timeStr: string) => {
-              if (!timeStr) return '';
-              const [hoursStr, minutesStr] = timeStr.split(':');
-              const hours = parseInt(hoursStr, 10);
-              const ampm = hours >= 12 ? 'PM' : 'AM';
-              const displayHours = hours % 12 === 0 ? 12 : hours % 12;
-              return `${displayHours}:${minutesStr} ${ampm}`;
-            };
+            const formatTime = formatTimeString;
 
             const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 

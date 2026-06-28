@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { MapPin, Phone, Mail, ShieldCheck, Lock, Award, Calendar, Sparkles } from 'lucide-react';
 import type { ClinicConfigResponseDto } from '@/modules/clinic-config/dtos/settings/get-clinic-config.dto';
 
+import { formatTimeString } from '@/shared/utils/date.util';
+
 interface FooterProps {
   config: ClinicConfigResponseDto | null;
 }
@@ -36,14 +38,7 @@ export function Footer({ config }: FooterProps) {
   const phone = config?.phone ?? '+1 (555) 234-8890';
   const email = config?.email ?? 'contact@samsondental.com';
 
-  const formatTime = (timeStr: string | null) => {
-    if (!timeStr) return '';
-    const [hours, minutes] = timeStr.split(':');
-    const hr = parseInt(hours, 10);
-    const ampm = hr >= 12 ? 'PM' : 'AM';
-    const displayHr = hr % 12 || 12;
-    return `${displayHr}:${minutes} ${ampm}`;
-  };
+  const formatTime = formatTimeString;
 
   const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
 
