@@ -79,34 +79,26 @@ export function DoctorReadPane({ doctor }: DoctorReadPaneProps) {
                   {sortedSchedules.map((sched) => (
                     <div key={sched.dayOfWeek} className="flex justify-between py-1 border-b border-card-border/20 last:border-b-0">
                       <span className="font-medium text-text-secondary">{dayNames[sched.dayOfWeek]}</span>
-                      <span>
-                        {formatTime(sched.startTime)} - {formatTime(sched.endTime)}
-                      </span>
+                      {sched.isOpen ? (
+                        <span>
+                          {formatTime(sched.startTime)} - {formatTime(sched.endTime)}
+                        </span>
+                      ) : (
+                        <span className="text-red-500/75 font-medium">Off-Duty</span>
+                      )}
                     </div>
                   ))}
-                  {/* Highlight weekends/days off if they aren't mapped */}
-                  {Array.from({ length: 7 }).map((_, idx) => {
-                    if (!doctor.schedules?.some((s) => s.dayOfWeek === idx)) {
-                      return (
-                        <div key={`off-${idx}`} className="flex justify-between py-1 text-red-500/75 last:border-b-0">
-                          <span className="font-medium">{dayNames[idx]}</span>
-                          <span>Off-Duty</span>
-                        </div>
-                      );
-                    }
-                    return null;
-                  })}
                 </>
               );
             }
 
-            // Fallback default schedules (Mon-Fri 8:00 AM - 5:00 PM)
+            // Fallback default schedules (Mon-Fri 9:00 AM - 5:00 PM)
             return (
               <>
                 {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map((day) => (
                   <div key={day} className="flex justify-between py-1 border-b border-card-border/20 last:border-b-0">
                     <span className="font-medium text-text-secondary">{day}</span>
-                    <span>8:00 AM - 5:00 PM</span>
+                    <span>9:00 AM - 5:00 PM</span>
                   </div>
                 ))}
                 <div className="flex justify-between py-1 text-red-500/75">

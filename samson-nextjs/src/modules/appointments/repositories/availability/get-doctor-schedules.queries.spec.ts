@@ -46,6 +46,8 @@ describe('getDoctorSchedulesQuery', () => {
       endTime: '17:00:00',
       breakStartTime: null,
       breakEndTime: null,
+      isCustom: true,
+      isOpen: true,
       doctorName: 'Dr. John Doe',
     }]);
   });

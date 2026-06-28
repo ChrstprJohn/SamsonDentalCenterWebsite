@@ -48,6 +48,14 @@ export default async function SecretaryDoctorsPage() {
     console.error('Failed to load doctor schedules:', schedulesError);
   }
 
+  // 3.6. Fetch clinic config settings
+  const adminDb = await createAdminClient();
+  const { data: clinicConfig } = await adminDb
+    .from('clinic_config')
+    .select('operating_hours')
+    .eq('is_singleton', true)
+    .single();
+
   // 4. Fetch auth users to get metadata status & specialization
   let authUsers: any[] = [];
   try {
@@ -73,15 +81,35 @@ export default async function SecretaryDoctorsPage() {
       .filter((ds: any) => ds.doctor_id === doc.id)
       .map((ds: any) => ds.service_id);
 
-    const doctorSchedules = (dbDoctorSchedules || [])
-      .filter((ds: any) => ds.doctor_id === doc.id)
-      .map((ds: any) => ({
-        dayOfWeek: ds.day_of_week,
-        startTime: ds.start_time,
-        endTime: ds.end_time,
-        breakStartTime: ds.break_start_time,
-        breakEndTime: ds.break_end_time,
-      }));
+    const rawSchedules = (dbDoctorSchedules || []).filter((ds: any) => ds.doctor_id === doc.id);
+
+    const resolvedSchedules = Array.from({ length: 7 }).map((_, dayNum) => {
+      const custom = rawSchedules.find((s: any) => s.day_of_week === dayNum && s.is_custom);
+      if (custom) {
+        return {
+          dayOfWeek: dayNum,
+          startTime: custom.start_time,
+          endTime: custom.end_time,
+          breakStartTime: custom.break_start_time,
+          breakEndTime: custom.break_end_time,
+          isOpen: custom.is_open,
+          isCustom: true,
+        };
+      }
+      
+      const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+      const dayName = dayNames[dayNum];
+      const baseline = (clinicConfig?.operating_hours as any)?.[dayName] || {};
+      return {
+        dayOfWeek: dayNum,
+        startTime: baseline.open_time ?? baseline.openTime ?? null,
+        endTime: baseline.close_time ?? baseline.closeTime ?? null,
+        breakStartTime: baseline.break_start_time ?? baseline.breakStartTime ?? null,
+        breakEndTime: baseline.break_end_time ?? baseline.breakEndTime ?? null,
+        isOpen: baseline.is_open ?? baseline.isOpen ?? false,
+        isCustom: false,
+      };
+    });
 
     return {
       id: doc.id,
@@ -95,7 +123,7 @@ export default async function SecretaryDoctorsPage() {
       status,
       isActive: doc.is_active,
       services: doctorServiceIds,
-      schedules: doctorSchedules,
+      schedules: resolvedSchedules,
     };
   });
 

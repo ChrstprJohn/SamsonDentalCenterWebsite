@@ -22,6 +22,8 @@ describe('doctorScheduleResponseSchema', () => {
       endTime: validRecord.end_time,
       breakStartTime: validRecord.break_start_time,
       breakEndTime: validRecord.break_end_time,
+      isCustom: true,
+      isOpen: true,
       doctorName: undefined,
     });
   });
@@ -43,6 +45,8 @@ describe('doctorScheduleResponseSchema', () => {
       endTime: validRecord.end_time,
       breakStartTime: validRecord.break_start_time,
       breakEndTime: validRecord.break_end_time,
+      isCustom: true,
+      isOpen: true,
       doctorName: 'Dr. Jane Doe',
     });
   });

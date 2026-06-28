@@ -8,6 +8,8 @@ export interface DoctorSchedule {
   endTime: string;
   breakStartTime?: string | null;
   breakEndTime?: string | null;
+  isOpen?: boolean;
+  isCustom?: boolean;
 }
 
 export interface Doctor {

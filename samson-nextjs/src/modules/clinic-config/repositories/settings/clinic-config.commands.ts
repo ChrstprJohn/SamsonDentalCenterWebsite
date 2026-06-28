@@ -25,6 +25,8 @@ export const updateClinicConfigCommand = (supabase: SupabaseClient) => {
             is_open: dayData.isOpen,
             open_time: dayData.openTime,
             close_time: dayData.closeTime,
+            break_start_time: dayData.breakStartTime || null,
+            break_end_time: dayData.breakEndTime || null,
           };
         }
       }
@@ -32,9 +34,9 @@ export const updateClinicConfigCommand = (supabase: SupabaseClient) => {
     }
 
     const { data: result, error } = await supabase
-      .from("clinic_settings")
+      .from("clinic_config")
       .update(dbPayload)
-      .eq("id", 1)
+      .eq("is_singleton", true)
       .select()
       .single();
 

@@ -10,6 +10,10 @@ vi.mock("../../../../shared/database/server", () => ({
   createClient: vi.fn().mockResolvedValue({}),
 }));
 
+vi.mock("next/cache", () => ({
+  revalidatePath: vi.fn(),
+}));
+
 vi.mock("../../repositories/settings/clinic-config.commands", () => ({
   updateClinicConfigCommand: mocks.updateClinicConfigCommand,
 }));
