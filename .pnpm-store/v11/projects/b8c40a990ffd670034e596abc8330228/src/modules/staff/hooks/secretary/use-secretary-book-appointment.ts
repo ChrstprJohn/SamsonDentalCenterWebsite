@@ -61,7 +61,7 @@ export function useSecretaryBookAppointment() {
   useEffect(() => {
     async function loadServices() {
       setIsLoadingServices(true);
-      const res = await getServicesAction();
+      const res = await getServicesAction('BOOKABLE');
       setIsLoadingServices(false);
       if (res.data) setServices(res.data);
     }

@@ -91,7 +91,7 @@ export function useSecretaryPendingRequests() {
 
   useEffect(() => {
     if (!isEditing || editServices.length > 0) return;
-    getServicesAction().then((res) => { if (res.data) setEditServices(res.data); });
+    getServicesAction('BOOKABLE').then((res) => { if (res.data) setEditServices(res.data); });
   }, [isEditing, editServices.length]);
 
   useEffect(() => {

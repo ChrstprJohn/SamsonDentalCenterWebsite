@@ -7,6 +7,7 @@ export const createServiceSchema = z.object({
   price: z.number().nonnegative("Price cannot be negative").optional().nullable(),
   serviceType: z.enum(["GENERAL", "SPECIALIZED"]).default("GENERAL"),
   isActive: z.boolean().default(true),
+  imageUrl: z.string().url().optional().nullable(),
 });
 
 export type CreateServiceDto = z.infer<typeof createServiceSchema>;

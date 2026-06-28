@@ -2,11 +2,15 @@ import { SupabaseClient } from '@supabase/supabase-js';
 import { ServiceResponseDto, serviceResponseSchema } from '../../dtos/management/service-response.dto';
 
 export const getServicesQuery = (supabase: SupabaseClient) => {
-  return async (includeInactive = false): Promise<ServiceResponseDto[]> => {
+  return async (includeInactive: boolean | 'ALL' | 'BOOKABLE' = false): Promise<ServiceResponseDto[]> => {
     let query = supabase.from("services").select("*").order("name");
     
-    if (!includeInactive) {
-      query = query.eq("is_active", true);
+    if (includeInactive === 'BOOKABLE') {
+      query = query.neq("status", "ARCHIVED");
+    } else if (includeInactive === true || includeInactive === 'ALL') {
+      // Fetch all including archived
+    } else {
+      query = query.eq("status", "ACTIVE");
     }
 
     const { data, error } = await query;

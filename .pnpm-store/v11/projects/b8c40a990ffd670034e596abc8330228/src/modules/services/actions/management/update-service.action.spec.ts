@@ -18,6 +18,10 @@ vi.mock("../../use-cases/management/update-service.use-case", () => ({
   updateServiceUseCase: mocks.updateServiceUseCase,
 }));
 
+vi.mock("next/cache", () => ({
+  revalidatePath: vi.fn(),
+}));
+
 describe("updateServiceAction (Unit Test)", () => {
   it("should successfully call the use case and return data", async () => {
     const result = await updateServiceAction({

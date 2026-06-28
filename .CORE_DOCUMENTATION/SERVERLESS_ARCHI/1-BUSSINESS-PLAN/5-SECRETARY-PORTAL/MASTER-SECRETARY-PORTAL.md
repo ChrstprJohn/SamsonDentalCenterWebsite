@@ -137,6 +137,10 @@ A sticky sidebar container provides fast route switching:
 - **Email Log**: `/secretary/emails`
 - **Audit Log**: `/secretary/audits`
 - **Profile**: `/secretary/profile`
+- **Services Management**: `/secretary/services`
+- **Doctor Management**: `/secretary/doctors`
+- **Doctor Schedule Management**: `/secretary/schedules`
+
 
 ---
 
@@ -260,3 +264,37 @@ Ledger of portal actions.
 Personal credentials editor for the staff user.
 - **Fields**: First name, Middle name, Last name, Suffix, Email (read-only), Phone number.
 - **Password**: Link to trigger password modifications.
+
+---
+
+### Page 11: Services Management (`/secretary/services`)
+Manages the clinic's treatment catalog using a Multi-State Service Lifecycle to prevent data referential breaks in past invoices or logs.
+- **Service Lifecycle States**:
+  - `DRAFT`: Visible nowhere (initial configuration stage).
+  - `ACTIVE`: Visible on both the public Patient Portal and internal Secretary Portal.
+  - `HIDDEN`: Hidden from Patient Portal self-bookings, but remains visible in the Secretary Portal for intake screening.
+  - `ARCHIVED`: Soft-deleted/retired clinic-wide (hidden from both booking wizards, but retained in historical ledger records).
+- **Service Catalog Layout**: A grid of service cards containing service names, categories, descriptions, base pricing, duration, and status indicators.
+- **Form Controls**: Includes toggles for Online Booking visibility and a confirmation-guarded "Archive" utility, plus fields for editing service details.
+
+
+---
+
+### Page 12: Doctor Management (`/secretary/doctors`)
+Manages the dentist roster and handles secure staff recruitment.
+- **Roster Directory Layout**: Grid of cards or list view showing each doctor's name, specialization, contact info, and status badge (`ACTIVE`, `PENDING_REGISTRATION`, `INACTIVE`).
+- **Secure Invitation Workflow**: The secretary inputs the doctor's details (Name, Email, Specialization) and clicks "Send Invitation". The system creates a profile in `PENDING_REGISTRATION` status, auto-hooks their default Layer 2 availability, and generates a secure 48-hour email invitation link.
+- **Password Ownership**: The doctor clicks the email link to choose their own password, promoting secure credential management.
+- **Details Drawer**: Displays full contact details, active schedules summary, and options to resend the invitation or update their active status.
+
+
+---
+
+### Page 13: Doctor Schedule Management (`/secretary/schedules`)
+Configures clinic and doctor availability using a tiered 3-layer scheduling architecture with a tabbed interface.
+- **Tab 1: Clinic Global Hours**: Configures Layer 1 clinic-wide operating hours (Monday–Sunday) with active toggles and time ranges.
+- **Tab 2: Custom Doctor Shifts**: Selects a doctor to edit their standard weekly Layer 2 schedule (with toggles to unlock custom hours or inherit Layer 1 baseline).
+- **Tab 3: Time Exclusions & Blocks**: A split-screen layout with a Form (left) to schedule Layer 3 vacation/sick blocks for doctors, and a Table (right) displaying active blocks with a quick "Revoke Block" action.
+
+
+

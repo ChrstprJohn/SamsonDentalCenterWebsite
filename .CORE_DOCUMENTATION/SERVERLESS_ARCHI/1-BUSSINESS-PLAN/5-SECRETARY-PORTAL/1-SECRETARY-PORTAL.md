@@ -26,3 +26,10 @@ We break down the secretary portal into the following sections. Each has its own
    - Records of admin and staff actions with justification notes.
 10. **Profile** ([11-PROFILE.md](file:///c:/Users/picar/Desktop/samson-website/.CORE_DOCUMENTATION/SERVERLESS_ARCHI/1-BUSSINESS-PLAN/5-SECRETARY-PORTAL/11-PROFILE.md))
     - Details edit page for the logged-in secretary.
+11. **Services Management** ([12-SERVICES.md](file:///c:/Users/picar/Desktop/samson-website/.CORE_DOCUMENTATION/SERVERLESS_ARCHI/1-BUSSINESS-PLAN/5-SECRETARY-PORTAL/12-SERVICES.md))
+    - Managing services and pricing.
+12. **Doctor Management** ([13-DOCTORS.md](file:///c:/Users/picar/Desktop/samson-website/.CORE_DOCUMENTATION/SERVERLESS_ARCHI/1-BUSSINESS-PLAN/5-SECRETARY-PORTAL/13-DOCTORS.md))
+    - Registering and managing doctor profiles.
+13. **Doctor Schedule Management** ([14-DOCTOR-SCHEDULES.md](file:///c:/Users/picar/Desktop/samson-website/.CORE_DOCUMENTATION/SERVERLESS_ARCHI/1-BUSSINESS-PLAN/5-SECRETARY-PORTAL/14-DOCTOR-SCHEDULES.md))
+    - Configuring active availability and shift settings.
+

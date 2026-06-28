@@ -34,19 +34,36 @@ export function ServiceCard({ service, onSelect }: ServiceCardProps) {
       className="group relative flex flex-col justify-between p-6 md:p-8 rounded-3xl border border-card-border bg-card shadow-lg shadow-slate-100/5 hover:shadow-2xl hover:shadow-primary-start/5 hover:-translate-y-1.5 transition-all duration-300 cursor-pointer"
     >
       <div>
-        {/* Dynamic Emoji Icon */}
-        <div className="w-12 h-12 rounded-2xl bg-accent-blue-bg flex items-center justify-center text-2xl group-hover:scale-110 transition-transform duration-300 mb-6">
-          {getEmoji(service.name)}
+        {/* Dynamic Emoji Icon or Thumbnail */}
+        <div className="w-12 h-12 rounded-2xl bg-accent-blue-bg flex items-center justify-center text-2xl group-hover:scale-110 transition-transform duration-300 mb-6 overflow-hidden border border-card-border">
+          {service.imageUrl ? (
+            <img src={service.imageUrl} alt={service.name} className="w-full h-full object-cover" />
+          ) : (
+            getEmoji(service.name)
+          )}
         </div>
 
-        {/* Specialization Badge */}
-        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold tracking-wide uppercase mb-3 ${
-          service.serviceType === 'SPECIALIZED'
-            ? 'bg-purple-100/70 text-purple-700'
-            : 'bg-accent-blue-bg text-accent-blue-text'
-        }`}>
-          {service.serviceType}
-        </span>
+        {/* Badges Container */}
+        <div className="flex flex-wrap gap-2 mb-3">
+          {/* Specialization Badge */}
+          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold tracking-wide uppercase ${
+            service.serviceType === 'SPECIALIZED'
+              ? 'bg-purple-100/70 text-purple-700'
+              : 'bg-accent-blue-bg text-accent-blue-text'
+          }`}>
+            {service.serviceType}
+          </span>
+          {/* Status Badge */}
+          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold tracking-wide uppercase ${
+            service.status === 'ACTIVE'
+              ? 'bg-green-100 text-green-700'
+              : service.status === 'HIDDEN'
+              ? 'bg-amber-100 text-amber-700'
+              : 'bg-red-100 text-red-700'
+          }`}>
+            {service.status}
+          </span>
+        </div>
 
         {/* Name */}
         <h3 className="text-xl font-bold text-text-primary group-hover:text-accent-blue-text transition-colors mb-2">

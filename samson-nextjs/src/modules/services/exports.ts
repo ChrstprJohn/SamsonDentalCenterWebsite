@@ -16,3 +16,5 @@ export * from "./use-cases/management/get-services.use-case";
 export * from "./use-cases/management/get-service-by-id.use-case";
 export * from "./use-cases/management/update-service.use-case";
 export * from "./use-cases/management/delete-service.use-case";
+export * from "./use-cases/management/archive-service.use-case";
+export * from "./use-cases/management/toggle-service-visibility.use-case";

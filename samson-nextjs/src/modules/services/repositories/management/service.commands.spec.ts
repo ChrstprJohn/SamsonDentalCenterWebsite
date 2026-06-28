@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { createServiceCommand, deleteServiceCommand, updateServiceCommand } from "./service.commands";
+import { createServiceCommand, deleteServiceCommand, updateServiceCommand, archiveServiceCommand, toggleServiceVisibilityCommand } from "./service.commands";
 
 const mockFrom = vi.fn();
 const mockInsert = vi.fn();
@@ -113,4 +113,47 @@ describe("service command closures (Unit Test)", () => {
       );
     });
   });
+
+  describe("archiveService", () => {
+    it("should archive a service (set is_active to false) and return result", async () => {
+      mockSingle.mockResolvedValue({
+        data: {
+          id: "550e8400-e29b-41d4-a716-446655440000",
+          name: "Teeth Cleaning",
+          duration_minutes: 30,
+          price: 100,
+          service_type: "GENERAL",
+          is_active: false,
+        },
+        error: null,
+      });
+
+      const archiveService = archiveServiceCommand(mockSupabase);
+      const result = await archiveService("550e8400-e29b-41d4-a716-446655440000");
+
+      expect(result.isActive).toBe(false);
+    });
+  });
+
+  describe("toggleServiceVisibility", () => {
+    it("should toggle service visibility status and return result", async () => {
+      mockSingle.mockResolvedValue({
+        data: {
+          id: "550e8400-e29b-41d4-a716-446655440000",
+          name: "Teeth Cleaning",
+          duration_minutes: 30,
+          price: 100,
+          service_type: "GENERAL",
+          is_active: false,
+        },
+        error: null,
+      });
+
+      const toggleServiceVisibility = toggleServiceVisibilityCommand(mockSupabase);
+      const result = await toggleServiceVisibility("550e8400-e29b-41d4-a716-446655440000", true);
+
+      expect(result.isActive).toBe(false);
+    });
+  });
 });
+

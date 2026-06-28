@@ -4,7 +4,7 @@ import { getServicesUseCase } from '../../use-cases/management/get-services.use-
 import { getServicesQuery } from '../../repositories/management/service.queries';
 import { createClient } from '../../../../shared/database/server';
 
-export async function getServicesAction(includeInactive = false) {
+export async function getServicesAction(includeInactive: boolean | 'ALL' | 'BOOKABLE' = false) {
   try {
     const supabase = await createClient();
     const query = getServicesQuery(supabase);

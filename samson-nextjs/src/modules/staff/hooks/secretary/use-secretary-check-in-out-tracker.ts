@@ -50,7 +50,7 @@ export function useSecretaryCheckInOutTracker() {
       else setErrorMessage(apptRes.error || 'Failed to load appointments');
       const invRes = await getInvoicesAction({ limit: 100, page: 1 });
       if (invRes.success && invRes.data) setInvoices(invRes.data);
-      const svcRes = await getServicesAction();
+      const svcRes = await getServicesAction('BOOKABLE');
       if (svcRes.data) setServicesCatalog(svcRes.data.map((service: any) => ({ id: service.id, name: service.name, price: Number(service.price || 0) })));
     } catch (err: any) {
       setErrorMessage(err.message || 'An unexpected error occurred');

@@ -18,6 +18,10 @@ vi.mock("../../use-cases/management/create-service.use-case", () => ({
   createServiceUseCase: mocks.createServiceUseCase,
 }));
 
+vi.mock("next/cache", () => ({
+  revalidatePath: vi.fn(),
+}));
+
 describe("createServiceAction (Unit Test)", () => {
   it("should successfully call the use case and return data", async () => {
     const result = await createServiceAction({

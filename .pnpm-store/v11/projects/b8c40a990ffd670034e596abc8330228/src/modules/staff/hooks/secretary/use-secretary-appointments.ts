@@ -87,7 +87,7 @@ export function useSecretaryAppointments() {
     let active = true;
     async function loadServices() {
       setIsLoadingServices(true);
-      const res = await getServicesAction();
+      const res = await getServicesAction('BOOKABLE');
       if (!active) return;
       setIsLoadingServices(false);
       if (res.data) setServices(res.data as ServiceResponseDto[]);

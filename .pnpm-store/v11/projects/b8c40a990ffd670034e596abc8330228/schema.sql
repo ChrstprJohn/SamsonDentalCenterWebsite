@@ -15,6 +15,7 @@ CREATE TYPE invoice_status AS ENUM ('DRAFT', 'FINALIZED', 'PAID', 'VOID');
 CREATE TYPE payment_method AS ENUM ('CASH', 'CARD', 'HMO');
 CREATE TYPE inquiry_status AS ENUM ('NEW', 'CONVERTED', 'DROPPED');
 CREATE TYPE appointment_source AS ENUM ('SELF_BOOKED', 'STAFF_CREATED');
+CREATE TYPE service_status AS ENUM ('ACTIVE', 'HIDDEN', 'ARCHIVED');
 
 -- 3. CORE TABLES
 
@@ -61,6 +62,8 @@ CREATE TABLE services (
     price NUMERIC(10, 2) CHECK (price >= 0),
     service_type service_type DEFAULT 'GENERAL'::service_type NOT NULL,
     is_active BOOLEAN DEFAULT true NOT NULL,
+    image_url TEXT,
+    status service_status DEFAULT 'ACTIVE'::service_status NOT NULL,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
