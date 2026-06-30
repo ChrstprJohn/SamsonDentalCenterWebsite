@@ -11,8 +11,19 @@ export const loginUseCase = (
     }
 
     try {
-      return await loginCommand(data);
+      const result = await loginCommand(data);
+      const role = result?.user?.user_metadata?.role || 'PATIENT';
+      const isStaff = ['ADMIN', 'SECRETARY', 'DOCTOR'].includes(role);
+      
+      if (isStaff) {
+        throw new DomainError('Access denied: staff members cannot log in to the patient portal');
+      }
+
+      return result;
     } catch (error: any) {
+      if (error instanceof DomainError) {
+        throw error;
+      }
       throw new DomainError(error.message || 'Login failed');
     }
   };

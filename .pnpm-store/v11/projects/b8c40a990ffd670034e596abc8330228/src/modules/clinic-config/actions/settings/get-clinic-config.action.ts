@@ -2,11 +2,11 @@
 
 import { getClinicConfigUseCase } from '../../use-cases/settings/get-clinic-config.use-case';
 import { getClinicConfigQuery } from '../../repositories/settings/clinic-config.queries';
-import { createClient } from '../../../../shared/database/server';
+import { createAdminClient } from '../../../../shared/database/server';
 
 export async function getClinicConfigAction() {
   try {
-    const supabase = await createClient();
+    const supabase = await createAdminClient();
     const query = getClinicConfigQuery(supabase);
     const useCase = getClinicConfigUseCase(query);
 

@@ -66,3 +66,46 @@ VALUES (
     ]'::jsonb
 )
 ON CONFLICT (is_singleton) DO NOTHING;
+
+-- 4. Seed Failed Outbox Event for Secretary Portal Testing
+DO $$
+DECLARE
+  v_patient_id UUID;
+  v_service_id UUID;
+  v_doctor_id UUID := 'd3b07384-d113-4ec2-a5e6-ec083b0f5cc5';
+BEGIN
+  -- Ensure Doctor exists
+  INSERT INTO public.users (id, email, first_name, last_name, role, is_active)
+  VALUES (v_doctor_id, 'doctor.a@example.com', 'Jane', 'Doe', 'DOCTOR'::public.user_role, true)
+  ON CONFLICT (id) DO NOTHING;
+
+  -- Get or create Patient
+  SELECT id INTO v_patient_id FROM public.users WHERE email = 'picardochristopherjohnoleo1@gmail.com' LIMIT 1;
+  IF v_patient_id IS NULL THEN
+    v_patient_id := gen_random_uuid();
+    INSERT INTO public.users (id, email, first_name, last_name, role, is_active)
+    VALUES (v_patient_id, 'picardochristopherjohnoleo1@gmail.com', 'Christopher', 'Picardo', 'PATIENT'::public.user_role, true);
+  END IF;
+
+  -- Get Service
+  SELECT id INTO v_service_id FROM public.services WHERE name = 'Oral Prophylaxis (Teeth Cleaning)' LIMIT 1;
+
+  -- Insert Failed Outbox Event with valid payload layout
+  INSERT INTO outbox (event_type, payload, status, error_logs, retry_count)
+  VALUES (
+    'APPOINTMENT_BOOKED',
+    jsonb_build_object(
+      'appointmentId', gen_random_uuid(),
+      'patientId', v_patient_id,
+      'serviceId', v_service_id,
+      'doctorId', v_doctor_id,
+      'date', CURRENT_DATE::text,
+      'startTime', (CURRENT_TIMESTAMP + interval '1 hour')::text,
+      'durationMinutes', 30
+    ),
+    'FAILED',
+    'Failed to send email: API rate limit exceeded.',
+    3
+  );
+END $$;
+

@@ -320,9 +320,11 @@ export type Database = {
           created_at: string
           day_of_week: number
           doctor_id: string
-          end_time: string
+          end_time: string | null
           id: string
-          start_time: string
+          is_custom: boolean
+          is_open: boolean
+          start_time: string | null
           updated_at: string
         }
         Insert: {
@@ -331,9 +333,11 @@ export type Database = {
           created_at?: string
           day_of_week: number
           doctor_id: string
-          end_time: string
+          end_time?: string | null
           id?: string
-          start_time: string
+          is_custom?: boolean
+          is_open?: boolean
+          start_time?: string | null
           updated_at?: string
         }
         Update: {
@@ -342,9 +346,11 @@ export type Database = {
           created_at?: string
           day_of_week?: number
           doctor_id?: string
-          end_time?: string
+          end_time?: string | null
           id?: string
-          start_time?: string
+          is_custom?: boolean
+          is_open?: boolean
+          start_time?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -463,6 +469,57 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      time_blocks: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          date: string
+          doctor_id: string | null
+          end_time: string
+          id: string
+          reason: string
+          start_time: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          date: string
+          doctor_id?: string | null
+          end_time: string
+          id?: string
+          reason: string
+          start_time: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          date?: string
+          doctor_id?: string | null
+          end_time?: string
+          id?: string
+          reason?: string
+          start_time?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "time_blocks_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "time_blocks_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       users: {
         Row: {

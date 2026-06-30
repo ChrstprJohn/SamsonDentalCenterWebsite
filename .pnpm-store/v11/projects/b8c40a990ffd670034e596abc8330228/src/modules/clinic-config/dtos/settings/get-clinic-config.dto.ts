@@ -19,6 +19,8 @@ export const operatingDaySchema = z
     isOpen: z.boolean(),
     openTime: TimeStringSchema.nullable(),
     closeTime: TimeStringSchema.nullable(),
+    breakStartTime: TimeStringSchema.nullable().optional(),
+    breakEndTime: TimeStringSchema.nullable().optional(),
   })
   .refine(
     (data) => {
@@ -43,6 +45,18 @@ export const operatingDaySchema = z
       message: "Close time must be after open time",
       path: ["closeTime"],
     }
+  )
+  .refine(
+    (data) => {
+      if (data.isOpen && data.breakStartTime && data.breakEndTime) {
+        return data.breakStartTime < data.breakEndTime;
+      }
+      return true;
+    },
+    {
+      message: "Break end time must be after break start time",
+      path: ["breakEndTime"],
+    }
   );
 
 export const operatingHoursSchema = z.object({
@@ -60,11 +74,22 @@ export const socialLinkSchema = z.object({
   url: z.string().url("Must be a valid URL"),
 });
 
-const operatingDayDbSchema = z.object({
+const operatingDayDbSchema = z.preprocess((val: any) => {
+  if (!val || typeof val !== 'object') return val;
+  return {
+    is_open: val.is_open !== undefined ? val.is_open : (val.isOpen ?? false),
+    open_time: val.open_time !== undefined ? val.open_time : (val.openTime ?? null),
+    close_time: val.close_time !== undefined ? val.close_time : (val.closeTime ?? null),
+    break_start_time: val.break_start_time !== undefined ? val.break_start_time : (val.breakStartTime ?? null),
+    break_end_time: val.break_end_time !== undefined ? val.break_end_time : (val.breakEndTime ?? null),
+  };
+}, z.object({
   is_open: z.boolean(),
   open_time: TimeStringSchema.nullable(),
   close_time: TimeStringSchema.nullable(),
-});
+  break_start_time: TimeStringSchema.nullable().optional(),
+  break_end_time: TimeStringSchema.nullable().optional(),
+}));
 
 const operatingHoursDbSchema = z.object(
   Object.fromEntries(WEEK_DAYS.map((day) => [day, operatingDayDbSchema])) as Record<
@@ -88,6 +113,7 @@ export const clinicConfigAppSchema = z.object({
 });
 
 export const clinicConfigDbSchema = z.object({
+  is_open: z.boolean().optional(), // map config if needed
   is_booking_open: z.boolean(),
   maintenance_message: z.string().nullable(),
   max_reschedules: z.number().int().min(0),
@@ -116,6 +142,8 @@ export const clinicConfigResponseSchema = clinicConfigDbSchema.transform((record
         isOpen: record.operating_hours[day].is_open,
         openTime: record.operating_hours[day].open_time,
         closeTime: record.operating_hours[day].close_time,
+        breakStartTime: record.operating_hours[day].break_start_time || null,
+        breakEndTime: record.operating_hours[day].break_end_time || null,
       },
     ])
   ) as z.infer<typeof operatingHoursSchema>,

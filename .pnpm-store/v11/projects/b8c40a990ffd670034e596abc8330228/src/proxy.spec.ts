@@ -97,4 +97,38 @@ describe('proxy Route Guards (Unit Test)', () => {
     expect(result?.status).toBe(200)
     expect(result?.headers.get('location')).toBeNull()
   })
+
+  it('blocks DOCTOR, SECRETARY, and ADMIN from accessing /user/dashboard', async () => {
+    const roles = ['DOCTOR', 'SECRETARY', 'ADMIN']
+    for (const role of roles) {
+      const mockResponse = new NextResponse()
+      vi.mocked(updateSession).mockResolvedValue({
+        supabaseResponse: mockResponse,
+        user: { user_metadata: { role } } as any,
+      })
+
+      const request = new NextRequest(new URL('http://localhost:3000/user/dashboard'))
+      const result = await proxy(request)
+
+      expect(result?.status).toBe(307)
+      expect(result?.headers.get('location')).toBe('http://localhost:3000/')
+    }
+  })
+
+  it('blocks PATIENT from accessing /doctor/dashboard or /secretary/appointments', async () => {
+    const paths = ['/doctor/dashboard', '/secretary/appointments', '/admin/dashboard']
+    for (const path of paths) {
+      const mockResponse = new NextResponse()
+      vi.mocked(updateSession).mockResolvedValue({
+        supabaseResponse: mockResponse,
+        user: { user_metadata: { role: 'PATIENT' } } as any,
+      })
+
+      const request = new NextRequest(new URL(`http://localhost:3000${path}`))
+      const result = await proxy(request)
+
+      expect(result?.status).toBe(307)
+      expect(result?.headers.get('location')).toBe('http://localhost:3000/')
+    }
+  })
 })

@@ -97,7 +97,7 @@ export function SecretaryInvoiceManagementView() {
         </div>
 
         {/* Right Column - Invoice details receipt */}
-        <div className="lg:col-span-4 border border-card-border bg-card rounded-3xl p-6 shadow-md flex flex-col gap-4">
+        <div id="invoice-receipt-pane" className="lg:col-span-4 border border-card-border bg-card rounded-3xl p-6 shadow-md flex flex-col gap-4 print:border-none print:shadow-none print:w-full print:fixed print:top-0 print:left-0 print:bg-white print:z-50 print:p-8">
           {selectedInvoice ? (
             <div className="flex flex-col gap-4">
               <div className="border-b border-card-border pb-3 text-center">
@@ -135,7 +135,24 @@ export function SecretaryInvoiceManagementView() {
                 </div>
               </div>
 
-              <InvoiceReceiptActions />
+              <style jsx global>{`
+                @media print {
+                  body * {
+                    visibility: hidden;
+                  }
+                  #invoice-receipt-pane, #invoice-receipt-pane * {
+                    visibility: visible;
+                  }
+                  #invoice-receipt-pane {
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    width: 100%;
+                  }
+                }
+              `}</style>
+
+              <InvoiceReceiptActions onPrint={() => window.print()} />
             </div>
           ) : (
             <div className="h-full flex items-center justify-center text-xs text-text-muted text-center py-12">

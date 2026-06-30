@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Doctor } from '../hooks/use-doctor-management';
+import { formatTimeString } from '@/shared/utils/date.util';
 
 interface DoctorReadPaneProps {
   doctor: Doctor | null;
@@ -59,14 +60,7 @@ export function DoctorReadPane({ doctor }: DoctorReadPaneProps) {
         </h4>
         <div className="flex flex-col gap-1.5 text-[11px] text-text-muted">
           {(() => {
-            const formatTime = (timeStr: string) => {
-              if (!timeStr) return '';
-              const [hoursStr, minutesStr] = timeStr.split(':');
-              const hours = parseInt(hoursStr, 10);
-              const ampm = hours >= 12 ? 'PM' : 'AM';
-              const displayHours = hours % 12 === 0 ? 12 : hours % 12;
-              return `${displayHours}:${minutesStr} ${ampm}`;
-            };
+            const formatTime = formatTimeString;
 
             const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
@@ -79,34 +73,26 @@ export function DoctorReadPane({ doctor }: DoctorReadPaneProps) {
                   {sortedSchedules.map((sched) => (
                     <div key={sched.dayOfWeek} className="flex justify-between py-1 border-b border-card-border/20 last:border-b-0">
                       <span className="font-medium text-text-secondary">{dayNames[sched.dayOfWeek]}</span>
-                      <span>
-                        {formatTime(sched.startTime)} - {formatTime(sched.endTime)}
-                      </span>
+                      {sched.isOpen ? (
+                        <span>
+                          {formatTime(sched.startTime)} - {formatTime(sched.endTime)}
+                        </span>
+                      ) : (
+                        <span className="text-red-500/75 font-medium">Off-Duty</span>
+                      )}
                     </div>
                   ))}
-                  {/* Highlight weekends/days off if they aren't mapped */}
-                  {Array.from({ length: 7 }).map((_, idx) => {
-                    if (!doctor.schedules?.some((s) => s.dayOfWeek === idx)) {
-                      return (
-                        <div key={`off-${idx}`} className="flex justify-between py-1 text-red-500/75 last:border-b-0">
-                          <span className="font-medium">{dayNames[idx]}</span>
-                          <span>Off-Duty</span>
-                        </div>
-                      );
-                    }
-                    return null;
-                  })}
                 </>
               );
             }
 
-            // Fallback default schedules (Mon-Fri 8:00 AM - 5:00 PM)
+            // Fallback default schedules (Mon-Fri 9:00 AM - 5:00 PM)
             return (
               <>
                 {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map((day) => (
                   <div key={day} className="flex justify-between py-1 border-b border-card-border/20 last:border-b-0">
                     <span className="font-medium text-text-secondary">{day}</span>
-                    <span>8:00 AM - 5:00 PM</span>
+                    <span>9:00 AM - 5:00 PM</span>
                   </div>
                 ))}
                 <div className="flex justify-between py-1 text-red-500/75">

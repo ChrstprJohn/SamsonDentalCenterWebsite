@@ -51,7 +51,7 @@ describe("updateClinicConfigCommand (Unit Test)", () => {
       const result = await updateConfig({ isBookingOpen: false });
 
       expect(result.isBookingOpen).toBe(false);
-      expect(mockFrom).toHaveBeenCalledWith("clinic_settings");
+      expect(mockFrom).toHaveBeenCalledWith("clinic_config");
       expect(mockUpdate).toHaveBeenCalledWith({ is_booking_open: false });
     });
 

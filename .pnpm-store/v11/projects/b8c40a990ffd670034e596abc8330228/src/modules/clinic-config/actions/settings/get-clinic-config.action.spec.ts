@@ -8,6 +8,7 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock("../../../../shared/database/server", () => ({
   createClient: vi.fn().mockResolvedValue({}),
+  createAdminClient: vi.fn().mockResolvedValue({}),
 }));
 
 vi.mock("../../repositories/settings/clinic-config.queries", () => ({

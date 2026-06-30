@@ -4,10 +4,12 @@ export const doctorScheduleDbSchema = z.object({
   id: z.string().uuid(),
   doctor_id: z.string().uuid(),
   day_of_week: z.number().int().min(0).max(6),
-  start_time: z.string(),
-  end_time: z.string(),
+  start_time: z.string().nullable(),
+  end_time: z.string().nullable(),
   break_start_time: z.string().nullable(),
   break_end_time: z.string().nullable(),
+  is_custom: z.boolean().optional().default(true),
+  is_open: z.boolean().optional().default(true),
   doctor: z.object({
     first_name: z.string(),
     last_name: z.string(),
@@ -23,6 +25,8 @@ export const doctorScheduleResponseSchema = doctorScheduleDbSchema.transform((da
   endTime: data.end_time,
   breakStartTime: data.break_start_time,
   breakEndTime: data.break_end_time,
+  isCustom: data.is_custom ?? true,
+  isOpen: data.is_open ?? true,
   doctorName: data.doctor
     ? `Dr. ${data.doctor.first_name} ${data.doctor.last_name}`.trim()
     : undefined,

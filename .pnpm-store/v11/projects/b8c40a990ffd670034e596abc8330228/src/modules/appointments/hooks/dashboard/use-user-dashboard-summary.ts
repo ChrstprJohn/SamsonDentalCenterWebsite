@@ -39,16 +39,19 @@ const INITIAL_MOCK_NOTIFICATIONS: DashboardNotification[] = [
   },
 ];
 
+import { formatTimeString } from '@/shared/utils/date.util';
+
 export function useUserDashboardSummary(appointments: AppointmentDto[]) {
   const [notifications] = useState<DashboardNotification[]>(INITIAL_MOCK_NOTIFICATIONS);
 
-  // Extract closest upcoming appointment (APPROVED, RESCHEDULE_REQUESTED, CHECKED_IN)
+  // Get next active appointment (closest future date)
   const nextAppointment = useMemo(() => {
-    const upcoming = appointments.filter((appt) => 
-      appt.status === 'APPROVED' || 
-      appt.status === 'RESCHEDULE_REQUESTED' || 
-      appt.status === 'CHECKED_IN'
-    );
+    const now = new Date();
+    const upcoming = appointments.filter((appt) => {
+      if (appt.status === 'CANCELLED' || appt.status === 'REJECTED') return false;
+      const apptDate = new Date(`${appt.date}T${appt.startTime || '00:00'}`);
+      return apptDate >= now;
+    });
 
     if (upcoming.length === 0) return null;
 
@@ -61,14 +64,7 @@ export function useUserDashboardSummary(appointments: AppointmentDto[]) {
   }, [appointments]);
 
   // Format helper for UI
-  const formatTime = (timeStr?: string) => {
-    if (!timeStr) return '';
-    const [hours, minutes] = timeStr.split(':');
-    const hr = parseInt(hours, 10);
-    const ampm = hr >= 12 ? 'PM' : 'AM';
-    const displayHr = hr % 12 || 12;
-    return `${displayHr}:${minutes} ${ampm}`;
-  };
+  const formatTime = formatTimeString;
 
   return {
     nextAppointment,

@@ -47,6 +47,16 @@ export function formatClinicTime(date: Date | string): string {
 }
 
 /**
+ * Formats a naive 24h time string (e.g. '08:00' or '17:00:00') into a standard AM/PM time string.
+ * Example: '17:00' -> '5:00 PM'
+ */
+export function formatTimeString(timeStr: string): string {
+  if (!timeStr) return '';
+  const cleanTime = timeStr.length === 5 ? `${timeStr}:00` : timeStr;
+  return formatClinicTime(`2000-01-01T${cleanTime}Z`);
+}
+
+/**
  * Calculates the end time given an ISO string and duration in minutes.
  * Returns a new Date object representing the end time, safely preserving timezone.
  */

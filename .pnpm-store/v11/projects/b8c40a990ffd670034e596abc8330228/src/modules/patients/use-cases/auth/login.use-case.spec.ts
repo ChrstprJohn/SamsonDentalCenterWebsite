@@ -30,4 +30,17 @@ describe('loginUseCase', () => {
     await expect(useCase({ email: 'test@example.com', password: 'password123' }))
       .rejects.toThrowError(new DomainError('Invalid login credentials'));
   });
+
+  it('blocks staff roles from logging in', async () => {
+    const staffRoles = ['ADMIN', 'SECRETARY', 'DOCTOR'];
+    for (const role of staffRoles) {
+      const mockCommand = vi.fn().mockResolvedValue({
+        user: { id: '123', user_metadata: { role } }
+      });
+      const useCase = loginUseCase(mockCommand);
+
+      await expect(useCase({ email: 'test@example.com', password: 'password123' }))
+        .rejects.toThrowError(new DomainError('Access denied: staff members cannot log in to the patient portal'));
+    }
+  });
 });
