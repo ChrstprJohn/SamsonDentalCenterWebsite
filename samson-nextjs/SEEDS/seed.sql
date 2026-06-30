@@ -66,3 +66,14 @@ VALUES (
     ]'::jsonb
 )
 ON CONFLICT (is_singleton) DO NOTHING;
+
+-- 4. Seed Failed Outbox Event for Secretary Portal Testing
+INSERT INTO outbox (event_type, payload, status, error_logs, retry_count)
+VALUES (
+    'APPOINTMENT_BOOKED',
+    '{"email": "picardochristoherjohnoleo1@gmail.com", "patientName": "Picardo Christopher", "serviceName": "Teeth Cleaning", "appointmentDate": "2026-07-05", "appointmentTime": "10:00"}'::jsonb,
+    'FAILED',
+    'Failed to send email: API rate limit exceeded.',
+    3
+);
+
