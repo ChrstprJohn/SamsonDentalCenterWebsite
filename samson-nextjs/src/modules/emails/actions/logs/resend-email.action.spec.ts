@@ -5,6 +5,10 @@ vi.mock('@/shared/auth/auth.util', () => ({
   authorizeRole: vi.fn().mockResolvedValue({ id: 'secretary_id' }),
 }));
 
+vi.mock('@/orchestrators/event-subscribers', () => ({
+  bootstrapEventSubscribers: vi.fn(),
+}));
+
 // Mock dependencies
 vi.mock('@/shared/database/server', () => {
   const mockDbClient = {

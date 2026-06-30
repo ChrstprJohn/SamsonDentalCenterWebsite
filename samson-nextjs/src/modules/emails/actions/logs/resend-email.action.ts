@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { createAdminClient } from '@/shared/database/server';
 import { globalOutboxDispatcher } from '@/shared/outbox/outbox.dispatcher';
 import { authorizeRole } from '@/shared/auth/auth.util';
+import { bootstrapEventSubscribers } from '@/orchestrators/event-subscribers';
 
 const resendEmailActionSchema = z.object({
   id: z.string().uuid(),
@@ -45,6 +46,7 @@ export async function resendEmailAction(data: { id: string }) {
     }
 
     // Trigger dispatcher synchronously for quick feedback
+    bootstrapEventSubscribers();
     const dispatch = globalOutboxDispatcher(supabase);
     await dispatch();
 
