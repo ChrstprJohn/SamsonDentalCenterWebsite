@@ -4,11 +4,39 @@
 import React from 'react';
 import { useSecretaryEmailLog } from '@/modules/staff/hooks/secretary/use-secretary-email-log';
 import { Input } from '@/components/ui/input';
+import { Select } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 export function SecretaryEmailLogView() {
-  const { searchTerm, setSearchTerm, selectedEmailId, setSelectedEmailId, selectedEmail, filteredEmails } =
-    useSecretaryEmailLog();
+  const {
+    searchTerm,
+    setSearchTerm,
+    statusFilter,
+    setStatusFilter,
+    selectedEmailId,
+    setSelectedEmailId,
+    selectedEmail,
+    filteredEmails,
+    handleResend,
+    resendingId,
+  } = useSecretaryEmailLog();
+
+  const getStatusVariant = (status: string) => {
+    switch (status.toUpperCase()) {
+      case 'SENT':
+      case 'PROCESSED':
+        return 'success';
+      case 'FAILED':
+      case 'ERROR':
+        return 'error';
+      case 'PENDING':
+      case 'PROCESSING':
+        return 'warning';
+      default:
+        return 'default';
+    }
+  };
 
   return (
     <div className="flex flex-col gap-8 h-full">
@@ -19,13 +47,24 @@ export function SecretaryEmailLogView() {
         </p>
       </div>
 
-      <div className="flex border border-card-border bg-card rounded-2xl p-4 shadow-sm">
+      <div className="flex flex-col sm:flex-row gap-3 border border-card-border bg-card rounded-2xl p-4 shadow-sm">
         <Input
           type="text"
           placeholder="Filter logs by recipient email or subject..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="text-xs flex-1"
+        />
+        <Select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          className="text-xs sm:w-48"
+          options={[
+            { value: 'ALL', label: 'All Statuses' },
+            { value: 'SENT', label: 'Sent' },
+            { value: 'FAILED', label: 'Failed' },
+            { value: 'PENDING', label: 'Pending' },
+          ]}
         />
       </div>
 
@@ -40,12 +79,13 @@ export function SecretaryEmailLogView() {
                   <th className="py-3 px-2">Subject</th>
                   <th className="py-3 px-2">Date & Time</th>
                   <th className="py-3 px-2">Status</th>
+                  <th className="py-3 px-2 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredEmails.length === 0 ? (
                   <tr>
-                    <td colSpan={4} className="py-12 text-center text-text-muted">
+                    <td colSpan={5} className="py-12 text-center text-text-muted">
                       No matching email logs.
                     </td>
                   </tr>
@@ -64,7 +104,19 @@ export function SecretaryEmailLogView() {
                         {new Date(eml.timestamp).toLocaleString()}
                       </td>
                       <td className="py-3.5 px-2">
-                        <Badge variant="success">{eml.status}</Badge>
+                        <Badge variant={getStatusVariant(eml.status)}>{eml.status}</Badge>
+                      </td>
+                      <td className="py-3.5 px-2 text-right" onClick={(e) => e.stopPropagation()}>
+                        {eml.status.toUpperCase() === 'FAILED' && (
+                          <Button
+                            size="sm"
+                            className="text-[10px] px-2.5 py-1"
+                            onClick={() => handleResend(eml.id)}
+                            disabled={resendingId === eml.id}
+                          >
+                            {resendingId === eml.id ? 'Resending...' : 'Resend'}
+                          </Button>
+                        )}
                       </td>
                     </tr>
                   ))
@@ -108,3 +160,4 @@ export function SecretaryEmailLogView() {
     </div>
   );
 }
+

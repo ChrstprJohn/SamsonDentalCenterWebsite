@@ -57,8 +57,16 @@ export async function resendEmailAction(data: { id: string }) {
       .eq('id', id)
       .single();
 
-    if (updatedEvent?.status === 'FAILED') {
-      return { error: `Email sending failed again: ${updatedEvent.error_logs}` };
+    if (updatedEvent?.status !== 'PROCESSED') {
+      await supabase
+        .from('outbox')
+        .update({
+          status: 'FAILED',
+          retry_count: 3,
+        })
+        .eq('id', id);
+
+      return { error: `Email sending failed again: ${updatedEvent?.error_logs || 'Unknown error'}` };
     }
 
     return { data: { success: true } };

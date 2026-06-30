@@ -306,6 +306,7 @@ export function useSecretary() {
     inquiries,
     invoices,
     emails,
+    setEmails,
     audits,
     patients,
 

@@ -83,6 +83,7 @@ Implementing Doctor Schedule Management page at `/secretary/schedules` adhering 
   - [x] Verify changing Tab 1 global hours changes availability for doctors inheriting baseline.
   - [x] Verify Tab 2 custom hours override the global baseline.
   - [x] Verify Tab 3 exclusions successfully block slots in scheduling workflows.
+  - [x] Already tested all 3 tabs; all working well.
 
 ---
 
