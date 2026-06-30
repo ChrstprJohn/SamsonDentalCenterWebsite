@@ -9,10 +9,15 @@ export const dynamic = 'force-dynamic';
 
 export default async function NotificationsPage() {
   let userId: string | null = null;
+  let hasError = false;
   try {
     const user = await authorizeRole('SECRETARY');
     userId = user.id;
   } catch {
+    hasError = true;
+  }
+
+  if (hasError || !userId) {
     redirect('/auth/login');
   }
 

@@ -19,30 +19,31 @@ export default async function SecretaryPortalLayout({
   let headerUser: AuthHeaderUser | null = null;
   let isAuthorized = false;
   let userId: string | null = null;
+  let user: any = null;
   
   // Secure route access and authorize roles
   try {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    if (!user) {
-      redirect('/auth/login?redirect=/secretary');
-    }
-
-    userId = user.id;
-    const role = user.user_metadata?.role as string;
-    isAuthorized = role === 'SECRETARY' || role === 'ADMIN';
-
-    headerUser = {
-      firstName: user.user_metadata?.first_name || user.user_metadata?.firstName || 'Staff',
-      lastName: user.user_metadata?.last_name || user.user_metadata?.lastName || '',
-      email: user.email || '',
-      avatarUrl: user.user_metadata?.avatar_url || user.user_metadata?.avatarUrl || null,
-    };
+    const { data } = await supabase.auth.getUser();
+    user = data.user;
   } catch (err) {
-    console.error('Secretary portal auth check failed, redirecting:', err);
-    redirect('/auth/login');
+    console.error('Secretary portal auth check failed:', err);
   }
+
+  if (!user) {
+    redirect('/auth/login?redirect=/secretary');
+  }
+
+  userId = user.id;
+  const role = user.user_metadata?.role as string;
+  isAuthorized = role === 'SECRETARY' || role === 'ADMIN';
+
+  headerUser = {
+    firstName: user.user_metadata?.first_name || user.user_metadata?.firstName || 'Staff',
+    lastName: user.user_metadata?.last_name || user.user_metadata?.lastName || '',
+    email: user.email || '',
+    avatarUrl: user.user_metadata?.avatar_url || user.user_metadata?.avatarUrl || null,
+  };
 
   // Fetch clinic config
   let clinicConfig = null;
