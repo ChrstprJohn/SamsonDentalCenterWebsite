@@ -7,6 +7,7 @@ import { Navbar } from '@/components/ui/navbar';
 import { Footer } from '@/components/ui/footer';
 import { Button } from '@/components/ui/button';
 import type { AuthHeaderUser } from '@/modules/patients/hooks/auth/header/use-auth-header';
+import { getUnreadNotifications, getUnreadCount, NotificationPopover, RealtimeListener } from '@/modules/notifications/exports';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,6 +18,7 @@ export default async function SecretaryPortalLayout({
 }) {
   let headerUser: AuthHeaderUser | null = null;
   let isAuthorized = false;
+  let userId: string | null = null;
   
   // Secure route access and authorize roles
   try {
@@ -27,6 +29,7 @@ export default async function SecretaryPortalLayout({
       redirect('/auth/login?redirect=/secretary');
     }
 
+    userId = user.id;
     const role = user.user_metadata?.role as string;
     isAuthorized = role === 'SECRETARY' || role === 'ADMIN';
 
@@ -75,12 +78,36 @@ export default async function SecretaryPortalLayout({
     );
   }
 
+  // Fetch notifications
+  let unreadNotifications: any[] = [];
+  let unreadCount = 0;
+  try {
+    const supabase = await createClient();
+    unreadNotifications = await getUnreadNotifications(supabase)(userId, 'SECRETARY');
+    unreadCount = await getUnreadCount(supabase)(userId, 'SECRETARY');
+  } catch (err) {
+    console.error('Failed to fetch unread notifications:', err);
+  }
+
   return (
     <div className="flex flex-col min-h-screen bg-background transition-colors duration-300">
       <Navbar user={headerUser} />
+      <RealtimeListener userId={userId} />
       
       {/* Sidebar + Main content layout */}
-      <div className="flex-1 max-w-7xl mx-auto w-full px-6 py-10 pt-[100px] grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="flex-1 max-w-7xl mx-auto w-full px-6 py-10 pt-[100px]">
+        {/* Workspace HUD Header */}
+        <div className="flex justify-between items-center mb-6 pb-4 border-b border-card-border/30">
+          <div className="flex flex-col">
+            <h1 className="text-lg font-bold text-text-primary">Secretary Control Center</h1>
+            <span className="text-[10px] text-text-muted">Real-time scheduling and notifications</span>
+          </div>
+          <div className="flex items-center gap-4">
+            <NotificationPopover initialNotifications={unreadNotifications} initialUnreadCount={unreadCount} />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Secretary sub sidebar */}
         <aside className="lg:col-span-3 flex flex-col gap-1.5 border-r border-card-border/50 pr-4">
           <div className="text-[10px] font-bold text-text-muted uppercase tracking-widest px-4 mb-2">
@@ -168,6 +195,13 @@ export default async function SecretaryPortalLayout({
             System & Logs
           </div>
           <Link
+            href="/secretary/notifications"
+            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-secondary-bg transition-colors text-text-secondary hover:text-text-primary"
+          >
+            <span>🔔</span>
+            Notifications
+          </Link>
+          <Link
             href="/secretary/emails"
             className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-secondary-bg transition-colors text-text-secondary hover:text-text-primary"
           >
@@ -195,8 +229,9 @@ export default async function SecretaryPortalLayout({
           {children}
         </main>
       </div>
-
-      <Footer config={clinicConfig} />
     </div>
-  );
+
+    <Footer config={clinicConfig} />
+  </div>
+);
 }

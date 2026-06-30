@@ -296,5 +296,14 @@ Configures clinic and doctor availability using a tiered 3-layer scheduling arch
 - **Tab 2: Custom Doctor Shifts**: Selects a doctor to edit their standard weekly Layer 2 schedule (with toggles to unlock custom hours or inherit Layer 1 baseline).
 - **Tab 3: Time Exclusions & Blocks**: A split-screen layout with a Form (left) to schedule Layer 3 vacation/sick blocks for doctors, and a Table (right) displaying active blocks with a quick "Revoke Block" action.
 
+---
+
+### Module 14: In-App Notifications & Alert Center
+A persistent real-time notification service to accelerate front-desk response times.
+- **Notification Bell Dropdown**: Positioned in the global layout header showing unread badge count. Clicking opens a list containing the latest 10 notifications with categories (e.g., booking, invoicing, warning) and deep links.
+- **Real-Time HUD Toasts**: High-priority alert toasts (such as checkout ready or schedule conflict alerts) with an auto-dismiss gate (8 seconds) and direct deep-link action triggers.
+- **Database Schema Hooking**: Integrates into the core lifecycle tables (appointments, schedule exclusions, and resend email logs) via trigger functions or server actions.
+
+
 
 

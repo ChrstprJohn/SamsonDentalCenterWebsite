@@ -5,6 +5,11 @@ import { onAppointmentBookedSubscriber } from '@/modules/emails/subscribers/on-a
 import { onAppointmentConvertedSubscriber } from '@/modules/emails/subscribers/on-appointment-converted.subscriber';
 import { onManualBookingGuestSubscriber } from '@/modules/emails/subscribers/on-manual-booking-guest.subscriber';
 import { onManualBookingPatientSubscriber } from '@/modules/emails/subscribers/on-manual-booking-patient.subscriber';
+import { onTreatmentRenderedSubscriber } from '@/modules/notifications/subscribers/on-treatment-rendered.subscriber';
+import { onEmailFailedSubscriber } from '@/modules/notifications/subscribers/on-email-failed.subscriber';
+import { onScheduleConflictSubscriber } from '@/modules/notifications/subscribers/on-schedule-conflict.subscriber';
+import { onNewBookingSubscriber } from '@/modules/notifications/subscribers/on-new-booking.subscriber';
+import { onCancelBookingSubscriber } from '@/modules/notifications/subscribers/on-cancel-booking.subscriber';
 
 /**
  * Bootstraps the Event Bus Registry.
