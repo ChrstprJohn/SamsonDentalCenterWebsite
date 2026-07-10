@@ -5,7 +5,7 @@ const ROLE_PERMISSIONS: Record<string, string[]> = {
   ADMIN: ['/admin'],
   SECRETARY: ['/secretary'],
   DOCTOR: ['/doctor'],
-  PATIENT: ['/user'],
+  PATIENT: ['/user', '/user-v2'],
 };
 
 export async function proxy(request: NextRequest) {
@@ -28,7 +28,7 @@ export async function proxy(request: NextRequest) {
   }
 
   // Skip other checks if public/marketing routes
-  if (!pathname.match(/\/(admin|secretary|user|doctor)/)) {
+  if (!pathname.match(/\/(admin|secretary|user|user-v2|doctor)/)) {
     return supabaseResponse
   }
 

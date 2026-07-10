@@ -38,6 +38,8 @@ export const metadata: Metadata = {
   description: "Schedule appointment slots, view treatment history, and connect with premier dental care practitioners at Samson Dental Center.",
 };
 
+import { TooltipProvider } from "@/components/ui/tooltip";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -51,10 +53,12 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-300 overflow-x-hidden">
         <ThemeProvider>
-          <ToastProvider>
-            {children}
-            <SmoothScroll />
-          </ToastProvider>
+          <TooltipProvider>
+            <ToastProvider>
+              {children}
+              <SmoothScroll />
+            </ToastProvider>
+          </TooltipProvider>
         </ThemeProvider>
       </body>
     </html>

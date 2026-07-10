@@ -51,7 +51,7 @@ export function useLoginView(): UseLoginViewReturn {
     // Success flow - Check if it was OTP or Password
     addToast('Logged in successfully!', 'success');
     // Navigate to requested redirect or default to user portal
-    const redirectTo = searchParams.get('redirect') || '/user';
+    const redirectTo = searchParams.get('redirect') || '/user-v2';
     router.push(redirectTo);
   };
 

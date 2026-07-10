@@ -85,7 +85,7 @@ export function useOTPVerifyView(): UseOTPVerifyViewReturn {
       router.push('/auth/reset-password');
     } else {
       addToast('Email verified successfully! Welcome to Samson Dental.', 'success');
-      router.push('/user');
+      router.push('/user-v2');
     }
   };
 
