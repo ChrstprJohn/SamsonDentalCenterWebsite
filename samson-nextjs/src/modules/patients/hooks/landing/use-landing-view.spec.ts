@@ -134,7 +134,6 @@ describe('useLandingView', () => {
       result.current.contactForm.setFirstName('John');
       result.current.contactForm.setLastName('Doe');
       result.current.contactForm.setContactEmail('john@example.com');
-      result.current.contactForm.setDateOfBirth('1990-01-01');
       result.current.contactForm.setTimePreference('MORNING');
     });
 
@@ -158,7 +157,7 @@ describe('useLandingView', () => {
       preferredServiceId: 'd9b233a0-7f2a-43c2-bf72-881c00222a00',
       preferredDate: '2026-06-30',
       patientNote: 'Some notes',
-      dateOfBirth: '1990-01-01',
+      dateOfBirth: undefined,
       timePreference: 'MORNING',
     });
 
@@ -168,9 +167,7 @@ describe('useLandingView', () => {
     );
     expect(success).toBe(true);
     expect(result.current.contactForm.firstName).toBe('');
-    expect(result.current.contactForm.middleName).toBe('');
     expect(result.current.contactForm.lastName).toBe('');
-    expect(result.current.contactForm.suffix).toBe('');
     expect(result.current.contactForm.contactEmail).toBe('');
   });
 });

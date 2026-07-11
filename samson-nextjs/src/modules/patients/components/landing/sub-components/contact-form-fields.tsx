@@ -7,74 +7,55 @@ import type { ServiceResponseDto } from '@/modules/services/dtos/management/serv
 export interface ContactFormFields {
   firstName: string;
   setFirstName: (val: string) => void;
-  middleName: string;
-  setMiddleName: (val: string) => void;
   lastName: string;
   setLastName: (val: string) => void;
-  suffix: string;
-  setSuffix: (val: string) => void;
   contactEmail: string;
   setContactEmail: (val: string) => void;
-  dateOfBirth: string;
-  setDateOfBirth: (val: string) => void;
   timePreference: 'MORNING' | 'AFTERNOON';
   setTimePreference: (val: 'MORNING' | 'AFTERNOON') => void;
   isContactSubmitting: boolean;
+  contactMessage: string;
+  setContactMessage: (val: string) => void;
 }
 
 export function PreferenceFields({ fields }: { fields: ContactFormFields }) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-      <div className="flex flex-col gap-2 font-sans">
-        <label className="text-[10px] tracking-wider uppercase font-semibold text-gray-500">Preferred Time of Day *</label>
-        <div className="grid grid-cols-2 gap-4">
-          <button
-            type="button"
-            onClick={() => fields.setTimePreference('MORNING')}
-            className={`py-3 text-xs font-semibold tracking-wider uppercase text-center border transition-all cursor-pointer ${
-              fields.timePreference === 'MORNING'
-                ? 'bg-[#1D1E1E] text-white border-[#1D1E1E]'
-                : 'bg-white text-gray-600 border-[#E4E4DC] hover:border-gray-400'
-            }`}
-          >
-            Morning
-          </button>
-          <button
-            type="button"
-            onClick={() => fields.setTimePreference('AFTERNOON')}
-            className={`py-3 text-xs font-semibold tracking-wider uppercase text-center border transition-all cursor-pointer ${
-              fields.timePreference === 'AFTERNOON'
-                ? 'bg-[#1D1E1E] text-white border-[#1D1E1E]'
-                : 'bg-white text-gray-600 border-[#E4E4DC] hover:border-gray-400'
-            }`}
-          >
-            Afternoon
-          </button>
-        </div>
+    <div className="flex flex-col gap-2 font-sans">
+      <label className="text-[10px] tracking-wider uppercase font-semibold text-gray-500">Preferred Time of Day *</label>
+      <div className="grid grid-cols-2 gap-4">
+        <button
+          type="button"
+          onClick={() => fields.setTimePreference('MORNING')}
+          className={`py-3 text-xs font-semibold tracking-wider uppercase text-center border transition-all cursor-pointer ${
+            fields.timePreference === 'MORNING'
+              ? 'bg-[#1D1E1E] text-white border-[#1D1E1E]'
+              : 'bg-white text-gray-600 border-[#E4E4DC] hover:border-gray-400'
+          }`}
+        >
+          Morning
+        </button>
+        <button
+          type="button"
+          onClick={() => fields.setTimePreference('AFTERNOON')}
+          className={`py-3 text-xs font-semibold tracking-wider uppercase text-center border transition-all cursor-pointer ${
+            fields.timePreference === 'AFTERNOON'
+              ? 'bg-[#1D1E1E] text-white border-[#1D1E1E]'
+              : 'bg-white text-gray-600 border-[#E4E4DC] hover:border-gray-400'
+          }`}
+        >
+          Afternoon
+        </button>
       </div>
-      <TextField
-        label="Date of Birth (Optional)"
-        type="date"
-        value={fields.dateOfBirth}
-        onChange={fields.setDateOfBirth}
-        placeholder="YYYY-MM-DD"
-      />
     </div>
   );
 }
 
 export function NameFields({ fields }: { fields: ContactFormFields }) {
   return (
-    <>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <TextField label="First Name *" value={fields.firstName} onChange={fields.setFirstName} required placeholder="Eleanor" />
-        <TextField label="Middle Name" value={fields.middleName} onChange={fields.setMiddleName} placeholder="Jean" />
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <TextField label="Last Name *" value={fields.lastName} onChange={fields.setLastName} required placeholder="Vance" />
-        <TextField label="Suffix" value={fields.suffix} onChange={fields.setSuffix} placeholder="Jr. / III" />
-      </div>
-    </>
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <TextField label="First Name *" value={fields.firstName} onChange={fields.setFirstName} required placeholder="Eleanor" />
+      <TextField label="Last Name *" value={fields.lastName} onChange={fields.setLastName} required placeholder="Vance" />
+    </div>
   );
 }
 

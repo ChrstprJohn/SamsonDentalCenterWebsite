@@ -13,18 +13,12 @@ interface ContactSectionProps {
   contactForm: {
     firstName: string;
     setFirstName: (val: string) => void;
-    middleName: string;
-    setMiddleName: (val: string) => void;
     lastName: string;
     setLastName: (val: string) => void;
-    suffix: string;
-    setSuffix: (val: string) => void;
     contactEmail: string;
     setContactEmail: (val: string) => void;
     contactMessage: string;
     setContactMessage: (val: string) => void;
-    dateOfBirth: string;
-    setDateOfBirth: (val: string) => void;
     timePreference: 'MORNING' | 'AFTERNOON';
     setTimePreference: (val: 'MORNING' | 'AFTERNOON') => void;
     isContactSubmitting: boolean;
