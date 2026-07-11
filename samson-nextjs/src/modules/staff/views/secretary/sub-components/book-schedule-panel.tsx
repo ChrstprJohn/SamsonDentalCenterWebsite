@@ -97,7 +97,38 @@ function ScheduleCalendar(props: BookSchedulePanelProps) {
         </div>
       </div>
       {props.selectedDate && <DoctorPicker {...props} />}
-      {props.selectedDoctor && <TimeslotPicker {...props} />}
+      {props.selectedDoctor && (
+        <div className="grid grid-cols-2 gap-4 mt-2">
+          <div className="flex flex-col gap-1.5">
+            <span className="text-[10px] font-bold uppercase text-text-muted tracking-wider">Start Time</span>
+            <input
+              type="time"
+              value={props.selectedTime ? new Date(props.selectedTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' }) : ''}
+              onChange={(event) => {
+                const val = event.target.value;
+                if (val && props.selectedDate) {
+                  props.selectTimeslot({ startTime: `${props.selectedDate}T${val}:00.000Z`, endTime: props.selectedTime ? props.selectedTime.split('T')[0] + 'T' + (props.selectedTime.split('T')[1] || '00:00:00.000Z') : '' });
+                }
+              }}
+              className="text-xs border border-card-border rounded-xl px-3 py-2 bg-secondary-bg/20 text-text-primary focus:outline-none focus:border-primary-start/60"
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <span className="text-[10px] font-bold uppercase text-text-muted tracking-wider">End Time</span>
+            <input
+              type="time"
+              value={props.selectedTime && props.isReadyToSubmit ? new Date(props.selectedTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' }) : ''} 
+              onChange={(event) => {
+                const val = event.target.value;
+                if (val && props.selectedDate && props.selectedTime) {
+                  props.selectTimeslot({ startTime: props.selectedTime, endTime: `${props.selectedDate}T${val}:00.000Z` });
+                }
+              }}
+              className="text-xs border border-card-border rounded-xl px-3 py-2 bg-secondary-bg/20 text-text-primary focus:outline-none focus:border-primary-start/60"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -122,10 +153,6 @@ function CalendarDay({ day, date, isAvailable, isSelected, onSelect }: { day: nu
 
 function DoctorPicker(props: BookSchedulePanelProps) {
   return <ChoiceGrid label="Available Dentist" isLoading={props.isLoadingDoctors} loadingLabel="Scanning schedules..." emptyLabel="No doctors scheduled for this service on this date." items={props.availableDoctors} selectedId={props.selectedDoctor} getId={(doctor) => doctor.doctorId} getTitle={(doctor) => doctor.doctorName} getCaption={() => 'Shift scheduled'} onSelect={props.selectDoctor} />;
-}
-
-function TimeslotPicker(props: BookSchedulePanelProps) {
-  return <ChoiceGrid label="Timeslot" isLoading={props.isLoadingSlots} loadingLabel="Retrieving slots..." emptyLabel="No available timeslots for this dentist on this date." items={props.timeslots} selectedId={props.selectedTime} getId={(slot) => slot.startTime} getTitle={(slot) => formatTimeLabel(slot.startTime)} getCaption={() => ''} onSelect={(startTime) => props.selectTimeslot(props.timeslots.find((slot) => slot.startTime === startTime)!)} />;
 }
 
 function ChoiceGrid<T>({ label, isLoading, loadingLabel, emptyLabel, items, selectedId, getId, getTitle, getCaption, onSelect }: { label: string; isLoading: boolean; loadingLabel: string; emptyLabel: string; items: T[]; selectedId: string; getId: (item: T) => string; getTitle: (item: T) => string; getCaption: (item: T) => string; onSelect: (id: string) => void }) {

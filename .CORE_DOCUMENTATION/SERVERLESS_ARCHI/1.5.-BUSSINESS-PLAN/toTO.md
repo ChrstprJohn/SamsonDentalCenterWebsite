@@ -28,14 +28,15 @@ This document outlines the current technical flow in the Samson Dental Center co
 ### Already Implemented:
 *   `DateTimeStep` component has been refactored: includes a `DoctorPreferenceSelector` ("Any Doctor" option) and a `Preferred Time of Day` toggle (Morning / Afternoon).
 *   `use-booking-data.ts` queries calendar dates for "Any Doctor" by sending `doctorId: undefined` to the backend (which aggregates dates for all rostered doctors for that service).
-
-### Must Do (Pending Tasks):
-*   [ ] **Zod Schema:** In `submit-booking.dto.ts`, ensure `doctorId` is optional/nullable.
-*   [ ] **Hook mapping (`use-user-booking.ts`):** 
+*   **Zod Schema:** In `submit-booking.dto.ts`, ensure `doctorId` is optional/nullable.
+*   **Hook mapping (`use-user-booking.ts`):** 
     *   Stop selecting a fallback doctor (e.g. `data.doctors[0]`) when "Any Doctor" (`'ANY'`) is selected.
     *   Map `resolvedDoctorId` to `null` and set `doctorAssignmentSource: 'SYSTEM'` if `'ANY'` is chosen.
     *   If a specific doctor is chosen, map `resolvedDoctorId` to their UUID and set `doctorAssignmentSource: 'USER'`.
-*   [ ] **Verification:** Ensure rescheduling and booking flow test suites are updated to verify this mapping.
+*   **Verification:** Ensure rescheduling and booking flow test suites are updated to verify this mapping.
+
+### Must Do (Pending Tasks):
+*   None (Fully Implemented)
 
 ---
 
@@ -45,9 +46,10 @@ This document outlines the current technical flow in the Samson Dental Center co
 *   Landing page form captures guest details: Name, Phone, Email, DOB, Service, Preferred Date, and Time Preference (Morning / Afternoon).
 *   Form does not ask for doctor selection.
 *   Guest submissions save to `appointment_inquiries` table with status `'NEW'`.
+*   **Mapping Verification:** Verify that `submitInquirySchema` maps inquiries correctly and that they save to the DB without a `doctor_id`.
 
 ### Must Do (Pending Tasks):
-*   [ ] **Mapping Verification:** Verify that `submitInquirySchema` maps inquiries correctly and that they save to the DB without a `doctor_id`.
+*   None (Fully Implemented)
 
 ---
 

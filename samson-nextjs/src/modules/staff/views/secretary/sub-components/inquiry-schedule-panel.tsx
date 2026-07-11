@@ -28,12 +28,40 @@ export function InquirySchedulePanel(props: InquirySchedulePanelProps) {
       <div className="border border-card-border/60 rounded-2xl p-4 bg-secondary-bg/10 flex flex-col gap-5">
         <DateSelector {...props} />
         {props.selectedDate && <DoctorSelector {...props} />}
-        {props.selectedDoctor && <SlotSelector {...props} />}
-      </div>
+      {props.selectedDoctor && (
+        <div className="grid grid-cols-2 gap-4 mt-2">
+          <div className="flex flex-col gap-1.5">
+            <span className="text-[10px] font-bold uppercase text-text-muted tracking-wider">Start Time</span>
+            <input
+              type="time"
+              value={props.selectedTime ? new Date(props.selectedTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' }) : ''}
+              onChange={(event) => {
+                const val = event.target.value;
+                if (val && props.selectedDate) {
+                  props.onSlotSelect({ startTime: `${props.selectedDate}T${val}:00.000Z`, endTime: props.selectedTime ? props.selectedTime.split('T')[0] + 'T' + (props.selectedTime.split('T')[1] || '00:00:00.000Z') : '' });
+                }
+              }}
+              className="text-xs border border-card-border rounded-xl px-3 py-2 bg-secondary-bg/25 text-text-primary focus:outline-none focus:border-primary-start/60"
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <span className="text-[10px] font-bold uppercase text-text-muted tracking-wider">End Time</span>
+            <input
+              type="time"
+              value={props.selectedTime ? new Date(props.selectedTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' }) : ''}
+              onChange={(event) => {
+                const val = event.target.value;
+                if (val && props.selectedDate && props.selectedTime) {
+                  props.onSlotSelect({ startTime: props.selectedTime, endTime: `${props.selectedDate}T${val}:00.000Z` });
+                }
+              }}
+              className="text-xs border border-card-border rounded-xl px-3 py-2 bg-secondary-bg/25 text-text-primary focus:outline-none focus:border-primary-start/60"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
-}
-
 function ServiceSelector(props: InquirySchedulePanelProps) {
   return (
     <div className="border border-card-border/60 rounded-2xl p-4 bg-secondary-bg/10 flex flex-col gap-2">
@@ -82,10 +110,6 @@ function DateSelector(props: InquirySchedulePanelProps) {
 
 function DoctorSelector(props: InquirySchedulePanelProps) {
   return <ChoiceGrid label="Available Dentist" loadingLabel="Scanning schedules..." emptyLabel="No doctors scheduled for this service on this date." isLoading={props.isLoadingDoctors} items={props.doctors} selectedId={props.selectedDoctor} getId={(doctor) => doctor.doctorId} getLabel={(doctor) => doctor.doctorName} onSelect={props.onDoctorSelect} />;
-}
-
-function SlotSelector(props: InquirySchedulePanelProps) {
-  return <ChoiceGrid label="Timeslot" loadingLabel="Retrieving slots..." emptyLabel="No available timeslots for this dentist on this date." isLoading={props.isLoadingSlots} items={props.slots} selectedId={props.selectedTime} getId={(slot) => slot.startTime} getLabel={(slot) => formatTimeLabel(slot.startTime)} onSelect={(startTime) => props.onSlotSelect(props.slots.find((slot) => slot.startTime === startTime)!)} />;
 }
 
 function ChoiceGrid<T>({ label, loadingLabel, emptyLabel, isLoading, items, selectedId, getId, getLabel, onSelect }: { label: string; loadingLabel: string; emptyLabel: string; isLoading: boolean; items: T[]; selectedId: string; getId: (item: T) => string; getLabel: (item: T) => string; onSelect: (id: string) => void }) {

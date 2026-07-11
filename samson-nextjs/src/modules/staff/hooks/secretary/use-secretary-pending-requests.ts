@@ -6,6 +6,7 @@ import { getAvailableTimeSlotsAction } from '@/modules/appointments/actions/avai
 import { getDoctorScheduleAction } from '@/modules/appointments/actions/availability/get-doctor-schedule.action';
 import { getClinicAppointmentsAction } from '@/modules/appointments/actions/clinic/get-clinic-appointments.action';
 import { updateAppointmentStatusAction } from '@/modules/appointments/actions/status/update-appointment-status.action';
+import { getAvailableDoctorsForDateAction } from '@/modules/appointments/actions/availability/get-available-doctors-for-date.action';
 import { getPatientDetailsForStaffAction } from '@/modules/patients/actions/profile/get-patient-details-for-staff.action';
 import { getServicesAction } from '@/modules/services/actions/management/get-services.action';
 import { getDoctorsAction } from '@/modules/staff/actions/management/get-doctors.action';
@@ -92,34 +93,6 @@ export function useSecretaryPendingRequests() {
     getServicesAction('BOOKABLE').then((res) => { if (res.data) setEditServices(res.data); });
   }, [isEditing, editServices.length]);
 
-  useEffect(() => {
-    if (!isEditing || !editServiceId) {
-      setEditDoctors([]);
-      setEditDoctorId('');
-      setEditAvailableDates([]);
-      return;
-    }
-    getDoctorsAction({ serviceId: editServiceId, includeHidden: true }).then((res) => {
-      if (res.success && res.data) setEditDoctors(res.data);
-    });
-  }, [isEditing, editServiceId]);
-
-  useEffect(() => {
-    if (!isEditing || !editServiceId) {
-      setEditAvailableDates([]);
-      return;
-    }
-    let active = true;
-    setIsLoadingEditDays(true);
-    const month = `${editCurrentMonth.getFullYear()}-${String(editCurrentMonth.getMonth() + 1).padStart(2, '0')}`;
-    getAvailableDaysAction({ serviceId: editServiceId, month, doctorId: editDoctorId || undefined }).then((res) => {
-      if (!active) return;
-      setEditAvailableDates(res.success && res.data ? res.data.availableDates || [] : []);
-      setIsLoadingEditDays(false);
-    });
-    return () => { active = false; };
-  }, [isEditing, editServiceId, editDoctorId, editCurrentMonth]);
-
   const selectAppointment = (appointmentId: string) => {
     setSelectedAppointmentId(appointmentId);
     setStagedStatus('');
@@ -149,6 +122,19 @@ export function useSecretaryPendingRequests() {
     });
   };
 
+  useEffect(() => {
+    if (!isEditing || !editDate || !editServiceId) {
+      setEditDoctors([]);
+      return;
+    }
+    getAvailableDoctorsForDateAction({ date: editDate, serviceId: editServiceId }).then((res) => {
+      if (res.success && res.data) {
+        const mapped = res.data.map((d: any) => ({ id: d.doctorId, firstName: d.doctorName.split(' ')[1] || d.doctorName, lastName: d.doctorName.split(' ')[2] || '' }));
+        setEditDoctors(mapped);
+      }
+    });
+  }, [isEditing, editDate, editServiceId]);
+
   const setEditService = (serviceId: string) => {
     setEditServiceId(serviceId);
     setEditDoctorId('');
@@ -159,15 +145,10 @@ export function useSecretaryPendingRequests() {
 
   const setEditDoctor = (doctorId: string) => {
     setEditDoctorId(doctorId);
-    setEditDate('');
-    setEditStartTime('');
-    setEditEndTime('');
   };
 
   const setEditAppointmentDate = (date: string) => {
     setEditDate(date);
-    setEditStartTime('');
-    setEditEndTime('');
   };
 
   const setDecision = (status: Exclude<PendingDecision, ''>) => {

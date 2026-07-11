@@ -27,15 +27,8 @@ export async function createManualBookingAction(data: CreateManualBookingDto) {
     const supabase = await createClient();
     const duration = getServiceDurationQuery(supabase)(parsed.serviceId);
 
-    const getAvailableTimeSlots = getAvailableTimeSlotsUseCase({
-      duration,
-      getDoctorSchedules: getDoctorSchedulesQuery(supabase),
-      getExistingAppointments: getExistingAppointmentsQuery(supabase),
-    });
-
     const useCase = createManualBookingUseCase({
       createManualBooking: createManualBookingCommand(supabase),
-      getAvailableTimeSlots,
     });
 
     // 3. Execution

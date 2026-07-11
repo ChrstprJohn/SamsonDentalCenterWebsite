@@ -35,8 +35,7 @@ export function PendingEditPanel(props: PendingEditPanelProps) {
       {props.isEditing && (
         <div className="p-4 flex flex-col gap-4 bg-card border-t border-card-border/60">
           <PillGroup label="1. Select Service" items={props.services} selectedId={props.serviceId} getLabel={(service) => service.name} onSelect={props.onServiceChange} />
-          {props.serviceId && <PillGroup label="2. Select Doctor" items={props.doctors} selectedId={props.doctorId} getLabel={(doctor) => `Dr. ${doctor.firstName} ${doctor.lastName}`} onSelect={props.onDoctorChange} />}
-          {props.doctorId && (
+          {props.serviceId && (
             <DatePicker
               currentMonth={props.currentMonth}
               availableDates={props.availableDates}
@@ -46,6 +45,7 @@ export function PendingEditPanel(props: PendingEditPanelProps) {
               onMonthChange={props.onMonthChange}
             />
           )}
+          {props.date && props.serviceId && <PillGroup label="3. Select Doctor" items={props.doctors} selectedId={props.doctorId} getLabel={(doctor) => `Dr. ${doctor.firstName} ${doctor.lastName}`} onSelect={props.onDoctorChange} />}
           {props.date && (
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-1.5">

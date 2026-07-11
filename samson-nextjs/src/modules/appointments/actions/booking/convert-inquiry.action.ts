@@ -27,15 +27,8 @@ export async function convertInquiryAction(data: ConvertInquiryDto) {
     const supabase = await createClient();
     const duration = getServiceDurationQuery(supabase)(parsed.serviceId);
 
-    const getAvailableTimeSlots = getAvailableTimeSlotsUseCase({
-      duration,
-      getDoctorSchedules: getDoctorSchedulesQuery(supabase),
-      getExistingAppointments: getExistingAppointmentsQuery(supabase),
-    });
-
     const useCase = convertInquiryUseCase({
       executeConversionTransaction: convertInquiryToAppointmentCommand(supabase),
-      getAvailableTimeSlots,
     });
 
     // 3. Execution
