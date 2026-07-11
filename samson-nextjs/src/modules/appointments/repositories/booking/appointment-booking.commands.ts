@@ -8,7 +8,7 @@ export const executeBookingTransactionCommand = (supabase: SupabaseClient) => {
     const { data: appointmentId, error } = await supabase.rpc('submit_booking_transaction', {
       p_patient_id: userId,
       p_service_id: data.serviceId,
-      p_doctor_id: data.doctorId,
+      p_doctor_id: data.doctorId ?? null,
       p_date: data.date,
       p_start_time: data.startTime,
       p_end_time: data.endTime,

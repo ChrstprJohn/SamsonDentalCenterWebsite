@@ -18,7 +18,9 @@ export function ReviewAppointmentDetails({
   onEditStep,
 }: ReviewAppointmentDetailsProps) {
   const selectedDoc = doctors.find((d) => d.id === selectedDoctorId);
-  const doctorName = selectedDoc ? `Dr. ${selectedDoc.firstName} ${selectedDoc.lastName}` : 'Any Doctor';
+  const doctorName = selectedDoctorId === 'ANY' || !selectedDoc
+    ? 'Any Available Doctor (Secretary will assign)'
+    : `Dr. ${selectedDoc.firstName} ${selectedDoc.lastName}`;
   const preferenceLabel = timePreference === 'MORNING' ? 'Morning (09:00 AM - 12:00 PM)' : 'Afternoon (01:00 PM - 05:00 PM)';
 
   return (

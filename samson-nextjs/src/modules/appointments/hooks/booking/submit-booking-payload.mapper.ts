@@ -12,7 +12,7 @@ interface PayloadMapperParams {
   userNote: string;
   selectedDoctorId: string;
   timePreference: 'MORNING' | 'AFTERNOON';
-  resolvedDoctorId: string;
+  resolvedDoctorId: string | null; // null when 'ANY' is selected
 }
 
 export function createBookingPayload({

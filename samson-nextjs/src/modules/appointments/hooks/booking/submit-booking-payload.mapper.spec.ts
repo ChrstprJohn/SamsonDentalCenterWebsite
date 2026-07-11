@@ -50,7 +50,7 @@ describe('createBookingPayload Mapper', () => {
     expect(payload.endTime).toBeUndefined();
   });
 
-  it('should map doctorAssignmentSource as SYSTEM when selectedDoctorId is ANY', () => {
+  it('should map doctorAssignmentSource as SYSTEM and doctorId as null when selectedDoctorId is ANY', () => {
     const payload = createBookingPayload({
       selectedService: mockService,
       selectedDate: '2025-01-01',
@@ -60,10 +60,11 @@ describe('createBookingPayload Mapper', () => {
       userNote: '',
       selectedDoctorId: 'ANY',
       timePreference: 'MORNING',
-      resolvedDoctorId: 'doc-1',
+      resolvedDoctorId: null, // null = ANY doctor — no fallback UUID
     });
 
     expect(payload.doctorAssignmentSource).toBe('SYSTEM');
+    expect(payload.doctorId).toBeNull();
   });
 
   it('should map dependent fields for NEW_DEPENDENT', () => {

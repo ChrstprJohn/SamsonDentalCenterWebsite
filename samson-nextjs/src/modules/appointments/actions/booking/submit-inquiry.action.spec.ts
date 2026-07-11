@@ -44,4 +44,43 @@ describe('submitInquiryAction', () => {
     expect(response.success).toBe(true);
     expect(response.data?.firstName).toBe('Jane');
   });
+
+  it('should return { success: false } when Zod validation fails (missing timePreference)', async () => {
+    const invalidPayload = {
+      firstName: 'Jane',
+      lastName: 'Doe',
+      phoneNumber: '+639171234567',
+      email: 'jane@example.com',
+      preferredServiceId: 'b3b07384-d113-4ec2-a5e6-ec083b0f5cc1',
+      preferredDate: '2026-06-25',
+      // timePreference omitted — required field
+    };
+
+    const response = await submitInquiryAction(invalidPayload as any);
+    expect(response.success).toBe(false);
+    expect(response.error).toBeDefined();
+  });
+
+  it('should return { success: false } when use case throws (DB error)', async () => {
+    const mockSingle = vi.fn().mockResolvedValue({ data: null, error: { message: 'DB error' } });
+    const mockSelect = vi.fn().mockReturnValue({ single: mockSingle });
+    const mockInsert = vi.fn().mockReturnValue({ select: mockSelect });
+    const mockFrom = vi.fn().mockReturnValue({ insert: mockInsert });
+
+    vi.spyOn(dbModule, 'createAdminClient').mockResolvedValue({ from: mockFrom } as any);
+
+    const payload = {
+      firstName: 'Jane',
+      lastName: 'Doe',
+      phoneNumber: '+639171234567',
+      email: 'jane@example.com',
+      preferredServiceId: 'b3b07384-d113-4ec2-a5e6-ec083b0f5cc1',
+      preferredDate: '2026-06-25',
+      timePreference: 'MORNING' as const,
+    };
+
+    const response = await submitInquiryAction(payload);
+    expect(response.success).toBe(false);
+    expect(response.error).toContain('DB error');
+  });
 });

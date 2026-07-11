@@ -10,6 +10,7 @@ describe('submitBookingSchema', () => {
         date: '2026-05-28',
         startTime: '2026-05-28T09:00:00Z',
         endTime: '2026-05-28T09:30:00Z',
+        timePreference: 'MORNING' as const,
     };
 
     // ==========================================
@@ -162,5 +163,47 @@ describe('submitBookingSchema', () => {
             timePreference: 'EVENING',
         });
         expect(result.success).toBe(false);
+    });
+
+    // ==========================================
+    // 5. NULL DOCTOR (ANY DOCTOR) TESTS
+    // ==========================================
+    it('should accept null doctorId (ANY doctor preference)', () => {
+        const result = submitBookingSchema.safeParse({
+            ...baseValidData,
+            patientType: 'SELF',
+            doctorId: null,
+            doctorAssignmentSource: 'SYSTEM',
+        });
+        expect(result.success).toBe(true);
+        if (result.success) {
+            expect(result.data.doctorId).toBeNull();
+            expect(result.data.doctorAssignmentSource).toBe('SYSTEM');
+        }
+    });
+
+    it('should accept omitted doctorId (ANY doctor preference)', () => {
+        const { doctorId, ...withoutDoctor } = baseValidData;
+        const result = submitBookingSchema.safeParse({
+            ...withoutDoctor,
+            patientType: 'SELF',
+            doctorAssignmentSource: 'SYSTEM',
+        });
+        expect(result.success).toBe(true);
+    });
+
+    it('should reject missing timePreference', () => {
+        const { timePreference, ...withoutPref } = baseValidData;
+        const result = submitBookingSchema.safeParse({
+            ...withoutPref,
+            patientType: 'SELF',
+        });
+        expect(result.success).toBe(false);
+        if (!result.success) {
+            const hasTimePrefError = result.error.issues.some(
+                (i) => i.path.includes('timePreference')
+            );
+            expect(hasTimePrefError).toBe(true);
+        }
     });
 });

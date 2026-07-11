@@ -75,6 +75,39 @@ describe('submitInquirySchema Validation', () => {
     const result = submitInquirySchema.safeParse(payload);
     expect(result.success).toBe(false);
   });
+
+  it('should reject when timePreference is missing (required field)', () => {
+    const payload = {
+      firstName: 'John',
+      lastName: 'Doe',
+      phoneNumber: '+639171234567',
+      email: 'john.doe@example.com',
+      preferredServiceId: 'b3b07384-d113-4ec2-a5e6-ec083b0f5cc1',
+      preferredDate: '2026-06-25',
+      // timePreference omitted
+    };
+    const result = submitInquirySchema.safeParse(payload);
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      const hasTimePrefError = result.error.issues.some(
+        (i) => i.path.includes('timePreference')
+      );
+      expect(hasTimePrefError).toBe(true);
+    }
+  });
+
+  it('should reject when firstName is missing', () => {
+    const payload = {
+      lastName: 'Doe',
+      phoneNumber: '+639171234567',
+      email: 'john.doe@example.com',
+      preferredServiceId: 'b3b07384-d113-4ec2-a5e6-ec083b0f5cc1',
+      preferredDate: '2026-06-25',
+      timePreference: 'MORNING' as const,
+    };
+    const result = submitInquirySchema.safeParse(payload);
+    expect(result.success).toBe(false);
+  });
 });
 
 describe('inquiryResponseSchema Transform', () => {

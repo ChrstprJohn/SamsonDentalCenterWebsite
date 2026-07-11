@@ -224,7 +224,7 @@ export function useUserBooking(
           status: 'RESCHEDULE_REQUESTED',
           statusReason: state.userNote || 'Patient requested reschedule.',
           newDate: state.selectedDate,
-          newDoctorId: state.selectedDoctorId === 'ANY' ? (data.doctors[0]?.id || '') : state.selectedDoctorId,
+          newDoctorId: state.selectedDoctorId === 'ANY' ? null : state.selectedDoctorId,
           timePreference: state.timePreference,
         });
 
@@ -253,7 +253,7 @@ export function useUserBooking(
       userNote: state.userNote,
       selectedDoctorId: state.selectedDoctorId,
       timePreference: state.timePreference,
-      resolvedDoctorId: state.selectedDoctorId === 'ANY' ? (data.doctors[0]?.id || '') : state.selectedDoctorId,
+      resolvedDoctorId: state.selectedDoctorId === 'ANY' ? null : state.selectedDoctorId,
     });
 
     try {

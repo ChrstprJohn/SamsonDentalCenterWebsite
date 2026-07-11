@@ -190,4 +190,32 @@ describe('useUserBooking Hook Specs', () => {
     expect(result.current.isSuccess).toBe(false);
     expect(mockAddToast).toHaveBeenCalledWith('Conflict: Slot already taken', 'error');
   });
+
+  it('should submit null doctorId when selectedDoctorId is ANY (no fallback to doctors[0])', async () => {
+    (submitBookingAction as any).mockResolvedValue({
+      success: true,
+      data: { appointmentId: 'appt-any-456' },
+    });
+
+    const { result } = renderHook(() => useUserBooking(mockServices));
+
+    act(() => {
+      result.current.selectService(mockServices[0]);
+      result.current.selectDate('2026-06-25');
+      result.current.setTimePreference('AFTERNOON');
+      // selectedDoctorId defaults to 'ANY' on selectService
+    });
+
+    await act(async () => {
+      await result.current.handleSubmit();
+    });
+
+    expect(submitBookingAction).toHaveBeenCalledWith(
+      expect.objectContaining({
+        doctorId: null,
+        doctorAssignmentSource: 'SYSTEM',
+      })
+    );
+    expect(result.current.isSuccess).toBe(true);
+  });
 });
