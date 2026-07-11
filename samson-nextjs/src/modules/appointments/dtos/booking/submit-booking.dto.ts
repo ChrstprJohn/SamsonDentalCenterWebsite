@@ -14,8 +14,9 @@ export const submitBookingSchema = z
         doctorAssignmentSource: z.enum(['SYSTEM', 'USER']).optional().default('SYSTEM'),
 
         date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format'),
-        startTime: z.string().datetime('Must be a valid ISO string'),
-        endTime: z.string().datetime('Must be a valid ISO string'),
+        startTime: z.string().datetime('Must be a valid ISO string').optional().or(emptyStringToUndefined),
+        endTime: z.string().datetime('Must be a valid ISO string').optional().or(emptyStringToUndefined),
+        timePreference: z.enum(['MORNING', 'AFTERNOON']).optional(),
         userNote: cleanOptionalString,
 
         patientType: z.enum(['SELF', 'EXISTING_DEPENDENT', 'NEW_DEPENDENT']),
@@ -41,12 +42,14 @@ export const submitBookingSchema = z
     })
     .superRefine((data, ctx) => {
         // 1. Chronological Ordering Boundary Guard
-        if (new Date(data.startTime) >= new Date(data.endTime)) {
-            ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                message: 'Start time must be before end time',
-                path: ['endTime'],
-            });
+        if (data.startTime && data.endTime) {
+            if (new Date(data.startTime) >= new Date(data.endTime)) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: 'Start time must be before end time',
+                    path: ['endTime'],
+                });
+            }
         }
 
         // 2. Bound Family Verification Verification Rule

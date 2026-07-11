@@ -21,6 +21,7 @@ export const executeBookingTransactionCommand = (supabase: SupabaseClient) => {
       p_new_dependent_middle_name: data.patientType === 'NEW_DEPENDENT' ? data.dependentMiddleName : null,
       p_new_dependent_suffix: data.patientType === 'NEW_DEPENDENT' ? data.dependentSuffix : null,
       p_doctor_assignment_source: data.doctorAssignmentSource,
+      p_time_preference: data.timePreference || null,
     });
 
     if (error || !appointmentId) {

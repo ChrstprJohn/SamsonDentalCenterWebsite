@@ -10,6 +10,7 @@ describe('useBookingState', () => {
     const { result } = renderHook(() => useBookingState());
     expect(result.current.currentStep).toBe(1);
     expect(result.current.selectedService).toBeNull();
+    expect(result.current.timePreference).toBe('MORNING');
   });
 
   it('should reset wizard state when requested', () => {
@@ -19,11 +20,13 @@ describe('useBookingState', () => {
       result.current.setCurrentStep(3);
       result.current.setPatientType('NEW_DEPENDENT');
       result.current.setUserNote('test note');
+      result.current.setTimePreference('AFTERNOON');
       result.current.resetState();
     });
 
     expect(result.current.currentStep).toBe(1);
     expect(result.current.patientType).toBe('SELF');
     expect(result.current.userNote).toBe('');
+    expect(result.current.timePreference).toBe('MORNING');
   });
 });

@@ -4,17 +4,23 @@ import { formatShortDate } from '@/shared/utils/date.util';
 
 interface ReviewAppointmentDetailsProps {
   date: string | null;
-  slot: BookingSlot | null;
+  timePreference: 'MORNING' | 'AFTERNOON';
+  selectedDoctorId: string;
+  doctors?: any[];
   onEditStep?: (step: 1 | 2 | 3 | 4) => void;
-  getSlotRange: () => string;
 }
 
 export function ReviewAppointmentDetails({
   date,
-  slot,
+  timePreference,
+  selectedDoctorId,
+  doctors = [],
   onEditStep,
-  getSlotRange,
 }: ReviewAppointmentDetailsProps) {
+  const selectedDoc = doctors.find((d) => d.id === selectedDoctorId);
+  const doctorName = selectedDoc ? `Dr. ${selectedDoc.firstName} ${selectedDoc.lastName}` : 'Any Doctor';
+  const preferenceLabel = timePreference === 'MORNING' ? 'Morning (09:00 AM - 12:00 PM)' : 'Afternoon (01:00 PM - 05:00 PM)';
+
   return (
     <div className="border border-slate-200 dark:border-white/10 rounded-2xl p-5 bg-card/50 dark:bg-slate-900/30 relative shadow-sm hover:scale-[1.01] transition-all duration-300 text-left">
       {onEditStep && (
@@ -25,19 +31,19 @@ export function ReviewAppointmentDetails({
           Edit
         </button>
       )}
-      <h4 className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-4">2. Date & Time</h4>
+      <h4 className="text-xs font-bold text-slate-400 dark:text-slate-505 uppercase tracking-wider mb-4">2. Date & Time</h4>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div className="flex flex-col gap-1">
           <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-wider font-bold">Appointment Date</span>
           <span className="font-bold text-slate-800 dark:text-slate-300 text-sm">📅 {date ? formatShortDate(date) : ''}</span>
         </div>
         <div className="flex flex-col gap-1">
-          <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-wider font-bold">Time Range</span>
-          <span className="font-bold text-slate-800 dark:text-slate-300 text-sm">⏰ {getSlotRange()}</span>
+          <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-wider font-bold">Preferred Time</span>
+          <span className="font-bold text-slate-800 dark:text-slate-300 text-sm">⏰ {preferenceLabel}</span>
         </div>
         <div className="flex flex-col gap-1">
-          <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-wider font-bold">Assigned Practitioner</span>
-          <span className="font-bold text-slate-800 dark:text-slate-300 text-sm">👨‍⚕️ {slot?.doctorName}</span>
+          <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-wider font-bold">Preferred Practitioner</span>
+          <span className="font-bold text-slate-800 dark:text-slate-300 text-sm">👨‍⚕️ {doctorName}</span>
         </div>
       </div>
     </div>

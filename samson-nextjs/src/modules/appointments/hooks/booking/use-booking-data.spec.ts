@@ -75,34 +75,7 @@ describe('useBookingData', () => {
   });
 
 
-  it('should fetch available slots when serviceId and date are provided', async () => {
-    (getDoctorsAction as any).mockResolvedValue({
-      success: true,
-      data: [],
-    });
-    (getAvailableDaysAction as any).mockResolvedValue({
-      success: true,
-      data: { availableDates: [], availabilityMap: {} },
-    });
-    (getAvailableTimeSlotsAction as any).mockResolvedValue({
-      success: true,
-      data: {
-        availableSlots: [
-          { startTime: '2025-01-01T09:00:00Z', doctorId: 'd1', doctorName: 'Dr. Smith' },
-        ],
-      },
-    });
 
-    const { result } = renderHook(() => useBookingData('s1', '2025-01-01', undefined));
-
-    await waitFor(() => {
-      expect(result.current.availableSlots.length).toBe(1);
-    });
-
-    expect(result.current.availableSlots[0].doctorId).toBe('d1');
-    expect(result.current.availableSlots[0].doctorName).toBe('Dr. Smith');
-    expect(getAvailableTimeSlotsAction).toHaveBeenCalled();
-  });
 
   it('should not re-fetch doctors when selectedDoctorId changes', async () => {
     (getDoctorsAction as any).mockResolvedValue({

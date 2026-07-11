@@ -5,34 +5,35 @@ import { calculateEndTimeFromIso } from '@/shared/utils/date.util';
 
 interface PayloadMapperParams {
   selectedService: ServiceResponseDto;
-  selectedSlot: BookingSlot;
   selectedDate: string;
   patientType: 'SELF' | 'EXISTING_DEPENDENT' | 'NEW_DEPENDENT';
   selectedDependentId: string | null;
   newDependentData: NewDependentInput | null;
   userNote: string;
   selectedDoctorId: string;
+  timePreference: 'MORNING' | 'AFTERNOON';
+  resolvedDoctorId: string;
 }
 
 export function createBookingPayload({
   selectedService,
-  selectedSlot,
   selectedDate,
   patientType,
   selectedDependentId,
   newDependentData,
   userNote,
   selectedDoctorId,
+  timePreference,
+  resolvedDoctorId,
 }: PayloadMapperParams): SubmitBookingDto {
   const payload: SubmitBookingDto = {
     idempotencyKey: crypto.randomUUID(),
     serviceId: selectedService.id,
-    doctorId: selectedSlot.doctorId,
-    isPreferredDoctor: selectedSlot.isPreferred ?? false,
+    doctorId: resolvedDoctorId,
+    isPreferredDoctor: selectedDoctorId !== 'ANY',
     doctorAssignmentSource: selectedDoctorId === 'ANY' ? 'SYSTEM' : 'USER',
     date: selectedDate,
-    startTime: selectedSlot.originalStartTime,
-    endTime: calculateEndTimeFromIso(selectedSlot.originalStartTime, selectedService.durationMinutes).toISOString(),
+    timePreference,
     patientType,
     userNote: userNote || undefined,
   };

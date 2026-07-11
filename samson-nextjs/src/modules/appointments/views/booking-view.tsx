@@ -26,14 +26,13 @@ export function BookingView({ services, userProfile, userDependents, reschedulin
     currentStep,
     selectedService,
     selectedDate,
-    selectedSlot,
+    timePreference,
     selectedDoctorId,
     patientType,
     selectedDependentId,
     newDependentData,
     userNote,
     availableDates,
-    availableSlots,
     doctors,
     isLoadingAvailability,
     isLoadingDoctors,
@@ -47,7 +46,7 @@ export function BookingView({ services, userProfile, userDependents, reschedulin
     goToStep,
     selectService,
     selectDate,
-    selectSlot,
+    setTimePreference,
     selectDoctor,
     setPatientType,
     setSelectedDependentId,
@@ -61,7 +60,9 @@ export function BookingView({ services, userProfile, userDependents, reschedulin
       <BookingSuccessView
         appointmentId={createdAppointmentId}
         service={selectedService}
-        slot={selectedSlot}
+        timePreference={timePreference}
+        selectedDoctorId={selectedDoctorId}
+        doctors={doctors}
         date={selectedDate}
         patientName={getPatientName(patientType, selectedDependentId, newDependentData, userProfile, userDependents)}
         patientType={patientType}
@@ -94,15 +95,14 @@ export function BookingView({ services, userProfile, userDependents, reschedulin
         {currentStep === 2 && (
           <DateTimeStep
             selectedDate={selectedDate}
-            selectedSlot={selectedSlot}
+            timePreference={timePreference}
             selectedDoctorId={selectedDoctorId}
             doctors={doctors}
             availableDates={availableDates}
-            availableSlots={availableSlots}
             isLoading={isLoadingAvailability}
             isLoadingDoctors={isLoadingDoctors}
             onSelectDate={selectDate}
-            onSelectSlot={selectSlot}
+            onSelectTimePreference={setTimePreference}
             onSelectDoctor={selectDoctor}
           />
         )}
@@ -124,7 +124,9 @@ export function BookingView({ services, userProfile, userDependents, reschedulin
           <ReviewStep
             service={selectedService}
             date={selectedDate}
-            slot={selectedSlot}
+            timePreference={timePreference}
+            selectedDoctorId={selectedDoctorId}
+            doctors={doctors}
             patientType={patientType}
             selectedDependentId={selectedDependentId}
             newDependentData={newDependentData}

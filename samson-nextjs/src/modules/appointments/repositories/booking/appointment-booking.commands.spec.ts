@@ -53,6 +53,7 @@ describe('AppointmentBookingCommands', () => {
         p_new_dependent_middle_name: null,
         p_new_dependent_suffix: null,
         p_doctor_assignment_source: 'USER',
+        p_time_preference: null,
       });
       expect(result).toMatchObject({ appointmentId: validApptId });
     });

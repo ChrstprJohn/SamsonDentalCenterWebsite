@@ -10,9 +10,10 @@ export const requestRescheduleTransactionCommand = (supabase: SupabaseClient) =>
     reason: string,
     proposedMetadata: {
       date: string;
-      startTime: string;
-      endTime: string;
+      startTime?: string;
+      endTime?: string;
       doctorId: string;
+      timePreference?: string;
     }
   ): Promise<AppointmentDto> => {
     const { data, error } = await supabase.rpc('request_reschedule_transaction', {
@@ -21,9 +22,10 @@ export const requestRescheduleTransactionCommand = (supabase: SupabaseClient) =>
       p_actor_role:           actorRole,
       p_reason:               reason,
       p_proposed_date:        proposedMetadata.date,
-      p_proposed_start_time:  proposedMetadata.startTime,
-      p_proposed_end_time:    proposedMetadata.endTime,
+      p_proposed_start_time:  proposedMetadata.startTime || null,
+      p_proposed_end_time:    proposedMetadata.endTime || null,
       p_proposed_doctor_id:   proposedMetadata.doctorId,
+      p_proposed_time_preference: proposedMetadata.timePreference || null,
     });
 
     if (error || !data || (Array.isArray(data) && data.length === 0)) {

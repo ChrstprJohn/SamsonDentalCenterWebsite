@@ -139,4 +139,28 @@ describe('submitBookingSchema', () => {
         });
         expect(result.success).toBe(false);
     });
+
+    it('should validate when startTime/endTime are omitted and timePreference is provided', () => {
+        const dataWithoutTimes = { ...baseValidData };
+        delete (dataWithoutTimes as any).startTime;
+        delete (dataWithoutTimes as any).endTime;
+        const result = submitBookingSchema.safeParse({
+            ...dataWithoutTimes,
+            patientType: 'SELF',
+            timePreference: 'MORNING',
+        });
+        expect(result.success).toBe(true);
+        if (result.success) {
+            expect(result.data.timePreference).toBe('MORNING');
+        }
+    });
+
+    it('should reject invalid timePreference values', () => {
+        const result = submitBookingSchema.safeParse({
+            ...baseValidData,
+            patientType: 'SELF',
+            timePreference: 'EVENING',
+        });
+        expect(result.success).toBe(false);
+    });
 });

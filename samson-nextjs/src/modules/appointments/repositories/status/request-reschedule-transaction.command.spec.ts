@@ -53,6 +53,7 @@ describe('requestRescheduleTransactionCommand', () => {
       p_proposed_start_time: PROPOSED.startTime,
       p_proposed_end_time:   PROPOSED.endTime,
       p_proposed_doctor_id:  PROPOSED.doctorId,
+      p_proposed_time_preference: null,
     });
 
     expect(result.id).toBe(APPT_ID);

@@ -6,7 +6,7 @@ export function useBookingState() {
   const [currentStep, setCurrentStep] = useState<BookingStep>(1);
   const [selectedService, setSelectedService] = useState<ServiceResponseDto | null>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const [selectedSlot, setSelectedSlot] = useState<BookingSlot | null>(null);
+  const [timePreference, setTimePreference] = useState<'MORNING' | 'AFTERNOON'>('MORNING');
   const [selectedDoctorId, setSelectedDoctorId] = useState<string>('ANY');
   
   const [patientType, setPatientType] = useState<'SELF' | 'EXISTING_DEPENDENT' | 'NEW_DEPENDENT'>('SELF');
@@ -19,7 +19,7 @@ export function useBookingState() {
     setCurrentStep(1);
     setSelectedService(null);
     setSelectedDate(null);
-    setSelectedSlot(null);
+    setTimePreference('MORNING');
     setSelectedDoctorId('ANY');
     setPatientType('SELF');
     setSelectedDependentId(null);
@@ -31,7 +31,7 @@ export function useBookingState() {
     currentStep, setCurrentStep,
     selectedService, setSelectedService,
     selectedDate, setSelectedDate,
-    selectedSlot, setSelectedSlot,
+    timePreference, setTimePreference,
     selectedDoctorId, setSelectedDoctorId,
     patientType, setPatientType,
     selectedDependentId, setSelectedDependentId,

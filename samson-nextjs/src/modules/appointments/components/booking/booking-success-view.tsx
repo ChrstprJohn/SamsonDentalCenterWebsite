@@ -11,22 +11,31 @@ import { formatShortDate, formatClinicTime, calculateEndTimeFromIso } from '@/sh
 interface BookingSuccessViewProps {
   appointmentId: string | null;
   service: ServiceResponseDto | null;
-  slot: BookingSlot | null;
+  timePreference: 'MORNING' | 'AFTERNOON';
+  selectedDoctorId: string;
+  doctors?: any[];
   date: string | null;
   patientName: string;
   patientType: 'SELF' | 'EXISTING_DEPENDENT' | 'NEW_DEPENDENT';
   relationship?: string | null;
 }
 
-export function BookingSuccessView({ appointmentId, service, slot, date, patientName, patientType, relationship }: BookingSuccessViewProps) {
+export function BookingSuccessView({
+  appointmentId,
+  service,
+  timePreference,
+  selectedDoctorId,
+  doctors = [],
+  date,
+  patientName,
+  patientType,
+  relationship,
+}: BookingSuccessViewProps) {
   const router = useRouter();
 
-  const getSlotRange = () => {
-    if (!date || !slot || !service) return '';
-    const start = new Date(slot.originalStartTime);
-    const end = calculateEndTimeFromIso(slot.originalStartTime, service.durationMinutes);
-    return `${formatClinicTime(start)} - ${formatClinicTime(end)}`;
-  };
+  const selectedDoc = doctors.find((d) => d.id === selectedDoctorId);
+  const doctorName = selectedDoc ? `Dr. ${selectedDoc.firstName} ${selectedDoc.lastName}` : 'Any Doctor';
+  const preferenceLabel = timePreference === 'MORNING' ? 'Morning (09:00 AM - 12:00 PM)' : 'Afternoon (01:00 PM - 05:00 PM)';
 
   return (
     <div className="w-full max-w-xl mx-auto p-8 rounded-3xl border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-slate-950/40 backdrop-blur-2xl shadow-2xl text-center flex flex-col items-center gap-6 animate-in fade-in zoom-in duration-300">
@@ -35,7 +44,7 @@ export function BookingSuccessView({ appointmentId, service, slot, date, patient
       </div>
       <div className="flex flex-col gap-2">
         <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Request Submitted Successfully!</h2>
-        <p className="text-sm text-slate-500 max-w-md">
+        <p className="text-sm text-slate-505 max-w-md">
           Your appointment request has been routed to our clinic desk. Our administration team is currently verifying the details against the doctor’s real-time schedule.
         </p>
       </div>
@@ -57,8 +66,8 @@ export function BookingSuccessView({ appointmentId, service, slot, date, patient
           <span className="font-semibold text-slate-800 dark:text-slate-200">{service?.name}</span>
         </div>
         <div className="flex justify-between">
-          <span className="text-slate-400">Assigned Doctor</span>
-          <span className="font-semibold text-slate-800 dark:text-slate-200">{slot?.doctorName}</span>
+          <span className="text-slate-400">Preferred Doctor</span>
+          <span className="font-semibold text-slate-800 dark:text-slate-200">{doctorName}</span>
         </div>
         <div className="flex justify-between">
           <span className="text-slate-400">Date</span>
@@ -66,7 +75,7 @@ export function BookingSuccessView({ appointmentId, service, slot, date, patient
         </div>
         <div className="flex justify-between">
           <span className="text-slate-400">Requested Window</span>
-          <span className="font-semibold text-slate-800 dark:text-slate-200">{getSlotRange()}</span>
+          <span className="font-semibold text-slate-800 dark:text-slate-200">{preferenceLabel}</span>
         </div>
         <div className="flex justify-between items-center">
           <span className="text-slate-400">Current Status</span>

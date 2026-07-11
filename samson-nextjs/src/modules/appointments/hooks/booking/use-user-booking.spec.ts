@@ -116,15 +116,10 @@ describe('useUserBooking Hook Specs', () => {
     });
     expect(result.current.currentStep).toBe(2);
 
-    // Select date and slot
+    // Select date and set time preference
     act(() => {
       result.current.selectDate('2026-06-25');
-      result.current.selectSlot({
-        time: '10:00 AM',
-        originalStartTime: '2026-06-25T10:00:00.000Z',
-        doctorId: 'doc-1',
-        doctorName: 'Dr. Samson',
-      });
+      result.current.setTimePreference('MORNING');
     });
 
     act(() => {
@@ -159,12 +154,7 @@ describe('useUserBooking Hook Specs', () => {
     act(() => {
       result.current.selectService(mockServices[0]);
       result.current.selectDate('2026-06-25');
-      result.current.selectSlot({
-        time: '10:00 AM',
-        originalStartTime: '2026-06-25T10:00:00.000Z',
-        doctorId: 'doc-1',
-        doctorName: 'Dr. Samson',
-      });
+      result.current.setTimePreference('MORNING');
     });
 
     await act(async () => {
@@ -189,12 +179,7 @@ describe('useUserBooking Hook Specs', () => {
     act(() => {
       result.current.selectService(mockServices[0]);
       result.current.selectDate('2026-06-25');
-      result.current.selectSlot({
-        time: '10:00 AM',
-        originalStartTime: '2026-06-25T10:00:00.000Z',
-        doctorId: 'doc-1',
-        doctorName: 'Dr. Samson',
-      });
+      result.current.setTimePreference('MORNING');
     });
 
     await act(async () => {

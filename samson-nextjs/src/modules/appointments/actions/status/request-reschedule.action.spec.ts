@@ -72,6 +72,7 @@ describe('requestRescheduleAction', () => {
         startTime: '2026-06-01T09:00:00Z',
         endTime: '2026-06-01T09:30:00Z',
         doctorId,
+        timePreference: undefined,
       }
     );
   });

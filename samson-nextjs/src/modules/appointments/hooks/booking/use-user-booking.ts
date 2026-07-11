@@ -38,6 +38,7 @@ interface UseUserBookingReturn {
   selectedDate: string | null;
   selectedSlot: BookingSlot | null;
   selectedDoctorId: string;
+  timePreference: 'MORNING' | 'AFTERNOON';
   patientType: 'SELF' | 'EXISTING_DEPENDENT' | 'NEW_DEPENDENT';
   selectedDependentId: string | null;
   newDependentData: NewDependentInput | null;
@@ -60,6 +61,7 @@ interface UseUserBookingReturn {
   selectService: (service: ServiceResponseDto) => void;
   selectDate: (date: string) => void;
   selectSlot: (slot: BookingSlot) => void;
+  setTimePreference: (pref: 'MORNING' | 'AFTERNOON') => void;
   selectDoctor: (doctorId: string) => void;
   setPatientType: (type: 'SELF' | 'EXISTING_DEPENDENT' | 'NEW_DEPENDENT') => void;
   setSelectedDependentId: (id: string | null) => void;
@@ -118,13 +120,16 @@ export function useUserBooking(
         state.setPatientType('SELF');
       }
       state.setUserNote(reschedulingAppointment.userNote || '');
+      if (reschedulingAppointment.timePreference) {
+        state.setTimePreference(reschedulingAppointment.timePreference);
+      }
       state.setCurrentStep(2);
     }
   }, [reschedulingAppointment, services]);
 
   const nextStep = () => {
     if (state.currentStep === 1 && !state.selectedService) return;
-    if (state.currentStep === 2 && (!state.selectedDate || !state.selectedSlot)) return;
+    if (state.currentStep === 2 && !state.selectedDate) return;
     if (state.currentStep === 3) {
       if (state.patientType === 'EXISTING_DEPENDENT' && !state.selectedDependentId) return;
       if (state.patientType === 'NEW_DEPENDENT' && !state.newDependentData) return;
@@ -142,7 +147,7 @@ export function useUserBooking(
 
   const goToStep = (step: BookingStep) => {
     if (step > 1 && !state.selectedService) return;
-    if (step > 2 && (!state.selectedDate || !state.selectedSlot)) return;
+    if (step > 2 && !state.selectedDate) return;
     if (step > 3) {
       if (state.patientType === 'EXISTING_DEPENDENT' && !state.selectedDependentId) return;
       if (state.patientType === 'NEW_DEPENDENT' && !state.newDependentData) return;
@@ -154,23 +159,20 @@ export function useUserBooking(
     if (reschedulingAppointment) return;
     state.setSelectedService(service);
     state.setSelectedDate(null);
-    state.setSelectedSlot(null);
     state.setSelectedDoctorId('ANY');
   };
 
   const selectDate = (date: string) => {
     state.setSelectedDate(date);
-    state.setSelectedSlot(null);
   };
 
   const selectDoctor = (doctorId: string) => {
     state.setSelectedDoctorId(doctorId);
     state.setSelectedDate(null);
-    state.setSelectedSlot(null);
   };
 
   const selectSlot = (slot: BookingSlot) => {
-    state.setSelectedSlot(slot);
+    // No-op in request-to-confirm mode
   };
 
   const validateAbuse = (): { valid: boolean; message?: string } => {
@@ -186,7 +188,6 @@ export function useUserBooking(
   const resetWizard = () => {
     state.resetState();
     data.setAvailableDates([]);
-    data.setAvailableSlots([]);
     setIsSuccess(false);
     setCreatedAppointmentId(null);
     setIsSubmitting(false);
@@ -194,15 +195,16 @@ export function useUserBooking(
 
   const isNextDisabled = () => {
     if (state.currentStep === 1 && !state.selectedService) return true;
-    if (state.currentStep === 2 && (!state.selectedDate || !state.selectedSlot)) return true;
+    if (state.currentStep === 2 && !state.selectedDate) return true;
     if (state.currentStep === 3) {
       if (state.patientType === 'EXISTING_DEPENDENT' && !state.selectedDependentId) return true;
       if (state.patientType === 'NEW_DEPENDENT' && !state.newDependentData) return true;
     }
     return false;
   };
+
   const handleSubmit = async () => {
-    if (!state.selectedService || !state.selectedDate || !state.selectedSlot) {
+    if (!state.selectedService || !state.selectedDate) {
       addToast('Missing booking details.', 'error');
       return;
     }
@@ -217,19 +219,13 @@ export function useUserBooking(
     
     if (reschedulingAppointment) {
       try {
-        const endTime = calculateEndTimeFromIso(
-          state.selectedSlot.originalStartTime,
-          state.selectedService.durationMinutes
-        ).toISOString();
-
         const response = await requestRescheduleAction({
           appointmentId: reschedulingAppointment.id,
           status: 'RESCHEDULE_REQUESTED',
           statusReason: state.userNote || 'Patient requested reschedule.',
           newDate: state.selectedDate,
-          newStartTime: state.selectedSlot.originalStartTime,
-          newEndTime: endTime,
-          newDoctorId: state.selectedSlot.doctorId,
+          newDoctorId: state.selectedDoctorId === 'ANY' ? (data.doctors[0]?.id || '') : state.selectedDoctorId,
+          timePreference: state.timePreference,
         });
 
         if (response.success) {
@@ -250,13 +246,14 @@ export function useUserBooking(
 
     const payload = createBookingPayload({
       selectedService: state.selectedService,
-      selectedSlot: state.selectedSlot,
       selectedDate: state.selectedDate,
       patientType: state.patientType,
       selectedDependentId: state.selectedDependentId,
       newDependentData: state.newDependentData,
       userNote: state.userNote,
       selectedDoctorId: state.selectedDoctorId,
+      timePreference: state.timePreference,
+      resolvedDoctorId: state.selectedDoctorId === 'ANY' ? (data.doctors[0]?.id || '') : state.selectedDoctorId,
     });
 
     try {
@@ -278,6 +275,7 @@ export function useUserBooking(
   return {
     ...state,
     ...data,
+    selectedSlot: null,
     isSubmitting,
     isSuccess,
     createdAppointmentId,

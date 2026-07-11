@@ -25,21 +25,7 @@ describe('submitBookingUseCase', () => {
     mockGetAvailableTimeSlots = vi.fn();
   });
 
-  it('should successfully book an appointment if the slot is completely available', async () => {
-    // Mock the slot as available
-    mockGetAvailableTimeSlots.mockResolvedValueOnce({
-      date: '2024-12-25',
-      serviceId: mockDto.serviceId,
-      availableSlots: [
-        {
-          startTime: mockDto.startTime,
-          endTime: mockDto.endTime,
-          doctorId: mockDto.doctorId,
-          doctorName: 'Dr. John Doe',
-        },
-      ],
-    });
-
+  it('should successfully book an appointment without checking slots', async () => {
     const mockCreatedAppt = { appointmentId: 'appt-123' };
     mockExecuteBookingTransaction.mockResolvedValueOnce(mockCreatedAppt);
 
@@ -54,41 +40,7 @@ describe('submitBookingUseCase', () => {
     expect(mockExecuteBookingTransaction).toHaveBeenCalledWith('user-123', mockDto);
   });
 
-  it('should throw ValidationError if the requested slot is not in the list of available slots', async () => {
-    // Mock availability returning no slots (slot is taken)
-    mockGetAvailableTimeSlots.mockResolvedValueOnce({
-      date: '2024-12-25',
-      serviceId: mockDto.serviceId,
-      availableSlots: [],
-    });
-
-    const useCase = submitBookingUseCase({
-      executeBookingTransaction: mockExecuteBookingTransaction,
-      getAvailableTimeSlots: mockGetAvailableTimeSlots,
-    });
-
-    await expect(useCase('user-123', mockDto)).rejects.toThrow(
-      ValidationError
-    );
-
-    expect(mockExecuteBookingTransaction).not.toHaveBeenCalled();
-  });
-
   it('should throw ValidationError if a database unique constraint violation occurs', async () => {
-    // Mock availability returning the slot as available (simulating race condition before DB insert)
-    mockGetAvailableTimeSlots.mockResolvedValueOnce({
-      date: '2024-12-25',
-      serviceId: mockDto.serviceId,
-      availableSlots: [
-        {
-          startTime: mockDto.startTime,
-          endTime: mockDto.endTime,
-          doctorId: mockDto.doctorId,
-          doctorName: 'Dr. John Doe',
-        },
-      ],
-    });
-
     // Mock DB unique constraint violation
     const dbError = new Error('duplicate key value violates unique constraint') as any;
     dbError.code = '23P01';

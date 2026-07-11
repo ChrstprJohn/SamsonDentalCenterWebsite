@@ -118,8 +118,9 @@ CREATE TABLE appointments (
     service_id UUID REFERENCES services(id) ON DELETE RESTRICT NOT NULL,
     doctor_id UUID REFERENCES users(id) ON DELETE RESTRICT NOT NULL,
     date DATE NOT NULL,
-    start_time TIMESTAMPTZ NOT NULL,
-    end_time TIMESTAMPTZ NOT NULL,
+    start_time TIMESTAMPTZ, -- Nullable for pending request-to-confirm bookings
+    end_time TIMESTAMPTZ,   -- Nullable for pending request-to-confirm bookings
+    time_preference TEXT CHECK (time_preference IN ('MORNING', 'AFTERNOON')),
     status appointment_status DEFAULT 'PENDING'::appointment_status NOT NULL,
     source appointment_source DEFAULT 'SELF_BOOKED'::appointment_source NOT NULL,
     user_note TEXT,
@@ -129,6 +130,7 @@ CREATE TABLE appointments (
     proposed_start_time TIMESTAMPTZ,
     proposed_end_time TIMESTAMPTZ,
     proposed_doctor_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    proposed_time_preference TEXT CHECK (proposed_time_preference IN ('MORNING', 'AFTERNOON')),
     reschedule_count INT DEFAULT 0 NOT NULL,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -137,7 +139,7 @@ CREATE TABLE appointments (
     CONSTRAINT no_overlapping_appointments EXCLUDE USING gist (
         doctor_id WITH =,
         tstzrange(start_time, end_time) WITH &&
-    ),
+    ) WHERE (status != 'PENDING' AND status != 'RESCHEDULE_REQUESTED'),
     CONSTRAINT valid_appointment_time CHECK (start_time < end_time)
 );
 
@@ -156,6 +158,8 @@ CREATE TABLE appointment_inquiries (
     status inquiry_status DEFAULT 'NEW'::inquiry_status NOT NULL,
     secretary_notes TEXT,
     linked_appointment_id UUID REFERENCES appointments(id) ON DELETE SET NULL,
+    date_of_birth DATE,
+    time_preference TEXT CHECK (time_preference IN ('MORNING', 'AFTERNOON')),
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
 );

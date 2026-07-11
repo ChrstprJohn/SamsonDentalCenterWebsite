@@ -39,9 +39,9 @@ describe('useUserDashboardSummary', () => {
   it('selects the nearest actionable upcoming appointment', () => {
     const { result } = renderHook(() =>
       useUserDashboardSummary([
-        appointment('later', 'APPROVED', '2026-07-20', '10:00'),
-        appointment('cancelled', 'CANCELLED', '2026-07-01', '09:00'),
-        appointment('soon', 'CHECKED_IN', '2026-07-02', '08:30'),
+        appointment('later', 'APPROVED', '2026-08-20', '10:00'),
+        appointment('cancelled', 'CANCELLED', '2026-08-01', '09:00'),
+        appointment('soon', 'CHECKED_IN', '2026-08-02', '08:30'),
       ])
     );
 

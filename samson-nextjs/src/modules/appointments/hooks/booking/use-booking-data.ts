@@ -1,28 +1,8 @@
 import { useState, useEffect } from 'react';
-import { getAvailableTimeSlotsAction } from '../../actions/availability/get-available-time-slots.action';
 import { getAvailableDaysAction } from '../../actions/availability/get-available-days.action';
 import { getDoctorsAction } from '@/modules/staff/actions/management/get-doctors.action';
-import type { AvailabilityMapDto, AvailableSlotDto } from '../../dtos/exports';
+import type { AvailabilityMapDto } from '../../dtos/exports';
 import type { UserProfileResponseDto } from '@/modules/staff/dtos/exports';
-import type { BookingSlot } from './use-user-booking';
-
-function formatSlotsForBooking(slots: AvailableSlotDto[]): BookingSlot[] {
-  return slots.map((slot) => {
-    const timeObj = new Date(slot.startTime);
-    const formattedTime = timeObj.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      timeZone: 'UTC',
-    });
-
-    return {
-      time: formattedTime,
-      originalStartTime: slot.startTime,
-      doctorId: slot.doctorId,
-      doctorName: slot.doctorName,
-    };
-  });
-}
 
 export function useBookingData(
   selectedServiceId: string | undefined,
@@ -32,7 +12,6 @@ export function useBookingData(
   clinicConfig?: any
 ) {
   const [availableDates, setAvailableDates] = useState<string[]>([]);
-  const [availableSlots, setAvailableSlots] = useState<BookingSlot[]>([]);
   const [availabilityMap, setAvailabilityMap] = useState<AvailabilityMapDto>({});
   const [doctors, setDoctors] = useState<UserProfileResponseDto[]>([]);
   const [isLoadingAvailability, setIsLoadingAvailability] = useState(false);
@@ -182,69 +161,14 @@ export function useBookingData(
     };
   }, [selectedServiceId, selectedDoctorId, clinicConfig]);
 
-  // Effect 3: Fetch Available Slots when Date/Doctor is selected
-  useEffect(() => {
-    let active = true;
-    const controller = new AbortController();
-
-    async function fetchSlots() {
-      if (!selectedServiceId || !selectedDate) {
-        setAvailableSlots([]);
-        return;
-      }
-
-      // const cachedSlots = availabilityMap[selectedDate];
-      // if (cachedSlots) {
-      //   setAvailableSlots(formatSlotsForBooking(cachedSlots));
-      //   return;
-      // }
-
-      setIsLoadingAvailability(true);
-      try {
-        const res = await getAvailableTimeSlotsAction({
-          serviceId: selectedServiceId,
-          date: selectedDate,
-          doctorId: selectedDoctorId === 'ANY' ? undefined : selectedDoctorId,
-        });
-        if (active) {
-          if (res.success && res.data) {
-            const nowTime = Date.now();
-            const filteredSlots = res.data.availableSlots.filter(
-              (slot) => new Date(slot.startTime).getTime() > nowTime
-            );
-            setAvailableSlots(formatSlotsForBooking(filteredSlots));
-          } else {
-            setAvailableSlots([]);
-          }
-        }
-      } catch (err) {
-        console.error(err);
-        if (active) {
-          setAvailableSlots([]);
-        }
-      } finally {
-        if (active) {
-          setIsLoadingAvailability(false);
-        }
-      }
-    }
-
-    fetchSlots();
-
-    return () => {
-      active = false;
-      controller.abort();
-    };
-  }, [selectedServiceId, selectedDate, selectedDoctorId]);
-
   return {
     availableDates,
-    availableSlots,
+    availableSlots: [],
     availabilityMap,
     doctors,
     isLoadingAvailability,
     isLoadingDoctors,
     setAvailableDates,
-    setAvailableSlots,
+    setAvailableSlots: () => {},
   };
 }

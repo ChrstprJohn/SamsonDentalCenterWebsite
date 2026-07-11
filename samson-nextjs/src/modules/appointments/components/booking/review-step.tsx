@@ -12,7 +12,9 @@ import { ReviewContactDetails } from './sub-components/review-contact-details';
 interface ReviewStepProps {
   service: ServiceResponseDto | null;
   date: string | null;
-  slot: BookingSlot | null;
+  timePreference: 'MORNING' | 'AFTERNOON';
+  selectedDoctorId: string;
+  doctors?: any[];
   patientType: 'SELF' | 'EXISTING_DEPENDENT' | 'NEW_DEPENDENT';
   selectedDependentId: string | null;
   newDependentData: NewDependentInput | null;
@@ -25,7 +27,9 @@ interface ReviewStepProps {
 export function ReviewStep({
   service,
   date,
-  slot,
+  timePreference,
+  selectedDoctorId,
+  doctors = [],
   patientType,
   selectedDependentId,
   newDependentData,
@@ -34,13 +38,6 @@ export function ReviewStep({
   userProfile,
   userDependents,
 }: ReviewStepProps) {
-  const getSlotRange = () => {
-    if (!date || !slot || !service) return '';
-    const start = new Date(slot.originalStartTime);
-    const end = calculateEndTimeFromIso(slot.originalStartTime, service.durationMinutes);
-    return `${formatClinicTime(start)} - ${formatClinicTime(end)}`;
-  };
-
   return (
     <div className="flex flex-col gap-6 text-left">
       <div className="flex flex-col gap-1 mb-2">
@@ -50,7 +47,13 @@ export function ReviewStep({
 
       <ReviewServiceDetails service={service} onEditStep={onEditStep} />
 
-      <ReviewAppointmentDetails date={date} slot={slot} onEditStep={onEditStep} getSlotRange={getSlotRange} />
+      <ReviewAppointmentDetails
+        date={date}
+        timePreference={timePreference}
+        selectedDoctorId={selectedDoctorId}
+        doctors={doctors}
+        onEditStep={onEditStep}
+      />
 
       {/* Patient Details Section */}
       <div className="border border-slate-200 dark:border-white/10 rounded-2xl p-5 bg-card/50 dark:bg-slate-900/30 relative shadow-sm hover:scale-[1.01] transition-all duration-300">
