@@ -32,7 +32,7 @@ This architecture simplifies the online patient experience while ensuring the Se
 
 ---
 
-## 2. The Secretary's "Bridge" Flow (The Confirmation)
+## 2. The Secretary's "Bridge" Flow (The Confirmation) - [FULLY IMPLEMENTED]
 
 When the Secretary opens a `PENDING` request on the dashboard, they see the pre-filled data. Here is the logic for handling confirmation:
 
@@ -50,7 +50,7 @@ When the Secretary opens a `PENDING` request on the dashboard, they see the pre-
 
 ---
 
-## 3. The Mirroring Flow (Walk-in / Phone Call)
+## 3. The Mirroring Flow (Walk-in / Phone Call) - [FULLY IMPLEMENTED]
 
 Ensures walk-ins and phone calls receive the same automated notifications and reminder tracking.
 

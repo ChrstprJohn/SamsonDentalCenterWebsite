@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const doctorScheduleDbSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string(),
   doctor_id: z.string().uuid(),
   day_of_week: z.number().int().min(0).max(6),
   start_time: z.string().nullable(),
