@@ -74,10 +74,10 @@ describe('useSecretaryPendingRequests', () => {
     act(() => result.current.setEditDoctor('doctor-2'));
     await waitFor(() => expect(result.current.editAvailableDates).toContain('2026-07-03'));
     act(() => result.current.setEditAppointmentDate('2026-07-03'));
-    await waitFor(() => expect(result.current.editSlots).toHaveLength(1));
 
     act(() => {
-      result.current.setEditSlot({ startTime: '2026-07-03T09:00:00Z', endTime: '2026-07-03T09:30:00Z' });
+      result.current.setEditStartTime('09:00');
+      result.current.setEditEndTime('09:30');
       result.current.setDecision('APPROVED');
       result.current.setReason('Roster schedule cleared');
     });
@@ -90,8 +90,8 @@ describe('useSecretaryPendingRequests', () => {
       newServiceId: 'service-2',
       newDoctorId: 'doctor-2',
       newDate: '2026-07-03',
-      newStartTime: '2026-07-03T09:00:00Z',
-      newEndTime: '2026-07-03T09:30:00Z',
+      newStartTime: '2026-07-03T09:00:00.000Z',
+      newEndTime: '2026-07-03T09:30:00.000Z',
     });
   });
 });

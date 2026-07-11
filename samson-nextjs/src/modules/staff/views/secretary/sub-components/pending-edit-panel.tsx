@@ -11,17 +11,17 @@ interface PendingEditPanelProps {
   availableDates: string[];
   date: string;
   currentMonth: Date;
-  slots: { startTime: string; endTime: string }[];
   startTime: string;
+  endTime: string;
   note: string;
   isLoadingDays: boolean;
-  isLoadingSlots: boolean;
   onToggle: () => void;
   onServiceChange: (serviceId: string) => void;
   onDoctorChange: (doctorId: string) => void;
   onDateChange: (date: string) => void;
   onMonthChange: (date: Date) => void;
-  onSlotChange: (slot: { startTime: string; endTime: string }) => void;
+  onStartTimeChange: (time: string) => void;
+  onEndTimeChange: (time: string) => void;
   onNoteChange: (note: string) => void;
 }
 
@@ -47,10 +47,29 @@ export function PendingEditPanel(props: PendingEditPanelProps) {
             />
           )}
           {props.date && (
-            <SlotPicker slots={props.slots} startTime={props.startTime} isLoading={props.isLoadingSlots} onSlotChange={props.onSlotChange} />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col gap-1.5">
+                <span className="text-[10px] font-bold uppercase text-text-muted tracking-wider">4. Start Time</span>
+                <input
+                  type="time"
+                  value={props.startTime}
+                  onChange={(event) => props.onStartTimeChange(event.target.value)}
+                  className="text-xs border border-card-border rounded-xl px-3 py-2 bg-secondary-bg/20 text-text-primary focus:outline-none focus:border-primary-start/60"
+                />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <span className="text-[10px] font-bold uppercase text-text-muted tracking-wider">5. End Time</span>
+                <input
+                  type="time"
+                  value={props.endTime}
+                  onChange={(event) => props.onEndTimeChange(event.target.value)}
+                  className="text-xs border border-card-border rounded-xl px-3 py-2 bg-secondary-bg/20 text-text-primary focus:outline-none focus:border-primary-start/60"
+                />
+              </div>
+            </div>
           )}
           <div className="flex flex-col gap-1.5">
-            <span className="text-[10px] font-bold uppercase text-text-muted tracking-wider">5. Secretary Note (Optional)</span>
+            <span className="text-[10px] font-bold uppercase text-text-muted tracking-wider">6. Secretary Note (Optional)</span>
             <textarea value={props.note} onChange={(event) => props.onNoteChange(event.target.value)} placeholder="Add an internal note or message for the patient..." rows={2} className="text-xs border border-card-border rounded-xl px-3 py-2 bg-secondary-bg/20 text-text-primary resize-none focus:outline-none focus:border-primary-start/60" />
           </div>
         </div>
@@ -93,22 +112,6 @@ function DatePicker({ currentMonth, availableDates, date, isLoading, onDateChang
         {availableDates.map((availableDate) => (
           <button key={availableDate} type="button" onClick={() => onDateChange(availableDate)} className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold border transition-all ${date === availableDate ? 'bg-primary-start text-white border-primary-start' : 'bg-card border-card-border text-text-secondary hover:border-primary-start/50'}`}>
             {formatShortDate(availableDate)}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function SlotPicker({ slots, startTime, isLoading, onSlotChange }: { slots: { startTime: string; endTime: string }[]; startTime: string; isLoading: boolean; onSlotChange: (slot: { startTime: string; endTime: string }) => void }) {
-  return (
-    <div className="flex flex-col gap-2">
-      <span className="text-[10px] font-bold uppercase text-text-muted tracking-wider">4. Select Time Slot {isLoading && <span className="text-primary-start ml-1">Loading...</span>}</span>
-      <div className="flex flex-wrap gap-1.5">
-        {slots.length === 0 && !isLoading && <span className="text-[11px] text-text-muted">No available slots on this date.</span>}
-        {slots.map((slot) => (
-          <button key={slot.startTime} type="button" onClick={() => onSlotChange(slot)} className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold border transition-all ${startTime === slot.startTime ? 'bg-primary-start text-white border-primary-start' : 'bg-card border-card-border text-text-secondary hover:border-primary-start/50'}`}>
-            {formatClinicTime(slot.startTime)}
           </button>
         ))}
       </div>

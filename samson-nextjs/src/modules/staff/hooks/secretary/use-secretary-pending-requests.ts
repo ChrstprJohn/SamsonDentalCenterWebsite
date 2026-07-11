@@ -36,12 +36,10 @@ export function useSecretaryPendingRequests() {
   const [editAvailableDates, setEditAvailableDates] = useState<string[]>([]);
   const [editDate, setEditDate] = useState('');
   const [editCurrentMonth, setEditCurrentMonth] = useState(new Date());
-  const [editSlots, setEditSlots] = useState<{ startTime: string; endTime: string }[]>([]);
   const [editStartTime, setEditStartTime] = useState('');
   const [editEndTime, setEditEndTime] = useState('');
   const [editNote, setEditNote] = useState('');
   const [isLoadingEditDays, setIsLoadingEditDays] = useState(false);
-  const [isLoadingEditSlots, setIsLoadingEditSlots] = useState(false);
 
   const fetchPending = useCallback(async () => {
     setIsLoading(true);
@@ -122,21 +120,6 @@ export function useSecretaryPendingRequests() {
     return () => { active = false; };
   }, [isEditing, editServiceId, editDoctorId, editCurrentMonth]);
 
-  useEffect(() => {
-    if (!isEditing || !editServiceId || !editDate || !editDoctorId) {
-      setEditSlots([]);
-      return;
-    }
-    let active = true;
-    setIsLoadingEditSlots(true);
-    getAvailableTimeSlotsAction({ serviceId: editServiceId, doctorId: editDoctorId, date: editDate }).then((res) => {
-      if (!active) return;
-      setEditSlots(res.success && res.data ? res.data.availableSlots || [] : []);
-      setIsLoadingEditSlots(false);
-    });
-    return () => { active = false; };
-  }, [isEditing, editServiceId, editDoctorId, editDate]);
-
   const selectAppointment = (appointmentId: string) => {
     setSelectedAppointmentId(appointmentId);
     setStagedStatus('');
@@ -147,11 +130,20 @@ export function useSecretaryPendingRequests() {
     setIsEditing((current) => {
       if (!current && selectedAppointment) {
         setEditServiceId(selectedAppointment.serviceId || '');
-        setEditDoctorId(selectedAppointment.doctorId || '');
+        setEditDoctorId(selectedAppointment.doctorAssignmentSource === 'SYSTEM' ? '' : selectedAppointment.doctorId || '');
         setEditDate(selectedAppointment.date || '');
         setEditNote('');
-        setEditStartTime('');
-        setEditEndTime('');
+
+        const extractTimePart = (isoOrTime: string) => {
+          if (!isoOrTime) return '';
+          if (isoOrTime.includes('T')) {
+            return isoOrTime.split('T')[1].substring(0, 5);
+          }
+          return isoOrTime;
+        };
+
+        setEditStartTime(extractTimePart(selectedAppointment.startTime || ''));
+        setEditEndTime(extractTimePart(selectedAppointment.endTime || ''));
       }
       return !current;
     });
@@ -178,11 +170,6 @@ export function useSecretaryPendingRequests() {
     setEditEndTime('');
   };
 
-  const setEditSlot = (slot: { startTime: string; endTime: string }) => {
-    setEditStartTime(slot.startTime);
-    setEditEndTime(slot.endTime);
-  };
-
   const setDecision = (status: Exclude<PendingDecision, ''>) => {
     setStagedStatus(status);
     setStagedReason('');
@@ -200,12 +187,39 @@ export function useSecretaryPendingRequests() {
     setIsSubmitting(true);
 
     const payload: any = { appointmentId, status: stagedStatus as any, statusReason: finalReason.trim() };
-    if (isEditing && editServiceId && editDoctorId && editDate && editStartTime && editEndTime) {
+    if (isEditing) {
+      if (!editServiceId) {
+        alert('Please select a service');
+        setIsSubmitting(false);
+        return;
+      }
+      if (!editDoctorId) {
+        alert('Please select a doctor');
+        setIsSubmitting(false);
+        return;
+      }
+      if (!editDate) {
+        alert('Please select a date');
+        setIsSubmitting(false);
+        return;
+      }
+      if (!editStartTime || !editEndTime) {
+        alert('Please fill in both Start and End times');
+        setIsSubmitting(false);
+        return;
+      }
+
+      if (editStartTime >= editEndTime) {
+        alert('End time must be after start time');
+        setIsSubmitting(false);
+        return;
+      }
+
       payload.newServiceId = editServiceId;
       payload.newDoctorId = editDoctorId;
       payload.newDate = editDate;
-      payload.newStartTime = editStartTime;
-      payload.newEndTime = editEndTime;
+      payload.newStartTime = `${editDate}T${editStartTime}:00.000Z`;
+      payload.newEndTime = `${editDate}T${editEndTime}:00.000Z`;
     }
 
     const res = await updateAppointmentStatusAction(payload);
@@ -233,8 +247,9 @@ export function useSecretaryPendingRequests() {
     appointments, selectedAppointment, selectedAppointmentId, patientDetails, doctorSchedule, conflictingAppointment,
     stagedStatus, stagedReason, customReason, isLoading, isSubmitting, isLoadingDetails, isEditing,
     editServices, editServiceId, editDoctors, editDoctorId, editAvailableDates, editDate, editCurrentMonth,
-    editSlots, editStartTime, editEndTime, editNote, isLoadingEditDays, isLoadingEditSlots,
+    editStartTime, editEndTime, editNote, isLoadingEditDays,
     selectAppointment, setDecision, setReason, setCustomReason, toggleEditing, setEditService, setEditDoctor,
-    setEditAppointmentDate, setEditSlot, setEditCurrentMonth, setEditNote, finishAppointmentReview,
+    setEditAppointmentDate, setEditCurrentMonth, setEditNote, finishAppointmentReview,
+    setEditStartTime, setEditEndTime,
   };
 }

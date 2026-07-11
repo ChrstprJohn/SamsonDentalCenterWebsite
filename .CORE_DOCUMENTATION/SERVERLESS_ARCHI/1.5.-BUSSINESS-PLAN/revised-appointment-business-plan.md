@@ -5,12 +5,12 @@ We are shifting the online scheduling architecture from a **dynamic real-time sl
 
 ---
 
-## 1. The Online Request Flow (The "Request-to-Confirm" Loop)
-This flow turns a "wish" into a "confirmed appointment."
+## 1. The Online Request Flow (The "Request-to-Confirm" Loop) - [COMPLETED / IMPLEMENTED]
+This flow turns a "wish" into a "confirmed appointment." Both **Authenticated** and **Unauthenticated (Guest)** entry points are modified and fully supported:
 
-### Step 1: User Request
-- User visits your website.
-- User selects **Service, Date, Doctor, and Time Preference (Morning/Afternoon)**.
+### Step 1: User Request (Authenticated & Unauthenticated)
+- **Authenticated Flow**: Registered users book via their portal. Their profile details (Name, Contact, etc.) are automatically mapped, and they select **Service, Date, Doctor, and Time Preference (Morning/Afternoon)**.
+- **Unauthenticated (Guest) Flow**: Visitors can book without logging in. They fill out their patient/contact details (Name, Email, Phone, Date of Birth) along with **Service, Date, Doctor, and Time Preference (Morning/Afternoon)**.
 - User submits the form.
 
 ### Step 2: Database Entry

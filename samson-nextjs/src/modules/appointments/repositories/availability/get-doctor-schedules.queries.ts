@@ -1,6 +1,7 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { DomainError } from '@/shared/errors';
 import { doctorScheduleResponseSchema } from '../../dtos/exports';
+import { createAdminClient } from '@/shared/database/server';
 
 export const getDoctorSchedulesQuery = (supabase: SupabaseClient) => {
   return async (date: string, doctorId?: string, serviceId?: string, includeHidden = false) => {
@@ -56,8 +57,6 @@ export const getDoctorSchedulesQuery = (supabase: SupabaseClient) => {
       );
     }
 
-    // 2. Fetch clinic operating hours config (Layer 1 fallback)
-    const { createAdminClient } = require('@/shared/database/server');
     const adminDb = isMockClient ? supabase : await createAdminClient();
     const { data: configData, error: configError } = await adminDb
       .from('clinic_config')

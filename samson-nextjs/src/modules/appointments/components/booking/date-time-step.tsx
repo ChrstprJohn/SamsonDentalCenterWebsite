@@ -38,6 +38,10 @@ export function DateTimeStep({
     return date.toLocaleDateString('en-US', { weekday: 'short', timeZone: 'UTC' });
   };
 
+  const getMonthName = (date: Date) => {
+    return date.toLocaleDateString('en-US', { month: 'short', timeZone: 'UTC' });
+  };
+
   const getDayNum = (date: Date) => {
     return date.getUTCDate();
   };
@@ -81,7 +85,7 @@ export function DateTimeStep({
                     }`}
                   >
                     <span className="text-[9px] uppercase tracking-wider font-bold text-slate-400 dark:text-slate-500">
-                      {getDayName(date)}
+                      {getDayName(date)} • {getMonthName(date)}
                     </span>
                     <span className="text-base font-extrabold mt-0.5">{getDayNum(date)}</span>
                   </button>

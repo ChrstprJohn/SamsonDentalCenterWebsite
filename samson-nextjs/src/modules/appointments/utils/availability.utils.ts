@@ -21,10 +21,10 @@ export function generateAvailableSlotsForDay(params: GenerateSlotsParams): Gener
 
     // Pre-parse appointments for this doctor to avoid parsing inside the loop
     const docAppointmentsMs = appointments
-      .filter((appt) => appt.doctorId === docId && appt.date === date)
+      .filter((appt) => appt.doctorId === docId && appt.date === date && appt.startTime && appt.endTime)
       .map((appt) => ({
-        startMs: new Date(appt.startTime).getTime(),
-        endMs: new Date(appt.endTime).getTime(),
+        startMs: new Date(appt.startTime!).getTime(),
+        endMs: new Date(appt.endTime!).getTime(),
       }));
 
     const dayStartMs = parseTimeToMs(date, schedule.startTime);

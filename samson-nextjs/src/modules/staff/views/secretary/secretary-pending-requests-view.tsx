@@ -46,17 +46,17 @@ export function SecretaryPendingRequestsView() {
                   availableDates={view.editAvailableDates}
                   date={view.editDate}
                   currentMonth={view.editCurrentMonth}
-                  slots={view.editSlots}
                   startTime={view.editStartTime}
+                  endTime={view.editEndTime}
                   note={view.editNote}
                   isLoadingDays={view.isLoadingEditDays}
-                  isLoadingSlots={view.isLoadingEditSlots}
                   onToggle={view.toggleEditing}
                   onServiceChange={view.setEditService}
                   onDoctorChange={view.setEditDoctor}
                   onDateChange={view.setEditAppointmentDate}
                   onMonthChange={view.setEditCurrentMonth}
-                  onSlotChange={view.setEditSlot}
+                  onStartTimeChange={view.setEditStartTime}
+                  onEndTimeChange={view.setEditEndTime}
                   onNoteChange={view.setEditNote}
                 />
                 <PendingDecisionForm

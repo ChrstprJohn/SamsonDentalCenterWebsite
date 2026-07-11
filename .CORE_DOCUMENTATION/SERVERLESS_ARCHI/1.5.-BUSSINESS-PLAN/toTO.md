@@ -52,9 +52,15 @@ This document outlines the current technical flow implemented in the Samson Dent
     2.  Secretary can edit details by selecting a date and pre-calculated time slot from `SlotPicker`.
     3.  Secretary clicks "Approve" inside `PendingDecisionForm` which moves status to `'APPROVED'`.
 *   **What to Modify/Add**:
-    1.  **Remove SlotPicker/Slots Scanning**: Completely remove the timeslot queries (`isLoadingSlots`, `slots`, etc.) from the secretary view hooks and components.
-    2.  **Add Exact Time & Duration Inputs**: Replace the slot picker with text or time fields (e.g. hour/minute pickers or input text fields) to record the exact time (e.g., `09:15 AM`) and duration (e.g. `30` mins) manually matching the offline system.
-    3.  **Status Shift**: Update status from `'PENDING'` to `'CONFIRMED'`.
+    1.  **Remove SlotPicker/Slots Scanning**: Remove timeslot queries (`isLoadingSlots`, `slots`, etc.) from secretary hooks and components.
+    2.  **Add Exact Start Time & End Time Inputs**: Replace slot/duration picker with manual inputs/pickers for **Start Time** and **End Time**.
+    3.  **Fetch & Autofill User Booking Preferences**:
+        *   Retrieve `timePreference` (Morning/Afternoon), `serviceId`, `doctorId` (if selected), and `date` from the initial user request.
+        *   Display these details clearly in the overview and pre-fill them in the edit/confirmation form.
+        *   If doctor was not selected (e.g. from an inquiry/guest lead), leave doctor selection field blank for secretary to fill.
+    4.  **Priority Sorting / Ordering**:
+        *   Sort pending list by creation source: user-submitted requests (first) followed by secretary-created pending requests.
+    5.  **Status Shift**: Update status from `'PENDING'` to `'CONFIRMED'`.
 
 ### B. Walk-in / Phone Booking ("Mirror" Loop)
 *   **Target Files**:
