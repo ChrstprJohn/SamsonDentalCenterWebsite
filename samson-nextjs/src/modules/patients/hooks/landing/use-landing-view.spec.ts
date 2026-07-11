@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useToast } from '@/components/feedback/toast-container';
 import { submitInquiryAction } from '@/modules/appointments/actions/booking/submit-inquiry.action';
 import { InquiryResponseDto } from '@/modules/appointments/dtos/booking/submit-inquiry.dto';
+import { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 
 vi.mock('next/navigation', () => ({
@@ -26,15 +27,16 @@ describe('useLandingView', () => {
   const mockAddToast = vi.fn();
   const mockSubmitInquiryAction = vi.mocked(submitInquiryAction);
 
-  const mockServices = [
+  const mockServices: ServiceResponseDto[] = [
     {
       id: 'd9b233a0-7f2a-43c2-bf72-881c00222a00',
       name: 'General Dentistry',
       description: 'Checkups and cleanings',
       price: 100,
       durationMinutes: 30,
-      serviceType: 'GENERAL' as const,
+      serviceType: 'GENERAL',
       isActive: true,
+      status: 'ACTIVE',
       createdAt: '2026-06-24T00:00:00.000Z',
       updatedAt: '2026-06-24T00:00:00.000Z',
     },

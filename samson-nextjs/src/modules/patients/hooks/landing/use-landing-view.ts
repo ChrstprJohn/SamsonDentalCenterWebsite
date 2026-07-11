@@ -33,9 +33,7 @@ const contactInquirySchema = z.object({
     .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format')
     .or(z.literal(''))
     .optional(),
-  timePreference: z.enum(['MORNING', 'AFTERNOON'], {
-    errorMap: () => ({ message: 'Preferred time of day is required' }),
-  }),
+  timePreference: z.enum(['MORNING', 'AFTERNOON']),
 });
 
 type ContactInquiryFormValues = z.infer<typeof contactInquirySchema>;
