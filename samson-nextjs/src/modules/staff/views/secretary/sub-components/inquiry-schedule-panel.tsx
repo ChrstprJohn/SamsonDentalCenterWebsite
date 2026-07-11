@@ -60,8 +60,11 @@ export function InquirySchedulePanel(props: InquirySchedulePanelProps) {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
+}
+
 function ServiceSelector(props: InquirySchedulePanelProps) {
   return (
     <div className="border border-card-border/60 rounded-2xl p-4 bg-secondary-bg/10 flex flex-col gap-2">

@@ -11,7 +11,7 @@ export const convertInquirySchema = z
   .object({
     inquiryId: z.string().uuid('Invalid inquiry ID format'),
     serviceId: z.string().uuid('Invalid service ID format'),
-    doctorId: z.string().uuid('Invalid doctor ID format'),
+    doctorId: z.string().uuid('Invalid doctor ID format').nullable().optional(),
     date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format'),
     startTime: z.string().datetime('Must be a valid ISO string'),
     endTime: z.string().datetime('Must be a valid ISO string'),

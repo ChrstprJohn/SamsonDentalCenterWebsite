@@ -12,14 +12,12 @@ This document outlines the current technical flow in the Samson Dental Center co
 *   `appointments` table has `time_preference` (Zod/Check constraint: `'MORNING'`, `'AFTERNOON'`).
 *   `submit_booking_transaction` and `request_reschedule_transaction` RPCs accept `p_time_preference`.
 *   Exclusion constraint `no_overlapping_appointments` is bypassed for `'PENDING'` and `'RESCHEDULE_REQUESTED'` states.
+*   [x] **Migration:** `appointments.doctor_id` is now nullable (migration `20260711030000_make_doctor_id_nullable_on_appointments.sql`).
+*   [x] **RPC Update:** `submit_booking_transaction` and `create_manual_booking` RPCs accept `p_doctor_id` as `NULL`.
+*   [x] **RPC Update:** `convert_inquiry_to_appointment` RPC now saves converted inquiry appointments with state `'CONFIRMED'` (migration `20260711040000_update_booking_rpcs_to_confirmed.sql`).
 
 ### Must Do (Pending Tasks):
-*   [ ] **Migration:** Make `appointments.doctor_id` column nullable:
-    ```sql
-    ALTER TABLE public.appointments ALTER COLUMN doctor_id DROP NOT NULL;
-    ```
-*   [ ] **RPC Update:** Update the `submit_booking_transaction` and `create_manual_booking` RPC parameters to allow `p_doctor_id` as `NULL`.
-*   [ ] **RPC Update:** Update `convert_inquiry_to_appointment` RPC to save converted inquiry appointments with state `'CONFIRMED'` instead of `'APPROVED'`.
+*   None (Fully Implemented)
 
 ---
 
@@ -60,35 +58,32 @@ This document outlines the current technical flow in the Samson Dental Center co
 #### Already Implemented:
 *   `SecretaryPendingRequestsView` renders lists and details of pending requests.
 *   Secretary can edit service, date, doctor, and note.
+*   [x] **Remove Slots Checking:** Removed all hourly time slot fetching from `use-secretary-pending-requests.ts` and UI sub-components.
+*   [x] **Exact Start to End Time Inputs:** `PendingEditPanel` now has manual **Start Time** and **End Time** input fields with validation.
+*   [x] **Edit Form Order & Roster-based Filtering:** Inputs arranged Service → Date → Doctor → Start/End Time. Doctor list filters by date via `getAvailableDoctorsForDateAction`. Any-Doctor requests pre-fill doctor as blank.
+*   [x] **Dynamic Calendar:** Secretary edit panel calendar is now roster-based — highlights only dates where any doctor is rostered for the selected service (same as guest/auth booking).
+*   [x] **Status Transition:** Confirmation now transitions to `'CONFIRMED'` instead of `'APPROVED'`.
 
 #### Must Do (Pending Tasks):
-*   [ ] **Remove Slots Checking:** Remove all hourly time slot fetching (`getAvailableTimeSlotsAction`, `isLoadingSlots`, `availableSlots`) from `use-secretary-pending-requests.ts` and UI sub-components.
-*   [ ] **Exact Start to End Time Inputs:** 
-    *   In `PendingEditPanel`, replace the slot picker with two manual input fields: **Start Time** and **End Time**.
-    *   Add validation in `finishAppointmentReview` ensuring Start and End times are filled, and End Time is after Start Time.
-*   [ ] **Edit Form Order & Roster-based Filtering:**
-    *   Arrange edit inputs in order: **Service** → **Date** → **Doctor** → **Start to End Time**.
-    *   Instead of filtering dates by doctor, **filter doctors by date**: when the selected/edited Date changes, call `getAvailableDoctorsForDateAction` to retrieve only doctors rostered for that service on that date. Update the dropdown selection options.
-    *   If no doctor was selected by the patient (doctor is null / `'SYSTEM'`), pre-fill the doctor input as blank and require the secretary to pick a doctor from the filtered dropdown.
-*   [ ] **Status Transition:** Shift confirmation status updates from `'APPROVED'` to `'CONFIRMED'`.
+*   None (Fully Implemented)
 
 ### B. Walk-in / Phone Booking ("Mirror" Loop)
 
 #### Already Implemented:
-*   Dashboard allows manual booking but requires selecting pre-calculated slots.
+*   [x] **Remove Slots Picker:** `book-schedule-panel.tsx` now uses manual **Start to End Time** inputs instead of pre-calculated slot selection.
+*   [x] **Immediate Status:** Walk-in appointments are inserted directly as `'CONFIRMED'`.
 
 #### Must Do (Pending Tasks):
-*   [ ] **Remove Slots Picker:** Replace slot selector in `book-schedule-panel.tsx` with manual **Start to End Time** inputs.
-*   [ ] **Immediate Status:** Insert mirrored walk-in appointments directly as `'CONFIRMED'`.
+*   None (Fully Implemented)
 
 ### C. Inquiry Conversion Queue
 
 #### Already Implemented:
-*   Allows converting guest leads into appointments using a slot picker.
+*   [x] **Remove Slots Picker:** `inquiry-schedule-panel.tsx` now uses manual **Start to End Time** inputs.
+*   [x] **Immediate Status:** Inquiries are converted directly to `'CONFIRMED'` status.
 
 #### Must Do (Pending Tasks):
-*   [ ] **Remove Slots Picker:** Replace slot selector in `inquiry-schedule-panel.tsx` with manual **Start to End Time** inputs.
-*   [ ] **Immediate Status:** Convert inquiries directly into a `'CONFIRMED'` status.
+*   None (Fully Implemented)
 
 ---
 

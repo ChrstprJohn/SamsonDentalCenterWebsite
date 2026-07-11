@@ -93,6 +93,22 @@ export function useSecretaryPendingRequests() {
     getServicesAction('BOOKABLE').then((res) => { if (res.data) setEditServices(res.data); });
   }, [isEditing, editServices.length]);
 
+  useEffect(() => {
+    if (!isEditing || !editServiceId) {
+      setEditAvailableDates([]);
+      return;
+    }
+    let active = true;
+    setIsLoadingEditDays(true);
+    const month = `${editCurrentMonth.getFullYear()}-${String(editCurrentMonth.getMonth() + 1).padStart(2, '0')}`;
+    getAvailableDaysAction({ serviceId: editServiceId, month }).then((res) => {
+      if (!active) return;
+      setEditAvailableDates(res.success && res.data ? res.data.availableDates || [] : []);
+      setIsLoadingEditDays(false);
+    });
+    return () => { active = false; };
+  }, [isEditing, editServiceId, editCurrentMonth]);
+
   const selectAppointment = (appointmentId: string) => {
     setSelectedAppointmentId(appointmentId);
     setStagedStatus('');

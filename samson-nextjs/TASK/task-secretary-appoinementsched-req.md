@@ -60,6 +60,7 @@ This task list defines all the remaining database, backend, and frontend steps r
   1. Remove all hourly time slot fetching calls.
   2. Implement roster-based doctor filtering: fetch rostered doctors for the selected date by calling `getAvailableDoctorsForDateAction`.
   3. Validate that start/end times are filled and that end time is after start time when submitting review decisions.
+  4. **Dynamic Calendar:** Call `getAvailableDaysAction` when service is selected to populate available dates — same roster-based logic as guest/auth booking (all doctors qualified for service).
 - **Files to create/modify:**
   - [DONE] `src/modules/staff/hooks/secretary/use-secretary-pending-requests.ts`
 

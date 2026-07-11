@@ -70,7 +70,7 @@ Ensures walk-ins and phone calls receive the same automated notifications and re
 | **Guest Booking** | Auto-set to `NULL` (Mapped as `'SYSTEM'`). | Combined availability of all doctors who perform the Service. |
 | **Auth Booking (Any)** | User selects "Any" -> `NULL` (Mapped as `'SYSTEM'`). | Combined availability of all doctors who perform the Service. |
 | **Auth Booking (Specific)** | User selects specific doctor -> `doctor_id` (Mapped as `'USER'`). | Only dates where that specific doctor is rostered to work. |
-| **Secretary Edit / Confirm** | Can pick any doctor. The dropdown dynamically filters to show doctors rostered on the selected Date. | Fully manual calendar selection. Changing Date refreshes the rostered doctors list. |
+| **Secretary Edit / Confirm** | Can pick any doctor. The dropdown dynamically filters to show doctors rostered on the selected Date. | Roster-based calendar: highlights only dates where any doctor is rostered for the selected service (same as Guest/Auth-Any booking). Changing Date refreshes the rostered doctors list. |
 
 ---
 
