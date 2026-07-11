@@ -22,6 +22,16 @@ export const submitInquirySchema = z.object({
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format'),
   patientNote: cleanOptionalString,
+  dateOfBirth: z
+    .string()
+    .trim()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format')
+    .or(z.literal(''))
+    .transform((val) => (val === '' ? undefined : val))
+    .optional(),
+  timePreference: z.enum(['MORNING', 'AFTERNOON'], {
+    errorMap: () => ({ message: 'Preferred time of day is required' }),
+  }),
 });
 
 export type SubmitInquiryDto = z.infer<typeof submitInquirySchema>;
@@ -42,6 +52,8 @@ const inquiryDbSchema = z.object({
   linked_appointment_id: z.string().uuid().nullable().optional(),
   created_at: z.string(),
   updated_at: z.string(),
+  date_of_birth: z.string().nullable().optional(),
+  time_preference: z.enum(['MORNING', 'AFTERNOON']).nullable().optional(),
   services: z
     .object({
       name: z.string(),
@@ -67,6 +79,8 @@ export const inquiryResponseSchema = inquiryDbSchema.transform((data) => ({
   linkedAppointmentId: data.linked_appointment_id ?? undefined,
   createdAt: data.created_at,
   updatedAt: data.updated_at,
+  dateOfBirth: data.date_of_birth ?? undefined,
+  timePreference: data.time_preference ?? undefined,
 }));
 
 export type InquiryResponseDto = z.infer<typeof inquiryResponseSchema>;

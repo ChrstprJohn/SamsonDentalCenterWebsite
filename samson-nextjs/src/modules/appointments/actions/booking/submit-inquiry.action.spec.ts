@@ -19,6 +19,7 @@ describe('submitInquiryAction', () => {
       status: 'NEW',
       created_at: '2026-06-22T04:00:00Z',
       updated_at: '2026-06-22T04:00:00Z',
+      time_preference: 'MORNING',
     };
 
     const mockSingle = vi.fn().mockResolvedValue({ data: mockDbRecord, error: null });
@@ -36,6 +37,7 @@ describe('submitInquiryAction', () => {
       email: 'jane@example.com',
       preferredServiceId: 'b3b07384-d113-4ec2-a5e6-ec083b0f5cc1',
       preferredDate: '2026-06-25',
+      timePreference: 'MORNING' as const,
     };
 
     const response = await submitInquiryAction(payload);

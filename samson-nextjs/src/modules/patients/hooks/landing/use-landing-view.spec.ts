@@ -118,6 +118,8 @@ describe('useLandingView', () => {
       linkedAppointmentId: undefined,
       createdAt: '2026-06-24T00:00:00.000Z',
       updatedAt: '2026-06-24T00:00:00.000Z',
+      dateOfBirth: '1990-01-01',
+      timePreference: 'MORNING',
     };
 
     mockSubmitInquiryAction.mockResolvedValue({ success: true, data: mockInquiryResponse });
@@ -130,6 +132,8 @@ describe('useLandingView', () => {
       result.current.contactForm.setFirstName('John');
       result.current.contactForm.setLastName('Doe');
       result.current.contactForm.setContactEmail('john@example.com');
+      result.current.contactForm.setDateOfBirth('1990-01-01');
+      result.current.contactForm.setTimePreference('MORNING');
     });
 
     let success: boolean | undefined;
@@ -152,6 +156,8 @@ describe('useLandingView', () => {
       preferredServiceId: 'd9b233a0-7f2a-43c2-bf72-881c00222a00',
       preferredDate: '2026-06-30',
       patientNote: 'Some notes',
+      dateOfBirth: '1990-01-01',
+      timePreference: 'MORNING',
     });
 
     expect(mockAddToast).toHaveBeenCalledWith(

@@ -27,6 +27,15 @@ const contactInquirySchema = z.object({
   pathway: z.string().trim().min(1, 'Treatment service is required'),
   targetDate: z.string().trim().min(1, 'Target date is required'),
   notes: z.string().trim().optional(),
+  dateOfBirth: z
+    .string()
+    .trim()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format')
+    .or(z.literal(''))
+    .optional(),
+  timePreference: z.enum(['MORNING', 'AFTERNOON'], {
+    errorMap: () => ({ message: 'Preferred time of day is required' }),
+  }),
 });
 
 type ContactInquiryFormValues = z.infer<typeof contactInquirySchema>;
@@ -49,6 +58,8 @@ export function useLandingView({ isAuthenticated, services }: UseLandingViewProp
       pathway: '',
       targetDate: '',
       notes: '',
+      dateOfBirth: '',
+      timePreference: 'MORNING',
     },
   });
 
@@ -58,6 +69,8 @@ export function useLandingView({ isAuthenticated, services }: UseLandingViewProp
   const suffix = form.watch('suffix') ?? '';
   const contactEmail = form.watch('contactEmail');
   const contactMessage = form.watch('contactMessage') ?? '';
+  const dateOfBirth = form.watch('dateOfBirth') ?? '';
+  const timePreference = form.watch('timePreference') ?? 'MORNING';
   const setField = <TName extends keyof ContactInquiryFormValues>(name: TName) =>
     (value: ContactInquiryFormValues[TName]) =>
       form.setValue(name, value as PathValue<ContactInquiryFormValues, TName>, {
@@ -128,6 +141,8 @@ export function useLandingView({ isAuthenticated, services }: UseLandingViewProp
         preferredServiceId: serviceId,
         preferredDate: values.targetDate,
         patientNote: values.notes || undefined,
+        dateOfBirth: values.dateOfBirth || undefined,
+        timePreference: values.timePreference,
       });
 
       if (res.success) {
@@ -163,6 +178,10 @@ export function useLandingView({ isAuthenticated, services }: UseLandingViewProp
       setContactEmail: setField('contactEmail'),
       contactMessage,
       setContactMessage: setField('contactMessage'),
+      dateOfBirth,
+      setDateOfBirth: setField('dateOfBirth'),
+      timePreference,
+      setTimePreference: setField('timePreference'),
       isContactSubmitting,
       handleRealInquirySubmit,
     },

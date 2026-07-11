@@ -23,6 +23,10 @@ interface ContactSectionProps {
     setContactEmail: (val: string) => void;
     contactMessage: string;
     setContactMessage: (val: string) => void;
+    dateOfBirth: string;
+    setDateOfBirth: (val: string) => void;
+    timePreference: 'MORNING' | 'AFTERNOON';
+    setTimePreference: (val: 'MORNING' | 'AFTERNOON') => void;
     isContactSubmitting: boolean;
     handleRealInquirySubmit: (data: {
       phone: string;
