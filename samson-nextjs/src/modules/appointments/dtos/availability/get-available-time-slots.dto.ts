@@ -6,7 +6,7 @@ const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 export const getAvailableTimeSlotsSchema = z.object({
   serviceId: z.string().uuid('Invalid Service ID format'),
   // Omit or pass undefined for 'Any Doctor'
-  doctorId: z.string().uuid('Invalid Doctor ID format').optional().or(emptyStringToUndefined),
+  doctorId: z.string().uuid('Invalid Doctor ID format').optional().nullable().or(emptyStringToUndefined),
   // Specific date clicked on the calendar wizard
   date: z.string().regex(DATE_REGEX, 'Date must be in YYYY-MM-DD format'),
 });
