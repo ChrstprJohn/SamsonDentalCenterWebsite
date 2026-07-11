@@ -14,7 +14,7 @@ This document outlines the current technical flow in the Samson Dental Center co
 *   Exclusion constraint `no_overlapping_appointments` is bypassed for `'PENDING'` and `'RESCHEDULE_REQUESTED'` states.
 *   [x] **Migration:** `appointments.doctor_id` is now nullable (migration `20260711030000_make_doctor_id_nullable_on_appointments.sql`).
 *   [x] **RPC Update:** `submit_booking_transaction` and `create_manual_booking` RPCs accept `p_doctor_id` as `NULL`.
-*   [x] **RPC Update:** `convert_inquiry_to_appointment` RPC now saves converted inquiry appointments with state `'CONFIRMED'` (migration `20260711040000_update_booking_rpcs_to_confirmed.sql`).
+*   [x] **RPC Update:** `convert_inquiry_to_appointment` RPC now saves converted inquiry appointments with state `'APPROVED'` (mapped to Confirmed on UI) (migration `20260711040000_update_booking_rpcs_to_confirmed.sql`).
 
 ### Must Do (Pending Tasks):
 *   None (Fully Implemented)
@@ -62,7 +62,7 @@ This document outlines the current technical flow in the Samson Dental Center co
 *   [x] **Exact Start to End Time Inputs:** `PendingEditPanel` now has manual **Start Time** and **End Time** input fields with validation.
 *   [x] **Edit Form Order & Roster-based Filtering:** Inputs arranged Service → Date → Doctor → Start/End Time. Doctor list filters by date via `getAvailableDoctorsForDateAction`. Any-Doctor requests pre-fill doctor as blank.
 *   [x] **Dynamic Calendar:** Secretary edit panel calendar is now roster-based — highlights only dates where any doctor is rostered for the selected service (same as guest/auth booking).
-*   [x] **Status Transition:** Confirmation now transitions to `'CONFIRMED'` instead of `'APPROVED'`.
+*   [x] **Status Transition:** Confirmation now transitions to `'APPROVED'` (mapped to Confirmed on UI).
 
 #### Must Do (Pending Tasks):
 *   None (Fully Implemented)
@@ -71,7 +71,7 @@ This document outlines the current technical flow in the Samson Dental Center co
 
 #### Already Implemented:
 *   [x] **Remove Slots Picker:** `book-schedule-panel.tsx` now uses manual **Start to End Time** inputs instead of pre-calculated slot selection.
-*   [x] **Immediate Status:** Walk-in appointments are inserted directly as `'CONFIRMED'`.
+*   [x] **Immediate Status:** Walk-in appointments are inserted directly as `'APPROVED'` (mapped to Confirmed on UI).
 
 #### Must Do (Pending Tasks):
 *   None (Fully Implemented)
@@ -80,7 +80,7 @@ This document outlines the current technical flow in the Samson Dental Center co
 
 #### Already Implemented:
 *   [x] **Remove Slots Picker:** `inquiry-schedule-panel.tsx` now uses manual **Start to End Time** inputs.
-*   [x] **Immediate Status:** Inquiries are converted directly to `'CONFIRMED'` status.
+*   [x] **Immediate Status:** Inquiries are converted directly to `'APPROVED'` (mapped to Confirmed on UI).
 
 #### Must Do (Pending Tasks):
 *   None (Fully Implemented)

@@ -45,7 +45,7 @@ When the Secretary opens a `PENDING` request on the dashboard, they see the pre-
         *   If the request is for "Any" (`'SYSTEM'`), the doctor field starts blank. The Secretary **must** select a doctor from the filtered dropdown.
     *   **Time:** The Secretary manually enters/types the exact **Start to End Time** (e.g., `09:15 AM - 09:45 AM`) from the offline software.
 3.  **Confirm:** Secretary clicks **[Confirm]**.
-    *   **Result:** Status updates to `'CONFIRMED'`.
+    *   **Result:** Status updates to `'APPROVED'` (mapped to Confirmed on UI).
     *   **Result:** Automation triggers the confirmation notification (email/SMS) to the patient.
 
 ---
@@ -58,8 +58,8 @@ Ensures walk-ins and phone calls receive the same automated notifications and re
 *   **Step 2:** Secretary opens the Website Dashboard and clicks the **"Quick-Add"** button.
 *   **Step 3:** Secretary enters Patient Details and selects Service, Date, Doctor, and Exact Start/End Time.
 *   **Step 4:** Secretary saves the form.
-    *   **Result:** Status is set to `'CONFIRMED'` immediately (bypasses `PENDING`).
-    *   **Result:** Automation triggers the confirmation email and queues the 48-hour/24-hour reminder countdown.
+*   **Result:** Status is set to `'APPROVED'` immediately (bypasses `PENDING`, mapped to Confirmed on UI).
+*   **Result:** Automation triggers the confirmation email and queues the 48-hour/24-hour reminder countdown.
 
 ---
 

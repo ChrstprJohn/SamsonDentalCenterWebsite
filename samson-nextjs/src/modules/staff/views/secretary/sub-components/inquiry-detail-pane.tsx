@@ -70,7 +70,10 @@ function ConvertPanels({ view }: { view: any }) {
         onDoctorSelect={view.selectDoctor}
         slots={view.timeslots}
         selectedTime={view.stagedInquiryTime}
+        selectedEndTime={view.stagedInquiryEndTime}
         onSlotSelect={view.selectSlot}
+        onStartTimeChange={view.setStagedInquiryTime}
+        onEndTimeChange={view.setStagedInquiryEndTime}
         isLoadingServices={view.isLoadingServices}
         isLoadingDays={view.isLoadingDays}
         isLoadingDoctors={view.isLoadingDoctors}

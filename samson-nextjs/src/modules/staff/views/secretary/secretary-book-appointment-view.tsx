@@ -91,7 +91,10 @@ export function SecretaryBookAppointmentView() {
               selectDoctor={view.selectDoctor}
               timeslots={view.timeslots}
               selectedTime={view.selectedTime}
+              selectedEndTime={view.selectedEndTime}
               selectTimeslot={view.selectTimeslot}
+              onStartTimeChange={view.setSelectedTime}
+              onEndTimeChange={view.setSelectedEndTime}
               patientNote={view.patientNote}
               setPatientNote={view.setPatientNote}
               isLoadingServices={view.isLoadingServices}

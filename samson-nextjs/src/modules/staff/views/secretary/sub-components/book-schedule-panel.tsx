@@ -17,7 +17,10 @@ interface BookSchedulePanelProps {
   selectDoctor: (doctorId: string) => void;
   timeslots: { startTime: string; endTime: string }[];
   selectedTime: string;
+  selectedEndTime?: string;
   selectTimeslot: (slot: { startTime: string; endTime: string }) => void;
+  onStartTimeChange?: (time: string) => void;
+  onEndTimeChange?: (time: string) => void;
   patientNote: string;
   setPatientNote: (value: string) => void;
   isLoadingServices: boolean;
@@ -103,13 +106,8 @@ function ScheduleCalendar(props: BookSchedulePanelProps) {
             <span className="text-[10px] font-bold uppercase text-text-muted tracking-wider">Start Time</span>
             <input
               type="time"
-              value={props.selectedTime ? new Date(props.selectedTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' }) : ''}
-              onChange={(event) => {
-                const val = event.target.value;
-                if (val && props.selectedDate) {
-                  props.selectTimeslot({ startTime: `${props.selectedDate}T${val}:00.000Z`, endTime: props.selectedTime ? props.selectedTime.split('T')[0] + 'T' + (props.selectedTime.split('T')[1] || '00:00:00.000Z') : '' });
-                }
-              }}
+              value={props.selectedTime}
+              onChange={(event) => props.onStartTimeChange?.(event.target.value)}
               className="text-xs border border-card-border rounded-xl px-3 py-2 bg-secondary-bg/20 text-text-primary focus:outline-none focus:border-primary-start/60"
             />
           </div>
@@ -117,13 +115,8 @@ function ScheduleCalendar(props: BookSchedulePanelProps) {
             <span className="text-[10px] font-bold uppercase text-text-muted tracking-wider">End Time</span>
             <input
               type="time"
-              value={props.selectedTime && props.isReadyToSubmit ? new Date(props.selectedTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' }) : ''} 
-              onChange={(event) => {
-                const val = event.target.value;
-                if (val && props.selectedDate && props.selectedTime) {
-                  props.selectTimeslot({ startTime: props.selectedTime, endTime: `${props.selectedDate}T${val}:00.000Z` });
-                }
-              }}
+              value={props.selectedEndTime || ''}
+              onChange={(event) => props.onEndTimeChange?.(event.target.value)}
               className="text-xs border border-card-border rounded-xl px-3 py-2 bg-secondary-bg/20 text-text-primary focus:outline-none focus:border-primary-start/60"
             />
           </div>

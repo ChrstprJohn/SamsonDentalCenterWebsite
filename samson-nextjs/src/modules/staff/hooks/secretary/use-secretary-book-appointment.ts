@@ -167,8 +167,15 @@ export function useSecretaryBookAppointment() {
   };
 
   const selectTimeslot = (slot: { startTime: string; endTime: string }) => {
-    setSelectedTime(slot.startTime);
-    setSelectedEndTime(slot.endTime);
+    const extractTimePart = (isoOrTime: string) => {
+      if (!isoOrTime) return '';
+      if (isoOrTime.includes('T')) {
+        return isoOrTime.split('T')[1].substring(0, 5);
+      }
+      return isoOrTime;
+    };
+    setSelectedTime(extractTimePart(slot.startTime));
+    setSelectedEndTime(extractTimePart(slot.endTime));
   };
 
   const resetForm = () => {
@@ -197,7 +204,7 @@ export function useSecretaryBookAppointment() {
   };
 
   const isReadyToSubmit = useMemo(() => {
-    const hasSchedule = !!(selectedService && selectedDate && selectedDoctor && selectedTime);
+    const hasSchedule = !!(selectedService && selectedDate && selectedDoctor && selectedTime && selectedEndTime);
     if (!hasSchedule) return false;
     if (patientMode === 'GUEST') return !!(firstName && lastName && phoneNumber);
     return selectedPatient !== null && (
@@ -205,7 +212,7 @@ export function useSecretaryBookAppointment() {
       (bookingFor === 'EXISTING_DEP' && selectedDependent !== null) ||
       (bookingFor === 'NEW_DEP' && !!(newDepFirstName && newDepLastName && newDepDOB && newDepRelationship))
     );
-  }, [selectedService, selectedDate, selectedDoctor, selectedTime, patientMode, firstName, lastName, phoneNumber, selectedPatient, bookingFor, selectedDependent, newDepFirstName, newDepLastName, newDepDOB, newDepRelationship]);
+  }, [selectedService, selectedDate, selectedDoctor, selectedTime, selectedEndTime, patientMode, firstName, lastName, phoneNumber, selectedPatient, bookingFor, selectedDependent, newDepFirstName, newDepLastName, newDepDOB, newDepRelationship]);
 
   const bookedPatientLabel = patientMode === 'SEARCH' && selectedPatient
     ? bookingFor === 'EXISTING_DEP' && selectedDependent
@@ -232,8 +239,8 @@ export function useSecretaryBookAppointment() {
             }
           : {};
       const payload = patientMode === 'SEARCH' && selectedPatient
-        ? { patientId: selectedPatient.id, serviceId: selectedService, doctorId: selectedDoctor, date: selectedDate, startTime: selectedTime, endTime: selectedEndTime, patientNote: patientNote || undefined, ...dependentPayload }
-        : { serviceId: selectedService, doctorId: selectedDoctor, date: selectedDate, startTime: selectedTime, endTime: selectedEndTime, patientNote: patientNote || undefined, firstName, middleName: middleName || undefined, lastName, suffix: suffix || undefined, phoneNumber, email: email || undefined };
+        ? { patientId: selectedPatient.id, serviceId: selectedService, doctorId: selectedDoctor, date: selectedDate, startTime: `${selectedDate}T${selectedTime}:00Z`, endTime: `${selectedDate}T${selectedEndTime}:00Z`, patientNote: patientNote || undefined, ...dependentPayload }
+        : { serviceId: selectedService, doctorId: selectedDoctor, date: selectedDate, startTime: `${selectedDate}T${selectedTime}:00Z`, endTime: `${selectedDate}T${selectedEndTime}:00Z`, patientNote: patientNote || undefined, firstName, middleName: middleName || undefined, lastName, suffix: suffix || undefined, phoneNumber, email: email || undefined };
 
       const res = await createManualBookingAction(payload as any);
       if (res.success) {
@@ -259,7 +266,7 @@ export function useSecretaryBookAppointment() {
     newDepRelationship, setNewDepRelationship, firstName, setFirstName, middleName, setMiddleName, lastName, setLastName,
     suffix, setSuffix, phoneNumber, setPhoneNumber, email, setEmail, services, selectedService, selectService, currentMonth,
     setCurrentMonth, availableDates, selectedDate, selectDate, availableDoctors, selectedDoctor, selectDoctor, timeslots,
-    selectedTime, selectTimeslot, patientNote, setPatientNote, isLoadingServices, isLoadingDays: scheduler.loadingKey === 'dates',
+    selectedTime, setSelectedTime, selectedEndTime, setSelectedEndTime, selectTimeslot, patientNote, setPatientNote, isLoadingServices, isLoadingDays: scheduler.loadingKey === 'dates',
     isLoadingDoctors: scheduler.loadingKey === 'doctors', isLoadingSlots: scheduler.loadingKey === 'slots', isSubmitting,
     inlineError, toast, booked, isReadyToSubmit, bookedPatientLabel, resetForm, submit,
   };

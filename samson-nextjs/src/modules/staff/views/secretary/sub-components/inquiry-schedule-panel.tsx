@@ -14,7 +14,10 @@ interface InquirySchedulePanelProps {
   onDoctorSelect: (doctorId: string) => void;
   slots: { startTime: string; endTime: string }[];
   selectedTime: string;
+  selectedEndTime?: string;
   onSlotSelect: (slot: { startTime: string; endTime: string }) => void;
+  onStartTimeChange?: (time: string) => void;
+  onEndTimeChange?: (time: string) => void;
   isLoadingServices: boolean;
   isLoadingDays: boolean;
   isLoadingDoctors: boolean;
@@ -34,12 +37,9 @@ export function InquirySchedulePanel(props: InquirySchedulePanelProps) {
             <span className="text-[10px] font-bold uppercase text-text-muted tracking-wider">Start Time</span>
             <input
               type="time"
-              value={props.selectedTime ? new Date(props.selectedTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' }) : ''}
+              value={props.selectedTime}
               onChange={(event) => {
-                const val = event.target.value;
-                if (val && props.selectedDate) {
-                  props.onSlotSelect({ startTime: `${props.selectedDate}T${val}:00.000Z`, endTime: props.selectedTime ? props.selectedTime.split('T')[0] + 'T' + (props.selectedTime.split('T')[1] || '00:00:00.000Z') : '' });
-                }
+                props.onStartTimeChange?.(event.target.value);
               }}
               className="text-xs border border-card-border rounded-xl px-3 py-2 bg-secondary-bg/25 text-text-primary focus:outline-none focus:border-primary-start/60"
             />
@@ -48,12 +48,9 @@ export function InquirySchedulePanel(props: InquirySchedulePanelProps) {
             <span className="text-[10px] font-bold uppercase text-text-muted tracking-wider">End Time</span>
             <input
               type="time"
-              value={props.selectedTime ? new Date(props.selectedTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' }) : ''}
+              value={props.selectedEndTime || ''}
               onChange={(event) => {
-                const val = event.target.value;
-                if (val && props.selectedDate && props.selectedTime) {
-                  props.onSlotSelect({ startTime: props.selectedTime, endTime: `${props.selectedDate}T${val}:00.000Z` });
-                }
+                props.onEndTimeChange?.(event.target.value);
               }}
               className="text-xs border border-card-border rounded-xl px-3 py-2 bg-secondary-bg/25 text-text-primary focus:outline-none focus:border-primary-start/60"
             />

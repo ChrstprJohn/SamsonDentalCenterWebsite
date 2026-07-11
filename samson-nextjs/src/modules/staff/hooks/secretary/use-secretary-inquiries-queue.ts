@@ -188,8 +188,15 @@ export function useSecretaryInquiriesQueue() {
   };
 
   const selectSlot = (slot: { startTime: string; endTime: string }) => {
-    setStagedInquiryTime(slot.startTime);
-    setStagedInquiryEndTime(slot.endTime);
+    const extractTimePart = (isoOrTime: string) => {
+      if (!isoOrTime) return '';
+      if (isoOrTime.includes('T')) {
+        return isoOrTime.split('T')[1].substring(0, 5);
+      }
+      return isoOrTime;
+    };
+    setStagedInquiryTime(extractTimePart(slot.startTime));
+    setStagedInquiryEndTime(extractTimePart(slot.endTime));
   };
 
   const selectPatient = (patient: any) => {
@@ -221,8 +228,8 @@ export function useSecretaryInquiriesQueue() {
           serviceId: stagedInquiryService,
           doctorId: stagedInquiryDoctor,
           date: stagedInquiryDate,
-          startTime: stagedInquiryTime,
-          endTime: stagedInquiryEndTime,
+          startTime: `${stagedInquiryDate}T${stagedInquiryTime}:00Z`,
+          endTime: `${stagedInquiryDate}T${stagedInquiryEndTime}:00Z`,
           patientNote: stagedInquiryNote || undefined,
           secretaryNotes: stagedSecretaryNotes || undefined,
           linkedPatientId: linkedPatientId || undefined,
@@ -269,12 +276,13 @@ export function useSecretaryInquiriesQueue() {
     && !!stagedInquiryAction
     && (stagedInquiryAction === 'DROP'
       ? !!stagedInquiryNote.trim()
-      : !!(stagedInquiryService && stagedInquiryDate && stagedInquiryDoctor && stagedInquiryTime));
+      : !!(stagedInquiryService && stagedInquiryDate && stagedInquiryDoctor && stagedInquiryTime && stagedInquiryEndTime));
 
   return {
     inquiries, selectedInquiry, selectedInquiryId, selectInquiry, isLoadingInquiries, inquiriesError, loadInquiries,
     stagedInquiryAction, setDecision, stagedInquiryService, selectService, stagedInquiryDoctor, selectDoctor,
-    stagedInquiryDate, selectDate, stagedInquiryTime, selectSlot, stagedInquiryNote, setStagedInquiryNote,
+    stagedInquiryDate, selectDate, stagedInquiryTime, setStagedInquiryTime, stagedInquiryEndTime, setStagedInquiryEndTime,
+    selectSlot, stagedInquiryNote, setStagedInquiryNote,
     stagedSecretaryNotes, setSecretaryNotes, guestFirstName, setGuestFirstName, guestMiddleName, setGuestMiddleName,
     guestLastName, setGuestLastName, guestSuffix, setGuestSuffix, guestPhone, setGuestPhone, guestEmail, setGuestEmail,
     patientMode, setPatientMode, patientSearchQuery, setPatientSearchQuery, patientSearchResults, isSearchingPatients,
