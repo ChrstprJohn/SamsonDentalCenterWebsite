@@ -1,93 +1,99 @@
 # Revised Appointment and Inquiry Business Plan
+# Refined "Secretary-as-the-Brain" Architecture
 
-## Core Philosophy
-We are shifting the online scheduling architecture from a **dynamic real-time slot inventory system** to a **simplified request and manual synchronization flow**. The clinic uses an offline system to manage doctor schedules and slot availability (the "One Source of Truth"). The website functions as an inquiry/booking-request portal and a notification agent.
-
----
-
-## 1. The Online Request Flow (The "Request-to-Confirm" Loop) - [COMPLETED / IMPLEMENTED]
-This flow turns a "wish" into a "confirmed appointment." Both **Authenticated** and **Unauthenticated (Guest)** entry points are modified and fully supported:
-
-### Step 1: User Request (Authenticated & Unauthenticated)
-- **Authenticated Flow**: Registered users book via their portal. Their profile details (Name, Contact, etc.) are automatically mapped, and they select **Service, Date, Doctor, and Time Preference (Morning/Afternoon)**.
-- **Unauthenticated (Guest) Flow**: Visitors can book without logging in. They fill out their patient/contact details (Name, Email, Phone, Date of Birth) along with **Service, Date, Doctor, and Time Preference (Morning/Afternoon)**.
-- User submits the form.
-
-### Step 2: Database Entry
-- Your website saves this as a record with status: `'PENDING'`.
-
-### Step 3: Secretary Review
-- Secretary opens the Secretary Dashboard and sees the new `'PENDING'` request.
-
-### Step 4: The Offline Check (The "Brain")
-- Secretary opens their Offline Software.
-- Secretary looks at the clinic’s actual, real-time availability for that date.
-
-### Step 5: The Sync & Approve (The "Bridge")
-- Secretary books the appointment in the Offline Software (e.g., 9:15 AM).
-- Secretary goes to your Website Dashboard, clicks the **[Approve]** button on that request.
-- Secretary enters the **exact time** (e.g., 9:15 AM) and **duration** from the offline software.
-- Secretary hits **Confirm**.
-
-### Step 6: Automation Trigger
-- Website updates status to `'CONFIRMED'`.
-- **Notification Engine**: Sends "Appointment Confirmed" message to patient.
-- **Reminder Engine**: Sets up the 48-hour/24-hour reminder countdown for that specific date and time.
+This architecture simplifies the online patient experience while ensuring the Secretary has full control and visibility, using the offline software as the ultimate source of truth.
 
 ---
 
-## 2. The Walk-in / Phone Call Flow (The "Mirror" Loop)
-This flow ensures walk-ins and phone bookings get the same automated care as online bookers.
+## 1. The Patient Request Flows (The Website Portal)
 
-### Step 1: Booking
-- Patient calls or walks in.
-- Secretary books the appointment only in the Offline Software.
+### A. Guest Booking (The "Fast Path")
+*   **Step 1:** Guest enters contact details (Name, Phone, Email, DOB).
+*   **Step 2:** Guest selects Service.
+*   **Step 3:** System renders the Date calendar based on the combined working rosters of all doctors qualified to perform that specific service.
+*   **Step 4:** Guest selects Date and Time Preference (Morning/Afternoon).
+*   **Step 5:** Submission. System saves as `PENDING` with:
+    *   `doctor_id` = `NULL`
+    *   `doctor_assignment_source` = `'SYSTEM'` (Flag: "Any Available Doctor")
 
-### Step 2: The Mirroring
-- Secretary immediately opens your Secretary Dashboard.
-- Secretary clicks the **"Quick-Add"** button.
-- Secretary enters the **Patient Name, Service, Date, Doctor, and Time** (copying what they just typed in the offline software).
-
-### Step 3: Automation Trigger
-- Secretary hits **Save/Confirm**.
-- Website sets status to `'CONFIRMED'`.
-- **Notification Engine**: Immediately triggers the "Appointment Confirmed" message.
-- **Reminder Engine**: Sets up the 48-hour/24-hour reminder countdown.
+### B. Authenticated (Auth) Booking (The "Relationship Path")
+*   **Step 1:** User logs in.
+*   **Step 2:** User selects Service.
+*   **Step 3:** User selects Doctor preference:
+    *   **Option 1: "Any Available Doctor"**
+    *   **Option 2: Specific Doctor**
+*   **Step 4:** Date Calendar rendering:
+    *   If **Specific Doctor** is chosen: Renders only dates where that specific doctor is rostered to work.
+    *   If **"Any Available Doctor"** is chosen: Renders dates based on the combined rosters of all doctors qualified for the service.
+*   **Step 5:** User selects Date and Time Preference (Morning/Afternoon).
+*   **Step 6:** Submission. System saves as `PENDING` with:
+    *   If specific doctor chosen: `doctor_id` = `[Doctor's UUID]`, `doctor_assignment_source` = `'USER'`.
+    *   If "Any" chosen: `doctor_id` = `NULL`, `doctor_assignment_source` = `'SYSTEM'`.
 
 ---
 
-## 3. Summary of Roles & Logic
+## 2. The Secretary's "Bridge" Flow (The Confirmation)
 
-| Feature | Online Request | Walk-in / Phone Call |
+When the Secretary opens a `PENDING` request on the dashboard, they see the pre-filled data. Here is the logic for handling confirmation:
+
+### The "Approve/Confirm" Action (Modal / Form Panel)
+1.  **Review Requested Data:** Secretary sees the requested Service, Date, Time Preference, and Doctor (if any).
+2.  **Verify / Edit Details:**
+    *   **Service & Date:** Secretary checks the offline software. If the date requested is unavailable/full, the Secretary selects a new date.
+    *   **Doctor:** 
+        *   If the request has a specific doctor (`'USER'`), it pre-fills the doctor field. The Secretary can keep or override it.
+        *   If the request is for "Any" (`'SYSTEM'`), the doctor field starts blank. The Secretary **must** select a doctor from the filtered dropdown.
+    *   **Time:** The Secretary manually enters/types the exact **Start to End Time** (e.g., `09:15 AM - 09:45 AM`) from the offline software.
+3.  **Confirm:** Secretary clicks **[Confirm]**.
+    *   **Result:** Status updates to `'CONFIRMED'`.
+    *   **Result:** Automation triggers the confirmation notification (email/SMS) to the patient.
+
+---
+
+## 3. The Mirroring Flow (Walk-in / Phone Call)
+
+Ensures walk-ins and phone calls receive the same automated notifications and reminder tracking.
+
+*   **Step 1:** Secretary books the appointment directly in the Offline Software.
+*   **Step 2:** Secretary opens the Website Dashboard and clicks the **"Quick-Add"** button.
+*   **Step 3:** Secretary enters Patient Details and selects Service, Date, Doctor, and Exact Start/End Time.
+*   **Step 4:** Secretary saves the form.
+    *   **Result:** Status is set to `'CONFIRMED'` immediately (bypasses `PENDING`).
+    *   **Result:** Automation triggers the confirmation email and queues the 48-hour/24-hour reminder countdown.
+
+---
+
+## 4. Summary of Logic for Development
+
+| Workflow / User Type | Logic for "Doctor" Selection | Logic for "Date" Calendar |
 | :--- | :--- | :--- |
-| **Where it starts** | Your Website | Offline Software |
-| **Who is the "Boss"?** | Offline Software | Offline Software |
-| **Secretary's Action** | Approve + Enter Time | Quick-Add + Enter Time |
-| **Goal** | Get to `'CONFIRMED'` status | Get to `'CONFIRMED'` status |
-| **Result** | Automation Starts | Automation Starts |
-
----
-
-## 4. Important Operational Rules
-
-- **The "CONFIRMED" Status is Holy**: No notifications should ever be sent while an appointment is `'PENDING'`. Only when the secretary has finished the "Mirror/Sync" process and the record is `'CONFIRMED'` should your system start interacting with the patient.
-- **No Time-Slot Competition**: Since you are removing the specific time-slot picker from the online user form (keeping it just Date + Morning/Afternoon preference), you will never have a database collision or a "Slot taken" error.
-- **One Source of Truth for Time**: The time is always defined by the Offline Software first. Your website is just the "notification record" of that truth.
-- **No Website Timeslot Rendering for Secretary**: The Secretary Dashboard will not calculate, fetch, or display available timeslots. The secretary has complete control to type or select any custom start time and duration based on their visual verification of the offline software calendar. The website will trust the secretary's inputs without performing slot availability checks.
+| **Guest Booking** | Auto-set to `NULL` (Mapped as `'SYSTEM'`). | Combined availability of all doctors who perform the Service. |
+| **Auth Booking (Any)** | User selects "Any" -> `NULL` (Mapped as `'SYSTEM'`). | Combined availability of all doctors who perform the Service. |
+| **Auth Booking (Specific)** | User selects specific doctor -> `doctor_id` (Mapped as `'USER'`). | Only dates where that specific doctor is rostered to work. |
+| **Secretary Edit / Confirm** | Can pick any doctor. The dropdown dynamically filters to show doctors rostered on the selected Date. | Fully manual calendar selection. Changing Date refreshes the rostered doctors list. |
 
 ---
 
 ## 5. Reschedule, Cancellation, & Checkout Actions
 
-To maintain parity with the rest of the clinic's administrative needs:
+To maintain parity with other clinic administrative actions:
 
 ### A. User Reschedule Requests
-1. **Submit Reschedule Request**: The user selects a new proposed Date and Preferred Time of Day (Morning/Afternoon).
-2. **Review & Confirm**: The secretary checks availability in the offline system, updates the offline software, and then approves the request on the website by updating the record with the confirmed Doctor, Time, and changing status to `'CONFIRMED'`.
+1.  **Submit Reschedule Request:** The user selects a new proposed Date and Preferred Time of Day (Morning/Afternoon).
+2.  **Review & Confirm:** The secretary checks the offline software, updates it, and approves the request on the website dashboard by updating the record with the confirmed Date, Doctor, Start to End Time, and changing status to `'CONFIRMED'`.
 
 ### B. User Cancellation Requests
-1. **Submit Cancel Request**: When a user cancels, the status updates to `'CANCELLATION_PENDING'`.
-2. **Review & Confirm**: The secretary records the cancellation in the offline software and approves the cancellation on the website (updating status to `'CANCELLED'`).
+1.  **Submit Cancel Request:** The user cancels their appointment. Status updates to `'CANCELLATION_PENDING'`.
+2.  **Review & Confirm:** The secretary records the cancellation in the offline software and approves the cancellation on the website (updating status to `'CANCELLED'`).
 
 ### C. Checkout Action
-- **Thank You Notification**: Triggered immediately when the secretary performs the manual **Check-out** action in the portal, thanking the patient for their visit.
+*   **Thank You Notification:** Triggered immediately when the secretary performs the manual **Check-out** action in the portal, thanking the patient for their visit.
+
+---
+
+## 6. Final Operational Rules
+
+*   **One Source of Truth:** The Offline Software is the only place for real-time slot management.
+*   **Website as Record:** The website is a portal to collect intent and facilitate communication (Notifications/Reminders).
+*   **Status Lock:** No automated patient messaging (emails/SMS/reminders) occurs while an appointment is `'PENDING'` or `'CANCELLATION_PENDING'`. Messages only send upon transitioning to `'CONFIRMED'` or `'CANCELLED'`.
+*   **Flexibility:** The Secretary has complete authority to override and change anything (Date, Doctor, Time, Service) during the confirmation step, regardless of what the user originally requested.
