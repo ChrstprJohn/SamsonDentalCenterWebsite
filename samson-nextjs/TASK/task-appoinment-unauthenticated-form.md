@@ -71,27 +71,27 @@ This checklist tracks the modifications required to capture a guest's **Preferre
 
 ---
 
-## 6. Simplify Inquiry Form UI [PENDING]
+## 6. Simplify Inquiry Form UI [DONE]
 The business plan calls for reducing form friction by hiding non-essential fields. `middleName`, `suffix`, and `dateOfBirth` should be **removed from the rendered UI** while the backend (DTO, repository, hook submission) continues to accept them as optional/nullable.
 
 ### 6a. UI Component Changes
 **File:** [contact-form-fields.tsx](file:///c:/Users/picar/Desktop/samson-website/samson-nextjs/src/modules/patients/components/landing/sub-components/contact-form-fields.tsx)
-- [ ] Remove `middleName` field from `NameFields` — keep only `firstName` and `lastName` in the grid.
-- [ ] Remove `suffix` field from `NameFields` — keep only `firstName` and `lastName` in the grid.
-- [ ] Remove `dateOfBirth` field from `PreferenceFields` — keep only the `timePreference` toggle buttons.
+- [x] Remove `middleName` field from `NameFields` — keep only `firstName` and `lastName` in the grid.
+- [x] Remove `suffix` field from `NameFields` — keep only `firstName` and `lastName` in the grid.
+- [x] Remove `dateOfBirth` field from `PreferenceFields` — keep only the `timePreference` toggle buttons.
 
 ### 6b. Interface & Hook Adjustments
 **File:** [contact-form-fields.tsx](file:///c:/Users/picar/Desktop/samson-website/samson-nextjs/src/modules/patients/components/landing/sub-components/contact-form-fields.tsx)
-- [ ] Update `ContactFormFields` interface — remove `middleName`, `setMiddleName`, `suffix`, `setSuffix`, `dateOfBirth`, `setDateOfBirth` (or keep them for data pass-through but not render them; preference is to remove them from the interface entirely since they are no longer shown).
+- [x] Update `ContactFormFields` interface — remove `middleName`, `setMiddleName`, `suffix`, `setSuffix`, `dateOfBirth`, `setDateOfBirth` (or keep them for data pass-through but not render them; preference is to remove them from the interface entirely since they are no longer shown).
 
 **File:** [use-landing-view.ts](file:///c:/Users/picar/Desktop/samson-website/samson-nextjs/src/modules/patients/hooks/landing/use-landing-view.ts)
-- [ ] Remove `middleName`, `suffix`, `dateOfBirth` getters/setters from the `contactForm` return object (they are no longer needed by the UI).
-- [ ] Ensure `handleRealInquirySubmit` still sends `middleName: undefined`, `suffix: undefined`, `dateOfBirth: undefined` in the `submitInquiryAction` payload (DTO/repo already handle these as nullable).
+- [x] Remove `middleName`, `suffix`, `dateOfBirth` getters/setters from the `contactForm` return object (they are no longer needed by the UI).
+- [x] Ensure `handleRealInquirySubmit` still sends `middleName: undefined`, `suffix: undefined`, `dateOfBirth: undefined` in the `submitInquiryAction` payload (DTO/repo already handle these as nullable).
 
 **File:** [contact-form-card.tsx](file:///c:/Users/picar/Desktop/samson-website/samson-nextjs/src/modules/patients/components/landing/sub-components/contact-form-card.tsx)
-- [ ] Remove `middleName`, `suffix`, `dateOfBirth` from the `ContactFormCardProps` (if they are no longer in `ContactFormFields`).
+- [x] Remove `middleName`, `suffix`, `dateOfBirth` from the `ContactFormCardProps` (if they are no longer in `ContactFormFields`).
 
 ### 6c. Test File Updates
 **File:** [use-landing-view.spec.ts](file:///c:/Users/picar/Desktop/samson-website/samson-nextjs/src/modules/patients/hooks/landing/use-landing-view.spec.ts)
-- [ ] Update tests to reflect that the `contactForm` return object no longer exposes `middleName`, `suffix`, `dateOfBirth` setters.
-- [ ] Ensure the submission test still verifies `submitInquiryAction` is called with the correct payload (including `dateOfBirth`, `middleName`, `suffix` as undefined/null when not provided).
+- [x] Update tests to reflect that the `contactForm` return object no longer exposes `middleName`, `suffix`, `dateOfBirth` setters.
+- [x] Ensure the submission test still verifies `submitInquiryAction` is called with the correct payload (including `dateOfBirth`, `middleName`, `suffix` as undefined/null when not provided).
