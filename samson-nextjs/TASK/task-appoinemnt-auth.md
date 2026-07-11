@@ -39,7 +39,7 @@ From `revised-appointment-business-plan.md` §1.B (Auth Booking — "Relationshi
 
 ## 1. Database Migration
 
-- [ ] **Run migration — make `doctor_id` nullable on `appointments` table:**
+- [x] **Run migration — make `doctor_id` nullable on `appointments` table:**
   ```sql
   ALTER TABLE public.appointments ALTER COLUMN doctor_id DROP NOT NULL;
   ```
@@ -47,13 +47,13 @@ From `revised-appointment-business-plan.md` §1.B (Auth Booking — "Relationshi
   - Existing rows with a doctor are unaffected
   - PENDING rows will now legally hold `doctor_id = NULL`
 
-- [ ] **Verify exclusion constraint `no_overlapping_appointments` still works:**
+- [x] **Verify exclusion constraint `no_overlapping_appointments` still works:**
   - Constraint should only apply to non-`PENDING` / non-`RESCHEDULE_REQUESTED` states
   - `NULL` doctor_id rows in PENDING state must NOT trigger overlap errors
 
-- [ ] **Verify `doctor_assignment_source` column exists** with check constraint `('SYSTEM', 'USER')`
-- [ ] **Verify `time_preference` column exists** with check constraint `('MORNING', 'AFTERNOON')`
-- [ ] **Verify `start_time` and `end_time` are already nullable** — PENDING rows have no confirmed time yet
+- [x] **Verify `doctor_assignment_source` column exists** with check constraint `('SYSTEM', 'USER')`
+- [x] **Verify `time_preference` column exists** with check constraint `('MORNING', 'AFTERNOON')`
+- [x] **Verify `start_time` and `end_time` are already nullable** — PENDING rows have no confirmed time yet
 
 ---
 
@@ -62,7 +62,7 @@ From `revised-appointment-business-plan.md` §1.B (Auth Booking — "Relationshi
 ### 2.1 DTO — `submit-booking.dto.ts`
 > File: `src/modules/appointments/dtos/booking/submit-booking.dto.ts`
 
-- [ ] **Update `doctorId` field to allow `null`:**
+- [x] **Update `doctorId` field to allow `null`:**
   ```ts
   // Before (wrong — requires UUID string):
   doctorId: z.string().uuid('Invalid Doctor ID format'),
@@ -70,17 +70,17 @@ From `revised-appointment-business-plan.md` §1.B (Auth Booking — "Relationshi
   // After (correct — allows null for ANY doctor):
   doctorId: z.string().uuid('Invalid Doctor ID format').nullable().optional(),
   ```
-- [ ] **Verify `doctorAssignmentSource` defaults correctly:**
+- [x] **Verify `doctorAssignmentSource` defaults correctly:**
   ```ts
   doctorAssignmentSource: z.enum(['SYSTEM', 'USER']).optional().default('SYSTEM'),
   ```
-- [ ] **Verify `timePreference` is present and correctly typed:**
+- [x] **Verify `timePreference` is present and correctly typed:**
   ```ts
   timePreference: z.enum(['MORNING', 'AFTERNOON']),
   ```
   This is required for auth booking — user must select one.
-- [ ] **Verify `startTime` and `endTime` remain optional** — they are `NULL` at PENDING state, assigned later by secretary
-- [ ] **Update sibling spec `submit-booking.dto.spec.ts` to cover:**
+- [x] **Verify `startTime` and `endTime` remain optional** — they are `NULL` at PENDING state, assigned later by secretary
+- [x] **Update sibling spec `submit-booking.dto.spec.ts` to cover:**
   - Valid payload with `doctorId: null` (ANY doctor) → passes
   - Valid payload with specific UUID `doctorId` → passes
   - Missing `timePreference` → Zod error
@@ -90,8 +90,8 @@ From `revised-appointment-business-plan.md` §1.B (Auth Booking — "Relationshi
 ### 2.2 Use Case — `submit-booking.use-case.ts`
 > File: `src/modules/appointments/use-cases/booking/submit-booking.use-case.ts`
 
-- [ ] **Verify use case does NOT validate slot availability** — this is a request-to-confirm flow. No hourly slot checking. Secretary handles final slot assignment.
-- [ ] **Verify use case builds DB payload with `doctor_id` as `null` when `ANY`:**
+- [x] **Verify use case does NOT validate slot availability** — this is a request-to-confirm flow. No hourly slot checking. Secretary handles final slot assignment.
+- [x] **Verify use case builds DB payload with `doctor_id` as `null` when `ANY`:**
   ```ts
   doctor_id: data.doctorId ?? null,
   doctor_assignment_source: data.doctorAssignmentSource,
@@ -100,8 +100,8 @@ From `revised-appointment-business-plan.md` §1.B (Auth Booking — "Relationshi
   end_time: null,    // Not assigned at PENDING
   status: 'PENDING',
   ```
-- [ ] **Verify use case is pure** — no Supabase imports, no HTTP objects, functional DI
-- [ ] **Verify `submit-booking.use-case.spec.ts` is updated:**
+- [x] **Verify use case is pure** — no Supabase imports, no HTTP objects, functional DI
+- [x] **Verify `submit-booking.use-case.spec.ts` is updated:**
   - Mock `executeBookingTransaction`, assert correct payload when `doctorId = null`
   - Assert correct payload when `doctorId = 'some-uuid'`
   - Assert status is always `'PENDING'`
@@ -109,12 +109,12 @@ From `revised-appointment-business-plan.md` §1.B (Auth Booking — "Relationshi
 ### 2.3 Server Action — `submit-booking.action.ts`
 > File: `src/modules/appointments/actions/booking/submit-booking.action.ts`
 
-- [ ] **Verify action is thin** — parse → DI → use case → return
-- [ ] **Verify `'use server'` directive at line 1**
-- [ ] **Verify auth check: `getAuthenticatedUser()` called before any business logic**
-- [ ] **Verify `doctorId: null` flows through without being rejected** — action must accept `null` after schema update
-- [ ] **Verify action returns standardized response:** `{ success: true, data: { appointmentId } }` or `{ success: false, error: string }`
-- [ ] **Verify `submit-booking.action.spec.ts` is updated:**
+- [x] **Verify action is thin** — parse → DI → use case → return
+- [x] **Verify `'use server'` directive at line 1**
+- [x] **Verify auth check: `getAuthenticatedUser()` called before any business logic**
+- [x] **Verify `doctorId: null` flows through without being rejected** — action must accept `null` after schema update
+- [x] **Verify action returns standardized response:** `{ success: true, data: { appointmentId } }` or `{ success: false, error: string }`
+- [x] **Verify `submit-booking.action.spec.ts` is updated:**
   - Mock user auth, mock use case, submit with `doctorId: null` → `{ success: true }`
   - Submit with specific doctor UUID → `{ success: true }`
   - Unauthenticated → `{ success: false, error: 'Unauthorized' }`
@@ -126,26 +126,26 @@ From `revised-appointment-business-plan.md` §1.B (Auth Booking — "Relationshi
 ### 3.1 Payload Mapper — `submit-booking-payload.mapper.ts`
 > File: `src/modules/appointments/hooks/booking/submit-booking-payload.mapper.ts`
 
-- [ ] **Update `PayloadMapperParams.resolvedDoctorId` to `string | null`:**
+- [x] **Update `PayloadMapperParams.resolvedDoctorId` to `string | null`:**
   ```ts
   interface PayloadMapperParams {
     // ...
     resolvedDoctorId: string | null; // null when 'ANY' is selected
   }
   ```
-- [ ] **Remove any fallback to `data.doctors[0]?.id`** — if ANY is selected, `resolvedDoctorId` must be `null`, never a fallback UUID
-- [ ] **Verify `doctorAssignmentSource` mapping:**
+- [x] **Remove any fallback to `data.doctors[0]?.id`** — if ANY is selected, `resolvedDoctorId` must be `null`, never a fallback UUID
+- [x] **Verify `doctorAssignmentSource` mapping:**
   ```ts
   doctorAssignmentSource: selectedDoctorId === 'ANY' ? 'SYSTEM' : 'USER',
   ```
-- [ ] **Update sibling spec `submit-booking-payload.mapper.spec.ts`:**
+- [x] **Update sibling spec `submit-booking-payload.mapper.spec.ts`:**
   - `selectedDoctorId = 'ANY'` → `doctorId: null`, `doctorAssignmentSource: 'SYSTEM'`
   - `selectedDoctorId = 'some-uuid'` → `doctorId: 'some-uuid'`, `doctorAssignmentSource: 'USER'`
 
 ### 3.2 Hook — `use-user-booking.ts`
 > File: `src/modules/appointments/hooks/booking/use-user-booking.ts`
 
-- [ ] **Fix `resolvedDoctorId` logic — remove fallback to `data.doctors[0]?.id`:**
+- [x] **Fix `resolvedDoctorId` logic — remove fallback to `data.doctors[0]?.id`:**
   ```ts
   // BEFORE (wrong — auto-assigns first doctor):
   resolvedDoctorId: state.selectedDoctorId === 'ANY'
@@ -157,7 +157,7 @@ From `revised-appointment-business-plan.md` §1.B (Auth Booking — "Relationshi
     ? null
     : state.selectedDoctorId,
   ```
-- [ ] **Fix reschedule path too** — same null-instead-of-fallback logic:
+- [x] **Fix reschedule path too** — same null-instead-of-fallback logic:
   ```ts
   // BEFORE:
   newDoctorId: state.selectedDoctorId === 'ANY' ? (data.doctors[0]?.id || '') : state.selectedDoctorId,
@@ -165,9 +165,9 @@ From `revised-appointment-business-plan.md` §1.B (Auth Booking — "Relationshi
   // AFTER:
   newDoctorId: state.selectedDoctorId === 'ANY' ? null : state.selectedDoctorId,
   ```
-- [ ] **Verify `setTimePreference` is exposed from hook return** — user must be able to change preference in UI
-- [ ] **Verify hook does NOT import Supabase** — all writes go through server actions
-- [ ] **Update `use-user-booking.spec.ts`:**
+- [x] **Verify `setTimePreference` is exposed from hook return** — user must be able to change preference in UI
+- [x] **Verify hook does NOT import Supabase** — all writes go through server actions
+- [x] **Update `use-user-booking.spec.ts`:**
   - Assert `resolvedDoctorId = null` when `selectedDoctorId = 'ANY'`
   - Assert `resolvedDoctorId = 'uuid'` when specific doctor picked
   - Assert `doctorAssignmentSource = 'SYSTEM'` when ANY, `'USER'` when specific
@@ -176,24 +176,24 @@ From `revised-appointment-business-plan.md` §1.B (Auth Booking — "Relationshi
 > File: `src/modules/appointments/components/booking/date-time-step.tsx`
 > Abides by: Dumb Component Pattern (`2-REACT-COMPONENTS.md`)
 
-- [ ] **Verify Doctor Preference selector is rendered:**
+- [x] **Verify Doctor Preference selector is rendered:**
   - Option 1: "Any Available Doctor"
   - Option 2+: List of doctors who can perform the selected service
-- [ ] **Verify selecting "Any Doctor" sets `selectedDoctorId = 'ANY'` in hook state**
-- [ ] **Verify date calendar adapts to doctor selection:**
+- [x] **Verify selecting "Any Doctor" sets `selectedDoctorId = 'ANY'` in hook state**
+- [x] **Verify date calendar adapts to doctor selection:**
   - "Any Doctor" selected → calendar queries combined rosters of all qualified doctors
   - Specific doctor selected → calendar queries only that doctor's rostered dates
-- [ ] **Verify Time Preference toggle is rendered and required:**
+- [x] **Verify Time Preference toggle is rendered and required:**
   - "Morning" / "Afternoon" toggle
   - Must be selected before "Next" is enabled
-- [ ] **Verify component is dumb** — all state in hook, component only receives props and fires callbacks
+- [x] **Verify component is dumb** — all state in hook, component only receives props and fires callbacks
 
 ### 3.4 Step 4 — `review-step.tsx` / `review-appointment-details.tsx` (Review Screen)
 > Files: `src/modules/appointments/components/booking/review-step.tsx`
 > `src/modules/appointments/components/booking/sub-components/review-appointment-details.tsx`
 > Abides by: Dumb Component Pattern
 
-- [ ] **Display doctor as "Any Available Doctor" when `selectedDoctorId === 'ANY'`** — do NOT show a specific doctor name when ANY was selected
+- [x] **Display doctor as "Any Available Doctor" when `selectedDoctorId === 'ANY'`** — do NOT show a specific doctor name when ANY was selected
   ```ts
   const doctorLabel = selectedDoctorId === 'ANY'
     ? 'Any Available Doctor (Secretary will assign)'
@@ -201,31 +201,31 @@ From `revised-appointment-business-plan.md` §1.B (Auth Booking — "Relationshi
         ? `Dr. ${doctor.firstName} ${doctor.lastName}`
         : 'Unknown';
   ```
-- [ ] **Display `timePreference` clearly** — "Morning (09:00 AM – 12:00 PM)" or "Afternoon (01:00 PM – 05:00 PM)"
-- [ ] **Do NOT display `startTime` / `endTime`** — these are null at PENDING state; exact time is assigned by secretary
+- [x] **Display `timePreference` clearly** — "Morning (09:00 AM – 12:00 PM)" or "Afternoon (01:00 PM – 05:00 PM)"
+- [x] **Do NOT display `startTime` / `endTime`** — these are null at PENDING state; exact time is assigned by secretary
 
 ### 3.5 Booking Success View — `booking-success-view.tsx`
 > File: `src/modules/appointments/components/booking/booking-success-view.tsx`
 
-- [ ] **Display "Any Available Doctor" when `selectedDoctorId === 'ANY'` or `doctors` array is empty:**
+- [x] **Display "Any Available Doctor" when `selectedDoctorId === 'ANY'` or `doctors` array is empty:**
   ```ts
   const doctorName = selectedDoctorId === 'ANY' || !selectedDoc
     ? 'Any Available Doctor'
     : `Dr. ${selectedDoc.firstName} ${selectedDoc.lastName}`;
   ```
-- [ ] **Verify status badge shows "Pending Staff Review"** — not "Confirmed" ✅ (already correct)
-- [ ] **Verify "What happens next?" section explains secretary review** — already present ✅
+- [x] **Verify status badge shows "Pending Staff Review"** — not "Confirmed" ✅ (already correct)
+- [x] **Verify "What happens next?" section explains secretary review** — already present ✅
 
 ---
 
 ## 4. Testing
 
-- [ ] **`submit-booking.dto.spec.ts`** — `doctorId: null` passes, `doctorId: uuid` passes, missing `timePreference` fails
-- [ ] **`submit-booking.use-case.spec.ts`** — null doctor payload → `status: 'PENDING'`, `doctor_id: null`
-- [ ] **`submit-booking.action.spec.ts`** — null doctor flows through, auth check fires, standardized response returned
-- [ ] **`submit-booking-payload.mapper.spec.ts`** — ANY → `null`/`SYSTEM`, specific → `uuid`/`USER`
-- [ ] **`use-user-booking.spec.ts`** — no fallback to `doctors[0]`, correct null mapping
-- [ ] **Full test suite:** `pnpm test` — all tests pass, no regressions
+- [x] **`submit-booking.dto.spec.ts`** — `doctorId: null` passes, `doctorId: uuid` passes, missing `timePreference` fails
+- [x] **`submit-booking.use-case.spec.ts`** — null doctor payload → `status: 'PENDING'`, `doctor_id: null`
+- [x] **`submit-booking.action.spec.ts`** — null doctor flows through, auth check fires, standardized response returned
+- [x] **`submit-booking-payload.mapper.spec.ts`** — ANY → `null`/`SYSTEM`, specific → `uuid`/`USER`
+- [x] **`use-user-booking.spec.ts`** — no fallback to `doctors[0]`, correct null mapping
+- [x] **Full test suite:** `pnpm test` — all tests pass, no regressions
 
 ---
 
