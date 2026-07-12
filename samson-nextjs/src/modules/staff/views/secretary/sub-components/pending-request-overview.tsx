@@ -1,6 +1,6 @@
 'use client';
 
-import { formatClinicTime, formatShortDate } from '@/shared/utils/date.util';
+import { formatClinicTime, formatShortDate, formatTimeString } from '@/shared/utils/date.util';
 
 export function PendingRequestOverview({ appointment, patientDetails, conflictingAppointment }: { appointment: any; patientDetails: any; conflictingAppointment: any }) {
   return (
@@ -64,11 +64,9 @@ function RequestFacts({ appointment, patientDetails }: { appointment: any; patie
     : 'No doctor assigned';
   const birthday = appointment.dependent?.dateOfBirth || patientDetails?.profile.dateOfBirth;
   
-  const timeDisplay = appointment.startTime && appointment.endTime
-    ? `${formatClinicTime(appointment.startTime)} - ${formatClinicTime(appointment.endTime)}`
-    : appointment.timePreference
-      ? `Preference: ${appointment.timePreference.charAt(0).toUpperCase() + appointment.timePreference.slice(1).toLowerCase()}`
-      : 'No time preference';
+  const timeDisplay = appointment.preferredStartTime
+    ? `Preference: ${formatTimeString(appointment.preferredStartTime)}`
+    : 'No time preference';
 
   return (
     <div className="grid grid-cols-2 gap-3 text-xs border-b border-card-border pb-3">

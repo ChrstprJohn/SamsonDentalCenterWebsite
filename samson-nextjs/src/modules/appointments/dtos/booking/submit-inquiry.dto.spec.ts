@@ -12,7 +12,7 @@ describe('submitInquirySchema Validation', () => {
       preferredDate: '2026-06-25',
       patientNote: 'Tooth hurts',
       dateOfBirth: '1990-01-01',
-      timePreference: 'MORNING' as const,
+      preferredStartTime: '09:00',
     };
     expect(submitInquirySchema.safeParse(payload).success).toBe(true);
   });
@@ -25,7 +25,7 @@ describe('submitInquirySchema Validation', () => {
       email: 'john.doe@example.com',
       preferredServiceId: 'b3b07384-d113-4ec2-a5e6-ec083b0f5cc1',
       preferredDate: '2026-06-25',
-      timePreference: 'AFTERNOON' as const,
+      preferredStartTime: '13:00',
       dateOfBirth: '',
     };
     const parsed = submitInquirySchema.safeParse(payload);
@@ -35,7 +35,7 @@ describe('submitInquirySchema Validation', () => {
     }
   });
 
-  it('should reject invalid timePreference values', () => {
+  it('should reject invalid preferredStartTime values', () => {
     const payload = {
       firstName: 'John',
       lastName: 'Doe',
@@ -43,7 +43,7 @@ describe('submitInquirySchema Validation', () => {
       email: 'john.doe@example.com',
       preferredServiceId: 'b3b07384-d113-4ec2-a5e6-ec083b0f5cc1',
       preferredDate: '2026-06-25',
-      timePreference: 'EVENING' as any,
+      preferredStartTime: '99:99',
     };
     expect(submitInquirySchema.safeParse(payload).success).toBe(false);
   });
@@ -56,7 +56,7 @@ describe('submitInquirySchema Validation', () => {
       email: 'john.doe@example.com',
       preferredServiceId: 'b3b07384-d113-4ec2-a5e6-ec083b0f5cc1',
       preferredDate: '2026-06-25',
-      timePreference: 'MORNING' as const,
+      preferredStartTime: '09:00',
       dateOfBirth: '01-01-1990',
     };
     expect(submitInquirySchema.safeParse(payload).success).toBe(false);
@@ -70,13 +70,13 @@ describe('submitInquirySchema Validation', () => {
       email: 'not-an-email',
       preferredServiceId: 'b3b07384-d113-4ec2-a5e6-ec083b0f5cc1',
       preferredDate: '2026-06-25',
-      timePreference: 'MORNING' as const,
+      preferredStartTime: '09:00',
     };
     const result = submitInquirySchema.safeParse(payload);
     expect(result.success).toBe(false);
   });
 
-  it('should reject when timePreference is missing (required field)', () => {
+  it('should reject when preferredStartTime is missing (required field)', () => {
     const payload = {
       firstName: 'John',
       lastName: 'Doe',
@@ -84,15 +84,15 @@ describe('submitInquirySchema Validation', () => {
       email: 'john.doe@example.com',
       preferredServiceId: 'b3b07384-d113-4ec2-a5e6-ec083b0f5cc1',
       preferredDate: '2026-06-25',
-      // timePreference omitted
+      // preferredStartTime omitted
     };
     const result = submitInquirySchema.safeParse(payload);
     expect(result.success).toBe(false);
     if (!result.success) {
-      const hasTimePrefError = result.error.issues.some(
-        (i) => i.path.includes('timePreference')
+      const hasPrefError = result.error.issues.some(
+        (i) => i.path.includes('preferredStartTime')
       );
-      expect(hasTimePrefError).toBe(true);
+      expect(hasPrefError).toBe(true);
     }
   });
 
@@ -103,7 +103,7 @@ describe('submitInquirySchema Validation', () => {
       email: 'john.doe@example.com',
       preferredServiceId: 'b3b07384-d113-4ec2-a5e6-ec083b0f5cc1',
       preferredDate: '2026-06-25',
-      timePreference: 'MORNING' as const,
+      preferredStartTime: '09:00',
     };
     const result = submitInquirySchema.safeParse(payload);
     expect(result.success).toBe(false);
@@ -124,7 +124,7 @@ describe('inquiryResponseSchema Transform', () => {
       created_at: '2026-06-22T04:00:00Z',
       updated_at: '2026-06-22T04:00:00Z',
       date_of_birth: '1990-01-01',
-      time_preference: 'MORNING',
+      preferred_start_time: '09:00',
     };
 
     const transformed = inquiryResponseSchema.parse(rawDbData);
@@ -132,6 +132,6 @@ describe('inquiryResponseSchema Transform', () => {
     expect(transformed.phoneNumber).toBe('+639171234567');
     expect(transformed.preferredServiceId).toBe('b3b07384-d113-4ec2-a5e6-ec083b0f5cc1');
     expect(transformed.dateOfBirth).toBe('1990-01-01');
-    expect(transformed.timePreference).toBe('MORNING');
+    expect(transformed.preferredStartTime).toBe('09:00');
   });
 });

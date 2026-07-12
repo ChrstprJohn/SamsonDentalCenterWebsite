@@ -1,16 +1,16 @@
-# Graph Report - samson-website  (2026-07-11)
+# Graph Report - samson-website  (2026-07-12)
 
 ## Corpus Check
-- 2110 files · ~1,403,724 words
+- 2114 files · ~1,407,324 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 10308 nodes · 19016 edges · 833 communities (647 shown, 186 thin omitted)
+- 10352 nodes · 19067 edges · 857 communities (658 shown, 199 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 8 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `15b3fe68`
+- Built from commit: `94ef9432`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -459,9 +459,11 @@
 - [[_COMMUNITY_Community 467|Community 467]]
 - [[_COMMUNITY_Community 468|Community 468]]
 - [[_COMMUNITY_Community 469|Community 469]]
+- [[_COMMUNITY_Community 470|Community 470]]
 - [[_COMMUNITY_Community 471|Community 471]]
 - [[_COMMUNITY_Community 472|Community 472]]
 - [[_COMMUNITY_Community 473|Community 473]]
+- [[_COMMUNITY_Community 474|Community 474]]
 - [[_COMMUNITY_Community 475|Community 475]]
 - [[_COMMUNITY_Community 476|Community 476]]
 - [[_COMMUNITY_Community 477|Community 477]]
@@ -475,6 +477,7 @@
 - [[_COMMUNITY_Community 485|Community 485]]
 - [[_COMMUNITY_Community 486|Community 486]]
 - [[_COMMUNITY_Community 487|Community 487]]
+- [[_COMMUNITY_Community 488|Community 488]]
 - [[_COMMUNITY_Community 489|Community 489]]
 - [[_COMMUNITY_Community 490|Community 490]]
 - [[_COMMUNITY_Community 491|Community 491]]
@@ -488,6 +491,7 @@
 - [[_COMMUNITY_Community 499|Community 499]]
 - [[_COMMUNITY_Community 500|Community 500]]
 - [[_COMMUNITY_Community 501|Community 501]]
+- [[_COMMUNITY_Community 502|Community 502]]
 - [[_COMMUNITY_Community 504|Community 504]]
 - [[_COMMUNITY_Community 505|Community 505]]
 - [[_COMMUNITY_Community 506|Community 506]]
@@ -504,12 +508,14 @@
 - [[_COMMUNITY_Community 517|Community 517]]
 - [[_COMMUNITY_Community 518|Community 518]]
 - [[_COMMUNITY_Community 519|Community 519]]
+- [[_COMMUNITY_Community 520|Community 520]]
 - [[_COMMUNITY_Community 521|Community 521]]
 - [[_COMMUNITY_Community 522|Community 522]]
 - [[_COMMUNITY_Community 523|Community 523]]
 - [[_COMMUNITY_Community 524|Community 524]]
 - [[_COMMUNITY_Community 525|Community 525]]
 - [[_COMMUNITY_Community 526|Community 526]]
+- [[_COMMUNITY_Community 527|Community 527]]
 - [[_COMMUNITY_Community 528|Community 528]]
 - [[_COMMUNITY_Community 529|Community 529]]
 - [[_COMMUNITY_Community 530|Community 530]]
@@ -552,6 +558,7 @@
 - [[_COMMUNITY_Community 570|Community 570]]
 - [[_COMMUNITY_Community 571|Community 571]]
 - [[_COMMUNITY_Community 572|Community 572]]
+- [[_COMMUNITY_Community 573|Community 573]]
 - [[_COMMUNITY_Community 574|Community 574]]
 - [[_COMMUNITY_Community 575|Community 575]]
 - [[_COMMUNITY_Community 577|Community 577]]
@@ -600,6 +607,7 @@
 - [[_COMMUNITY_Community 621|Community 621]]
 - [[_COMMUNITY_Community 622|Community 622]]
 - [[_COMMUNITY_Community 623|Community 623]]
+- [[_COMMUNITY_Community 625|Community 625]]
 - [[_COMMUNITY_Community 626|Community 626]]
 - [[_COMMUNITY_Community 627|Community 627]]
 - [[_COMMUNITY_Community 628|Community 628]]
@@ -611,6 +619,8 @@
 - [[_COMMUNITY_Community 634|Community 634]]
 - [[_COMMUNITY_Community 635|Community 635]]
 - [[_COMMUNITY_Community 636|Community 636]]
+- [[_COMMUNITY_Community 637|Community 637]]
+- [[_COMMUNITY_Community 638|Community 638]]
 - [[_COMMUNITY_Community 641|Community 641]]
 - [[_COMMUNITY_Community 642|Community 642]]
 - [[_COMMUNITY_Community 643|Community 643]]
@@ -639,6 +649,7 @@
 - [[_COMMUNITY_Community 667|Community 667]]
 - [[_COMMUNITY_Community 668|Community 668]]
 - [[_COMMUNITY_Community 669|Community 669]]
+- [[_COMMUNITY_Community 670|Community 670]]
 - [[_COMMUNITY_Community 671|Community 671]]
 - [[_COMMUNITY_Community 672|Community 672]]
 - [[_COMMUNITY_Community 673|Community 673]]
@@ -646,6 +657,7 @@
 - [[_COMMUNITY_Community 675|Community 675]]
 - [[_COMMUNITY_Community 676|Community 676]]
 - [[_COMMUNITY_Community 677|Community 677]]
+- [[_COMMUNITY_Community 678|Community 678]]
 - [[_COMMUNITY_Community 679|Community 679]]
 - [[_COMMUNITY_Community 680|Community 680]]
 - [[_COMMUNITY_Community 681|Community 681]]
@@ -661,6 +673,8 @@
 - [[_COMMUNITY_Community 692|Community 692]]
 - [[_COMMUNITY_Community 693|Community 693]]
 - [[_COMMUNITY_Community 694|Community 694]]
+- [[_COMMUNITY_Community 695|Community 695]]
+- [[_COMMUNITY_Community 697|Community 697]]
 - [[_COMMUNITY_Community 698|Community 698]]
 - [[_COMMUNITY_Community 699|Community 699]]
 - [[_COMMUNITY_Community 700|Community 700]]
@@ -672,6 +686,8 @@
 - [[_COMMUNITY_Community 706|Community 706]]
 - [[_COMMUNITY_Community 707|Community 707]]
 - [[_COMMUNITY_Community 708|Community 708]]
+- [[_COMMUNITY_Community 709|Community 709]]
+- [[_COMMUNITY_Community 710|Community 710]]
 - [[_COMMUNITY_Community 713|Community 713]]
 - [[_COMMUNITY_Community 714|Community 714]]
 - [[_COMMUNITY_Community 715|Community 715]]
@@ -695,6 +711,14 @@
 - [[_COMMUNITY_Community 777|Community 777]]
 - [[_COMMUNITY_Community 793|Community 793]]
 - [[_COMMUNITY_Community 808|Community 808]]
+- [[_COMMUNITY_Community 849|Community 849]]
+- [[_COMMUNITY_Community 850|Community 850]]
+- [[_COMMUNITY_Community 851|Community 851]]
+- [[_COMMUNITY_Community 852|Community 852]]
+- [[_COMMUNITY_Community 853|Community 853]]
+- [[_COMMUNITY_Community 854|Community 854]]
+- [[_COMMUNITY_Community 855|Community 855]]
+- [[_COMMUNITY_Community 856|Community 856]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `createClient` - 320 edges
@@ -709,36 +733,36 @@
 10. `formatShortDate()` - 85 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `AppointmentSummaryCardProps` --references--> `AppointmentDto`  [EXTRACTED]
-  .pnpm-store/v11/projects/b8c40a990ffd670034e596abc8330228/src/modules/appointments/components/dashboard/appointment-summary-card.tsx → samson-nextjs/src/modules/appointments/dtos/shared/appointment.dto.ts
-- `AppointmentTeaserCardProps` --references--> `AppointmentDto`  [EXTRACTED]
-  .pnpm-store/v11/projects/b8c40a990ffd670034e596abc8330228/src/modules/appointments/components/dashboard/appointment-teaser-card.tsx → samson-nextjs/src/modules/appointments/dtos/shared/appointment.dto.ts
-- `RescheduleDetailsProps` --references--> `AppointmentDto`  [EXTRACTED]
-  .pnpm-store/v11/projects/b8c40a990ffd670034e596abc8330228/src/modules/appointments/components/dashboard/sub-components/reschedule-details.tsx → samson-nextjs/src/modules/appointments/dtos/shared/appointment.dto.ts
-- `AppointmentDetailViewProps` --references--> `AppointmentDto`  [EXTRACTED]
-  .pnpm-store/v11/projects/b8c40a990ffd670034e596abc8330228/src/modules/appointments/views/appointment-detail-view.tsx → samson-nextjs/src/modules/appointments/dtos/shared/appointment.dto.ts
-- `PatientAppointmentsViewProps` --references--> `AppointmentDto`  [EXTRACTED]
-  .pnpm-store/v11/projects/b8c40a990ffd670034e596abc8330228/src/modules/appointments/views/patient-appointments-view.tsx → samson-nextjs/src/modules/appointments/dtos/shared/appointment.dto.ts
+- `FooterProps` --references--> `ClinicConfigResponseDto`  [EXTRACTED]
+  .pnpm-store/v11/projects/b8c40a990ffd670034e596abc8330228/src/components/ui/footer.tsx → samson-nextjs/src/modules/clinic-config/dtos/settings/get-clinic-config.dto.ts
+- `AddDependentModalProps` --references--> `NewDependentInput`  [EXTRACTED]
+  .pnpm-store/v11/projects/b8c40a990ffd670034e596abc8330228/src/modules/appointments/components/booking/add-dependent-modal.tsx → samson-nextjs/src/modules/appointments/hooks/booking/use-user-booking.ts
+- `DashboardUpcomingWidgetProps` --references--> `AppointmentDto`  [EXTRACTED]
+  .pnpm-store/v11/projects/b8c40a990ffd670034e596abc8330228/src/modules/appointments/components/dashboard/sub-components/dashboard-upcoming-widget.tsx → samson-nextjs/src/modules/appointments/dtos/shared/appointment.dto.ts
+- `AppointmentScheduleCardProps` --references--> `AppointmentDto`  [EXTRACTED]
+  .pnpm-store/v11/projects/b8c40a990ffd670034e596abc8330228/src/modules/appointments/components/sub-components/appointment-schedule-card.tsx → samson-nextjs/src/modules/appointments/dtos/shared/appointment.dto.ts
+- `GenerateSlotsParams` --references--> `AppointmentResponseDto`  [EXTRACTED]
+  .pnpm-store/v11/projects/b8c40a990ffd670034e596abc8330228/src/modules/appointments/dtos/availability/availability-internal.dto.ts → samson-nextjs/src/modules/appointments/dtos/availability/appointment-response.dto.ts
 
 ## Import Cycles
-- 2-file cycle: `samson-nextjs/src/modules/doctors/components/schedules/time-exclusions-tab.tsx -> samson-nextjs/src/modules/doctors/views/schedule-view.tsx -> samson-nextjs/src/modules/doctors/components/schedules/time-exclusions-tab.tsx`
 - 2-file cycle: `samson-nextjs/src/modules/doctors/components/schedules/doctor-weekly-shifts-tab.tsx -> samson-nextjs/src/modules/doctors/views/schedule-view.tsx -> samson-nextjs/src/modules/doctors/components/schedules/doctor-weekly-shifts-tab.tsx`
 - 2-file cycle: `samson-nextjs/src/modules/doctors/components/schedules/global-hours-tab.tsx -> samson-nextjs/src/modules/doctors/views/schedule-view.tsx -> samson-nextjs/src/modules/doctors/components/schedules/global-hours-tab.tsx`
-- 2-file cycle: `samson-nextjs/src/modules/appointments/hooks/booking/submit-booking-payload.mapper.ts -> samson-nextjs/src/modules/appointments/hooks/booking/use-user-booking.ts -> samson-nextjs/src/modules/appointments/hooks/booking/submit-booking-payload.mapper.ts`
-- 2-file cycle: `samson-nextjs/src/modules/appointments/hooks/booking/use-booking-data.ts -> samson-nextjs/src/modules/appointments/hooks/booking/use-user-booking.ts -> samson-nextjs/src/modules/appointments/hooks/booking/use-booking-data.ts`
+- 2-file cycle: `samson-nextjs/src/modules/doctors/components/schedules/time-exclusions-tab.tsx -> samson-nextjs/src/modules/doctors/views/schedule-view.tsx -> samson-nextjs/src/modules/doctors/components/schedules/time-exclusions-tab.tsx`
 - 2-file cycle: `samson-nextjs/src/modules/appointments/hooks/booking/use-booking-state.ts -> samson-nextjs/src/modules/appointments/hooks/booking/use-user-booking.ts -> samson-nextjs/src/modules/appointments/hooks/booking/use-booking-state.ts`
+- 2-file cycle: `samson-nextjs/src/modules/appointments/hooks/booking/use-booking-data.ts -> samson-nextjs/src/modules/appointments/hooks/booking/use-user-booking.ts -> samson-nextjs/src/modules/appointments/hooks/booking/use-booking-data.ts`
+- 2-file cycle: `samson-nextjs/src/modules/appointments/hooks/booking/submit-booking-payload.mapper.ts -> samson-nextjs/src/modules/appointments/hooks/booking/use-user-booking.ts -> samson-nextjs/src/modules/appointments/hooks/booking/submit-booking-payload.mapper.ts`
 - 2-file cycle: `samson-nextjs/src/components/ui/navbar-mobile-drawer.tsx -> samson-nextjs/src/components/ui/navbar.tsx -> samson-nextjs/src/components/ui/navbar-mobile-drawer.tsx`
 - 3-file cycle: `samson-nextjs/src/components/ui/navbar-mobile-drawer.tsx -> samson-nextjs/src/components/ui/navbar.tsx -> samson-nextjs/src/components/ui/navbar-v1.tsx -> samson-nextjs/src/components/ui/navbar-mobile-drawer.tsx`
 
-## Communities (833 total, 186 thin omitted)
+## Communities (857 total, 199 thin omitted)
 
 ### Community 0 - "Community 0"
-Cohesion: 0.04
-Nodes (35): convertInquiryToAppointmentCommand(), getInquiriesQuery(), convertInquiryAction(), { mockConvertInquiry, mockGetServiceDuration }, cleanOptionalString, ConvertInquiryDto, convertInquirySchema, convertInquiryUseCase() (+27 more)
+Cohesion: 0.05
+Nodes (33): convertInquiryToAppointmentCommand(), convertInquiryAction(), { mockConvertInquiry, mockGetServiceDuration }, cleanOptionalString, ConvertInquiryDto, convertInquirySchema, convertInquiryUseCase(), dropInquiryAction() (+25 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.07
-Nodes (20): staffLoginAction(), staffLoginCommand(), StaffLoginDto, staffLoginSchema, staffLoginUseCase(), useStaffLoginForm(), mockAddToast, mockGet (+12 more)
+Cohesion: 0.12
+Nodes (9): StaffLoginDto, staffLoginSchema, useStaffLoginForm(), UseStaffLoginViewReturn, StaffLoginFormProps, UseStaffLoginViewReturn, StaffLoginFormProps, UseStaffLoginViewReturn (+1 more)
 
 ### Community 2 - "Community 2"
 Cohesion: 0.08
@@ -761,20 +785,16 @@ Cohesion: 0.05
 Nodes (39): 1. Notifications for Grouped Bookings, 6. No-Show, Treatment Rendered & Doctor Calendar, Doctor, Doctor Portal, Patient Account Access, Staff Profile Details, 1. User Booking Wizard, 3. Availability Caching & Stale Data (+31 more)
 
 ### Community 7 - "Community 7"
-Cohesion: 0.08
+Cohesion: 0.07
 Nodes (31): useSecretary(), MOCK_APPOINTMENTS, MOCK_AUDITS, MOCK_EMAILS, MOCK_INQUIRIES, MOCK_INVOICES, MOCK_PATIENT_USERS, ProfileField (+23 more)
 
 ### Community 8 - "Community 8"
 Cohesion: 0.05
 Nodes (38): 1. Booking Holds & Session Management, 2. Notifications for Grouped Bookings, 2. Unified Slot Hold & Session Recovery System, 6. No-Show, Invoice Generation & Doctor Calendar, Account Access, 1. User Booking Wizard, 3. Availability Caching & Stale Data, 4. Secretary Workflow Conflicts & Audit (+30 more)
 
-### Community 9 - "Community 9"
-Cohesion: 0.13
-Nodes (4): GetActiveDoctorsQueries, getAllUsersUseCase(), UserManagementQueries, terminateStaffUseCase()
-
 ### Community 10 - "Community 10"
-Cohesion: 0.14
-Nodes (6): ClinicAppointmentsQueries, getAppointmentsByClinicQuery(), emptyStringToUndefined, GetClinicAppointmentsDto, getClinicAppointmentsSchema, getClinicAppointmentsUseCase()
+Cohesion: 0.09
+Nodes (7): ClinicAppointmentsQueries, getAppointmentsByClinicQuery(), emptyStringToUndefined, GetClinicAppointmentsDto, getClinicAppointmentsSchema, getClinicAppointmentsUseCase(), mapAppointmentRecords()
 
 ### Community 11 - "Community 11"
 Cohesion: 0.04
@@ -785,16 +805,16 @@ Cohesion: 0.19
 Nodes (12): TimeExclusionsTabProps, TimeExclusionsTabProps, createTimeBlockAction(), CreateTimeBlockInput, revokeTimeBlockAction(), TimeExclusionsTabProps, timeBlockFormSchema, TimeBlockFormValues (+4 more)
 
 ### Community 13 - "Community 13"
-Cohesion: 0.09
-Nodes (8): capitalize(), isDefined(), getErrorMessage(), isError(), omit(), sleep(), slugify(), generateId()
+Cohesion: 0.08
+Nodes (9): capitalize(), getBaseUrl(), isDefined(), getErrorMessage(), isError(), omit(), sleep(), slugify() (+1 more)
 
 ### Community 14 - "Community 14"
-Cohesion: 0.13
-Nodes (14): appointment, scheduler, appointment, scheduler, SecretaryAppointmentsView(), appointment, scheduler, useSecretaryAppointments() (+6 more)
+Cohesion: 0.10
+Nodes (7): CreateTimeBlockInput, updateDoctorSchema, UpdateDoctorWeeklyScheduleInput, CreateTimeBlockInput, updateDoctorSchema, UpdateDoctorWeeklyScheduleInput, ActionResponse
 
 ### Community 15 - "Community 15"
 Cohesion: 0.06
-Nodes (37): AuditLogItem, DoctorCrudItem, INITIAL_DOCTORS, INITIAL_SERVICES, MOCK_AUDITS, ServiceCrudItem, initialConfig, mockAddToast (+29 more)
+Nodes (35): AuditLogItem, DoctorCrudItem, INITIAL_DOCTORS, INITIAL_SERVICES, MOCK_AUDITS, ServiceCrudItem, UseAdminDashboardProps, AdminAuditLogsProps (+27 more)
 
 ### Community 16 - "Community 16"
 Cohesion: 0.07
@@ -805,20 +825,20 @@ Cohesion: 0.07
 Nodes (28): Browser Testing with DevTools, Common Rationalizations, DAMP Over DRY in Tests, Decision Guide, Name Tests Descriptively, One Assertion Per Concept, Overview, Prefer Real Implementations Over Mocks (+20 more)
 
 ### Community 18 - "Community 18"
-Cohesion: 0.07
-Nodes (28): generateInvoiceCommand(), getServicesByIdsQuery(), { mockExecute }, mockEq, mockFrom, mockSupabase, mockUpdate, { mockExecute } (+20 more)
+Cohesion: 0.04
+Nodes (50): generateInvoiceAction(), GenerateInvoiceDto, generateInvoiceUseCase(), generateInvoiceCommand(), InvoiceCommandsRepository, mockEq, mockFrom, mockInsert (+42 more)
 
 ### Community 19 - "Community 19"
-Cohesion: 0.03
-Nodes (38): AppointmentsDirectoryPage(), AppointmentSummaryCard(), AppointmentSummaryCardProps, AppointmentRequestsPage(), AppointmentSummaryCardProps, AppointmentTeaserCardProps, RescheduleDetailsProps, DashboardNotification (+30 more)
+Cohesion: 0.02
+Nodes (65): AddDependentModal(), AddDependentModalProps, ExistingDependentSelector(), ExistingDependentSelectorProps, MOCK_DEPENDENTS, MOCK_DEPENDENTS, PatientDetailsStepProps, ReviewStepProps (+57 more)
 
 ### Community 20 - "Community 20"
 Cohesion: 0.08
 Nodes (25): 1️⃣ Core Architectural Principles, 1. File Naming Conventions, 2. Casing Standards for Variables and Properties, 2️⃣ Directory & Folder Blueprint, 3️⃣ Handling Growth: Best Practices When Files Get Too Long, 3. Zod Schema & Types Naming, 4. Architectural Component Conventions, 4️⃣ Enterprise Patterns for Scale (+17 more)
 
 ### Community 21 - "Community 21"
-Cohesion: 0.13
-Nodes (6): DayOfWeekEnum, DayOfWeekMap, DoctorScheduleDto, doctorScheduleSchema, timeStringSchema, upsertScheduleCommand()
+Cohesion: 0.08
+Nodes (24): geistMono, geistSans, josefinSans, jost, metadata, playfair, Theme, ThemeContext (+16 more)
 
 ### Community 22 - "Community 22"
 Cohesion: 0.08
@@ -873,7 +893,7 @@ Cohesion: 0.09
 Nodes (21): Common Rationalizations, Contract-First Slicing, Implementation Rules, Increment Checklist, Incremental Implementation, Overview, Red Flags, Risk-First Slicing (+13 more)
 
 ### Community 35 - "Community 35"
-Cohesion: 0.08
+Cohesion: 0.06
 Nodes (9): CreateStaffDto, createStaffUseCase(), createStaffCommand(), StaffProfileCommands, terminateStaffCommand(), updateStaffCommand(), StaffProfileDto, UpdateStaffDto (+1 more)
 
 ### Community 36 - "Community 36"
@@ -881,8 +901,8 @@ Cohesion: 0.10
 Nodes (20): ADR Lifecycle, ADR Template, API Documentation, Architecture Decision Records (ADRs), Changelog Maintenance, Common Rationalizations, Document Known Gotchas, Documentation and ADRs (+12 more)
 
 ### Community 37 - "Community 37"
-Cohesion: 0.17
-Nodes (7): { mockCheckIn }, { mockCheckIn }, checkInAction(), { mockCheckIn }, CheckInDto, checkInSchema, checkInUseCase()
+Cohesion: 0.14
+Nodes (8): AppointmentBookingCommands, createAppointmentCommand(), executeBookingTransactionCommand(), cleanOptionalString, emptyStringToUndefined, SubmitBookingDto, submitBookingSchema, submitBookingUseCase()
 
 ### Community 38 - "Community 38"
 Cohesion: 0.10
@@ -909,8 +929,8 @@ Cohesion: 0.11
 Nodes (17): Common Rationalizations, Example, Interaction with Other Skills, Interview Me, Loading Constraints, Output, Overview, Red Flags (+9 more)
 
 ### Community 44 - "Community 44"
-Cohesion: 0.09
-Nodes (25): ArchiveConfirmModal(), ArchiveConfirmModalProps, ServiceDetailPanel(), ServiceDetailPanelProps, ServiceForm(), ServiceListHeader(), ServiceListHeaderProps, ServiceList() (+17 more)
+Cohesion: 0.08
+Nodes (26): ArchiveConfirmModal(), ArchiveConfirmModalProps, ServiceCard(), formatPrice(), getEmoji(), ServiceDetailPanel(), ServiceDetailPanelProps, ServiceForm() (+18 more)
 
 ### Community 45 - "Community 45"
 Cohesion: 0.12
@@ -930,27 +950,27 @@ Nodes (22): 1. Upcoming Tab, 2. Pending Requests Tab, 3. History Tab, My Appoint
 
 ### Community 49 - "Community 49"
 Cohesion: 0.07
-Nodes (32): DoctorCard(), DoctorCardProps, DoctorDetailsPane(), DoctorDetailsPaneProps, Service, DoctorEditForm(), DoctorEditFormProps, Service (+24 more)
+Nodes (31): DoctorCard(), DoctorCardProps, DoctorDetailsPane(), DoctorDetailsPaneProps, Service, DoctorEditForm(), DoctorEditFormProps, Service (+23 more)
 
 ### Community 50 - "Community 50"
-Cohesion: 0.31
+Cohesion: 0.45
 Nodes (3): getAuditLogsQuery(), getAuditLogsAction(), getAuditLogsUseCase()
 
 ### Community 51 - "Community 51"
-Cohesion: 0.07
-Nodes (18): getAuthenticatedUser(), BookingPage(), metadata, createDependentAction(), assignDoctorServicesAction(), deactivateUserAction(), assignDoctorServicesCommand(), getAllUsersAction() (+10 more)
+Cohesion: 0.05
+Nodes (35): getAuthenticatedUser(), BookingPage(), metadata, getUserDependentsAction(), AppointmentDetailPage(), metadata, PageProps, getServicesUseCase() (+27 more)
 
 ### Community 52 - "Community 52"
 Cohesion: 0.10
 Nodes (19): Appointment Summary Section, CTA Button, Database RPC / Outbox Payload, Dependent Booking — Additional Fields:, Design Principle, Email Content Requirements, Email Template (`appointment-booked-email.tsx`), Footer (+11 more)
 
 ### Community 53 - "Community 53"
-Cohesion: 0.10
-Nodes (9): SecretaryPendingRequestsView(), PendingDecisionForm(), REASONS, PendingDoctorSchedule(), PendingEditPanel(), PendingEditPanelProps, PendingRequestList(), PendingRequestListProps (+1 more)
+Cohesion: 0.06
+Nodes (10): PendingEditPanelProps, SecretaryPendingRequestsView(), PENDING_CLINIC_HOURS, PendingDecisionForm(), PendingDoctorSchedule(), PendingEditPanel(), PendingEditPanelProps, SlotPicker() (+2 more)
 
 ### Community 54 - "Community 54"
-Cohesion: 0.03
-Nodes (48): geistMono, geistSans, josefinSans, jost, metadata, playfair, Theme, ThemeContext (+40 more)
+Cohesion: 0.07
+Nodes (18): Toast, ToastContext, ToastContextType, useToast(), UseNotificationsBellProps, NotificationsListViewProps, UseOTPVerifyViewReturn, InitialUser (+10 more)
 
 ### Community 55 - "Community 55"
 Cohesion: 0.12
@@ -969,8 +989,8 @@ Cohesion: 0.12
 Nodes (15): Common Rationalizations, Cross-model escalation, Doubt-Driven Development, Interaction with Other Skills, Loading Constraints, Overview, Red Flags, Step 1: CLAIM — Surface what stands (+7 more)
 
 ### Community 59 - "Community 59"
-Cohesion: 0.16
-Nodes (5): assignDoctorServicesSchema, deactivateUserSchema, getAllUsersSchema, userProfileResponseSchema, terminateStaffSchema
+Cohesion: 0.20
+Nodes (3): assignDoctorServicesSchema, deactivateUserSchema, terminateStaffSchema
 
 ### Community 60 - "Community 60"
 Cohesion: 0.12
@@ -1013,8 +1033,8 @@ Cohesion: 0.10
 Nodes (19): 1. Split-Pane Layout, 2. Left Column (Requests Table), 3.1 Booking Conflict Banner (Conditional), 3.2 Account Owner & Patient Profile, 3.3 Appointment Details, 3.4 Patient Note, 3.5 Reliability Counters, 3.6 Patient Past History (Latest 5) (+11 more)
 
 ### Community 70 - "Community 70"
-Cohesion: 0.11
-Nodes (13): invoiceStatusEnum, GenerateInvoiceDto, GenerateInvoiceSchema, GetInvoicesDto, GetInvoicesSchema, UpdateInvoiceDto, UpdateInvoiceSchema, GenerateInvoiceDto (+5 more)
+Cohesion: 0.16
+Nodes (6): invoiceResponseSchema, InvoiceStatus, mapInvoiceRecord(), mapInvoiceRecords(), MaybeRecord, PaymentMethod
 
 ### Community 71 - "Community 71"
 Cohesion: 0.15
@@ -1057,12 +1077,8 @@ Cohesion: 0.17
 Nodes (11): 1. User Value, 2. Feasibility, 3. Differentiation, Assumption Audit, Core Evaluation Dimensions, Decision Framework, Might Be True (Nice to Have), Must Be True (Dealbreakers) (+3 more)
 
 ### Community 81 - "Community 81"
-Cohesion: 0.07
-Nodes (18): SignUpInput, signUpSchema, SignUpFormProps, SignUpFormProps, mockAddToast, mockPush, validData, UseSignUpViewReturn (+10 more)
-
-### Community 82 - "Community 82"
 Cohesion: 0.08
-Nodes (21): getUserDependentsAction(), getServicesAction(), mocks, DEFAULT_CONFIG, HomePage(), mocks, AppointmentDirectoryTab, AvailableDoctorItem (+13 more)
+Nodes (17): SignUpInput, signUpSchema, SignUpFormProps, mockAddToast, mockPush, validData, UseSignUpViewReturn, SignUpFormProps (+9 more)
 
 ### Community 83 - "Community 83"
 Cohesion: 0.17
@@ -1221,8 +1237,8 @@ Cohesion: 0.25
 Nodes (7): 📂 Backend File Structure & Colocation, Patient Forgot Password Feature: Backend Architecture, `request-password-reset.action.ts`, `reset-password.action.ts`, ⚡ Secure Next.js Server Actions, 🔄 The Outbox Repository Commands, `verify-otp.action.ts`
 
 ### Community 122 - "Community 122"
-Cohesion: 0.21
-Nodes (5): SecretaryInquiriesQueueView(), InquiriesList(), InquiriesListProps, InquiryDetailPane(), InquiryToast()
+Cohesion: 0.07
+Nodes (6): DB_ROW, DB_ROW, appointmentDtoSchema, mapAppointmentRecord(), DB_ROW, AppointmentStatusValue
 
 ### Community 123 - "Community 123"
 Cohesion: 0.25
@@ -1301,8 +1317,8 @@ Cohesion: 0.33
 Nodes (5): Copilot Usage, Default Workflow, Project Rules, Safety Boundaries, Samson Dental Copilot Instructions
 
 ### Community 142 - "Community 142"
-Cohesion: 0.08
-Nodes (16): createDoctorAction(), updateDoctorAction(), updateDoctorSchema, doctorFormSchema, DoctorFormValues, useDoctorForm(), UseDoctorFormProps, CreateTimeBlockInput (+8 more)
+Cohesion: 0.20
+Nodes (9): createDoctorAction(), updateDoctorAction(), updateDoctorSchema, doctorFormSchema, DoctorFormValues, useDoctorForm(), UseDoctorFormProps, UseDoctorFormProps (+1 more)
 
 ### Community 143 - "Community 143"
 Cohesion: 0.33
@@ -1361,8 +1377,8 @@ Cohesion: 0.50
 Nodes (3): Deploy on Vercel, Getting Started, Learn More
 
 ### Community 158 - "Community 158"
-Cohesion: 0.12
-Nodes (9): SecretaryRescheduleRequestsView(), RescheduleDecisionForm(), RescheduleDecisionFormProps, RescheduleDoctorSchedule(), RescheduleDoctorScheduleProps, RescheduleRequestList(), RescheduleRequestListProps, RescheduleRequestSummary() (+1 more)
+Cohesion: 0.09
+Nodes (10): RescheduleDoctorScheduleProps, RescheduleDoctorScheduleProps, SecretaryRescheduleRequestsView(), CLINIC_HOURS, RescheduleDecisionForm(), RescheduleDoctorSchedule(), RescheduleDoctorScheduleProps, RescheduleRequestList() (+2 more)
 
 ### Community 163 - "Community 163"
 Cohesion: 0.10
@@ -1373,8 +1389,8 @@ Cohesion: 0.09
 Nodes (21): 1. Split-Pane Layout Structure, 1. Stepper Workflow, 2. Left Column: Patient Identity (Search-First Verification), 2. Step 1: Patient Identity (Search-First Verification), 3. Right Column: Service & Schedule Selection, 3. Step 2: Service & Schedule Selection, 4. Step 3: Review & Submit, 4. Submission & Auto-Approval (+13 more)
 
 ### Community 165 - "Community 165"
-Cohesion: 0.13
-Nodes (11): resendAuthOtpCommand(), verifyOtpCommand(), checkUserExistsQuery(), ResendOtpDeps, resendOtpUseCase(), resendOtpAction(), verifyOtpAction(), VerifyOtpInput (+3 more)
+Cohesion: 0.12
+Nodes (12): resendAuthOtpCommand(), verifyOtpCommand(), checkUserExistsQuery(), ResendOtpDeps, resendOtpUseCase(), resendOtpAction(), verifyOtpAction(), VerifyOtpInput (+4 more)
 
 ### Community 170 - "Community 170"
 Cohesion: 0.25
@@ -1389,36 +1405,36 @@ Cohesion: 0.17
 Nodes (11): 1. DTO Layer — `src/modules/appointments/dtos/booking/`, 2. Repository Layer — `src/modules/appointments/repositories/booking/`, 3. Use Case Layer — `src/modules/appointments/use-cases/booking/`, 4. Server Action Layer — `src/modules/appointments/actions/booking/`, Architecture Decision: `guest_contacts` Table, Backend Implementation — Appointments Module, Core Rules & Reusability, Database States (+3 more)
 
 ### Community 182 - "Community 182"
-Cohesion: 0.18
+Cohesion: 0.16
 Nodes (3): SecretaryProfileView(), ProfileField, useSecretaryProfile()
 
 ### Community 184 - "Community 184"
-Cohesion: 0.21
-Nodes (4): LoginForm(), LoginFormProps, useLoginView(), LoginView()
+Cohesion: 0.13
+Nodes (16): bootstrapEventSubscribers(), globalOutboxDispatcher(), clearRegistry(), getSubscribers(), OutboxSubscriberFn, registerSubscriber(), registry, convertInquiryAction() (+8 more)
 
 ### Community 187 - "Community 187"
 Cohesion: 0.40
 Nodes (4): 1. Metrics Overview Grid, 2. Today's Timeline, 3. Quick Action Panel, Secretary Portal: Dashboard
 
 ### Community 188 - "Community 188"
-Cohesion: 0.16
-Nodes (3): GetInvoicesDto, GetInvoicesSchema, mapInvoiceRecords()
+Cohesion: 0.15
+Nodes (9): archiveServiceUseCase(), archiveServiceCommand(), mockEq, mockFrom, mockInsert, mockSelect, mockSingle, mockSupabase (+1 more)
 
 ### Community 190 - "Community 190"
 Cohesion: 0.08
 Nodes (24): Appointment Source Tag, Availability Rules — No Change to Core Logic, Booking — Two-Pronged Architecture (Inquiry + Self-Service), Concept, Concept, Dynamic Calendar & Doctor Selection During Conversion, Entry Point 1 — Landing Page Inquiry Form (Unauthenticated), Entry Point 2 — Self-Service Booking Wizard (Authenticated) (+16 more)
 
 ### Community 193 - "Community 193"
-Cohesion: 0.06
-Nodes (30): metadata, ActivePatient, AvailableServiceItem, CLINIC_SERVICES, INITIAL_QUEUE, PatientHistoryRecord, mockAddToast, useDoctorDashboard() (+22 more)
+Cohesion: 0.07
+Nodes (26): ActivePatient, AvailableServiceItem, CLINIC_SERVICES, INITIAL_QUEUE, PatientHistoryRecord, mockAddToast, useDoctorDashboard(), ActiveSessionDiagnosticsProps (+18 more)
 
 ### Community 194 - "Community 194"
 Cohesion: 0.18
 Nodes (10): 1. 🔴 Fix Sequential Waterfall in `getAvailableDays` (HIGH — ~100-300ms saved), 2. 🔴 Eliminate Duplicate `getServiceDuration` Calls (HIGH — ~50-100ms saved), 3. 🟡 Return Slots Map to Eliminate Date-Selection Round-Trip (MEDIUM — ~200-500ms saved per click), 4. 🟡 Add Server-Side Caching for Semi-Static Data (MEDIUM — ~200-500ms saved after first load), 5. 🟡 Fix Redundant Re-fetches on Doctor Change in Hook (MEDIUM — eliminates wasted requests), 6. 🟡 Replace Per-Row Zod `.parse()` with Lightweight Mapping (MEDIUM — ~20-80ms saved), 7. 🟢 Optimize Date Object Allocations in Slot Generation (LOW — ~5-15ms saved), 8. 🟢 Verify Supabase Client Pooling (LOW — ~10ms saved) (+2 more)
 
 ### Community 195 - "Community 195"
-Cohesion: 0.15
-Nodes (4): CreateDependentDto, createDependentUseCase(), addDependentCommand(), PatientDependentsCommands
+Cohesion: 0.14
+Nodes (5): createDependentAction(), CreateDependentDto, createDependentUseCase(), addDependentCommand(), PatientDependentsCommands
 
 ### Community 196 - "Community 196"
 Cohesion: 0.40
@@ -1440,13 +1456,9 @@ Nodes (4): 1. God Component Violations (>150 Lines Rule), 2. Mock Data & Missing
 Cohesion: 0.12
 Nodes (16): 1. `BookingApprovalModal`, 1. `PendingBookingQueue`, 2. `BookingRejectionModal`, 2. `CheckInTracker`, 3. `CheckoutQueue`, 3. `InvoiceCheckoutModal`, 4. `PatientNotifications`, 5. `AuditTimeline` (+8 more)
 
-### Community 202 - "Community 202"
-Cohesion: 0.06
-Nodes (40): metadata, PatientAppointmentsPage(), AppointmentHistory(), AppointmentHistoryProps, CancelAppointmentModal(), PendingApprovals(), PendingApprovalsProps, RescheduleBlockedModal() (+32 more)
-
 ### Community 203 - "Community 203"
-Cohesion: 0.05
-Nodes (27): appointmentDbSchema, AppointmentResponseDto, appointmentResponseSchema, GeneratedSlot, GenerateSlotsParams, WorkingScheduleMonthItem, DoctorScheduleResponseDto, GetAvailableDaysResponseDto (+19 more)
+Cohesion: 0.09
+Nodes (19): AppointmentResponseDto, GeneratedSlot, GenerateSlotsParams, WorkingScheduleMonthItem, DoctorScheduleResponseDto, GetAvailableDaysResponseDto, WorkingScheduleMonthItem, GetAvailableTimeSlotsDto (+11 more)
 
 ### Community 204 - "Community 204"
 Cohesion: 0.22
@@ -1469,8 +1481,8 @@ Cohesion: 0.15
 Nodes (12): 1. Database Schema & Migrations, 2. Seed Data Alignment, 3. Database RPC & Transaction Functions, 4.1. Guest Inquiry Flow (Landing Page Form), 4.2. Inquiry Conversion Flow (Secretary Dashboard Form), 4.3. Existing Appointment & DTO Schema Alignment, 4.4. Testing & Validation Specs, 4. Codebase, DTOs & Test Files (+4 more)
 
 ### Community 210 - "Community 210"
-Cohesion: 0.23
-Nodes (5): useContactSection(), UseContactSectionProps, ContactSectionProps, ContactFormCard(), ContactInfoPanel()
+Cohesion: 0.20
+Nodes (7): ContactSectionProps, useContactSection(), UseContactSectionProps, ContactSectionProps, ContactSectionProps, ContactFormCard(), ContactInfoPanel()
 
 ### Community 212 - "Community 212"
 Cohesion: 0.13
@@ -1481,8 +1493,8 @@ Cohesion: 0.25
 Nodes (7): Option 1: Automated Background Worker (Recommended), Option 2: Admin/Secretary Dashboard Manual Retry, Option 3: Supabase Database Webhooks + Edge Functions, Outbox Email Retry Polish Recommendations, Tasks:, Tasks:, Tasks:
 
 ### Community 214 - "Community 214"
-Cohesion: 0.03
-Nodes (42): RescheduleBlockedModalProps, BookingFooterControlsProps, RescheduleBlockedModalProps, ProfileDetailsFormProps, ArchiveConfirmModalProps, ServiceListHeaderProps, BookingApprovalModalProps, BookingRejectionModalProps (+34 more)
+Cohesion: 0.02
+Nodes (63): useClickOutside(), ModalProps, AddDependentModalProps, BookingFooterControlsProps, RescheduleBlockedModalProps, DashboardUpcomingWidgetProps, ProfileDetailsFormProps, ArchiveConfirmModalProps (+55 more)
 
 ### Community 215 - "Community 215"
 Cohesion: 0.13
@@ -1498,51 +1510,43 @@ Nodes (15): 1. Database Migration, 2.1 DTO — `submit-booking.dto.ts`, 2.2 Use 
 
 ### Community 218 - "Community 218"
 Cohesion: 0.02
-Nodes (50): createManualBookingAction(), { mockCreateManualBooking, mockGetServiceDuration }, createManualBookingCommand(), cleanOptionalString, CreateManualBookingDto, createManualBookingSchema, emailOrEmpty, createManualBookingUseCase() (+42 more)
+Nodes (36): loginUseCase(), GetAvailableDoctorsForDateDto, createManualBookingCommand(), cleanOptionalString, CreateManualBookingDto, createManualBookingSchema, emailOrEmpty, createManualBookingUseCase() (+28 more)
 
 ### Community 219 - "Community 219"
 Cohesion: 0.11
 Nodes (17): 1.1 Inquiries List Query + Action, 1.2 Available Doctors for Date Action, 2.1 Patient Search Query + Action, 2.2 Update Convert RPC + DTO to Support Optional Patient Linking + Guest Contacts, Phase 10 — Secretary Notes on Conversion, Phase 1 — Backend: Read Side, Phase 2 — Backend: Patient Search, Phase 3 — Frontend: Service + Calendar (Date-First) (+9 more)
 
 ### Community 220 - "Community 220"
-Cohesion: 0.11
-Nodes (9): generateInvoiceUseCase(), InvoiceCommandsRepository, mockEq, mockFrom, mockInsert, mockSelect, mockSingle, mockSupabase (+1 more)
-
-### Community 221 - "Community 221"
-Cohesion: 0.09
-Nodes (13): additionalItemSchema, invoiceResponseSchema, InvoiceStatus, mapInvoiceRecord(), MaybeRecord, PaymentMethod, paymentMethodEnum, additionalItemSchema (+5 more)
+Cohesion: 0.19
+Nodes (11): PendingBooking, FamilyGroupRowProps, IndividualBookingRowProps, PendingBookingQueueProps, PendingBookingQueueProps, FamilyGroupRow(), FamilyGroupRowProps, IndividualBookingRow() (+3 more)
 
 ### Community 224 - "Community 224"
 Cohesion: 0.13
 Nodes (10): AboutSection(), CAROUSEL_IMAGES, doctorsData, GALLERY_IMAGES, MANIFEST_IMAGES, STEPS, doctorsData, doctorsData (+2 more)
 
 ### Community 225 - "Community 225"
-Cohesion: 0.05
-Nodes (32): createAdminClient(), EmailTemplates, resend, ResendService, ManualBookingGuestEventDto, manualBookingGuestEventSchema, PatientRegisteredEventDto, patientRegisteredEventSchema (+24 more)
+Cohesion: 0.06
+Nodes (37): createAdminClient(), EmailTemplates, resend, ResendService, AppointmentBookedEventDto, appointmentBookedEventSchema, AppointmentConvertedEventDto, appointmentConvertedEventSchema (+29 more)
 
 ### Community 226 - "Community 226"
 Cohesion: 0.50
 Nodes (3): 📋 Done, ⏳ In Progress, Task: Patient Portal Backend Database Integration & Clean Architecture
 
 ### Community 227 - "Community 227"
-Cohesion: 0.10
+Cohesion: 0.12
 Nodes (12): createServiceAction(), mocks, CreateServiceDto, createServiceSchema, createServiceUseCase(), createServiceCommand(), mocks, UpdateServiceDto (+4 more)
 
 ### Community 228 - "Community 228"
-Cohesion: 0.08
-Nodes (16): AppointmentDetailPaneProps, AppointmentDetails(), getRescheduleProps(), AppointmentRescheduleFormProps, AppointmentDetailPaneProps, AppointmentDetails(), getRescheduleProps(), AvailableDoctorItem (+8 more)
+Cohesion: 0.11
+Nodes (13): invoiceStatusEnum, GenerateInvoiceDto, GenerateInvoiceSchema, GetInvoicesDto, GetInvoicesSchema, UpdateInvoiceDto, UpdateInvoiceSchema, GenerateInvoiceDto (+5 more)
 
 ### Community 230 - "Community 230"
 Cohesion: 0.13
 Nodes (15): Architecture Rules Reference, [MODIFY] `book/page.tsx`, [MODIFY] `create-manual-booking.command.spec.ts`, [MODIFY] `create-manual-booking.command.ts`, [MODIFY] `create-manual-booking.use-case.spec.ts`, [MODIFY] `src/shared/database/database.types.ts`, [NEW] `migrations/20260626_add_dependent_support_to_manual_booking_rpc.sql`, Overview (+7 more)
 
 ### Community 232 - "Community 232"
-Cohesion: 0.12
-Nodes (21): getDoctorScheduleAction(), CheckInOutTrackerPage(), getClinicAppointmentsAction(), getInvoicesAction(), getInvoicesQuery(), PENDING_CLINIC_HOURS, PendingDecision, appointment (+13 more)
-
-### Community 233 - "Community 233"
-Cohesion: 0.21
-Nodes (3): getStaffProfileUseCase(), getProfileByIdQuery(), StaffProfileQueries
+Cohesion: 0.09
+Nodes (8): appointmentDbSchema, appointmentResponseSchema, GeneratedSlot, GenerateSlotsParams, WorkingScheduleMonthItem, GeneratedSlot, GenerateSlotsParams, WorkingScheduleMonthItem
 
 ### Community 234 - "Community 234"
 Cohesion: 0.22
@@ -1557,16 +1561,16 @@ Cohesion: 0.18
 Nodes (3): AssignDoctorServicesDto, assignDoctorServicesUseCase(), DoctorServicesCommands
 
 ### Community 237 - "Community 237"
-Cohesion: 0.06
-Nodes (26): validConfig, validOperatingHours, UpdateClinicConfigDto, updateClinicConfigSchema, timeBlockFormSchema, TimeBlockFormValues, UseTimeBlockFormProps, validConfig (+18 more)
+Cohesion: 0.04
+Nodes (28): validConfig, validOperatingHours, UpdateClinicConfigDto, updateClinicConfigSchema, DEFAULT_CONFIG, timeBlockFormSchema, TimeBlockFormValues, UseTimeBlockFormProps (+20 more)
 
 ### Community 238 - "Community 238"
 Cohesion: 0.40
 Nodes (4): 1. Update Appointment Status, 2. Request Reschedule, 3. Submit Treatment, Non-Atomic Database Transaction Bugs
 
 ### Community 240 - "Community 240"
-Cohesion: 0.06
-Nodes (26): AddDependentModal(), AddDependentModalProps, ExistingDependentSelector(), ExistingDependentSelectorProps, MOCK_DEPENDENTS, MOCK_DEPENDENTS, PatientDetailsStep(), PatientDetailsStepProps (+18 more)
+Cohesion: 0.15
+Nodes (9): mockEq, mockFrom, mockInsert, mockSelect, mockSingle, mockSupabase, mockUpdate, toggleServiceVisibilityCommand() (+1 more)
 
 ### Community 241 - "Community 241"
 Cohesion: 0.12
@@ -1581,8 +1585,8 @@ Cohesion: 0.40
 Nodes (4): 1. Invoice Ledger Table, 2. Actions, Columns, Secretary Portal: Invoice Management
 
 ### Community 244 - "Community 244"
-Cohesion: 0.03
-Nodes (28): createBookingPayload(), PayloadMapperParams, useBookingState(), ServiceCardProps, serviceDbSchema, ServiceResponseDto, serviceResponseSchema, ServiceStepProps (+20 more)
+Cohesion: 0.04
+Nodes (42): BookingFooterControls(), BookingFooterControlsProps, BookingProgressTabs(), BookingProgressTabsProps, BookingSuccessView(), BookingSuccessViewProps, DateTimeStep(), PatientDetailsStep() (+34 more)
 
 ### Community 246 - "Community 246"
 Cohesion: 0.18
@@ -1606,7 +1610,7 @@ Nodes (3): 1. Edit Profile Form, 2. Password & Security, Secretary Portal: Profi
 
 ### Community 251 - "Community 251"
 Cohesion: 0.04
-Nodes (58): AdminPortalLayout(), AuthenticatedUserHeader(), AuthenticatedUserHeaderProps, NAV_LINKS, NotificationIndicator(), NotificationIndicatorProps, BookingLayout(), DoctorPortalLayout() (+50 more)
+Nodes (67): AdminPortalLayout(), metadata, PatientAppointmentsPage(), AuthenticatedUserHeader(), AuthenticatedUserHeaderProps, NAV_LINKS, NotificationIndicator(), NotificationIndicatorProps (+59 more)
 
 ### Community 252 - "Community 252"
 Cohesion: 0.12
@@ -1617,16 +1621,16 @@ Cohesion: 0.20
 Nodes (10): Database, DTOs — Appointments, DTOs — Emails, Email Subscribers, File Checklist, Repositories, Server Actions — Appointments, Server Actions — Patients (+2 more)
 
 ### Community 254 - "Community 254"
-Cohesion: 0.08
-Nodes (6): doctorScheduleDbSchema, doctorScheduleResponseSchema, GetAvailableDoctorsForDateDto, getAvailableDoctorsForDateSchema, GetAppointmentByIdDto, getAppointmentByIdSchema
+Cohesion: 0.12
+Nodes (6): getAvailableDoctorsForDateSchema, GetAppointmentByIdDto, getAppointmentByIdSchema, cancelAppointmentSchema, markNoShowSchema, undoCheckInSchema
 
 ### Community 255 - "Community 255"
 Cohesion: 0.29
 Nodes (6): Checklist: Secretary Pages Development, Checklist: Secretary Pages UI-Only Development, 🔄 Live Database & Server Action Hookup Tasks, 🔌 Phase 1: Backend Server Actions (Do first), 💻 Phase 2: Frontend Integration (`/secretary/pending`), 🔒 Phase 3: Validation, Overlaps, and Security
 
 ### Community 256 - "Community 256"
-Cohesion: 0.10
-Nodes (14): AppointmentBookedEventDto, appointmentBookedEventSchema, AppointmentConvertedEventDto, appointmentConvertedEventSchema, ManualBookingPatientEventDto, manualBookingPatientEventSchema, onAppointmentBookedSubscriber, onAppointmentConvertedSubscriber (+6 more)
+Cohesion: 0.18
+Nodes (11): calculateFinalPrice(), INITIAL_AUDITS, INITIAL_DRAFTS, INITIAL_EMAILS, INITIAL_PENDING, INITIAL_UPCOMING, mockAddToast, useSecretaryDashboard() (+3 more)
 
 ### Community 257 - "Community 257"
 Cohesion: 0.22
@@ -1653,20 +1657,20 @@ Cohesion: 0.40
 Nodes (5): [MODIFY] `src/modules/emails/dtos/events/manual-booking-patient.event.dto.spec.ts`, [MODIFY] `src/modules/emails/dtos/events/manual-booking-patient.event.dto.ts`, [MODIFY] `src/modules/emails/subscribers/on-manual-booking-patient.subscriber.spec.ts`, [MODIFY] `src/modules/emails/subscribers/on-manual-booking-patient.subscriber.ts`, Step 6: Email — `src/modules/emails/`
 
 ### Community 263 - "Community 263"
-Cohesion: 0.03
-Nodes (45): createStaffAction(), terminateStaffAction(), updateStaffAction(), authorizeRole(), ROLE_HIERARCHY, { mockGetDoctorSchedules }, mockGetExistingAppointments, { mockGetClinicAppointments } (+37 more)
+Cohesion: 0.02
+Nodes (55): createStaffAction(), terminateStaffAction(), updateStaffAction(), authorizeRole(), ROLE_HIERARCHY, mockGetExistingAppointments, { mockSubmitBooking }, { mockSubmitBooking, mockGetServiceDuration } (+47 more)
 
 ### Community 264 - "Community 264"
 Cohesion: 0.22
 Nodes (8): 1. General Appointment Approvals / Rejections, 2. Cancellations, 3. Patient Reschedule Requests, 4. Staff Reschedule Actions, 5. Displacement & Attendance, Already Done (Email Sent), Missing (Email Can Be Added Later), Task: Secretary and Patient Portal Email Transactions
 
 ### Community 265 - "Community 265"
-Cohesion: 0.09
-Nodes (14): createInquiryCommand(), dropInquiryCommand(), submitInquiryAction(), cleanOptionalString, inquiryDbSchema, InquiryResponseDto, inquiryResponseSchema, SubmitInquiryDto (+6 more)
+Cohesion: 0.10
+Nodes (10): createInquiryCommand(), dropInquiryCommand(), getInquiriesQuery(), cleanOptionalString, inquiryDbSchema, InquiryResponseDto, inquiryResponseSchema, SubmitInquiryDto (+2 more)
 
 ### Community 266 - "Community 266"
-Cohesion: 0.06
-Nodes (36): BookingFooterControls(), BookingFooterControlsProps, BookingProgressTabs(), BookingProgressTabsProps, BookingSuccessView(), BookingSuccessViewProps, ReviewStep(), ReviewStepProps (+28 more)
+Cohesion: 0.19
+Nodes (4): StaffLoginForm(), StaffLoginFormProps, useStaffLoginView(), StaffLoginView()
 
 ### Community 267 - "Community 267"
 Cohesion: 0.50
@@ -1677,8 +1681,8 @@ Cohesion: 0.50
 Nodes (4): Backend ✅ COMPLETE, Frontend, Frontend ✅ COMPLETE, Remaining Work Summary
 
 ### Community 269 - "Community 269"
-Cohesion: 0.10
-Nodes (14): mocks, mocks, mockEq, mockFrom, mockSelect, mockSingle, mockSupabase, mockUpdate (+6 more)
+Cohesion: 0.12
+Nodes (9): mocks, mocks, updateClinicConfigCommand(), clinicConfigResponseSchema, mocks, updateClinicConfigAction(), UpdateClinicConfigDto, updateClinicConfigSchema (+1 more)
 
 ### Community 270 - "Community 270"
 Cohesion: 0.50
@@ -1701,32 +1705,32 @@ Cohesion: 0.40
 Nodes (4): 1. Documentation, 2. Secretary Portal UI Implementation, 3. Verification & Build, Task: Secretary Reschedule Requests Page
 
 ### Community 275 - "Community 275"
-Cohesion: 0.13
-Nodes (4): getUserDependentsUseCase(), getDependentsByPatientIdQuery(), PatientDependentsQueries, searchPatientsQuery()
+Cohesion: 0.19
+Nodes (3): getDependentsByPatientIdQuery(), PatientDependentsQueries, searchPatientsQuery()
 
 ### Community 276 - "Community 276"
 Cohesion: 0.12
-Nodes (8): SecretaryCheckInOutTrackerView(), CheckInBoard(), TONE_CLASSES, CheckInCheckoutModal(), CheckInDetailsModal(), CheckInHeader(), CheckInLoading(), CheckInRescheduleModal()
+Nodes (9): SecretaryCheckInOutTrackerView(), useSecretaryCheckInOutTracker(), CheckInBoard(), TONE_CLASSES, CheckInCheckoutModal(), CheckInDetailsModal(), CheckInHeader(), CheckInLoading() (+1 more)
 
 ### Community 277 - "Community 277"
-Cohesion: 0.17
-Nodes (7): { mockUndoCheckIn }, { mockUndoCheckIn }, { mockUndoCheckIn }, undoCheckInAction(), UndoCheckInDto, undoCheckInSchema, undoCheckInUseCase()
+Cohesion: 0.09
+Nodes (5): GetActiveDoctorsQueries, GetAllUsersDto, getAllUsersUseCase(), UserManagementQueries, terminateStaffUseCase()
 
 ### Community 278 - "Community 278"
 Cohesion: 0.09
 Nodes (16): DashboardNotification, NotificationsView(), metadata, INITIAL_MOCK_NOTIFICATIONS, useNotifications(), metadata, INITIAL_MOCK_NOTIFICATIONS, metadata (+8 more)
 
 ### Community 279 - "Community 279"
-Cohesion: 0.26
-Nodes (3): MarkNoShowDto, markNoShowSchema, markNoShowUseCase()
+Cohesion: 0.20
+Nodes (7): Service, ServicePillSelector(), ServicePillSelectorProps, DoctorEditFormProps, Service, DoctorEditFormProps, Service
 
 ### Community 280 - "Community 280"
-Cohesion: 0.02
-Nodes (74): AppointmentTeaserCard(), AppointmentTeaserCardProps, CancelAppointmentModalProps, INITIAL_MOCK_NOTIFICATIONS, useUserDashboardSummary(), MOCK_APPOINTMENTS, getAppointmentByIdUseCase(), AppSidebarProps (+66 more)
+Cohesion: 0.12
+Nodes (13): INITIAL_MOCK_NOTIFICATIONS, useUserDashboardSummary(), UserDashboardSummaryViewProps, UserDashboardSummaryViewProps, DashboardQuickActions(), DashboardQuickActionsProps, DashboardRecentNotifications(), DashboardRecentNotificationsProps (+5 more)
 
 ### Community 281 - "Community 281"
-Cohesion: 0.03
-Nodes (59): AuditRecord, calculateFinalPrice(), DraftInvoice, EmailLog, INITIAL_AUDITS, INITIAL_DRAFTS, INITIAL_EMAILS, INITIAL_PENDING (+51 more)
+Cohesion: 0.09
+Nodes (17): metadata, metadata, metadata, BookingApprovalModal(), BookingRejectionModal(), AuditRecord, DraftInvoice, EmailLog (+9 more)
 
 ### Community 282 - "Community 282"
 Cohesion: 0.15
@@ -1737,32 +1741,28 @@ Cohesion: 0.13
 Nodes (14): 1. Database & Schema Verification, 2.1 DTO — `submit-inquiry.dto.ts`, 2.2 Use Case — `submit-inquiry.use-case.ts`, 2.3 Server Action — `submit-inquiry.action.ts`, 2. Backend: DTO, Use Case, Action, 3.1 Client-Side Zod Schema, 3.2 Hook — `use-landing-view.ts`, 3.3 Form UI Component (Dumb Component) (+6 more)
 
 ### Community 284 - "Community 284"
-Cohesion: 0.08
-Nodes (27): ContactSection(), HeroSectionProps, HeroSectionV1(), HeroSectionProps, HeroSectionV2(), JourneySection(), journeySlides, marqueeRow1 (+19 more)
+Cohesion: 0.06
+Nodes (26): ContactSection(), galleryItems, GallerySection(), PortfolioCardProps, portfolioItems, repeatedPortfolioItems, HeroSectionProps, HeroSectionV1() (+18 more)
 
 ### Community 285 - "Community 285"
-Cohesion: 0.06
-Nodes (12): PendingDecisionFormProps, REASONS, RescheduleDecisionFormProps, AppointmentRescheduleFormProps, PendingDecisionFormProps, REASONS, RescheduleDecisionFormProps, PendingDecision (+4 more)
-
-### Community 286 - "Community 286"
-Cohesion: 0.10
-Nodes (5): GenerateInvoiceDto, GenerateInvoiceSchema, InvoiceResponseDto, UpdateInvoiceDto, UpdateInvoiceSchema
+Cohesion: 0.05
+Nodes (27): AppointmentsDirectoryPage(), AvailableDoctorItem, DoctorFilterItem, AppointmentDetailPaneProps, AppointmentDetails(), getRescheduleProps(), AppointmentRescheduleFormProps, AppointmentDetailPaneProps (+19 more)
 
 ### Community 287 - "Community 287"
-Cohesion: 0.10
-Nodes (7): AppointmentCancelFormProps, AppointmentCancelFormProps, SecretaryInvoiceManagementView(), useSecretaryInvoiceManagement(), InvoiceReceiptActions(), Select, SelectProps
+Cohesion: 0.20
+Nodes (4): metadata, metadata, metadata, DoctorDashboardView()
 
 ### Community 288 - "Community 288"
 Cohesion: 0.14
 Nodes (13): 1.1. Make Doctor ID Nullable [DONE], 1.2. Update SQL Transactions / RPCs [DONE], 1. Database & Supabase Layer Tasks, 2.1. DTO Schema Alignments [DONE], 2.2. Server Actions Update [DONE], 2.3. Repository Layer Updates [DONE], 2. Backend Layer Tasks (DTOs, Actions, Use Cases, Repositories), 3.1. Hook Logic Refactoring (`useSecretaryPendingRequests`) [DONE] (+5 more)
 
 ### Community 289 - "Community 289"
-Cohesion: 0.11
-Nodes (14): useToast(), metadata, ProfileSettingsViewProps, ProfileDetailsForm(), ProfileDetailsFormProps, ProfilePreferencesForm(), ProfilePreferencesFormProps, InitialUser (+6 more)
+Cohesion: 0.12
+Nodes (12): metadata, ProfileSettingsViewProps, ProfileDetailsForm(), ProfileDetailsFormProps, ProfilePreferencesForm(), ProfilePreferencesFormProps, useProfileSettingsView(), metadata (+4 more)
 
 ### Community 290 - "Community 290"
-Cohesion: 0.12
-Nodes (11): galleryItems, GallerySection(), PortfolioCardProps, portfolioItems, repeatedPortfolioItems, useGallerySection(), buildColumns(), GalleryGrid() (+3 more)
+Cohesion: 0.16
+Nodes (6): useGallerySection(), buildColumns(), GalleryGrid(), GalleryGridProps, GalleryLightbox(), GalleryLightboxProps
 
 ### Community 291 - "Community 291"
 Cohesion: 0.08
@@ -1777,20 +1777,20 @@ Cohesion: 0.08
 Nodes (8): Sidebar(), SidebarContext, SidebarContextProps, SidebarMenuButton(), sidebarMenuButtonVariants, SidebarRail(), SidebarTrigger(), useSidebar()
 
 ### Community 295 - "Community 295"
-Cohesion: 0.13
-Nodes (14): ContactFormCardProps, ContactFormCardProps, ContactFormFields, ContactCalendar(), ContactCalendarProps, ContactFormCardProps, ContactFields(), ContactFormFields (+6 more)
+Cohesion: 0.25
+Nodes (12): ContactFormCardProps, ContactFormCardProps, ContactCalendar(), ContactCalendarProps, ContactFormCardProps, ContactFields(), ContactFormFields, ContactSuccess() (+4 more)
 
 ### Community 296 - "Community 296"
-Cohesion: 0.09
-Nodes (11): outboxCommands(), OutboxEvent, globalOutboxDispatcher(), resendEmailActionSchema, VerifyOtpInput, { mockExecute }, createPatientCommand(), PatientProfileCommands (+3 more)
+Cohesion: 0.08
+Nodes (11): outboxCommands(), OutboxEvent, { mockExecute }, createPatientCommand(), PatientProfileCommands, PatientProfileDto, registerPatientAction(), { mockExecute } (+3 more)
 
 ### Community 297 - "Community 297"
-Cohesion: 0.13
-Nodes (4): LoginInput, loginSchema, LoginFormProps, LoginFormProps
+Cohesion: 0.06
+Nodes (22): loginAction(), loginCommand(), LoginInput, loginSchema, LoginForm(), LoginFormProps, useLoginForm(), mockAddToast (+14 more)
 
 ### Community 298 - "Community 298"
-Cohesion: 0.08
-Nodes (22): getInvoiceByIdQuery(), mockEq, mockFrom, mockMaybeSingle, mockOrder, mockRange, mockSelect, mockSupabase (+14 more)
+Cohesion: 0.19
+Nodes (6): GetInvoicesDto, getInvoicesUseCase(), getInvoiceByIdQuery(), InvoiceQueriesRepository, InvoiceResponseDto, CheckoutResult
 
 ### Community 299 - "Community 299"
 Cohesion: 0.08
@@ -1801,24 +1801,24 @@ Cohesion: 0.08
 Nodes (25): 1. Staff Module Tests, 2. Appointments Module Tests, 3. UI View Tests, 4. Services Module Tests, [ ] `src/modules/appointments/components/booking/date-time-step.spec.tsx` (New), [ ] `src/modules/appointments/hooks/booking/use-booking-data.spec.ts` (Update), [ ] `src/modules/appointments/hooks/booking/use-booking-state.spec.ts` (Update), [ ] `src/modules/appointments/hooks/booking/use-user-booking.spec.ts` (Update) (+17 more)
 
 ### Community 301 - "Community 301"
-Cohesion: 0.22
-Nodes (3): SignUpForm(), useSignUpView(), SignUpView()
+Cohesion: 0.21
+Nodes (4): SignUpForm(), SignUpFormProps, useSignUpView(), SignUpView()
 
 ### Community 305 - "Community 305"
-Cohesion: 0.09
-Nodes (22): availabilityMapSchema, emptyStringToUndefined, getAvailableDaysResponseSchema, getAvailableDaysSchema, availableSlotSchema, emptyStringToUndefined, getAvailableTimeSlotsResponseSchema, getAvailableTimeSlotsSchema (+14 more)
+Cohesion: 0.11
+Nodes (18): availableSlotSchema, emptyStringToUndefined, getAvailableTimeSlotsResponseSchema, getAvailableTimeSlotsSchema, AvailabilityMapDto, availabilityMapSchema, emptyStringToUndefined, GetAvailableDaysDto (+10 more)
 
 ### Community 307 - "Community 307"
-Cohesion: 0.11
-Nodes (9): changeHandlers, useJourneySection(), journeySlides, changeHandlers, journeySlides, changeHandlers, JourneySlide, JourneyWheel() (+1 more)
+Cohesion: 0.10
+Nodes (11): JourneySection(), journeySlides, changeHandlers, useJourneySection(), journeySlides, changeHandlers, journeySlides, changeHandlers (+3 more)
 
 ### Community 308 - "Community 308"
-Cohesion: 0.11
+Cohesion: 0.14
 Nodes (8): updateServiceCommand(), mocks, updateServiceAction(), UpdateServiceDto, updateServiceSchema, updateServiceUseCase(), mocks, mocks
 
 ### Community 310 - "Community 310"
-Cohesion: 0.13
-Nodes (3): getPatientProfileUseCase(), PatientProfileDto, PatientProfileQueries
+Cohesion: 0.16
+Nodes (3): getUserDependentsUseCase(), getPatientProfileUseCase(), PatientProfileQueries
 
 ### Community 311 - "Community 311"
 Cohesion: 0.09
@@ -1829,28 +1829,28 @@ Cohesion: 0.17
 Nodes (11): 1. Service Lifecycle, 2. Split-Pane Layout & User Interface Details, 3. Permissions, 4. Data Schema & TS Interfaces, 5. Appointment Decoupling Rule, Add / Edit Service Form (Inline in Right Pane), Left Column (Service Roster / Cards), Lifecycle States Reference: (+3 more)
 
 ### Community 313 - "Community 313"
-Cohesion: 0.07
-Nodes (29): deleteServiceAction(), mocks, deleteServiceUseCase(), archiveServiceCommand(), deleteServiceCommand(), mockEq, mockFrom, mockInsert (+21 more)
+Cohesion: 0.20
+Nodes (6): deleteServiceAction(), mocks, deleteServiceUseCase(), deleteServiceCommand(), mocks, mocks
 
 ### Community 314 - "Community 314"
-Cohesion: 0.04
-Nodes (38): GetAvailableDaysDto, getAvailableDaysUseCase(), getAvailableTimeSlotsUseCase(), getDoctorSchedulesQuery(), getExistingAppointmentsForMonthQuery(), MonthAppointment, getExistingAppointmentsQuery(), getServiceDurationQuery() (+30 more)
+Cohesion: 0.12
+Nodes (8): checkoutAction(), completeCheckoutCommand(), finalizeInvoiceAction(), FinalizeInvoiceDto, finalizeInvoiceUseCase(), finalizeInvoiceCommand(), createAuditLogCommand(), checkoutOrchestrator()
 
 ### Community 315 - "Community 315"
-Cohesion: 0.18
-Nodes (8): ServiceFormProps, createServiceFormSchema, CreateServiceFormValues, ServiceFormProps, UseServiceFormProps, useServiceForm(), UseServiceFormProps, uploadServiceImage()
+Cohesion: 0.14
+Nodes (10): ServiceFormProps, createServiceFormSchema, CreateServiceFormValues, ServiceFormProps, UseServiceFormProps, ServiceFormProps, UseServiceFormProps, useServiceForm() (+2 more)
 
 ### Community 316 - "Community 316"
-Cohesion: 0.07
-Nodes (25): appointmentDbSchema, appointmentDoctorDbSchema, appointmentDoctorSchema, AppointmentDto, appointmentDtoSchema, appointmentPatientDbSchema, appointmentPatientSchema, appointmentServiceDbSchema (+17 more)
+Cohesion: 0.11
+Nodes (16): appointmentDbSchema, appointmentDoctorDbSchema, appointmentDoctorSchema, AppointmentDto, appointmentDtoSchema, appointmentPatientDbSchema, appointmentPatientSchema, appointmentServiceDbSchema (+8 more)
 
 ### Community 317 - "Community 317"
 Cohesion: 0.22
 Nodes (8): 1. Default Password & Force Password Change Workflow, 2. Split-Pane Layout & User Interface Details, 3. Data Schema & TS Interfaces, Left Column (Doctor Roster), Right Column (Doctor Details & Schedule Pane), Secretary Portal: Doctor Management, Step 1: Intake & Account Creation (Secretary Side), Step 2: First Login & Forced Reset
 
 ### Community 318 - "Community 318"
-Cohesion: 0.09
-Nodes (9): getPatientAppointmentsAction(), { mockExecute }, getPatientAppointmentsUseCase(), getAppointmentsByUserQuery(), PatientAppointmentsQueries, metadata, { mockExecute }, metadata (+1 more)
+Cohesion: 0.17
+Nodes (3): getAppointmentByIdUseCase(), getPatientAppointmentsUseCase(), PatientAppointmentsQueries
 
 ### Community 319 - "Community 319"
 Cohesion: 0.16
@@ -1861,15 +1861,15 @@ Cohesion: 0.09
 Nodes (22): Custom Hooks, DTOs, Dumb Presentational Components, E2E Tests (5%) — Playwright, Integration Tests (15%) — Real Supabase (isolated env), Module Exports, Module Facade, 📋 Naming & Convention Checklist (+14 more)
 
 ### Community 321 - "Community 321"
-Cohesion: 0.10
-Nodes (15): mockDelete, mockEq, mockFrom, mockInsert, mockSupabase, mockDelete, mockEq, mockFrom (+7 more)
+Cohesion: 0.09
+Nodes (16): mockDelete, mockEq, mockFrom, mockInsert, mockSupabase, getAllUsersQuery(), mockDelete, mockEq (+8 more)
 
 ### Community 322 - "Community 322"
 Cohesion: 0.09
 Nodes (21): aliases, components, hooks, lib, ui, utils, iconLibrary, menuAccent (+13 more)
 
 ### Community 323 - "Community 323"
-Cohesion: 0.21
+Cohesion: 0.29
 Nodes (3): useOTPVerifyView(), UseOTPVerifyViewReturn, OTPVerifyView()
 
 ### Community 324 - "Community 324"
@@ -1885,8 +1885,8 @@ Cohesion: 0.17
 Nodes (3): InquiryPatientLinkingProps, InquiryPatientLinkingProps, InquiryPatientMode
 
 ### Community 327 - "Community 327"
-Cohesion: 0.04
-Nodes (43): mockAddToast, mockGet, { mockExecuteAtomicCancel }, mockAddToast, mockGet, BASE_APPOINTMENT, PROPOSED, BASE_APPOINTMENT (+35 more)
+Cohesion: 0.07
+Nodes (28): mockAddToast, mockGet, appt, mockAddToast, mockRefresh, useAppointmentDetail(), UseAppointmentDetailProps, FilterOption (+20 more)
 
 ### Community 328 - "Community 328"
 Cohesion: 0.08
@@ -1902,23 +1902,27 @@ Nodes (19): Appointment Summary Section, CTA Button, Database RPC / Outbox Paylo
 
 ### Community 331 - "Community 331"
 Cohesion: 0.09
-Nodes (6): InquiryGuestProfileProps, InquiryGuestProfileProps, SecretaryAuditLogView(), useSecretaryAuditLog(), Input, InputProps
+Nodes (4): SecretaryAuditLogView(), useSecretaryAuditLog(), Select, SelectProps
 
 ### Community 332 - "Community 332"
-Cohesion: 0.09
-Nodes (30): AvailableDoctorItem, DoctorFilterItem, getAvailableDaysAction(), AvailabilityMapDto, getAvailableDoctorsForDateAction(), getAvailableTimeSlotsAction(), { mockGetAvailableTimeSlots }, { mockGetAvailableTimeSlotsUseCase } (+22 more)
+Cohesion: 0.03
+Nodes (64): getAvailableDaysAction(), { mockGetAvailableDays }, { mockGetAvailableDaysUseCase }, { mockGetAvailableDaysUseCase, mockGetServiceDuration }, AvailabilityMapDto, GetAvailableDaysDto, getAvailableDaysUseCase(), getAvailableDoctorsForDateAction() (+56 more)
 
 ### Community 333 - "Community 333"
 Cohesion: 0.10
 Nodes (19): Appointment Summary Section, CTA Button, Database RPC / Outbox Payload, Dependent Booking — Additional Fields:, Design Principle, Email Content Requirements, Email Template (`appointment-booked-email.tsx`), Footer (+11 more)
 
 ### Community 334 - "Community 334"
-Cohesion: 0.13
-Nodes (8): mockRpc, mockSupabase, getInvoicesUseCase(), InvoiceQueriesRepository, mockRpc, mockSupabase, mockRpc, mockSupabase
+Cohesion: 0.17
+Nodes (6): mockRpc, mockSupabase, mockRpc, mockSupabase, mockRpc, mockSupabase
 
 ### Community 335 - "Community 335"
-Cohesion: 0.36
-Nodes (3): useLoginForm(), UseLoginViewReturn, UseLoginViewReturn
+Cohesion: 0.24
+Nodes (5): AuditRecord, AuditTimelineProps, AuditTimelineProps, AuditTimeline(), AuditTimelineProps
+
+### Community 336 - "Community 336"
+Cohesion: 0.24
+Nodes (5): DraftInvoice, CheckoutQueueProps, CheckoutQueueProps, CheckoutQueue(), CheckoutQueueProps
 
 ### Community 337 - "Community 337"
 Cohesion: 0.18
@@ -1941,7 +1945,7 @@ Cohesion: 0.11
 Nodes (17): 1.1 Inquiries List Query + Action, 1.2 Available Doctors for Date Action, 2.1 Patient Search Query + Action, 2.2 Update Convert RPC + DTO to Support Optional Patient Linking + Guest Contacts, Phase 10 — Secretary Notes on Conversion, Phase 1 — Backend: Read Side, Phase 2 — Backend: Patient Search, Phase 3 — Frontend: Service + Calendar (Date-First) (+9 more)
 
 ### Community 342 - "Community 342"
-Cohesion: 0.20
+Cohesion: 0.19
 Nodes (4): cleanOptionalString, DropInquiryDto, dropInquirySchema, dropInquiryUseCase()
 
 ### Community 343 - "Community 343"
@@ -1949,12 +1953,12 @@ Cohesion: 0.09
 Nodes (17): createDependentSchema, DependentRelationship, dependentRelationshipEnum, cleanOptionalString, emptyStringToUndefined, SubmitBookingDto, submitBookingSchema, DependentProfileDto (+9 more)
 
 ### Community 344 - "Community 344"
-Cohesion: 0.08
-Nodes (9): SecretaryBookAppointmentView(), BookPatientIdentityPanel(), GuestFields, NewDependentFields, BookSchedulePanel(), BookSchedulePanelProps, BookSuccessPanel(), formatTimeLabel() (+1 more)
+Cohesion: 0.36
+Nodes (5): BookPatientIdentityPanel(), BookSchedulePanel(), BookSuccessPanel(), formatTimeLabel(), BookToast()
 
 ### Community 345 - "Community 345"
-Cohesion: 0.04
-Nodes (42): appt, mockAddToast, mockRefresh, useAppointmentDetail(), UseAppointmentDetailProps, AppointmentDetailPage(), metadata, PageProps (+34 more)
+Cohesion: 0.02
+Nodes (118): AppointmentHistory(), AppointmentHistoryProps, AppointmentSummaryCard(), AppointmentSummaryCardProps, AppointmentTeaserCard(), AppointmentTeaserCardProps, CancelAppointmentModal(), CancelAppointmentModalProps (+110 more)
 
 ### Community 346 - "Community 346"
 Cohesion: 0.13
@@ -1981,8 +1985,8 @@ Cohesion: 0.12
 Nodes (14): ClinicConfigItem, DoctorListItem, DoctorScheduleItem, ScheduleViewProps, TimeBlockItem, ClinicConfigItem, DoctorListItem, DoctorScheduleItem (+6 more)
 
 ### Community 354 - "Community 354"
-Cohesion: 0.17
-Nodes (6): TrustAndStats(), TrustAndStatsProps, HeroSectionProps, HeroSectionProps, HeroSectionProps, HeroSectionProps
+Cohesion: 0.24
+Nodes (5): EmailLog, PatientNotificationsProps, PatientNotificationsProps, PatientNotifications(), PatientNotificationsProps
 
 ### Community 356 - "Community 356"
 Cohesion: 0.13
@@ -2021,8 +2025,8 @@ Cohesion: 0.15
 Nodes (10): AuditRecord, DraftInvoice, EmailLog, INITIAL_AUDITS, INITIAL_DRAFTS, INITIAL_EMAILS, INITIAL_PENDING, INITIAL_UPCOMING (+2 more)
 
 ### Community 365 - "Community 365"
-Cohesion: 0.29
-Nodes (4): AuditLogResponseDto, CheckoutResult, CheckoutResult, CheckoutResult
+Cohesion: 0.12
+Nodes (16): 1. Automated Reminder System (24h & 48h), 2. Check-In → Check-Out Flow Enhancement, 3. Post-Visit Follow-Up System (1 Month Auto-Recall), 4. Secretary "Today Dashboard" (Operational Command Center), 5. No-Show Auto-Detection, 6. SMS Channel (Future, High Impact), Architectural Fit, Open Questions for You (+8 more)
 
 ### Community 367 - "Community 367"
 Cohesion: 0.15
@@ -2032,9 +2036,13 @@ Nodes (12): 1. Route Entry Points (App Router `page.tsx` Violations), 2. File Le
 Cohesion: 0.15
 Nodes (12): 1. Database Schema & Migrations, 2. Seed Data Alignment, 3. Database RPC & Transaction Functions, 4.1. Guest Inquiry Flow (Landing Page Form), 4.2. Inquiry Conversion Flow (Secretary Dashboard Form), 4.3. Existing Appointment & DTO Schema Alignment, 4.4. Testing & Validation Specs, 4. Codebase, DTOs & Test Files (+4 more)
 
+### Community 369 - "Community 369"
+Cohesion: 0.17
+Nodes (9): BASE_APPOINTMENT, makeUseCase(), RESCHEDULE_META, BASE_APPOINTMENT, RESCHEDULE_META, BASE_APPOINTMENT, makeUseCase(), RESCHEDULE_META (+1 more)
+
 ### Community 370 - "Community 370"
-Cohesion: 0.08
-Nodes (9): BookPatientIdentityPanelProps, GuestFields, NewDependentFields, BookPatientIdentityPanelProps, GuestFields, NewDependentFields, BookingFor, PatientMode (+1 more)
+Cohesion: 0.15
+Nodes (3): BookPatientIdentityPanelProps, GuestFields, NewDependentFields
 
 ### Community 372 - "Community 372"
 Cohesion: 0.15
@@ -2044,17 +2052,17 @@ Nodes (12): 1. Route Entry Points (App Router `page.tsx` Violations), 2. File Le
 Cohesion: 0.15
 Nodes (12): 1. Database Schema & Migrations, 2. Seed Data Alignment, 3. Database RPC & Transaction Functions, 4.1. Guest Inquiry Flow (Landing Page Form), 4.2. Inquiry Conversion Flow (Secretary Dashboard Form), 4.3. Existing Appointment & DTO Schema Alignment, 4.4. Testing & Validation Specs, 4. Codebase, DTOs & Test Files (+4 more)
 
+### Community 374 - "Community 374"
+Cohesion: 0.24
+Nodes (5): UpcomingAppointment, CheckInTrackerProps, CheckInTrackerProps, CheckInTracker(), CheckInTrackerProps
+
 ### Community 375 - "Community 375"
 Cohesion: 0.17
 Nodes (11): clinicConfigAppSchema, clinicConfigDbSchema, ClinicConfigResponseDto, clinicConfigResponseSchema, operatingDayDbSchema, operatingDaySchema, operatingHoursDbSchema, operatingHoursSchema (+3 more)
 
-### Community 376 - "Community 376"
-Cohesion: 0.19
-Nodes (4): DAYS, GlobalHoursTabProps, ScheduleView(), ScheduleViewProps
-
 ### Community 377 - "Community 377"
-Cohesion: 0.33
-Nodes (4): ServiceCard(), formatPrice(), getEmoji(), ServiceListProps
+Cohesion: 0.22
+Nodes (7): paymentMethodEnum, additionalItemSchema, FinalizeInvoiceDto, finalizeInvoiceSchema, additionalItemSchema, FinalizeInvoiceDto, finalizeInvoiceSchema
 
 ### Community 378 - "Community 378"
 Cohesion: 0.17
@@ -2081,8 +2089,12 @@ Cohesion: 0.19
 Nodes (7): updateDoctorWeeklyScheduleAction(), UpdateDoctorWeeklyScheduleInput, ShiftState, UseDoctorShiftsFormProps, ShiftState, UseDoctorShiftsFormProps, UseDoctorShiftsFormProps
 
 ### Community 384 - "Community 384"
-Cohesion: 0.15
-Nodes (8): AdminDashboardPage(), DEFAULT_CONFIG, metadata, DEFAULT_CONFIG, metadata, DEFAULT_CONFIG, metadata, AdminDashboardView()
+Cohesion: 0.09
+Nodes (15): AdminDashboardPage(), DEFAULT_CONFIG, metadata, initialConfig, mockAddToast, useAdminDashboard(), DEFAULT_CONFIG, metadata (+7 more)
+
+### Community 385 - "Community 385"
+Cohesion: 0.19
+Nodes (4): DAYS, GlobalHoursTabProps, ScheduleView(), ScheduleViewProps
 
 ### Community 387 - "Community 387"
 Cohesion: 0.16
@@ -2091,6 +2103,10 @@ Nodes (8): SignUpInput, signUpSchema, mapPatientProfile(), MaybeRecord, patientP
 ### Community 388 - "Community 388"
 Cohesion: 0.18
 Nodes (10): Appointment, AppointmentSource, AppointmentStatus, AuditLog, EmailLog, Inquiry, InquiryStatus, Invoice (+2 more)
+
+### Community 389 - "Community 389"
+Cohesion: 0.25
+Nodes (7): mockEq, mockFrom, mockMaybeSingle, mockOrder, mockRange, mockSelect, mockSupabase
 
 ### Community 390 - "Community 390"
 Cohesion: 0.23
@@ -2144,25 +2160,29 @@ Nodes (10): 1. Localhost Testing (Query Parameter Fallback), 1. Middleware & Rou
 Cohesion: 0.21
 Nodes (11): 1. Database Schema Update [COMPLETED], 2. Data Transfer Objects (DTOs) [COMPLETED], 3. Database Repository Command [COMPLETED], 4. Frontend Hook [COMPLETED], 5. UI Form Component [COMPLETED], 6. Simplify Inquiry Form UI [DONE], 6. Simplify Inquiry Form UI [PENDING], 6a. UI Component Changes (+3 more)
 
-### Community 405 - "Community 405"
-Cohesion: 0.29
-Nodes (6): mockEq, mockFrom, mockSelect, mockSingle, mockSupabase, mockUpdate
+### Community 404 - "Community 404"
+Cohesion: 0.25
+Nodes (7): mockEq, mockFrom, mockMaybeSingle, mockOrder, mockRange, mockSelect, mockSupabase
 
 ### Community 406 - "Community 406"
-Cohesion: 0.10
-Nodes (16): createAuditLogCommand(), mockFrom, mockInsert, mockSelect, mockSingle, mockSupabase, mockFrom, mockInsert (+8 more)
+Cohesion: 0.22
+Nodes (5): mockFrom, mockInsert, mockSelect, mockSingle, mockSupabase
+
+### Community 407 - "Community 407"
+Cohesion: 0.16
+Nodes (5): auditLogDbSchema, AuditLogResponseDto, auditLogResponseSchema, CheckoutResult, CheckoutResult
 
 ### Community 408 - "Community 408"
-Cohesion: 0.12
-Nodes (6): archiveServiceAction(), archiveServiceUseCase(), toggleServiceVisibilityAction(), toggleServiceVisibilityUseCase(), UseServiceDetailProps, UseServiceDetailProps
+Cohesion: 0.16
+Nodes (6): archiveServiceAction(), toggleServiceVisibilityAction(), UseServiceDetailProps, UseServiceDetailProps, useServiceDetail(), UseServiceDetailProps
 
 ### Community 409 - "Community 409"
 Cohesion: 0.20
 Nodes (7): InvoiceResponseDto, invoiceResponseSchema, InvoiceStatus, invoiceStatusEnum, MaybeRecord, PaymentMethod, paymentMethodEnum
 
 ### Community 410 - "Community 410"
-Cohesion: 0.19
-Nodes (4): StaffLoginForm(), StaffLoginFormProps, useStaffLoginView(), StaffLoginView()
+Cohesion: 0.11
+Nodes (12): staffLoginAction(), staffLoginCommand(), staffLoginUseCase(), mockAddToast, mockGet, mockPush, mockAddToast, mockGet (+4 more)
 
 ### Community 411 - "Community 411"
 Cohesion: 0.20
@@ -2193,12 +2213,20 @@ Cohesion: 0.20
 Nodes (9): Overview, Phase 1: Sidebar & Navigation Updates, Phase 2: Patient Dashboard Refactor, Phase 3: My Appointments Page & Tabs, Phase 4: Notifications Hub Scaffold, Phase 5: Account Settings Consolidation, Phase 6: Verification, Task: Patient Portal Navigation & Layout Refactor (+1 more)
 
 ### Community 418 - "Community 418"
-Cohesion: 0.14
-Nodes (8): checkoutAction(), completeCheckoutCommand(), finalizeInvoiceAction(), FinalizeInvoiceDto, finalizeInvoiceSchema, finalizeInvoiceUseCase(), finalizeInvoiceCommand(), checkoutOrchestrator()
+Cohesion: 0.08
+Nodes (41): getDoctorScheduleAction(), CheckInOutTrackerPage(), getClinicAppointmentsAction(), getInvoicesAction(), getInvoicesQuery(), getServicesAction(), mocks, mocks (+33 more)
+
+### Community 419 - "Community 419"
+Cohesion: 0.12
+Nodes (8): DayOfWeekEnum, DayOfWeekMap, DoctorScheduleDto, doctorScheduleSchema, timeStringSchema, StaffScheduleCommands, upsertScheduleCommand(), updateDoctorScheduleUseCase()
 
 ### Community 420 - "Community 420"
-Cohesion: 0.06
-Nodes (18): ContactSectionProps, DAY_NAMES, DEFAULT_HOURS, FooterProps, DEFAULT_CONFIG, ContactSectionProps, ClinicConfigFormProps, AuditLogItem (+10 more)
+Cohesion: 0.13
+Nodes (10): DAY_NAMES, DEFAULT_HOURS, FooterProps, AuditLogItem, DoctorCrudItem, INITIAL_DOCTORS, INITIAL_SERVICES, MOCK_AUDITS (+2 more)
+
+### Community 421 - "Community 421"
+Cohesion: 0.25
+Nodes (7): mockEq, mockFrom, mockMaybeSingle, mockOrder, mockRange, mockSelect, mockSupabase
 
 ### Community 422 - "Community 422"
 Cohesion: 0.15
@@ -2261,8 +2289,8 @@ Cohesion: 0.25
 Nodes (7): AvailableSlotDto, availableSlotSchema, emptyStringToUndefined, GetAvailableTimeSlotsDto, GetAvailableTimeSlotsResponseDto, getAvailableTimeSlotsResponseSchema, getAvailableTimeSlotsSchema
 
 ### Community 444 - "Community 444"
-Cohesion: 0.20
-Nodes (7): Service, ServicePillSelector(), ServicePillSelectorProps, DoctorEditFormProps, Service, DoctorEditFormProps, Service
+Cohesion: 0.15
+Nodes (12): 1. Current Implementation vs. Proposed Changes, 2. Step-by-Step Task Checklist for Implementation, A. Database Schema, B. Unauthenticated (Guest) Request Flow, C. Authenticated (Patient) Booking Wizard, D. Secretary Dashboard (Guest Inquiries & Pending Appointments), New Revised Appointment and Inquiry Plan, Phase 1: Database Migration (+4 more)
 
 ### Community 446 - "Community 446"
 Cohesion: 0.25
@@ -2276,21 +2304,25 @@ Nodes (7): 🗄️ 1. Database & Server Actions (Backend), 🎨 2. Component & H
 Cohesion: 0.25
 Nodes (7): 1. Authentication & Users Domain, 2. Dependents Domain, 3. Appointments & Booking Domain (Most Complex), 4. Clinic Config & Services Domain, 5. Billing & Clinical Treatment Domain, 6. Audit Logs Domain, 🔄 Phase 8: Mock Swap & Schema Alignment Checklist
 
+### Community 449 - "Community 449"
+Cohesion: 0.16
+Nodes (10): BASE_APPOINTMENT, PROPOSED, BASE_APPOINTMENT, PROPOSED, RequestRescheduleDto, requestRescheduleSchema, requestRescheduleTransactionCommand(), requestRescheduleUseCase() (+2 more)
+
+### Community 451 - "Community 451"
+Cohesion: 0.11
+Nodes (6): AppointmentScheduleCardProps, AppointmentScheduleCardProps, AppointmentStatusReasonCallout(), AppointmentStatusReasonCalloutProps, getReasonLabel(), TONE_CLASSES
+
 ### Community 452 - "Community 452"
 Cohesion: 0.29
 Nodes (6): cleanOptionalString, inquiryDbSchema, InquiryResponseDto, inquiryResponseSchema, SubmitInquiryDto, submitInquirySchema
 
 ### Community 453 - "Community 453"
-Cohesion: 0.40
-Nodes (3): mockAddToast, mockPush, validData
+Cohesion: 0.15
+Nodes (12): 1. Dynamic State & Data Schema, 2. Event Handlers & API Actions, 3. UI Layout Skeletons, 4. Vibe-Coding Checklist & Rules, Conflicting Appointment (`conflictingAppointment`), Core View States, Data Models & Mock Data, Doctor Schedule (`doctorSchedule`) (+4 more)
 
 ### Community 454 - "Community 454"
-Cohesion: 0.57
-Nodes (3): mapStaffProfile(), MaybeRecord, staffProfileSchema
-
-### Community 455 - "Community 455"
-Cohesion: 0.40
-Nodes (3): mockAddToast, mockPush, validData
+Cohesion: 0.15
+Nodes (6): BookPatientIdentityPanelProps, GuestFields, NewDependentFields, BookingFor, PatientMode, BookPatientIdentityPanelProps
 
 ### Community 456 - "Community 456"
 Cohesion: 0.29
@@ -2313,8 +2345,8 @@ Cohesion: 0.29
 Nodes (6): cleanOptionalString, inquiryDbSchema, InquiryResponseDto, inquiryResponseSchema, SubmitInquiryDto, submitInquirySchema
 
 ### Community 462 - "Community 462"
-Cohesion: 0.40
-Nodes (3): mockAddToast, mockPush, validData
+Cohesion: 0.21
+Nodes (5): SecretaryInquiriesQueueView(), InquiriesList(), InquiriesListProps, InquiryDetailPane(), InquiryToast()
 
 ### Community 463 - "Community 463"
 Cohesion: 0.17
@@ -2357,8 +2389,8 @@ Cohesion: 0.33
 Nodes (4): FilterOption, PatientAppointmentsTabsProps, TABS, TabType
 
 ### Community 475 - "Community 475"
-Cohesion: 0.50
-Nodes (3): AppointmentRow(), AppointmentsTableProps, getBadgeVariant()
+Cohesion: 0.31
+Nodes (4): PatientRegisteredEventDto, patientRegisteredEventSchema, onPatientRegisteredSubscriber, onPatientRegisteredSubscriber
 
 ### Community 476 - "Community 476"
 Cohesion: 0.33
@@ -2369,8 +2401,8 @@ Cohesion: 0.33
 Nodes (3): outboxDbRecordSchema, OutboxLogResponseDto, outboxLogResponseSchema
 
 ### Community 479 - "Community 479"
-Cohesion: 0.17
-Nodes (4): SecretaryEmailLogView(), useSecretaryEmailLog(), Badge(), BadgeProps
+Cohesion: 0.09
+Nodes (9): InquiryGuestProfileProps, InquiryGuestProfileProps, SecretaryEmailLogView(), SecretaryInvoiceManagementView(), InvoiceReceiptActions(), Badge(), BadgeProps, Input (+1 more)
 
 ### Community 481 - "Community 481"
 Cohesion: 0.33
@@ -2404,17 +2436,13 @@ Nodes (5): mockEq, mockFrom, mockOrder, mockSelect, mockSupabase
 Cohesion: 0.33
 Nodes (3): outboxDbRecordSchema, OutboxLogResponseDto, outboxLogResponseSchema
 
-### Community 492 - "Community 492"
-Cohesion: 0.50
-Nodes (3): { mockGetAvailableDays }, { mockGetAvailableDaysUseCase }, { mockGetAvailableDaysUseCase, mockGetServiceDuration }
-
 ### Community 494 - "Community 494"
 Cohesion: 0.33
 Nodes (5): DayOfWeekEnum, DayOfWeekMap, DoctorScheduleDto, doctorScheduleSchema, timeStringSchema
 
 ### Community 495 - "Community 495"
-Cohesion: 0.06
-Nodes (14): DateTimeStep(), DateTimeStepProps, MOCK_SLOTS, GetAllUsersDto, UserProfileResponseDto, getAllUsersQuery(), DateTimeStepProps, DoctorPreferenceSelectorProps (+6 more)
+Cohesion: 0.09
+Nodes (11): DateTimeStepProps, MOCK_SLOTS, UserProfileResponseDto, DateTimeStepProps, DoctorPreferenceSelectorProps, DateTimeStepProps, DoctorPreferenceSelectorProps, AvailableTimeSlots() (+3 more)
 
 ### Community 496 - "Community 496"
 Cohesion: 0.33
@@ -2425,12 +2453,12 @@ Cohesion: 0.33
 Nodes (5): Checklist: Secretary Pages Development, 🔄 Live Database & Server Action Hookup Tasks, 🔌 Phase 1: Backend Server Actions (Do first), 💻 Phase 2: Frontend Integration (`/secretary/pending`), 🔒 Phase 3: Validation, Overlaps, and Security
 
 ### Community 499 - "Community 499"
-Cohesion: 0.25
-Nodes (7): mockEq, mockFrom, mockInsert, mockSelect, mockSingle, mockSupabase, mockUpdate
+Cohesion: 0.50
+Nodes (4): AppointmentStatusReasonCallout(), AppointmentStatusReasonCalloutProps, getReasonLabel(), TONE_CLASSES
 
 ### Community 501 - "Community 501"
-Cohesion: 0.25
-Nodes (7): mockEq, mockFrom, mockInsert, mockSelect, mockSingle, mockSupabase, mockUpdate
+Cohesion: 0.40
+Nodes (4): mockEq, mockFrom, mockSupabase, mockUpdate
 
 ### Community 504 - "Community 504"
 Cohesion: 0.40
@@ -2487,6 +2515,10 @@ Nodes (5): [MODIFY] `src/modules/emails/dtos/events/manual-booking-patient.event
 ### Community 519 - "Community 519"
 Cohesion: 0.40
 Nodes (3): DAY_NAMES, DEFAULT_HOURS, FooterProps
+
+### Community 520 - "Community 520"
+Cohesion: 0.15
+Nodes (10): appointmentDbSchema, appointmentDoctorDbSchema, appointmentDoctorSchema, AppointmentDto, appointmentDtoSchema, appointmentPatientDbSchema, appointmentPatientSchema, appointmentServiceDbSchema (+2 more)
 
 ### Community 521 - "Community 521"
 Cohesion: 0.40
@@ -2648,6 +2680,10 @@ Nodes (3): emptyStringToUndefined, GetClinicAppointmentsDto, getClinicAppointmen
 Cohesion: 0.50
 Nodes (3): servicePerformedSchema, SubmitTreatmentDto, submitTreatmentSchema
 
+### Community 573 - "Community 573"
+Cohesion: 0.46
+Nodes (4): availabilityMapSchema, emptyStringToUndefined, getAvailableDaysResponseSchema, getAvailableDaysSchema
+
 ### Community 574 - "Community 574"
 Cohesion: 0.50
 Nodes (3): auditLogDbSchema, AuditLogResponseDto, auditLogResponseSchema
@@ -2692,6 +2728,14 @@ Nodes (4): [NEW if needed] `src/modules/patients/actions/dependents/get-dependen
 Cohesion: 0.29
 Nodes (6): mockEq, mockFrom, mockSelect, mockSingle, mockSupabase, mockUpdate
 
+### Community 625 - "Community 625"
+Cohesion: 0.29
+Nodes (5): ActivePatient, AvailableServiceItem, CLINIC_SERVICES, INITIAL_QUEUE, PatientHistoryRecord
+
+### Community 637 - "Community 637"
+Cohesion: 0.25
+Nodes (7): mockEq, mockFrom, mockInsert, mockSelect, mockSingle, mockSupabase, mockUpdate
+
 ### Community 657 - "Community 657"
 Cohesion: 0.67
 Nodes (3): Backend ✅ COMPLETE, Frontend ✅ COMPLETE, Remaining Work Summary
@@ -2699,6 +2743,22 @@ Nodes (3): Backend ✅ COMPLETE, Frontend ✅ COMPLETE, Remaining Work Summary
 ### Community 658 - "Community 658"
 Cohesion: 0.67
 Nodes (3): [MODIFY] `create-manual-booking.dto.spec.ts`, [MODIFY] `create-manual-booking.dto.ts`, Step 2: DTO Layer — `src/modules/appointments/dtos/booking/`
+
+### Community 670 - "Community 670"
+Cohesion: 0.09
+Nodes (18): submitInquiryAction(), ContactInquiryFormValues, contactInquirySchema, useLandingView(), UseLandingViewProps, uuidSchema, DEFAULT_CONFIG, ContactInquiryFormValues (+10 more)
+
+### Community 695 - "Community 695"
+Cohesion: 0.57
+Nodes (3): mapStaffProfile(), MaybeRecord, staffProfileSchema
+
+### Community 709 - "Community 709"
+Cohesion: 0.29
+Nodes (6): mockEq, mockFrom, mockSelect, mockSingle, mockSupabase, mockUpdate
+
+### Community 710 - "Community 710"
+Cohesion: 0.29
+Nodes (6): mockEq, mockFrom, mockSelect, mockSingle, mockSupabase, mockUpdate
 
 ### Community 729 - "Community 729"
 Cohesion: 0.67
@@ -2708,25 +2768,33 @@ Nodes (3): Backend ✅ COMPLETE, Frontend ✅ COMPLETE, Remaining Work Summary
 Cohesion: 0.67
 Nodes (3): [MODIFY] `create-manual-booking.dto.spec.ts`, [MODIFY] `create-manual-booking.dto.ts`, Step 2: DTO Layer — `src/modules/appointments/dtos/booking/`
 
+### Community 850 - "Community 850"
+Cohesion: 0.33
+Nodes (5): mockFrom, mockInsert, mockSelect, mockSingle, mockSupabase
+
+### Community 851 - "Community 851"
+Cohesion: 0.33
+Nodes (5): mockFrom, mockInsert, mockSelect, mockSingle, mockSupabase
+
 ## Knowledge Gaps
-- **4168 isolated node(s):** `idea-refine.sh script`, `$schema`, `style`, `rsc`, `tsx` (+4163 more)
+- **4198 isolated node(s):** `idea-refine.sh script`, `$schema`, `style`, `rsc`, `tsx` (+4193 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **186 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **199 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Button()` connect `Community 214` to `Community 1`, `Community 386`, `Community 266`, `Community 396`, `Community 15`, `Community 19`, `Community 276`, `Community 278`, `Community 280`, `Community 281`, `Community 410`, `Community 284`, `Community 285`, `Community 158`, `Community 287`, `Community 289`, `Community 291`, `Community 420`, `Community 294`, `Community 297`, `Community 44`, `Community 301`, `Community 176`, `Community 49`, `Community 53`, `Community 182`, `Community 184`, `Community 315`, `Community 444`, `Community 193`, `Community 449`, `Community 323`, `Community 451`, `Community 202`, `Community 331`, `Community 332`, `Community 81`, `Community 210`, `Community 344`, `Community 345`, `Community 216`, `Community 479`, `Community 228`, `Community 232`, `Community 366`, `Community 240`, `Community 371`, `Community 244`, `Community 251`?**
-  _High betweenness centrality (0.048) - this node is a cross-community bridge._
-- **Why does `createClient` connect `Community 263` to `Community 0`, `Community 1`, `Community 259`, `Community 265`, `Community 12`, `Community 269`, `Community 142`, `Community 18`, `Community 277`, `Community 21`, `Community 279`, `Community 408`, `Community 280`, `Community 284`, `Community 289`, `Community 418`, `Community 165`, `Community 37`, `Community 296`, `Community 50`, `Community 51`, `Community 308`, `Community 313`, `Community 314`, `Community 318`, `Community 327`, `Community 332`, `Community 336`, `Community 82`, `Community 345`, `Community 218`, `Community 227`, `Community 232`, `Community 363`, `Community 492`, `Community 369`, `Community 376`, `Community 251`, `Community 254`, `Community 383`?**
+- **Why does `Button()` connect `Community 214` to `Community 0`, `Community 1`, `Community 386`, `Community 7`, `Community 266`, `Community 396`, `Community 15`, `Community 19`, `Community 276`, `Community 405`, `Community 278`, `Community 279`, `Community 280`, `Community 281`, `Community 284`, `Community 285`, `Community 670`, `Community 289`, `Community 418`, `Community 291`, `Community 294`, `Community 297`, `Community 44`, `Community 301`, `Community 176`, `Community 49`, `Community 182`, `Community 315`, `Community 193`, `Community 323`, `Community 331`, `Community 332`, `Community 336`, `Community 81`, `Community 210`, `Community 344`, `Community 345`, `Community 474`, `Community 216`, `Community 220`, `Community 479`, `Community 237`, `Community 366`, `Community 371`, `Community 244`, `Community 374`, `Community 502`, `Community 251`?**
+  _High betweenness centrality (0.044) - this node is a cross-community bridge._
+- **Why does `createClient` connect `Community 263` to `Community 0`, `Community 385`, `Community 259`, `Community 12`, `Community 269`, `Community 14`, `Community 18`, `Community 408`, `Community 410`, `Community 670`, `Community 289`, `Community 418`, `Community 35`, `Community 165`, `Community 297`, `Community 50`, `Community 51`, `Community 308`, `Community 313`, `Community 314`, `Community 188`, `Community 449`, `Community 195`, `Community 327`, `Community 332`, `Community 342`, `Community 218`, `Community 227`, `Community 363`, `Community 240`, `Community 251`, `Community 383`?**
   _High betweenness centrality (0.032) - this node is a cross-community bridge._
-- **Why does `AppointmentDto` connect `Community 280` to `Community 10`, `Community 14`, `Community 19`, `Community 276`, `Community 277`, `Community 279`, `Community 285`, `Community 418`, `Community 37`, `Community 54`, `Community 314`, `Community 318`, `Community 449`, `Community 451`, `Community 327`, `Community 202`, `Community 332`, `Community 82`, `Community 214`, `Community 345`, `Community 218`, `Community 475`, `Community 228`, `Community 232`, `Community 365`, `Community 251`?**
-  _High betweenness centrality (0.030) - this node is a cross-community bridge._
+- **Why does `DomainError` connect `Community 218` to `Community 0`, `Community 263`, `Community 265`, `Community 18`, `Community 275`, `Community 406`, `Community 407`, `Community 410`, `Community 418`, `Community 35`, `Community 419`, `Community 165`, `Community 37`, `Community 296`, `Community 297`, `Community 50`, `Community 51`, `Community 314`, `Community 321`, `Community 449`, `Community 70`, `Community 327`, `Community 332`, `Community 334`, `Community 342`, `Community 232`, `Community 122`, `Community 251`?**
+  _High betweenness centrality (0.029) - this node is a cross-community bridge._
 - **What connects `idea-refine.sh script`, `$schema`, `style` to the rest of the system?**
-  _4168 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _4198 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
-  _Cohesion score 0.04459644322845417 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.05058717253839205 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
-  _Cohesion score 0.07139079851930195 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.11586452762923351 - nodes in this community are weakly interconnected._
 - **Should `Community 2` be split into smaller, more focused modules?**
   _Cohesion score 0.08 - nodes in this community are weakly interconnected._

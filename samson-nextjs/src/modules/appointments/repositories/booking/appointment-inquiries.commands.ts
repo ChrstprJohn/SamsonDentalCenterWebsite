@@ -18,7 +18,7 @@ export const createInquiryCommand = (supabase: SupabaseClient) => {
           patient_note: data.patientNote || null,
           status: 'NEW',
           date_of_birth: data.dateOfBirth || null,
-          time_preference: data.timePreference,
+          preferred_start_time: data.preferredStartTime,
         },
       ])
       .select()

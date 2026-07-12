@@ -28,14 +28,14 @@ describe('requestRescheduleSchema', () => {
     expect(() => requestRescheduleSchema.parse(invalidData)).toThrow();
   });
 
-  it('should validate when times are omitted and timePreference is provided', () => {
+  it('should validate when times are omitted and preferredStartTime is provided', () => {
     const validData = {
       appointmentId: 'c3fabe0d-bd2c-4d35-acc0-48afe5b22673',
       status: 'RESCHEDULE_REQUESTED',
       statusReason: 'Need another day',
       newDate: '2026-06-01',
       newDoctorId: 'c3fabe0d-bd2c-4d35-acc0-48afe5b22673',
-      timePreference: 'AFTERNOON',
+      preferredStartTime: '13:00',
     };
     expect(() => requestRescheduleSchema.parse(validData)).not.toThrow();
   });

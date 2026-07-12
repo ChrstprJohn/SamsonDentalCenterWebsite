@@ -33,7 +33,7 @@ const contactInquirySchema = z.object({
     .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format')
     .or(z.literal(''))
     .optional(),
-  timePreference: z.enum(['MORNING', 'AFTERNOON']),
+  preferredStartTime: z.string().regex(/^\d{2}:\d{2}$/, 'Preferred start time must be in HH:MM format'),
 });
 
 type ContactInquiryFormValues = z.infer<typeof contactInquirySchema>;
@@ -57,7 +57,7 @@ export function useLandingView({ isAuthenticated, services }: UseLandingViewProp
       targetDate: '',
       notes: '',
       dateOfBirth: '',
-      timePreference: 'MORNING',
+      preferredStartTime: '09:00',
     },
   });
 
@@ -68,7 +68,7 @@ export function useLandingView({ isAuthenticated, services }: UseLandingViewProp
   const contactEmail = form.watch('contactEmail');
   const contactMessage = form.watch('contactMessage') ?? '';
   const dateOfBirth = form.watch('dateOfBirth') ?? '';
-  const timePreference = form.watch('timePreference') ?? 'MORNING';
+  const preferredStartTime = form.watch('preferredStartTime') ?? '09:00';
   const setField = <TName extends keyof ContactInquiryFormValues>(name: TName) =>
     (value: ContactInquiryFormValues[TName]) =>
       form.setValue(name, value as PathValue<ContactInquiryFormValues, TName>, {
@@ -140,7 +140,7 @@ export function useLandingView({ isAuthenticated, services }: UseLandingViewProp
         preferredDate: values.targetDate,
         patientNote: values.notes || undefined,
         dateOfBirth: values.dateOfBirth || undefined,
-        timePreference: values.timePreference,
+        preferredStartTime: values.preferredStartTime,
       });
 
       if (res.success) {
@@ -172,8 +172,8 @@ export function useLandingView({ isAuthenticated, services }: UseLandingViewProp
       setContactEmail: setField('contactEmail'),
       contactMessage,
       setContactMessage: setField('contactMessage'),
-      timePreference,
-      setTimePreference: setField('timePreference'),
+      preferredStartTime,
+      setPreferredStartTime: setField('preferredStartTime'),
       isContactSubmitting,
       handleRealInquirySubmit,
     },

@@ -11,8 +11,8 @@ export interface ContactFormFields {
   setLastName: (val: string) => void;
   contactEmail: string;
   setContactEmail: (val: string) => void;
-  timePreference: 'MORNING' | 'AFTERNOON';
-  setTimePreference: (val: 'MORNING' | 'AFTERNOON') => void;
+  preferredStartTime: string;
+  setPreferredStartTime: (val: string) => void;
   isContactSubmitting: boolean;
   contactMessage: string;
   setContactMessage: (val: string) => void;
@@ -21,31 +21,14 @@ export interface ContactFormFields {
 export function PreferenceFields({ fields }: { fields: ContactFormFields }) {
   return (
     <div className="flex flex-col gap-2 font-sans">
-      <label className="text-[10px] tracking-wider uppercase font-semibold text-gray-500">Preferred Time of Day *</label>
-      <div className="grid grid-cols-2 gap-4">
-        <button
-          type="button"
-          onClick={() => fields.setTimePreference('MORNING')}
-          className={`py-3 text-xs font-semibold tracking-wider uppercase text-center border transition-all cursor-pointer ${
-            fields.timePreference === 'MORNING'
-              ? 'bg-[#1D1E1E] text-white border-[#1D1E1E]'
-              : 'bg-white text-gray-600 border-[#E4E4DC] hover:border-gray-400'
-          }`}
-        >
-          Morning
-        </button>
-        <button
-          type="button"
-          onClick={() => fields.setTimePreference('AFTERNOON')}
-          className={`py-3 text-xs font-semibold tracking-wider uppercase text-center border transition-all cursor-pointer ${
-            fields.timePreference === 'AFTERNOON'
-              ? 'bg-[#1D1E1E] text-white border-[#1D1E1E]'
-              : 'bg-white text-gray-600 border-[#E4E4DC] hover:border-gray-400'
-          }`}
-        >
-          Afternoon
-        </button>
-      </div>
+      <label className="text-[10px] tracking-wider uppercase font-semibold text-gray-500">Preferred Start Time *</label>
+      <input
+        type="time"
+        required
+        value={fields.preferredStartTime}
+        onChange={(event) => fields.setPreferredStartTime(event.target.value)}
+        className="w-full bg-white border border-[#E4E4DC] px-4 py-3 rounded-none text-xs sm:text-sm focus:outline-none focus:border-[#D94E4E] transition-colors"
+      />
     </div>
   );
 }

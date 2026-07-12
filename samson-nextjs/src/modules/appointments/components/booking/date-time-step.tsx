@@ -8,27 +8,27 @@ import { AvailableTimeSlots } from './sub-components/available-time-slots';
 
 interface DateTimeStepProps {
   selectedDate: string | null;
-  timePreference: 'MORNING' | 'AFTERNOON';
+  preferredStartTime: string;
   selectedDoctorId: string;
   doctors?: UserProfileResponseDto[];
   availableDates?: string[];
   isLoading?: boolean;
   isLoadingDoctors?: boolean;
   onSelectDate: (date: string) => void;
-  onSelectTimePreference: (pref: 'MORNING' | 'AFTERNOON') => void;
+  onSelectPreferredStartTime: (time: string) => void;
   onSelectDoctor: (doctorId: string) => void;
 }
 
 export function DateTimeStep({
   selectedDate,
-  timePreference,
+  preferredStartTime,
   selectedDoctorId,
   doctors = [],
   availableDates = [],
   isLoading = false,
   isLoadingDoctors = false,
   onSelectDate,
-  onSelectTimePreference,
+  onSelectPreferredStartTime,
   onSelectDoctor,
 }: DateTimeStepProps) {
   // Create Date objects from available YYYY-MM-DD strings to format them
@@ -102,38 +102,16 @@ export function DateTimeStep({
         </div>
       </div>
 
-      {/* Time Preference Toggle Group */}
+      {/* Preferred Start Time Selection */}
       <div className="flex flex-col gap-3">
-        <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-505">Preferred Time of Day</h4>
-        <div className="grid grid-cols-2 gap-4">
-          <button
-            type="button"
-            onClick={() => onSelectTimePreference('MORNING')}
-            className={`p-4 rounded-2xl border text-center transition-all duration-350 cursor-pointer flex flex-col items-center justify-center gap-1 hover:scale-[1.01] active:scale-[0.99] ${
-              timePreference === 'MORNING'
-                ? 'border-blue-500 bg-blue-500/10 text-blue-600 dark:text-blue-400 font-extrabold ring-2 ring-blue-500/20 shadow-sm'
-                : 'border-slate-200 dark:border-white/10 bg-card/50 dark:bg-slate-900/30 text-slate-700 dark:text-slate-350 hover:border-slate-300 dark:hover:border-white/20'
-            }`}
-          >
-            <span className="text-lg">🌅</span>
-            <span className="text-xs font-extrabold">Morning</span>
-            <span className="text-[10px] font-normal text-slate-400 dark:text-slate-500">09:00 AM - 12:00 PM</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => onSelectTimePreference('AFTERNOON')}
-            className={`p-4 rounded-2xl border text-center transition-all duration-350 cursor-pointer flex flex-col items-center justify-center gap-1 hover:scale-[1.01] active:scale-[0.99] ${
-              timePreference === 'AFTERNOON'
-                ? 'border-blue-500 bg-blue-500/10 text-blue-600 dark:text-blue-400 font-extrabold ring-2 ring-blue-500/20 shadow-sm'
-                : 'border-slate-200 dark:border-white/10 bg-card/50 dark:bg-slate-900/30 text-slate-700 dark:text-slate-350 hover:border-slate-300 dark:hover:border-white/20'
-            }`}
-          >
-            <span className="text-lg">☀️</span>
-            <span className="text-xs font-extrabold">Afternoon</span>
-            <span className="text-[10px] font-normal text-slate-400 dark:text-slate-500">01:00 PM - 05:00 PM</span>
-          </button>
-        </div>
+        <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Preferred Start Time</h4>
+        <input
+          type="time"
+          required
+          value={preferredStartTime}
+          onChange={(event) => onSelectPreferredStartTime(event.target.value)}
+          className="w-full sm:w-64 bg-card border border-slate-200 dark:border-white/10 px-4 py-3 rounded-2xl text-xs sm:text-sm focus:outline-none focus:border-blue-500 text-slate-705 dark:text-slate-300 transition-colors"
+        />
       </div>
     </div>
   );

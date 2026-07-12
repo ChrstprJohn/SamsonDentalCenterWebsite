@@ -38,7 +38,7 @@ interface UseUserBookingReturn {
   selectedDate: string | null;
   selectedSlot: BookingSlot | null;
   selectedDoctorId: string;
-  timePreference: 'MORNING' | 'AFTERNOON';
+  preferredStartTime: string;
   patientType: 'SELF' | 'EXISTING_DEPENDENT' | 'NEW_DEPENDENT';
   selectedDependentId: string | null;
   newDependentData: NewDependentInput | null;
@@ -61,7 +61,7 @@ interface UseUserBookingReturn {
   selectService: (service: ServiceResponseDto) => void;
   selectDate: (date: string) => void;
   selectSlot: (slot: BookingSlot) => void;
-  setTimePreference: (pref: 'MORNING' | 'AFTERNOON') => void;
+  setPreferredStartTime: (time: string) => void;
   selectDoctor: (doctorId: string) => void;
   setPatientType: (type: 'SELF' | 'EXISTING_DEPENDENT' | 'NEW_DEPENDENT') => void;
   setSelectedDependentId: (id: string | null) => void;
@@ -120,8 +120,8 @@ export function useUserBooking(
         state.setPatientType('SELF');
       }
       state.setUserNote(reschedulingAppointment.userNote || '');
-      if (reschedulingAppointment.timePreference) {
-        state.setTimePreference(reschedulingAppointment.timePreference);
+      if (reschedulingAppointment.preferredStartTime) {
+        state.setPreferredStartTime(reschedulingAppointment.preferredStartTime);
       }
       state.setCurrentStep(2);
     }
@@ -225,7 +225,7 @@ export function useUserBooking(
           statusReason: state.userNote || 'Patient requested reschedule.',
           newDate: state.selectedDate,
           newDoctorId: state.selectedDoctorId === 'ANY' ? null : state.selectedDoctorId,
-          timePreference: state.timePreference,
+          preferredStartTime: state.preferredStartTime,
         });
 
         if (response.success) {
@@ -252,7 +252,7 @@ export function useUserBooking(
       newDependentData: state.newDependentData,
       userNote: state.userNote,
       selectedDoctorId: state.selectedDoctorId,
-      timePreference: state.timePreference,
+      preferredStartTime: state.preferredStartTime,
       resolvedDoctorId: state.selectedDoctorId === 'ANY' ? null : state.selectedDoctorId,
     });
 

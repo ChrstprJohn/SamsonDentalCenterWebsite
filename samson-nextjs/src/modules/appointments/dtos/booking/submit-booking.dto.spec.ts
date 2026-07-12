@@ -10,7 +10,7 @@ describe('submitBookingSchema', () => {
         date: '2026-05-28',
         startTime: '2026-05-28T09:00:00Z',
         endTime: '2026-05-28T09:30:00Z',
-        timePreference: 'MORNING' as const,
+        preferredStartTime: '09:00',
     };
 
     // ==========================================
@@ -141,26 +141,26 @@ describe('submitBookingSchema', () => {
         expect(result.success).toBe(false);
     });
 
-    it('should validate when startTime/endTime are omitted and timePreference is provided', () => {
+    it('should validate when startTime/endTime are omitted and preferredStartTime is provided', () => {
         const dataWithoutTimes = { ...baseValidData };
         delete (dataWithoutTimes as any).startTime;
         delete (dataWithoutTimes as any).endTime;
         const result = submitBookingSchema.safeParse({
             ...dataWithoutTimes,
             patientType: 'SELF',
-            timePreference: 'MORNING',
+            preferredStartTime: '09:00',
         });
         expect(result.success).toBe(true);
         if (result.success) {
-            expect(result.data.timePreference).toBe('MORNING');
+            expect(result.data.preferredStartTime).toBe('09:00');
         }
     });
 
-    it('should reject invalid timePreference values', () => {
+    it('should reject invalid preferredStartTime values', () => {
         const result = submitBookingSchema.safeParse({
             ...baseValidData,
             patientType: 'SELF',
-            timePreference: 'EVENING',
+            preferredStartTime: '99:99',
         });
         expect(result.success).toBe(false);
     });
@@ -192,18 +192,18 @@ describe('submitBookingSchema', () => {
         expect(result.success).toBe(true);
     });
 
-    it('should reject missing timePreference', () => {
-        const { timePreference, ...withoutPref } = baseValidData;
+    it('should reject missing preferredStartTime', () => {
+        const { preferredStartTime, ...withoutPref } = baseValidData;
         const result = submitBookingSchema.safeParse({
             ...withoutPref,
             patientType: 'SELF',
         });
         expect(result.success).toBe(false);
         if (!result.success) {
-            const hasTimePrefError = result.error.issues.some(
-                (i) => i.path.includes('timePreference')
+            const hasPrefError = result.error.issues.some(
+                (i) => i.path.includes('preferredStartTime')
             );
-            expect(hasTimePrefError).toBe(true);
+            expect(hasPrefError).toBe(true);
         }
     });
 });

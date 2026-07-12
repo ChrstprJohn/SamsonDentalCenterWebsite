@@ -36,7 +36,12 @@ export function formatShortDate(date: Date | string): string {
  * Example: '2:30 PM'
  */
 export function formatClinicTime(date: Date | string): string {
+  if (!date) return '';
   const d = typeof date === 'string' ? new Date(date) : date;
+
+  if (Number.isNaN(d.getTime())) {
+    return typeof date === 'string' ? date : '';
+  }
 
   return new Intl.DateTimeFormat('en-US', {
     hour: 'numeric',
@@ -52,8 +57,20 @@ export function formatClinicTime(date: Date | string): string {
  */
 export function formatTimeString(timeStr: string): string {
   if (!timeStr) return '';
+  if (timeStr === 'MORNING') return 'Morning (09:00 AM - 12:00 PM)';
+  if (timeStr === 'AFTERNOON') return 'Afternoon (01:00 PM - 05:00 PM)';
+  if (timeStr.includes('AM') || timeStr.includes('PM')) return timeStr;
+
   const cleanTime = timeStr.length === 5 ? `${timeStr}:00` : timeStr;
-  return formatClinicTime(`2000-01-01T${cleanTime}Z`);
+  try {
+    const formatted = formatClinicTime(`2000-01-01T${cleanTime}Z`);
+    if (formatted === `2000-01-01T${cleanTime}Z` || !formatted) {
+      return timeStr;
+    }
+    return formatted;
+  } catch {
+    return timeStr;
+  }
 }
 
 /**

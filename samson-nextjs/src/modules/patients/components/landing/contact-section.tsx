@@ -19,8 +19,8 @@ interface ContactSectionProps {
     setContactEmail: (val: string) => void;
     contactMessage: string;
     setContactMessage: (val: string) => void;
-    timePreference: 'MORNING' | 'AFTERNOON';
-    setTimePreference: (val: 'MORNING' | 'AFTERNOON') => void;
+    preferredStartTime: string;
+    setPreferredStartTime: (val: string) => void;
     isContactSubmitting: boolean;
     handleRealInquirySubmit: (data: {
       phone: string;

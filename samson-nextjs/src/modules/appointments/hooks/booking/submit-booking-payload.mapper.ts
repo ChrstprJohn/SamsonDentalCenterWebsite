@@ -11,7 +11,7 @@ interface PayloadMapperParams {
   newDependentData: NewDependentInput | null;
   userNote: string;
   selectedDoctorId: string;
-  timePreference: 'MORNING' | 'AFTERNOON';
+  preferredStartTime: string;
   resolvedDoctorId: string | null; // null when 'ANY' is selected
 }
 
@@ -23,7 +23,7 @@ export function createBookingPayload({
   newDependentData,
   userNote,
   selectedDoctorId,
-  timePreference,
+  preferredStartTime,
   resolvedDoctorId,
 }: PayloadMapperParams): SubmitBookingDto {
   const payload: SubmitBookingDto = {
@@ -33,7 +33,7 @@ export function createBookingPayload({
     isPreferredDoctor: selectedDoctorId !== 'ANY',
     doctorAssignmentSource: selectedDoctorId === 'ANY' ? 'SYSTEM' : 'USER',
     date: selectedDate,
-    timePreference,
+    preferredStartTime,
     patientType,
     userNote: userNote || undefined,
   };

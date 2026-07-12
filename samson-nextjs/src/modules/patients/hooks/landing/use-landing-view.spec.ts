@@ -121,7 +121,7 @@ describe('useLandingView', () => {
       createdAt: '2026-06-24T00:00:00.000Z',
       updatedAt: '2026-06-24T00:00:00.000Z',
       dateOfBirth: '1990-01-01',
-      timePreference: 'MORNING',
+      preferredStartTime: '09:00',
     };
 
     mockSubmitInquiryAction.mockResolvedValue({ success: true, data: mockInquiryResponse });
@@ -134,7 +134,7 @@ describe('useLandingView', () => {
       result.current.contactForm.setFirstName('John');
       result.current.contactForm.setLastName('Doe');
       result.current.contactForm.setContactEmail('john@example.com');
-      result.current.contactForm.setTimePreference('MORNING');
+      result.current.contactForm.setPreferredStartTime('09:00');
     });
 
     let success: boolean | undefined;
@@ -158,7 +158,7 @@ describe('useLandingView', () => {
       preferredDate: '2026-06-30',
       patientNote: 'Some notes',
       dateOfBirth: undefined,
-      timePreference: 'MORNING',
+      preferredStartTime: '09:00',
     });
 
     expect(mockAddToast).toHaveBeenCalledWith(

@@ -119,7 +119,7 @@ describe('useUserBooking Hook Specs', () => {
     // Select date and set time preference
     act(() => {
       result.current.selectDate('2026-06-25');
-      result.current.setTimePreference('MORNING');
+      result.current.setPreferredStartTime('09:00');
     });
 
     act(() => {
@@ -154,7 +154,7 @@ describe('useUserBooking Hook Specs', () => {
     act(() => {
       result.current.selectService(mockServices[0]);
       result.current.selectDate('2026-06-25');
-      result.current.setTimePreference('MORNING');
+      result.current.setPreferredStartTime('09:00');
     });
 
     await act(async () => {
@@ -179,7 +179,7 @@ describe('useUserBooking Hook Specs', () => {
     act(() => {
       result.current.selectService(mockServices[0]);
       result.current.selectDate('2026-06-25');
-      result.current.setTimePreference('MORNING');
+      result.current.setPreferredStartTime('09:00');
     });
 
     await act(async () => {
@@ -202,7 +202,7 @@ describe('useUserBooking Hook Specs', () => {
     act(() => {
       result.current.selectService(mockServices[0]);
       result.current.selectDate('2026-06-25');
-      result.current.setTimePreference('AFTERNOON');
+      result.current.setPreferredStartTime('14:00');
       // selectedDoctorId defaults to 'ANY' on selectService
     });
 

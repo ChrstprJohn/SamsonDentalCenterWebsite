@@ -2,7 +2,7 @@
 
 import { Badge } from '@/components/ui/badge';
 import type { AppointmentDto } from '@/modules/appointments/dtos/shared/appointment.dto';
-import { formatClinicTime, formatShortDate } from '@/shared/utils/date.util';
+import { formatClinicTime, formatShortDate, formatTimeString } from '@/shared/utils/date.util';
 
 interface AppointmentsTableProps {
   appointments: AppointmentDto[];
@@ -45,7 +45,15 @@ function AppointmentRow({ appointment, isSelected, formatPatientName, onSelect }
       <td className="py-3.5 px-2 font-semibold text-text-primary">{formatPatientName(appointment)}</td>
       <td className="py-3.5 px-2 text-text-secondary">{appointment.service?.name || '-'}</td>
       <td className="py-3.5 px-2 text-text-muted">{appointment.doctor ? `Dr. ${appointment.doctor.lastName}` : '-'}</td>
-      <td className="py-3.5 px-2 text-text-muted text-[11px]">{formatShortDate(appointment.date)} | {formatClinicTime(appointment.startTime)} - {formatClinicTime(appointment.endTime)}</td>
+      <td className="py-3.5 px-2 text-text-muted text-[11px]">
+        {formatShortDate(appointment.date)} | {
+          appointment.startTime && appointment.endTime
+            ? `${formatClinicTime(appointment.startTime)} - ${formatClinicTime(appointment.endTime)}`
+            : appointment.preferredStartTime
+              ? `Pref: ${formatTimeString(appointment.preferredStartTime)}`
+              : 'Time Pending'
+        }
+      </td>
       <td className="py-3.5 px-2"><Badge variant={getBadgeVariant(appointment.status)}>{appointment.status}</Badge></td>
     </tr>
   );

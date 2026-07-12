@@ -26,7 +26,7 @@ export function BookingView({ services, userProfile, userDependents, reschedulin
     currentStep,
     selectedService,
     selectedDate,
-    timePreference,
+    preferredStartTime,
     selectedDoctorId,
     patientType,
     selectedDependentId,
@@ -46,7 +46,7 @@ export function BookingView({ services, userProfile, userDependents, reschedulin
     goToStep,
     selectService,
     selectDate,
-    setTimePreference,
+    setPreferredStartTime,
     selectDoctor,
     setPatientType,
     setSelectedDependentId,
@@ -60,7 +60,7 @@ export function BookingView({ services, userProfile, userDependents, reschedulin
       <BookingSuccessView
         appointmentId={createdAppointmentId}
         service={selectedService}
-        timePreference={timePreference}
+        preferredStartTime={preferredStartTime}
         selectedDoctorId={selectedDoctorId}
         doctors={doctors}
         date={selectedDate}
@@ -95,14 +95,14 @@ export function BookingView({ services, userProfile, userDependents, reschedulin
         {currentStep === 2 && (
           <DateTimeStep
             selectedDate={selectedDate}
-            timePreference={timePreference}
+            preferredStartTime={preferredStartTime}
             selectedDoctorId={selectedDoctorId}
             doctors={doctors}
             availableDates={availableDates}
             isLoading={isLoadingAvailability}
             isLoadingDoctors={isLoadingDoctors}
             onSelectDate={selectDate}
-            onSelectTimePreference={setTimePreference}
+            onSelectPreferredStartTime={setPreferredStartTime}
             onSelectDoctor={selectDoctor}
           />
         )}
@@ -124,7 +124,7 @@ export function BookingView({ services, userProfile, userDependents, reschedulin
           <ReviewStep
             service={selectedService}
             date={selectedDate}
-            timePreference={timePreference}
+            preferredStartTime={preferredStartTime}
             selectedDoctorId={selectedDoctorId}
             doctors={doctors}
             patientType={patientType}

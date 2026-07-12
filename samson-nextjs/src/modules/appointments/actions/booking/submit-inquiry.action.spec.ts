@@ -19,7 +19,7 @@ describe('submitInquiryAction', () => {
       status: 'NEW',
       created_at: '2026-06-22T04:00:00Z',
       updated_at: '2026-06-22T04:00:00Z',
-      time_preference: 'MORNING',
+      preferred_start_time: '09:00',
     };
 
     const mockSingle = vi.fn().mockResolvedValue({ data: mockDbRecord, error: null });
@@ -37,7 +37,7 @@ describe('submitInquiryAction', () => {
       email: 'jane@example.com',
       preferredServiceId: 'b3b07384-d113-4ec2-a5e6-ec083b0f5cc1',
       preferredDate: '2026-06-25',
-      timePreference: 'MORNING' as const,
+      preferredStartTime: '09:00',
     };
 
     const response = await submitInquiryAction(payload);
@@ -45,7 +45,7 @@ describe('submitInquiryAction', () => {
     expect(response.data?.firstName).toBe('Jane');
   });
 
-  it('should return { success: false } when Zod validation fails (missing timePreference)', async () => {
+  it('should return { success: false } when Zod validation fails (missing preferredStartTime)', async () => {
     const invalidPayload = {
       firstName: 'Jane',
       lastName: 'Doe',
@@ -53,7 +53,7 @@ describe('submitInquiryAction', () => {
       email: 'jane@example.com',
       preferredServiceId: 'b3b07384-d113-4ec2-a5e6-ec083b0f5cc1',
       preferredDate: '2026-06-25',
-      // timePreference omitted — required field
+      // preferredStartTime omitted — required field
     };
 
     const response = await submitInquiryAction(invalidPayload as any);
@@ -76,7 +76,7 @@ describe('submitInquiryAction', () => {
       email: 'jane@example.com',
       preferredServiceId: 'b3b07384-d113-4ec2-a5e6-ec083b0f5cc1',
       preferredDate: '2026-06-25',
-      timePreference: 'MORNING' as const,
+      preferredStartTime: '09:00',
     };
 
     const response = await submitInquiryAction(payload);

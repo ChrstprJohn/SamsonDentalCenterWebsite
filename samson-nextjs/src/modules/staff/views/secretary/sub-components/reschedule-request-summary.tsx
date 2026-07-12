@@ -1,6 +1,6 @@
 'use client';
 
-import { formatClinicTime, formatShortDate } from '@/shared/utils/date.util';
+import { formatClinicTime, formatShortDate, formatTimeString } from '@/shared/utils/date.util';
 
 interface RescheduleRequestSummaryProps {
   appointment: any;
@@ -18,7 +18,7 @@ export function RescheduleRequestSummary({ appointment, patientDetails, getDocto
           title="Original Appointment"
           rows={[
             ['Date', formatShortDate(appointment.date)],
-            ['Time', `${formatClinicTime(appointment.startTime)} - ${formatClinicTime(appointment.endTime)}`],
+            ['Time', appointment.startTime && appointment.endTime ? `${formatClinicTime(appointment.startTime)} - ${formatClinicTime(appointment.endTime)}` : (appointment.preferredStartTime ? `Pref: ${formatTimeString(appointment.preferredStartTime)}` : 'Time pending')],
             ['Dentist', appointment.doctor ? `Dr. ${appointment.doctor.firstName} ${appointment.doctor.lastName}` : 'No doctor'],
           ]}
         />
@@ -27,7 +27,7 @@ export function RescheduleRequestSummary({ appointment, patientDetails, getDocto
           title="Proposed Reschedule"
           rows={[
             ['Proposed Date', appointment.proposedDate ? formatShortDate(appointment.proposedDate) : 'Not specified'],
-            ['Proposed Time', appointment.proposedStartTime ? `${formatClinicTime(appointment.proposedStartTime)} - ${formatClinicTime(appointment.proposedEndTime)}` : 'Not specified'],
+            ['Proposed Time', appointment.proposedStartTime && appointment.proposedEndTime ? `${formatClinicTime(appointment.proposedStartTime)} - ${formatClinicTime(appointment.proposedEndTime)}` : (appointment.proposedPreferredStartTime ? `Pref: ${formatTimeString(appointment.proposedPreferredStartTime)}` : 'Not specified')],
             ['Proposed Dentist', getDoctorName(appointment.proposedDoctorId)],
           ]}
         />

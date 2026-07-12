@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button';
 import type { AppointmentDto } from '@/modules/appointments/dtos/shared/appointment.dto';
 import type { AppointmentDirectoryTab } from '@/modules/staff/hooks/secretary/use-secretary-appointments';
-import { formatClinicTime, formatShortDate } from '@/shared/utils/date.util';
+import { formatClinicTime, formatShortDate, formatTimeString } from '@/shared/utils/date.util';
 import { AppointmentCancelForm } from './appointment-cancel-form';
 import { AppointmentRescheduleForm } from './appointment-reschedule-form';
 import { AppointmentStatusHistory } from './appointment-status-history';
@@ -61,7 +61,16 @@ function AppointmentSummary({ appointment, formatPatientName }: { appointment: A
       </div>
       <div className="flex flex-col gap-1.5 text-xs">
         <InfoRow label="Dentist" value={appointment.doctor ? `Dr. ${appointment.doctor.firstName} ${appointment.doctor.lastName}` : '-'} />
-        <InfoRow label="Scheduled" value={`${formatShortDate(appointment.date)} | ${formatClinicTime(appointment.startTime)} - ${formatClinicTime(appointment.endTime)}`} />
+        <InfoRow 
+          label="Scheduled" 
+          value={`${formatShortDate(appointment.date)} | ${
+            appointment.startTime && appointment.endTime
+              ? `${formatClinicTime(appointment.startTime)} - ${formatClinicTime(appointment.endTime)}`
+              : appointment.preferredStartTime
+                ? `Pref: ${formatTimeString(appointment.preferredStartTime)}`
+                : 'Time Pending'
+          }`} 
+        />
         <InfoRow label="Source" value={appointment.source || 'SELF_BOOKED'} />
         {appointment.userNote && (
           <div className="mt-1 bg-secondary-bg/25 p-2 rounded-lg border border-card-border/60">

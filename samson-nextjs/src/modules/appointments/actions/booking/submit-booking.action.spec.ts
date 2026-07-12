@@ -75,7 +75,7 @@ describe('submitBookingAction', () => {
       serviceId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd2',
       doctorId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd2',
       date: '2026-06-01',
-      timePreference: 'MORNING' as const,
+      preferredStartTime: '09:00',
       patientType: 'SELF',
     };
 
@@ -103,7 +103,7 @@ describe('submitBookingAction', () => {
       doctorId: null,
       doctorAssignmentSource: 'SYSTEM',
       date: '2026-06-01',
-      timePreference: 'AFTERNOON' as const,
+      preferredStartTime: '14:00',
       patientType: 'SELF',
     };
 

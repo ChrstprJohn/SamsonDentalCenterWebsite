@@ -14,7 +14,7 @@ describe('submitBookingUseCase', () => {
     isPreferredDoctor: true,
     doctorAssignmentSource: 'USER',
     date: '2024-12-25',
-    timePreference: 'MORNING',
+    preferredStartTime: '09:00',
     userNote: 'Dental checkup',
     patientType: 'SELF',
   };
@@ -26,7 +26,7 @@ describe('submitBookingUseCase', () => {
     isPreferredDoctor: false,
     doctorAssignmentSource: 'SYSTEM',
     date: '2024-12-25',
-    timePreference: 'AFTERNOON',
+    preferredStartTime: '14:00',
     patientType: 'SELF',
   };
 

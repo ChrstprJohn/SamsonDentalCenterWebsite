@@ -2,7 +2,7 @@
 
 import React from 'react';
 import type { AppointmentDto } from '../../dtos/shared/appointment.dto';
-import { formatShortDate, formatClinicTime } from '@/shared/utils/date.util';
+import { formatShortDate, formatClinicTime, formatTimeString } from '@/shared/utils/date.util';
 import { RescheduleDetails } from './sub-components/reschedule-details';
 import { StatusReasonBanners } from './sub-components/status-reason-banners';
 
@@ -21,7 +21,11 @@ export function AppointmentSummaryCard({ appt }: AppointmentSummaryCardProps) {
   const bookedBy = appt.patient ? `${appt.patient.firstName} ${appt.patient.lastName}` : 'Unknown';
 
   const dateStr = formatShortDate(appt.date);
-  const timeWindow = `${formatClinicTime(appt.startTime)} - ${formatClinicTime(appt.endTime)}`;
+  const timeWindow = appt.startTime && appt.endTime
+    ? `${formatClinicTime(appt.startTime)} - ${formatClinicTime(appt.endTime)}`
+    : appt.preferredStartTime
+      ? `Preference: ${formatTimeString(appt.preferredStartTime)}`
+      : 'Time pending';
 
   const getStatusLabel = (status: string) => {
     switch (status) {

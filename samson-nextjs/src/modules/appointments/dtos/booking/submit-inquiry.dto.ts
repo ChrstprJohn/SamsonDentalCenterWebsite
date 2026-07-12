@@ -29,8 +29,8 @@ export const submitInquirySchema = z.object({
     .or(z.literal(''))
     .transform((val) => (val === '' ? undefined : val))
     .optional(),
-  timePreference: z.enum(['MORNING', 'AFTERNOON'], {
-    errorMap: () => ({ message: 'Preferred time of day is required' }),
+  preferredStartTime: z.string().regex(/^(?:[01]\d|2[0-3]):[0-5]\d$/, {
+    message: 'Preferred start time is required (HH:MM)',
   }),
 });
 
@@ -53,7 +53,7 @@ const inquiryDbSchema = z.object({
   created_at: z.string(),
   updated_at: z.string(),
   date_of_birth: z.string().nullable().optional(),
-  time_preference: z.enum(['MORNING', 'AFTERNOON']).nullable().optional(),
+  preferred_start_time: z.string().nullable().optional(),
   services: z
     .object({
       name: z.string(),
@@ -80,7 +80,7 @@ export const inquiryResponseSchema = inquiryDbSchema.transform((data) => ({
   createdAt: data.created_at,
   updatedAt: data.updated_at,
   dateOfBirth: data.date_of_birth ?? undefined,
-  timePreference: data.time_preference ?? undefined,
+  preferredStartTime: data.preferred_start_time ?? undefined,
 }));
 
 export type InquiryResponseDto = z.infer<typeof inquiryResponseSchema>;

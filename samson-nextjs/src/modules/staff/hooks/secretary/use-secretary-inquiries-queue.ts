@@ -136,7 +136,7 @@ export function useSecretaryInquiriesQueue() {
     setStagedInquiryService(inquiry.preferredServiceId);
     setStagedInquiryDate('');
     setStagedInquiryDoctor('');
-    setStagedInquiryTime('');
+    setStagedInquiryTime(inquiry.preferredStartTime || '');
     setStagedInquiryEndTime('');
     setStagedInquiryNote(inquiry.patientNote || '');
     setStagedSecretaryNotes('');

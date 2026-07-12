@@ -14,7 +14,7 @@ describe('submitInquiryUseCase', () => {
       status: 'NEW' as const,
       createdAt: '2026-06-22T04:00:00Z',
       updatedAt: '2026-06-22T04:00:00Z',
-      timePreference: 'MORNING' as const,
+      preferredStartTime: '09:00',
     };
 
     const mockCreateInquiry = vi.fn().mockResolvedValue(mockCreatedInquiry);
@@ -27,17 +27,17 @@ describe('submitInquiryUseCase', () => {
       email: 'jane@example.com',
       preferredServiceId: 'b3b07384-d113-4ec2-a5e6-ec083b0f5cc1',
       preferredDate: '2026-06-25',
-      timePreference: 'MORNING' as const,
+      preferredStartTime: '09:00',
     };
 
     const result = await useCase(payload);
     expect(mockCreateInquiry).toHaveBeenCalledWith(payload);
     expect(result.firstName).toBe('Jane');
     expect(result.status).toBe('NEW');
-    expect(result.timePreference).toBe('MORNING');
+    expect(result.preferredStartTime).toBe('09:00');
   });
 
-  it('should pass AFTERNOON timePreference through correctly', async () => {
+  it('should pass preferredStartTime through correctly', async () => {
     const mockCreatedInquiry = {
       id: 'eeeeeeee-d113-4ec2-a5e6-ec083b0f5cc5',
       firstName: 'Ana',
@@ -49,7 +49,7 @@ describe('submitInquiryUseCase', () => {
       status: 'NEW' as const,
       createdAt: '2026-07-10T04:00:00Z',
       updatedAt: '2026-07-10T04:00:00Z',
-      timePreference: 'AFTERNOON' as const,
+      preferredStartTime: '14:00',
       dateOfBirth: '1990-05-15',
     };
 
@@ -63,13 +63,13 @@ describe('submitInquiryUseCase', () => {
       email: 'ana@example.com',
       preferredServiceId: 'b3b07384-d113-4ec2-a5e6-ec083b0f5cc1',
       preferredDate: '2026-07-10',
-      timePreference: 'AFTERNOON' as const,
+      preferredStartTime: '14:00',
       dateOfBirth: '1990-05-15',
     };
 
     const result = await useCase(payload);
     expect(mockCreateInquiry).toHaveBeenCalledWith(payload);
-    expect(result.timePreference).toBe('AFTERNOON');
+    expect(result.preferredStartTime).toBe('14:00');
     expect(result.dateOfBirth).toBe('1990-05-15');
   });
 });

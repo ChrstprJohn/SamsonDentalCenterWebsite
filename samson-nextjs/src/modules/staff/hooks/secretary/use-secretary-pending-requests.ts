@@ -131,7 +131,7 @@ export function useSecretaryPendingRequests() {
           return isoOrTime;
         };
 
-        setEditStartTime(extractTimePart(selectedAppointment.startTime || ''));
+        setEditStartTime(extractTimePart(selectedAppointment.startTime || '') || selectedAppointment.preferredStartTime || '');
         setEditEndTime(extractTimePart(selectedAppointment.endTime || ''));
       }
       return !current;

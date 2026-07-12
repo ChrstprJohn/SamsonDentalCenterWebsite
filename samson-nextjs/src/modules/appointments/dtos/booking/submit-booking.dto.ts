@@ -16,8 +16,8 @@ export const submitBookingSchema = z
         date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format'),
         startTime: z.string().datetime('Must be a valid ISO string').optional().or(emptyStringToUndefined),
         endTime: z.string().datetime('Must be a valid ISO string').optional().or(emptyStringToUndefined),
-        timePreference: z.enum(['MORNING', 'AFTERNOON'], {
-            errorMap: () => ({ message: 'Preferred time of day is required' }),
+        preferredStartTime: z.string().regex(/^(?:[01]\d|2[0-3]):[0-5]\d$/, {
+            message: 'Preferred start time is required (HH:MM)',
         }),
         userNote: cleanOptionalString,
 

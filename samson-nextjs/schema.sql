@@ -120,7 +120,7 @@ CREATE TABLE appointments (
     date DATE NOT NULL,
     start_time TIMESTAMPTZ, -- Nullable for pending request-to-confirm bookings
     end_time TIMESTAMPTZ,   -- Nullable for pending request-to-confirm bookings
-    time_preference TEXT CHECK (time_preference IN ('MORNING', 'AFTERNOON')),
+    preferred_start_time TEXT,
     status appointment_status DEFAULT 'PENDING'::appointment_status NOT NULL,
     source appointment_source DEFAULT 'SELF_BOOKED'::appointment_source NOT NULL,
     user_note TEXT,
@@ -130,7 +130,7 @@ CREATE TABLE appointments (
     proposed_start_time TIMESTAMPTZ,
     proposed_end_time TIMESTAMPTZ,
     proposed_doctor_id UUID REFERENCES users(id) ON DELETE SET NULL,
-    proposed_time_preference TEXT CHECK (proposed_time_preference IN ('MORNING', 'AFTERNOON')),
+    proposed_preferred_start_time TEXT,
     reschedule_count INT DEFAULT 0 NOT NULL,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -159,7 +159,7 @@ CREATE TABLE appointment_inquiries (
     secretary_notes TEXT,
     linked_appointment_id UUID REFERENCES appointments(id) ON DELETE SET NULL,
     date_of_birth DATE,
-    time_preference TEXT CHECK (time_preference IN ('MORNING', 'AFTERNOON')),
+    preferred_start_time TEXT,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
@@ -422,7 +422,7 @@ CREATE OR REPLACE FUNCTION public.submit_booking_transaction(
     p_new_dependent_middle_name TEXT DEFAULT NULL,
     p_new_dependent_suffix TEXT DEFAULT NULL,
     p_doctor_assignment_source doctor_assignment_source DEFAULT 'SYSTEM'::doctor_assignment_source,
-    p_time_preference TEXT DEFAULT NULL
+    p_preferred_start_time TEXT DEFAULT NULL
 ) RETURNS UUID
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -464,7 +464,7 @@ BEGIN
         date,
         start_time,
         end_time,
-        time_preference,
+        preferred_start_time,
         user_note,
         status,
         doctor_assignment_source
@@ -476,7 +476,7 @@ BEGIN
         p_date,
         p_start_time,
         p_end_time,
-        p_time_preference,
+        p_preferred_start_time,
         p_user_note,
         'PENDING',
         p_doctor_assignment_source
@@ -495,7 +495,7 @@ BEGIN
         'startTime', p_start_time,
         'durationMinutes', v_duration,
         'dependentId', v_dependent_id,
-        'timePreference', p_time_preference
+        'timePreference', p_preferred_start_time
     );
 
     INSERT INTO outbox (event_type, payload, status)

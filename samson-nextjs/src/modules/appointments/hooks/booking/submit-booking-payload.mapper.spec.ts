@@ -32,7 +32,7 @@ describe('createBookingPayload Mapper', () => {
       newDependentData: null,
       userNote: 'Extra note',
       selectedDoctorId: 'doc-1',
-      timePreference: 'MORNING',
+      preferredStartTime: '09:00',
       resolvedDoctorId: 'doc-1',
     });
 
@@ -45,7 +45,7 @@ describe('createBookingPayload Mapper', () => {
     expect(payload.dependentId).toBeUndefined();
     
     // Check time mappings
-    expect(payload.timePreference).toBe('MORNING');
+    expect(payload.preferredStartTime).toBe('09:00');
     expect(payload.startTime).toBeUndefined();
     expect(payload.endTime).toBeUndefined();
   });
@@ -59,7 +59,7 @@ describe('createBookingPayload Mapper', () => {
       newDependentData: null,
       userNote: '',
       selectedDoctorId: 'ANY',
-      timePreference: 'MORNING',
+      preferredStartTime: '09:00',
       resolvedDoctorId: null, // null = ANY doctor — no fallback UUID
     });
 
@@ -83,7 +83,7 @@ describe('createBookingPayload Mapper', () => {
       },
       userNote: '',
       selectedDoctorId: 'doc-1',
-      timePreference: 'MORNING',
+      preferredStartTime: '09:00',
       resolvedDoctorId: 'doc-1',
     });
 
@@ -101,7 +101,7 @@ describe('createBookingPayload Mapper', () => {
       newDependentData: null,
       userNote: '',
       selectedDoctorId: 'doc-1',
-      timePreference: 'MORNING',
+      preferredStartTime: '09:00',
       resolvedDoctorId: 'doc-1',
     });
 

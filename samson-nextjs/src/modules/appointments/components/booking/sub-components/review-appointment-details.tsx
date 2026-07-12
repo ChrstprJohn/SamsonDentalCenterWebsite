@@ -1,10 +1,10 @@
 import React from 'react';
 import type { BookingSlot } from '../../../hooks/booking/use-user-booking';
-import { formatShortDate } from '@/shared/utils/date.util';
+import { formatShortDate, formatTimeString } from '@/shared/utils/date.util';
 
 interface ReviewAppointmentDetailsProps {
   date: string | null;
-  timePreference: 'MORNING' | 'AFTERNOON';
+  preferredStartTime: string;
   selectedDoctorId: string;
   doctors?: any[];
   onEditStep?: (step: 1 | 2 | 3 | 4) => void;
@@ -12,7 +12,7 @@ interface ReviewAppointmentDetailsProps {
 
 export function ReviewAppointmentDetails({
   date,
-  timePreference,
+  preferredStartTime,
   selectedDoctorId,
   doctors = [],
   onEditStep,
@@ -21,7 +21,7 @@ export function ReviewAppointmentDetails({
   const doctorName = selectedDoctorId === 'ANY' || !selectedDoc
     ? 'Any Available Doctor (Secretary will assign)'
     : `Dr. ${selectedDoc.firstName} ${selectedDoc.lastName}`;
-  const preferenceLabel = timePreference === 'MORNING' ? 'Morning (09:00 AM - 12:00 PM)' : 'Afternoon (01:00 PM - 05:00 PM)';
+  const preferenceLabel = formatTimeString(preferredStartTime);
 
   return (
     <div className="border border-slate-200 dark:border-white/10 rounded-2xl p-5 bg-card/50 dark:bg-slate-900/30 relative shadow-sm hover:scale-[1.01] transition-all duration-300 text-left">

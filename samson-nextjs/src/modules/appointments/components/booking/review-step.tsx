@@ -12,7 +12,7 @@ import { ReviewContactDetails } from './sub-components/review-contact-details';
 interface ReviewStepProps {
   service: ServiceResponseDto | null;
   date: string | null;
-  timePreference: 'MORNING' | 'AFTERNOON';
+  preferredStartTime: string;
   selectedDoctorId: string;
   doctors?: any[];
   patientType: 'SELF' | 'EXISTING_DEPENDENT' | 'NEW_DEPENDENT';
@@ -27,7 +27,7 @@ interface ReviewStepProps {
 export function ReviewStep({
   service,
   date,
-  timePreference,
+  preferredStartTime,
   selectedDoctorId,
   doctors = [],
   patientType,
@@ -42,14 +42,14 @@ export function ReviewStep({
     <div className="flex flex-col gap-6 text-left">
       <div className="flex flex-col gap-1 mb-2">
         <h3 className="text-xl font-bold text-slate-900 dark:text-white">Review Booking Details</h3>
-        <p className="text-sm text-slate-500">Confirm the scheduling parameters before finalizing submission.</p>
+        <p className="text-sm text-slate-505">Confirm the scheduling parameters before finalizing submission.</p>
       </div>
 
       <ReviewServiceDetails service={service} onEditStep={onEditStep} />
 
       <ReviewAppointmentDetails
         date={date}
-        timePreference={timePreference}
+        preferredStartTime={preferredStartTime}
         selectedDoctorId={selectedDoctorId}
         doctors={doctors}
         onEditStep={onEditStep}

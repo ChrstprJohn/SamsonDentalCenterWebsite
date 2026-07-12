@@ -6,12 +6,12 @@ import { Button } from '@/components/ui/button';
 import type { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
 import type { BookingSlot } from '../../hooks/booking/use-user-booking';
 
-import { formatShortDate, formatClinicTime, calculateEndTimeFromIso } from '@/shared/utils/date.util';
+import { formatShortDate, formatClinicTime, calculateEndTimeFromIso, formatTimeString } from '@/shared/utils/date.util';
 
 interface BookingSuccessViewProps {
   appointmentId: string | null;
   service: ServiceResponseDto | null;
-  timePreference: 'MORNING' | 'AFTERNOON';
+  preferredStartTime: string;
   selectedDoctorId: string;
   doctors?: any[];
   date: string | null;
@@ -23,7 +23,7 @@ interface BookingSuccessViewProps {
 export function BookingSuccessView({
   appointmentId,
   service,
-  timePreference,
+  preferredStartTime,
   selectedDoctorId,
   doctors = [],
   date,
@@ -37,7 +37,7 @@ export function BookingSuccessView({
   const doctorName = selectedDoctorId === 'ANY' || !selectedDoc
     ? 'Any Available Doctor'
     : `Dr. ${selectedDoc.firstName} ${selectedDoc.lastName}`;
-  const preferenceLabel = timePreference === 'MORNING' ? 'Morning (09:00 AM - 12:00 PM)' : 'Afternoon (01:00 PM - 05:00 PM)';
+  const preferenceLabel = formatTimeString(preferredStartTime);
 
   return (
     <div className="w-full max-w-xl mx-auto p-8 rounded-3xl border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-slate-950/40 backdrop-blur-2xl shadow-2xl text-center flex flex-col items-center gap-6 animate-in fade-in zoom-in duration-300">
