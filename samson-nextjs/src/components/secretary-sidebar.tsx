@@ -38,22 +38,22 @@ const data = {
       icon: <LayoutDashboard className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
     },
     {
-      title: "Booking Queue",
+      title: "Website Requests",
       url: "#",
       icon: <ClipboardList className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
       isActive: true,
       items: [
         {
-          title: "Appointment Requests",
+          title: "Bookings",
           url: "/secretary-v2/pending",
         },
         {
-          title: "Reschedule Requests",
+          title: "Reschedules",
           url: "/secretary-v2/reschedule-requests",
         },
         {
-          title: "Inquiries Queue",
-          url: "/secretary-v2/inquiries",
+          title: "Cancellations",
+          url: "/secretary-v2/cancellations",
         },
       ],
     },
