@@ -11,7 +11,8 @@ export function PendingDoctorSchedule({ appointment, doctorSchedule }: { appoint
         <span>Doctor Schedule ({doctorName})</span>
         <span className="text-[9px] text-primary-start font-bold">{appointment.date}</span>
       </div>
-      <div className="relative pl-6 flex flex-col gap-3 max-h-[180px] overflow-y-auto pr-1">
+      {/* data-lenis-prevent stops Lenis from hijacking nested scroll wheel events */}
+      <div className="relative pl-6 flex flex-col gap-3 max-h-[180px] overflow-y-auto pr-1" data-lenis-prevent>
         <div className="absolute left-[11px] top-2 bottom-2 w-0.5 bg-card-border/60" />
         {PENDING_CLINIC_HOURS.map((hour) => {
           const matchedAppointment = doctorSchedule.find((scheduled) => formatClinicTime(scheduled.startTime) === hour);

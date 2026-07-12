@@ -39,7 +39,7 @@ export function SecretaryEmailLogView() {
   };
 
   return (
-    <div className="flex flex-col gap-8 h-full">
+    <div className="flex flex-col gap-8 h-full p-6 md:p-8 overflow-y-auto">
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl md:text-3xl font-extrabold text-text-primary tracking-tight">Email Logs</h1>
         <p className="text-xs text-text-muted">
