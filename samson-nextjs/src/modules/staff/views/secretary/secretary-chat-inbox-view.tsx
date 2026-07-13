@@ -447,16 +447,6 @@ export function SecretaryChatInboxView({ initialThreads }: SecretaryChatInboxVie
                                             >
                                                 🚫 Cancel Booking
                                             </Button>
-                                            <Button 
-                                                onClick={() => {
-                                                    setActiveAction('COMPLETE');
-                                                    setActionError(null);
-                                                    setActionSuccess(null);
-                                                }}
-                                                className="w-full text-xs py-2 bg-blue-600 text-white hover:bg-blue-700"
-                                            >
-                                                🟢 Mark as Completed
-                                            </Button>
                                         </>
                                     ) : (
                                         <div className="p-3 rounded-lg bg-slate-800/40 text-[10px] text-slate-500 text-center">
@@ -467,7 +457,7 @@ export function SecretaryChatInboxView({ initialThreads }: SecretaryChatInboxVie
                             ) : (
                                 <form onSubmit={handleActionSubmit} className="space-y-3 bg-slate-900/60 p-4 rounded-xl border border-slate-800">
                                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                                        {activeAction === 'RESCHEDULE' ? '📅 Reschedule Slot' : activeAction === 'CANCEL' ? '🚫 Cancel Booking' : '🟢 Complete Appointment'}
+                                        {activeAction === 'RESCHEDULE' ? '📅 Reschedule Slot' : '🚫 Cancel Booking'}
                                     </p>
 
                                     {activeAction === 'RESCHEDULE' && (
@@ -524,9 +514,9 @@ export function SecretaryChatInboxView({ initialThreads }: SecretaryChatInboxVie
                                         <textarea
                                             value={actionReason}
                                             onChange={e => setActionReason(e.target.value)}
-                                            placeholder={activeAction === 'COMPLETE' ? 'Completed successfully' : 'Provide reason...'}
+                                            placeholder="Provide reason..."
                                             className="w-full h-16 bg-slate-950 border border-slate-800 rounded p-2 text-xs text-slate-100 focus:outline-none placeholder-slate-600 resize-none"
-                                            required={activeAction !== 'COMPLETE'}
+                                            required
                                         />
                                     </div>
 
