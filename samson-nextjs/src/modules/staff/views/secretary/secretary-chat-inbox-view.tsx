@@ -16,8 +16,9 @@ export function SecretaryChatInboxView({ initialThreads }: SecretaryChatInboxVie
     const [threads, setThreads] = useState<ChatThreadDto[]>(initialThreads);
     const [searchQuery, setSearchQuery] = useState('');
     const [activeTab, setActiveTab] = useState<'ACTIVE' | 'ARCHIVE'>('ACTIVE');
+    const initialActive = initialThreads.filter(t => t.status !== 'PENDING' && ['APPROVED', 'CHECKED_IN', 'RESCHEDULE_REQUESTED'].includes(t.status));
     const [selectedThreadId, setSelectedThreadId] = useState<string | null>(
-        initialThreads.length > 0 ? initialThreads[0].appointmentId : null
+        initialActive.length > 0 ? initialActive[0].appointmentId : null
     );
     const [selectedThreadMessages, setSelectedThreadMessages] = useState<MessageResponseDto[]>([]);
     const [loadingMessages, setLoadingMessages] = useState(false);
@@ -91,8 +92,9 @@ export function SecretaryChatInboxView({ initialThreads }: SecretaryChatInboxVie
     }, [selectedThreadId]);
 
     // Filter threads
-    const activeStates = ['APPROVED', 'CHECKED_IN', 'RESCHEDULE_REQUESTED', 'PENDING'];
+    const activeStates = ['APPROVED', 'CHECKED_IN', 'RESCHEDULE_REQUESTED'];
     const filteredThreads = threads.filter((t) => {
+        if (t.status === 'PENDING') return false;
         const nameMatch = t.patientName.toLowerCase().includes(searchQuery.toLowerCase());
         const isTabMatch = activeTab === 'ACTIVE' 
             ? activeStates.includes(t.status)
