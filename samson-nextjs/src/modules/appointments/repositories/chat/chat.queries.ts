@@ -48,7 +48,7 @@ export const getChatThreadsForSecretaryQuery = (supabase: SupabaseClient) => {
                 date,
                 preferred_start_time,
                 chat_token,
-                patient:users (
+                patient:users!appointments_patient_id_fkey (
                     first_name,
                     last_name,
                     email
@@ -132,7 +132,7 @@ export const validateChatTokenQuery = (supabase: SupabaseClient) => {
                 status,
                 date,
                 preferred_start_time,
-                patient:users (
+                patient:users!appointments_patient_id_fkey (
                     first_name,
                     last_name
                 ),
