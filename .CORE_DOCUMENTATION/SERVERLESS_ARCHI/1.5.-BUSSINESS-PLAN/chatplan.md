@@ -114,3 +114,14 @@ To provide a modern, seamless communication experience similar to popular messag
   * **When Closed/Read-Only:** The input bar is replaced with a clear notice banner: *"This chat thread is now closed because the appointment is [Status]."*
 
 
+## Implementation Status (Completed: 2026-07-13)
+
+The specifications in this plan have been fully implemented:
+1. **Implicit Threading:** Configured `appointment_messages` referencing `appointments` with cascades.
+2. **Access Control & Secure Token Validation:** Implemented `validateChatTokenQuery` for guests. Protected routes via server-side session checks and tokens.
+3. **Database & Realtime:** Created schema tables/indexes in [20260713150000_add_appointment_chat.sql](file:///c:/Users/picar/Desktop/samson-website/samson-nextjs/migrations/20260713150000_add_appointment_chat.sql) and registered `appointment_messages` to Supabase Realtime replication.
+4. **Messenger Split UI:** Built inbox with tabbed filters (Active/Archive) and message history bubble views.
+5. **Continuous Email Lifecycle:** Designed `/appointments/chat/[id]?token=[token]` route page as persistent entry point.
+
+
+
