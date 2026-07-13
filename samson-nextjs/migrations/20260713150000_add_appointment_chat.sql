@@ -58,3 +58,73 @@ BEGIN
   END IF;
 END
 $$;
+
+-- 7. Trigger: Send automated welcome message on appointment approval
+CREATE OR REPLACE FUNCTION public.trigger_on_appointment_approved()
+RETURNS TRIGGER 
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  IF (TG_OP = 'INSERT' AND NEW.status = 'APPROVED') OR 
+     (TG_OP = 'UPDATE' AND NEW.status = 'APPROVED' AND (OLD.status IS NULL OR OLD.status != 'APPROVED')) THEN
+    INSERT INTO public.appointment_messages (
+      appointment_id,
+      sender_role,
+      sender_name,
+      message
+    ) VALUES (
+      NEW.id,
+      'STAFF',
+      'System',
+      'Hello! Your appointment is approved. If you need to reschedule or cancel, please reply here.'
+    );
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER trg_appointment_approved_message
+AFTER INSERT OR UPDATE ON public.appointments
+FOR EACH ROW
+EXECUTE FUNCTION public.trigger_on_appointment_approved();
+
+-- 8. Trigger: Send auto-response on patient first chat message
+CREATE OR REPLACE FUNCTION public.trigger_on_new_patient_message()
+RETURNS TRIGGER 
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_patient_msg_count INT;
+BEGIN
+  IF NEW.sender_role = 'PATIENT' THEN
+    SELECT COUNT(*) INTO v_patient_msg_count
+    FROM public.appointment_messages
+    WHERE appointment_id = NEW.appointment_id
+      AND sender_role = 'PATIENT'
+      AND id != NEW.id;
+
+    IF v_patient_msg_count = 0 THEN
+      INSERT INTO public.appointment_messages (
+        appointment_id,
+        sender_role,
+        sender_name,
+        message
+      ) VALUES (
+        NEW.appointment_id,
+        'STAFF',
+        'System',
+        'This is an automated message. We have received your message and our team will get back to you shortly.'
+      );
+    END IF;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER trg_new_patient_message
+AFTER INSERT ON public.appointment_messages
+FOR EACH ROW
+EXECUTE FUNCTION public.trigger_on_new_patient_message();
+

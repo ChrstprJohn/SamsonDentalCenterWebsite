@@ -89,6 +89,25 @@ export function PatientChatView({
                 )}
             </div>
 
+            {/* Sticky Marketplace-style Context Banner */}
+            <div className="bg-slate-950/60 border-b border-slate-800/80 px-5 py-3 flex items-center justify-between text-xs text-slate-300 backdrop-blur-md">
+                <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-blue-500/10 text-blue-400 font-bold border border-blue-500/15 text-sm leading-none">
+                        🦷
+                    </div>
+                    <div>
+                        <p className="font-bold text-slate-100">{appointmentDetails.serviceName}</p>
+                        <p className="text-[10px] text-slate-400">Scheduled: {appointmentDetails.date} {appointmentDetails.preferredStartTime ? `at ${appointmentDetails.preferredStartTime}` : ''}</p>
+                    </div>
+                </div>
+                <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-slate-500">Status:</span>
+                    <span className="px-2 py-0.5 font-semibold text-[10px] bg-slate-800 rounded-md border border-slate-700/50">
+                        {appointmentDetails.status}
+                    </span>
+                </div>
+            </div>
+
             {/* Messages Area */}
             <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-slate-950/20">
                 {messages.length === 0 ? (
