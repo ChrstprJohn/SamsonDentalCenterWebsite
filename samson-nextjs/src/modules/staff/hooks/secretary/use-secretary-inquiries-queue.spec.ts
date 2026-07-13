@@ -66,6 +66,7 @@ describe('useSecretaryInquiriesQueue', () => {
     await waitFor(() => expect(result.current.inquiries).toHaveLength(1));
     act(() => {
       result.current.selectInquiry(inquiry);
+      result.current.setDecision('CONVERT');
       result.current.selectDate('2026-07-09');
       result.current.selectDoctor('doctor-1');
       result.current.selectSlot({ startTime: '2026-07-09T08:00:00Z', endTime: '2026-07-09T08:30:00Z' });

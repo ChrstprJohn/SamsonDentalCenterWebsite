@@ -14,6 +14,7 @@ interface PendingDecisionFormProps {
   onReasonChange: (reason: string) => void;
   onCustomReasonChange: (reason: string) => void;
   onConfirm: () => void;
+  isLockedForApproval?: boolean;
 }
 
 const REASONS = {
@@ -49,11 +50,24 @@ export function PendingDecisionForm(props: PendingDecisionFormProps) {
       <div className="flex flex-col gap-1.5">
         <span className="text-xs font-bold text-text-secondary">Staged Decision Action</span>
         <div className="flex gap-2">
-          {(['APPROVED', 'REJECTED', 'DISPLACED'] as const).map((status) => (
-            <button key={status} type="button" onClick={() => props.onDecisionChange(status)} className={`flex-1 py-2 text-[10px] font-bold uppercase tracking-wider rounded-lg border transition-all ${getDecisionClass(props.stagedStatus, status)}`}>
-              {status === 'APPROVED' ? 'Approve' : status === 'REJECTED' ? 'Reject' : 'Displace'}
-            </button>
-          ))}
+          {(['APPROVED', 'REJECTED'] as const).map((status) => {
+            const isLocked = props.isLockedForApproval && status === 'APPROVED';
+            return (
+              <button 
+                key={status} 
+                type="button" 
+                disabled={isLocked}
+                onClick={() => props.onDecisionChange(status)} 
+                className={`flex-1 py-2 text-[10px] font-bold uppercase tracking-wider rounded-lg border transition-all ${
+                  isLocked ? 'opacity-40 cursor-not-allowed bg-secondary-bg/5 border-card-border text-text-muted' : getDecisionClass(props.stagedStatus, status)
+                }`}
+              >
+                {status === 'APPROVED' 
+                  ? `🟢 Approve Booking${isLocked ? ' (Locked)' : ''}` 
+                  : '🔴 Reject Booking'}
+              </button>
+            );
+          })}
         </div>
       </div>
       {props.stagedStatus && (

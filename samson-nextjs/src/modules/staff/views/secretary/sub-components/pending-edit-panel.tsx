@@ -23,9 +23,57 @@ interface PendingEditPanelProps {
   onStartTimeChange: (time: string) => void;
   onEndTimeChange: (time: string) => void;
   onNoteChange: (note: string) => void;
+  showHeader?: boolean;
 }
 
 export function PendingEditPanel(props: PendingEditPanelProps) {
+  const showHeader = props.showHeader !== false;
+
+  if (!showHeader) {
+    return (
+      <div className="flex flex-col gap-4 bg-card">
+        <PillGroup label="1. Select Service" items={props.services} selectedId={props.serviceId} getLabel={(service) => service.name} onSelect={props.onServiceChange} />
+        {props.serviceId && (
+          <DatePicker
+            currentMonth={props.currentMonth}
+            availableDates={props.availableDates}
+            date={props.date}
+            isLoading={props.isLoadingDays}
+            onDateChange={props.onDateChange}
+            onMonthChange={props.onMonthChange}
+          />
+        )}
+        {props.date && props.serviceId && <PillGroup label="2. Select Doctor" items={props.doctors} selectedId={props.doctorId} getLabel={(doctor) => `Dr. ${doctor.firstName} ${doctor.lastName}`} onSelect={props.onDoctorChange} />}
+        {props.date && (
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1.5">
+              <span className="text-[10px] font-bold uppercase text-text-muted tracking-wider">3. Start Time</span>
+              <input
+                type="time"
+                value={props.startTime}
+                onChange={(event) => props.onStartTimeChange(event.target.value)}
+                className="text-xs border border-card-border rounded-xl px-3 py-2 bg-secondary-bg/20 text-text-primary focus:outline-none focus:border-primary-start/60"
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <span className="text-[10px] font-bold uppercase text-text-muted tracking-wider">4. End Time</span>
+              <input
+                type="time"
+                value={props.endTime}
+                onChange={(event) => props.onEndTimeChange(event.target.value)}
+                className="text-xs border border-card-border rounded-xl px-3 py-2 bg-secondary-bg/20 text-text-primary focus:outline-none focus:border-primary-start/60"
+              />
+            </div>
+          </div>
+        )}
+        <div className="flex flex-col gap-1.5">
+          <span className="text-[10px] font-bold uppercase text-text-muted tracking-wider">5. Secretary Note (Optional)</span>
+          <textarea value={props.note} onChange={(event) => props.onNoteChange(event.target.value)} placeholder="Add an internal note or message for the patient..." rows={2} className="text-xs border border-card-border rounded-xl px-3 py-2 bg-secondary-bg/20 text-text-primary resize-none focus:outline-none focus:border-primary-start/60" />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="border border-card-border/60 rounded-2xl overflow-hidden">
       <button type="button" onClick={props.onToggle} className="w-full flex items-center justify-between px-4 py-3 text-xs font-bold text-text-secondary bg-secondary-bg/20 hover:bg-secondary-bg/40 transition-colors">
@@ -45,11 +93,11 @@ export function PendingEditPanel(props: PendingEditPanelProps) {
               onMonthChange={props.onMonthChange}
             />
           )}
-          {props.date && props.serviceId && <PillGroup label="3. Select Doctor" items={props.doctors} selectedId={props.doctorId} getLabel={(doctor) => `Dr. ${doctor.firstName} ${doctor.lastName}`} onSelect={props.onDoctorChange} />}
+          {props.date && props.serviceId && <PillGroup label="2. Select Doctor" items={props.doctors} selectedId={props.doctorId} getLabel={(doctor) => `Dr. ${doctor.firstName} ${doctor.lastName}`} onSelect={props.onDoctorChange} />}
           {props.date && (
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-1.5">
-                <span className="text-[10px] font-bold uppercase text-text-muted tracking-wider">4. Start Time</span>
+                <span className="text-[10px] font-bold uppercase text-text-muted tracking-wider">3. Start Time</span>
                 <input
                   type="time"
                   value={props.startTime}
@@ -58,7 +106,7 @@ export function PendingEditPanel(props: PendingEditPanelProps) {
                 />
               </div>
               <div className="flex flex-col gap-1.5">
-                <span className="text-[10px] font-bold uppercase text-text-muted tracking-wider">5. End Time</span>
+                <span className="text-[10px] font-bold uppercase text-text-muted tracking-wider">4. End Time</span>
                 <input
                   type="time"
                   value={props.endTime}
@@ -69,7 +117,7 @@ export function PendingEditPanel(props: PendingEditPanelProps) {
             </div>
           )}
           <div className="flex flex-col gap-1.5">
-            <span className="text-[10px] font-bold uppercase text-text-muted tracking-wider">6. Secretary Note (Optional)</span>
+            <span className="text-[10px] font-bold uppercase text-text-muted tracking-wider">5. Secretary Note (Optional)</span>
             <textarea value={props.note} onChange={(event) => props.onNoteChange(event.target.value)} placeholder="Add an internal note or message for the patient..." rows={2} className="text-xs border border-card-border rounded-xl px-3 py-2 bg-secondary-bg/20 text-text-primary resize-none focus:outline-none focus:border-primary-start/60" />
           </div>
         </div>

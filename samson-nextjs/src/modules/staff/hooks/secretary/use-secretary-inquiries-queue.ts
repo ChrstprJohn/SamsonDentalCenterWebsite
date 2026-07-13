@@ -132,9 +132,9 @@ export function useSecretaryInquiriesQueue() {
 
   const selectInquiry = (inquiry: any) => {
     setSelectedInquiryId(inquiry.id);
-    setStagedInquiryAction('CONVERT');
+    setStagedInquiryAction('');
     setStagedInquiryService(inquiry.preferredServiceId);
-    setStagedInquiryDate('');
+    setStagedInquiryDate(inquiry.preferredDate || '');
     setStagedInquiryDoctor('');
     setStagedInquiryTime(inquiry.preferredStartTime || '');
     setStagedInquiryEndTime('');

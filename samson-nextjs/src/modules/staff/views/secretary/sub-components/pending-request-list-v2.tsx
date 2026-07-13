@@ -85,7 +85,7 @@ export function PendingRequestListV2(props: PendingRequestListV2Props) {
                 : 'border-transparent text-text-muted hover:text-text-primary'
             }`}
           >
-            Registered Patient ({filteredAppointments.length})
+            Registered User ({filteredAppointments.length})
           </button>
           <button
             onClick={() => props.onTabChange('guest')}

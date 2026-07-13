@@ -15,7 +15,7 @@ export function PendingRequestOverview({ appointment, patientDetails, conflictin
         </div>
       )}
       <ReliabilityCounters reliability={patientDetails?.reliability} />
-      <PatientHistory history={patientDetails?.history || []} />
+      {/* <PatientHistory history={patientDetails?.history || []} /> */}
     </div>
   );
 }
