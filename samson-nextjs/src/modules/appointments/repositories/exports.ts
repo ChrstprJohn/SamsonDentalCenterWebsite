@@ -9,3 +9,5 @@ export * from './clinic/clinic-appointments.queries';
 export * from './patient/patient-appointments.queries';
 export * from './treatment/treatment.commands';
 export * from './booking/appointment-inquiries.queries';
+export * from './chat/chat.commands';
+export * from './chat/chat.queries';

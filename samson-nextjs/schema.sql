@@ -132,6 +132,7 @@ CREATE TABLE appointments (
     proposed_doctor_id UUID REFERENCES users(id) ON DELETE SET NULL,
     proposed_preferred_start_time TEXT,
     reschedule_count INT DEFAULT 0 NOT NULL,
+    chat_token TEXT DEFAULT uuid_generate_v4()::text,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
     
@@ -142,6 +143,21 @@ CREATE TABLE appointments (
     ) WHERE (status != 'PENDING' AND status != 'RESCHEDULE_REQUESTED' AND doctor_id IS NOT NULL),
     CONSTRAINT valid_appointment_time CHECK (start_time < end_time)
 );
+
+-- APPOINTMENT_MESSAGES
+CREATE TABLE appointment_messages (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    appointment_id UUID REFERENCES appointments(id) ON DELETE CASCADE NOT NULL,
+    sender_role TEXT NOT NULL CHECK (sender_role IN ('PATIENT', 'STAFF')),
+    sender_name TEXT NOT NULL,
+    message TEXT NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    is_read BOOLEAN DEFAULT false NOT NULL
+);
+
+CREATE INDEX idx_appointment_messages_appointment_id ON appointment_messages(appointment_id);
+
+
 
 -- APPOINTMENT_INQUIRIES (For landing page unauthenticated guest booking leads)
 CREATE TABLE appointment_inquiries (

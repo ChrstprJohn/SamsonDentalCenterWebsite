@@ -20,7 +20,8 @@ import {
   Clock,
   ClipboardList,
   DollarSign,
-  Briefcase
+  Briefcase,
+  MessageSquare
 } from "lucide-react"
 
 const data = {
@@ -36,6 +37,11 @@ const data = {
       title: "Dashboard",
       url: "/secretary-v2",
       icon: <LayoutDashboard className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
+    },
+    {
+      title: "Chat Inbox",
+      url: "/secretary-v2/chat",
+      icon: <MessageSquare className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
     },
     {
       title: "Website Requests",
