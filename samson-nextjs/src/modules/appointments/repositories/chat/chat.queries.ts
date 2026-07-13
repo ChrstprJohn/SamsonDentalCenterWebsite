@@ -10,7 +10,13 @@ export interface ChatThreadDto {
     chatToken: string | null;
     patientName: string;
     patientEmail: string;
+    patientPhone?: string | null;
     serviceName: string;
+    serviceId?: string | null;
+    doctorId?: string | null;
+    doctorName?: string | null;
+    startTime?: string | null;
+    endTime?: string | null;
     latestMessage: {
         text: string;
         createdAt: string;
@@ -47,16 +53,26 @@ export const getChatThreadsForSecretaryQuery = (supabase: SupabaseClient) => {
                 status,
                 date,
                 preferred_start_time,
+                start_time,
+                end_time,
+                service_id,
+                doctor_id,
                 chat_token,
                 patient:users!appointments_patient_id_fkey (
                     first_name,
                     last_name,
-                    email
+                    email,
+                    phone_number
+                ),
+                doctor:users!appointments_doctor_id_fkey (
+                    first_name,
+                    last_name
                 ),
                 guest_contacts (
                     first_name,
                     last_name,
-                    email
+                    email,
+                    phone_number
                 ),
                 service:services (
                     name
@@ -91,14 +107,21 @@ export const getChatThreadsForSecretaryQuery = (supabase: SupabaseClient) => {
 
             let patientName = 'Unknown Patient';
             let patientEmail = '';
+            let patientPhone = '';
 
             if (row.patient) {
                 patientName = `${row.patient.first_name} ${row.patient.last_name}`;
                 patientEmail = row.patient.email || '';
+                patientPhone = row.patient.phone_number || '';
             } else if (row.guest_contacts && row.guest_contacts.length > 0) {
-                const gc = row.guest_contacts[0];
-                patientName = `${gc.first_name} ${gc.last_name} (Guest)`;
-                patientEmail = gc.email || '';
+                patientName = `${row.guest_contacts[0].first_name} ${row.guest_contacts[0].last_name}`;
+                patientEmail = row.guest_contacts[0].email || '';
+                patientPhone = row.guest_contacts[0].phone_number || '';
+            }
+
+            let doctorName = 'Unassigned';
+            if (row.doctor) {
+                doctorName = `Dr. ${row.doctor.first_name} ${row.doctor.last_name}`;
             }
 
             return {
@@ -106,10 +129,16 @@ export const getChatThreadsForSecretaryQuery = (supabase: SupabaseClient) => {
                 status: row.status,
                 date: row.date,
                 preferredStartTime: row.preferred_start_time,
+                startTime: row.start_time,
+                endTime: row.end_time,
+                serviceId: row.service_id,
+                doctorId: row.doctor_id,
                 chatToken: row.chat_token,
                 patientName,
                 patientEmail,
+                patientPhone,
                 serviceName: row.service?.name || 'General Inquiry',
+                doctorName,
                 latestMessage: latest
                     ? {
                           text: latest.message,
@@ -132,7 +161,13 @@ export const validateChatTokenQuery = (supabase: SupabaseClient) => {
                 status,
                 date,
                 preferred_start_time,
+                start_time,
+                end_time,
                 patient:users!appointments_patient_id_fkey (
+                    first_name,
+                    last_name
+                ),
+                doctor:users!appointments_doctor_id_fkey (
                     first_name,
                     last_name
                 ),
@@ -165,13 +200,21 @@ export const validateChatTokenQuery = (supabase: SupabaseClient) => {
             patientName = `${gc.first_name} ${gc.last_name}`;
         }
 
+        let doctorName = 'Unassigned';
+        if (data.doctor) {
+            doctorName = `Dr. ${data.doctor.first_name} ${data.doctor.last_name}`;
+        }
+
         return {
             appointmentId: data.id,
             status: data.status,
             date: data.date,
             preferredStartTime: data.preferred_start_time,
+            startTime: data.start_time,
+            endTime: data.end_time,
             patientName,
             serviceName: data.service?.name || 'General Inquiry',
+            doctorName,
         };
     };
 };
