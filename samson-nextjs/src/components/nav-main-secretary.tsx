@@ -42,9 +42,23 @@ export function NavMainSecretary({
       <SidebarGroupLabel>{label}</SidebarGroupLabel>
       <SidebarMenu className="gap-1.5">
         {items.map((item) => {
+          const hasSubItems = item.items && item.items.length > 0
           // If any of the sub-items are active, auto-open this group
           const hasActiveSubItem = item.items?.some((subItem) => pathname === subItem.url)
           const isGroupOpen = item.isActive || hasActiveSubItem
+
+          if (!hasSubItems) {
+            return (
+              <SidebarMenuItem key={item.title}>
+                <SidebarMenuButton asChild tooltip={item.title} isActive={pathname === item.url}>
+                  <Link href={item.url}>
+                    {item.icon}
+                    <span>{item.title}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            )
+          }
 
           return (
             <Collapsible
