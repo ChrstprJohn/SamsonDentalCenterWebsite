@@ -151,7 +151,7 @@ export function PatientChatView({
                                     className="h-7 text-xs rounded-full cursor-pointer border-primary/20 bg-primary/5 hover:bg-primary/10 text-primary"
                                     onClick={() => setActiveWorkflow('RESCHEDULE')}
                                 >
-                                    I want to request a reschedule on my appointment
+                                    Request Reschedule
                                 </Button>
                                 <Button
                                     variant="outline"
@@ -159,7 +159,7 @@ export function PatientChatView({
                                     className="h-7 text-xs rounded-full cursor-pointer border-destructive/20 bg-destructive/5 hover:bg-destructive/10 text-destructive"
                                     onClick={() => setActiveWorkflow('CANCEL')}
                                 >
-                                    I want to request a cancellation on my appointment
+                                    Request Cancellation
                                 </Button>
                                 <Button
                                     variant="ghost"
