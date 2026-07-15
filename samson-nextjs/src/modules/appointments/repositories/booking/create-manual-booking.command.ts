@@ -29,6 +29,7 @@ export const createManualBookingCommand = (supabase: SupabaseClient) => {
       p_new_dependent_date_of_birth: data.newDependentDateOfBirth || null,
       p_new_dependent_relationship: data.newDependentRelationship || null,
       p_doctor_assignment_source: data.doctorAssignmentSource,
+      p_confirmation_channel: data.confirmationChannel || 'EMAIL',
     });
 
     if (error || !appointmentId) {

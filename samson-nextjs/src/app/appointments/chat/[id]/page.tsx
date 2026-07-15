@@ -49,6 +49,7 @@ export default async function SecureChatPage({ params, searchParams }: PageProps
                         last_name
                     ),
                     service:services (
+                        id,
                         name
                     )
                 `)
@@ -76,6 +77,7 @@ export default async function SecureChatPage({ params, searchParams }: PageProps
                         preferredStartTime: appt.preferred_start_time,
                         patientName,
                         serviceName: appt.service?.name || 'General Inquiry',
+                        serviceId: appt.service?.id || null,
                     };
                     currentUserName = isStaff
                         ? 'Secretary'

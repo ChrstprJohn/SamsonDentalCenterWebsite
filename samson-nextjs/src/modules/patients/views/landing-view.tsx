@@ -19,7 +19,6 @@ import { ContactSection } from '../components/landing/contact-section';
 interface LandingViewProps {
   services: ServiceResponseDto[];
   config: ClinicConfigResponseDto;
-  isAuthenticated: boolean;
 }
 
 const DEFAULT_SERVICES: ServiceResponseDto[] = [
@@ -73,7 +72,7 @@ const DEFAULT_SERVICES: ServiceResponseDto[] = [
   },
 ];
 
-export function LandingView({ services, config, isAuthenticated }: LandingViewProps) {
+export function LandingView({ services, config }: LandingViewProps) {
   const activeServices = services.length > 0 ? services : DEFAULT_SERVICES;
 
   const {
@@ -81,7 +80,7 @@ export function LandingView({ services, config, isAuthenticated }: LandingViewPr
     setSelectedService,
     contactForm,
     handleBookingCTA,
-  } = useLandingView({ isAuthenticated, services: activeServices });
+  } = useLandingView({ services: activeServices });
 
   return (
     <div className="flex flex-col w-full bg-[#FDFDFD] text-[#1D1E1E]">

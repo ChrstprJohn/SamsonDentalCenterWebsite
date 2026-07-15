@@ -38,6 +38,7 @@ export const createManualBookingSchema = z
     patientNote: cleanOptionalString,
     statusReason: cleanOptionalString,
     doctorAssignmentSource: z.enum(['SYSTEM', 'USER']).optional().default('SYSTEM'),
+    confirmationChannel: z.enum(['EMAIL', 'SMS', 'NONE']).optional().default('EMAIL'),
     // Dependent support
     dependentId: z.string().uuid('Invalid dependent ID format').nullable().optional(),
     newDependentFirstName: z.string().trim().min(1).optional(),

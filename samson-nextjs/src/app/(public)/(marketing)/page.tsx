@@ -1,7 +1,6 @@
 import React from 'react';
 import { getServicesAction } from '@/modules/services/actions/management/get-services.action';
 import { getClinicConfigAction } from '@/modules/clinic-config/actions/settings/get-clinic-config.action';
-import { createClient } from '@/shared/database/server';
 import { LandingView } from '@/modules/patients/views/landing-view';
 import type { ClinicConfigResponseDto } from '@/modules/clinic-config/dtos/settings/get-clinic-config.dto';
 import type { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
@@ -31,7 +30,6 @@ const DEFAULT_CONFIG: ClinicConfigResponseDto = {
 export default async function HomePage() {
   let services: ServiceResponseDto[] = [];
   let config = DEFAULT_CONFIG;
-  let isAuthenticated = false;
 
   // 1. Fetch Active Services
   try {
@@ -53,20 +51,10 @@ export default async function HomePage() {
     console.error('Failed to load clinic config on landing page:', err);
   }
 
-  // 3. Inspect Session State
-  try {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    isAuthenticated = !!user;
-  } catch (err) {
-    console.error('Failed to resolve active session state on landing page:', err);
-  }
-
   return (
     <LandingView
       services={services}
       config={config}
-      isAuthenticated={isAuthenticated}
     />
   );
 }

@@ -2,6 +2,7 @@ import { createAdminClient } from '@/shared/database/server';
 import { ResendService } from '@/shared/services/email/resend.service';
 import { appointmentConvertedEventSchema } from '../dtos/events/appointment-converted.event.dto';
 import { formatShortDate, formatClinicTime, calculateEndTimeFromIso } from '@/shared/utils/date.util';
+import { getBaseUrl } from '@/shared/utils/get-base-url.util';
 
 export const onAppointmentConvertedSubscriber = {
   /**
@@ -48,6 +49,15 @@ export const onAppointmentConvertedSubscriber = {
     const subject = 'Appointment Confirmed – Samson Dental Center';
 
 
+    const { data: appt } = await supabaseAdmin
+      .from('appointments')
+      .select('chat_token')
+      .eq('id', appointmentId)
+      .single();
+
+    const chatToken = appt?.chat_token || '';
+    const baseUrl = getBaseUrl();
+
     // Send email using Resend
     await ResendService.sendTemplatedEmail(
       guestEmail,
@@ -60,6 +70,8 @@ export const onAppointmentConvertedSubscriber = {
         dateStr,
         timeRangeStr,
         appointmentId,
+        chatToken,
+        baseUrl,
       }
     );
   }

@@ -37,6 +37,7 @@ describe('onManualBookingPatientSubscriber', () => {
       { data: { email: 'john@example.com', first_name: 'John', middle_name: null, last_name: 'Doe', suffix: null }, error: null },
       { data: { name: 'Teeth Cleaning' }, error: null },
       { data: { first_name: 'Jane', last_name: 'Smith' }, error: null },
+      { data: { chat_token: 'chat-tok' }, error: null },
     ]);
     vi.mocked(createAdminClient).mockResolvedValue(mockSupabase);
 
@@ -66,6 +67,7 @@ describe('onManualBookingPatientSubscriber', () => {
       { data: { email: 'john@example.com', first_name: 'John', middle_name: null, last_name: 'Santos', suffix: null }, error: null },
       { data: { name: 'Teeth Cleaning' }, error: null },
       { data: { first_name: 'Jane', last_name: 'Smith' }, error: null },
+      { data: { chat_token: 'chat-tok' }, error: null },
     ]);
     vi.mocked(createAdminClient).mockResolvedValue(mockSupabase);
 

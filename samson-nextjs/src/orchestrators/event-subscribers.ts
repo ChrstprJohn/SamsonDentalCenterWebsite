@@ -9,7 +9,11 @@ import { onTreatmentRenderedSubscriber } from '@/modules/notifications/subscribe
 import { onEmailFailedSubscriber } from '@/modules/notifications/subscribers/on-email-failed.subscriber';
 import { onScheduleConflictSubscriber } from '@/modules/notifications/subscribers/on-schedule-conflict.subscriber';
 import { onNewBookingSubscriber } from '@/modules/notifications/subscribers/on-new-booking.subscriber';
-import { onCancelBookingSubscriber } from '@/modules/notifications/subscribers/on-cancel-booking.subscriber';
+import { onCancelBookingSubscriber as onCancelBookingNotificationSubscriber } from '@/modules/notifications/subscribers/on-cancel-booking.subscriber';
+import { onCancelBookingSubscriber as onCancelBookingEmailSubscriber } from '@/modules/emails/subscribers/on-cancel-booking.subscriber';
+import { onRescheduleBookingSubscriber } from '@/modules/emails/subscribers/on-reschedule-booking.subscriber';
+import { onStaffReplySubscriber } from '@/modules/emails/subscribers/on-staff-reply.subscriber';
+import { onManualBookingSmsSubscriber } from '@/modules/emails/subscribers/on-manual-booking-sms.subscriber';
 
 /**
  * Bootstraps the Event Bus Registry.
@@ -27,6 +31,18 @@ export const bootstrapEventSubscribers = () => {
   registerSubscriber('APPOINTMENT_MANUALLY_BOOKED_GUEST', onManualBookingGuestSubscriber.handle);
   registerSubscriber('APPOINTMENT_MANUALLY_BOOKED_PATIENT', onManualBookingPatientSubscriber.handle);
   
-  // Future SMS Module
-  // registerSubscriber('PATIENT_REGISTERED', onPatientRegisteredSmsSubscriber.handle);
+  // Missing notification subscriptions
+  registerSubscriber('TREATMENT_RENDERED', onTreatmentRenderedSubscriber.handle);
+  registerSubscriber('EMAIL_FAILED', onEmailFailedSubscriber.handle);
+  registerSubscriber('SCHEDULE_CONFLICT', onScheduleConflictSubscriber.handle);
+  registerSubscriber('NEW_APPOINTMENT_REQUEST', onNewBookingSubscriber.handle);
+  
+  // Dual-purpose Cancel subscribers
+  registerSubscriber('CANCEL_BOOKING', onCancelBookingNotificationSubscriber.handle);
+  registerSubscriber('CANCEL_BOOKING', onCancelBookingEmailSubscriber.handle);
+  
+  // Reschedule & reply & SMS confirmation subscribers
+  registerSubscriber('RESCHEDULE_BOOKING', onRescheduleBookingSubscriber.handle);
+  registerSubscriber('STAFF_REPLIED_TO_CHAT', onStaffReplySubscriber.handle);
+  registerSubscriber('APPOINTMENT_MANUALLY_BOOKED_SMS', onManualBookingSmsSubscriber.handle);
 };

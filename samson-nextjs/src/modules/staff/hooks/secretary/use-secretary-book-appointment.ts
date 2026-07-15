@@ -47,6 +47,7 @@ export function useSecretaryBookAppointment() {
   const [inlineError, setInlineError] = useState('');
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [booked, setBooked] = useState(false);
+  const [confirmationChannel, setConfirmationChannel] = useState<'EMAIL' | 'SMS' | 'NONE'>('EMAIL');
 
   const availableDates = selectedService ? scheduler.availableDates : [];
   const availableDoctors = selectedDate ? scheduler.availableDoctors as { doctorId: string; doctorName: string }[] : [];
@@ -201,6 +202,7 @@ export function useSecretaryBookAppointment() {
     setPatientNote('');
     setBooked(false);
     setInlineError('');
+    setConfirmationChannel('EMAIL');
   };
 
   const isReadyToSubmit = useMemo(() => {
@@ -239,8 +241,8 @@ export function useSecretaryBookAppointment() {
             }
           : {};
       const payload = patientMode === 'SEARCH' && selectedPatient
-        ? { patientId: selectedPatient.id, serviceId: selectedService, doctorId: selectedDoctor, date: selectedDate, startTime: `${selectedDate}T${selectedTime}:00Z`, endTime: `${selectedDate}T${selectedEndTime}:00Z`, patientNote: patientNote || undefined, ...dependentPayload }
-        : { serviceId: selectedService, doctorId: selectedDoctor, date: selectedDate, startTime: `${selectedDate}T${selectedTime}:00Z`, endTime: `${selectedDate}T${selectedEndTime}:00Z`, patientNote: patientNote || undefined, firstName, middleName: middleName || undefined, lastName, suffix: suffix || undefined, phoneNumber, email: email || undefined };
+        ? { patientId: selectedPatient.id, serviceId: selectedService, doctorId: selectedDoctor, date: selectedDate, startTime: `${selectedDate}T${selectedTime}:00Z`, endTime: `${selectedDate}T${selectedEndTime}:00Z`, patientNote: patientNote || undefined, confirmationChannel, ...dependentPayload }
+        : { serviceId: selectedService, doctorId: selectedDoctor, date: selectedDate, startTime: `${selectedDate}T${selectedTime}:00Z`, endTime: `${selectedDate}T${selectedEndTime}:00Z`, patientNote: patientNote || undefined, firstName, middleName: middleName || undefined, lastName, suffix: suffix || undefined, phoneNumber, email: email || undefined, confirmationChannel };
 
       const res = await createManualBookingAction(payload as any);
       if (res.success) {
@@ -269,5 +271,6 @@ export function useSecretaryBookAppointment() {
     selectedTime, setSelectedTime, selectedEndTime, setSelectedEndTime, selectTimeslot, patientNote, setPatientNote, isLoadingServices, isLoadingDays: scheduler.loadingKey === 'dates',
     isLoadingDoctors: scheduler.loadingKey === 'doctors', isLoadingSlots: scheduler.loadingKey === 'slots', isSubmitting,
     inlineError, toast, booked, isReadyToSubmit, bookedPatientLabel, resetForm, submit,
+    confirmationChannel, setConfirmationChannel,
   };
 }

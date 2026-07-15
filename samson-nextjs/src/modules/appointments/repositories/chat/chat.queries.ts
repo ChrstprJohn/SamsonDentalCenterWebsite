@@ -176,6 +176,7 @@ export const validateChatTokenQuery = (supabase: SupabaseClient) => {
                     last_name
                 ),
                 service:services (
+                    id,
                     name
                 )
             `)
@@ -214,8 +215,28 @@ export const validateChatTokenQuery = (supabase: SupabaseClient) => {
             endTime: data.end_time,
             patientName,
             serviceName: data.service?.name || 'General Inquiry',
+            serviceId: data.service?.id || null,
             doctorName,
         };
+    };
+};
+
+export const getAppointmentIdByChatTokenQuery = (supabase: SupabaseClient) => {
+    return async (token: string): Promise<string | null> => {
+        const { data, error } = await supabase
+            .from('appointments')
+            .select('id')
+            .eq('chat_token', token)
+            .maybeSingle();
+
+        if (error) {
+            throw new DomainError(
+                `Failed to query appointment by token: ${error.message}`,
+                'DATABASE_ERROR'
+            );
+        }
+
+        return data ? data.id : null;
     };
 };
 

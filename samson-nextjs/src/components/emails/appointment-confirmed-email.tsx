@@ -19,6 +19,8 @@ interface AppointmentConfirmedEmailProps {
   dateStr: string;
   timeRangeStr: string;
   appointmentId: string;
+  chatToken?: string;
+  baseUrl?: string;
 }
 
 const row = (label: string, value: React.ReactNode) => (
@@ -45,6 +47,8 @@ export const AppointmentConfirmedEmail = ({
   dateStr = 'Jun 4, 2026',
   timeRangeStr = '9:00 AM – 9:30 AM',
   appointmentId = 'f616dc57-4194-428c-901b-2e30205c97e4',
+  chatToken = '',
+  baseUrl = 'http://localhost:3000',
 }: AppointmentConfirmedEmailProps) => {
   const previewText = `Your appointment at Samson Dental Center is confirmed for ${dateStr}.`;
 
@@ -105,6 +109,30 @@ export const AppointmentConfirmedEmail = ({
                   </Text>
                 </div>
               </Section>
+
+              {chatToken && baseUrl && (
+                <Section style={{ textAlign: 'center', marginTop: '24px', marginBottom: '24px' }}>
+                  <a
+                    href={`${baseUrl}/manage?token=${chatToken}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      backgroundColor: '#1e293b',
+                      borderRadius: '6px',
+                      color: '#ffffff',
+                      display: 'inline-block',
+                      fontSize: '13px',
+                      fontWeight: '600',
+                      lineHeight: '44px',
+                      textAlign: 'center',
+                      textDecoration: 'none',
+                      width: '100%',
+                    }}
+                  >
+                    Manage Appointment
+                  </a>
+                </Section>
+              )}
 
               {/* Reminders */}
               <Text style={{ margin: '0 0 12px', fontSize: '13px', fontWeight: '700', color: '#111827' }}>

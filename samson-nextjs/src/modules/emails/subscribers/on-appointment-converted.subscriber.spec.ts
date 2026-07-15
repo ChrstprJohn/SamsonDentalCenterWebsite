@@ -42,7 +42,11 @@ describe('onAppointmentConvertedSubscriber', () => {
       .mockResolvedValueOnce({
         data: { first_name: 'Jane', last_name: 'Smith' },
         error: null,
-      }); // doctor
+      }) // doctor
+      .mockResolvedValueOnce({
+        data: { chat_token: 'chat-tok' },
+        error: null,
+      }); // appointment chat_token
 
     const start = new Date(validPayload.startTime);
     const end = new Date(start.getTime() + validPayload.durationMinutes * 60000);

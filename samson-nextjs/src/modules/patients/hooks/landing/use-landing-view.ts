@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, type PathValue } from 'react-hook-form';
 import { z } from 'zod';
@@ -10,7 +9,6 @@ import type { ServiceResponseDto } from '@/modules/services/dtos/management/serv
 import { submitInquiryAction } from '@/modules/appointments/actions/booking/submit-inquiry.action';
 
 interface UseLandingViewProps {
-  isAuthenticated: boolean;
   services: ServiceResponseDto[];
 }
 
@@ -38,11 +36,10 @@ const contactInquirySchema = z.object({
 
 type ContactInquiryFormValues = z.infer<typeof contactInquirySchema>;
 
-export function useLandingView({ isAuthenticated, services }: UseLandingViewProps) {
+export function useLandingView({ services }: UseLandingViewProps) {
   const [selectedService, setSelectedService] = useState<ServiceResponseDto | null>(null);
   const [isContactSubmitting, setIsContactSubmitting] = useState(false);
   const { addToast } = useToast();
-  const router = useRouter();
   const form = useForm<ContactInquiryFormValues>({
     resolver: zodResolver(contactInquirySchema),
     defaultValues: {
@@ -76,14 +73,17 @@ export function useLandingView({ isAuthenticated, services }: UseLandingViewProp
         shouldValidate: false,
       });
 
-  const handleBookingCTA = (serviceId?: string) => {
+  // Per new booking strategy (Flow 1): guests submit inquiries via the contact form.
+  // No auth wall — scroll to the contact section instead.
+  const handleBookingCTA = (_serviceId?: string) => {
     setSelectedService(null);
-    const targetUrl = serviceId ? `/user?service=${serviceId}` : '/user';
-
-    if (isAuthenticated) {
-      router.push(targetUrl);
-    } else {
-      router.push(`/auth/login?redirect=${encodeURIComponent(targetUrl)}`);
+    const contactSection = document.getElementById('contact');
+    if (contactSection) {
+      if (typeof window !== 'undefined' && (window as any).lenis) {
+        (window as any).lenis.scrollTo(contactSection, { offset: -80 });
+      } else {
+        contactSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     }
   };
 

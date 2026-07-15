@@ -2,6 +2,7 @@ import { createAdminClient } from '@/shared/database/server';
 import { ResendService } from '@/shared/services/email/resend.service';
 import { manualBookingPatientEventSchema } from '../dtos/events/manual-booking-patient.event.dto';
 import { formatShortDate, formatClinicTime, calculateEndTimeFromIso } from '@/shared/utils/date.util';
+import { getBaseUrl } from '@/shared/utils/get-base-url.util';
 
 export const onManualBookingPatientSubscriber = {
   /**
@@ -59,6 +60,15 @@ export const onManualBookingPatientSubscriber = {
     const end = calculateEndTimeFromIso(startTime, durationMinutes);
     const timeRangeStr = `${formatClinicTime(start)} - ${formatClinicTime(end)}`;
 
+    const { data: appt } = await supabaseAdmin
+      .from('appointments')
+      .select('chat_token')
+      .eq('id', appointmentId)
+      .single();
+
+    const chatToken = appt?.chat_token || '';
+    const baseUrl = getBaseUrl();
+
     await ResendService.sendTemplatedEmail(
       patient.email,
       'Appointment Confirmed – Samson Dental Center',
@@ -70,6 +80,8 @@ export const onManualBookingPatientSubscriber = {
         dateStr,
         timeRangeStr,
         appointmentId,
+        chatToken,
+        baseUrl,
       }
     );
   },

@@ -30,6 +30,8 @@ interface BookSchedulePanelProps {
   isSubmitting: boolean;
   isReadyToSubmit: boolean;
   onSubmit: () => void;
+  confirmationChannel?: 'EMAIL' | 'SMS' | 'NONE';
+  setConfirmationChannel?: (channel: 'EMAIL' | 'SMS' | 'NONE') => void;
 }
 
 export function BookSchedulePanel(props: BookSchedulePanelProps) {
@@ -42,6 +44,7 @@ export function BookSchedulePanel(props: BookSchedulePanelProps) {
         </div>
         <ServiceChips {...props} />
         <ScheduleCalendar {...props} />
+        <ConfirmationChannelPicker confirmationChannel={props.confirmationChannel} setConfirmationChannel={props.setConfirmationChannel} />
         <PatientNote value={props.patientNote} onChange={props.setPatientNote} />
       </div>
       <Button type="button" variant="primary" className="w-full text-xs font-bold py-3 mt-2" disabled={props.isSubmitting || !props.isReadyToSubmit} onClick={props.onSubmit}>
@@ -179,4 +182,35 @@ function formatTimeLabel(isoStr: string) {
   } catch {
     return isoStr;
   }
+}
+
+function ConfirmationChannelPicker({
+  confirmationChannel = 'EMAIL',
+  setConfirmationChannel,
+}: {
+  confirmationChannel?: 'EMAIL' | 'SMS' | 'NONE';
+  setConfirmationChannel?: (channel: 'EMAIL' | 'SMS' | 'NONE') => void;
+}) {
+  if (!setConfirmationChannel) return null;
+  return (
+    <div className="border border-card-border/60 rounded-2xl p-4 bg-secondary-bg/10 flex flex-col gap-2">
+      <label className="text-[9px] font-bold text-text-secondary uppercase">Confirmation Channel</label>
+      <div className="flex gap-2">
+        {(['EMAIL', 'SMS', 'NONE'] as const).map((channel) => (
+          <button
+            key={channel}
+            type="button"
+            onClick={() => setConfirmationChannel(channel)}
+            className={`px-3 py-2 rounded-lg text-xs font-semibold border transition-all ${
+              confirmationChannel === channel
+                ? 'bg-primary-start text-white border-primary-start shadow-sm'
+                : 'bg-card border-card-border text-text-secondary hover:text-text-primary'
+            }`}
+          >
+            {channel === 'EMAIL' ? 'Email' : channel === 'SMS' ? 'SMS' : 'None'}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
 }

@@ -104,6 +104,8 @@ export function SecretaryBookAppointmentView() {
               isSubmitting={view.isSubmitting}
               isReadyToSubmit={view.isReadyToSubmit}
               onSubmit={view.submit}
+              confirmationChannel={view.confirmationChannel}
+              setConfirmationChannel={view.setConfirmationChannel}
             />
           </div>
           <BookToast toast={view.toast} />

@@ -40,8 +40,41 @@ export async function sendMessageAction(data: SendMessageDto, chatToken?: string
 
         const result = await useCase(parsed);
 
+        // Task 2.4: Cooldown check for staff replies
+        if (parsed.senderRole === 'STAFF' && parsed.senderName !== 'System') {
+            const systemDb = await createAdminClient();
+            const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000).toISOString();
+            
+            const { data: recentEvents, error: eventError } = await systemDb
+                .from('outbox')
+                .select('id')
+                .eq('event_type', 'STAFF_REPLIED_TO_CHAT')
+                .eq('payload->>appointmentId', parsed.appointmentId)
+                .gt('created_at', fifteenMinutesAgo)
+                .limit(1);
+
+            if (!eventError && (!recentEvents || recentEvents.length === 0)) {
+                await systemDb.from('outbox').insert({
+                    event_type: 'STAFF_REPLIED_TO_CHAT',
+                    payload: { appointmentId: parsed.appointmentId },
+                    status: 'PENDING'
+                });
+            }
+        }
+
         revalidatePath(`/appointments/chat/${parsed.appointmentId}`);
         revalidatePath(`/secretary-v2/chat`);
+
+        // Non-blocking outbox processing for async side-effects
+        const { after } = await import('next/server');
+        const { bootstrapEventSubscribers } = await import('@/orchestrators/event-subscribers');
+        const { globalOutboxDispatcher } = await import('@/shared/outbox/outbox.dispatcher');
+        const { createAdminClient: createAdminDb } = await import('@/shared/database/server');
+
+        after(async () => {
+          bootstrapEventSubscribers();
+          await globalOutboxDispatcher(await createAdminDb())();
+        });
 
         return { data: result };
     } catch (error: any) {

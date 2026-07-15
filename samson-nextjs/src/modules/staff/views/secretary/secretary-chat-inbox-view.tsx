@@ -333,6 +333,7 @@ export function SecretaryChatInboxView({ initialThreads }: SecretaryChatInboxVie
                                 preferredStartTime: selectedThread.preferredStartTime,
                                 patientName: selectedThread.patientName,
                                 serviceName: selectedThread.serviceName,
+                                serviceId: selectedThread.serviceId ?? null,
                                 doctorName: selectedThread.doctorName,
                                 startTime: selectedThread.startTime,
                                 endTime: selectedThread.endTime,

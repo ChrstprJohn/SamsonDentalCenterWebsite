@@ -3,16 +3,11 @@
  */
 import { renderHook, act } from '@testing-library/react';
 import { useLandingView } from './use-landing-view';
-import { useRouter } from 'next/navigation';
 import { useToast } from '@/components/feedback/toast-container';
 import { submitInquiryAction } from '@/modules/appointments/actions/booking/submit-inquiry.action';
 import { InquiryResponseDto } from '@/modules/appointments/dtos/booking/submit-inquiry.dto';
 import { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
-
-vi.mock('next/navigation', () => ({
-  useRouter: vi.fn(),
-}));
 
 vi.mock('@/components/feedback/toast-container', () => ({
   useToast: vi.fn(),
@@ -23,7 +18,6 @@ vi.mock('@/modules/appointments/actions/booking/submit-inquiry.action', () => ({
 }));
 
 describe('useLandingView', () => {
-  const mockPush = vi.fn();
   const mockAddToast = vi.fn();
   const mockSubmitInquiryAction = vi.mocked(submitInquiryAction);
 
@@ -44,49 +38,50 @@ describe('useLandingView', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(useRouter).mockReturnValue({ push: mockPush } as unknown as ReturnType<typeof useRouter>);
     vi.mocked(useToast).mockReturnValue({ addToast: mockAddToast } as unknown as ReturnType<typeof useToast>);
   });
 
-  it('should handle booking CTA when authenticated', () => {
+  it('should scroll to #contact when booking CTA is triggered', () => {
+    const scrollIntoViewMock = vi.fn();
+    const contactEl = document.createElement('section');
+    contactEl.id = 'contact';
+    contactEl.scrollIntoView = scrollIntoViewMock;
+    document.body.appendChild(contactEl);
+
     const { result } = renderHook(() =>
-      useLandingView({ isAuthenticated: true, services: mockServices })
+      useLandingView({ services: mockServices })
     );
 
     act(() => {
       result.current.handleBookingCTA('s-1');
     });
 
-    expect(mockPush).toHaveBeenCalledWith('/user?service=s-1');
+    expect(scrollIntoViewMock).toHaveBeenCalledWith({ behavior: 'smooth', block: 'start' });
+    document.body.removeChild(contactEl);
   });
 
-  it('should handle booking CTA when authenticated without service id', () => {
+  it('should scroll to #contact when booking CTA is triggered without service id', () => {
+    const scrollIntoViewMock = vi.fn();
+    const contactEl = document.createElement('section');
+    contactEl.id = 'contact';
+    contactEl.scrollIntoView = scrollIntoViewMock;
+    document.body.appendChild(contactEl);
+
     const { result } = renderHook(() =>
-      useLandingView({ isAuthenticated: true, services: mockServices })
+      useLandingView({ services: mockServices })
     );
 
     act(() => {
       result.current.handleBookingCTA();
     });
 
-    expect(mockPush).toHaveBeenCalledWith('/user');
-  });
-
-  it('should handle booking CTA when not authenticated', () => {
-    const { result } = renderHook(() =>
-      useLandingView({ isAuthenticated: false, services: mockServices })
-    );
-
-    act(() => {
-      result.current.handleBookingCTA('s-1');
-    });
-
-    expect(mockPush).toHaveBeenCalledWith('/auth/login?redirect=%2Fuser%3Fservice%3Ds-1');
+    expect(scrollIntoViewMock).toHaveBeenCalledWith({ behavior: 'smooth', block: 'start' });
+    document.body.removeChild(contactEl);
   });
 
   it('should validate contact form before submitting', async () => {
     const { result } = renderHook(() =>
-      useLandingView({ isAuthenticated: false, services: mockServices })
+      useLandingView({ services: mockServices })
     );
 
     let success: boolean | undefined;
@@ -127,7 +122,7 @@ describe('useLandingView', () => {
     mockSubmitInquiryAction.mockResolvedValue({ success: true, data: mockInquiryResponse });
 
     const { result } = renderHook(() =>
-      useLandingView({ isAuthenticated: false, services: mockServices })
+      useLandingView({ services: mockServices })
     );
 
     act(() => {

@@ -36,7 +36,8 @@ describe('onManualBookingGuestSubscriber', () => {
   it('queries DB and sends confirmation email when guestEmail is present', async () => {
     mockSingle
       .mockResolvedValueOnce({ data: { name: 'Teeth Cleaning' }, error: null })  // service
-      .mockResolvedValueOnce({ data: { first_name: 'John', last_name: 'Smith' }, error: null }); // doctor
+      .mockResolvedValueOnce({ data: { first_name: 'John', last_name: 'Smith' }, error: null }) // doctor
+      .mockResolvedValueOnce({ data: { chat_token: 'chat-tok' }, error: null }); // appointment chat_token
 
     const start = new Date(validPayload.startTime);
     const end = new Date(start.getTime() + validPayload.durationMinutes * 60000);

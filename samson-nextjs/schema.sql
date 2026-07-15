@@ -638,7 +638,7 @@ BEGIN
         p_date,
         p_start_time,
         p_end_time,
-        'CONFIRMED'::public.appointment_status,
+        'APPROVED'::public.appointment_status,
         'STAFF_CREATED'::public.appointment_source,
         p_patient_note,
         COALESCE(p_status_reason, 'Manually scheduled by staff'),
@@ -715,7 +715,7 @@ BEGIN
         p_secretary_user_id,
         'SECRETARY',
         NULL,
-        'CONFIRMED'::public.appointment_status,
+        'APPROVED'::public.appointment_status,
         COALESCE(p_status_reason, 'Manually scheduled by staff')
     );
 
@@ -808,7 +808,7 @@ BEGIN
         p_date,
         p_start_time,
         p_end_time,
-        'CONFIRMED'::appointment_status,
+        'APPROVED'::appointment_status,
         'STAFF_CREATED'::appointment_source,
         p_patient_note,
         p_secretary_notes,
@@ -886,7 +886,7 @@ BEGIN
         p_secretary_user_id,
         'SECRETARY',
         NULL,
-        'CONFIRMED'::appointment_status,
+        'APPROVED'::appointment_status,
         COALESCE(p_secretary_notes, 'Inquiry converted to confirmed appointment')
     );
 
