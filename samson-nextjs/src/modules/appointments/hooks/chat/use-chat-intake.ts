@@ -30,12 +30,12 @@ export function useChatIntake({ appointmentId, chatToken, onPatientMessageSent }
     setError(null);
   };
 
-  const handleSystemAutoReply = async () => {
+  const handleSystemAutoReply = async (messageText: string) => {
     try {
       // System auto-reply bypass payload
       await sendMessageAction({
         appointmentId,
-        message: 'Got it. The clinic will review this and reply here shortly.',
+        message: messageText,
         senderRole: 'STAFF',
         senderName: 'System',
         chatToken,
@@ -64,7 +64,7 @@ export function useChatIntake({ appointmentId, chatToken, onPatientMessageSent }
       await onPatientMessageSent(requestText);
 
       // 3. System auto-reply
-      await handleSystemAutoReply();
+      await handleSystemAutoReply("Your request to reschedule has been submitted to the clinic staff. We will reply to this chat as soon as we have confirmed the new date and time.");
 
       resetIntake();
       setActiveWorkflow('NONE');
@@ -88,7 +88,7 @@ export function useChatIntake({ appointmentId, chatToken, onPatientMessageSent }
       await onPatientMessageSent(requestText);
 
       // 3. System auto-reply
-      await handleSystemAutoReply();
+      await handleSystemAutoReply("Your appointment cancellation request has been logged. A representative will contact you via this chat to finalize the process.");
 
       resetIntake();
       setActiveWorkflow('NONE');
@@ -113,7 +113,7 @@ export function useChatIntake({ appointmentId, chatToken, onPatientMessageSent }
       await onPatientMessageSent(questionText.trim());
 
       // 3. System auto-reply
-      await handleSystemAutoReply();
+      await handleSystemAutoReply("Got it. The clinic will review this and reply here shortly.");
 
       resetIntake();
       setActiveWorkflow('NONE');
