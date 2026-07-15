@@ -30,9 +30,9 @@ export function ChatHeader({
 }: ChatHeaderProps) {
   return (
     <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border-b border-border bg-sidebar gap-4 shrink-0">
-      <div className="flex items-center">
-        <h2 className="text-base font-medium text-foreground">{patientName}</h2>
-      </div>
+        <h2 className="text-base font-medium text-foreground">
+          {currentUserRole === 'PATIENT' ? 'Samson Dental Center' : patientName}
+        </h2>
       {currentUserRole === 'PATIENT' && !chatToken && (
         <Link href={`/user/appointments/${appointmentId}`}>
           <Button variant="secondary" size="sm">
