@@ -73,7 +73,11 @@ export function SecretaryPendingRequestsViewV2() {
       </div>
 
       {/* Right Column: Profile, Details & Actions */}
-      <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-y-auto p-6 gap-6" data-lenis-prevent>
+      <div 
+        className="flex-1 flex flex-col min-w-0 min-h-0 !overflow-y-auto p-6 gap-6 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent" 
+        style={{ scrollbarWidth: 'thin' }}
+        data-lenis-prevent
+      >
         {inquiriesView.selectedInquiry ? (
           <>
             {inquiriesView.inlineError && (
