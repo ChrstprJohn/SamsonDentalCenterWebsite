@@ -19,7 +19,7 @@ import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Search, Mail, Archive, MessageSquare, Calendar, XCircle, CheckCircle, User, Stethoscope, Clock, ChevronUp, ChevronDown, AlertCircle } from 'lucide-react';
+import { Search, Mail, Archive, MessageSquare, Calendar, XCircle, CheckCircle, User, Stethoscope, Clock, ChevronUp, ChevronDown, AlertCircle, ArrowLeft } from 'lucide-react';
 import {
     Sidebar,
     SidebarHeader,
@@ -157,6 +157,8 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
     const [searchQuery, setSearchQuery] = useState('');
     const [activeTab, setActiveTab] = useState<'ACTIVE' | 'ARCHIVE'>('ACTIVE');
     const [showOnlyUnreads, setShowOnlyUnreads] = useState(false);
+
+    const [mobileView, setMobileView] = useState<'list' | 'chat' | 'detail'>('list');
     
     const activeStates = ['APPROVED', 'CHECKED_IN', 'RESCHEDULE_REQUESTED'];
     const initialActive = initialThreads.filter(t => t.status !== 'PENDING' && activeStates.includes(t.status));
@@ -333,6 +335,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
         setSelectedThreadHasMore(false);
         setLoadingMessages(true);
         setMessagesLoadKey((k) => k + 1);
+        setMobileView('chat');
         if (thread.unreadCount > 0) {
             setThreads(prev => prev.map(t =>
                 t.appointmentId === thread.appointmentId
@@ -343,6 +346,20 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                 .catch(console.error);
         }
     };
+
+    const handleBackToList = useCallback(() => {
+        setMobileView('list');
+        setSelectedThreadId(null);
+        setSelectedThreadMessages([]);
+    }, []);
+
+    const handleBackToChat = useCallback(() => {
+        setMobileView('chat');
+    }, []);
+
+    const handleShowDetail = useCallback(() => {
+        setMobileView('detail');
+    }, []);
 
     const handleActionSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -413,12 +430,15 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
         }
     };
 
+    const colMobile = (view: 'list' | 'chat' | 'detail') =>
+        mobileView === view ? 'flex' : 'hidden';
+
     return (
         <div className="flex h-full w-full overflow-hidden">
             {/* Column 1: Left List Sidebar */}
             <Sidebar
                 collapsible="none"
-                className="hidden md:flex flex-col w-80 shrink-0 border-r border-card-border/40 bg-sidebar h-full overflow-hidden"
+                className={`flex-col w-full md:w-80 shrink-0 border-r border-card-border/40 bg-sidebar h-full overflow-hidden ${colMobile('list')} md:flex`}
             >
                 <SidebarHeader className="gap-3.5 border-b p-4 shrink-0">
                     <div className="flex w-full items-center justify-between">
@@ -544,11 +564,11 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                 </SidebarContent>
             </Sidebar>
 
-            {/* Columns 2 & 3 wrapper */}
+            {/* Columns 2 & 3 */}
             {selectedThreadId && selectedThread ? (
                 <>
                     {/* Column 2: Dialogue Stream */}
-                    <div className="flex-1 flex flex-col bg-muted/20 border-r border-border relative">
+                    <div className={`flex-1 flex-col bg-muted/20 border-r border-border relative ${colMobile('chat')} md:flex`}>
                         {loadingMessages ? (
                             <ChatMessagesSkeleton />
                         ) : (
@@ -571,19 +591,24 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                                 currentUserRole="STAFF"
                                 currentUserName="Secretary"
                                 className="border-0 rounded-none shadow-none h-full max-w-none w-full"
+                                onBack={handleBackToList}
+                                onShowDetail={handleShowDetail}
                             />
                         )}
                     </div>
 
                     {/* Column 3: Context & Action Control Dock */}
-                    <div className="w-80 flex flex-col border-l border-border bg-sidebar h-full overflow-hidden flex-shrink-0">
+                    <div className={`w-full md:w-80 flex-col border-l border-border bg-sidebar h-full overflow-hidden flex-shrink-0 ${colMobile('detail')} md:flex`}>
                         <div className="flex flex-col h-full overflow-hidden">
                             {loadingMessages ? (
                                 <div className="p-4 border-b border-border bg-sidebar shrink-0 flex items-center">
                                     <Skeleton className="h-5 w-36 rounded-md" />
                                 </div>
                             ) : (
-                                <div className="p-4 border-b border-border bg-sidebar shrink-0 flex items-center">
+                                <div className="p-4 border-b border-border bg-sidebar shrink-0 flex items-center gap-2">
+                                    <button onClick={handleBackToChat} className="md:hidden p-1 -ml-1 text-muted-foreground hover:text-foreground shrink-0">
+                                        <ArrowLeft className="size-5" />
+                                    </button>
                                     <h3 className="text-base font-medium text-foreground">
                                         Appointment Detail
                                     </h3>
@@ -678,9 +703,6 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                                             </div>
                                         </div>
 
-                                        <div className="text-xs font-semibold text-muted-foreground mt-4">
-                                            Quick Action
-                                        </div>
                                     </div>
 
                                     <div className="p-4 border-t border-border bg-sidebar shrink-0">
@@ -710,7 +732,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                                                                 setActionSuccess(null);
                                                             }}
                                                             variant="outline" 
-                                                            className="flex-1 h-[44px]"
+                                                            className="flex-1"
                                                         >
                                                             Reschedule
                                                         </Button>
@@ -721,7 +743,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                                                                 setActionSuccess(null);
                                                             }}
                                                             variant="outline" 
-                                                            className="flex-1 h-[44px] border-destructive/50 text-destructive hover:bg-destructive/10"
+                                                            className="flex-1 border-destructive/50 text-destructive hover:bg-destructive/10"
                                                         >
                                                             Cancel
                                                         </Button>
@@ -820,7 +842,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                     </div>
                 </>
             ) : (
-                <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground bg-muted/10 space-y-2">
+                <div className={`flex-1 flex-col items-center justify-center text-muted-foreground bg-muted/10 space-y-2 ${colMobile('list')} md:flex`}>
                     <MessageSquare className="size-12 text-muted-foreground/40" />
                     <p className="text-sm font-medium">Select a thread from the inbox list to start chatting.</p>
                 </div>

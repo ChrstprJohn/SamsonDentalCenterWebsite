@@ -31,6 +31,8 @@ interface PatientChatViewProps {
     chatToken?: string;
     className?: string;
     initialHasMore?: boolean;
+    onBack?: () => void;
+    onShowDetail?: () => void;
 }
 
 export function PatientChatView({
@@ -42,6 +44,8 @@ export function PatientChatView({
     chatToken,
     className,
     initialHasMore = false,
+    onBack,
+    onShowDetail,
 }: PatientChatViewProps) {
     const {
         messages,
@@ -118,6 +122,8 @@ export function PatientChatView({
                 appointmentId={appointmentId}
                 chatToken={chatToken}
                 activeStatuses={activeStatuses}
+                onBack={onBack}
+                onShowDetail={onShowDetail}
             />
 
             <ChatMessageList
@@ -192,14 +198,14 @@ export function PatientChatView({
                                     onKeyDown={handleKeyDown}
                                     placeholder="Type your message here..."
                                     disabled={isSending}
-                                    className="h-[44px] disabled:opacity-50 flex-1"
+                                    className="h-[42px] disabled:opacity-50 flex-1"
                                 />
                                 
                                 {currentUserRole === 'PATIENT' && appointmentDetails.status === 'APPROVED' && activeWorkflow === 'NONE' && (
                                     <Button
                                         type="button"
                                         variant="outline"
-                                        className="h-[44px] px-3.5 border-border text-foreground hover:bg-muted"
+                                        className="h-[42px] px-3.5 border-border text-foreground hover:bg-muted"
                                         onClick={() => setActiveWorkflow('SELECT_OPTION')}
                                     >
                                         Quick Actions
@@ -209,10 +215,10 @@ export function PatientChatView({
                                 <Button
                                     onClick={handleSend}
                                     disabled={isSending || !text.trim()}
-                                    className="h-[44px] px-5 bg-primary text-primary-foreground hover:bg-primary/90 border-0 flex items-center gap-1.5"
+                                    className="h-[42px] px-3 md:px-5 bg-primary text-primary-foreground hover:bg-primary/90 border-0 flex items-center gap-1.5"
                                 >
                                     <Send className="size-4" />
-                                    {isSending ? 'Sending...' : 'Send'}
+                                    <span className="hidden md:inline">{isSending ? 'Sending...' : 'Send'}</span>
                                 </Button>
                             </div>
                         )}
