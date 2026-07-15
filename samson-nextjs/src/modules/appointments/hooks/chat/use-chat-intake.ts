@@ -104,7 +104,7 @@ export function useChatIntake({ appointmentId, chatToken, onPatientMessageSent }
   const submitQuestion = async () => {
     if (!questionText.trim()) {
       setError('Please type your question.');
-      return;
+      return false;
     }
     setError(null);
     setIsSubmitting(true);
@@ -117,8 +117,10 @@ export function useChatIntake({ appointmentId, chatToken, onPatientMessageSent }
 
       resetIntake();
       setActiveWorkflow('NONE');
+      return true;
     } catch (err: any) {
       setError(err.message || 'Question submission failed');
+      return false;
     } finally {
       setIsSubmitting(false);
     }
