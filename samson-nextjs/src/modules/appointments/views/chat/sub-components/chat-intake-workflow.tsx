@@ -228,7 +228,12 @@ export function ChatIntakeWorkflow({
              {intake.selectedDate && intake.selectedTime && (
               <Button
                 type="button"
-                onClick={intake.submitReschedule}
+                onClick={async () => {
+                  const success = await intake.submitReschedule();
+                  if (success) {
+                    setActiveWorkflow('NONE');
+                  }
+                }}
                 disabled={intake.isSubmitting}
                 className="w-full mt-auto bg-primary text-primary-foreground hover:bg-primary/90 border-0"
               >
@@ -276,7 +281,12 @@ export function ChatIntakeWorkflow({
 
         <Button
           type="button"
-          onClick={intake.submitCancellation}
+          onClick={async () => {
+            const success = await intake.submitCancellation();
+            if (success) {
+              setActiveWorkflow('NONE');
+            }
+          }}
           disabled={intake.isSubmitting}
           className="w-full bg-primary text-primary-foreground hover:bg-primary/90 border-0"
         >

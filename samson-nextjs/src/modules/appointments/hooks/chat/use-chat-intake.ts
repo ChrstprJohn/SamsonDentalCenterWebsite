@@ -48,7 +48,7 @@ export function useChatIntake({ appointmentId, chatToken, onPatientMessageSent }
   const submitReschedule = async () => {
     if (!selectedDate || !selectedTime) {
       setError('Please select a date and time slot.');
-      return;
+      return false;
     }
     setError(null);
     setIsSubmitting(true);
@@ -58,7 +58,7 @@ export function useChatIntake({ appointmentId, chatToken, onPatientMessageSent }
       const dateStr = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
       const timeStr = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
 
-      const requestText = `I would like to request a reschedule for my appointment to ${dateStr} at ${timeStr}.`;
+      const requestText = `I would like to request a reschedule for my appointment:\nDate: ${dateStr}\nTime: ${timeStr}`;
 
       // 2. Patient message
       await onPatientMessageSent(requestText);
@@ -68,8 +68,10 @@ export function useChatIntake({ appointmentId, chatToken, onPatientMessageSent }
 
       resetIntake();
       setActiveWorkflow('NONE');
+      return true;
     } catch (err: any) {
       setError(err.message || 'Reschedule request failed');
+      return false;
     } finally {
       setIsSubmitting(false);
     }
@@ -79,7 +81,7 @@ export function useChatIntake({ appointmentId, chatToken, onPatientMessageSent }
     setError(null);
     setIsSubmitting(true);
     try {
-      const reasonSuffix = reasonText.trim() ? ` Reason: "${reasonText.trim()}"` : '';
+      const reasonSuffix = reasonText.trim() ? `\nReason: ${reasonText.trim()}` : '';
       const requestText = `I would like to request a cancellation for this appointment.${reasonSuffix}`;
 
       // 2. Patient message
@@ -90,8 +92,10 @@ export function useChatIntake({ appointmentId, chatToken, onPatientMessageSent }
 
       resetIntake();
       setActiveWorkflow('NONE');
+      return true;
     } catch (err: any) {
       setError(err.message || 'Cancellation request failed');
+      return false;
     } finally {
       setIsSubmitting(false);
     }
