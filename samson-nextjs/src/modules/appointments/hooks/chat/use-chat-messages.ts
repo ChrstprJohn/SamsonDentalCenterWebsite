@@ -5,6 +5,7 @@ import { createClient } from '@/shared/database/client';
 import { MessageResponseDto } from '../../dtos/chat/message-response.dto';
 import { sendMessageAction } from '../../actions/chat/send-message.action';
 import { markMessagesAsReadAction } from '../../actions/chat/mark-read.action';
+import { getMessagesAction } from '../../actions/chat/get-messages.action';
 
 interface UseChatMessagesProps {
     appointmentId: string;
@@ -100,8 +101,22 @@ export function useChatMessages({
         // Initial mark as read when chat is opened
         markMessagesAsReadAction(appointmentId, currentUserRole, chatToken).catch(console.error);
 
+        // Guest polling fallback for read status / message updates (4s interval)
+        let pollInterval: any = null;
+        if (chatToken) {
+            pollInterval = setInterval(async () => {
+                const res = await getMessagesAction(appointmentId, chatToken);
+                if (res && res.data) {
+                    setMessages(res.data);
+                }
+            }, 4000);
+        }
+
         return () => {
             supabase.removeChannel(channel);
+            if (pollInterval) {
+                clearInterval(pollInterval);
+            }
         };
     }, [appointmentId, currentUserRole, chatToken]);
 
