@@ -31,7 +31,7 @@ export function ChatHeader({
   return (
     <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border-b border-border bg-sidebar gap-4 shrink-0">
         <h2 className="text-base font-medium text-foreground">
-          {currentUserRole === 'PATIENT' ? 'Samson Dental Center' : patientName}
+          {currentUserRole === 'PATIENT' ? 'Samson Dental Center Help Desk' : patientName}
         </h2>
       {currentUserRole === 'PATIENT' && !chatToken && (
         <Link href={`/user/appointments/${appointmentId}`}>

@@ -144,7 +144,7 @@ export function PatientChatView({
 
                         {/* Quick action chips shown above the input box when activeWorkflow is SELECT_OPTION or PATIENT has options */}
                         {currentUserRole === 'PATIENT' && appointmentDetails.status === 'APPROVED' && activeWorkflow === 'SELECT_OPTION' && (
-                            <div className="flex flex-wrap gap-2 mb-1.5 select-none">
+                            <div className="flex flex-wrap items-center gap-2 mb-1.5 select-none w-full">
                                 <Button
                                     variant="outline"
                                     size="sm"
@@ -166,10 +166,10 @@ export function PatientChatView({
                                 <Button
                                     variant="ghost"
                                     size="sm"
-                                    className="h-7 text-xs rounded-full cursor-pointer text-muted-foreground"
+                                    className="h-7 text-xs rounded-full cursor-pointer text-muted-foreground ml-auto"
                                     onClick={() => setActiveWorkflow('NONE')}
                                 >
-                                    Dismiss
+                                    Hide
                                 </Button>
                             </div>
                         )}
@@ -193,7 +193,7 @@ export function PatientChatView({
                                     className="h-[44px] px-3.5 border-border text-foreground hover:bg-muted"
                                     onClick={() => setActiveWorkflow('SELECT_OPTION')}
                                 >
-                                    Options
+                                    Quick Actions
                                 </Button>
                             )}
 
