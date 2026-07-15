@@ -83,11 +83,11 @@ export function ChatMessageList({
                   {isMe && isLastInGroup && (
                     <MessageFooter>
                       {msg.isRead ? (
-                        <CheckCheck className="size-3 text-primary" />
+                        <CheckCheck className="size-3 text-sky-500" />
                       ) : (
-                        <Check className="size-3 text-muted-foreground/40" />
+                        <Check className="size-3 text-muted-foreground/60" />
                       )}
-                      <span className="font-medium text-[9px]">
+                      <span className="font-medium text-[9px] text-muted-foreground/70">
                         {msg.isRead ? 'Read' : 'Sent'}
                       </span>
                     </MessageFooter>
