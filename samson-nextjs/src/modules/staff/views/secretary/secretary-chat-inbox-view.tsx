@@ -345,7 +345,7 @@ export function SecretaryChatInboxView({ initialThreads }: SecretaryChatInboxVie
                                             <span className="font-medium text-xs text-text-secondary">
                                                 {t.serviceName || 'Treatment'}
                                             </span>
-                                            <div className="flex w-full items-start justify-between gap-4 mt-0.5 min-w-0">
+                                            <div className="flex w-full items-end justify-between gap-4 mt-0.5 min-w-0">
                                                 {t.latestMessage ? (
                                                     <span className={`line-clamp-2 w-[260px] text-xs whitespace-break-spaces ${
                                                         t.unreadCount > 0 ? 'font-medium text-foreground' : 'text-muted-foreground'
@@ -358,7 +358,7 @@ export function SecretaryChatInboxView({ initialThreads }: SecretaryChatInboxVie
                                                     </span>
                                                 )}
                                                 {t.unreadCount > 0 && (
-                                                    <span className="w-2 h-2 bg-primary rounded-full shrink-0 animate-pulse mt-1 ml-auto" />
+                                                    <span className="w-2 h-2 bg-primary rounded-full shrink-0 animate-pulse mb-1 ml-auto" />
                                                 )}
                                             </div>
                                         </button>
