@@ -10,7 +10,7 @@ import { ChatHeader } from './sub-components/chat-header';
 import { ChatMessageList } from './sub-components/chat-message-list';
 import { ChatIntakeWorkflow } from './sub-components/chat-intake-workflow';
 import { IntakeWorkflowState } from '../../hooks/chat/use-chat-intake';
-import { Send, AlertTriangle, List } from 'lucide-react';
+import { Send, AlertTriangle, List, Calendar, XCircle } from 'lucide-react';
 
 interface PatientChatViewProps {
     appointmentId: string;
@@ -92,7 +92,7 @@ export function PatientChatView({
     };
 
     return (
-        <div className={`flex flex-col h-[650px] w-full max-w-4xl mx-auto bg-card border border-border rounded-2xl overflow-hidden shadow-2xl ${className || ''}`}>
+        <div className={`flex flex-col h-full w-full max-w-4xl mx-auto bg-card border-x border-y-0 border-border rounded-none shadow-none ${className || ''}`}>
             
             {/* Cancellation Notice Banner */}
             {isCancelled && (
@@ -126,18 +126,56 @@ export function PatientChatView({
                     <div className="p-3 bg-muted border border-border rounded-xl text-center text-xs text-muted-foreground">
                         This chat thread is now closed because the appointment is {appointmentDetails.status}.
                     </div>
-                ) : currentUserRole === 'PATIENT' && activeWorkflow !== 'NONE' ? (
-                    <ChatIntakeWorkflow
-                        appointmentId={appointmentId}
-                        serviceId={appointmentDetails.serviceId}
-                        chatToken={chatToken}
-                        onPatientMessageSent={sendMessage}
-                        activeWorkflow={activeWorkflow}
-                        setActiveWorkflow={setActiveWorkflow}
-                    />
                 ) : (
                     <div className="flex flex-col gap-2">
+                        {/* If patient is in an active non-SELECT_OPTION workflow, show the sub-panel (Reschedule picker or Cancel input) */}
+                        {currentUserRole === 'PATIENT' && activeWorkflow !== 'NONE' && activeWorkflow !== 'SELECT_OPTION' && (
+                            <div className="mb-2 p-3 bg-card border border-border rounded-xl">
+                                <ChatIntakeWorkflow
+                                    appointmentId={appointmentId}
+                                    serviceId={appointmentDetails.serviceId}
+                                    chatToken={chatToken}
+                                    onPatientMessageSent={sendMessage}
+                                    activeWorkflow={activeWorkflow}
+                                    setActiveWorkflow={setActiveWorkflow}
+                                />
+                            </div>
+                        )}
+
+                        {/* Quick action chips shown above the input box when activeWorkflow is SELECT_OPTION or PATIENT has options */}
+                        {currentUserRole === 'PATIENT' && appointmentDetails.status === 'APPROVED' && activeWorkflow === 'SELECT_OPTION' && (
+                            <div className="flex flex-wrap gap-2 mb-1.5 select-none">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-7 text-xs rounded-full cursor-pointer border-primary/20 bg-primary/5 hover:bg-primary/10 text-primary"
+                                    onClick={() => setActiveWorkflow('RESCHEDULE')}
+                                >
+                                    <Calendar className="size-3 mr-1" />
+                                    Reschedule Appointment
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-7 text-xs rounded-full cursor-pointer border-destructive/20 bg-destructive/5 hover:bg-destructive/10 text-destructive"
+                                    onClick={() => setActiveWorkflow('CANCEL')}
+                                >
+                                    <XCircle className="size-3 mr-1" />
+                                    Cancel Appointment
+                                </Button>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-7 text-xs rounded-full cursor-pointer text-muted-foreground"
+                                    onClick={() => setActiveWorkflow('NONE')}
+                                >
+                                    Dismiss
+                                </Button>
+                            </div>
+                        )}
+
                         {sendError && <p className="text-xs text-destructive px-1 flex items-center gap-1"><AlertTriangle className="size-3" />{sendError}</p>}
+                        
                         <div className="flex gap-2 items-center">
                             <Input
                                 value={text}
@@ -145,29 +183,28 @@ export function PatientChatView({
                                 onKeyDown={handleKeyDown}
                                 placeholder="Type your message here..."
                                 disabled={isSending}
-                                className="h-[44px] disabled:opacity-50"
+                                className="h-[44px] disabled:opacity-50 flex-1"
                             />
-                            <div className="flex flex-col gap-2">
-                                {currentUserRole === 'PATIENT' && appointmentDetails.status === 'APPROVED' && (
-                                    <Button
-                                        type="button"
-                                        variant="secondary"
-                                        size="sm"
-                                        onClick={() => setActiveWorkflow('SELECT_OPTION')}
-                                    >
-                                        <List className="size-3.5 mr-1" />
-                                        Options
-                                    </Button>
-                                )}
+                            
+                            {currentUserRole === 'PATIENT' && appointmentDetails.status === 'APPROVED' && activeWorkflow === 'NONE' && (
                                 <Button
-                                    onClick={handleSend}
-                                    disabled={isSending || !text.trim()}
-                                    className="h-[44px] px-5 bg-primary text-primary-foreground hover:bg-primary/90 border-0"
+                                    type="button"
+                                    variant="outline"
+                                    className="h-[44px] px-3.5 border-border text-foreground hover:bg-muted"
+                                    onClick={() => setActiveWorkflow('SELECT_OPTION')}
                                 >
-                                    <Send className="size-4 mr-1.5" />
-                                    {isSending ? 'Sending...' : 'Send'}
+                                    Options
                                 </Button>
-                            </div>
+                            )}
+
+                            <Button
+                                onClick={handleSend}
+                                disabled={isSending || !text.trim()}
+                                className="h-[44px] px-5 bg-primary text-primary-foreground hover:bg-primary/90 border-0 flex items-center gap-1.5"
+                            >
+                                <Send className="size-4" />
+                                {isSending ? 'Sending...' : 'Send'}
+                            </Button>
                         </div>
                     </div>
                 )}

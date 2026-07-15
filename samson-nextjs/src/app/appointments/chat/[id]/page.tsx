@@ -125,7 +125,7 @@ export default async function SecureChatPage({ params, searchParams }: PageProps
     const initialMessages = res?.data || [];
 
     return (
-        <div className="min-h-screen bg-slate-950 p-6 flex items-center justify-center">
+        <div className="h-screen w-full bg-slate-950 flex justify-center overflow-hidden">
             <PatientChatView
                 appointmentId={id}
                 appointmentDetails={appointmentDetails}
