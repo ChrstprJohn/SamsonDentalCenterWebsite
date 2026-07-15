@@ -1,15 +1,21 @@
 import { DomainError } from '@/shared/errors';
 import { MessageResponseDto } from '../../dtos/chat/message-response.dto';
 
+interface GetMessagesOptions {
+    limit?: number;
+    beforeCreatedAt?: string;
+}
+
 export const getMessagesUseCase = (
     getAppointmentStatus: (appointmentId: string) => Promise<{ status: string; patientId: string | null } | null>,
-    getMessages: (appointmentId: string) => Promise<MessageResponseDto[]>
+    getMessages: (appointmentId: string, options?: GetMessagesOptions) => Promise<{ messages: MessageResponseDto[]; hasMore: boolean }>
 ) => {
     return async (
         appointmentId: string,
         currentUser: { id: string; role: string } | null,
-        chatToken?: string
-    ): Promise<MessageResponseDto[]> => {
+        chatToken?: string,
+        options?: GetMessagesOptions
+    ): Promise<{ messages: MessageResponseDto[]; hasMore: boolean }> => {
         const appt = await getAppointmentStatus(appointmentId);
         if (!appt) {
             throw new DomainError('Appointment not found', 'NOT_FOUND');
@@ -27,6 +33,6 @@ export const getMessagesUseCase = (
             }
         }
 
-        return await getMessages(appointmentId);
+        return await getMessages(appointmentId, options);
     };
 };

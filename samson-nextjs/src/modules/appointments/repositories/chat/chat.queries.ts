@@ -30,12 +30,24 @@ export interface ChatThreadDto {
 }
 
 export const getMessagesByAppointmentIdQuery = (supabase: SupabaseClient) => {
-    return async (appointmentId: string): Promise<MessageResponseDto[]> => {
-        const { data, error } = await supabase
+    return async (
+        appointmentId: string,
+        options?: { limit?: number; beforeCreatedAt?: string }
+    ): Promise<{ messages: MessageResponseDto[]; hasMore: boolean }> => {
+        const limit = options?.limit ?? 25;
+
+        let query = supabase
             .from('appointment_messages')
             .select('*')
-            .eq('appointment_id', appointmentId)
-            .order('created_at', { ascending: true });
+            .eq('appointment_id', appointmentId);
+
+        if (options?.beforeCreatedAt) {
+            query = query.lt('created_at', options.beforeCreatedAt);
+        }
+
+        const { data, error } = await query
+            .order('created_at', { ascending: false })
+            .limit(limit + 1);
 
         if (error) {
             throw new DomainError(
@@ -44,9 +56,17 @@ export const getMessagesByAppointmentIdQuery = (supabase: SupabaseClient) => {
             );
         }
 
-        return (data || []).map((row) => messageResponseSchema.parse(row));
+        const hasMore = (data || []).length > limit;
+        const messages = (data || []).slice(0, limit).reverse();
+
+        return {
+            messages: messages.map((row) => messageResponseSchema.parse(row)),
+            hasMore,
+        };
     };
 };
+
+const NINETY_DAYS_AGO = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
 export const getChatThreadsForSecretaryQuery = (supabase: SupabaseClient) => {
     return async (): Promise<ChatThreadDto[]> => {
@@ -84,15 +104,13 @@ export const getChatThreadsForSecretaryQuery = (supabase: SupabaseClient) => {
                 ),
                 service:services (
                     name
-                ),
-                appointment_messages (
-                    id,
-                    message,
-                    created_at,
-                    sender_role,
-                    is_read
                 )
-            `);
+            `)
+            .is('patient_id', null)
+            .gte('date', NINETY_DAYS_AGO)
+            .neq('status', 'PENDING')
+            .order('date', { ascending: false })
+            .limit(100);
 
         if (error) {
             throw new DomainError(
@@ -101,17 +119,34 @@ export const getChatThreadsForSecretaryQuery = (supabase: SupabaseClient) => {
             );
         }
 
-        return (data || [])
-            .filter((row: any) => !row.patient && row.guest_contacts?.length > 0)
-            .map((row: any) => {
-            const messages = row.appointment_messages || [];
-            
-            // Unread count is patient messages that staff hasn't read
+        const rows = (data || [])
+            .filter((row: any) => row.guest_contacts?.length > 0);
+
+        const appointmentIds = rows.map((r: any) => r.id);
+
+        // Single batch query for message data across all filtered appointments
+        const messagesByAppointment = new Map<string, any[]>();
+        if (appointmentIds.length > 0) {
+            const { data: allMessages } = await supabase
+                .from('appointment_messages')
+                .select('id, appointment_id, message, created_at, sender_role, is_read')
+                .in('appointment_id', appointmentIds);
+            if (allMessages) {
+                for (const msg of allMessages) {
+                    const existing = messagesByAppointment.get(msg.appointment_id) || [];
+                    existing.push(msg);
+                    messagesByAppointment.set(msg.appointment_id, existing);
+                }
+            }
+        }
+
+        return rows.map((row: any) => {
+            const messages = messagesByAppointment.get(row.id) || [];
+
             const unreadCount = messages.filter((m: any) => m.sender_role === 'PATIENT' && !m.is_read).length;
 
-            // Latest message sorting by created_at DESC
             const sortedMessages = [...messages].sort(
-                (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+                (a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
             );
             const latest = sortedMessages[0] || null;
 

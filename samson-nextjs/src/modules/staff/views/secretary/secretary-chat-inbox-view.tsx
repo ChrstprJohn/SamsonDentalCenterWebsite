@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { createClient } from '@/shared/database/client';
 import { getChatThreadsAction } from '@/modules/appointments/actions/chat/get-chat-threads.action';
 import { getMessagesAction } from '@/modules/appointments/actions/chat/get-messages.action';
+import { markMessagesAsReadAction } from '@/modules/appointments/actions/chat/mark-read.action';
 import { ChatThreadDto } from '@/modules/appointments/repositories/chat/chat.queries';
 import { MessageResponseDto } from '@/modules/appointments/dtos/chat/message-response.dto';
 import { PatientChatView } from '@/modules/appointments/views/chat/patient-chat-view';
@@ -42,6 +43,7 @@ export function SecretaryChatInboxView({ initialThreads }: SecretaryChatInboxVie
     
     const [selectedThreadId, setSelectedThreadId] = useState<string | null>(null);
     const [selectedThreadMessages, setSelectedThreadMessages] = useState<MessageResponseDto[]>([]);
+    const [selectedThreadHasMore, setSelectedThreadHasMore] = useState(false);
     const [loadingMessages, setLoadingMessages] = useState(false);
 
     const [doctors, setDoctors] = useState<{ id: string; firstName: string; lastName: string }[]>([]);
@@ -73,6 +75,9 @@ export function SecretaryChatInboxView({ initialThreads }: SecretaryChatInboxVie
         });
     }, []);
 
+    const selectedThreadIdRef = useRef(selectedThreadId);
+    selectedThreadIdRef.current = selectedThreadId;
+
     useEffect(() => {
         const supabase = createClient();
         const channel = supabase
@@ -80,12 +85,14 @@ export function SecretaryChatInboxView({ initialThreads }: SecretaryChatInboxVie
             .on(
                 'postgres_changes',
                 { event: '*', schema: 'public', table: 'appointment_messages' },
-                () => {
+                (payload: any) => {
                     fetchThreads();
-                    if (selectedThreadId) {
-                        getMessagesAction(selectedThreadId).then((res) => {
+                    const affectedAppointmentId = payload.new?.appointment_id || payload.old?.appointment_id;
+                    if (affectedAppointmentId && affectedAppointmentId === selectedThreadIdRef.current) {
+                        getMessagesAction(affectedAppointmentId).then((res) => {
                             if (res && res.data) {
                                 setSelectedThreadMessages(res.data);
+                                setSelectedThreadHasMore(res.hasMore ?? false);
                             }
                         });
                     }
@@ -96,7 +103,7 @@ export function SecretaryChatInboxView({ initialThreads }: SecretaryChatInboxVie
         return () => {
             supabase.removeChannel(channel);
         };
-    }, [selectedThreadId, fetchThreads]);
+    }, [fetchThreads]);
 
     useEffect(() => {
         if (!selectedThreadId) return;
@@ -105,9 +112,10 @@ export function SecretaryChatInboxView({ initialThreads }: SecretaryChatInboxVie
         const loadMessages = async () => {
             setLoadingMessages(true);
             try {
-                const res = await getMessagesAction(selectedThreadId);
+                const res = await getMessagesAction(selectedThreadId, undefined, { limit: 20 });
                 if (active && res && res.data) {
                     setSelectedThreadMessages(res.data);
+                    setSelectedThreadHasMore(res.hasMore ?? false);
                 }
             } catch (err) {
                 console.error('Failed to load thread messages:', err);
@@ -127,7 +135,7 @@ export function SecretaryChatInboxView({ initialThreads }: SecretaryChatInboxVie
         };
     }, [selectedThreadId]);
 
-    const filteredThreads = threads
+    const filteredThreads = useMemo(() => threads
         .filter((t) => {
             if (t.status === 'PENDING') return false;
             const nameMatch = t.patientName.toLowerCase().includes(searchQuery.toLowerCase());
@@ -141,7 +149,7 @@ export function SecretaryChatInboxView({ initialThreads }: SecretaryChatInboxVie
             const timeA = a.latestMessage ? new Date(a.latestMessage.createdAt).getTime() : 0;
             const timeB = b.latestMessage ? new Date(b.latestMessage.createdAt).getTime() : 0;
             return timeB - timeA;
-        });
+        }), [threads, searchQuery, activeTab, showOnlyUnreads]);
 
     const selectedThread = threads.find((t) => t.appointmentId === selectedThreadId);
 
@@ -180,6 +188,23 @@ export function SecretaryChatInboxView({ initialThreads }: SecretaryChatInboxVie
             return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
         } catch {
             return '';
+        }
+    };
+
+    const handleThreadSelect = (thread: ChatThreadDto) => {
+        setSelectedThreadId(thread.appointmentId);
+        setSelectedThreadMessages([]);
+        setSelectedThreadHasMore(false);
+        setLoadingMessages(true);
+        if (thread.unreadCount > 0) {
+            setThreads(prev => prev.map(t =>
+                t.appointmentId === thread.appointmentId
+                    ? { ...t, unreadCount: 0 }
+                    : t
+            ));
+            markMessagesAsReadAction(thread.appointmentId, 'STAFF')
+                .then(() => fetchThreads())
+                .catch(console.error);
         }
     };
 
@@ -238,6 +263,7 @@ export function SecretaryChatInboxView({ initialThreads }: SecretaryChatInboxVie
                 const msgRes = await getMessagesAction(selectedThreadId);
                 if (msgRes && msgRes.data) {
                     setSelectedThreadMessages(msgRes.data);
+                    setSelectedThreadHasMore(msgRes.hasMore ?? false);
                 }
                 setActiveAction('NONE');
                 setActionReason('');
@@ -327,7 +353,7 @@ export function SecretaryChatInboxView({ initialThreads }: SecretaryChatInboxVie
                                     return (
                                         <button
                                             key={t.appointmentId}
-                                            onClick={() => setSelectedThreadId(t.appointmentId)}
+                                            onClick={() => handleThreadSelect(t)}
                                             className={`flex flex-col items-start w-full gap-1.5 border-b p-4 text-sm leading-tight text-left transition-colors last:border-b-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${
                                                 isSelected
                                                     ? 'bg-sidebar-accent text-sidebar-accent-foreground'
@@ -374,13 +400,14 @@ export function SecretaryChatInboxView({ initialThreads }: SecretaryChatInboxVie
             {selectedThreadId && selectedThread ? (
                 <>
                     {/* Column 2: Dialogue Stream */}
-                    <div className="flex-1 flex flex-col bg-muted/20 border-r border-border">
+                    <div className="flex-1 flex flex-col bg-muted/20 border-r border-border relative">
                         {loadingMessages ? (
-                            <div className="flex-1 flex items-center justify-center text-sm text-muted-foreground">
+                            <div className="flex items-center justify-center h-full text-sm text-muted-foreground">
                                 Loading messages...
                             </div>
                         ) : (
                             <PatientChatView
+                                key={selectedThreadId}
                                 appointmentId={selectedThreadId}
                                 appointmentDetails={{
                                     status: selectedThread.status,
@@ -394,6 +421,7 @@ export function SecretaryChatInboxView({ initialThreads }: SecretaryChatInboxVie
                                     endTime: selectedThread.endTime,
                                 }}
                                 initialMessages={selectedThreadMessages}
+                                initialHasMore={selectedThreadHasMore}
                                 currentUserRole="STAFF"
                                 currentUserName="Secretary"
                                 className="border-0 rounded-none shadow-none h-full max-w-none w-full"

@@ -16,12 +16,12 @@ describe('GetMessagesUseCase', () => {
 
     it('should succeed if user is staff', async () => {
         const mockGetStatus = vi.fn().mockResolvedValue({ status: 'APPROVED', patientId: 'owner-id' });
-        const mockGetMessages = vi.fn().mockResolvedValue([{ id: 'msg-1' }]);
+        const mockGetMessages = vi.fn().mockResolvedValue({ messages: [{ id: 'msg-1' }], hasMore: false });
 
         const useCase = getMessagesUseCase(mockGetStatus, mockGetMessages);
         const result = await useCase('appt-123', { id: 'staff-id', role: 'SECRETARY' });
 
-        expect(result).toHaveLength(1);
+        expect(result.messages).toHaveLength(1);
         expect(mockGetMessages).toHaveBeenCalled();
     });
 });

@@ -3,7 +3,7 @@ import { getMessagesByAppointmentIdQuery, getChatThreadsForSecretaryQuery, valid
 import { SupabaseClient } from '@supabase/supabase-js';
 
 describe('ChatQueries', () => {
-    it('getMessagesByAppointmentIdQuery should fetch messages sorted ascending', async () => {
+    it('getMessagesByAppointmentIdQuery should fetch messages with pagination', async () => {
         const mockMessages = [
             {
                 id: 'c2a71d23-28ad-4c81-8178-5e4c622a59a7',
@@ -16,7 +16,8 @@ describe('ChatQueries', () => {
             },
         ];
 
-        const mockOrder = vi.fn().mockResolvedValue({ data: mockMessages, error: null });
+        const mockLimit = vi.fn().mockResolvedValue({ data: mockMessages, error: null });
+        const mockOrder = vi.fn().mockReturnValue({ limit: mockLimit });
         const mockEq = vi.fn().mockReturnValue({ order: mockOrder });
         const mockSelect = vi.fn().mockReturnValue({ eq: mockEq });
         const mockSupabase = {
@@ -26,9 +27,10 @@ describe('ChatQueries', () => {
         const query = getMessagesByAppointmentIdQuery(mockSupabase);
         const result = await query('d3b82e34-39be-5d92-9289-6f5d733b6ab8');
 
-        expect(result).toHaveLength(1);
-        expect(result[0].id).toBe('c2a71d23-28ad-4c81-8178-5e4c622a59a7');
-        expect(mockOrder).toHaveBeenCalledWith('created_at', { ascending: true });
+        expect(result.messages).toHaveLength(1);
+        expect(result.messages[0].id).toBe('c2a71d23-28ad-4c81-8178-5e4c622a59a7');
+        expect(result.hasMore).toBe(false);
+        expect(mockOrder).toHaveBeenCalledWith('created_at', { ascending: false });
     });
 
     it('validateChatTokenQuery should return mapped guest data if valid', async () => {

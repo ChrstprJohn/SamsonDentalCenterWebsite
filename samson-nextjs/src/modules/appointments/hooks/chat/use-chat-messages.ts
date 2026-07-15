@@ -7,12 +7,15 @@ import { sendMessageAction } from '../../actions/chat/send-message.action';
 import { markMessagesAsReadAction } from '../../actions/chat/mark-read.action';
 import { getMessagesAction } from '../../actions/chat/get-messages.action';
 
+const PAGE_SIZE = 20;
+
 interface UseChatMessagesProps {
     appointmentId: string;
     initialMessages: MessageResponseDto[];
     currentUserRole: 'PATIENT' | 'STAFF';
     currentUserName: string;
     chatToken?: string;
+    initialHasMore?: boolean;
 }
 
 export function useChatMessages({
@@ -21,11 +24,30 @@ export function useChatMessages({
     currentUserRole,
     currentUserName,
     chatToken,
+    initialHasMore = false,
 }: UseChatMessagesProps) {
     const [messages, setMessages] = useState<MessageResponseDto[]>(initialMessages);
     const [isSending, setIsSending] = useState(false);
     const [sendError, setSendError] = useState<string | null>(null);
+    const [hasMore, setHasMore] = useState(initialHasMore);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const [scrollKey, setScrollKey] = useState(0);
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
+    const prevAppointmentIdRef = useRef(appointmentId);
+    const loadedAllRef = useRef(!initialHasMore);
+    const markReadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const markReadScheduledRef = useRef(false);
+
+    // Sync initialMessages when they arrive after mount (e.g., parent fetches asynchronously)
+    useEffect(() => {
+        setMessages(initialMessages);
+        setHasMore(initialHasMore);
+        setScrollKey((k) => k + 1);
+        if (appointmentId !== prevAppointmentIdRef.current) {
+            prevAppointmentIdRef.current = appointmentId;
+            loadedAllRef.current = !initialHasMore;
+        }
+    }, [appointmentId, initialMessages, initialHasMore]);
 
     // Auto-scroll to bottom of chat
     const scrollToBottom = useCallback(() => {
@@ -34,10 +56,49 @@ export function useChatMessages({
         }
     }, []);
 
-    // Scroll on message list change
+    // Scroll to bottom when scrollKey increments (new messages only, not pagination)
     useEffect(() => {
         scrollToBottom();
-    }, [messages, scrollToBottom]);
+    }, [scrollKey, scrollToBottom]);
+
+    const loadOlderMessages = useCallback(async () => {
+        if (loadingMore || loadedAllRef.current) return;
+
+        setLoadingMore(true);
+        try {
+            const oldestMsg = messages[0];
+            if (!oldestMsg) return;
+
+            const res = await getMessagesAction(appointmentId, chatToken, {
+                limit: PAGE_SIZE,
+                beforeCreatedAt: oldestMsg.createdAt,
+            });
+
+            if (res && res.data && res.data.length > 0) {
+                setMessages((prev) => [...res.data!, ...prev]);
+                setHasMore(res.hasMore ?? false);
+                loadedAllRef.current = !res.hasMore;
+            } else {
+                setHasMore(false);
+                loadedAllRef.current = true;
+            }
+        } catch (err) {
+            console.error('Failed to load older messages:', err);
+        } finally {
+            setLoadingMore(false);
+        }
+    }, [appointmentId, chatToken, loadingMore, messages]);
+
+    const scheduleMarkAsRead = useCallback(() => {
+        if (markReadScheduledRef.current) return;
+        markReadScheduledRef.current = true;
+        if (markReadTimerRef.current) clearTimeout(markReadTimerRef.current);
+        markReadTimerRef.current = setTimeout(() => {
+            markReadScheduledRef.current = false;
+            markReadTimerRef.current = null;
+            markMessagesAsReadAction(appointmentId, currentUserRole, chatToken).catch(console.error);
+        }, 1500);
+    }, [appointmentId, currentUserRole, chatToken]);
 
     // Handle real-time database listener
     useEffect(() => {
@@ -70,10 +131,11 @@ export function useChatMessages({
                         if (prev.some((m) => m.id === mapped.id)) return prev;
                         return [...prev, mapped];
                     });
+                    setScrollKey((k) => k + 1);
 
-                    // Mark as read if receiving message from opposite role
+                    // Debounced mark-as-read when receiving messages from opposite role
                     if (newMsg.sender_role !== currentUserRole) {
-                        markMessagesAsReadAction(appointmentId, currentUserRole, chatToken).catch(console.error);
+                        scheduleMarkAsRead();
                     }
                 }
             )
@@ -101,13 +163,19 @@ export function useChatMessages({
         // Initial mark as read when chat is opened
         markMessagesAsReadAction(appointmentId, currentUserRole, chatToken).catch(console.error);
 
-        // Guest polling fallback for read status / message updates (4s interval)
+        // Guest polling: only poll for new messages (latest 5)
         let pollInterval: any = null;
         if (chatToken) {
             pollInterval = setInterval(async () => {
-                const res = await getMessagesAction(appointmentId, chatToken);
-                if (res && res.data) {
-                    setMessages(res.data);
+                const res = await getMessagesAction(appointmentId, chatToken, { limit: 5, skipAuth: true });
+                if (res && res.data && res.data.length > 0) {
+                    setMessages((prev) => {
+                        const existingIds = new Set(prev.map((m) => m.id));
+                        const newMsgs = res.data!.filter((m) => !existingIds.has(m.id));
+                        if (newMsgs.length === 0) return prev;
+                        return [...prev, ...newMsgs];
+                    });
+                    setScrollKey((k) => k + 1);
                 }
             }, 4000);
         }
@@ -117,6 +185,11 @@ export function useChatMessages({
             if (pollInterval) {
                 clearInterval(pollInterval);
             }
+            if (markReadTimerRef.current) {
+                clearTimeout(markReadTimerRef.current);
+                markReadTimerRef.current = null;
+            }
+            markReadScheduledRef.current = false;
         };
     }, [appointmentId, currentUserRole, chatToken]);
 
@@ -157,5 +230,8 @@ export function useChatMessages({
         sendError,
         messagesEndRef,
         scrollToBottom,
+        hasMore,
+        loadingMore,
+        loadOlderMessages,
     };
 }

@@ -30,6 +30,7 @@ interface PatientChatViewProps {
     currentUserName: string;
     chatToken?: string;
     className?: string;
+    initialHasMore?: boolean;
 }
 
 export function PatientChatView({
@@ -40,6 +41,7 @@ export function PatientChatView({
     currentUserName,
     chatToken,
     className,
+    initialHasMore = false,
 }: PatientChatViewProps) {
     const {
         messages,
@@ -47,12 +49,16 @@ export function PatientChatView({
         isSending,
         sendError,
         messagesEndRef,
+        hasMore,
+        loadingMore,
+        loadOlderMessages,
     } = useChatMessages({
         appointmentId,
         initialMessages,
         currentUserRole,
         currentUserName,
         chatToken,
+        initialHasMore,
     });
 
     const [text, setText] = useState('');
@@ -118,6 +124,9 @@ export function PatientChatView({
                 messages={messages}
                 currentUserRole={currentUserRole}
                 messagesEndRef={messagesEndRef}
+                hasMore={hasMore}
+                loadingMore={loadingMore}
+                onLoadOlder={loadOlderMessages}
             />
 
             {/* Workflow / Input Area */}
