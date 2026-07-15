@@ -66,51 +66,12 @@ export const getMessagesByAppointmentIdQuery = (supabase: SupabaseClient) => {
     };
 };
 
-const NINETY_DAYS_AGO = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-
 export const getChatThreadsForSecretaryQuery = (supabase: SupabaseClient) => {
     return async (): Promise<ChatThreadDto[]> => {
-        const { data, error } = await supabase
-            .from('appointments')
-            .select(`
-                id,
-                status,
-                date,
-                preferred_start_time,
-                start_time,
-                end_time,
-                service_id,
-                doctor_id,
-                chat_token,
-                patient:users!appointments_patient_id_fkey (
-                    first_name,
-                    last_name,
-                    middle_name,
-                    suffix,
-                    email,
-                    phone_number
-                ),
-                doctor:users!appointments_doctor_id_fkey (
-                    first_name,
-                    last_name
-                ),
-                guest_contacts (
-                    first_name,
-                    last_name,
-                    middle_name,
-                    suffix,
-                    email,
-                    phone_number
-                ),
-                service:services (
-                    name
-                )
-            `)
-            .is('patient_id', null)
-            .gte('date', NINETY_DAYS_AGO)
-            .neq('status', 'PENDING')
-            .order('date', { ascending: false })
-            .limit(100);
+        const { data, error } = await supabase.rpc('get_secretary_chat_threads', {
+            p_max_age_days: 90,
+            p_max_rows: 100,
+        });
 
         if (error) {
             throw new DomainError(
@@ -119,37 +80,9 @@ export const getChatThreadsForSecretaryQuery = (supabase: SupabaseClient) => {
             );
         }
 
-        const rows = (data || [])
-            .filter((row: any) => row.guest_contacts?.length > 0);
-
-        const appointmentIds = rows.map((r: any) => r.id);
-
-        // Single batch query for message data across all filtered appointments
-        const messagesByAppointment = new Map<string, any[]>();
-        if (appointmentIds.length > 0) {
-            const { data: allMessages } = await supabase
-                .from('appointment_messages')
-                .select('id, appointment_id, message, created_at, sender_role, is_read')
-                .in('appointment_id', appointmentIds);
-            if (allMessages) {
-                for (const msg of allMessages) {
-                    const existing = messagesByAppointment.get(msg.appointment_id) || [];
-                    existing.push(msg);
-                    messagesByAppointment.set(msg.appointment_id, existing);
-                }
-            }
-        }
+        const rows = (data || []) as any[];
 
         return rows.map((row: any) => {
-            const messages = messagesByAppointment.get(row.id) || [];
-
-            const unreadCount = messages.filter((m: any) => m.sender_role === 'PATIENT' && !m.is_read).length;
-
-            const sortedMessages = [...messages].sort(
-                (a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-            );
-            const latest = sortedMessages[0] || null;
-
             let patientName = 'Unknown Patient';
             let patientEmail = '';
             let patientPhone = '';
@@ -158,31 +91,23 @@ export const getChatThreadsForSecretaryQuery = (supabase: SupabaseClient) => {
             let patientLastName = '';
             let patientSuffix = '';
 
-            if (row.patient) {
-                patientName = `${row.patient.first_name} ${row.patient.last_name}`;
-                patientFirstName = row.patient.first_name || '';
-                patientMiddleName = row.patient.middle_name || '';
-                patientLastName = row.patient.last_name || '';
-                patientSuffix = row.patient.suffix || '';
-                patientEmail = row.patient.email || '';
-                patientPhone = row.patient.phone_number || '';
-            } else if (row.guest_contacts && row.guest_contacts.length > 0) {
-                patientName = `${row.guest_contacts[0].first_name} ${row.guest_contacts[0].last_name}`;
-                patientFirstName = row.guest_contacts[0].first_name || '';
-                patientMiddleName = row.guest_contacts[0].middle_name || '';
-                patientLastName = row.guest_contacts[0].last_name || '';
-                patientSuffix = row.guest_contacts[0].suffix || '';
-                patientEmail = row.guest_contacts[0].email || '';
-                patientPhone = row.guest_contacts[0].phone_number || '';
+            if (row.guest_first_name) {
+                patientName = `${row.guest_first_name} ${row.guest_last_name}`;
+                patientFirstName = row.guest_first_name || '';
+                patientMiddleName = row.guest_middle_name || '';
+                patientLastName = row.guest_last_name || '';
+                patientSuffix = row.guest_suffix || '';
+                patientEmail = row.guest_email || '';
+                patientPhone = row.guest_phone || '';
             }
 
             let doctorName = 'Unassigned';
-            if (row.doctor) {
-                doctorName = `Dr. ${row.doctor.first_name} ${row.doctor.last_name}`;
+            if (row.doctor_first_name) {
+                doctorName = `Dr. ${row.doctor_first_name} ${row.doctor_last_name}`;
             }
 
             return {
-                appointmentId: row.id,
+                appointmentId: row.appointment_id,
                 status: row.status,
                 date: row.date,
                 preferredStartTime: row.preferred_start_time,
@@ -198,16 +123,16 @@ export const getChatThreadsForSecretaryQuery = (supabase: SupabaseClient) => {
                 patientMiddleName,
                 patientLastName,
                 patientSuffix,
-                serviceName: row.service?.name || 'General Inquiry',
+                serviceName: row.service_name || 'General Inquiry',
                 doctorName,
-                latestMessage: latest
+                latestMessage: row.latest_message_text
                     ? {
-                          text: latest.message,
-                          createdAt: latest.created_at,
-                          senderRole: latest.sender_role,
+                          text: row.latest_message_text,
+                          createdAt: row.latest_message_created_at,
+                          senderRole: row.latest_message_sender_role,
                       }
                     : null,
-                unreadCount,
+                unreadCount: Number(row.unread_count),
             };
         });
     };

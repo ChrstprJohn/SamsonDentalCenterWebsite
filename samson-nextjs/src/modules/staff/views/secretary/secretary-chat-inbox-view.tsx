@@ -18,6 +18,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Search, Mail, Archive, MessageSquare, Calendar, XCircle, CheckCircle, User, Stethoscope, Clock, ChevronUp, ChevronDown, AlertCircle } from 'lucide-react';
 import {
     Sidebar,
@@ -27,6 +28,88 @@ import {
     SidebarGroupContent,
     SidebarInput,
 } from '@/components/ui/sidebar';
+
+function ChatMessagesSkeleton() {
+    return (
+        <div className="flex-1 flex flex-col gap-4 p-6 overflow-hidden">
+            {[0, 1, 2, 3, 4].map((i) => {
+                const isLeft = i % 2 === 0;
+                return (
+                    <div key={i} className={`flex ${isLeft ? 'justify-start' : 'justify-end'}`}>
+                        <div className={`flex flex-col gap-2 ${isLeft ? 'items-start' : 'items-end'}`}>
+                            <Skeleton className={`h-3.5 rounded-md ${i === 0 ? 'w-48' : i === 1 ? 'w-36' : i === 2 ? 'w-56' : i === 3 ? 'w-40' : 'w-52'}`} />
+                            <Skeleton className={`h-3.5 rounded-md ${i === 0 ? 'w-40' : i === 1 ? 'w-28' : i === 2 ? 'w-48' : i === 3 ? 'w-32' : 'w-44'}`} />
+                            {i === 2 && <Skeleton className="h-3.5 w-36 rounded-md" />}
+                            <Skeleton className="h-2.5 w-14 rounded-md mt-0.5" />
+                        </div>
+                    </div>
+                );
+            })}
+        </div>
+    );
+}
+
+function DetailSkeleton() {
+    return (
+        <div className="flex flex-col gap-5 p-5 text-xs">
+            <div className="space-y-2">
+                <Skeleton className="h-3 w-20 rounded-md" />
+                <div className="border border-card-border/60 bg-muted/10 rounded-xl p-3 space-y-2">
+                    {[0, 1, 2, 3].map((i) => (
+                        <div key={i} className="flex justify-between items-center">
+                            <Skeleton className="h-3 w-12 rounded-md" />
+                            <Skeleton className="h-3 w-24 rounded-md" />
+                        </div>
+                    ))}
+                </div>
+            </div>
+            <div className="space-y-2">
+                <Skeleton className="h-3 w-16 rounded-md" />
+                <div className="border border-card-border/60 bg-muted/10 rounded-xl p-3 space-y-2">
+                    {[0, 1].map((i) => (
+                        <div key={i} className="flex justify-between items-center">
+                            <Skeleton className="h-3 w-10 rounded-md" />
+                            <Skeleton className="h-3 w-28 rounded-md" />
+                        </div>
+                    ))}
+                </div>
+            </div>
+            <div className="space-y-2">
+                <Skeleton className="h-3 w-24 rounded-md" />
+                <div className="border border-card-border/60 bg-muted/10 rounded-xl p-3 space-y-2">
+                    {[0, 1, 2, 3, 4, 5].map((i) => (
+                        <div key={i} className="flex justify-between items-center">
+                            <Skeleton className="h-3 w-14 rounded-md" />
+                            <Skeleton className="h-3 w-20 rounded-md" />
+                        </div>
+                    ))}
+                </div>
+            </div>
+            <Skeleton className="h-3 w-16 rounded-md mt-4" />
+            <div className="flex gap-2">
+                <Skeleton className="h-[44px] flex-1 rounded-md" />
+                <Skeleton className="h-[44px] flex-1 rounded-md" />
+            </div>
+        </div>
+    );
+}
+
+function SidebarThreadSkeleton() {
+    return (
+        <div className="flex flex-col w-full">
+            {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
+                <div key={i} className="flex flex-col gap-2 w-full border-b p-4">
+                    <div className="flex w-full items-center justify-between gap-2">
+                        <Skeleton className="h-3.5 w-32 rounded-md" />
+                        <Skeleton className="h-2.5 w-12 rounded-md" />
+                    </div>
+                    <Skeleton className="h-3 w-20 rounded-md" />
+                    <Skeleton className="h-3 w-full rounded-md" />
+                </div>
+            ))}
+        </div>
+    );
+}
 
 interface SecretaryChatInboxViewProps {
     initialThreads: ChatThreadDto[];
@@ -89,7 +172,7 @@ export function SecretaryChatInboxView({ initialThreads }: SecretaryChatInboxVie
                     fetchThreads();
                     const affectedAppointmentId = payload.new?.appointment_id || payload.old?.appointment_id;
                     if (affectedAppointmentId && affectedAppointmentId === selectedThreadIdRef.current) {
-                        getMessagesAction(affectedAppointmentId).then((res) => {
+                        getMessagesAction(affectedAppointmentId, undefined, { skipAuth: true }).then((res) => {
                             if (res && res.data) {
                                 setSelectedThreadMessages(res.data);
                                 setSelectedThreadHasMore(res.hasMore ?? false);
@@ -112,7 +195,7 @@ export function SecretaryChatInboxView({ initialThreads }: SecretaryChatInboxVie
         const loadMessages = async () => {
             setLoadingMessages(true);
             try {
-                const res = await getMessagesAction(selectedThreadId, undefined, { limit: 20 });
+                const res = await getMessagesAction(selectedThreadId, undefined, { limit: 20, skipAuth: true });
                 if (active && res && res.data) {
                     setSelectedThreadMessages(res.data);
                     setSelectedThreadHasMore(res.hasMore ?? false);
@@ -203,7 +286,6 @@ export function SecretaryChatInboxView({ initialThreads }: SecretaryChatInboxVie
                     : t
             ));
             markMessagesAsReadAction(thread.appointmentId, 'STAFF')
-                .then(() => fetchThreads())
                 .catch(console.error);
         }
     };

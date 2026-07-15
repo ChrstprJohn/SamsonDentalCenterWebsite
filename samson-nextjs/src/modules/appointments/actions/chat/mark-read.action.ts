@@ -3,7 +3,6 @@
 import { createClient, createAdminClient } from '@/shared/database/server';
 import { markMessagesAsReadUseCase } from '../../use-cases/chat/mark-messages-as-read.use-case';
 import { markMessagesAsReadCommand } from '../../repositories/chat/chat.commands';
-import { revalidatePath } from 'next/cache';
 
 export async function markMessagesAsReadAction(appointmentId: string, readerRole: 'PATIENT' | 'STAFF', chatToken?: string) {
     try {
@@ -35,9 +34,6 @@ export async function markMessagesAsReadAction(appointmentId: string, readerRole
         const useCase = markMessagesAsReadUseCase(markAsRead);
 
         await useCase(appointmentId, readerRole);
-
-        revalidatePath(`/appointments/chat/${appointmentId}`);
-        revalidatePath(`/secretary-v2/chat`);
 
         return { success: true };
     } catch (error: any) {
