@@ -39,7 +39,7 @@ export function useChatIntake({ appointmentId, chatToken, onPatientMessageSent }
         senderRole: 'STAFF',
         senderName: 'System',
         chatToken,
-      });
+      }, chatToken);
     } catch (err) {
       console.error('Failed to post system auto-reply message:', err);
     }
