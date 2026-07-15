@@ -15,6 +15,7 @@ import { InquirySchedulePanel } from './sub-components/inquiry-schedule-panel';
 import { InquiryToast } from './sub-components/inquiry-toast';
 import { Button } from '@/components/ui/button';
 import { Select } from '@/components/ui/select';
+import { ClipboardList } from 'lucide-react';
 
 function getDayOfWeek(dateStr: string) {
   if (!dateStr) return '';
@@ -254,12 +255,9 @@ export function SecretaryPendingRequestsViewV2() {
             })()}
           </>
         ) : (
-          <div className="h-full min-h-[50vh] flex flex-col items-center justify-center text-center p-8 border border-dashed border-card-border/60 rounded-3xl bg-card/20">
-            <span className="text-3xl mb-3 text-muted-foreground">📋</span>
-            <h3 className="text-sm font-bold text-text-primary">No Selection</h3>
-            <p className="text-xs text-text-muted max-w-xs mt-1">
-              Select an inquiry from the left list to view details and process the request.
-            </p>
+          <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground bg-muted/10 space-y-2 rounded-3xl">
+            <ClipboardList className="size-12 text-muted-foreground/40" />
+            <p className="text-sm font-medium">Select an inquiry from the left list to view details and process the request.</p>
           </div>
         )}
       </div>
