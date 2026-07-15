@@ -142,57 +142,60 @@ export function ChatIntakeWorkflow({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Calendar Day Picker */}
-          <div className="p-3 bg-card border border-border rounded-xl">
-            <div className="flex items-center justify-between mb-3 px-1">
-              <span className="text-xs font-bold text-foreground">{monthLabel}</span>
-              <div className="flex gap-1">
-                <button type="button" onClick={handleMonthPrev} className="p-1 text-muted-foreground hover:text-foreground text-xs cursor-pointer">◀</button>
-                <button type="button" onClick={handleMonthNext} className="p-1 text-muted-foreground hover:text-foreground text-xs cursor-pointer">▶</button>
+          <div className="flex flex-col gap-2">
+            <span className="text-[10px] font-bold text-muted-foreground uppercase">Preferred Appointment Date</span>
+            <div className="p-3 bg-card border border-border rounded-xl">
+              <div className="flex items-center justify-between mb-3 px-1">
+                <span className="text-xs font-bold text-foreground">{monthLabel}</span>
+                <div className="flex gap-1">
+                  <button type="button" onClick={handleMonthPrev} className="p-1 text-muted-foreground hover:text-foreground text-xs cursor-pointer">◀</button>
+                  <button type="button" onClick={handleMonthNext} className="p-1 text-muted-foreground hover:text-foreground text-xs cursor-pointer">▶</button>
+                </div>
               </div>
-            </div>
 
-            {scheduler.loadingKey === 'dates' ? (
-              <div className="text-center text-[10px] text-muted-foreground py-10 flex items-center justify-center gap-1">
-                <Loader2 className="size-3 animate-spin" />
-                Scanning schedule...
-              </div>
-            ) : (
-              <div className="grid grid-cols-7 gap-1 text-center text-[10px]">
-                {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => (
-                  <div key={i} className="font-bold text-muted-foreground py-1">{d}</div>
-                ))}
-                {blankDays.map((_, i) => (
-                  <div key={`b-${i}`} className="py-2" />
-                ))}
-                {daysArray.map((day) => {
-                  const dateStr = `${year}-${(month + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-                  const isAvailable = scheduler.availableDates.includes(dateStr);
-                  const isSelected = intake.selectedDate === dateStr;
-                  return (
-                    <button
-                      key={day}
-                      type="button"
-                      disabled={!isAvailable}
-                      onClick={() => handleDateSelect(dateStr)}
-                      className={`py-2 rounded-lg font-bold text-center cursor-pointer transition-all ${
-                        isSelected
-                          ? 'bg-primary text-primary-foreground'
-                          : isAvailable
-                          ? 'bg-primary/10 text-primary hover:bg-primary/20'
-                          : 'text-muted-foreground/30 cursor-not-allowed opacity-30'
-                      }`}
-                    >
-                      {day}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
+              {scheduler.loadingKey === 'dates' ? (
+                <div className="text-center text-[10px] text-muted-foreground py-10 flex items-center justify-center gap-1">
+                  <Loader2 className="size-3 animate-spin" />
+                  Scanning schedule...
+                </div>
+              ) : (
+                <div className="grid grid-cols-7 gap-1 text-center text-[10px]">
+                  {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => (
+                    <div key={i} className="font-bold text-muted-foreground py-1">{d}</div>
+                  ))}
+                  {blankDays.map((_, i) => (
+                    <div key={`b-${i}`} className="py-2" />
+                  ))}
+                  {daysArray.map((day) => {
+                    const dateStr = `${year}-${(month + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+                    const isAvailable = scheduler.availableDates.includes(dateStr);
+                    const isSelected = intake.selectedDate === dateStr;
+                    return (
+                      <button
+                        key={day}
+                        type="button"
+                        disabled={!isAvailable}
+                        onClick={() => handleDateSelect(dateStr)}
+                        className={`py-2 rounded-lg font-bold text-center cursor-pointer transition-all ${
+                          isSelected
+                            ? 'bg-primary text-primary-foreground'
+                            : isAvailable
+                            ? 'bg-primary/10 text-primary hover:bg-primary/20'
+                            : 'text-muted-foreground/30 cursor-not-allowed opacity-30'
+                        }`}
+                      >
+                        {day}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Time Picker */}
           <div className="flex flex-col gap-2">
-            <span className="text-[10px] font-bold text-muted-foreground uppercase">Preferred Time</span>
+            <span className="text-[10px] font-bold text-muted-foreground uppercase">Preferred Appointment Time</span>
             {!intake.selectedDate ? (
               <div className="text-xs text-muted-foreground p-4 bg-card border border-border rounded-xl text-center">
                 Please select a date on the calendar.
