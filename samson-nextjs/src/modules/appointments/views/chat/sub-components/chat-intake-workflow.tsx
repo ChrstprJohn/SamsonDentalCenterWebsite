@@ -125,7 +125,7 @@ export function ChatIntakeWorkflow({
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-bold text-foreground flex items-center gap-1.5">
             <Calendar className="size-4" />
-            Request to Reschedule
+            Preferred Appointment Date
           </h3>
           <Button variant="ghost" onClick={() => handleStateChange('SELECT_OPTION')} size="sm">
             <ArrowLeft className="size-3.5 mr-1" />
@@ -143,7 +143,7 @@ export function ChatIntakeWorkflow({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Calendar Day Picker */}
           <div className="flex flex-col gap-2">
-            <span className="text-[10px] font-bold text-muted-foreground uppercase">Preferred Appointment Date</span>
+            <span className="text-[10px] font-bold text-muted-foreground uppercase">Choose Date</span>
             <div className="p-3 bg-card border border-border rounded-xl">
               <div className="flex items-center justify-between mb-3 px-1">
                 <span className="text-xs font-bold text-foreground">{monthLabel}</span>
@@ -195,7 +195,7 @@ export function ChatIntakeWorkflow({
 
           {/* Time Picker */}
           <div className="flex flex-col gap-2">
-            <span className="text-[10px] font-bold text-muted-foreground uppercase">Preferred Appointment Time</span>
+            <span className="text-[10px] font-bold text-muted-foreground uppercase">Choose Time</span>
             {!intake.selectedDate ? (
               <div className="text-xs text-muted-foreground p-4 bg-card border border-border rounded-xl text-center">
                 Please select a date on the calendar.
