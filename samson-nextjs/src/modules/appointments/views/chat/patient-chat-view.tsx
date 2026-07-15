@@ -174,36 +174,39 @@ export function PatientChatView({
 
                         {sendError && <p className="text-xs text-destructive px-1 flex items-center gap-1"><AlertTriangle className="size-3" />{sendError}</p>}
                         
-                        <div className="flex gap-2 items-center">
-                            <Input
-                                value={text}
-                                onChange={(e) => setText(e.target.value)}
-                                onKeyDown={handleKeyDown}
-                                placeholder="Type your message here..."
-                                disabled={isSending}
-                                className="h-[44px] disabled:opacity-50 flex-1"
-                            />
-                            
-                            {currentUserRole === 'PATIENT' && appointmentDetails.status === 'APPROVED' && activeWorkflow === 'NONE' && (
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    className="h-[44px] px-3.5 border-border text-foreground hover:bg-muted"
-                                    onClick={() => setActiveWorkflow('SELECT_OPTION')}
-                                >
-                                    Quick Actions
-                                </Button>
-                            )}
+                        {/* Only show input field & send button if not in a reschedule/cancel active workflow */}
+                        {(currentUserRole !== 'PATIENT' || activeWorkflow === 'NONE' || activeWorkflow === 'SELECT_OPTION') && (
+                            <div className="flex gap-2 items-center">
+                                <Input
+                                    value={text}
+                                    onChange={(e) => setText(e.target.value)}
+                                    onKeyDown={handleKeyDown}
+                                    placeholder="Type your message here..."
+                                    disabled={isSending}
+                                    className="h-[44px] disabled:opacity-50 flex-1"
+                                />
+                                
+                                {currentUserRole === 'PATIENT' && appointmentDetails.status === 'APPROVED' && activeWorkflow === 'NONE' && (
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        className="h-[44px] px-3.5 border-border text-foreground hover:bg-muted"
+                                        onClick={() => setActiveWorkflow('SELECT_OPTION')}
+                                    >
+                                        Quick Actions
+                                    </Button>
+                                )}
 
-                            <Button
-                                onClick={handleSend}
-                                disabled={isSending || !text.trim()}
-                                className="h-[44px] px-5 bg-primary text-primary-foreground hover:bg-primary/90 border-0 flex items-center gap-1.5"
-                            >
-                                <Send className="size-4" />
-                                {isSending ? 'Sending...' : 'Send'}
-                            </Button>
-                        </div>
+                                <Button
+                                    onClick={handleSend}
+                                    disabled={isSending || !text.trim()}
+                                    className="h-[44px] px-5 bg-primary text-primary-foreground hover:bg-primary/90 border-0 flex items-center gap-1.5"
+                                >
+                                    <Send className="size-4" />
+                                    {isSending ? 'Sending...' : 'Send'}
+                                </Button>
+                            </div>
+                        )}
                     </div>
                 )}
             </div>
