@@ -37,7 +37,7 @@ const MemoizedMessage = React.memo(function MessageItem({
               {isSystem ? 'Secretary (Automated)' : msg.senderName}
             </span>
           )}
-          <Bubble variant={isMe ? "default" : "muted"}>
+          <Bubble variant={isMe ? "default" : "muted"} className={isMe ? "rounded-br-sm" : "rounded-bl-sm"}>
             <BubbleContent>{msg.message}</BubbleContent>
           </Bubble>
           {isMe && isLastInGroup && (
