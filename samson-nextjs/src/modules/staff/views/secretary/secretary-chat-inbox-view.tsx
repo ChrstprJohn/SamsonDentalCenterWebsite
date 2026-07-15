@@ -610,7 +610,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
             {selectedThreadId && selectedThread ? (
                 <>
                     {/* Column 2: Dialogue Stream */}
-                    <div className={`flex-1 flex-col bg-muted/20 border-r border-border relative ${colMobile('chat')} md:flex`}>
+                    <div className={`flex-1 flex-col bg-muted/20 border-r border-border relative ${colMobile('chat')} lg:flex`}>
                         {loadingMessages ? (
                             <ChatMessagesSkeleton />
                         ) : (
@@ -640,12 +640,12 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                     </div>
 
                     {/* Column 3: Context & Action Control Dock */}
-                    <div className={`w-full md:w-80 flex-col border-l border-border bg-sidebar h-full overflow-hidden flex-shrink-0 ${colMobile('detail')} md:flex`}>
+                    <div className={`w-full lg:w-80 flex-col border-l border-border bg-sidebar h-full overflow-hidden flex-shrink-0 ${colMobile('detail')} lg:flex`}>
                         <div className="flex flex-col h-full overflow-hidden">
                             {loadingMessages ? (
                                 <div className="p-4 border-b border-border bg-sidebar shrink-0">
                                     <div className="flex items-center gap-2">
-                                        <div className="md:hidden size-[42px] shrink-0" />
+                                        <div className="lg:hidden size-[42px] shrink-0" />
                                         <div className="flex flex-col min-w-0">
                                             <Skeleton className="h-[24px] w-36 rounded-md" />
                                             <Skeleton className="h-[16px] w-20 rounded-md" />
@@ -655,7 +655,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                             ) : (
                                 <div className="p-4 border-b border-border bg-sidebar shrink-0">
                                     <div className="flex items-center gap-2">
-                                        <button onClick={handleBackToChat} className="md:hidden p-1 -ml-1 text-muted-foreground hover:text-foreground shrink-0">
+                                        <button onClick={handleBackToChat} className="lg:hidden p-1 -ml-1 text-muted-foreground hover:text-foreground shrink-0">
                                             <ArrowLeft className="size-5" />
                                         </button>
                                         <div className="flex flex-col min-w-0">
@@ -802,8 +802,8 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                                                         </Button>
                                                     </div>
                                                 ) : (
-                                                    <div className="p-3 rounded-lg bg-muted/40 text-[10px] text-muted-foreground text-center">
-                                                        Appointment is closed. Actions are disabled.
+                                                    <div className="p-3 bg-muted border border-border rounded-xl text-center text-xs text-muted-foreground">
+                                                        Action disabled
                                                     </div>
                                                 )}
                                             </div>

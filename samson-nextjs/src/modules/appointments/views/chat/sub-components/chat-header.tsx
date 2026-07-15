@@ -3,7 +3,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { ExternalLink, ArrowLeft, EllipsisVertical } from 'lucide-react';
+import { ExternalLink, ArrowLeft, EllipsisVertical, UserRound } from 'lucide-react';
 
 interface ChatHeaderProps {
   patientName: string;
@@ -40,9 +40,19 @@ export function ChatHeader({
             <ArrowLeft className="size-5" />
           </button>
         )}
-        <h2 className="text-base font-medium text-foreground truncate">
-          {currentUserRole === 'PATIENT' ? 'Samson Dental Center Help Desk' : patientName}
-        </h2>
+        {currentUserRole === 'STAFF' && (
+          <div className="size-10 shrink-0 rounded-full bg-muted-foreground/10 flex items-center justify-center border-2 border-border/60 overflow-hidden">
+            <UserRound className="size-8 text-muted-foreground/70 translate-y-0.5" />
+          </div>
+        )}
+        <div className="flex flex-col min-w-0">
+          <h2 className="text-base font-medium text-foreground truncate">
+            {currentUserRole === 'PATIENT' ? 'Samson Dental Center Help Desk' : patientName}
+          </h2>
+          {currentUserRole === 'STAFF' && (
+            <span className="text-[11px] text-muted-foreground truncate">{serviceName || 'Treatment'}</span>
+          )}
+        </div>
       </div>
       <div className="flex items-center gap-2 shrink-0">
         {currentUserRole === 'PATIENT' && !chatToken && (
@@ -54,7 +64,7 @@ export function ChatHeader({
           </Link>
         )}
         {currentUserRole === 'STAFF' && onShowDetail && (
-          <button onClick={onShowDetail} className="md:hidden p-1 text-muted-foreground hover:text-foreground">
+          <button onClick={onShowDetail} className="lg:hidden p-1 text-muted-foreground hover:text-foreground">
             <EllipsisVertical className="size-5" />
           </button>
         )}

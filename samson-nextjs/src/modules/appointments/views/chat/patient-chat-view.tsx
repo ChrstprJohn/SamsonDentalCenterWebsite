@@ -72,7 +72,6 @@ export function PatientChatView({
 
     const activeStatuses = ['APPROVED', 'CHECKED_IN', 'RESCHEDULE_REQUESTED'];
     const isClosed = !activeStatuses.includes(appointmentDetails.status);
-    const isCancelled = appointmentDetails.status === 'CANCELLED';
 
     const prevDetailsRef = useRef(appointmentDetails);
     useEffect(() => {
@@ -104,14 +103,6 @@ export function PatientChatView({
     return (
         <div className={`flex flex-col h-full w-full max-w-3xl mx-auto bg-card border-x border-y-0 border-border rounded-none shadow-none ${className || ''}`}>
             
-            {/* Cancellation Notice Banner */}
-            {isCancelled && (
-                <div className="w-full bg-destructive/10 border-b border-destructive/20 text-destructive text-xs py-2 px-5 font-bold flex items-center gap-2">
-                    <AlertTriangle className="size-3.5" />
-                    <span>This appointment has been cancelled.</span>
-                </div>
-            )}
-
             <ChatHeader
                 patientName={appointmentDetails.patientName}
                 serviceName={appointmentDetails.serviceName}
@@ -133,6 +124,7 @@ export function PatientChatView({
                 hasMore={hasMore}
                 loadingMore={loadingMore}
                 onLoadOlder={loadOlderMessages}
+                isClosed={isClosed}
             />
 
             {/* Workflow / Input Area */}

@@ -2,7 +2,7 @@
 
 import React, { useRef, useLayoutEffect } from 'react';
 import { MessageResponseDto } from '../../../dtos/chat/message-response.dto';
-import { MessageSquare, Check, CheckCheck, ChevronUp } from 'lucide-react';
+import { MessageSquare, Check, CheckCheck, ChevronUp, UserRound } from 'lucide-react';
 import { Bubble, BubbleContent } from "@/components/ui/bubble";
 import { Message, MessageContent, MessageFooter } from "@/components/ui/message";
 import { Button } from '@/components/ui/button';
@@ -12,12 +12,14 @@ const MemoizedMessage = React.memo(function MessageItem({
   isMe,
   isFirstInGroup,
   isLastInGroup,
+  isLatest,
   showTimeHeader,
 }: {
   msg: MessageResponseDto;
   isMe: boolean;
   isFirstInGroup: boolean;
   isLastInGroup: boolean;
+  isLatest: boolean;
   showTimeHeader: boolean;
 }) {
   const isSystem = msg.senderName === 'System';
@@ -32,26 +34,31 @@ const MemoizedMessage = React.memo(function MessageItem({
       )}
       <Message align={isMe ? "end" : "start"} className={isLastInGroup ? "" : "mb-0.5"}>
         <MessageContent className={isMe ? "items-end" : "items-start"}>
-          {!isMe && isFirstInGroup && (
-            <span className="text-[10px] text-muted-foreground px-1 mb-0.5">
-              {isSystem ? 'Secretary (Automated)' : msg.senderName}
-            </span>
-          )}
-          <Bubble variant={isMe ? "default" : "muted"} className={isMe ? "rounded-br-sm" : "rounded-bl-sm"}>
-            <BubbleContent>{msg.message}</BubbleContent>
-          </Bubble>
-          {isMe && isLastInGroup && (
-            <MessageFooter>
-              {msg.isRead ? (
-                <CheckCheck className="size-3 text-sky-500" />
-              ) : (
-                <Check className="size-3 text-muted-foreground/60" />
+          <div className={`flex gap-2 w-full ${isMe ? 'flex-row-reverse' : 'flex-row'}`}>
+            {!isMe && isFirstInGroup && (
+              <div className="size-8 shrink-0 rounded-full bg-muted-foreground/10 flex items-center justify-center border border-border/60 overflow-hidden mt-0.5">
+                <UserRound className="size-6 text-muted-foreground/70 translate-y-0.5" />
+              </div>
+            )}
+            {!isMe && !isFirstInGroup && <div className="size-8 shrink-0" />}
+            <div className="flex flex-col">
+              <Bubble variant={isMe ? "default" : "muted"}>
+                <BubbleContent>{msg.message}</BubbleContent>
+              </Bubble>
+              {isMe && isLatest && (
+                <MessageFooter>
+                  {msg.isRead ? (
+                    <CheckCheck className="size-3 text-sky-500" />
+                  ) : (
+                    <Check className="size-3 text-muted-foreground/60" />
+                  )}
+                  <span className="font-medium text-[9px] text-muted-foreground/70">
+                    {msg.isRead ? 'Read' : 'Sent'}
+                  </span>
+                </MessageFooter>
               )}
-              <span className="font-medium text-[9px] text-muted-foreground/70">
-                {msg.isRead ? 'Read' : 'Sent'}
-              </span>
-            </MessageFooter>
-          )}
+            </div>
+          </div>
         </MessageContent>
       </Message>
     </>
@@ -65,6 +72,7 @@ interface ChatMessageListProps {
   hasMore?: boolean;
   loadingMore?: boolean;
   onLoadOlder?: () => void;
+  isClosed?: boolean;
 }
 
 function formatCenteredTime(dateStr: string) {
@@ -96,8 +104,17 @@ export const ChatMessageList = React.memo(function ChatMessageList({
   hasMore = false,
   loadingMore = false,
   onLoadOlder,
+  isClosed = false,
 }: ChatMessageListProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+
+  if (isClosed && messages.length === 0) {
+    return (
+      <div ref={containerRef} className="flex-1 !overflow-y-auto p-5 bg-muted/10 flex items-center justify-center">
+        <p className="text-sm text-muted-foreground">No conversation</p>
+      </div>
+    );
+  }
   const prevScrollHeightRef = useRef(0);
   const prevLoadingMoreRef = useRef(loadingMore);
 
@@ -153,6 +170,8 @@ export const ChatMessageList = React.memo(function ChatMessageList({
             const prevMsg = i > 0 ? messages[i - 1] : null;
             const showTimeHeader = !prevMsg || (new Date(msg.createdAt).getTime() - new Date(prevMsg.createdAt).getTime() > 5 * 60 * 1000);
 
+            const isLatest = i === messages.length - 1;
+
             return (
               <MemoizedMessage
                 key={msg.id}
@@ -160,6 +179,7 @@ export const ChatMessageList = React.memo(function ChatMessageList({
                 isMe={isMe}
                 isFirstInGroup={isFirstInGroup}
                 isLastInGroup={isLastInGroup}
+                isLatest={isLatest}
                 showTimeHeader={showTimeHeader}
               />
             );
