@@ -449,7 +449,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                             size="sm"
                             className={`flex-1 h-8 text-xs transition-all ${
                                 activeTab === 'ACTIVE'
-                                    ? 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm'
+                                    ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground shadow-sm'
                                     : 'text-muted-foreground hover:text-foreground'
                             }`}
                         >
@@ -462,7 +462,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                             size="sm"
                             className={`flex-1 h-8 text-xs transition-all ${
                                 activeTab === 'ARCHIVE'
-                                    ? 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm'
+                                    ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground shadow-sm'
                                     : 'text-muted-foreground hover:text-foreground'
                             }`}
                         >
