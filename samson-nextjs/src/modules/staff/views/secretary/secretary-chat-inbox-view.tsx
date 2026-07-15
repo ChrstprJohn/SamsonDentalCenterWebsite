@@ -729,7 +729,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
             {/* Column 1: Left List Sidebar */}
             <Sidebar
                 collapsible="none"
-                className={`flex-col w-full md:w-80 shrink-0 border-r border-card-border/40 bg-sidebar h-full overflow-hidden ${colMobile('list')} md:flex`}
+                className={`flex-col w-full lg:w-80 shrink-0 border-r border-card-border/40 bg-sidebar h-full overflow-hidden ${colMobile('list')} lg:flex`}
             >
                 <SidebarHeader className="gap-3.5 border-b p-4 shrink-0">
                     <div className="flex w-full items-center justify-between">
@@ -899,7 +899,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                     </div>
                 </>
             ) : (
-                <div className={`flex-1 flex-col items-center justify-center text-muted-foreground bg-muted/10 space-y-2 ${colMobile('list')} md:flex`}>
+                <div className={`flex-1 flex-col items-center justify-center text-muted-foreground bg-muted/10 space-y-2 ${colMobile('list')} lg:flex`}>
                     <MessageSquare className="size-12 text-muted-foreground/40" />
                     <p className="text-sm font-medium">Select a thread from the inbox list to start chatting.</p>
                 </div>
