@@ -2,7 +2,9 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
+import { User, ExternalLink } from 'lucide-react';
 
 interface ChatHeaderProps {
   patientName: string;
@@ -28,27 +30,27 @@ export function ChatHeader({
   activeStatuses,
 }: ChatHeaderProps) {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between p-5 border-b border-slate-800 bg-slate-950/40 gap-4">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between p-5 border-b border-border bg-muted/20 gap-4">
       <div className="flex flex-col">
         <div className="flex items-center gap-3">
-          <h2 className="text-lg font-bold text-white">{patientName}</h2>
-          <span
-            className={`px-2 py-0.5 text-xs font-semibold rounded-full ${
-              activeStatuses.includes(status)
-                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
-            }`}
-          >
+          <div className="p-1.5 rounded-full bg-primary/10 text-primary">
+            <User className="size-5" />
+          </div>
+          <div>
+            <h2 className="text-lg font-bold text-foreground">{patientName}</h2>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {serviceName} &bull; {date} {preferredStartTime ? `at ${preferredStartTime}` : ''}
+            </p>
+          </div>
+          <Badge variant={activeStatuses.includes(status) ? 'success' : 'error'}>
             {status}
-          </span>
+          </Badge>
         </div>
-        <p className="text-xs text-slate-400 mt-1">
-          {serviceName} &bull; {date} {preferredStartTime ? `at ${preferredStartTime}` : ''}
-        </p>
       </div>
       {currentUserRole === 'PATIENT' && !chatToken && (
         <Link href={`/user/appointments/${appointmentId}`}>
-          <Button variant="secondary" className="text-xs">
+          <Button variant="secondary" size="sm">
+            <ExternalLink className="size-3.5 mr-1.5" />
             View Appointment
           </Button>
         </Link>

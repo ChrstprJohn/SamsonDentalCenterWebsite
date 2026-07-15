@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { sendMessageAction } from '@/modules/appointments/actions/chat/send-message.action';
 
-export type IntakeWorkflowState = 'SELECT_OPTION' | 'RESCHEDULE' | 'CANCEL' | 'NONE';
+export type IntakeWorkflowState = 'SELECT_OPTION' | 'RESCHEDULE' | 'CANCEL' | 'QUESTION' | 'NONE';
 
 interface UseChatIntakeProps {
   appointmentId: string;

@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
 import { useChatMessages } from '../../hooks/chat/use-chat-messages';
 import { MessageResponseDto } from '../../dtos/chat/message-response.dto';
 import { ChatHeader } from './sub-components/chat-header';
@@ -9,6 +11,7 @@ import { ChatContextBanner } from './sub-components/chat-context-banner';
 import { ChatMessageList } from './sub-components/chat-message-list';
 import { ChatIntakeWorkflow } from './sub-components/chat-intake-workflow';
 import { IntakeWorkflowState } from '../../hooks/chat/use-chat-intake';
+import { Send, AlertTriangle, List } from 'lucide-react';
 
 interface PatientChatViewProps {
     appointmentId: string;
@@ -62,7 +65,6 @@ export function PatientChatView({
     const isClosed = !activeStatuses.includes(appointmentDetails.status);
     const isCancelled = appointmentDetails.status === 'CANCELLED';
 
-    // Auto-return to intake screen if appointment details (date/time/status) change in real-time
     const prevDetailsRef = useRef(appointmentDetails);
     useEffect(() => {
         if (
@@ -91,12 +93,12 @@ export function PatientChatView({
     };
 
     return (
-        <div className={`flex flex-col h-[650px] w-full max-w-4xl mx-auto bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl animate-in fade-in duration-300 ${className || ''}`}>
+        <div className={`flex flex-col h-[650px] w-full max-w-4xl mx-auto bg-card border border-border rounded-2xl overflow-hidden shadow-2xl ${className || ''}`}>
             
             {/* Cancellation Notice Banner */}
             {isCancelled && (
-                <div className="w-full bg-rose-600/10 border-b border-rose-500/20 text-rose-400 text-xs py-2 px-5 font-bold flex items-center gap-2">
-                    <span>⚠️</span>
+                <div className="w-full bg-destructive/10 border-b border-destructive/20 text-destructive text-xs py-2 px-5 font-bold flex items-center gap-2">
+                    <AlertTriangle className="size-3.5" />
                     <span>This appointment has been cancelled.</span>
                 </div>
             )}
@@ -134,9 +136,9 @@ export function PatientChatView({
             />
 
             {/* Workflow / Input Area */}
-            <div className="p-4 border-t border-slate-800 bg-slate-950/40">
+            <div className="p-4 border-t border-border bg-muted/20">
                 {isClosed ? (
-                    <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl text-center text-xs text-slate-400">
+                    <div className="p-3 bg-muted border border-border rounded-xl text-center text-xs text-muted-foreground">
                         This chat thread is now closed because the appointment is {appointmentDetails.status}.
                     </div>
                 ) : currentUserRole === 'PATIENT' && activeWorkflow !== 'NONE' ? (
@@ -150,24 +152,25 @@ export function PatientChatView({
                     />
                 ) : (
                     <div className="flex flex-col gap-2">
-                        {sendError && <p className="text-xs text-rose-400 px-1">{sendError}</p>}
+                        {sendError && <p className="text-xs text-destructive px-1 flex items-center gap-1"><AlertTriangle className="size-3" />{sendError}</p>}
                         <div className="flex gap-2 items-end">
-                            <textarea
+                            <Textarea
                                 value={text}
                                 onChange={(e) => setText(e.target.value)}
                                 onKeyDown={handleKeyDown}
                                 placeholder="Type your message here..."
                                 disabled={isSending}
-                                className="flex-1 min-h-[44px] max-h-[120px] bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors resize-none disabled:opacity-50"
+                                className="min-h-[44px] max-h-[120px] resize-none disabled:opacity-50"
                             />
                             <div className="flex flex-col gap-2">
                                 {currentUserRole === 'PATIENT' && appointmentDetails.status === 'APPROVED' && (
                                     <Button
                                         type="button"
                                         variant="secondary"
+                                        size="sm"
                                         onClick={() => setActiveWorkflow('SELECT_OPTION')}
-                                        className="h-8 text-[10px] px-2.5"
                                     >
+                                        <List className="size-3.5 mr-1" />
                                         Options
                                     </Button>
                                 )}
@@ -176,6 +179,7 @@ export function PatientChatView({
                                     disabled={isSending || !text.trim()}
                                     className="h-[44px] px-5"
                                 >
+                                    <Send className="size-4 mr-1.5" />
                                     {isSending ? 'Sending...' : 'Send'}
                                 </Button>
                             </div>

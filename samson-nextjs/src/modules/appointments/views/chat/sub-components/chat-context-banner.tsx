@@ -1,8 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
 import Link from 'next/link';
+import { Stethoscope, User, Calendar, Clock, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
 
 interface ChatContextBannerProps {
   patientName: string;
@@ -31,7 +34,7 @@ export function ChatContextBanner({
   appointmentId,
   chatToken,
 }: ChatContextBannerProps) {
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = React.useState(true);
 
   const formatTime = (timeStr?: string | null) => {
     if (!timeStr) return '';
@@ -54,58 +57,67 @@ export function ChatContextBanner({
   };
 
   return (
-    <div className="bg-slate-950/60 border-b border-slate-800/80 backdrop-blur-md transition-all">
-      <div
-        onClick={() => setIsExpanded(!isExpanded)}
-        className="px-5 py-3 flex items-center justify-between cursor-pointer hover:bg-slate-900/40 transition-colors select-none"
-      >
+    <Collapsible
+      open={isExpanded}
+      onOpenChange={setIsExpanded}
+      className="bg-muted/30 border-b border-border/80"
+    >
+      <CollapsibleTrigger className="w-full px-5 py-3 flex items-center justify-between cursor-pointer hover:bg-muted/40 transition-colors select-none">
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-blue-500/10 text-blue-400 font-bold border border-blue-500/15 text-sm leading-none">
-            🦷
+          <div className="p-2 rounded-lg bg-primary/10 text-primary border border-primary/15">
+            <Stethoscope className="size-4" />
           </div>
-          <div>
-            <p className="font-bold text-slate-100">{serviceName}</p>
-            <p className="text-[10px] text-slate-400">Patient: {patientName}</p>
+          <div className="text-left">
+            <p className="font-bold text-foreground text-sm">{serviceName}</p>
+            <p className="text-[10px] text-muted-foreground">Patient: {patientName}</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <span className="px-2 py-0.5 font-semibold text-[10px] bg-slate-800 rounded-md border border-slate-700/50 text-slate-300">
+          <Badge variant={status === 'CANCELLED' ? 'error' : status === 'COMPLETED' ? 'default' : 'success'}>
             {status}
-          </span>
-          <span className="text-slate-400 text-xs">{isExpanded ? '▲' : '▼'}</span>
+          </Badge>
+          {isExpanded ? (
+            <ChevronUp className="size-3.5 text-muted-foreground" />
+          ) : (
+            <ChevronDown className="size-3.5 text-muted-foreground" />
+          )}
         </div>
-      </div>
+      </CollapsibleTrigger>
 
-      {isExpanded && (
-        <div className="px-5 pb-4 pt-1 border-t border-slate-800/40 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-slate-300 animate-in slide-in-from-top duration-200">
-          <div className="space-y-1">
-            <p>
-              <span className="text-slate-500">Scheduled Date:</span>{' '}
-              <strong className="text-slate-200">{date}</strong>
+      <CollapsibleContent className="px-5 pb-4 pt-1 border-t border-border/40">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-muted-foreground">
+          <div className="space-y-2">
+            <p className="flex items-center gap-1.5">
+              <Calendar className="size-3" />
+              <span className="text-muted-foreground">Scheduled Date:</span>{' '}
+              <strong className="text-foreground">{date}</strong>
             </p>
-            <p>
-              <span className="text-slate-500">Time Window:</span>{' '}
-              <strong className="text-slate-200">
+            <p className="flex items-center gap-1.5">
+              <Clock className="size-3" />
+              <span className="text-muted-foreground">Time Window:</span>{' '}
+              <strong className="text-foreground">
                 {formatTime(startTime) || preferredStartTime || 'TBD'}
                 {endTime ? ` - ${formatTime(endTime)}` : ''}
               </strong>
             </p>
-            <p>
-              <span className="text-slate-500">Doctor Assigned:</span>{' '}
-              <strong className="text-slate-200">{doctorName || 'Unassigned'}</strong>
+            <p className="flex items-center gap-1.5">
+              <User className="size-3" />
+              <span className="text-muted-foreground">Doctor Assigned:</span>{' '}
+              <strong className="text-foreground">{doctorName || 'Unassigned'}</strong>
             </p>
           </div>
           <div className="flex sm:justify-end items-end">
             {currentUserRole === 'PATIENT' && !chatToken && (
               <Link href={`/user/appointments/${appointmentId}`}>
-                <Button variant="secondary" className="text-xs h-8">
+                <Button variant="secondary" size="sm">
+                  <ExternalLink className="size-3.5 mr-1.5" />
                   View Appointment Detail
                 </Button>
               </Link>
             )}
           </div>
         </div>
-      )}
-    </div>
+      </CollapsibleContent>
+    </Collapsible>
   );
 }
