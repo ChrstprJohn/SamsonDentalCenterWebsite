@@ -12,38 +12,14 @@ import {
 } from '@/components/ui/sidebar';
 
 interface PendingRequestListV2Props {
-  appointments: any[];
-  selectedAppointmentId: string | null;
-  isLoadingAppointments: boolean;
-  onSelectAppointment: (appointmentId: string) => void;
-
   inquiries: any[];
   selectedInquiryId: string | null;
   isLoadingInquiries: boolean;
   onSelectInquiry: (inquiry: any) => void;
-
-  activeTab: 'registered' | 'guest';
-  onTabChange: (tab: 'registered' | 'guest') => void;
 }
 
 export function PendingRequestListV2(props: PendingRequestListV2Props) {
   const [search, setSearch] = React.useState('');
-
-  const filteredAppointments = React.useMemo(() => {
-    return props.appointments.filter((appt) => {
-      const patientName = appt.dependent
-        ? `${appt.dependent.firstName} ${appt.dependent.lastName}`
-        : appt.patient
-          ? `${appt.patient.firstName} ${appt.patient.lastName}`
-          : 'Guest';
-      const serviceName = appt.service?.name || '';
-
-      return (
-        patientName.toLowerCase().includes(search.toLowerCase()) ||
-        serviceName.toLowerCase().includes(search.toLowerCase())
-      );
-    });
-  }, [props.appointments, search]);
 
   const filteredInquiries = React.useMemo(() => {
     return props.inquiries.filter((inq) => {
@@ -57,8 +33,8 @@ export function PendingRequestListV2(props: PendingRequestListV2Props) {
     });
   }, [props.inquiries, search]);
 
-  const currentCount = props.activeTab === 'registered' ? filteredAppointments.length : filteredInquiries.length;
-  const isLoading = props.activeTab === 'registered' ? props.isLoadingAppointments : props.isLoadingInquiries;
+  const currentCount = filteredInquiries.length;
+  const isLoading = props.isLoadingInquiries;
 
   return (
     <Sidebar
@@ -77,26 +53,9 @@ export function PendingRequestListV2(props: PendingRequestListV2Props) {
           onChange={(e) => setSearch(e.target.value)}
         />
         <div className="flex border-b border-card-border/40 w-full mt-1">
-          <button
-            onClick={() => props.onTabChange('registered')}
-            className={`flex-1 pb-2 text-xs font-semibold border-b-2 transition-all text-center ${
-              props.activeTab === 'registered'
-                ? 'border-primary text-primary font-bold'
-                : 'border-transparent text-text-muted hover:text-text-primary'
-            }`}
-          >
-            Registered User ({filteredAppointments.length})
-          </button>
-          <button
-            onClick={() => props.onTabChange('guest')}
-            className={`flex-1 pb-2 text-xs font-semibold border-b-2 transition-all text-center ${
-              props.activeTab === 'guest'
-                ? 'border-primary text-primary font-bold'
-                : 'border-transparent text-text-muted hover:text-text-primary'
-            }`}
-          >
-            Guest ({filteredInquiries.length})
-          </button>
+          <span className="flex-1 pb-2 text-xs font-semibold border-b-2 border-primary text-primary text-center">
+            Guest Inquiries ({filteredInquiries.length})
+          </span>
         </div>
       </SidebarHeader>
       {/* data-lenis-prevent stops Lenis from hijacking nested scroll wheel events */}
@@ -105,52 +64,8 @@ export function PendingRequestListV2(props: PendingRequestListV2Props) {
           <SidebarGroupContent className="flex flex-col">
             {isLoading ? (
               <div className="py-12 text-center text-text-muted text-xs">
-                {props.activeTab === 'registered' ? 'Loading pending requests...' : 'Loading active inquiries...'}
+                Loading guest inquiries...
               </div>
-            ) : props.activeTab === 'registered' ? (
-              filteredAppointments.length === 0 ? (
-                <div className="py-12 text-center text-text-muted text-xs">
-                  No pending requests found.
-                </div>
-              ) : (
-                filteredAppointments.map((appt) => {
-                  const isSelected = props.selectedAppointmentId === appt.id;
-                  const patientName = appt.dependent
-                    ? `${appt.dependent.firstName} ${appt.dependent.lastName}`
-                    : appt.patient
-                      ? `${appt.patient.firstName} ${appt.patient.lastName}`
-                      : 'Guest';
-
-                  const timeDisplay = appt.preferredStartTime
-                    ? formatTimeString(appt.preferredStartTime)
-                    : 'Time Pending';
-
-                  return (
-                    <button
-                      key={appt.id}
-                      onClick={() => props.onSelectAppointment(appt.id)}
-                      className={`flex flex-col items-start w-full gap-2 border-b p-4 text-sm leading-tight text-left transition-colors last:border-b-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${
-                        isSelected
-                          ? 'bg-sidebar-accent text-sidebar-accent-foreground'
-                          : 'text-foreground'
-                      }`}
-                    >
-                      <div className="flex w-full items-center gap-2">
-                        <span>{patientName}</span>
-                        <span className="ml-auto text-[10px] font-medium uppercase tracking-wider text-amber-600 bg-amber-500/10 dark:text-amber-400 px-1.5 py-0.5 rounded shrink-0">
-                          {appt.status}
-                        </span>
-                      </div>
-                      <span className="font-medium">
-                        {appt.service?.name || 'Treatment'}
-                      </span>
-                      <span className="line-clamp-2 w-[260px] text-xs whitespace-break-spaces">
-                        {formatShortDate(appt.date)} • {timeDisplay}
-                      </span>
-                    </button>
-                  );
-                })
-              )
             ) : filteredInquiries.length === 0 ? (
               <div className="py-12 text-center text-text-muted text-xs">
                 No active inquiries found.
