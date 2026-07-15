@@ -190,48 +190,35 @@ export function ChatIntakeWorkflow({
             )}
           </div>
 
-          {/* Slots Picker */}
+          {/* Time Picker */}
           <div className="flex flex-col gap-2">
-            <span className="text-[10px] font-bold text-muted-foreground uppercase">Available Time Slots</span>
+            <span className="text-[10px] font-bold text-muted-foreground uppercase">Preferred Time</span>
             {!intake.selectedDate ? (
               <div className="text-xs text-muted-foreground p-4 bg-card border border-border rounded-xl text-center">
                 Please select a date on the calendar.
               </div>
-            ) : scheduler.loadingKey === 'slots' ? (
-              <div className="text-center text-[10px] text-muted-foreground py-8 flex items-center justify-center gap-1">
-                <Loader2 className="size-3 animate-spin" />
-                Loading slots...
-              </div>
-            ) : scheduler.availableSlots.length === 0 ? (
-              <div className="text-xs text-muted-foreground p-4 bg-card border border-border rounded-xl text-center">
-                No slots available on this date.
-              </div>
             ) : (
-              <div className="grid grid-cols-2 gap-2 max-h-[140px] overflow-y-auto pr-1">
-                {scheduler.availableSlots.map((slot, index) => {
-                  const startTimeStr = slot.startTime.split('T')[1]?.substring(0, 5) || '';
-                  const endTimeStr = slot.endTime.split('T')[1]?.substring(0, 5) || '';
-                  const isSelected = intake.selectedTime === startTimeStr;
-                  const formattedTime = new Date(slot.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-                  return (
-                    <button
-                      key={index}
-                      type="button"
-                      onClick={() => {
-                        intake.setSelectedTime(startTimeStr);
-                        intake.setSelectedEndTime(endTimeStr);
-                      }}
-                      className={`p-2.5 rounded-lg text-xs font-semibold border transition-all text-center cursor-pointer ${
-                        isSelected
-                          ? 'bg-primary text-primary-foreground border-primary'
-                          : 'bg-card border-border text-foreground hover:border-primary/50'
-                      }`}
-                    >
-                      {formattedTime}
-                    </button>
-                  );
-                })}
+              <div className="flex flex-col gap-3">
+                <input
+                  type="time"
+                  value={intake.selectedTime}
+                  onChange={(e) => {
+                    const timeVal = e.target.value;
+                    intake.setSelectedTime(timeVal);
+                    if (timeVal) {
+                      const [h, m] = timeVal.split(':').map(Number);
+                      const dateObj = new Date();
+                      dateObj.setHours(h, m + 30, 0);
+                      const endH = dateObj.getHours().toString().padStart(2, '0');
+                      const endM = dateObj.getMinutes().toString().padStart(2, '0');
+                      intake.setSelectedEndTime(`${endH}:${endM}`);
+                    }
+                  }}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                />
+                <p className="text-[10px] text-muted-foreground">
+                  Select a convenient time for your reschedule request.
+                </p>
               </div>
             )}
 
