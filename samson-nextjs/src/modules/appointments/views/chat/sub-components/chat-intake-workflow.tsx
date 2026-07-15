@@ -125,7 +125,7 @@ export function ChatIntakeWorkflow({
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-bold text-foreground flex items-center gap-1.5">
             <Calendar className="size-4" />
-            Select New Date
+            Request to Reschedule
           </h3>
           <Button variant="ghost" onClick={() => handleStateChange('SELECT_OPTION')} size="sm">
             <ArrowLeft className="size-3.5 mr-1" />
@@ -248,7 +248,7 @@ export function ChatIntakeWorkflow({
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-bold text-foreground flex items-center gap-1.5">
             <XCircle className="size-4 text-destructive" />
-            Reason for Cancellation
+            Request Cancellation
           </h3>
           <Button variant="ghost" onClick={() => handleStateChange('SELECT_OPTION')} size="sm">
             <ArrowLeft className="size-3.5 mr-1" />
