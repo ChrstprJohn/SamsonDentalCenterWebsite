@@ -21,7 +21,7 @@ export function Bubble({ className, variant = "default", ...props }: BubbleProps
 }
 
 export function BubbleContent({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("", className)} {...props} />
+  return <div className={cn("whitespace-pre-wrap", className)} {...props} />
 }
 
 export function BubbleGroup({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
