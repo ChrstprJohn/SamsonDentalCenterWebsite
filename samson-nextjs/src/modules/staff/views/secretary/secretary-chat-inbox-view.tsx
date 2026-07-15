@@ -15,7 +15,17 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { Search, Mail, Archive, MessageSquare, Calendar, XCircle, CheckCircle, User, Stethoscope, Clock, ChevronUp, ChevronDown, AlertCircle } from 'lucide-react';
+import {
+    Sidebar,
+    SidebarHeader,
+    SidebarContent,
+    SidebarGroup,
+    SidebarGroupContent,
+    SidebarInput,
+} from '@/components/ui/sidebar';
 
 interface SecretaryChatInboxViewProps {
     initialThreads: ChatThreadDto[];
@@ -25,13 +35,12 @@ export function SecretaryChatInboxView({ initialThreads }: SecretaryChatInboxVie
     const [threads, setThreads] = useState<ChatThreadDto[]>(initialThreads);
     const [searchQuery, setSearchQuery] = useState('');
     const [activeTab, setActiveTab] = useState<'ACTIVE' | 'ARCHIVE'>('ACTIVE');
+    const [showOnlyUnreads, setShowOnlyUnreads] = useState(false);
     
     const activeStates = ['APPROVED', 'CHECKED_IN', 'RESCHEDULE_REQUESTED'];
     const initialActive = initialThreads.filter(t => t.status !== 'PENDING' && activeStates.includes(t.status));
     
-    const [selectedThreadId, setSelectedThreadId] = useState<string | null>(
-        initialActive.length > 0 ? initialActive[0].appointmentId : null
-    );
+    const [selectedThreadId, setSelectedThreadId] = useState<string | null>(null);
     const [selectedThreadMessages, setSelectedThreadMessages] = useState<MessageResponseDto[]>([]);
     const [loadingMessages, setLoadingMessages] = useState(false);
 
@@ -118,14 +127,21 @@ export function SecretaryChatInboxView({ initialThreads }: SecretaryChatInboxVie
         };
     }, [selectedThreadId]);
 
-    const filteredThreads = threads.filter((t) => {
-        if (t.status === 'PENDING') return false;
-        const nameMatch = t.patientName.toLowerCase().includes(searchQuery.toLowerCase());
-        const isTabMatch = activeTab === 'ACTIVE' 
-            ? activeStates.includes(t.status)
-            : !activeStates.includes(t.status);
-        return nameMatch && isTabMatch;
-    });
+    const filteredThreads = threads
+        .filter((t) => {
+            if (t.status === 'PENDING') return false;
+            const nameMatch = t.patientName.toLowerCase().includes(searchQuery.toLowerCase());
+            const isTabMatch = activeTab === 'ACTIVE' 
+                ? activeStates.includes(t.status)
+                : !activeStates.includes(t.status);
+            const isUnreadMatch = showOnlyUnreads ? t.unreadCount > 0 : true;
+            return nameMatch && isTabMatch && isUnreadMatch;
+        })
+        .sort((a, b) => {
+            const timeA = a.latestMessage ? new Date(a.latestMessage.createdAt).getTime() : 0;
+            const timeB = b.latestMessage ? new Date(b.latestMessage.createdAt).getTime() : 0;
+            return timeB - timeA;
+        });
 
     const selectedThread = threads.find((t) => t.appointmentId === selectedThreadId);
 
@@ -146,6 +162,24 @@ export function SecretaryChatInboxView({ initialThreads }: SecretaryChatInboxVie
             return timeStr;
         } catch {
             return timeStr;
+        }
+    };
+
+    const formatMessageTime = (dateStr: string) => {
+        try {
+            const date = new Date(dateStr);
+            const today = new Date();
+            if (date.toDateString() === today.toDateString()) {
+                return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            }
+            const yesterday = new Date();
+            yesterday.setDate(today.getDate() - 1);
+            if (date.toDateString() === yesterday.toDateString()) {
+                return 'Yesterday';
+            }
+            return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+        } catch {
+            return '';
         }
     };
 
@@ -220,370 +254,398 @@ export function SecretaryChatInboxView({ initialThreads }: SecretaryChatInboxVie
     return (
         <div className="flex h-full w-full overflow-hidden">
             {/* Column 1: Left List Sidebar */}
-            <div className="w-80 flex flex-col border-r border-border flex-shrink-0">
-                {/* Search */}
-                <div className="p-3 border-b border-border">
-                    <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-                        <Input
-                            type="text"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            placeholder="Search patient..."
-                            className="pl-9"
-                        />
+            <Sidebar
+                collapsible="none"
+                className="hidden md:flex flex-col w-80 shrink-0 border-r border-card-border/40 bg-sidebar h-full overflow-hidden"
+            >
+                <SidebarHeader className="gap-3.5 border-b p-4 shrink-0">
+                    <div className="flex w-full items-center justify-between">
+                        <div className="text-base font-medium text-foreground">
+                            Chat Inbox
+                        </div>
+                        <Label className="flex items-center gap-2 text-sm">
+                            <span>Unreads</span>
+                            <Switch 
+                                checked={showOnlyUnreads} 
+                                onCheckedChange={setShowOnlyUnreads}
+                                className="shadow-none"
+                            />
+                        </Label>
                     </div>
-                </div>
+                    <SidebarInput
+                        placeholder="Type to search..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="rounded-md"
+                    />
 
-                {/* Tabs */}
-                <div className="flex p-2 gap-1 bg-muted/20">
-                    <Button
-                        onClick={() => setActiveTab('ACTIVE')}
-                        variant={activeTab === 'ACTIVE' ? 'default' : 'ghost'}
-                        size="sm"
-                        className="flex-1 h-8 text-xs"
-                    >
-                        <Mail className="size-3.5 mr-1.5" />
-                        Active ({threads.filter(t => t.status !== 'PENDING' && activeStates.includes(t.status)).length})
-                    </Button>
-                    <Button
-                        onClick={() => setActiveTab('ARCHIVE')}
-                        variant={activeTab === 'ARCHIVE' ? 'default' : 'ghost'}
-                        size="sm"
-                        className="flex-1 h-8 text-xs"
-                    >
-                        <Archive className="size-3.5 mr-1.5" />
-                        Archive ({threads.filter(t => t.status !== 'PENDING' && !activeStates.includes(t.status)).length})
-                    </Button>
-                </div>
-
-                {/* Conversations List */}
-                <div className="flex-1 overflow-y-auto divide-y divide-border/40">
-                    {filteredThreads.length === 0 ? (
-                        <div className="p-8 text-center text-xs text-muted-foreground">
-                            No conversations found.
-                        </div>
-                    ) : (
-                        filteredThreads.map((t) => {
-                            const isSelected = t.appointmentId === selectedThreadId;
-                            const isActive = activeStates.includes(t.status);
-                            return (
-                                <button
-                                    key={t.appointmentId}
-                                    onClick={() => setSelectedThreadId(t.appointmentId)}
-                                    className={`w-full text-left p-4 flex flex-col gap-1.5 transition-all duration-200 hover:bg-muted/40 cursor-pointer ${
-                                        isSelected ? 'bg-muted/60 border-l-4 border-primary' : ''
-                                    }`}
-                                >
-                                    <div className="flex justify-between items-center w-full">
-                                        <span className={`text-xs font-bold flex items-center gap-1.5 ${
-                                            t.unreadCount > 0 ? 'text-foreground' : 'text-muted-foreground'
-                                        }`}>
-                                            <User className="size-3 text-muted-foreground" />
-                                            {t.patientName}
-                                        </span>
-                                        {t.unreadCount > 0 && (
-                                            <span className="w-2.5 h-2.5 bg-primary rounded-full animate-pulse" />
-                                        )}
-                                    </div>
-                                    <div className="flex justify-between items-center w-full text-[10px]">
-                                        <span className="text-muted-foreground truncate max-w-[120px] flex items-center gap-1">
-                                            <MessageSquare className="size-3" />
-                                            {t.serviceName}
-                                        </span>
-                                        <Badge variant={isActive ? 'success' : 'default'}>
-                                            {t.status}
-                                        </Badge>
-                                    </div>
-                                    {t.latestMessage && (
-                                        <p className={`text-xs truncate mt-0.5 text-muted-foreground max-w-[220px] ${
-                                            t.unreadCount > 0 ? 'font-semibold text-foreground' : ''
-                                        }`}>
-                                            {t.latestMessage.text}
-                                        </p>
-                                    )}
-                                </button>
-                            );
-                        })
-                    )}
-                </div>
-            </div>
-
-            {/* Column 2: Dialogue Stream */}
-            <div className="flex-1 flex flex-col bg-muted/20 border-r border-border">
-                {selectedThreadId && selectedThread ? (
-                    loadingMessages ? (
-                        <div className="flex-1 flex items-center justify-center text-sm text-muted-foreground">
-                            Loading messages...
-                        </div>
-                    ) : (
-                        <PatientChatView
-                            appointmentId={selectedThreadId}
-                            appointmentDetails={{
-                                status: selectedThread.status,
-                                date: selectedThread.date,
-                                preferredStartTime: selectedThread.preferredStartTime,
-                                patientName: selectedThread.patientName,
-                                serviceName: selectedThread.serviceName,
-                                serviceId: selectedThread.serviceId ?? null,
-                                doctorName: selectedThread.doctorName,
-                                startTime: selectedThread.startTime,
-                                endTime: selectedThread.endTime,
-                            }}
-                            initialMessages={selectedThreadMessages}
-                            currentUserRole="STAFF"
-                            currentUserName="Secretary"
-                            className="border-0 rounded-none shadow-none h-full max-w-none w-full"
-                        />
-                    )
-                ) : (
-                    <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground space-y-2">
-                        <MessageSquare className="size-10 text-muted-foreground/50" />
-                        <p className="text-sm">Select a thread from the inbox list to start chatting.</p>
+                    {/* Tabs */}
+                    <div className="flex gap-1 bg-muted/20 p-1 rounded-lg">
+                        <Button
+                            onClick={() => setActiveTab('ACTIVE')}
+                            variant="ghost"
+                            size="sm"
+                            className={`flex-1 h-8 text-xs transition-all ${
+                                activeTab === 'ACTIVE'
+                                    ? 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm'
+                                    : 'text-muted-foreground hover:text-foreground'
+                            }`}
+                        >
+                            <Mail className="size-3.5 mr-1.5" />
+                            Active ({threads.filter(t => t.status !== 'PENDING' && activeStates.includes(t.status)).length})
+                        </Button>
+                        <Button
+                            onClick={() => setActiveTab('ARCHIVE')}
+                            variant="ghost"
+                            size="sm"
+                            className={`flex-1 h-8 text-xs transition-all ${
+                                activeTab === 'ARCHIVE'
+                                    ? 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm'
+                                    : 'text-muted-foreground hover:text-foreground'
+                            }`}
+                        >
+                            <Archive className="size-3.5 mr-1.5" />
+                            Archive ({threads.filter(t => t.status !== 'PENDING' && !activeStates.includes(t.status)).length})
+                        </Button>
                     </div>
-                )}
-            </div>
+                </SidebarHeader>
 
-            {/* Column 3: Context & Action Control Dock */}
-            <div className="w-80 flex flex-col border-l border-border bg-sidebar h-full overflow-hidden flex-shrink-0">
-                {selectedThreadId && selectedThread ? (
-                    <div className="flex flex-col h-full overflow-hidden">
-                        {/* Header: Align with Center Top Container */}
-                        <div className="px-4 border-b border-border bg-sidebar shrink-0 flex items-center h-[64px]">
-                            <h3 className="text-base font-medium text-foreground">
-                                Appointment Detail
-                            </h3>
-                        </div>
-
-                        {/* Scrollable Content */}
-                        <div className="flex-1 overflow-y-auto p-5 flex flex-col justify-between gap-6" data-lenis-prevent>
-                            <div className="space-y-6">
-                                {/* Details list */}
-                                <div className="flex flex-col gap-5 text-xs">
-                                    {/* Section: Patient Name Info */}
-                                    <div className="space-y-2">
-                                        <div className="text-xs font-semibold text-muted-foreground flex justify-between items-center">
-                                            <span>Patient Info</span>
-                                            {selectedThread.chatToken && (
-                                                <Badge variant="warning" className="text-[9px] px-1.5 py-0">
-                                                    GUEST
-                                                </Badge>
-                                            )}
-                                        </div>
-                                        <div className="border border-card-border/60 bg-muted/10 rounded-xl p-3 space-y-2">
-                                            <div className="flex justify-between items-center">
-                                                <span className="text-text-muted">First</span>
-                                                <span className="font-semibold text-text-primary">{selectedThread.patientFirstName || selectedThread.patientName.split(' ')[0] || '-'}</span>
-                                            </div>
-                                            <div className="flex justify-between items-center">
-                                                <span className="text-text-muted">Middle</span>
-                                                <span className="font-semibold text-text-primary">{selectedThread.patientMiddleName || '-'}</span>
-                                            </div>
-                                            <div className="flex justify-between items-center">
-                                                <span className="text-text-muted">Last</span>
-                                                <span className="font-semibold text-text-primary">{selectedThread.patientLastName || selectedThread.patientName.split(' ')[1] || '-'}</span>
-                                            </div>
-                                            <div className="flex justify-between items-center">
-                                                <span className="text-text-muted">Suffix</span>
-                                                <span className="font-semibold text-text-primary">{selectedThread.patientSuffix || '-'}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Section: Contact Info */}
-                                    <div className="space-y-2">
-                                        <div className="text-xs font-semibold text-muted-foreground">Contact Info</div>
-                                        <div className="border border-card-border/60 bg-muted/10 rounded-xl p-3 space-y-2">
-                                            <div className="flex justify-between items-center">
-                                                <span className="text-text-muted">Phone</span>
-                                                <span className="font-semibold text-text-primary">{selectedThread.patientPhone || 'No Phone'}</span>
-                                            </div>
-                                            <div className="flex justify-between items-center gap-4">
-                                                <span className="text-text-muted shrink-0">Email</span>
-                                                <span className="font-semibold text-text-primary truncate max-w-[150px]" title={selectedThread.patientEmail}>{selectedThread.patientEmail || '-'}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Section: Appointment Details */}
-                                    <div className="space-y-2">
-                                        <div className="text-xs font-semibold text-muted-foreground">Schedule & Status</div>
-                                        <div className="border border-card-border/60 bg-muted/10 rounded-xl p-3 space-y-2">
-                                            <div className="flex justify-between items-center">
-                                                <span className="text-text-muted">Treatment</span>
-                                                <span className="font-semibold text-text-primary text-right">{selectedThread.serviceName || 'Treatment'}</span>
-                                            </div>
-                                            <div className="flex justify-between items-center">
-                                                <span className="text-text-muted">Date</span>
-                                                <span className="font-semibold text-text-primary">{selectedThread.date}</span>
-                                            </div>
-                                            <div className="flex justify-between items-center">
-                                                <span className="text-text-muted">Start Time</span>
-                                                <span className="font-semibold text-text-primary">{formatTime(selectedThread.startTime) || selectedThread.preferredStartTime || 'TBD'}</span>
-                                            </div>
-                                            <div className="flex justify-between items-center">
-                                                <span className="text-text-muted">End Time</span>
-                                                <span className="font-semibold text-text-primary">{formatTime(selectedThread.endTime) || 'TBD'}</span>
-                                            </div>
-                                            <div className="flex justify-between items-center">
-                                                <span className="text-text-muted">Doctor</span>
-                                                <span className="font-semibold text-text-primary text-right">{selectedThread.doctorName || 'Unassigned'}</span>
-                                            </div>
-                                            <div className="flex justify-between items-center">
-                                                <span className="text-text-muted">Status</span>
-                                                <Badge variant={activeStates.includes(selectedThread.status) ? 'success' : 'error'}>
-                                                    {selectedThread.status}
-                                                </Badge>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="text-xs font-semibold text-muted-foreground mt-4">
-                                Quick Action
-                            </div>
-                        </div>
-
-                        {/* Actions Area (Matches Chat Input Footer) */}
-                        <div className="p-4 border-t border-border bg-sidebar shrink-0">
-                            {actionError && (
-                                <div className="p-3 mb-3 rounded-lg bg-destructive/10 border border-destructive/20 text-[10px] text-destructive flex items-start gap-2">
-                                    <AlertCircle className="size-3.5 mt-0.5 shrink-0" />
-                                    <span>{actionError}</span>
-                                </div>
-                            )}
-                            {actionSuccess && (
-                                <div className="p-3 mb-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-[10px] text-emerald-500 flex items-start gap-2">
-                                    <CheckCircle className="size-3.5 mt-0.5 shrink-0" />
-                                    <span>{actionSuccess}</span>
-                                </div>
-                            )}
-
-                            {activeAction === 'NONE' ? (
-                                <div className="w-full">
-                                    {activeStates.includes(selectedThread.status) ? (
-                                        <div className="flex gap-2">
-                                            <Button 
-                                                onClick={() => {
-                                                    setActiveAction('RESCHEDULE');
-                                                    setRescheduleDate(selectedThread.date);
-                                                    setRescheduleDoctorId(selectedThread.doctorId || '');
-                                                    setActionError(null);
-                                                    setActionSuccess(null);
-                                                }}
-                                                variant="outline" 
-                                                className="flex-1 h-[44px]"
-                                            >
-                                                Reschedule
-                                            </Button>
-                                            <Button 
-                                                onClick={() => {
-                                                    setActiveAction('CANCEL');
-                                                    setActionError(null);
-                                                    setActionSuccess(null);
-                                                }}
-                                                variant="outline" 
-                                                className="flex-1 h-[44px] border-destructive/50 text-destructive hover:bg-destructive/10"
-                                            >
-                                                Cancel
-                                            </Button>
-                                        </div>
-                                    ) : (
-                                        <div className="p-3 rounded-lg bg-muted/40 text-[10px] text-muted-foreground text-center">
-                                            Appointment is closed. Actions are disabled.
-                                        </div>
-                                    )}
+                <SidebarContent 
+                    data-lenis-prevent 
+                    style={{ scrollbarWidth: 'thin' }} 
+                    className="!overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
+                >
+                    <SidebarGroup className="px-0">
+                        <SidebarGroupContent className="flex flex-col">
+                            {filteredThreads.length === 0 ? (
+                                <div className="py-12 text-center text-text-muted text-xs">
+                                    No conversations found.
                                 </div>
                             ) : (
-                                    <form onSubmit={handleActionSubmit} className="space-y-3 bg-card/60 p-4 rounded-xl border border-border">
-                                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
-                                            {activeAction === 'RESCHEDULE' ? <Calendar className="size-3" /> : <XCircle className="size-3" />}
-                                            {activeAction === 'RESCHEDULE' ? 'Reschedule Slot' : 'Cancel Booking'}
-                                        </p>
+                                filteredThreads.map((t) => {
+                                    const isSelected = t.appointmentId === selectedThreadId;
+                                    return (
+                                        <button
+                                            key={t.appointmentId}
+                                            onClick={() => setSelectedThreadId(t.appointmentId)}
+                                            className={`flex flex-col items-start w-full gap-1.5 border-b p-4 text-sm leading-tight text-left transition-colors last:border-b-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${
+                                                isSelected
+                                                    ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+                                                    : 'text-foreground'
+                                            }`}
+                                        >
+                                            <div className="flex w-full items-center justify-between gap-2">
+                                                <span className={t.unreadCount > 0 ? 'font-semibold' : ''}>
+                                                    {t.patientName}
+                                                </span>
+                                                <span className="text-[10px] text-muted-foreground font-medium whitespace-nowrap">
+                                                    {t.latestMessage ? formatMessageTime(t.latestMessage.createdAt) : ''}
+                                                </span>
+                                            </div>
+                                            <span className="font-medium text-xs text-text-secondary">
+                                                {t.serviceName || 'Treatment'}
+                                            </span>
+                                            <div className="flex w-full items-start justify-between gap-4 mt-0.5 min-w-0">
+                                                {t.latestMessage ? (
+                                                    <span className={`line-clamp-2 w-[260px] text-xs whitespace-break-spaces ${
+                                                        t.unreadCount > 0 ? 'font-medium text-foreground' : 'text-muted-foreground'
+                                                    }`}>
+                                                        {t.latestMessage.text}
+                                                    </span>
+                                                ) : (
+                                                    <span className="text-xs text-muted-foreground italic flex-1">
+                                                        No messages yet
+                                                    </span>
+                                                )}
+                                                {t.unreadCount > 0 && (
+                                                    <span className="w-2 h-2 bg-primary rounded-full shrink-0 animate-pulse mt-1 ml-auto" />
+                                                )}
+                                            </div>
+                                        </button>
+                                    );
+                                })
+                            )}
+                        </SidebarGroupContent>
+                    </SidebarGroup>
+                </SidebarContent>
+            </Sidebar>
 
-                                        {activeAction === 'RESCHEDULE' && (
-                                            <div className="space-y-2 text-[10px]">
-                                                <div>
-                                                    <label className="text-muted-foreground block mb-1">New Date</label>
-                                                    <Input 
-                                                        type="date" 
-                                                        value={rescheduleDate}
-                                                        onChange={e => setRescheduleDate(e.target.value)}
-                                                    />
+            {/* Columns 2 & 3 wrapper */}
+            {selectedThreadId && selectedThread ? (
+                <>
+                    {/* Column 2: Dialogue Stream */}
+                    <div className="flex-1 flex flex-col bg-muted/20 border-r border-border">
+                        {loadingMessages ? (
+                            <div className="flex-1 flex items-center justify-center text-sm text-muted-foreground">
+                                Loading messages...
+                            </div>
+                        ) : (
+                            <PatientChatView
+                                appointmentId={selectedThreadId}
+                                appointmentDetails={{
+                                    status: selectedThread.status,
+                                    date: selectedThread.date,
+                                    preferredStartTime: selectedThread.preferredStartTime,
+                                    patientName: selectedThread.patientName,
+                                    serviceName: selectedThread.serviceName,
+                                    serviceId: selectedThread.serviceId ?? null,
+                                    doctorName: selectedThread.doctorName,
+                                    startTime: selectedThread.startTime,
+                                    endTime: selectedThread.endTime,
+                                }}
+                                initialMessages={selectedThreadMessages}
+                                currentUserRole="STAFF"
+                                currentUserName="Secretary"
+                                className="border-0 rounded-none shadow-none h-full max-w-none w-full"
+                            />
+                        )}
+                    </div>
+
+                    {/* Column 3: Context & Action Control Dock */}
+                    <div className="w-80 flex flex-col border-l border-border bg-sidebar h-full overflow-hidden flex-shrink-0">
+                        <div className="flex flex-col h-full overflow-hidden">
+                            {/* Header: Align with Center Top Container */}
+                            <div className="p-4 border-b border-border bg-sidebar shrink-0 flex items-center">
+                                <h3 className="text-base font-medium text-foreground">
+                                    Appointment Detail
+                                </h3>
+                            </div>
+
+                            {/* Scrollable Content */}
+                            <div 
+                                className="flex-1 !overflow-y-auto p-5 flex flex-col justify-between gap-6 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent" 
+                                style={{ scrollbarWidth: 'thin' }}
+                                data-lenis-prevent
+                            >
+                                <div className="space-y-6">
+                                    {/* Details list */}
+                                    <div className="flex flex-col gap-5 text-xs">
+                                        {/* Section: Patient Name Info */}
+                                        <div className="space-y-2">
+                                            <div className="text-xs font-semibold text-muted-foreground flex justify-between items-center">
+                                                <span>Patient Info</span>
+                                                {selectedThread.chatToken && (
+                                                    <Badge variant="warning" className="text-[9px] px-1.5 py-0">
+                                                        GUEST
+                                                    </Badge>
+                                                )}
+                                            </div>
+                                            <div className="border border-card-border/60 bg-muted/10 rounded-xl p-3 space-y-2">
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-text-muted">First</span>
+                                                    <span className="font-semibold text-text-primary">{selectedThread.patientFirstName || selectedThread.patientName.split(' ')[0] || '-'}</span>
                                                 </div>
-                                                <div className="grid grid-cols-2 gap-2">
-                                                    <div>
-                                                        <label className="text-muted-foreground block mb-1">Start Time</label>
-                                                        <Input 
-                                                            type="time" 
-                                                            value={rescheduleStartTime}
-                                                            onChange={e => setRescheduleStartTime(e.target.value)}
-                                                        />
-                                                    </div>
-                                                    <div>
-                                                        <label className="text-muted-foreground block mb-1">End Time</label>
-                                                        <Input 
-                                                            type="time" 
-                                                            value={rescheduleEndTime}
-                                                            onChange={e => setRescheduleEndTime(e.target.value)}
-                                                        />
-                                                    </div>
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-text-muted">Middle</span>
+                                                    <span className="font-semibold text-text-primary">{selectedThread.patientMiddleName || '-'}</span>
                                                 </div>
-                                                <div>
-                                                    <label className="text-muted-foreground block mb-1">Assign Doctor</label>
-                                                    <Select
-                                                        value={rescheduleDoctorId}
-                                                        onChange={e => setRescheduleDoctorId(e.target.value)}
-                                                        options={[
-                                                            { value: '', label: 'Select Doctor...' },
-                                                            ...doctors.map(d => ({ value: d.id, label: `Dr. ${d.firstName} ${d.lastName}` }))
-                                                        ]}
-                                                    />
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-text-muted">Last</span>
+                                                    <span className="font-semibold text-text-primary">{selectedThread.patientLastName || selectedThread.patientName.split(' ')[1] || '-'}</span>
+                                                </div>
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-text-muted">Suffix</span>
+                                                    <span className="font-semibold text-text-primary">{selectedThread.patientSuffix || '-'}</span>
                                                 </div>
                                             </div>
-                                        )}
-
-                                        <div>
-                                            <label className="text-[10px] text-muted-foreground block mb-1">Reason / Notes</label>
-                                            <Textarea
-                                                value={actionReason}
-                                                onChange={e => setActionReason(e.target.value)}
-                                                placeholder="Provide reason..."
-                                                className="min-h-[60px] resize-none"
-                                                required
-                                            />
                                         </div>
 
-                                        <div className="flex gap-2">
-                                            <Button 
-                                                type="button" 
-                                                onClick={() => setActiveAction('NONE')}
-                                                variant="outline" 
-                                                size="sm"
-                                                className="flex-1"
-                                            >
-                                                Cancel
-                                            </Button>
-                                            <Button 
-                                                type="submit" 
-                                                disabled={actionLoading}
-                                                size="sm"
-                                                className="flex-1"
-                                            >
-                                                {actionLoading ? 'Saving...' : 'Confirm'}
-                                            </Button>
+                                        {/* Section: Contact Info */}
+                                        <div className="space-y-2">
+                                            <div className="text-xs font-semibold text-muted-foreground">Contact Info</div>
+                                            <div className="border border-card-border/60 bg-muted/10 rounded-xl p-3 space-y-2">
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-text-muted">Phone</span>
+                                                    <span className="font-semibold text-text-primary">{selectedThread.patientPhone || 'No Phone'}</span>
+                                                </div>
+                                                <div className="flex justify-between items-center gap-4">
+                                                    <span className="text-text-muted shrink-0">Email</span>
+                                                    <span className="font-semibold text-text-primary truncate max-w-[150px]" title={selectedThread.patientEmail}>{selectedThread.patientEmail || '-'}</span>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </form>
+
+                                        {/* Section: Appointment Details */}
+                                        <div className="space-y-2">
+                                            <div className="text-xs font-semibold text-muted-foreground">Schedule & Status</div>
+                                            <div className="border border-card-border/60 bg-muted/10 rounded-xl p-3 space-y-2">
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-text-muted">Treatment</span>
+                                                    <span className="font-semibold text-text-primary text-right">{selectedThread.serviceName || 'Treatment'}</span>
+                                                </div>
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-text-muted">Date</span>
+                                                    <span className="font-semibold text-text-primary">{selectedThread.date}</span>
+                                                </div>
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-text-muted">Start Time</span>
+                                                    <span className="font-semibold text-text-primary">{formatTime(selectedThread.startTime) || selectedThread.preferredStartTime || 'TBD'}</span>
+                                                </div>
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-text-muted">End Time</span>
+                                                    <span className="font-semibold text-text-primary">{formatTime(selectedThread.endTime) || 'TBD'}</span>
+                                                </div>
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-text-muted">Doctor</span>
+                                                    <span className="font-semibold text-text-primary text-right">{selectedThread.doctorName || 'Unassigned'}</span>
+                                                </div>
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-text-muted">Status</span>
+                                                    <Badge variant={activeStates.includes(selectedThread.status) ? 'success' : 'error'}>
+                                                        {selectedThread.status}
+                                                    </Badge>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="text-xs font-semibold text-muted-foreground mt-4">
+                                    Quick Action
+                                </div>
+                            </div>
+
+                            {/* Actions Area (Matches Chat Input Footer) */}
+                            <div className="p-4 border-t border-border bg-sidebar shrink-0">
+                                {actionError && (
+                                    <div className="p-3 mb-3 rounded-lg bg-destructive/10 border border-destructive/20 text-[10px] text-destructive flex items-start gap-2">
+                                        <AlertCircle className="size-3.5 mt-0.5 shrink-0" />
+                                        <span>{actionError}</span>
+                                    </div>
                                 )}
+                                {actionSuccess && (
+                                    <div className="p-3 mb-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-[10px] text-emerald-500 flex items-start gap-2">
+                                        <CheckCircle className="size-3.5 mt-0.5 shrink-0" />
+                                        <span>{actionSuccess}</span>
+                                    </div>
+                                )}
+
+                                {activeAction === 'NONE' ? (
+                                    <div className="w-full">
+                                        {activeStates.includes(selectedThread.status) ? (
+                                            <div className="flex gap-2">
+                                                <Button 
+                                                    onClick={() => {
+                                                        setActiveAction('RESCHEDULE');
+                                                        setRescheduleDate(selectedThread.date);
+                                                        setRescheduleDoctorId(selectedThread.doctorId || '');
+                                                        setActionError(null);
+                                                        setActionSuccess(null);
+                                                    }}
+                                                    variant="outline" 
+                                                    className="flex-1 h-[44px]"
+                                                >
+                                                    Reschedule
+                                                </Button>
+                                                <Button 
+                                                    onClick={() => {
+                                                        setActiveAction('CANCEL');
+                                                        setActionError(null);
+                                                        setActionSuccess(null);
+                                                    }}
+                                                    variant="outline" 
+                                                    className="flex-1 h-[44px] border-destructive/50 text-destructive hover:bg-destructive/10"
+                                                >
+                                                    Cancel
+                                                </Button>
+                                            </div>
+                                        ) : (
+                                            <div className="p-3 rounded-lg bg-muted/40 text-[10px] text-muted-foreground text-center">
+                                                Appointment is closed. Actions are disabled.
+                                            </div>
+                                        )}
+                                    </div>
+                                ) : (
+                                        <form onSubmit={handleActionSubmit} className="space-y-3 bg-card/60 p-4 rounded-xl border border-border">
+                                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
+                                                {activeAction === 'RESCHEDULE' ? <Calendar className="size-3" /> : <XCircle className="size-3" />}
+                                                {activeAction === 'RESCHEDULE' ? 'Reschedule Slot' : 'Cancel Booking'}
+                                            </p>
+
+                                            {activeAction === 'RESCHEDULE' && (
+                                                <div className="space-y-2 text-[10px]">
+                                                    <div>
+                                                        <label className="text-muted-foreground block mb-1">New Date</label>
+                                                        <Input 
+                                                            type="date" 
+                                                            value={rescheduleDate}
+                                                            onChange={e => setRescheduleDate(e.target.value)}
+                                                        />
+                                                    </div>
+                                                    <div className="grid grid-cols-2 gap-2">
+                                                        <div>
+                                                            <label className="text-muted-foreground block mb-1">Start Time</label>
+                                                            <Input 
+                                                                type="time" 
+                                                                value={rescheduleStartTime}
+                                                                onChange={e => setRescheduleStartTime(e.target.value)}
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <label className="text-muted-foreground block mb-1">End Time</label>
+                                                            <Input 
+                                                                type="time" 
+                                                                value={rescheduleEndTime}
+                                                                onChange={e => setRescheduleEndTime(e.target.value)}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <label className="text-muted-foreground block mb-1">Assign Doctor</label>
+                                                        <Select
+                                                            value={rescheduleDoctorId}
+                                                            onChange={e => setRescheduleDoctorId(e.target.value)}
+                                                            options={[
+                                                                { value: '', label: 'Select Doctor...' },
+                                                                ...doctors.map(d => ({ value: d.id, label: `Dr. ${d.firstName} ${d.lastName}` }))
+                                                            ]}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            <div>
+                                                <label className="text-[10px] text-muted-foreground block mb-1">Reason / Notes</label>
+                                                <Textarea
+                                                    value={actionReason}
+                                                    onChange={e => setActionReason(e.target.value)}
+                                                    placeholder="Provide reason..."
+                                                    className="min-h-[60px] resize-none"
+                                                    required
+                                                />
+                                            </div>
+
+                                            <div className="flex gap-2">
+                                                <Button 
+                                                    type="button" 
+                                                    onClick={() => setActiveAction('NONE')}
+                                                    variant="outline" 
+                                                    size="sm"
+                                                    className="flex-1"
+                                                >
+                                                    Cancel
+                                                </Button>
+                                                <Button 
+                                                    type="submit" 
+                                                    disabled={actionLoading}
+                                                    size="sm"
+                                                    className="flex-1"
+                                                >
+                                                    {actionLoading ? 'Saving...' : 'Confirm'}
+                                                </Button>
+                                            </div>
+                                        </form>
+                                    )}
                             </div>
                         </div>
-                ) : (
-                    <div className="h-full flex items-center justify-center text-muted-foreground text-center text-xs">
-                        No thread selected.
                     </div>
-                )}
-            </div>
+                </>
+            ) : (
+                <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground bg-muted/10 space-y-2">
+                    <MessageSquare className="size-12 text-muted-foreground/40" />
+                    <p className="text-sm font-medium">Select a thread from the inbox list to start chatting.</p>
+                </div>
+            )}
         </div>
     );
 }

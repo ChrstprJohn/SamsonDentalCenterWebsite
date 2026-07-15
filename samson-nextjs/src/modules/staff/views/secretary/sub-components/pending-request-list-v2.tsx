@@ -51,15 +51,15 @@ export function PendingRequestListV2(props: PendingRequestListV2Props) {
           placeholder="Type to search..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
+          className="rounded-md"
         />
-        <div className="flex border-b border-card-border/40 w-full mt-1">
-          <span className="flex-1 pb-2 text-xs font-semibold border-b-2 border-primary text-primary text-center">
-            Guest Inquiries ({filteredInquiries.length})
-          </span>
-        </div>
       </SidebarHeader>
       {/* data-lenis-prevent stops Lenis from hijacking nested scroll wheel events */}
-      <SidebarContent data-lenis-prevent>
+      <SidebarContent 
+        data-lenis-prevent 
+        style={{ scrollbarWidth: 'thin' }}
+        className="!overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
+      >
         <SidebarGroup className="px-0">
           <SidebarGroupContent className="flex flex-col">
             {isLoading ? (

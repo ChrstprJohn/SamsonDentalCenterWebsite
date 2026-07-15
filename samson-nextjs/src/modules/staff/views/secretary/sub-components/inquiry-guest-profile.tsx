@@ -41,14 +41,14 @@ export function InquiryGuestProfile(props: InquiryGuestProfileProps) {
           <SmallInput type="email" label="Email" value={props.email} onChange={props.setEmail} className="sm:col-span-2" />
         </div>
       ) : (
-        <div className="grid grid-cols-[110px_1fr] gap-x-4 gap-y-2 text-sm">
+        <div className="grid grid-cols-[110px_minmax(0,1fr)] gap-x-4 gap-y-2 text-sm">
           <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Name:</span>
-          <span className="font-semibold text-slate-900 dark:text-slate-100">
+          <span className="font-semibold text-slate-900 dark:text-slate-100 break-words">
             {props.firstName} {props.middleName ? `${props.middleName} ` : ''}{props.lastName}
           </span>
 
           <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Suffix:</span>
-          <span className="text-slate-700 dark:text-slate-300">
+          <span className="text-slate-700 dark:text-slate-300 break-words">
             {props.suffix || 'N/A'}
           </span>
 
@@ -58,17 +58,17 @@ export function InquiryGuestProfile(props: InquiryGuestProfileProps) {
           </span>
 
           <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Phone:</span>
-          <span className="text-slate-700 dark:text-slate-300">
+          <span className="text-slate-700 dark:text-slate-300 break-words">
             {props.phone || 'No phone'}
           </span>
 
           <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Email:</span>
-          <span className="text-slate-700 dark:text-slate-300">
+          <span className="text-slate-700 dark:text-slate-300 break-all">
             {props.email || 'No email'}
           </span>
 
           <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Patient Note:</span>
-          <span className="italic text-slate-700 dark:text-slate-300">
+          <span className="italic text-slate-700 dark:text-slate-300 break-words whitespace-pre-wrap">
             &quot;{props.patientNote || 'No special instructions provided'}&quot;
           </span>
         </div>

@@ -43,25 +43,11 @@ const data = {
       url: "/secretary-v2/chat",
       icon: <MessageSquare className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
     },
+
     {
-      title: "Website Requests",
-      url: "#",
+      title: "Appointment Requests",
+      url: "/secretary-v2/pending",
       icon: <ClipboardList className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
-      isActive: true,
-      items: [
-        {
-          title: "Bookings",
-          url: "/secretary-v2/pending",
-        },
-        {
-          title: "Reschedules",
-          url: "/secretary-v2/reschedule-requests",
-        },
-        {
-          title: "Cancellations",
-          url: "/secretary-v2/cancellations",
-        },
-      ],
     },
     {
       title: "Appointments",

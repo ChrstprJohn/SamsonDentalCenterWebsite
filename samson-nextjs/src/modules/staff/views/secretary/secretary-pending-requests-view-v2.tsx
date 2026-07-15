@@ -63,7 +63,7 @@ export function SecretaryPendingRequestsViewV2() {
   return (
     <div className="flex h-full w-full overflow-hidden">
       {/* Left Column: Inquiry List Only */}
-      <div className="w-80 flex flex-col border-r border-border flex-shrink-0">
+      <div className="w-[350px] flex flex-col flex-shrink-0">
         <PendingRequestListV2
           inquiries={inquiriesView.inquiries}
           selectedInquiryId={inquiriesView.selectedInquiryId}

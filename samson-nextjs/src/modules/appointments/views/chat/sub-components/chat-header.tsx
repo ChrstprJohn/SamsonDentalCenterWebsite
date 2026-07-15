@@ -29,7 +29,7 @@ export function ChatHeader({
   activeStatuses,
 }: ChatHeaderProps) {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between px-4 border-b border-border bg-sidebar gap-4 shrink-0 h-[64px]">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border-b border-border bg-sidebar gap-4 shrink-0">
       <div className="flex items-center">
         <h2 className="text-base font-medium text-foreground">{patientName}</h2>
       </div>

@@ -11,6 +11,10 @@ export interface ChatThreadDto {
     patientName: string;
     patientEmail: string;
     patientPhone?: string | null;
+    patientFirstName?: string | null;
+    patientMiddleName?: string | null;
+    patientLastName?: string | null;
+    patientSuffix?: string | null;
     serviceName: string;
     serviceId?: string | null;
     doctorId?: string | null;
@@ -61,6 +65,8 @@ export const getChatThreadsForSecretaryQuery = (supabase: SupabaseClient) => {
                 patient:users!appointments_patient_id_fkey (
                     first_name,
                     last_name,
+                    middle_name,
+                    suffix,
                     email,
                     phone_number
                 ),
@@ -71,6 +77,8 @@ export const getChatThreadsForSecretaryQuery = (supabase: SupabaseClient) => {
                 guest_contacts (
                     first_name,
                     last_name,
+                    middle_name,
+                    suffix,
                     email,
                     phone_number
                 ),
@@ -110,13 +118,25 @@ export const getChatThreadsForSecretaryQuery = (supabase: SupabaseClient) => {
             let patientName = 'Unknown Patient';
             let patientEmail = '';
             let patientPhone = '';
+            let patientFirstName = '';
+            let patientMiddleName = '';
+            let patientLastName = '';
+            let patientSuffix = '';
 
             if (row.patient) {
                 patientName = `${row.patient.first_name} ${row.patient.last_name}`;
+                patientFirstName = row.patient.first_name || '';
+                patientMiddleName = row.patient.middle_name || '';
+                patientLastName = row.patient.last_name || '';
+                patientSuffix = row.patient.suffix || '';
                 patientEmail = row.patient.email || '';
                 patientPhone = row.patient.phone_number || '';
             } else if (row.guest_contacts && row.guest_contacts.length > 0) {
                 patientName = `${row.guest_contacts[0].first_name} ${row.guest_contacts[0].last_name}`;
+                patientFirstName = row.guest_contacts[0].first_name || '';
+                patientMiddleName = row.guest_contacts[0].middle_name || '';
+                patientLastName = row.guest_contacts[0].last_name || '';
+                patientSuffix = row.guest_contacts[0].suffix || '';
                 patientEmail = row.guest_contacts[0].email || '';
                 patientPhone = row.guest_contacts[0].phone_number || '';
             }
@@ -139,6 +159,10 @@ export const getChatThreadsForSecretaryQuery = (supabase: SupabaseClient) => {
                 patientName,
                 patientEmail,
                 patientPhone,
+                patientFirstName,
+                patientMiddleName,
+                patientLastName,
+                patientSuffix,
                 serviceName: row.service?.name || 'General Inquiry',
                 doctorName,
                 latestMessage: latest

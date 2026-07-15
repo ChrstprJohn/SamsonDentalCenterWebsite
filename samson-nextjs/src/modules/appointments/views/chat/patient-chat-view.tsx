@@ -2,12 +2,11 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useChatMessages } from '../../hooks/chat/use-chat-messages';
 import { MessageResponseDto } from '../../dtos/chat/message-response.dto';
 import { ChatHeader } from './sub-components/chat-header';
-import { ChatContextBanner } from './sub-components/chat-context-banner';
 import { ChatMessageList } from './sub-components/chat-message-list';
 import { ChatIntakeWorkflow } from './sub-components/chat-intake-workflow';
 import { IntakeWorkflowState } from '../../hooks/chat/use-chat-intake';
@@ -85,8 +84,8 @@ export function PatientChatView({
         setText('');
     };
 
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
             e.preventDefault();
             handleSend();
         }
@@ -115,20 +114,6 @@ export function PatientChatView({
                 activeStatuses={activeStatuses}
             />
 
-            <ChatContextBanner
-                patientName={appointmentDetails.patientName}
-                serviceName={appointmentDetails.serviceName}
-                status={appointmentDetails.status}
-                date={appointmentDetails.date}
-                startTime={appointmentDetails.startTime}
-                endTime={appointmentDetails.endTime}
-                preferredStartTime={appointmentDetails.preferredStartTime}
-                doctorName={appointmentDetails.doctorName}
-                currentUserRole={currentUserRole}
-                appointmentId={appointmentId}
-                chatToken={chatToken}
-            />
-
             <ChatMessageList
                 messages={messages}
                 currentUserRole={currentUserRole}
@@ -153,14 +138,14 @@ export function PatientChatView({
                 ) : (
                     <div className="flex flex-col gap-2">
                         {sendError && <p className="text-xs text-destructive px-1 flex items-center gap-1"><AlertTriangle className="size-3" />{sendError}</p>}
-                        <div className="flex gap-2 items-end">
-                            <Textarea
+                        <div className="flex gap-2 items-center">
+                            <Input
                                 value={text}
                                 onChange={(e) => setText(e.target.value)}
                                 onKeyDown={handleKeyDown}
                                 placeholder="Type your message here..."
                                 disabled={isSending}
-                                className="min-h-[44px] max-h-[120px] resize-none disabled:opacity-50"
+                                className="h-[44px] disabled:opacity-50"
                             />
                             <div className="flex flex-col gap-2">
                                 {currentUserRole === 'PATIENT' && appointmentDetails.status === 'APPROVED' && (
@@ -177,7 +162,7 @@ export function PatientChatView({
                                 <Button
                                     onClick={handleSend}
                                     disabled={isSending || !text.trim()}
-                                    className="h-[44px] px-5"
+                                    className="h-[44px] px-5 bg-primary text-primary-foreground hover:bg-primary/90 border-0"
                                 >
                                     <Send className="size-4 mr-1.5" />
                                     {isSending ? 'Sending...' : 'Send'}
