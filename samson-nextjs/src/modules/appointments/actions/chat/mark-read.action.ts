@@ -23,11 +23,12 @@ export async function markMessagesAsReadAction(appointmentId: string, readerRole
 
             supabase = systemDb;
         } else {
-            supabase = await createClient();
-            const { data: { user } } = await supabase.auth.getUser();
+            const clientDb = await createClient();
+            const { data: { user } } = await clientDb.auth.getUser();
             if (!user) {
                 return { error: 'Unauthorized user session' };
             }
+            supabase = await createAdminClient();
         }
 
         const markAsRead = markMessagesAsReadCommand(supabase);
