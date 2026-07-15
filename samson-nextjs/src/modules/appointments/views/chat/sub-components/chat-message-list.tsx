@@ -52,7 +52,7 @@ export function ChatMessageList({
         </div>
       ) : (
         messages.map((msg, i) => {
-          const isSystem = msg.senderName === 'System' || msg.senderRole === 'SYSTEM';
+          const isSystem = msg.senderName === 'System';
           const isMe = msg.senderRole === currentUserRole || (isSystem && currentUserRole === 'STAFF');
 
           const isFirstInGroup = i === 0 || messages[i - 1].senderRole !== msg.senderRole || messages[i - 1].senderName !== msg.senderName;
