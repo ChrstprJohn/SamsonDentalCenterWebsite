@@ -345,99 +345,125 @@ export function SecretaryChatInboxView({ initialThreads }: SecretaryChatInboxVie
             </div>
 
             {/* Column 3: Context & Action Control Dock */}
-            <div className="w-80 flex flex-col bg-muted/20 p-5 overflow-y-auto flex-shrink-0">
+            <div className="w-80 flex flex-col border-l border-border bg-sidebar h-full overflow-hidden flex-shrink-0">
                 {selectedThreadId && selectedThread ? (
-                    <div className="flex flex-col h-full justify-between gap-6">
-                        <div className="space-y-6">
-                            {/* Section Header */}
-                            <div className="border-b border-border pb-3">
-                                <h3 className="text-xs font-bold text-muted-foreground tracking-wider uppercase flex items-center gap-1.5">
-                                    <Stethoscope className="size-3.5" />
-                                    Appointment Settings
-                                </h3>
+                    <div className="flex flex-col h-full overflow-hidden">
+                        {/* Header: Align with Center Top Container */}
+                        <div className="px-4 border-b border-border bg-sidebar shrink-0 flex items-center h-[64px]">
+                            <h3 className="text-base font-medium text-foreground">
+                                Appointment Detail
+                            </h3>
+                        </div>
+
+                        {/* Scrollable Content */}
+                        <div className="flex-1 overflow-y-auto p-5 flex flex-col justify-between gap-6" data-lenis-prevent>
+                            <div className="space-y-6">
+                                {/* Details list */}
+                                <div className="flex flex-col gap-5 text-xs">
+                                    {/* Section: Patient Name Info */}
+                                    <div className="space-y-2">
+                                        <div className="text-xs font-semibold text-muted-foreground flex justify-between items-center">
+                                            <span>Patient Info</span>
+                                            {selectedThread.chatToken && (
+                                                <Badge variant="warning" className="text-[9px] px-1.5 py-0">
+                                                    GUEST
+                                                </Badge>
+                                            )}
+                                        </div>
+                                        <div className="border border-card-border/60 bg-muted/10 rounded-xl p-3 space-y-2">
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-text-muted">First</span>
+                                                <span className="font-semibold text-text-primary">{selectedThread.patientFirstName || selectedThread.patientName.split(' ')[0] || '-'}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-text-muted">Middle</span>
+                                                <span className="font-semibold text-text-primary">{selectedThread.patientMiddleName || '-'}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-text-muted">Last</span>
+                                                <span className="font-semibold text-text-primary">{selectedThread.patientLastName || selectedThread.patientName.split(' ')[1] || '-'}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-text-muted">Suffix</span>
+                                                <span className="font-semibold text-text-primary">{selectedThread.patientSuffix || '-'}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Section: Contact Info */}
+                                    <div className="space-y-2">
+                                        <div className="text-xs font-semibold text-muted-foreground">Contact Info</div>
+                                        <div className="border border-card-border/60 bg-muted/10 rounded-xl p-3 space-y-2">
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-text-muted">Phone</span>
+                                                <span className="font-semibold text-text-primary">{selectedThread.patientPhone || 'No Phone'}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center gap-4">
+                                                <span className="text-text-muted shrink-0">Email</span>
+                                                <span className="font-semibold text-text-primary truncate max-w-[150px]" title={selectedThread.patientEmail}>{selectedThread.patientEmail || '-'}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Section: Appointment Details */}
+                                    <div className="space-y-2">
+                                        <div className="text-xs font-semibold text-muted-foreground">Schedule & Status</div>
+                                        <div className="border border-card-border/60 bg-muted/10 rounded-xl p-3 space-y-2">
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-text-muted">Treatment</span>
+                                                <span className="font-semibold text-text-primary text-right">{selectedThread.serviceName || 'Treatment'}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-text-muted">Date</span>
+                                                <span className="font-semibold text-text-primary">{selectedThread.date}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-text-muted">Start Time</span>
+                                                <span className="font-semibold text-text-primary">{formatTime(selectedThread.startTime) || selectedThread.preferredStartTime || 'TBD'}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-text-muted">End Time</span>
+                                                <span className="font-semibold text-text-primary">{formatTime(selectedThread.endTime) || 'TBD'}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-text-muted">Doctor</span>
+                                                <span className="font-semibold text-text-primary text-right">{selectedThread.doctorName || 'Unassigned'}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-text-muted">Status</span>
+                                                <Badge variant={activeStates.includes(selectedThread.status) ? 'success' : 'error'}>
+                                                    {selectedThread.status}
+                                                </Badge>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
-                            {/* Details list */}
-                            <div className="space-y-4 text-xs">
-                                <div>
-                                    <span className="text-muted-foreground block flex items-center gap-1">
-                                        <User className="size-3" />
-                                        Patient Name
-                                    </span>
-                                    <strong className="text-foreground text-sm">{selectedThread.patientName}</strong>
-                                    {selectedThread.chatToken && (
-                                        <Badge variant="warning" className="ml-2">
-                                            GUEST
-                                        </Badge>
-                                    )}
-                                </div>
-                                <Separator />
-                                <div>
-                                    <span className="text-muted-foreground block">Contact Info</span>
-                                    <p className="text-foreground font-medium">{selectedThread.patientPhone || 'No Phone'}</p>
-                                    <p className="text-muted-foreground text-[10px] truncate">{selectedThread.patientEmail}</p>
-                                </div>
-                                <Separator />
-                                <div>
-                                    <span className="text-muted-foreground block flex items-center gap-1">
-                                        <MessageSquare className="size-3" />
-                                        Service / Treatment
-                                    </span>
-                                    <strong className="text-foreground">{selectedThread.serviceName}</strong>
-                                </div>
-                                <Separator />
-                                <div>
-                                    <span className="text-muted-foreground block flex items-center gap-1">
-                                        <Calendar className="size-3" />
-                                        Scheduled Schedule
-                                    </span>
-                                    <p className="text-foreground font-semibold">{selectedThread.date}</p>
-                                    <p className="text-muted-foreground text-[10px] flex items-center gap-1">
-                                        <Clock className="size-3" />
-                                        Window: {formatTime(selectedThread.startTime)} - {formatTime(selectedThread.endTime)}
-                                    </p>
-                                </div>
-                                <Separator />
-                                <div>
-                                    <span className="text-muted-foreground block flex items-center gap-1">
-                                        <Stethoscope className="size-3" />
-                                        Assigned Doctor
-                                    </span>
-                                    <strong className="text-foreground">{selectedThread.doctorName || 'Unassigned'}</strong>
-                                </div>
-                                <Separator />
-                                <div>
-                                    <span className="text-muted-foreground block">Current Status</span>
-                                    <Badge variant={activeStates.includes(selectedThread.status) ? 'success' : 'error'} className="mt-1">
-                                        {selectedThread.status}
-                                    </Badge>
-                                </div>
+                            <div className="text-xs font-semibold text-muted-foreground mt-4">
+                                Quick Action
                             </div>
                         </div>
 
-                        {/* Actions Area */}
-                        <div className="border-t border-border pt-4 space-y-4">
+                        {/* Actions Area (Matches Chat Input Footer) */}
+                        <div className="p-4 border-t border-border bg-sidebar shrink-0">
                             {actionError && (
-                                <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-[10px] text-destructive flex items-start gap-2">
+                                <div className="p-3 mb-3 rounded-lg bg-destructive/10 border border-destructive/20 text-[10px] text-destructive flex items-start gap-2">
                                     <AlertCircle className="size-3.5 mt-0.5 shrink-0" />
                                     <span>{actionError}</span>
                                 </div>
                             )}
                             {actionSuccess && (
-                                <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-[10px] text-emerald-500 flex items-start gap-2">
+                                <div className="p-3 mb-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-[10px] text-emerald-500 flex items-start gap-2">
                                     <CheckCircle className="size-3.5 mt-0.5 shrink-0" />
                                     <span>{actionSuccess}</span>
                                 </div>
                             )}
 
                             {activeAction === 'NONE' ? (
-                                <div className="space-y-2">
-                                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
-                                        <AlertCircle className="size-3" />
-                                        Quick Core Actions
-                                    </p>
+                                <div className="w-full">
                                     {activeStates.includes(selectedThread.status) ? (
-                                        <>
+                                        <div className="flex gap-2">
                                             <Button 
                                                 onClick={() => {
                                                     setActiveAction('RESCHEDULE');
@@ -447,11 +473,9 @@ export function SecretaryChatInboxView({ initialThreads }: SecretaryChatInboxVie
                                                     setActionSuccess(null);
                                                 }}
                                                 variant="outline" 
-                                                size="sm"
-                                                className="w-full"
+                                                className="flex-1 h-[44px]"
                                             >
-                                                <Calendar className="size-3.5 mr-1.5" />
-                                                Reschedule Slot
+                                                Reschedule
                                             </Button>
                                             <Button 
                                                 onClick={() => {
@@ -460,13 +484,11 @@ export function SecretaryChatInboxView({ initialThreads }: SecretaryChatInboxVie
                                                     setActionSuccess(null);
                                                 }}
                                                 variant="outline" 
-                                                size="sm"
-                                                className="w-full border-destructive/50 text-destructive hover:bg-destructive/10"
+                                                className="flex-1 h-[44px] border-destructive/50 text-destructive hover:bg-destructive/10"
                                             >
-                                                <XCircle className="size-3.5 mr-1.5" />
-                                                Cancel Booking
+                                                Cancel
                                             </Button>
-                                        </>
+                                        </div>
                                     ) : (
                                         <div className="p-3 rounded-lg bg-muted/40 text-[10px] text-muted-foreground text-center">
                                             Appointment is closed. Actions are disabled.
@@ -474,88 +496,88 @@ export function SecretaryChatInboxView({ initialThreads }: SecretaryChatInboxVie
                                     )}
                                 </div>
                             ) : (
-                                <form onSubmit={handleActionSubmit} className="space-y-3 bg-card/60 p-4 rounded-xl border border-border">
-                                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
-                                        {activeAction === 'RESCHEDULE' ? <Calendar className="size-3" /> : <XCircle className="size-3" />}
-                                        {activeAction === 'RESCHEDULE' ? 'Reschedule Slot' : 'Cancel Booking'}
-                                    </p>
+                                    <form onSubmit={handleActionSubmit} className="space-y-3 bg-card/60 p-4 rounded-xl border border-border">
+                                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
+                                            {activeAction === 'RESCHEDULE' ? <Calendar className="size-3" /> : <XCircle className="size-3" />}
+                                            {activeAction === 'RESCHEDULE' ? 'Reschedule Slot' : 'Cancel Booking'}
+                                        </p>
 
-                                    {activeAction === 'RESCHEDULE' && (
-                                        <div className="space-y-2 text-[10px]">
-                                            <div>
-                                                <label className="text-muted-foreground block mb-1">New Date</label>
-                                                <Input 
-                                                    type="date" 
-                                                    value={rescheduleDate}
-                                                    onChange={e => setRescheduleDate(e.target.value)}
-                                                />
-                                            </div>
-                                            <div className="grid grid-cols-2 gap-2">
+                                        {activeAction === 'RESCHEDULE' && (
+                                            <div className="space-y-2 text-[10px]">
                                                 <div>
-                                                    <label className="text-muted-foreground block mb-1">Start Time</label>
+                                                    <label className="text-muted-foreground block mb-1">New Date</label>
                                                     <Input 
-                                                        type="time" 
-                                                        value={rescheduleStartTime}
-                                                        onChange={e => setRescheduleStartTime(e.target.value)}
+                                                        type="date" 
+                                                        value={rescheduleDate}
+                                                        onChange={e => setRescheduleDate(e.target.value)}
                                                     />
                                                 </div>
+                                                <div className="grid grid-cols-2 gap-2">
+                                                    <div>
+                                                        <label className="text-muted-foreground block mb-1">Start Time</label>
+                                                        <Input 
+                                                            type="time" 
+                                                            value={rescheduleStartTime}
+                                                            onChange={e => setRescheduleStartTime(e.target.value)}
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label className="text-muted-foreground block mb-1">End Time</label>
+                                                        <Input 
+                                                            type="time" 
+                                                            value={rescheduleEndTime}
+                                                            onChange={e => setRescheduleEndTime(e.target.value)}
+                                                        />
+                                                    </div>
+                                                </div>
                                                 <div>
-                                                    <label className="text-muted-foreground block mb-1">End Time</label>
-                                                    <Input 
-                                                        type="time" 
-                                                        value={rescheduleEndTime}
-                                                        onChange={e => setRescheduleEndTime(e.target.value)}
+                                                    <label className="text-muted-foreground block mb-1">Assign Doctor</label>
+                                                    <Select
+                                                        value={rescheduleDoctorId}
+                                                        onChange={e => setRescheduleDoctorId(e.target.value)}
+                                                        options={[
+                                                            { value: '', label: 'Select Doctor...' },
+                                                            ...doctors.map(d => ({ value: d.id, label: `Dr. ${d.firstName} ${d.lastName}` }))
+                                                        ]}
                                                     />
                                                 </div>
                                             </div>
-                                            <div>
-                                                <label className="text-muted-foreground block mb-1">Assign Doctor</label>
-                                                <Select
-                                                    value={rescheduleDoctorId}
-                                                    onChange={e => setRescheduleDoctorId(e.target.value)}
-                                                    options={[
-                                                        { value: '', label: 'Select Doctor...' },
-                                                        ...doctors.map(d => ({ value: d.id, label: `Dr. ${d.firstName} ${d.lastName}` }))
-                                                    ]}
-                                                />
-                                            </div>
+                                        )}
+
+                                        <div>
+                                            <label className="text-[10px] text-muted-foreground block mb-1">Reason / Notes</label>
+                                            <Textarea
+                                                value={actionReason}
+                                                onChange={e => setActionReason(e.target.value)}
+                                                placeholder="Provide reason..."
+                                                className="min-h-[60px] resize-none"
+                                                required
+                                            />
                                         </div>
-                                    )}
 
-                                    <div>
-                                        <label className="text-[10px] text-muted-foreground block mb-1">Reason / Notes</label>
-                                        <Textarea
-                                            value={actionReason}
-                                            onChange={e => setActionReason(e.target.value)}
-                                            placeholder="Provide reason..."
-                                            className="min-h-[60px] resize-none"
-                                            required
-                                        />
-                                    </div>
-
-                                    <div className="flex gap-2">
-                                        <Button 
-                                            type="button" 
-                                            onClick={() => setActiveAction('NONE')}
-                                            variant="outline" 
-                                            size="sm"
-                                            className="flex-1"
-                                        >
-                                            Cancel
-                                        </Button>
-                                        <Button 
-                                            type="submit" 
-                                            disabled={actionLoading}
-                                            size="sm"
-                                            className="flex-1"
-                                        >
-                                            {actionLoading ? 'Saving...' : 'Confirm'}
-                                        </Button>
-                                    </div>
-                                </form>
-                            )}
+                                        <div className="flex gap-2">
+                                            <Button 
+                                                type="button" 
+                                                onClick={() => setActiveAction('NONE')}
+                                                variant="outline" 
+                                                size="sm"
+                                                className="flex-1"
+                                            >
+                                                Cancel
+                                            </Button>
+                                            <Button 
+                                                type="submit" 
+                                                disabled={actionLoading}
+                                                size="sm"
+                                                className="flex-1"
+                                            >
+                                                {actionLoading ? 'Saving...' : 'Confirm'}
+                                            </Button>
+                                        </div>
+                                    </form>
+                                )}
+                            </div>
                         </div>
-                    </div>
                 ) : (
                     <div className="h-full flex items-center justify-center text-muted-foreground text-center text-xs">
                         No thread selected.
