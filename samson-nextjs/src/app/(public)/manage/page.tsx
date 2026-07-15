@@ -24,6 +24,9 @@ export default async function ManagePage({ searchParams }: PageProps) {
                 redirect(`/appointments/chat/${appointmentId}?token=${token}`);
             }
         } catch (err) {
+            if (err instanceof Error && 'digest' in err) {
+                throw err;
+            }
             console.error('Error handling manage redirection:', err);
         }
     }

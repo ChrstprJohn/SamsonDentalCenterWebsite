@@ -93,7 +93,9 @@ export const getChatThreadsForSecretaryQuery = (supabase: SupabaseClient) => {
             );
         }
 
-        return (data || []).map((row: any) => {
+        return (data || [])
+            .filter((row: any) => !row.patient && row.guest_contacts?.length > 0)
+            .map((row: any) => {
             const messages = row.appointment_messages || [];
             
             // Unread count is patient messages that staff hasn't read
