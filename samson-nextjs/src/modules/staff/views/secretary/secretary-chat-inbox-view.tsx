@@ -470,6 +470,260 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
     const colMobile = (view: 'list' | 'chat' | 'detail') =>
         mobileView === view ? 'flex' : 'hidden';
 
+    const detailPanelContent = selectedThreadId && selectedThread ? (
+        <div className="flex flex-col h-full overflow-hidden">
+            {loadingMessages ? (
+                <div className="p-4 border-b border-border bg-sidebar shrink-0">
+                    <div className="flex items-center gap-2">
+                        <div className="lg:hidden size-[42px] shrink-0" />
+                        <div className="flex flex-col min-w-0">
+                            <Skeleton className="h-[24px] w-36 rounded-md" />
+                            <Skeleton className="h-[16px] w-20 rounded-md" />
+                        </div>
+                    </div>
+                </div>
+            ) : (
+                <div className="p-4 border-b border-border bg-sidebar shrink-0">
+                    <div className="flex items-center gap-2">
+                        <button onClick={handleBackToChat} className="lg:hidden p-1 -ml-1 text-muted-foreground hover:text-foreground shrink-0">
+                            <ArrowLeft className="size-5" />
+                        </button>
+                        <div className="flex flex-col min-w-0">
+                            <h3 className="text-base font-medium text-foreground truncate">
+                                Appointment Detail
+                            </h3>
+                            <span className="text-[11px] text-muted-foreground truncate">Ref #{selectedThread.appointmentId.slice(0, 8)}</span>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {loadingMessages ? (
+                <DetailSkeleton />
+            ) : (
+                <>
+                    <div 
+                        className="flex-1 !overflow-y-auto p-5 flex flex-col justify-between gap-6 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent" 
+                        style={{ scrollbarWidth: 'thin' }}
+                        data-lenis-prevent
+                    >
+                        <div className="space-y-6">
+                            <div className="flex flex-col gap-5 text-xs">
+                                <div className="space-y-2">
+                                    <div className="text-xs font-semibold text-muted-foreground flex justify-between items-center">
+                                        <span>Patient Info</span>
+                                        {selectedThread.chatToken && (
+                                            <Badge variant="warning" className="text-[9px] px-1.5 py-0">
+                                                GUEST
+                                            </Badge>
+                                        )}
+                                    </div>
+                                    <div className="border border-card-border/60 bg-muted/10 rounded-xl p-3 space-y-2">
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-text-muted">First</span>
+                                            <span className="font-semibold text-text-primary">{selectedThread.patientFirstName || selectedThread.patientName.split(' ')[0] || '-'}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-text-muted">Middle</span>
+                                            <span className="font-semibold text-text-primary">{selectedThread.patientMiddleName || '-'}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-text-muted">Last</span>
+                                            <span className="font-semibold text-text-primary">{selectedThread.patientLastName || selectedThread.patientName.split(' ')[1] || '-'}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-text-muted">Suffix</span>
+                                            <span className="font-semibold text-text-primary">{selectedThread.patientSuffix || '-'}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <div className="text-xs font-semibold text-muted-foreground">Contact Info</div>
+                                    <div className="border border-card-border/60 bg-muted/10 rounded-xl p-3 space-y-2">
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-text-muted">Phone</span>
+                                            <span className="font-semibold text-text-primary">{selectedThread.patientPhone || 'No Phone'}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center gap-4">
+                                            <span className="text-text-muted shrink-0">Email</span>
+                                            <span className="font-semibold text-text-primary truncate max-w-[150px]" title={selectedThread.patientEmail}>{selectedThread.patientEmail || '-'}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <div className="text-xs font-semibold text-muted-foreground">Schedule & Status</div>
+                                    <div className="border border-card-border/60 bg-muted/10 rounded-xl p-3 space-y-2">
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-text-muted">Treatment</span>
+                                            <span className="font-semibold text-text-primary text-right">{selectedThread.serviceName || 'Treatment'}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-text-muted">Date</span>
+                                            <span className="font-semibold text-text-primary">{selectedThread.date}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-text-muted">Start Time</span>
+                                            <span className="font-semibold text-text-primary">{formatTime(selectedThread.startTime) || selectedThread.preferredStartTime || 'TBD'}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-text-muted">End Time</span>
+                                            <span className="font-semibold text-text-primary">{formatTime(selectedThread.endTime) || 'TBD'}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-text-muted">Doctor</span>
+                                            <span className="font-semibold text-text-primary text-right">{selectedThread.doctorName || 'Unassigned'}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-text-muted">Status</span>
+                                            <Badge variant={activeStates.includes(selectedThread.status) ? 'success' : 'error'}>
+                                                {selectedThread.status}
+                                            </Badge>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div className="p-4 border-t border-border bg-sidebar shrink-0">
+                        {actionError && (
+                            <div className="p-3 mb-3 rounded-lg bg-destructive/10 border border-destructive/20 text-[10px] text-destructive flex items-start gap-2">
+                                <AlertCircle className="size-3.5 mt-0.5 shrink-0" />
+                                <span>{actionError}</span>
+                            </div>
+                        )}
+                        {actionSuccess && (
+                            <div className="p-3 mb-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-[10px] text-emerald-500 flex items-start gap-2">
+                                <CheckCircle className="size-3.5 mt-0.5 shrink-0" />
+                                <span>{actionSuccess}</span>
+                            </div>
+                        )}
+
+                        {activeAction === 'NONE' ? (
+                            <div className="w-full">
+                                {activeStates.includes(selectedThread.status) ? (
+                                    <div className="flex gap-2">
+                                        <Button 
+                                            onClick={() => {
+                                                setActiveAction('RESCHEDULE');
+                                                setRescheduleDate(selectedThread.date);
+                                                setRescheduleDoctorId(selectedThread.doctorId || '');
+                                                setActionError(null);
+                                                setActionSuccess(null);
+                                            }}
+                                            variant="outline" 
+                                            className="flex-1"
+                                        >
+                                            Reschedule
+                                        </Button>
+                                        <Button 
+                                            onClick={() => {
+                                                setActiveAction('CANCEL');
+                                                setActionError(null);
+                                                setActionSuccess(null);
+                                            }}
+                                            variant="outline" 
+                                            className="flex-1 border-destructive/50 text-destructive hover:bg-destructive/10"
+                                        >
+                                            Cancel
+                                        </Button>
+                                    </div>
+                                ) : (
+                                    <div className="p-3 bg-muted border border-border rounded-xl text-center text-xs text-muted-foreground">
+                                        Action disabled
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <form onSubmit={handleActionSubmit} className="space-y-3 bg-card/60 p-4 rounded-xl border border-border">
+                                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
+                                    {activeAction === 'RESCHEDULE' ? <Calendar className="size-3" /> : <XCircle className="size-3" />}
+                                    {activeAction === 'RESCHEDULE' ? 'Reschedule Slot' : 'Cancel Booking'}
+                                </p>
+
+                                {activeAction === 'RESCHEDULE' && (
+                                    <div className="space-y-2 text-[10px]">
+                                        <div>
+                                            <label className="text-muted-foreground block mb-1">New Date</label>
+                                            <Input 
+                                                type="date" 
+                                                value={rescheduleDate}
+                                                onChange={e => setRescheduleDate(e.target.value)}
+                                            />
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-2">
+                                            <div>
+                                                <label className="text-muted-foreground block mb-1">Start Time</label>
+                                                <Input 
+                                                    type="time" 
+                                                    value={rescheduleStartTime}
+                                                    onChange={e => setRescheduleStartTime(e.target.value)}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="text-muted-foreground block mb-1">End Time</label>
+                                                <Input 
+                                                    type="time" 
+                                                    value={rescheduleEndTime}
+                                                    onChange={e => setRescheduleEndTime(e.target.value)}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label className="text-muted-foreground block mb-1">Assign Doctor</label>
+                                            <Select
+                                                value={rescheduleDoctorId}
+                                                onChange={e => setRescheduleDoctorId(e.target.value)}
+                                                options={[
+                                                    { value: '', label: 'Select Doctor...' },
+                                                    ...doctors.map(d => ({ value: d.id, label: `Dr. ${d.firstName} ${d.lastName}` }))
+                                                ]}
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div>
+                                    <label className="text-[10px] text-muted-foreground block mb-1">Reason / Notes</label>
+                                    <Textarea
+                                        value={actionReason}
+                                        onChange={e => setActionReason(e.target.value)}
+                                        placeholder="Provide reason..."
+                                        className="min-h-[60px] resize-none"
+                                        required
+                                    />
+                                </div>
+
+                                <div className="flex gap-2">
+                                    <Button 
+                                        type="button" 
+                                        onClick={() => setActiveAction('NONE')}
+                                        variant="outline" 
+                                        size="sm"
+                                        className="flex-1"
+                                    >
+                                        Cancel
+                                    </Button>
+                                    <Button 
+                                        type="submit" 
+                                        disabled={actionLoading}
+                                        size="sm"
+                                        className="flex-1"
+                                    >
+                                        {actionLoading ? 'Saving...' : 'Confirm'}
+                                    </Button>
+                                </div>
+                            </form>
+                        )}
+                    </div>
+                </>
+            )}
+        </div>
+    ) : null;
+
     return (
         <div className="flex h-full w-full overflow-hidden">
             {/* Column 1: Left List Sidebar */}
@@ -610,8 +864,8 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
             {selectedThreadId && selectedThread ? (
                 <>
                     {/* Column 2: Dialogue Stream */}
-                    <div className={`flex-1 flex-col bg-muted/20 border-r border-border relative ${colMobile('chat')} lg:flex`}>
-                        {loadingMessages ? (
+                    <div className={`flex-1 flex-col bg-muted/20 border-r border-border relative ${colMobile('chat')} md:flex`}>
+                        {mobileView === 'detail' ? detailPanelContent : loadingMessages ? (
                             <ChatMessagesSkeleton />
                         ) : (
                             <PatientChatView
@@ -640,258 +894,8 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                     </div>
 
                     {/* Column 3: Context & Action Control Dock */}
-                    <div className={`w-full lg:w-80 flex-col border-l border-border bg-sidebar h-full overflow-hidden flex-shrink-0 ${colMobile('detail')} lg:flex`}>
-                        <div className="flex flex-col h-full overflow-hidden">
-                            {loadingMessages ? (
-                                <div className="p-4 border-b border-border bg-sidebar shrink-0">
-                                    <div className="flex items-center gap-2">
-                                        <div className="lg:hidden size-[42px] shrink-0" />
-                                        <div className="flex flex-col min-w-0">
-                                            <Skeleton className="h-[24px] w-36 rounded-md" />
-                                            <Skeleton className="h-[16px] w-20 rounded-md" />
-                                        </div>
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="p-4 border-b border-border bg-sidebar shrink-0">
-                                    <div className="flex items-center gap-2">
-                                        <button onClick={handleBackToChat} className="lg:hidden p-1 -ml-1 text-muted-foreground hover:text-foreground shrink-0">
-                                            <ArrowLeft className="size-5" />
-                                        </button>
-                                        <div className="flex flex-col min-w-0">
-                                            <h3 className="text-base font-medium text-foreground truncate">
-                                                Appointment Detail
-                                            </h3>
-                                            <span className="text-[11px] text-muted-foreground truncate">Ref #{selectedThread.appointmentId.slice(0, 8)}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-
-                            {loadingMessages ? (
-                                <DetailSkeleton />
-                            ) : (
-                                <>
-                                    <div 
-                                        className="flex-1 !overflow-y-auto p-5 flex flex-col justify-between gap-6 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent" 
-                                        style={{ scrollbarWidth: 'thin' }}
-                                        data-lenis-prevent
-                                    >
-                                        <div className="space-y-6">
-                                            <div className="flex flex-col gap-5 text-xs">
-                                                <div className="space-y-2">
-                                                    <div className="text-xs font-semibold text-muted-foreground flex justify-between items-center">
-                                                        <span>Patient Info</span>
-                                                        {selectedThread.chatToken && (
-                                                            <Badge variant="warning" className="text-[9px] px-1.5 py-0">
-                                                                GUEST
-                                                            </Badge>
-                                                        )}
-                                                    </div>
-                                                    <div className="border border-card-border/60 bg-muted/10 rounded-xl p-3 space-y-2">
-                                                        <div className="flex justify-between items-center">
-                                                            <span className="text-text-muted">First</span>
-                                                            <span className="font-semibold text-text-primary">{selectedThread.patientFirstName || selectedThread.patientName.split(' ')[0] || '-'}</span>
-                                                        </div>
-                                                        <div className="flex justify-between items-center">
-                                                            <span className="text-text-muted">Middle</span>
-                                                            <span className="font-semibold text-text-primary">{selectedThread.patientMiddleName || '-'}</span>
-                                                        </div>
-                                                        <div className="flex justify-between items-center">
-                                                            <span className="text-text-muted">Last</span>
-                                                            <span className="font-semibold text-text-primary">{selectedThread.patientLastName || selectedThread.patientName.split(' ')[1] || '-'}</span>
-                                                        </div>
-                                                        <div className="flex justify-between items-center">
-                                                            <span className="text-text-muted">Suffix</span>
-                                                            <span className="font-semibold text-text-primary">{selectedThread.patientSuffix || '-'}</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div className="space-y-2">
-                                                    <div className="text-xs font-semibold text-muted-foreground">Contact Info</div>
-                                                    <div className="border border-card-border/60 bg-muted/10 rounded-xl p-3 space-y-2">
-                                                        <div className="flex justify-between items-center">
-                                                            <span className="text-text-muted">Phone</span>
-                                                            <span className="font-semibold text-text-primary">{selectedThread.patientPhone || 'No Phone'}</span>
-                                                        </div>
-                                                        <div className="flex justify-between items-center gap-4">
-                                                            <span className="text-text-muted shrink-0">Email</span>
-                                                            <span className="font-semibold text-text-primary truncate max-w-[150px]" title={selectedThread.patientEmail}>{selectedThread.patientEmail || '-'}</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div className="space-y-2">
-                                                    <div className="text-xs font-semibold text-muted-foreground">Schedule & Status</div>
-                                                    <div className="border border-card-border/60 bg-muted/10 rounded-xl p-3 space-y-2">
-                                                        <div className="flex justify-between items-center">
-                                                            <span className="text-text-muted">Treatment</span>
-                                                            <span className="font-semibold text-text-primary text-right">{selectedThread.serviceName || 'Treatment'}</span>
-                                                        </div>
-                                                        <div className="flex justify-between items-center">
-                                                            <span className="text-text-muted">Date</span>
-                                                            <span className="font-semibold text-text-primary">{selectedThread.date}</span>
-                                                        </div>
-                                                        <div className="flex justify-between items-center">
-                                                            <span className="text-text-muted">Start Time</span>
-                                                            <span className="font-semibold text-text-primary">{formatTime(selectedThread.startTime) || selectedThread.preferredStartTime || 'TBD'}</span>
-                                                        </div>
-                                                        <div className="flex justify-between items-center">
-                                                            <span className="text-text-muted">End Time</span>
-                                                            <span className="font-semibold text-text-primary">{formatTime(selectedThread.endTime) || 'TBD'}</span>
-                                                        </div>
-                                                        <div className="flex justify-between items-center">
-                                                            <span className="text-text-muted">Doctor</span>
-                                                            <span className="font-semibold text-text-primary text-right">{selectedThread.doctorName || 'Unassigned'}</span>
-                                                        </div>
-                                                        <div className="flex justify-between items-center">
-                                                            <span className="text-text-muted">Status</span>
-                                                            <Badge variant={activeStates.includes(selectedThread.status) ? 'success' : 'error'}>
-                                                                {selectedThread.status}
-                                                            </Badge>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                    </div>
-
-                                    <div className="p-4 border-t border-border bg-sidebar shrink-0">
-                                        {actionError && (
-                                            <div className="p-3 mb-3 rounded-lg bg-destructive/10 border border-destructive/20 text-[10px] text-destructive flex items-start gap-2">
-                                                <AlertCircle className="size-3.5 mt-0.5 shrink-0" />
-                                                <span>{actionError}</span>
-                                            </div>
-                                        )}
-                                        {actionSuccess && (
-                                            <div className="p-3 mb-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-[10px] text-emerald-500 flex items-start gap-2">
-                                                <CheckCircle className="size-3.5 mt-0.5 shrink-0" />
-                                                <span>{actionSuccess}</span>
-                                            </div>
-                                        )}
-
-                                        {activeAction === 'NONE' ? (
-                                            <div className="w-full">
-                                                {activeStates.includes(selectedThread.status) ? (
-                                                    <div className="flex gap-2">
-                                                        <Button 
-                                                            onClick={() => {
-                                                                setActiveAction('RESCHEDULE');
-                                                                setRescheduleDate(selectedThread.date);
-                                                                setRescheduleDoctorId(selectedThread.doctorId || '');
-                                                                setActionError(null);
-                                                                setActionSuccess(null);
-                                                            }}
-                                                            variant="outline" 
-                                                            className="flex-1"
-                                                        >
-                                                            Reschedule
-                                                        </Button>
-                                                        <Button 
-                                                            onClick={() => {
-                                                                setActiveAction('CANCEL');
-                                                                setActionError(null);
-                                                                setActionSuccess(null);
-                                                            }}
-                                                            variant="outline" 
-                                                            className="flex-1 border-destructive/50 text-destructive hover:bg-destructive/10"
-                                                        >
-                                                            Cancel
-                                                        </Button>
-                                                    </div>
-                                                ) : (
-                                                    <div className="p-3 bg-muted border border-border rounded-xl text-center text-xs text-muted-foreground">
-                                                        Action disabled
-                                                    </div>
-                                                )}
-                                            </div>
-                                        ) : (
-                                            <form onSubmit={handleActionSubmit} className="space-y-3 bg-card/60 p-4 rounded-xl border border-border">
-                                                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
-                                                    {activeAction === 'RESCHEDULE' ? <Calendar className="size-3" /> : <XCircle className="size-3" />}
-                                                    {activeAction === 'RESCHEDULE' ? 'Reschedule Slot' : 'Cancel Booking'}
-                                                </p>
-
-                                                {activeAction === 'RESCHEDULE' && (
-                                                    <div className="space-y-2 text-[10px]">
-                                                        <div>
-                                                            <label className="text-muted-foreground block mb-1">New Date</label>
-                                                            <Input 
-                                                                type="date" 
-                                                                value={rescheduleDate}
-                                                                onChange={e => setRescheduleDate(e.target.value)}
-                                                            />
-                                                        </div>
-                                                        <div className="grid grid-cols-2 gap-2">
-                                                            <div>
-                                                                <label className="text-muted-foreground block mb-1">Start Time</label>
-                                                                <Input 
-                                                                    type="time" 
-                                                                    value={rescheduleStartTime}
-                                                                    onChange={e => setRescheduleStartTime(e.target.value)}
-                                                                />
-                                                            </div>
-                                                            <div>
-                                                                <label className="text-muted-foreground block mb-1">End Time</label>
-                                                                <Input 
-                                                                    type="time" 
-                                                                    value={rescheduleEndTime}
-                                                                    onChange={e => setRescheduleEndTime(e.target.value)}
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                        <div>
-                                                            <label className="text-muted-foreground block mb-1">Assign Doctor</label>
-                                                            <Select
-                                                                value={rescheduleDoctorId}
-                                                                onChange={e => setRescheduleDoctorId(e.target.value)}
-                                                                options={[
-                                                                    { value: '', label: 'Select Doctor...' },
-                                                                    ...doctors.map(d => ({ value: d.id, label: `Dr. ${d.firstName} ${d.lastName}` }))
-                                                                ]}
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                )}
-
-                                                <div>
-                                                    <label className="text-[10px] text-muted-foreground block mb-1">Reason / Notes</label>
-                                                    <Textarea
-                                                        value={actionReason}
-                                                        onChange={e => setActionReason(e.target.value)}
-                                                        placeholder="Provide reason..."
-                                                        className="min-h-[60px] resize-none"
-                                                        required
-                                                    />
-                                                </div>
-
-                                                <div className="flex gap-2">
-                                                    <Button 
-                                                        type="button" 
-                                                        onClick={() => setActiveAction('NONE')}
-                                                        variant="outline" 
-                                                        size="sm"
-                                                        className="flex-1"
-                                                    >
-                                                        Cancel
-                                                    </Button>
-                                                    <Button 
-                                                        type="submit" 
-                                                        disabled={actionLoading}
-                                                        size="sm"
-                                                        className="flex-1"
-                                                    >
-                                                        {actionLoading ? 'Saving...' : 'Confirm'}
-                                                    </Button>
-                                                </div>
-                                            </form>
-                                        )}
-                                    </div>
-                                </>
-                            )}
-                        </div>
+                    <div className={`hidden lg:w-80 flex-col border-l border-border bg-sidebar h-full overflow-hidden flex-shrink-0 lg:flex`}>
+                        {detailPanelContent}
                     </div>
                 </>
             ) : (
