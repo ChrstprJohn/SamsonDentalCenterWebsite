@@ -67,10 +67,12 @@ export const getMessagesByAppointmentIdQuery = (supabase: SupabaseClient) => {
 };
 
 export const getChatThreadsForSecretaryQuery = (supabase: SupabaseClient) => {
-    return async (): Promise<ChatThreadDto[]> => {
+    return async (options?: { limit?: number; offset?: number }): Promise<{ data: ChatThreadDto[]; hasMore: boolean }> => {
+        const fetchLimit = (options?.limit ?? 20) + 1;
         const { data, error } = await supabase.rpc('get_secretary_chat_threads', {
             p_max_age_days: 90,
-            p_max_rows: 100,
+            p_max_rows: fetchLimit,
+            p_offset: options?.offset ?? 0,
         });
 
         if (error) {
@@ -81,8 +83,10 @@ export const getChatThreadsForSecretaryQuery = (supabase: SupabaseClient) => {
         }
 
         const rows = (data || []) as any[];
+        const hasMore = rows.length > (options?.limit ?? 20);
+        const page = rows.slice(0, options?.limit ?? 20);
 
-        return rows.map((row: any) => {
+        const mapped = page.map((row: any) => {
             let patientName = 'Unknown Patient';
             let patientEmail = '';
             let patientPhone = '';
@@ -135,6 +139,8 @@ export const getChatThreadsForSecretaryQuery = (supabase: SupabaseClient) => {
                 unreadCount: Number(row.unread_count),
             };
         });
+
+        return { data: mapped, hasMore };
     };
 };
 

@@ -149,9 +149,10 @@ function SidebarThreadSkeleton() {
 
 interface SecretaryChatInboxViewProps {
     initialThreads: ChatThreadDto[];
+    initialHasMore?: boolean;
 }
 
-export function SecretaryChatInboxView({ initialThreads }: SecretaryChatInboxViewProps) {
+export function SecretaryChatInboxView({ initialThreads, initialHasMore = false }: SecretaryChatInboxViewProps) {
     const [threads, setThreads] = useState<ChatThreadDto[]>(initialThreads);
     const [searchQuery, setSearchQuery] = useState('');
     const [activeTab, setActiveTab] = useState<'ACTIVE' | 'ARCHIVE'>('ACTIVE');
@@ -166,6 +167,7 @@ export function SecretaryChatInboxView({ initialThreads }: SecretaryChatInboxVie
     const [loadingMessages, setLoadingMessages] = useState(false);
     const [fetchingThreads, setFetchingThreads] = useState(false);
     const [messagesLoadKey, setMessagesLoadKey] = useState(0);
+    const [hasMoreThreads, setHasMoreThreads] = useState(initialHasMore);
 
     const [doctors, setDoctors] = useState<{ id: string; firstName: string; lastName: string }[]>([]);
 
@@ -183,12 +185,23 @@ export function SecretaryChatInboxView({ initialThreads }: SecretaryChatInboxVie
 
     const fetchThreads = useCallback(async () => {
         setFetchingThreads(true);
-        const res = await getChatThreadsAction();
+        const res = await getChatThreadsAction({ limit: 20, offset: 0 });
         if (res && res.data) {
             setThreads(res.data);
+            setHasMoreThreads(res.hasMore ?? false);
         }
         setFetchingThreads(false);
     }, []);
+
+    const loadMoreThreads = useCallback(async () => {
+        const res = await getChatThreadsAction({ limit: 20, offset: threads.length });
+        if (res && res.data && res.data.length > 0) {
+            setThreads((prev) => [...prev, ...res.data]);
+            setHasMoreThreads(res.hasMore ?? false);
+        } else {
+            setHasMoreThreads(false);
+        }
+    }, [threads.length]);
 
     useEffect(() => {
         getDoctorsAction().then((res) => {
@@ -515,6 +528,16 @@ export function SecretaryChatInboxView({ initialThreads }: SecretaryChatInboxVie
                                         </button>
                                     );
                                 })
+                            )}
+                            {hasMoreThreads && (
+                                <Button
+                                    onClick={loadMoreThreads}
+                                    variant="ghost"
+                                    size="sm"
+                                    className="w-full h-10 text-xs text-muted-foreground hover:text-foreground rounded-none border-t"
+                                >
+                                    Show more
+                                </Button>
                             )}
                         </SidebarGroupContent>
                     </SidebarGroup>

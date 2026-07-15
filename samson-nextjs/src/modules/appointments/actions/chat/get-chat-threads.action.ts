@@ -3,7 +3,7 @@
 import { createClient } from '@/shared/database/server';
 import { getChatThreadsForSecretaryQuery } from '../../repositories/chat/chat.queries';
 
-export async function getChatThreadsAction() {
+export async function getChatThreadsAction(options?: { limit?: number; offset?: number }) {
     try {
         const supabase = await createClient();
         const { data: { user } } = await supabase.auth.getUser();
@@ -16,8 +16,8 @@ export async function getChatThreadsAction() {
         }
 
         const query = getChatThreadsForSecretaryQuery(supabase);
-        const result = await query();
-        return { data: result };
+        const result = await query(options);
+        return { data: result.data, hasMore: result.hasMore };
     } catch (error: any) {
         return { error: error.message || 'Failed to retrieve chat threads' };
     }

@@ -5,7 +5,8 @@
 
 CREATE OR REPLACE FUNCTION public.get_secretary_chat_threads(
     p_max_age_days INT DEFAULT 90,
-    p_max_rows INT DEFAULT 100
+    p_max_rows INT DEFAULT 20,
+    p_offset INT DEFAULT 0
 )
 RETURNS TABLE(
     appointment_id UUID,
@@ -95,7 +96,8 @@ AS $$
       AND a.status != 'PENDING'
       AND gc.id IS NOT NULL
     ORDER BY latest_msg.created_at DESC NULLS LAST, a.date DESC
-    LIMIT p_max_rows;
+    LIMIT p_max_rows
+    OFFSET p_offset;
 $$;
 
 COMMENT ON FUNCTION public.get_secretary_chat_threads IS 'Returns chat threads for secretary inbox with latest message and unread counts in a single query';
