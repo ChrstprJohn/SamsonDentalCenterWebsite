@@ -225,17 +225,17 @@ export function ChatIntakeWorkflow({
               </div>
             )}
 
-            {intake.selectedDate && intake.selectedTime && (
+             {intake.selectedDate && intake.selectedTime && (
               <Button
                 type="button"
                 onClick={intake.submitReschedule}
                 disabled={intake.isSubmitting}
-                className="w-full mt-auto"
+                className="w-full mt-auto bg-primary text-primary-foreground hover:bg-primary/90 border-0"
               >
                 {intake.isSubmitting ? (
-                  <><Loader2 className="size-3.5 mr-1.5 animate-spin" />Requesting...</>
+                  <><Loader2 className="size-3.5 mr-1.5 animate-spin" />Submitting...</>
                 ) : (
-                  <><Check className="size-3.5 mr-1.5" />Confirm Reschedule Request</>
+                  <><Check className="size-3.5 mr-1.5" />Submit Request</>
                 )}
               </Button>
             )}
@@ -278,13 +278,12 @@ export function ChatIntakeWorkflow({
           type="button"
           onClick={intake.submitCancellation}
           disabled={intake.isSubmitting}
-          variant="destructive"
-          className="w-full"
+          className="w-full bg-primary text-primary-foreground hover:bg-primary/90 border-0"
         >
           {intake.isSubmitting ? (
             <><Loader2 className="size-3.5 mr-1.5 animate-spin" />Submitting...</>
           ) : (
-            <><XCircle className="size-3.5 mr-1.5" />Submit Cancellation Request</>
+            <><Check className="size-3.5 mr-1.5" />Submit Request</>
           )}
         </Button>
       </div>
