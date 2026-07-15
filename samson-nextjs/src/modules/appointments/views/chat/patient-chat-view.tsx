@@ -92,7 +92,7 @@ export function PatientChatView({
     };
 
     return (
-        <div className={`flex flex-col h-full w-full max-w-4xl mx-auto bg-card border-x border-y-0 border-border rounded-none shadow-none ${className || ''}`}>
+        <div className={`flex flex-col h-full w-full max-w-3xl mx-auto bg-card border-x border-y-0 border-border rounded-none shadow-none ${className || ''}`}>
             
             {/* Cancellation Notice Banner */}
             {isCancelled && (
@@ -151,8 +151,7 @@ export function PatientChatView({
                                     className="h-7 text-xs rounded-full cursor-pointer border-primary/20 bg-primary/5 hover:bg-primary/10 text-primary"
                                     onClick={() => setActiveWorkflow('RESCHEDULE')}
                                 >
-                                    <Calendar className="size-3 mr-1" />
-                                    Reschedule Appointment
+                                    I want to reschedule my appointment
                                 </Button>
                                 <Button
                                     variant="outline"
@@ -160,8 +159,7 @@ export function PatientChatView({
                                     className="h-7 text-xs rounded-full cursor-pointer border-destructive/20 bg-destructive/5 hover:bg-destructive/10 text-destructive"
                                     onClick={() => setActiveWorkflow('CANCEL')}
                                 >
-                                    <XCircle className="size-3 mr-1" />
-                                    Cancel Appointment
+                                    I want to cancel my appointment
                                 </Button>
                                 <Button
                                     variant="ghost"
