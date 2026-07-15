@@ -58,7 +58,7 @@ export function useChatIntake({ appointmentId, chatToken, onPatientMessageSent }
       const dateStr = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
       const timeStr = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
 
-      const requestText = `I would like to request a reschedule for my appointment:\nDate: ${dateStr}\nTime: ${timeStr}`;
+      const requestText = `I would like to request a reschedule for my appointment:\n\nNew Date: ${dateStr}\n\nPreferred Time: ${timeStr}`;
 
       // 2. Patient message
       await onPatientMessageSent(requestText);
