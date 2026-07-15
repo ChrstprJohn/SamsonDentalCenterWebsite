@@ -235,7 +235,7 @@ export function ChatIntakeWorkflow({
                 {intake.isSubmitting ? (
                   <><Loader2 className="size-3.5 mr-1.5 animate-spin" />Submitting...</>
                 ) : (
-                  <><Check className="size-3.5 mr-1.5" />Submit Request</>
+                  'Submit Request'
                 )}
               </Button>
             )}
@@ -283,7 +283,7 @@ export function ChatIntakeWorkflow({
           {intake.isSubmitting ? (
             <><Loader2 className="size-3.5 mr-1.5 animate-spin" />Submitting...</>
           ) : (
-            <><Check className="size-3.5 mr-1.5" />Submit Request</>
+            'Submit Request'
           )}
         </Button>
       </div>
