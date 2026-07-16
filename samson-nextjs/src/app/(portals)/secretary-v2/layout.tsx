@@ -2,13 +2,11 @@ import React from 'react';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/shared/database/server';
-import { getClinicConfigAction } from '@/modules/clinic-config/actions/settings/get-clinic-config.action';
 import { Button } from '@/components/ui/button';
 import type { AuthHeaderUser } from '@/modules/patients/hooks/auth/header/use-auth-header';
-import { getUnreadNotifications, getUnreadCount, NotificationPopover, RealtimeListener } from '@/modules/notifications/exports';
-import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
+import { RealtimeListener } from '@/modules/notifications/exports';
+import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { SecretarySidebar } from '@/components/secretary-sidebar';
-import { Separator } from '@/components/ui/separator';
 
 export const dynamic = 'force-dynamic';
 
@@ -46,17 +44,6 @@ export default async function SecretaryPortalV2Layout({
     avatarUrl: user.user_metadata?.avatar_url || user.user_metadata?.avatarUrl || null,
   };
 
-  // Fetch clinic config
-  let clinicConfig = null;
-  try {
-    const response = await getClinicConfigAction();
-    if (response && 'data' in response && response.data) {
-      clinicConfig = response.data;
-    }
-  } catch (err) {
-    console.error('Failed to load clinic config in secretary portal V2:', err);
-  }
-
   if (!isAuthorized) {
     return (
       <div className="flex flex-col min-h-screen bg-background items-center justify-center p-6 text-center gap-6">
@@ -74,17 +61,6 @@ export default async function SecretaryPortalV2Layout({
         </Link>
       </div>
     );
-  }
-
-  // Fetch notifications
-  let unreadNotifications: any[] = [];
-  let unreadCount = 0;
-  try {
-    const supabase = await createClient();
-    unreadNotifications = await getUnreadNotifications(supabase)(userId, 'SECRETARY');
-    unreadCount = await getUnreadCount(supabase)(userId, 'SECRETARY');
-  } catch (err) {
-    console.error('Failed to fetch unread notifications:', err);
   }
 
   const sidebarUser = {
