@@ -5,6 +5,7 @@ import { NavMainSecretary } from "@/components/nav-main-secretary"
 import { NavProjectsSecretary } from "@/components/nav-projects-secretary"
 import { NavUserSecretary } from "@/components/nav-user-secretary"
 import { TeamSwitcherSecretary } from "@/components/team-switcher-secretary"
+import { useRouter } from "next/navigation"
 import {
   Sidebar,
   SidebarContent,
@@ -130,6 +131,19 @@ interface SecretarySidebarProps extends React.ComponentProps<typeof Sidebar> {
 }
 
 export function SecretarySidebar({ userProfile, ...props }: SecretarySidebarProps) {
+  const router = useRouter()
+  const [isPending, startTransition] = React.useTransition()
+
+  const handleNavigate = React.useCallback((url: string, e?: React.MouseEvent) => {
+    if (!url || url === "#") return
+    if (e) {
+      e.preventDefault()
+    }
+    startTransition(() => {
+      router.push(url)
+    })
+  }, [router])
+
   const fallbackUser = {
     name: userProfile?.name || "Secretary",
     email: userProfile?.email || "secretary@samson.com",
@@ -137,13 +151,28 @@ export function SecretarySidebar({ userProfile, ...props }: SecretarySidebarProp
   }
 
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <Sidebar collapsible="icon" className="relative" {...props}>
+      {isPending && (
+        <div className="absolute top-0 left-0 right-0 h-1 bg-emerald-500/20 overflow-hidden z-50">
+          <div className="h-full bg-emerald-600 w-full" style={{
+            animation: "loading-bar 1.5s infinite ease-in-out",
+            transformOrigin: "left"
+          }} />
+          <style dangerouslySetInnerHTML={{__html: `
+            @keyframes loading-bar {
+              0% { transform: scaleX(0); }
+              50% { transform: scaleX(0.7); }
+              100% { transform: scaleX(1); opacity: 0; }
+            }
+          `}} />
+        </div>
+      )}
       <SidebarHeader>
         <TeamSwitcherSecretary teams={data.teams} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMainSecretary items={data.navMain} />
-        <NavProjectsSecretary projects={data.projects} label="Roster & Schedules" />
+        <NavMainSecretary items={data.navMain} isPending={isPending} onNavigate={handleNavigate} />
+        <NavProjectsSecretary projects={data.projects} label="Roster & Schedules" isPending={isPending} onNavigate={handleNavigate} />
       </SidebarContent>
       <SidebarFooter>
         <NavUserSecretary user={fallbackUser} />

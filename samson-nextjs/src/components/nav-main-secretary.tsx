@@ -22,6 +22,8 @@ import { ChevronRightIcon } from "lucide-react"
 export function NavMainSecretary({
   items,
   label = "Operations",
+  isPending = false,
+  onNavigate,
 }: {
   items: {
     title: string
@@ -34,13 +36,21 @@ export function NavMainSecretary({
     }[]
   }[]
   label?: string
+  isPending?: boolean
+  onNavigate?: (url: string, e: React.MouseEvent) => void
 }) {
   const pathname = usePathname()
+
+  const handleLinkClick = (url: string) => (e: React.MouseEvent) => {
+    if (onNavigate) {
+      onNavigate(url, e)
+    }
+  }
 
   return (
     <SidebarGroup>
       <SidebarGroupLabel>{label}</SidebarGroupLabel>
-      <SidebarMenu className="gap-1.5">
+      <SidebarMenu className={`gap-1.5 transition-opacity duration-200 ${isPending ? "pointer-events-none opacity-60 cursor-wait" : ""}`}>
         {items.map((item) => {
           const hasSubItems = item.items && item.items.length > 0
           // If any of the sub-items are active, auto-open this group
@@ -51,7 +61,7 @@ export function NavMainSecretary({
             return (
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton asChild tooltip={item.title} isActive={pathname === item.url}>
-                  <Link href={item.url}>
+                  <Link href={item.url} onClick={handleLinkClick(item.url)}>
                     {item.icon}
                     <span>{item.title}</span>
                   </Link>
@@ -82,7 +92,7 @@ export function NavMainSecretary({
                       return (
                         <SidebarMenuSubItem key={subItem.title}>
                           <SidebarMenuSubButton asChild isActive={isSubActive}>
-                            <Link href={subItem.url}>
+                            <Link href={subItem.url} onClick={handleLinkClick(subItem.url)}>
                               <span>{subItem.title}</span>
                             </Link>
                           </SidebarMenuSubButton>
