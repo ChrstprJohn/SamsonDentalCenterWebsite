@@ -128,7 +128,7 @@ export function PatientChatView({
             />
 
             {/* Workflow / Input Area */}
-            <div className="p-4 border-t border-border bg-muted/20">
+            <div className="p-4 border-t border-border bg-white">
                 {isClosed ? (
                     <div className="p-3 bg-muted border border-border rounded-xl text-center text-xs text-muted-foreground">
                         This chat thread is now closed because the appointment is {appointmentDetails.status}.

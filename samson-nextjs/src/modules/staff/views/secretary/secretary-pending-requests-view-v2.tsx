@@ -3,6 +3,7 @@
 import React from 'react';
 import { useSecretaryInquiriesQueue } from '../../hooks/secretary/use-secretary-inquiries-queue';
 import { PendingRequestListV2 } from './sub-components/pending-request-list-v2';
+import { CoordinationHub } from './sub-components/coordination-hub';
 import { Input } from '@/components/ui/input';
 import { InquiryToast } from './sub-components/inquiry-toast';
 import { Button } from '@/components/ui/button';
@@ -24,6 +25,7 @@ import {
   X,
   Check,
   ArrowLeft,
+  EllipsisVertical,
 } from 'lucide-react';
 
 function getServiceName(services: { id: string; name: string }[], serviceId: string): string {
@@ -73,7 +75,10 @@ export function SecretaryPendingRequestsViewV2() {
   const [contactSnapshot, setContactSnapshot] = React.useState<Record<string, string>>({});
   const [serviceSnapshot, setServiceSnapshot] = React.useState<Record<string, string>>({});
   const [approvalReason, setApprovalReason] = React.useState('');
-  const [activeView, setActiveView] = React.useState<'list' | 'detail'>('list');
+  const [mobileView, setMobileView] = React.useState<'list' | 'detail' | 'quickLogs'>('list');
+
+  const colMobile = (view: 'list' | 'detail' | 'quickLogs') =>
+    mobileView === view ? 'flex' : 'hidden';
 
   const startEditingNames = () => {
     setNamesSnapshot({
@@ -136,39 +141,35 @@ export function SecretaryPendingRequestsViewV2() {
 
   return (
     <div className="flex h-full w-full overflow-hidden">
-      <div className={`lg:w-[350px] flex-1 lg:flex-none flex-col border-r border-card-border/40 bg-sidebar h-full overflow-hidden ${
-        activeView === 'detail' ? 'hidden lg:flex' : 'flex'
-      }`}>
+      <div className={`lg:w-[350px] flex-1 lg:flex-none flex-col border-r border-card-border/40 bg-sidebar h-full overflow-hidden ${colMobile('list')} lg:flex`}>
         <PendingRequestListV2
           inquiries={inquiriesView.inquiries}
           selectedInquiryId={inquiriesView.selectedInquiryId}
           isLoadingInquiries={inquiriesView.isLoadingInquiries}
-          onSelectInquiry={(inq) => { inquiriesView.selectInquiry(inq); setActiveView('detail'); }}
+          onSelectInquiry={(inq) => { inquiriesView.selectInquiry(inq); setMobileView('detail'); }}
         />
       </div>
 
-      <div className={`flex-1 flex-col min-w-0 ${
-        activeView === 'detail' ? 'flex' : 'hidden lg:flex'
-      }`}>
+      {hasSelection ? (
+        <>
+      <div className={`flex-1 flex-col min-w-0 border-r border-card-border/40 ${colMobile('detail')} lg:flex`}>
+        <div className="p-4 border-b border-card-border/40 shrink-0">
+          <div className="flex items-center gap-2">
+            <button onClick={() => setMobileView('list')} className="lg:hidden p-1 -ml-1 text-muted-foreground hover:text-foreground shrink-0">
+              <ArrowLeft className="size-5" />
+            </button>
+            <div className="flex-1 text-base font-medium text-foreground">
+              Request Details
+            </div>
+            <button onClick={() => setMobileView('quickLogs')} className="lg:hidden p-1 -mr-1 text-muted-foreground hover:text-foreground shrink-0">
+              <EllipsisVertical className="size-5" />
+            </button>
+          </div>
+        </div>
         <div className="flex-1 !overflow-y-auto max-sm:p-3 p-6 space-y-4 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
           style={{ scrollbarWidth: 'thin' }}
           data-lenis-prevent
         >
-          {hasSelection && (
-            <div className="lg:hidden flex items-center gap-2 pb-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setActiveView('list')}
-                className="flex items-center gap-1 text-sm text-text-muted hover:text-text-primary -ml-2"
-              >
-                <ArrowLeft className="size-4" />
-                Back
-              </Button>
-            </div>
-          )}
-          {hasSelection ? (
-            <>
               {inquiriesView.inlineError && (
                 <div className="text-xs font-bold text-destructive bg-destructive/10 p-3 rounded-xl border border-destructive/20">
                   Error: {inquiriesView.inlineError}
@@ -503,15 +504,25 @@ export function SecretaryPendingRequestsViewV2() {
                   </CardContent>
                 </Card>
               )}
-            </>
-          ) : (
-            <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground bg-muted/10 space-y-2 rounded-xl min-h-[300px]">
-              <ClipboardList className="max-sm:size-8 size-12 text-muted-foreground/40" />
-              <p className="max-sm:text-xs text-sm font-medium">Select an inquiry from the left list to view details and process the request.</p>
-            </div>
-          )}
+
+          </div>
         </div>
+        <div className={`lg:w-[320px] flex-1 lg:flex-none flex-col h-full overflow-hidden ${colMobile('quickLogs')} lg:flex`}>
+          <div className="lg:hidden p-2 pb-0 shrink-0">
+            <button onClick={() => setMobileView('detail')} className="flex items-center gap-1 p-1 -ml-1 text-muted-foreground hover:text-foreground shrink-0">
+              <ArrowLeft className="size-5" />
+              <span className="text-sm font-medium">Back</span>
+            </button>
+          </div>
+          <CoordinationHub inquiryId={inquiriesView.selectedInquiryId} />
+        </div>
+      </>
+    ) : (
+      <div className="flex-1 flex-col items-center justify-center text-muted-foreground bg-muted/10 space-y-2 hidden lg:flex">
+        <ClipboardList className="size-12 text-muted-foreground/40" />
+        <p className="text-sm font-medium">Select an inquiry from the left list to view details and process the request.</p>
       </div>
+    )}
       <InquiryToast toast={inquiriesView.toast} />
     </div>
   );

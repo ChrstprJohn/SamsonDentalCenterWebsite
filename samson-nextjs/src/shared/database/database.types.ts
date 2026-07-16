@@ -575,6 +575,41 @@ export type Database = {
         }
         Relationships: []
       }
+      coordination_logs: {
+        Row: {
+          id: string
+          inquiry_id: string
+          action_type: string
+          message: string
+          created_at: string
+          created_by: string | null
+        }
+        Insert: {
+          id?: string
+          inquiry_id: string
+          action_type: string
+          message: string
+          created_at?: string
+          created_by?: string | null
+        }
+        Update: {
+          id?: string
+          inquiry_id?: string
+          action_type?: string
+          message?: string
+          created_at?: string
+          created_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coordination_logs_inquiry_id_fkey"
+            columns: ["inquiry_id"]
+            isOneToOne: false
+            referencedRelation: "appointment_inquiries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

@@ -33,7 +33,7 @@ export function ChatHeader({
   onShowDetail,
 }: ChatHeaderProps) {
   return (
-    <div className="flex items-center justify-between p-4 border-b border-border bg-sidebar shrink-0 min-h-[61px]">
+    <div className="flex items-center justify-between p-4 border-b border-border bg-white shrink-0 min-h-[61px]">
       <div className="flex items-center gap-2 min-w-0">
         {onBack && (
           <button onClick={onBack} className="lg:hidden p-1 -ml-1 text-muted-foreground hover:text-foreground shrink-0">
