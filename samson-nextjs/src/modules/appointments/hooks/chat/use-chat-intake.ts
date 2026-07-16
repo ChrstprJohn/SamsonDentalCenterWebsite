@@ -38,7 +38,6 @@ export function useChatIntake({ appointmentId, chatToken, onPatientMessageSent }
         message: messageText,
         senderRole: 'STAFF',
         senderName: 'System',
-        chatToken,
       }, chatToken);
     } catch (err) {
       console.error('Failed to post system auto-reply message:', err);

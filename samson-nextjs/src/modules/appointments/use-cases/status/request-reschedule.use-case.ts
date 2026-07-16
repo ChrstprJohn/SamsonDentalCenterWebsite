@@ -13,7 +13,7 @@ export const requestRescheduleUseCase = (deps: {
       date: string;
       startTime?: string;
       endTime?: string;
-      doctorId: string;
+      doctorId: string | null;
       preferredStartTime?: string;
     }
   ) => Promise<AppointmentDto>;
@@ -27,7 +27,7 @@ export const requestRescheduleUseCase = (deps: {
       date: string;
       startTime?: string;
       endTime?: string;
-      doctorId: string;
+      doctorId: string | null;
       preferredStartTime?: string;
     }
   ) => {

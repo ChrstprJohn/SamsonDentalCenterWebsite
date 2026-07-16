@@ -12,7 +12,7 @@ export const requestRescheduleTransactionCommand = (supabase: SupabaseClient) =>
       date: string;
       startTime?: string;
       endTime?: string;
-      doctorId: string;
+      doctorId: string | null;
       preferredStartTime?: string;
     }
   ): Promise<AppointmentDto> => {
@@ -24,7 +24,7 @@ export const requestRescheduleTransactionCommand = (supabase: SupabaseClient) =>
       p_proposed_date:        proposedMetadata.date,
       p_proposed_start_time:  proposedMetadata.startTime || null,
       p_proposed_end_time:    proposedMetadata.endTime || null,
-      p_proposed_doctor_id:   proposedMetadata.doctorId,
+      p_proposed_doctor_id:   proposedMetadata.doctorId || null,
       p_proposed_preferred_start_time: proposedMetadata.preferredStartTime || null,
     });
 

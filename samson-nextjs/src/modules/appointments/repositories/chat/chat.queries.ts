@@ -186,16 +186,18 @@ export const validateChatTokenQuery = (supabase: SupabaseClient) => {
         if (!data) return null;
 
         let patientName = 'Guest';
-        if (data.patient) {
-            patientName = `${data.patient.first_name} ${data.patient.last_name}`;
+        if (data.patient && data.patient.length > 0) {
+            const p = data.patient[0];
+            patientName = `${p.first_name ?? ''} ${p.last_name ?? ''}`.trim() || 'Guest';
         } else if (data.guest_contacts && data.guest_contacts.length > 0) {
             const gc = data.guest_contacts[0];
-            patientName = `${gc.first_name} ${gc.last_name}`;
+            patientName = `${gc.first_name ?? ''} ${gc.last_name ?? ''}`.trim() || 'Guest';
         }
 
         let doctorName = 'Unassigned';
-        if (data.doctor) {
-            doctorName = `Dr. ${data.doctor.first_name} ${data.doctor.last_name}`;
+        if (data.doctor && data.doctor.length > 0) {
+            const d = data.doctor[0];
+            doctorName = `Dr. ${d.first_name ?? ''} ${d.last_name ?? ''}`.trim() || 'Unassigned';
         }
 
         return {
@@ -206,8 +208,8 @@ export const validateChatTokenQuery = (supabase: SupabaseClient) => {
             startTime: data.start_time,
             endTime: data.end_time,
             patientName,
-            serviceName: data.service?.name || 'General Inquiry',
-            serviceId: data.service?.id || null,
+            serviceName: (data.service?.[0]?.name) || 'General Inquiry',
+            serviceId: data.service?.[0]?.id || null,
             doctorName,
         };
     };

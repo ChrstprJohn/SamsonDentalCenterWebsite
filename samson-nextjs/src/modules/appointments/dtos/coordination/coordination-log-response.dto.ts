@@ -22,10 +22,15 @@ export type CoordinationLogResponseDto = z.infer<typeof coordinationLogResponseS
 
 export type CreateCoordinationLogActionType =
   | 'SCHEDULE_CONFLICT'
-  | 'NEEDS_RESCHEDULE'
+  | 'OUTSIDE_HOURS'
+  | 'DR_UNAVAILABLE'
   | 'WAITING_ON_DOCTOR'
+  | 'NEEDS_RESCHEDULE'
   | 'CALLED_NO_ANSWER'
   | 'LEFT_VOICEMAIL'
+  | 'LINE_BUSY_DROPPED'
   | 'SMS_SENT'
+  | 'SMS_CONFIRMED'
   | 'EMAIL_SENT'
+  | 'PATIENT_EMAILED_BACK'
   | 'CUSTOM_NOTE';

@@ -35,7 +35,7 @@ export function formatShortDate(date: Date | string): string {
  * Formats a Date object or ISO string into a standard time string.
  * Example: '2:30 PM'
  */
-export function formatClinicTime(date: Date | string): string {
+export function formatClinicTime(date: Date | string | null): string {
   if (!date) return '';
   const d = typeof date === 'string' ? new Date(date) : date;
 

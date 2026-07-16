@@ -8,12 +8,17 @@ CREATE TABLE IF NOT EXISTS public.coordination_logs (
     inquiry_id UUID NOT NULL REFERENCES public.appointment_inquiries(id) ON DELETE CASCADE,
     action_type TEXT NOT NULL CHECK (action_type IN (
         'SCHEDULE_CONFLICT',
-        'NEEDS_RESCHEDULE',
+        'OUTSIDE_HOURS',
+        'DR_UNAVAILABLE',
         'WAITING_ON_DOCTOR',
+        'NEEDS_RESCHEDULE',
         'CALLED_NO_ANSWER',
         'LEFT_VOICEMAIL',
+        'LINE_BUSY_DROPPED',
         'SMS_SENT',
+        'SMS_CONFIRMED',
         'EMAIL_SENT',
+        'PATIENT_EMAILED_BACK',
         'CUSTOM_NOTE'
     )),
     message TEXT NOT NULL,
