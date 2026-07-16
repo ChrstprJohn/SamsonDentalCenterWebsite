@@ -10,6 +10,7 @@ import { getServicesAction } from '@/modules/services/actions/management/get-ser
 
 export type InquiryDecision = 'CONVERT' | 'DROP' | '';
 export type InquiryPatientMode = 'SEARCH' | 'GUEST';
+export type InquiryTab = 'NEW' | 'CONVERTED' | 'DROPPED';
 
 export function useSecretaryInquiriesQueue() {
   const scheduler = useBookingScheduler();
@@ -45,6 +46,7 @@ export function useSecretaryInquiriesQueue() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [inlineError, setInlineError] = useState('');
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [activeTab, setActiveTab] = useState<InquiryTab>('NEW');
 
   const selectedInquiry = useMemo(
     () => inquiries.find((inquiry) => inquiry.id === selectedInquiryId),
@@ -76,16 +78,16 @@ export function useSecretaryInquiriesQueue() {
     }
   }, [patientMode, selectedPatient, stagedInquiryAction, isNotesManual]);
 
-  const loadInquiries = async () => {
+  const loadInquiries = async (status?: InquiryTab) => {
     setIsLoadingInquiries(true);
     setInquiriesError('');
-    const res = await getInquiriesAction();
+    const res = await getInquiriesAction(status);
     setIsLoadingInquiries(false);
     if (res.success && res.data) setInquiries(res.data);
     else setInquiriesError(res.error || 'Failed to load inquiries queue.');
   };
 
-  useEffect(() => { loadInquiries(); }, []);
+  useEffect(() => { loadInquiries(activeTab); }, [activeTab]);
 
   useEffect(() => {
     async function loadServices() {
@@ -237,7 +239,7 @@ export function useSecretaryInquiriesQueue() {
           showToast('Inquiry converted to appointment successfully', 'success');
           setSelectedInquiryId(null);
           setStagedInquiryAction('');
-          await loadInquiries();
+          await loadInquiries(activeTab);
         } else {
           setInlineError(res.error || 'Conversion failed');
           showToast(res.error || 'Failed to convert inquiry', 'error');
@@ -248,7 +250,7 @@ export function useSecretaryInquiriesQueue() {
           showToast('Inquiry dropped successfully', 'success');
           setSelectedInquiryId(null);
           setStagedInquiryAction('');
-          await loadInquiries();
+          await loadInquiries(activeTab);
         } else {
           setInlineError(res.error || 'Failed to drop inquiry');
           showToast(res.error || 'Failed to drop inquiry', 'error');
@@ -282,5 +284,6 @@ export function useSecretaryInquiriesQueue() {
     availableDoctors, timeslots, isLoadingServices, isLoadingDays: scheduler.loadingKey === 'dates',
     isLoadingDoctors: scheduler.loadingKey === 'doctors', isLoadingSlots: scheduler.loadingKey === 'slots',
     isSubmitting, inlineError, toast, isAvailabilityLoading, canSubmit, submitReview,
+    activeTab, setActiveTab,
   };
 }

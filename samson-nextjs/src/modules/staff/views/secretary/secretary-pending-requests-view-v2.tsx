@@ -147,6 +147,8 @@ export function SecretaryPendingRequestsViewV2() {
           selectedInquiryId={inquiriesView.selectedInquiryId}
           isLoadingInquiries={inquiriesView.isLoadingInquiries}
           onSelectInquiry={(inq) => { inquiriesView.selectInquiry(inq); setMobileView('detail'); }}
+          activeTab={inquiriesView.activeTab}
+          setActiveTab={inquiriesView.setActiveTab}
         />
       </div>
 
@@ -181,12 +183,12 @@ export function SecretaryPendingRequestsViewV2() {
                   <div className="flex items-center justify-between">
                     <CardTitle className="max-sm:text-sm">Guest Profile</CardTitle>
                     <CardAction>
-                      {!isEditingNames ? (
-                        <Button variant="outline" onClick={startEditingNames} className="bg-white hover:bg-slate-50 max-sm:text-xs max-sm:px-3.5 max-sm:py-1.5 text-sm text-slate-700 font-medium px-5 py-2.5 border border-slate-200 rounded-lg h-auto">
-                          <Pencil className="size-4 mr-1.5" />
+                      {inquiriesView.selectedInquiry?.status === 'NEW' && !isEditingNames ? (
+                        <Button variant="outline" onClick={startEditingNames} className="bg-white hover:bg-slate-50 text-xs text-slate-700 font-medium px-3 py-1.5 border border-slate-200 rounded-lg h-auto">
+                          <Pencil className="size-3.5 mr-1" />
                           Edit
                         </Button>
-                      ) : (
+                      ) : isEditingNames ? (
                         <div className="flex items-center gap-2">
                           <Button variant="ghost" size="sm" onClick={cancelEditingNames} className="text-sm text-slate-500 hover:text-slate-700 max-sm:text-xs max-sm:px-3.5 max-sm:py-1.5 px-4 py-2 h-auto">
                             <X className="size-4 mr-1" />
@@ -197,7 +199,7 @@ export function SecretaryPendingRequestsViewV2() {
                             Save
                           </Button>
                         </div>
-                      )}
+                      ) : null}
                     </CardAction>
                   </div>
                 </CardHeader>
@@ -249,12 +251,12 @@ export function SecretaryPendingRequestsViewV2() {
                   <div className="flex items-center justify-between">
                     <CardTitle className="max-sm:text-sm">Contact Information</CardTitle>
                     <CardAction>
-                      {!isEditingContact ? (
-                        <Button variant="outline" onClick={startEditingContact} className="bg-white hover:bg-slate-50 max-sm:text-xs max-sm:px-3.5 max-sm:py-1.5 text-sm text-slate-700 font-medium px-5 py-2.5 border border-slate-200 rounded-lg h-auto">
-                          <Pencil className="size-4 mr-1.5" />
+                      {inquiriesView.selectedInquiry?.status === 'NEW' && !isEditingContact ? (
+                        <Button variant="outline" onClick={startEditingContact} className="bg-white hover:bg-slate-50 text-xs text-slate-700 font-medium px-3 py-1.5 border border-slate-200 rounded-lg h-auto">
+                          <Pencil className="size-3.5 mr-1" />
                           Edit
                         </Button>
-                      ) : (
+                      ) : isEditingContact ? (
                         <div className="flex items-center gap-2">
                           <Button variant="ghost" size="sm" onClick={cancelEditingContact} className="text-sm text-slate-500 hover:text-slate-700 max-sm:text-xs max-sm:px-3.5 max-sm:py-1.5 px-4 py-2 h-auto">
                             <X className="size-4 mr-1" />
@@ -265,7 +267,7 @@ export function SecretaryPendingRequestsViewV2() {
                             Save
                           </Button>
                         </div>
-                      )}
+                      ) : null}
                     </CardAction>
                   </div>
                 </CardHeader>
@@ -290,14 +292,14 @@ export function SecretaryPendingRequestsViewV2() {
               <Card>
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle className="max-sm:text-sm">Booking Details</CardTitle>
+                    <CardTitle className="max-sm:text-sm">Appointment Details</CardTitle>
                     <CardAction>
-                      {!isEditingService ? (
-                        <Button variant="outline" onClick={startEditingService} className="bg-white hover:bg-slate-50 max-sm:text-xs max-sm:px-3.5 max-sm:py-1.5 text-sm text-slate-700 font-medium px-5 py-2.5 border border-slate-200 rounded-lg h-auto">
-                          <Pencil className="size-4 mr-1.5" />
+                      {inquiriesView.selectedInquiry?.status === 'NEW' && !isEditingService ? (
+                        <Button variant="outline" onClick={startEditingService} className="bg-white hover:bg-slate-50 text-xs text-slate-700 font-medium px-3 py-1.5 border border-slate-200 rounded-lg h-auto">
+                          <Pencil className="size-3.5 mr-1" />
                           Edit
                         </Button>
-                      ) : (
+                      ) : isEditingService ? (
                         <div className="flex items-center gap-2">
                           <Button variant="ghost" size="sm" onClick={cancelEditingService} className="text-sm text-slate-500 hover:text-slate-700 max-sm:text-xs max-sm:px-3.5 max-sm:py-1.5 px-4 py-2 h-auto">
                             <X className="size-4 mr-1" />
@@ -308,7 +310,7 @@ export function SecretaryPendingRequestsViewV2() {
                             Save
                           </Button>
                         </div>
-                      )}
+                      ) : null}
                     </CardAction>
                   </div>
                 </CardHeader>
@@ -389,25 +391,27 @@ export function SecretaryPendingRequestsViewV2() {
                 </CardContent>
               </Card>
 
-              <div className={`flex items-start gap-3 max-sm:px-4 max-sm:py-3 px-5 py-4 rounded-xl border ${isLocked ? 'bg-amber-50 dark:bg-amber-500/5 border-amber-200 dark:border-amber-500/20' : 'bg-emerald-50 dark:bg-emerald-500/5 border-emerald-200 dark:border-emerald-500/20'}`}>
-                {isLocked
-                  ? <AlertTriangle className="max-sm:size-4 size-5 text-amber-500 shrink-0 mt-0.5" />
-                  : <BadgeCheck className="max-sm:size-4 size-5 text-emerald-500 shrink-0 mt-0.5" />
-                }
-                <div>
-                  <p className="max-sm:text-xs text-sm font-semibold text-text-primary">
-                    {isLocked ? 'Action required' : 'Ready for approval'}
-                  </p>
-                  <p className="max-sm:text-[10px] text-xs text-text-muted mt-0.5">
-                    {isLocked
-                      ? 'Fill in the required fields to enable the approval action.'
-                      : 'All required fields are set. You can now approve this booking.'
-                    }
-                  </p>
+              {inquiriesView.selectedInquiry?.status === 'NEW' && (
+                <div className={`flex items-start gap-3 max-sm:px-4 max-sm:py-3 px-5 py-4 rounded-xl border ${isLocked ? 'bg-amber-50 dark:bg-amber-500/5 border-amber-200 dark:border-amber-500/20' : 'bg-emerald-50 dark:bg-emerald-500/5 border-emerald-200 dark:border-emerald-500/20'}`}>
+                  {isLocked
+                    ? <AlertTriangle className="max-sm:size-4 size-5 text-amber-500 shrink-0 mt-0.5" />
+                    : <BadgeCheck className="max-sm:size-4 size-5 text-emerald-500 shrink-0 mt-0.5" />
+                  }
+                  <div>
+                    <p className="max-sm:text-xs text-sm font-semibold text-text-primary">
+                      {isLocked ? 'Action required' : 'Ready for approval'}
+                    </p>
+                    <p className="max-sm:text-[10px] text-xs text-text-muted mt-0.5">
+                      {isLocked
+                        ? 'Fill in the required fields to enable the approval action.'
+                        : 'All required fields are set. You can now approve this booking.'
+                      }
+                    </p>
+                  </div>
                 </div>
-              </div>
+              )}
 
-              {!inquiriesView.stagedInquiryAction ? (
+              {inquiriesView.selectedInquiry?.status === 'NEW' && !inquiriesView.stagedInquiryAction && (
                 <div className="flex gap-3">
                   <Button
                     variant="outline"
@@ -415,7 +419,7 @@ export function SecretaryPendingRequestsViewV2() {
                     className="flex-1 max-sm:py-2 py-3 max-sm:text-xs text-sm font-semibold"
                     onClick={() => { inquiriesView.setDecision('DROP'); setApprovalReason(''); }}
                   >
-                    Reject booking
+                    Drop / Reject
                   </Button>
                   <Button
                     disabled={isLocked}
@@ -423,15 +427,17 @@ export function SecretaryPendingRequestsViewV2() {
                     className="flex-1 max-sm:py-2 py-3 max-sm:text-xs text-sm font-semibold bg-slate-900 hover:bg-slate-800 text-white shadow-sm"
                     onClick={() => { inquiriesView.setDecision('CONVERT'); setApprovalReason(''); }}
                   >
-                    Approve booking
+                    Convert / Approve
                   </Button>
                 </div>
-              ) : (
+              )}
+
+              {inquiriesView.selectedInquiry?.status === 'NEW' && !!inquiriesView.stagedInquiryAction && (
                 <Card>
                   <CardContent className="flex flex-col gap-4 pt-4">
                     <div className="flex items-center justify-between">
                       <span className="max-sm:text-xs text-sm font-semibold flex items-center gap-2">
-                        {inquiriesView.stagedInquiryAction === 'CONVERT' ? 'Approval note' : 'Rejecting booking'}
+                        {inquiriesView.stagedInquiryAction === 'CONVERT' ? 'Convert note (Approve)' : 'Drop reason (Reject)'}
                       </span>
                       <Button
                         variant="ghost"
@@ -497,7 +503,7 @@ export function SecretaryPendingRequestsViewV2() {
                       >
                         {inquiriesView.isSubmitting
                           ? 'Saving...'
-                          : `Confirm ${inquiriesView.stagedInquiryAction === 'CONVERT' ? 'approval' : 'rejection'}`
+                          : `Confirm ${inquiriesView.stagedInquiryAction === 'CONVERT' ? 'convert / approve' : 'drop / reject'}`
                         }
                       </Button>
                     </div>
@@ -508,13 +514,7 @@ export function SecretaryPendingRequestsViewV2() {
           </div>
         </div>
         <div className={`lg:w-[320px] flex-1 lg:flex-none flex-col h-full overflow-hidden ${colMobile('quickLogs')} lg:flex`}>
-          <div className="lg:hidden p-2 pb-0 shrink-0">
-            <button onClick={() => setMobileView('detail')} className="flex items-center gap-1 p-1 -ml-1 text-muted-foreground hover:text-foreground shrink-0">
-              <ArrowLeft className="size-5" />
-              <span className="text-sm font-medium">Back</span>
-            </button>
-          </div>
-          <CoordinationHub inquiryId={inquiriesView.selectedInquiryId} />
+          <CoordinationHub inquiryId={inquiriesView.selectedInquiryId} hideActions={inquiriesView.selectedInquiry?.status !== 'NEW'} onBack={() => setMobileView('detail')} />
         </div>
       </>
     ) : (

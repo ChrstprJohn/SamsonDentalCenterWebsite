@@ -1,7 +1,10 @@
 'use client';
 
 import * as React from 'react';
+import { ArrowUpDown } from 'lucide-react';
 import { formatShortDate, formatTimeString } from '@/shared/utils/date.util';
+import type { InquiryTab } from '../../../hooks/secretary/use-secretary-inquiries-queue';
+import { Button } from '@/components/ui/button';
 import {
   Sidebar,
   SidebarHeader,
@@ -17,13 +20,47 @@ interface PendingRequestListV2Props {
   selectedInquiryId: string | null;
   isLoadingInquiries: boolean;
   onSelectInquiry: (inquiry: any) => void;
+  activeTab: InquiryTab;
+  setActiveTab: (tab: InquiryTab) => void;
+}
+
+const TABS: { key: InquiryTab; label: string }[] = [
+  { key: 'NEW', label: 'New' },
+  { key: 'CONVERTED', label: 'Converted' },
+  { key: 'DROPPED', label: 'Dropped' },
+];
+
+const BADGE_LABELS: Record<InquiryTab, string> = {
+  NEW: 'NEW',
+  CONVERTED: 'CONVERTED',
+  DROPPED: 'DROPPED',
+};
+
+const BADGE_STYLES: Record<InquiryTab, string> = {
+  NEW: 'text-amber-600 bg-amber-500/10 dark:text-amber-400',
+  CONVERTED: 'text-emerald-600 bg-emerald-500/10 dark:text-emerald-400',
+  DROPPED: 'text-rose-600 bg-rose-500/10 dark:text-rose-400',
+};
+
+const EMPTY_MESSAGES: Record<InquiryTab, string> = {
+  NEW: 'No new inquiries found.',
+  CONVERTED: 'No converted inquiries found.',
+  DROPPED: 'No dropped inquiries found.',
+};
+
+function formatCreatedAt(iso: string): string {
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '';
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
 export function PendingRequestListV2(props: PendingRequestListV2Props) {
   const [search, setSearch] = React.useState('');
+  const [sortOrder, setSortOrder] = React.useState<'newest' | 'oldest'>('newest');
 
   const filteredInquiries = React.useMemo(() => {
-    return props.inquiries.filter((inq) => {
+    const filtered = props.inquiries.filter((inq) => {
       const name = `${inq.firstName || ''} ${inq.middleName ? inq.middleName + ' ' : ''}${inq.lastName || ''} ${inq.suffix || ''}`.trim() || 'Guest';
       const serviceName = inq.preferredServiceName || '';
 
@@ -32,7 +69,13 @@ export function PendingRequestListV2(props: PendingRequestListV2Props) {
         serviceName.toLowerCase().includes(search.toLowerCase())
       );
     });
-  }, [props.inquiries, search]);
+
+    return [...filtered].sort((a, b) => {
+      const dateA = new Date(a.createdAt || a.preferredDate || 0).getTime();
+      const dateB = new Date(b.createdAt || b.preferredDate || 0).getTime();
+      return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
+    });
+  }, [props.inquiries, search, sortOrder]);
 
   const currentCount = filteredInquiries.length;
   const isLoading = props.isLoadingInquiries;
@@ -47,9 +90,17 @@ export function PendingRequestListV2(props: PendingRequestListV2Props) {
           <div className="flex items-center gap-2">
             <SidebarTrigger className="lg:hidden -ml-1 text-muted-foreground hover:text-foreground" />
             <div className="text-base font-medium text-foreground">
-              Booking Requests
+              Appointment Requests
             </div>
           </div>
+          <button
+            onClick={() => setSortOrder(sortOrder === 'newest' ? 'oldest' : 'newest')}
+            className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors shrink-0"
+            title={`Sort by ${sortOrder === 'newest' ? 'oldest' : 'newest'} first`}
+          >
+            <ArrowUpDown className="size-3" />
+            {sortOrder === 'newest' ? 'Newest' : 'Oldest'}
+          </button>
         </div>
         <SidebarInput
           placeholder="Type to search..."
@@ -57,8 +108,24 @@ export function PendingRequestListV2(props: PendingRequestListV2Props) {
           onChange={(e) => setSearch(e.target.value)}
           className="rounded-md"
         />
+        <div className="flex gap-1 bg-muted/20 p-1 rounded-lg">
+          {TABS.map((tab) => (
+            <Button
+              key={tab.key}
+              onClick={() => props.setActiveTab(tab.key)}
+              variant="ghost"
+              size="sm"
+              className={`flex-1 h-8 text-xs transition-all ${
+                props.activeTab === tab.key
+                  ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              {tab.label}
+            </Button>
+          ))}
+        </div>
       </SidebarHeader>
-      {/* data-lenis-prevent stops Lenis from hijacking nested scroll wheel events */}
       <SidebarContent 
         data-lenis-prevent 
         style={{ scrollbarWidth: 'thin' }}
@@ -72,12 +139,13 @@ export function PendingRequestListV2(props: PendingRequestListV2Props) {
               </div>
             ) : filteredInquiries.length === 0 ? (
               <div className="py-12 text-center text-text-muted text-xs">
-                No active inquiries found.
+                {EMPTY_MESSAGES[props.activeTab]}
               </div>
             ) : (
               filteredInquiries.map((inq) => {
                 const isSelected = props.selectedInquiryId === inq.id;
                 const name = `${inq.firstName || ''} ${inq.middleName ? inq.middleName + ' ' : ''}${inq.lastName || ''} ${inq.suffix || ''}`.trim() || 'Guest';
+                const status = inq.status as InquiryTab || 'NEW';
 
                 const timeDisplay = inq.preferredStartTime
                   ? formatTimeString(inq.preferredStartTime)
@@ -99,16 +167,17 @@ export function PendingRequestListV2(props: PendingRequestListV2Props) {
                   >
                     <div className="flex w-full items-center gap-2">
                       <span>{name}</span>
-                      <span className="ml-auto text-[10px] font-medium uppercase tracking-wider text-amber-600 bg-amber-500/10 dark:text-amber-400 px-1.5 py-0.5 rounded shrink-0">
-                        INQUIRY
+                      <span className={`ml-auto text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded shrink-0 ${BADGE_STYLES[status]}`}>
+                        {BADGE_LABELS[status]}
                       </span>
                     </div>
                     <span className="font-medium">
                       {inq.preferredServiceName || 'Treatment'}
                     </span>
-                    <span className="line-clamp-2 w-[260px] text-xs whitespace-break-spaces">
-                      {dateDisplay} • {timeDisplay}
-                    </span>
+                    <div className="w-full flex items-center justify-between gap-2 text-xs">
+                      <span className="truncate">{dateDisplay} • {timeDisplay}</span>
+                      <span className="text-[10px] text-muted-foreground shrink-0">Submitted {formatCreatedAt(inq.createdAt)}</span>
+                    </div>
                   </button>
                 );
               })

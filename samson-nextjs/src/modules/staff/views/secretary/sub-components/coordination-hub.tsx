@@ -1,11 +1,14 @@
 'use client';
 
+import { ArrowLeft } from 'lucide-react';
 import { useCoordinationHub } from '../../../hooks/secretary/use-coordination-hub';
 import type { CreateCoordinationLogActionType } from '@/modules/appointments/dtos/coordination/coordination-log-response.dto';
 
 interface CoordinationHubProps {
   inquiryId: string | null;
   hideHeader?: boolean;
+  hideActions?: boolean;
+  onBack?: () => void;
 }
 
 interface QuickAction {
@@ -48,15 +51,22 @@ function formatTime(iso: string): string {
   return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
 }
 
-export function CoordinationHub({ inquiryId, hideHeader }: CoordinationHubProps) {
+export function CoordinationHub({ inquiryId, hideHeader, hideActions, onBack }: CoordinationHubProps) {
   const { logs, isLoading, error, customNote, setCustomNote, addLog, removeLog, addCustomNote } = useCoordinationHub(inquiryId);
 
   return (
     <div className="flex flex-col h-full overflow-hidden border-r border-card-border/40 bg-card/50">
       {!hideHeader && (
         <div className="p-4 border-b border-card-border/40 shrink-0">
-          <div className="text-base font-medium text-foreground">
-            Quick Status Logs
+          <div className="flex items-center gap-2">
+            {onBack && (
+              <button onClick={onBack} className="lg:hidden p-1 -ml-1 text-muted-foreground hover:text-foreground shrink-0">
+                <ArrowLeft className="size-5" />
+              </button>
+            )}
+            <div className="text-base font-medium text-foreground">
+              Staff Notes & Logs
+            </div>
           </div>
         </div>
       )}
@@ -73,62 +83,68 @@ export function CoordinationHub({ inquiryId, hideHeader }: CoordinationHubProps)
               <div className="text-xs text-rose-500 bg-rose-500/10 p-2 rounded-lg border border-rose-500/20">{error}</div>
             )}
 
-            <div>
-              <div className="text-xs font-bold text-text-muted mb-1.5">Calendar Status</div>
-              <div className="flex flex-wrap gap-1">
-                {CALENDAR_ACTIONS.map((action) => (
+            {!hideActions && (
+              <div>
+                <div className="text-xs font-bold text-text-muted mb-1.5">Schedule Conflicts</div>
+                <div className="flex flex-wrap gap-1">
+                  {CALENDAR_ACTIONS.map((action) => (
+                    <button
+                      key={action.type}
+                      onClick={() => addLog(action.type, action.msg)}
+                      className={`text-xs px-3 py-1.5 rounded-full border font-medium transition-colors ${action.classes}`}
+                    >
+                      {action.emoji} {action.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {!hideActions && (
+              <div className="border-t border-card-border/30 pt-3">
+                <div className="text-xs font-bold text-text-muted mb-1.5">Contact Attempts</div>
+                <div className="flex flex-wrap gap-1">
+                  {COMMS_ACTIONS.map((action) => (
+                    <button
+                      key={action.type}
+                      onClick={() => addLog(action.type, action.msg)}
+                      className={`text-xs px-3 py-1.5 rounded-full border font-medium transition-colors ${action.classes}`}
+                    >
+                      {action.emoji} {action.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {!hideActions && (
+              <div className="border-t border-card-border/30 pt-3">
+                <div className="text-xs font-bold text-text-muted mb-1">Write Custom Note</div>
+                <div className="flex gap-1">
+                  <input
+                    value={customNote}
+                    onChange={(e) => setCustomNote(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addCustomNote(); } }}
+                    placeholder="Type a custom update..."
+                    className="flex-1 text-sm px-3 py-2 rounded-lg border border-card-border bg-card text-text-primary placeholder:text-text-muted focus:outline-none focus:border-primary-start/50 transition"
+                  />
                   <button
-                    key={action.type}
-                    onClick={() => addLog(action.type, action.msg)}
-                    className={`text-xs px-3 py-1.5 rounded-full border font-medium transition-colors ${action.classes}`}
+                    onClick={addCustomNote}
+                    disabled={!customNote.trim()}
+                    className="text-xs px-3 py-2 rounded-lg bg-slate-800 text-white font-medium hover:bg-slate-700 disabled:opacity-40 transition shrink-0"
                   >
-                    {action.emoji} {action.label}
+                    Add Note
                   </button>
-                ))}
+                </div>
               </div>
-            </div>
+            )}
 
-            <div className="border-t border-card-border/30 pt-3">
-              <div className="text-xs font-bold text-text-muted mb-1.5">Communication Log</div>
-              <div className="flex flex-wrap gap-1">
-                {COMMS_ACTIONS.map((action) => (
-                  <button
-                    key={action.type}
-                    onClick={() => addLog(action.type, action.msg)}
-                    className={`text-xs px-3 py-1.5 rounded-full border font-medium transition-colors ${action.classes}`}
-                  >
-                    {action.emoji} {action.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="border-t border-card-border/30 pt-3">
-              <div className="text-xs font-bold text-text-muted mb-1">Add Custom Note</div>
-              <div className="flex gap-1">
-                <input
-                  value={customNote}
-                  onChange={(e) => setCustomNote(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addCustomNote(); } }}
-                  placeholder="Type a custom update..."
-                  className="flex-1 text-sm px-3 py-2 rounded-lg border border-card-border bg-card text-text-primary placeholder:text-text-muted focus:outline-none focus:border-primary-start/50 transition"
-                />
-                <button
-                  onClick={addCustomNote}
-                  disabled={!customNote.trim()}
-                  className="text-xs px-3 py-2 rounded-lg bg-slate-800 text-white font-medium hover:bg-slate-700 disabled:opacity-40 transition shrink-0"
-                >
-                  Add Note
-                </button>
-              </div>
-            </div>
-
-            <div className="border-t border-card-border/30 pt-3">
-              <div className="text-xs font-bold text-text-muted mb-1.5">Updates Log</div>
+            <div className={`border-t border-card-border/30 pt-3 ${hideActions ? 'mt-0' : ''}`}>
+              <div className="text-xs font-bold text-text-muted mb-1.5">Notes History</div>
               {isLoading ? (
                 <div className="py-6 text-center text-xs text-text-muted">Loading timeline...</div>
               ) : logs.length === 0 ? (
-                <div className="py-6 text-center text-xs text-text-muted">No entries yet. Use quick actions above to start logging.</div>
+                <div className="py-6 text-center text-xs text-text-muted">No entries yet. Use the buttons above to log your first entry.</div>
               ) : (
                 <div className="flex flex-col gap-1">
                   {logs.map((log) => {
