@@ -5,7 +5,7 @@ import { SecretaryChatInboxView } from '@/modules/staff/views/secretary/secretar
 export const dynamic = 'force-dynamic';
 
 export default async function SecretaryChatInboxPage() {
-    const result = await getChatThreadsAction({ limit: 20, offset: 0 });
+    const result = await getChatThreadsAction({ limit: 20, offset: 0, skipAuth: true });
     const initialThreads = result?.data || [];
 
     return <SecretaryChatInboxView initialThreads={initialThreads} initialHasMore={result?.hasMore ?? false} />;

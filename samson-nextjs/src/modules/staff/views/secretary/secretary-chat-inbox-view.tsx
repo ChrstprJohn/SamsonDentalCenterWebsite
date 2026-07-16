@@ -262,16 +262,48 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                 'postgres_changes',
                 { event: '*', schema: 'public', table: 'appointment_messages' },
                 (payload: any) => {
-                    fetchThreads();
-                    const affectedAppointmentId = payload.new?.appointment_id || payload.old?.appointment_id;
-                    if (affectedAppointmentId && affectedAppointmentId === selectedThreadIdRef.current) {
-                        getMessagesAction(affectedAppointmentId, undefined, { skipAuth: true }).then((res) => {
-                            if (res && res.data) {
-                                setSelectedThreadMessages(res.data);
-                                setSelectedThreadHasMore(res.hasMore ?? false);
+                    const newMsg = payload.new;
+                    if (!newMsg) return;
+
+                    const affectedAppointmentId = newMsg.appointment_id;
+
+                    setThreads((prevThreads) => {
+                        const threadIndex = prevThreads.findIndex(t => t.appointmentId === affectedAppointmentId);
+
+                        if (threadIndex !== -1) {
+                            const updatedThreads = [...prevThreads];
+                            const thread = updatedThreads[threadIndex];
+
+                            const latestMessage = {
+                                text: newMsg.message,
+                                createdAt: newMsg.created_at,
+                                senderRole: newMsg.sender_role,
+                            };
+
+                            let unreadCount = thread.unreadCount;
+                            if (newMsg.sender_role === 'PATIENT') {
+                                if (newMsg.is_read) {
+                                    unreadCount = 0;
+                                } else if (affectedAppointmentId !== selectedThreadIdRef.current) {
+                                    unreadCount += 1;
+                                }
                             }
-                        });
-                    }
+
+                            updatedThreads[threadIndex] = {
+                                ...thread,
+                                latestMessage,
+                                unreadCount,
+                            };
+
+                            // Move updated thread to the top
+                            const [movedThread] = updatedThreads.splice(threadIndex, 1);
+                            return [movedThread, ...updatedThreads];
+                        } else {
+                            // Thread not currently in memory list (e.g. paginated out), fetch fresh threads
+                            fetchThreads();
+                            return prevThreads;
+                        }
+                    });
                 }
             )
             .subscribe();
