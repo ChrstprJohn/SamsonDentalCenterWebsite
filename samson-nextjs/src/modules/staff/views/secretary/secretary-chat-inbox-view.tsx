@@ -749,12 +749,14 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                             />
                         </Label>
                     </div>
-                    <SidebarInput
-                        placeholder="Type to search..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="rounded-md"
-                    />
+                    <div className="px-1">
+                        <SidebarInput
+                            placeholder="Type to search..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="rounded-md"
+                        />
+                    </div>
 
                     {/* Tabs */}
                     <div className="flex gap-1 bg-muted/20 p-1 rounded-lg">
