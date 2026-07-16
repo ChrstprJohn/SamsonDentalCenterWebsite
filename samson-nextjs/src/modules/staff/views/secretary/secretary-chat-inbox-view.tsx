@@ -730,7 +730,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
             {/* Column 1: Left List Sidebar */}
             <Sidebar
                 collapsible="none"
-                className={`flex-col w-full md:w-80 shrink-0 border-r border-card-border/40 bg-sidebar h-full overflow-hidden ${colMobile('list')} md:flex`}
+                className={`flex-col w-full md:w-[350px] shrink-0 border-r border-card-border/40 bg-sidebar h-full overflow-hidden ${colMobile('list')} md:flex`}
             >
                 <SidebarHeader className="gap-3.5 border-b p-4 shrink-0">
                     <div className="flex w-full items-center justify-between">
