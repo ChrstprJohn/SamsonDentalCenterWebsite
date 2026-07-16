@@ -11,82 +11,92 @@ interface InquiryGuestProfileProps {
   phone: string; setPhone: (value: string) => void;
   email: string; setEmail: (value: string) => void;
   patientNote: string;
+  setPatientNote: (value: string) => void;
   isEditing: boolean;
-  onToggle: () => void;
 }
 
 export function InquiryGuestProfile(props: InquiryGuestProfileProps) {
   return (
-    <div className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-lg p-4 flex flex-col gap-3">
-      <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800/80 pb-2">
-        <h4 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-          👤 1. GUEST PROFILE
-        </h4>
-        <button 
-          type="button" 
-          onClick={props.onToggle} 
-          className="text-xs font-bold text-primary hover:underline shrink-0"
-        >
-          {props.isEditing ? '[ Save ]' : '[ Edit ]'}
-        </button>
+    <div className="flex flex-col gap-6">
+      <div>
+        <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Guest Profile</h3>
+        <div className="grid grid-cols-4 gap-4">
+          <FieldBlock label="First name">
+            {!props.isEditing ? (
+              <span className="text-sm font-semibold text-slate-800">{props.firstName || '-'}</span>
+            ) : (
+              <Input value={props.firstName} onChange={(e) => props.setFirstName(e.target.value)} className="text-sm" />
+            )}
+          </FieldBlock>
+          <FieldBlock label="Middle name">
+            {!props.isEditing ? (
+              <span className="text-sm font-semibold text-slate-800">{props.middleName || '-'}</span>
+            ) : (
+              <Input value={props.middleName} onChange={(e) => props.setMiddleName(e.target.value)} className="text-sm" />
+            )}
+          </FieldBlock>
+          <FieldBlock label="Last name">
+            {!props.isEditing ? (
+              <span className="text-sm font-semibold text-slate-800">{props.lastName || '-'}</span>
+            ) : (
+              <Input value={props.lastName} onChange={(e) => props.setLastName(e.target.value)} className="text-sm" />
+            )}
+          </FieldBlock>
+          <FieldBlock label="Suffix">
+            {!props.isEditing ? (
+              <span className="text-sm font-semibold text-slate-800">{props.suffix || '-'}</span>
+            ) : (
+              <Input value={props.suffix} onChange={(e) => props.setSuffix(e.target.value)} className="text-sm" />
+            )}
+          </FieldBlock>
+        </div>
       </div>
 
-      {props.isEditing ? (
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 animate-in fade-in duration-200">
-          <SmallInput label="First Name" value={props.firstName} onChange={props.setFirstName} className="sm:col-span-2" />
-          <SmallInput label="Middle Name" value={props.middleName} onChange={props.setMiddleName} />
-          <SmallInput label="Last Name" value={props.lastName} onChange={props.setLastName} />
-          <SmallInput label="Suffix" value={props.suffix} onChange={props.setSuffix} />
-          <SmallInput label="Phone" value={props.phone} onChange={props.setPhone} className="sm:col-span-2" />
-          <SmallInput type="email" label="Email" value={props.email} onChange={props.setEmail} className="sm:col-span-2" />
+      <div>
+        <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Contact Information</h3>
+        <div className="grid grid-cols-2 gap-4">
+          <FieldBlock label="Email address">
+            {!props.isEditing ? (
+              <span className="text-sm font-semibold text-slate-800 truncate">{props.email || '-'}</span>
+            ) : (
+              <Input type="email" value={props.email} onChange={(e) => props.setEmail(e.target.value)} className="text-sm" />
+            )}
+          </FieldBlock>
+          <FieldBlock label="Phone">
+            {!props.isEditing ? (
+              <span className="text-sm font-semibold text-slate-800">{props.phone || '-'}</span>
+            ) : (
+              <Input value={props.phone} onChange={(e) => props.setPhone(e.target.value)} className="text-sm" />
+            )}
+          </FieldBlock>
         </div>
-      ) : (
-        <div className="grid grid-cols-[110px_minmax(0,1fr)] gap-x-4 gap-y-2 text-sm">
-          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Name:</span>
-          <span className="font-semibold text-slate-900 dark:text-slate-100 break-words">
-            {props.firstName} {props.middleName ? `${props.middleName} ` : ''}{props.lastName}
-          </span>
+      </div>
 
-          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Suffix:</span>
-          <span className="text-slate-700 dark:text-slate-300 break-words">
-            {props.suffix || 'N/A'}
-          </span>
-
-          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Date of Birth:</span>
-          <span className="text-slate-700 dark:text-slate-300">
-            N/A
-          </span>
-
-          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Phone:</span>
-          <span className="text-slate-700 dark:text-slate-300 break-words">
-            {props.phone || 'No phone'}
-          </span>
-
-          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Email:</span>
-          <span className="text-slate-700 dark:text-slate-300 break-all">
-            {props.email || 'No email'}
-          </span>
-
-          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Patient Note:</span>
-          <span className="italic text-slate-700 dark:text-slate-300 break-words whitespace-pre-wrap">
-            &quot;{props.patientNote || 'No special instructions provided'}&quot;
-          </span>
-        </div>
-      )}
+      <div>
+        <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Patient Note</h3>
+        {!props.isEditing ? (
+          <div className="text-sm text-slate-700 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+            {props.patientNote || <span className="text-slate-400">-</span>}
+          </div>
+        ) : (
+          <textarea
+            value={props.patientNote}
+            onChange={(e) => props.setPatientNote(e.target.value)}
+            rows={2}
+            className="text-sm text-slate-800 bg-white border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500 transition resize-none w-full"
+            placeholder="Add a note..."
+          />
+        )}
+      </div>
     </div>
   );
 }
 
-function SmallInput({ label, value, onChange, type = 'text', className = '' }: { label: string; value: string; onChange: (value: string) => void; type?: string; className?: string }) {
+function FieldBlock({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className={`flex flex-col gap-1 ${className}`}>
-      <label className="text-[9px] font-bold text-text-muted uppercase">{label}</label>
-      <Input 
-        type={type} 
-        value={value} 
-        onChange={(event) => onChange(event.target.value)} 
-        className="text-xs py-1.5 px-2.5 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-text-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-primary-ring" 
-      />
+    <div className="flex flex-col">
+      <span className="text-[11px] font-medium text-slate-400 mb-1">{label}</span>
+      {children}
     </div>
   );
 }

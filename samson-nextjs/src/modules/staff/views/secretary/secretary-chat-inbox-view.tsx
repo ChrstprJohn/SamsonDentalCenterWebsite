@@ -730,7 +730,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
             {/* Column 1: Left List Sidebar */}
             <Sidebar
                 collapsible="none"
-                className={`flex-col w-full md:w-[350px] shrink-0 border-r border-card-border/40 bg-sidebar h-full overflow-hidden ${colMobile('list')} md:flex`}
+                className={`flex-col lg:w-[350px] flex-1 lg:flex-none border-r border-card-border/40 bg-sidebar h-full overflow-hidden ${colMobile('list')} lg:flex`}
             >
                 <SidebarHeader className="gap-3.5 border-b p-4 shrink-0">
                     <div className="flex w-full items-center justify-between">
@@ -870,7 +870,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
             {selectedThreadId && selectedThread ? (
                 <>
                     {/* Column 2: Dialogue Stream */}
-                    <div className={`flex-1 flex-col bg-muted/20 border-r border-border relative ${colMobile('chat')} md:flex`}>
+                    <div className={`flex-1 flex-col bg-muted/20 border-r border-border relative ${colMobile('chat')} lg:flex`}>
                         {mobileView === 'detail' ? detailPanelContent : loadingMessages ? (
                             <ChatMessagesSkeleton />
                         ) : (
@@ -900,12 +900,12 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                     </div>
 
                     {/* Column 3: Context & Action Control Dock */}
-                    <div className={`hidden lg:w-80 flex-col border-l border-border bg-sidebar h-full overflow-hidden flex-shrink-0 lg:flex`}>
+                    <div className={`${colMobile('detail')} flex-1 lg:flex-none lg:w-80 flex-col border-l border-border bg-sidebar h-full overflow-hidden lg:flex`}>
                         {detailPanelContent}
                     </div>
                 </>
             ) : (
-                <div className={`flex-1 flex-col items-center justify-center text-muted-foreground bg-muted/10 space-y-2 ${colMobile('list')} lg:flex`}>
+                <div className="flex-1 flex-col items-center justify-center text-muted-foreground bg-muted/10 space-y-2 hidden lg:flex">
                     <MessageSquare className="size-12 text-muted-foreground/40" />
                     <p className="text-sm font-medium">Select a thread from the inbox list to start chatting.</p>
                 </div>

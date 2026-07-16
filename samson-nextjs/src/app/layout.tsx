@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Playfair_Display, Josefin_Sans, Jost } from "next/font/google";
+import { Geist, Geist_Mono, Playfair_Display, Josefin_Sans, Jost, Outfit } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/shared/context/theme-context";
 import { ToastProvider } from "@/components/feedback/toast-container";
@@ -33,6 +33,12 @@ const jost = Jost({
   weight: ["300", "400", "500", "600", "700"],
 });
 
+const outfit = Outfit({
+  variable: "--font-outfit",
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+});
+
 export const metadata: Metadata = {
   title: "Samson Dental Center | Premium Dental Care & Appointment System",
   description: "Schedule appointment slots, view treatment history, and connect with premier dental care practitioners at Samson Dental Center.",
@@ -48,7 +54,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} ${josefinSans.variable} ${jost.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} ${josefinSans.variable} ${jost.variable} ${outfit.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-300 overflow-x-hidden">

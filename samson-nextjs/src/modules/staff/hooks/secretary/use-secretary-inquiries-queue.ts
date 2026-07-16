@@ -168,23 +168,14 @@ export function useSecretaryInquiriesQueue() {
 
   const selectService = (serviceId: string) => {
     setStagedInquiryService(serviceId);
-    setStagedInquiryDate('');
-    setStagedInquiryDoctor('');
-    setStagedInquiryTime('');
-    setStagedInquiryEndTime('');
   };
 
   const selectDate = (date: string) => {
     setStagedInquiryDate(date);
-    setStagedInquiryDoctor('');
-    setStagedInquiryTime('');
-    setStagedInquiryEndTime('');
   };
 
   const selectDoctor = (doctorId: string) => {
     setStagedInquiryDoctor(doctorId);
-    setStagedInquiryTime('');
-    setStagedInquiryEndTime('');
   };
 
   const selectSlot = (slot: { startTime: string; endTime: string }) => {
@@ -274,8 +265,9 @@ export function useSecretaryInquiriesQueue() {
   const canSubmit = !isSubmitting
     && !isAvailabilityLoading
     && !!stagedInquiryAction
+    && !!stagedInquiryNote.trim()
     && (stagedInquiryAction === 'DROP'
-      ? !!stagedInquiryNote.trim()
+      ? true
       : !!(stagedInquiryService && stagedInquiryDate && stagedInquiryDoctor && stagedInquiryTime && stagedInquiryEndTime));
 
   return {
