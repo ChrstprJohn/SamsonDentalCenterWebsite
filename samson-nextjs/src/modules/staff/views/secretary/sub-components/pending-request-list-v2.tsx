@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { ArrowUpDown } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { formatShortDate, formatTimeString } from '@/shared/utils/date.util';
 import type { InquiryTab } from '../../../hooks/secretary/use-secretary-inquiries-queue';
 import { Button } from '@/components/ui/button';
@@ -134,8 +135,23 @@ export function PendingRequestListV2(props: PendingRequestListV2Props) {
         <SidebarGroup className="px-0">
           <SidebarGroupContent className="flex flex-col">
             {isLoading ? (
-              <div className="py-12 text-center text-text-muted text-xs">
-                Loading guest inquiries...
+              <div className="flex flex-col w-full">
+                {[0, 1, 2, 3, 4, 5].map((i) => (
+                  <div key={i} className="flex flex-col items-start w-full gap-2 border-b p-4">
+                    {/* Name + status badge */}
+                    <div className="flex w-full items-center justify-between gap-2">
+                      <Skeleton className="h-3.5 w-28 rounded-md !bg-slate-200" />
+                      <Skeleton className="h-4 w-16 rounded-full !bg-slate-200" />
+                    </div>
+                    {/* Service name */}
+                    <Skeleton className="h-3 w-40 rounded-md !bg-slate-200" />
+                    {/* Date • Time + Submitted */}
+                    <div className="w-full flex items-center justify-between gap-2">
+                      <Skeleton className="h-2.5 w-36 rounded-md !bg-slate-200" />
+                      <Skeleton className="h-2.5 w-24 rounded-md !bg-slate-200" />
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : filteredInquiries.length === 0 ? (
               <div className="py-12 text-center text-text-muted text-xs">

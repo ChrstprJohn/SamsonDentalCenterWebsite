@@ -19,6 +19,8 @@ import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
+import SkeletonLib, { SkeletonTheme } from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 import { Search, Mail, Archive, MessageSquare, Calendar, XCircle, CheckCircle, User, Stethoscope, Clock, ChevronUp, ChevronDown, AlertCircle, ArrowLeft, UserRound } from 'lucide-react';
 import {
     Sidebar,
@@ -34,49 +36,49 @@ function ChatMessagesSkeleton() {
     return (
         <div className="flex flex-col h-full">
             <div className="p-4 border-b border-border shrink-0 flex items-center gap-2">
-                <Skeleton className="size-10 rounded-full" />
+                <Skeleton className="size-10 rounded-full !bg-slate-200" />
                 <div className="flex flex-col gap-1">
-                    <Skeleton className="h-4 w-32 rounded-md" />
-                    <Skeleton className="h-3 w-20 rounded-md" />
+                    <Skeleton className="h-4 w-32 rounded-md !bg-slate-200" />
+                    <Skeleton className="h-3 w-20 rounded-md !bg-slate-200" />
                 </div>
             </div>
             <div className="flex-1 flex flex-col justify-between gap-3 p-5 overflow-hidden">
                 <div className="flex flex-col items-start">
-                    <Skeleton className="h-9 w-48 rounded-2xl" />
+                    <Skeleton className="h-9 w-48 rounded-2xl !bg-slate-200" />
                 </div>
                 <div className="flex flex-col items-end">
-                    <Skeleton className="h-9 w-36 rounded-2xl" />
+                    <Skeleton className="h-9 w-36 rounded-2xl !bg-slate-200" />
                     <div className="flex items-center gap-1 mt-1">
-                        <Skeleton className="size-3 rounded-sm" />
-                        <Skeleton className="h-2.5 w-7 rounded-md" />
+                        <Skeleton className="size-3 rounded-sm !bg-slate-200" />
+                        <Skeleton className="h-2.5 w-7 rounded-md !bg-slate-200" />
                     </div>
                 </div>
                 <div className="flex-1" />
                 <div className="flex flex-col items-start">
                     <div className="flex justify-center w-full mb-1">
-                        <Skeleton className="h-[18px] w-28 rounded-full" />
+                        <Skeleton className="h-[18px] w-28 rounded-full !bg-slate-200" />
                     </div>
-                    <Skeleton className="h-[60px] w-56 rounded-2xl" />
+                    <Skeleton className="h-[60px] w-56 rounded-2xl !bg-slate-200" />
                 </div>
                 <div className="flex flex-col items-end">
-                    <Skeleton className="h-9 w-40 rounded-2xl" />
+                    <Skeleton className="h-9 w-40 rounded-2xl !bg-slate-200" />
                 </div>
                 <div className="flex-1" />
                 <div className="flex flex-col items-start">
-                    <Skeleton className="h-9 w-52 rounded-2xl" />
+                    <Skeleton className="h-9 w-52 rounded-2xl !bg-slate-200" />
                 </div>
                 <div className="flex flex-col items-end">
-                    <Skeleton className="h-9 w-44 rounded-2xl" />
+                    <Skeleton className="h-9 w-44 rounded-2xl !bg-slate-200" />
                     <div className="flex items-center gap-1 mt-1">
-                        <Skeleton className="size-3 rounded-sm" />
-                        <Skeleton className="h-2.5 w-7 rounded-md" />
+                        <Skeleton className="size-3 rounded-sm !bg-slate-200" />
+                        <Skeleton className="h-2.5 w-7 rounded-md !bg-slate-200" />
                     </div>
                 </div>
             </div>
             <div className="p-4 border-t border-border shrink-0">
                 <div className="flex gap-2 items-center">
-                    <Skeleton className="h-[42px] flex-1 rounded-xl" />
-                    <Skeleton className="size-[42px] rounded-xl" />
+                    <Skeleton className="h-[42px] flex-1 rounded-xl !bg-slate-200" />
+                    <Skeleton className="size-[42px] rounded-xl !bg-slate-200" />
                 </div>
             </div>
         </div>
@@ -84,72 +86,56 @@ function ChatMessagesSkeleton() {
 }
 
 function DetailSkeleton() {
+    // Each skeleton row/height mirrors the real content exactly to prevent layout shift.
+    // Real section label: text-xs font-semibold → ~16px tall
+    // Real card rows: text-xs in flex items-center → ~20px per row with space-y-2
+    // Real card wrapper: border rounded-xl p-3 space-y-2
+    const SectionLabel = ({ width }: { width: string }) => (
+        <Skeleton className={`h-4 ${width} rounded-md !bg-slate-200`} />
+    );
+    const Row = ({ labelWidth, valueWidth }: { labelWidth: string; valueWidth: string }) => (
+        <div className="flex justify-between items-center">
+            <Skeleton className={`h-4 ${labelWidth} rounded-sm !bg-slate-200`} />
+            <Skeleton className={`h-4 ${valueWidth} rounded-sm !bg-slate-200`} />
+        </div>
+    );
     return (
         <>
-            <div className="flex-1 !overflow-y-auto p-5 flex flex-col justify-between gap-6">
+            <div
+                className="flex-1 !overflow-y-auto p-5 flex flex-col gap-6 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
+                style={{ scrollbarWidth: 'thin' }}
+                data-lenis-prevent
+            >
                 <div className="space-y-6">
                     <div className="flex flex-col gap-5 text-xs">
+                        {/* Patient Info */}
                         <div className="space-y-2">
-                            <Skeleton className="h-3 w-20 rounded-md" />
+                            <SectionLabel width="w-20" />
                             <div className="border border-card-border/60 bg-muted/10 rounded-xl p-3 space-y-2">
-                                <div className="flex justify-between items-center">
-                                    <Skeleton className="h-3 w-10 rounded-md" />
-                                    <Skeleton className="h-3 w-20 rounded-md" />
-                                </div>
-                                <div className="flex justify-between items-center">
-                                    <Skeleton className="h-3 w-14 rounded-md" />
-                                    <Skeleton className="h-3 w-20 rounded-md" />
-                                </div>
-                                <div className="flex justify-between items-center">
-                                    <Skeleton className="h-3 w-8 rounded-md" />
-                                    <Skeleton className="h-3 w-24 rounded-md" />
-                                </div>
-                                <div className="flex justify-between items-center">
-                                    <Skeleton className="h-3 w-12 rounded-md" />
-                                    <Skeleton className="h-3 w-16 rounded-md" />
-                                </div>
+                                <Row labelWidth="w-10" valueWidth="w-20" />
+                                <Row labelWidth="w-14" valueWidth="w-20" />
+                                <Row labelWidth="w-8"  valueWidth="w-24" />
+                                <Row labelWidth="w-12" valueWidth="w-16" />
                             </div>
                         </div>
+                        {/* Contact Info */}
                         <div className="space-y-2">
-                            <Skeleton className="h-3 w-20 rounded-md" />
+                            <SectionLabel width="w-20" />
                             <div className="border border-card-border/60 bg-muted/10 rounded-xl p-3 space-y-2">
-                                <div className="flex justify-between items-center">
-                                    <Skeleton className="h-3 w-12 rounded-md" />
-                                    <Skeleton className="h-3 w-28 rounded-md" />
-                                </div>
-                                <div className="flex justify-between items-center">
-                                    <Skeleton className="h-3 w-10 rounded-md" />
-                                    <Skeleton className="h-3 w-36 rounded-md" />
-                                </div>
+                                <Row labelWidth="w-10" valueWidth="w-20" />
+                                <Row labelWidth="w-10" valueWidth="w-36" />
                             </div>
                         </div>
+                        {/* Schedule & Status */}
                         <div className="space-y-2">
-                            <Skeleton className="h-3 w-28 rounded-md" />
+                            <SectionLabel width="w-28" />
                             <div className="border border-card-border/60 bg-muted/10 rounded-xl p-3 space-y-2">
-                                <div className="flex justify-between items-center">
-                                    <Skeleton className="h-3 w-16 rounded-md" />
-                                    <Skeleton className="h-3 w-20 rounded-md" />
-                                </div>
-                                <div className="flex justify-between items-center">
-                                    <Skeleton className="h-3 w-8 rounded-md" />
-                                    <Skeleton className="h-3 w-24 rounded-md" />
-                                </div>
-                                <div className="flex justify-between items-center">
-                                    <Skeleton className="h-3 w-16 rounded-md" />
-                                    <Skeleton className="h-3 w-20 rounded-md" />
-                                </div>
-                                <div className="flex justify-between items-center">
-                                    <Skeleton className="h-3 w-14 rounded-md" />
-                                    <Skeleton className="h-3 w-20 rounded-md" />
-                                </div>
-                                <div className="flex justify-between items-center">
-                                    <Skeleton className="h-3 w-12 rounded-md" />
-                                    <Skeleton className="h-3 w-28 rounded-md" />
-                                </div>
-                                <div className="flex justify-between items-center">
-                                    <Skeleton className="h-3 w-12 rounded-md" />
-                                    <Skeleton className="h-3 w-16 rounded-md" />
-                                </div>
+                                <Row labelWidth="w-16" valueWidth="w-20" />
+                                <Row labelWidth="w-8"  valueWidth="w-24" />
+                                <Row labelWidth="w-16" valueWidth="w-20" />
+                                <Row labelWidth="w-14" valueWidth="w-20" />
+                                <Row labelWidth="w-12" valueWidth="w-28" />
+                                <Row labelWidth="w-12" valueWidth="w-16" />
                             </div>
                         </div>
                     </div>
@@ -157,8 +143,8 @@ function DetailSkeleton() {
             </div>
             <div className="p-4 border-t border-border bg-sidebar shrink-0">
                 <div className="flex gap-2">
-                    <Skeleton className="flex-1 h-[42px] rounded-md" />
-                    <Skeleton className="flex-1 h-[42px] rounded-md" />
+                    <Skeleton className="flex-1 h-9 rounded-md !bg-slate-200" />
+                    <Skeleton className="flex-1 h-9 rounded-md !bg-slate-200" />
                 </div>
             </div>
         </>
@@ -167,21 +153,31 @@ function DetailSkeleton() {
 
 function SidebarThreadSkeleton() {
     return (
-        <div className="flex flex-col w-full">
-            {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
-                <div key={i} className="flex items-start w-full gap-3 border-b p-4">
-                    <Skeleton className="size-10 shrink-0 rounded-full" />
-                    <div className="flex flex-col min-w-0 flex-1 gap-1.5">
-                        <div className="flex w-full items-center justify-between gap-2">
-                            <Skeleton className="h-3.5 w-32 rounded-md" />
-                            <Skeleton className="h-2.5 w-12 rounded-md" />
+        <SkeletonTheme
+            baseColor="#e2e8f0"
+            highlightColor="#f1f5f9"
+            borderRadius="0.5rem"
+        >
+            <div className="flex flex-col w-full">
+                {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
+                    <div key={i} className="flex items-start w-full gap-3 border-b p-4">
+                        {/* Avatar circle */}
+                        <SkeletonLib circle width={40} height={40} />
+                        <div className="flex flex-col min-w-0 flex-1 gap-2">
+                            {/* Name + timestamp row */}
+                            <div className="flex w-full items-center justify-between gap-2">
+                                <SkeletonLib width={132} height={14} />
+                                <SkeletonLib width={40} height={10} />
+                            </div>
+                            {/* Service name */}
+                            <SkeletonLib width={88} height={11} />
+                            {/* Message preview full width */}
+                            <SkeletonLib width="100%" height={11} />
                         </div>
-                        <Skeleton className="h-3 w-20 rounded-md" />
-                        <Skeleton className="h-3 w-full rounded-md" />
                     </div>
-                </div>
-            ))}
-        </div>
+                ))}
+            </div>
+        </SkeletonTheme>
     );
 }
 
@@ -206,6 +202,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
     const [selectedThreadHasMore, setSelectedThreadHasMore] = useState(false);
     const [loadingMessages, setLoadingMessages] = useState(false);
     const [fetchingThreads, setFetchingThreads] = useState(false);
+    const [isInitialLoad, setIsInitialLoad] = useState(true);
     const [messagesLoadKey, setMessagesLoadKey] = useState(0);
     const [hasMoreThreads, setHasMoreThreads] = useState(initialHasMore);
 
@@ -242,6 +239,12 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
             setHasMoreThreads(false);
         }
     }, [threads.length]);
+
+    // Refresh threads on mount to fix stale data from Next.js cached SSR pages
+    // during client-side transitions.
+    useEffect(() => {
+        fetchThreads().finally(() => setIsInitialLoad(false));
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         getDoctorsAction().then((res) => {
@@ -509,9 +512,9 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                 <div className="p-4 border-b border-border bg-sidebar shrink-0">
                     <div className="flex items-center gap-2">
                         <div className="lg:hidden size-[42px] shrink-0" />
-                        <div className="flex flex-col min-w-0">
-                            <Skeleton className="h-[24px] w-36 rounded-md" />
-                            <Skeleton className="h-[16px] w-20 rounded-md" />
+                        <div className="flex flex-col gap-1 min-w-0">
+                            <Skeleton className="h-6 w-36 rounded-md !bg-slate-200" />
+                            <Skeleton className="h-3.5 w-24 rounded-md !bg-slate-200" />
                         </div>
                     </div>
                 </div>
@@ -828,7 +831,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                 >
                     <SidebarGroup className="px-0">
                         <SidebarGroupContent className="flex flex-col">
-                            {fetchingThreads && threads.length === 0 ? (
+                            {isInitialLoad ? (
                                 <SidebarThreadSkeleton />
                             ) : filteredThreads.length === 0 ? (
                                 <div className="py-12 text-center text-text-muted text-xs">
