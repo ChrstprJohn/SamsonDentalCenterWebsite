@@ -3,7 +3,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { ExternalLink, ArrowLeft, EllipsisVertical, UserRound } from 'lucide-react';
+import { ExternalLink, ArrowLeft, Info, UserRound } from 'lucide-react';
 
 interface ChatHeaderProps {
   patientName: string;
@@ -64,8 +64,9 @@ export function ChatHeader({
           </Link>
         )}
         {currentUserRole === 'STAFF' && onShowDetail && (
-          <button onClick={onShowDetail} className="lg:hidden p-1 text-muted-foreground hover:text-foreground">
-            <EllipsisVertical className="size-5" />
+          <button onClick={onShowDetail} className="lg:hidden p-1 text-muted-foreground hover:text-foreground flex flex-col items-center gap-0.5">
+            <Info className="size-5" />
+            <span className="text-[10px] leading-none">Detail</span>
           </button>
         )}
       </div>

@@ -10,7 +10,7 @@ import {
   ArrowLeft,
   Check,
   ChevronDown,
-  EllipsisVertical,
+  ClipboardList,
   Pencil,
   UserRound,
   X,
@@ -128,8 +128,9 @@ export function SecretaryPendingRequestsViewV2() {
             <div className="flex-1 text-base font-medium text-foreground text-left">
               Request Details
             </div>
-            <button onClick={() => setMobileView('quickLogs')} className="lg:hidden p-1 -mr-1 text-muted-foreground hover:text-foreground shrink-0">
-              <EllipsisVertical className="size-5" />
+            <button onClick={() => setMobileView('quickLogs')} className="lg:hidden p-1 -mr-1 text-muted-foreground hover:text-foreground shrink-0 flex flex-col items-center gap-0.5">
+              <ClipboardList className="size-5" />
+              <span className="text-[10px] leading-none">Notes</span>
             </button>
           </div>
         </div>
@@ -142,9 +143,9 @@ export function SecretaryPendingRequestsViewV2() {
                   <UserRound className="size-14 text-muted-foreground/70 translate-y-0.5" />
                 </div>
                 <h2 className="text-lg font-semibold text-foreground">
-                  {inquiriesView.guestFirstName && inquiriesView.guestLastName
-                    ? `${inquiriesView.guestFirstName} ${inquiriesView.guestLastName}`
-                    : inquiriesView.guestFirstName || inquiriesView.guestLastName || 'New Patient'
+                  {isEditingPatient
+                    ? [patientSnapshot.firstName, patientSnapshot.middleName, patientSnapshot.lastName].filter(Boolean).join(' ') + (patientSnapshot.suffix ? `, ${patientSnapshot.suffix}` : '')
+                    : [inquiriesView.guestFirstName, inquiriesView.guestMiddleName, inquiriesView.guestLastName].filter(Boolean).join(' ') + (inquiriesView.guestSuffix ? `, ${inquiriesView.guestSuffix}` : '')
                   }
                 </h2>
                 <p className="text-sm text-muted-foreground mt-0.5">Guest</p>
