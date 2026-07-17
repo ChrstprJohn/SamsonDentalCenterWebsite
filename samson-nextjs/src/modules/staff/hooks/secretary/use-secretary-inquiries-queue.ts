@@ -152,9 +152,9 @@ export function useSecretaryInquiriesQueue() {
     setStagedInquiryAction('');
     setStagedInquiryService(inquiry.preferredServiceId);
     setStagedInquiryDate(inquiry.preferredDate || '');
-    setStagedInquiryDoctor('');
+    setStagedInquiryDoctor(inquiry.assignedDoctorId || '');
     setStagedInquiryTime(inquiry.preferredStartTime || '');
-    setStagedInquiryEndTime('');
+    setStagedInquiryEndTime(inquiry.assignedEndTime || '');
     setStagedInquiryNote(inquiry.patientNote || '');
     setStagedSecretaryNotes('');
     setIsNotesManual(false);

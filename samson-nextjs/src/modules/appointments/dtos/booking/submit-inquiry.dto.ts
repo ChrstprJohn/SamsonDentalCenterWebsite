@@ -54,6 +54,8 @@ const inquiryDbSchema = z.object({
   updated_at: z.string(),
   date_of_birth: z.string().nullable().optional(),
   preferred_start_time: z.string().nullable().optional(),
+  assigned_doctor_id: z.string().uuid().nullable().optional(),
+  assigned_end_time: z.string().nullable().optional(),
   services: z
     .object({
       name: z.string(),
@@ -81,6 +83,8 @@ export const inquiryResponseSchema = inquiryDbSchema.transform((data) => ({
   updatedAt: data.updated_at,
   dateOfBirth: data.date_of_birth ?? undefined,
   preferredStartTime: data.preferred_start_time ?? undefined,
+  assignedDoctorId: data.assigned_doctor_id ?? undefined,
+  assignedEndTime: data.assigned_end_time ?? undefined,
 }));
 
 export type InquiryResponseDto = z.infer<typeof inquiryResponseSchema>;
