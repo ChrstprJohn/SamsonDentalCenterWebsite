@@ -8,13 +8,10 @@ import { Input } from '@/components/ui/input';
 import { InquiryToast } from './sub-components/inquiry-toast';
 import { Button } from '@/components/ui/button';
 import { Select } from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
 import {
   Card,
   CardHeader,
   CardTitle,
-  CardAction,
   CardContent,
 } from '@/components/ui/card';
 import {
@@ -25,11 +22,8 @@ import {
 } from '@/components/ui/accordion';
 import {
   ClipboardList,
-  Pencil,
   AlertTriangle,
   BadgeCheck,
-  X,
-  Check,
   ArrowLeft,
   EllipsisVertical,
 } from 'lucide-react';
@@ -74,53 +68,15 @@ const COMMON_REASONS = [
 
 export function SecretaryPendingRequestsViewV2() {
   const inquiriesView = useSecretaryInquiriesQueue();
-  const [isEditingContact, setIsEditingContact] = React.useState(false);
-  const [isEditingService, setIsEditingService] = React.useState(false);
-  const [contactSnapshot, setContactSnapshot] = React.useState<Record<string, string>>({});
-  const [serviceSnapshot, setServiceSnapshot] = React.useState<Record<string, string>>({});
   const [approvalReason, setApprovalReason] = React.useState('');
   const [mobileView, setMobileView] = React.useState<'list' | 'detail' | 'quickLogs'>('list');
 
   const colMobile = (view: 'list' | 'detail' | 'quickLogs') =>
     mobileView === view ? 'flex' : 'hidden';
 
-  const startEditingContact = () => {
-    setContactSnapshot({
-      phone: inquiriesView.guestPhone,
-      email: inquiriesView.guestEmail,
-    });
-    setIsEditingContact(true);
-  };
-
-  const cancelEditingContact = () => {
-    inquiriesView.setGuestPhone(contactSnapshot.phone || '');
-    inquiriesView.setGuestEmail(contactSnapshot.email || '');
-    setIsEditingContact(false);
-  };
-
-  const startEditingService = () => {
-    setServiceSnapshot({
-      service: inquiriesView.stagedInquiryService,
-      doctor: inquiriesView.stagedInquiryDoctor,
-      date: inquiriesView.stagedInquiryDate,
-      time: inquiriesView.stagedInquiryTime,
-      endTime: inquiriesView.stagedInquiryEndTime,
-    });
-    setIsEditingService(true);
-  };
-
-  const cancelEditingService = () => {
-    inquiriesView.selectService(serviceSnapshot.service || '');
-    inquiriesView.selectDoctor(serviceSnapshot.doctor || '');
-    inquiriesView.selectDate(serviceSnapshot.date || '');
-    inquiriesView.setStagedInquiryTime(serviceSnapshot.time || '');
-    inquiriesView.setStagedInquiryEndTime(serviceSnapshot.endTime || '');
-    setIsEditingService(false);
-  };
-
   const isMissingDoctor = !inquiriesView.stagedInquiryDoctor;
   const isMissingTime = !inquiriesView.stagedInquiryTime || !inquiriesView.stagedInquiryEndTime;
-  const isLocked = isMissingDoctor || isMissingTime || isEditingService;
+  const isLocked = isMissingDoctor || isMissingTime;
   const hasSelection = !!inquiriesView.selectedInquiry;
 
   return (
@@ -236,81 +192,54 @@ export function SecretaryPendingRequestsViewV2() {
 
               <Card>
                 <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="max-sm:text-sm">Contact Information</CardTitle>
-                    <CardAction>
-                      {inquiriesView.selectedInquiry?.status === 'NEW' && !isEditingContact ? (
-                        <Button variant="outline" onClick={startEditingContact} className="bg-white hover:bg-slate-50 text-xs text-slate-700 font-medium px-3 py-1.5 border border-slate-200 rounded-lg h-auto">
-                          <Pencil className="size-3.5 mr-1" />
-                          Edit
-                        </Button>
-                      ) : isEditingContact ? (
-                        <div className="flex items-center gap-2">
-                          <Button variant="ghost" size="sm" onClick={cancelEditingContact} className="text-sm text-slate-500 hover:text-slate-700 max-sm:text-xs max-sm:px-3.5 max-sm:py-1.5 px-4 py-2 h-auto">
-                            <X className="size-4 mr-1" />
-                            Cancel
-                          </Button>
-                          <Button size="sm" onClick={() => setIsEditingContact(false)} className="text-sm text-white bg-slate-900 hover:bg-slate-800 rounded-lg max-sm:text-xs max-sm:px-3.5 max-sm:py-1.5 px-5 py-2.5 h-auto shadow-sm">
-                            <Check className="size-4 mr-1" />
-                            Save
-                          </Button>
-                        </div>
-                      ) : null}
-                    </CardAction>
-                  </div>
+                  <CardTitle className="max-sm:text-sm">Contact Information</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="flex flex-col gap-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="flex flex-col gap-1.5">
-                        <Label className={`${!isEditingContact ? "text-text-muted" : ""} max-sm:text-xs`}>Email address</Label>
-                        {!isEditingContact ? <span className="max-sm:text-xs text-sm font-semibold text-slate-800 truncate">{inquiriesView.guestEmail || '-'}</span>
-                          : <Input type="email" value={inquiriesView.guestEmail} onChange={(e) => inquiriesView.setGuestEmail(e.target.value)} className="max-sm:text-xs text-sm" />}
-                      </div>
-                      <div className="flex flex-col gap-1.5">
-                        <Label className={`${!isEditingContact ? "text-text-muted" : ""} max-sm:text-xs`}>Phone</Label>
-                        {!isEditingContact ? <span className="max-sm:text-xs text-sm font-semibold text-slate-800">{inquiriesView.guestPhone || '-'}</span>
-                          : <Input value={inquiriesView.guestPhone} onChange={(e) => inquiriesView.setGuestPhone(e.target.value)} className="max-sm:text-xs text-sm" />}
-                      </div>
-                    </div>
-                  </div>
+                <CardContent className="p-0">
+                  <Accordion type="multiple">
+                    <AccordionItem value="email">
+                      <AccordionTrigger>
+                        <div className="flex flex-col items-start gap-0.5">
+                          <span className="max-sm:text-xs text-xs text-text-muted">Email address</span>
+                          <span className="max-sm:text-xs text-sm font-semibold text-slate-800 truncate">{inquiriesView.guestEmail || '-'}</span>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <Input type="email" value={inquiriesView.guestEmail} onChange={(e) => inquiriesView.setGuestEmail(e.target.value)} className="max-sm:text-xs text-sm" />
+                      </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="phone">
+                      <AccordionTrigger>
+                        <div className="flex flex-col items-start gap-0.5">
+                          <span className="max-sm:text-xs text-xs text-text-muted">Phone</span>
+                          <span className="max-sm:text-xs text-sm font-semibold text-slate-800">{inquiriesView.guestPhone || '-'}</span>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <Input value={inquiriesView.guestPhone} onChange={(e) => inquiriesView.setGuestPhone(e.target.value)} className="max-sm:text-xs text-sm" />
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="max-sm:text-sm">Appointment Details</CardTitle>
-                    <CardAction>
-                      {inquiriesView.selectedInquiry?.status === 'NEW' && !isEditingService ? (
-                        <Button variant="outline" onClick={startEditingService} className="bg-white hover:bg-slate-50 text-xs text-slate-700 font-medium px-3 py-1.5 border border-slate-200 rounded-lg h-auto">
-                          <Pencil className="size-3.5 mr-1" />
-                          Edit
-                        </Button>
-                      ) : isEditingService ? (
-                        <div className="flex items-center gap-2">
-                          <Button variant="ghost" size="sm" onClick={cancelEditingService} className="text-sm text-slate-500 hover:text-slate-700 max-sm:text-xs max-sm:px-3.5 max-sm:py-1.5 px-4 py-2 h-auto">
-                            <X className="size-4 mr-1" />
-                            Cancel
-                          </Button>
-                          <Button size="sm" onClick={() => setIsEditingService(false)} className="text-sm text-white bg-slate-900 hover:bg-slate-800 rounded-lg max-sm:text-xs max-sm:px-3.5 max-sm:py-1.5 px-5 py-2.5 h-auto shadow-sm">
-                            <Check className="size-4 mr-1" />
-                            Save
-                          </Button>
-                        </div>
-                      ) : null}
-                    </CardAction>
-                  </div>
+                  <CardTitle className="max-sm:text-sm">Appointment Details</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="flex flex-col gap-4">
-                    <div className="flex flex-col gap-2">
-                      <Label htmlFor="service" className={`${!isEditingService ? "text-text-muted" : ""} max-sm:text-xs`}>Treatment / Service <span className="text-destructive">*</span>{isEditingService && inquiriesView.selectedInquiry?.preferredServiceName ? <span className="max-sm:text-[10px] text-xs text-text-muted font-normal ml-2">(Preference: {inquiriesView.selectedInquiry.preferredServiceName})</span> : null}</Label>
-                      {!isEditingService ? (
-                        <span className="max-sm:text-xs text-sm font-semibold text-slate-800">{getServiceName(inquiriesView.services, inquiriesView.stagedInquiryService)}</span>
-                      ) : (
+                <CardContent className="p-0">
+                  <Accordion type="multiple">
+                    <AccordionItem value="service">
+                      <AccordionTrigger>
+                        <div className="flex flex-col items-start gap-0.5">
+                          <span className="max-sm:text-xs text-xs text-text-muted">Treatment / Service <span className="text-destructive">*</span></span>
+                          <span className="max-sm:text-xs text-sm font-semibold text-slate-800">{getServiceName(inquiriesView.services, inquiriesView.stagedInquiryService)}</span>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        {inquiriesView.selectedInquiry?.preferredServiceName && (
+                          <p className="max-sm:text-[10px] text-xs text-text-muted mb-2">Preference: {inquiriesView.selectedInquiry.preferredServiceName}</p>
+                        )}
                         <Select
-                          id="service"
                           value={inquiriesView.stagedInquiryService}
                           onChange={(e) => inquiriesView.selectService(e.target.value)}
                           options={[
@@ -318,64 +247,76 @@ export function SecretaryPendingRequestsViewV2() {
                             ...inquiriesView.services.map((s) => ({ value: s.id, label: s.name }))
                           ]}
                         />
-                      )}
-                    </div>
-                    <Separator />
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="flex flex-col gap-2">
-                        <Label htmlFor="date" className={`${!isEditingService ? "text-text-muted" : ""} max-sm:text-xs`}>Date <span className="text-destructive">*</span>{isEditingService && inquiriesView.selectedInquiry?.preferredDate ? <span className="max-sm:text-[10px] text-xs text-text-muted font-normal ml-2">(Preference: {new Date(inquiriesView.selectedInquiry.preferredDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })})</span> : null}</Label>
-                        {!isEditingService ? (
-                        <span className="max-sm:text-xs text-sm font-semibold text-slate-800">{inquiriesView.stagedInquiryDate ? new Date(inquiriesView.stagedInquiryDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '-'}</span>
-                      ) : (
+                      </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="date">
+                      <AccordionTrigger>
+                        <div className="flex flex-col items-start gap-0.5">
+                          <span className="max-sm:text-xs text-xs text-text-muted">Date <span className="text-destructive">*</span></span>
+                          <span className="max-sm:text-xs text-sm font-semibold text-slate-800">{inquiriesView.stagedInquiryDate ? new Date(inquiriesView.stagedInquiryDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '-'}</span>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        {inquiriesView.selectedInquiry?.preferredDate && (
+                          <p className="max-sm:text-[10px] text-xs text-text-muted mb-2">Preference: {new Date(inquiriesView.selectedInquiry.preferredDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+                        )}
                         <DatePicker value={inquiriesView.stagedInquiryDate} onChange={(v) => inquiriesView.selectDate(v)} />
-                        )}
-                      </div>
-                      <div className="flex flex-col gap-2">
-                        <Label htmlFor="dentist" className={`${!isEditingService ? "text-text-muted" : ""} max-sm:text-xs`}>Assign dentist <span className="text-destructive">*</span></Label>
-                        {!isEditingService ? (
-                        <span className="max-sm:text-xs text-sm font-semibold text-slate-800">{inquiriesView.stagedInquiryDoctor ? inquiriesView.availableDoctors.find((d) => d.doctorId === inquiriesView.stagedInquiryDoctor)?.doctorName || 'Unknown' : '-'}</span>
-                      ) : (
+                      </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="dentist">
+                      <AccordionTrigger>
+                        <div className="flex flex-col items-start gap-0.5">
+                          <span className="max-sm:text-xs text-xs text-text-muted">Assign dentist <span className="text-destructive">*</span></span>
+                          <span className="max-sm:text-xs text-sm font-semibold text-slate-800">{inquiriesView.stagedInquiryDoctor ? inquiriesView.availableDoctors.find((d) => d.doctorId === inquiriesView.stagedInquiryDoctor)?.doctorName || 'Unknown' : '-'}</span>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent>
                         <Select
-                          id="dentist"
-                            value={inquiriesView.stagedInquiryDoctor}
-                            onChange={(e) => inquiriesView.selectDoctor(e.target.value)}
-                            options={[
-                              { value: '', label: 'Select doctor...' },
-                              ...inquiriesView.availableDoctors.map((d) => ({ value: d.doctorId, label: d.doctorName }))
-                            ]}
-                          />
-                        )}
-                      </div>
-                      <div className="flex flex-col gap-2">
-                        <Label htmlFor="start-time" className={`${!isEditingService ? "text-text-muted" : ""} max-sm:text-xs`}>Start time <span className="text-destructive">*</span>{isEditingService && inquiriesView.selectedInquiry?.preferredStartTime ? <span className="max-sm:text-[10px] text-xs text-text-muted font-normal ml-2">(Preference: {formatTo12h(inquiriesView.selectedInquiry.preferredStartTime)})</span> : null}</Label>
-                        {!isEditingService ? (
+                          value={inquiriesView.stagedInquiryDoctor}
+                          onChange={(e) => inquiriesView.selectDoctor(e.target.value)}
+                          options={[
+                            { value: '', label: 'Select doctor...' },
+                            ...inquiriesView.availableDoctors.map((d) => ({ value: d.doctorId, label: d.doctorName }))
+                          ]}
+                        />
+                      </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="start-time">
+                      <AccordionTrigger>
+                        <div className="flex flex-col items-start gap-0.5">
+                          <span className="max-sm:text-xs text-xs text-text-muted">Start time <span className="text-destructive">*</span></span>
                           <span className="max-sm:text-xs text-sm font-semibold text-slate-800">{formatTo12h(inquiriesView.stagedInquiryTime)}</span>
-                        ) : (
-                          <input
-                            id="start-time"
-                            type="time"
-                            value={normalizeTo24h(inquiriesView.stagedInquiryTime)}
-                            onChange={(e) => inquiriesView.setStagedInquiryTime(e.target.value)}
-                            className="w-full px-4 py-2.5 rounded-xl border bg-card max-sm:text-xs text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-ring transition-all border-card-border focus:border-primary-start/50"
-                          />
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        {inquiriesView.selectedInquiry?.preferredStartTime && (
+                          <p className="max-sm:text-[10px] text-xs text-text-muted mb-2">Preference: {formatTo12h(inquiriesView.selectedInquiry.preferredStartTime)}</p>
                         )}
-                      </div>
-                      <div className="flex flex-col gap-2">
-                        <Label htmlFor="end-time" className={`${!isEditingService ? "text-text-muted" : ""} max-sm:text-xs`}>End time <span className="text-destructive">*</span></Label>
-                        {!isEditingService ? (
+                        <input
+                          type="time"
+                          value={normalizeTo24h(inquiriesView.stagedInquiryTime)}
+                          onChange={(e) => inquiriesView.setStagedInquiryTime(e.target.value)}
+                          className="w-full px-4 py-2.5 rounded-xl border bg-card max-sm:text-xs text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-ring transition-all border-card-border focus:border-primary-start/50"
+                        />
+                      </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="end-time">
+                      <AccordionTrigger>
+                        <div className="flex flex-col items-start gap-0.5">
+                          <span className="max-sm:text-xs text-xs text-text-muted">End time <span className="text-destructive">*</span></span>
                           <span className="max-sm:text-xs text-sm font-semibold text-slate-800">{formatTo12h(inquiriesView.stagedInquiryEndTime)}</span>
-                        ) : (
-                          <input
-                            id="end-time"
-                            type="time"
-                            value={inquiriesView.stagedInquiryEndTime}
-                            onChange={(e) => inquiriesView.setStagedInquiryEndTime(e.target.value)}
-                            className="w-full px-4 py-2.5 rounded-xl border bg-card max-sm:text-xs text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-ring transition-all border-card-border focus:border-primary-start/50"
-                          />
-                        )}
-                      </div>
-                    </div>
-                  </div>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <input
+                          type="time"
+                          value={inquiriesView.stagedInquiryEndTime}
+                          onChange={(e) => inquiriesView.setStagedInquiryEndTime(e.target.value)}
+                          className="w-full px-4 py-2.5 rounded-xl border bg-card max-sm:text-xs text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-ring transition-all border-card-border focus:border-primary-start/50"
+                        />
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
                 </CardContent>
               </Card>
 
