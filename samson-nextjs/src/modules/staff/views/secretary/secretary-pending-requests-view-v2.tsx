@@ -46,11 +46,12 @@ export function SecretaryPendingRequestsViewV2() {
   const [patientSnapshot, setPatientSnapshot] = React.useState<Record<string, string>>({});
   const [isEditingSchedule, setIsEditingSchedule] = React.useState(false);
   const [scheduleSnapshot, setScheduleSnapshot] = React.useState<Record<string, string>>({});
+  const [assignedDoctorName, setAssignedDoctorName] = React.useState('');
 
   const colMobile = (view: 'list' | 'detail' | 'quickLogs') =>
     mobileView === view ? 'flex' : 'hidden';
 
-  const isReady = !!inquiriesView.stagedInquiryDoctor && !!inquiriesView.stagedInquiryEndTime;
+  const isReady = !!inquiriesView.selectedInquiry?.assignedDoctorId && !!inquiriesView.selectedInquiry?.assignedEndTime;
   const hasSelection = !!inquiriesView.selectedInquiry;
 
   const startEditPatient = () => {
@@ -108,7 +109,7 @@ export function SecretaryPendingRequestsViewV2() {
           inquiries={inquiriesView.inquiries}
           selectedInquiryId={inquiriesView.selectedInquiryId}
           isLoadingInquiries={inquiriesView.isLoadingInquiries}
-          onSelectInquiry={(inq) => { inquiriesView.selectInquiry(inq); setIsEditingPatient(false); setIsEditingSchedule(false); setMobileView('detail'); }}
+          onSelectInquiry={(inq) => { inquiriesView.selectInquiry(inq); setIsEditingPatient(false); setIsEditingSchedule(false); setAssignedDoctorName(''); setMobileView('detail'); }}
           activeTab={inquiriesView.activeTab}
           setActiveTab={inquiriesView.setActiveTab}
           tabCounts={inquiriesView.tabCounts}
@@ -331,7 +332,7 @@ export function SecretaryPendingRequestsViewV2() {
                       <div className="flex flex-col gap-0.5">
                         <span className="text-xs text-muted-foreground">Assign Dentist <span className="text-destructive">*</span></span>
                         <div className="relative">
-                          <select value={inquiriesView.stagedInquiryDoctor} onChange={(e) => inquiriesView.selectDoctor(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border appearance-none">
+                          <select value={inquiriesView.stagedInquiryDoctor} onChange={(e) => { inquiriesView.selectDoctor(e.target.value); setAssignedDoctorName(e.target.options[e.target.selectedIndex].text); }} className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border appearance-none">
                             <option value="">Select available doctor...</option>
                             {inquiriesView.availableDoctors.map((d) => <option key={d.doctorId} value={d.doctorId}>{d.doctorName}</option>)}
                           </select>
@@ -370,7 +371,7 @@ export function SecretaryPendingRequestsViewV2() {
                     <div className="grid grid-cols-2 gap-3">
                       <div className="flex flex-col gap-0.5">
                         <span className="text-xs text-muted-foreground">Assign Dentist <span className="text-destructive">*</span></span>
-                        <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{inquiriesView.availableDoctors.find(d => d.doctorId === inquiriesView.stagedInquiryDoctor)?.doctorName || 'Select available doctor...'}</div>
+                        <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{assignedDoctorName || inquiriesView.availableDoctors.find(d => d.doctorId === inquiriesView.stagedInquiryDoctor)?.doctorName || inquiriesView.selectedInquiry?.assignedDoctorId || '-'}</div>
                       </div>
                     </div>
                   </div>
