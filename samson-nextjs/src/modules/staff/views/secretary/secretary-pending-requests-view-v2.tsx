@@ -12,7 +12,7 @@ import {
   ChevronDown,
   EllipsisVertical,
   Pencil,
-  User,
+  UserRound,
   X,
 } from 'lucide-react';
 
@@ -138,8 +138,8 @@ export function SecretaryPendingRequestsViewV2() {
           data-lenis-prevent
         >
               <div className="flex flex-col items-center pt-6 pb-4">
-                <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center border border-card-border mb-3">
-                  <User className="size-8 text-muted-foreground" />
+                <div className="size-16 shrink-0 rounded-full bg-muted-foreground/10 flex items-center justify-center border-2 border-border/60 overflow-hidden mb-3">
+                  <UserRound className="size-14 text-muted-foreground/70 translate-y-0.5" />
                 </div>
                 <h2 className="text-lg font-semibold text-foreground">
                   {inquiriesView.guestFirstName && inquiriesView.guestLastName
