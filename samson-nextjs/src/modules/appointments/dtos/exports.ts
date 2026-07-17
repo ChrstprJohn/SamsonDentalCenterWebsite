@@ -16,4 +16,5 @@ export * from './availability/get-available-doctors-for-date.dto';
 export * from './status/check-in.dto';
 export * from './status/undo-check-in.dto';
 export * from './status/mark-no-show.dto';
+export * from './booking/update-inquiry.dto';
 export * from './chat';

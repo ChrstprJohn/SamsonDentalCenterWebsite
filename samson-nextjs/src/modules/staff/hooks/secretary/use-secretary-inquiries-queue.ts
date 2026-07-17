@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { convertInquiryAction } from '@/modules/appointments/actions/booking/convert-inquiry.action';
 import { dropInquiryAction } from '@/modules/appointments/actions/booking/drop-inquiry.action';
 import { getInquiriesAction } from '@/modules/appointments/actions/booking/get-inquiries.action';
+import { updateInquiryAction } from '@/modules/appointments/actions/booking/update-inquiry.action';
 import { useBookingScheduler } from '@/modules/appointments/hooks/shared/use-booking-scheduler';
 import { searchPatientsAction } from '@/modules/patients/actions/profile/search-patients.action';
 import { getServicesAction } from '@/modules/services/actions/management/get-services.action';
@@ -221,6 +222,46 @@ export function useSecretaryInquiriesQueue() {
     setIsNotesManual(true);
   };
 
+  const saveInquiryChanges = async (section: string) => {
+    if (!selectedInquiryId) return;
+    setInlineError('');
+    setIsSubmitting(true);
+    try {
+      const payload: Record<string, any> = { inquiryId: selectedInquiryId };
+      if (section === 'guest') {
+        payload.firstName = guestFirstName;
+        payload.middleName = guestMiddleName;
+        payload.lastName = guestLastName;
+        payload.suffix = guestSuffix;
+        payload.patientNote = stagedInquiryNote;
+      } else if (section === 'contact') {
+        payload.phoneNumber = guestPhone;
+        payload.email = guestEmail;
+      } else if (section === 'patient') {
+        payload.firstName = guestFirstName;
+        payload.middleName = guestMiddleName;
+        payload.lastName = guestLastName;
+        payload.suffix = guestSuffix;
+        payload.patientNote = stagedInquiryNote;
+        payload.phoneNumber = guestPhone;
+        payload.email = guestEmail;
+      }
+      const res = await updateInquiryAction(payload as any);
+      if (res.success) {
+        showToast('Changes saved', 'success');
+        await loadInquiries();
+      } else {
+        setInlineError(res.error || 'Failed to save changes');
+        showToast(res.error || 'Failed to save changes', 'error');
+      }
+    } catch (err: any) {
+      setInlineError(err.message || 'Failed to save changes');
+      showToast(err.message || 'Failed to save changes', 'error');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const submitReview = async (inquiryId: string) => {
     if (!stagedInquiryAction) {
       showToast('Please select review decision action first', 'error');
@@ -297,7 +338,7 @@ export function useSecretaryInquiriesQueue() {
     selectedPatient, selectPatient, clearPatient, services, currentMonth, setCurrentMonth, availableDates,
     availableDoctors, timeslots, isLoadingServices, isLoadingDays: scheduler.loadingKey === 'dates',
     isLoadingDoctors: scheduler.loadingKey === 'doctors', isLoadingSlots: scheduler.loadingKey === 'slots',
-    isSubmitting, inlineError, toast, isAvailabilityLoading, canSubmit, submitReview,
+    isSubmitting, inlineError, toast, isAvailabilityLoading, canSubmit, submitReview, saveInquiryChanges,
     activeTab, setActiveTab, tabCounts,
   };
 }
