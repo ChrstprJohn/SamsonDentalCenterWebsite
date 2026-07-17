@@ -18,6 +18,12 @@ import {
   CardContent,
 } from '@/components/ui/card';
 import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from '@/components/ui/accordion';
+import {
   ClipboardList,
   Pencil,
   AlertTriangle,
@@ -68,10 +74,8 @@ const COMMON_REASONS = [
 
 export function SecretaryPendingRequestsViewV2() {
   const inquiriesView = useSecretaryInquiriesQueue();
-  const [isEditingNames, setIsEditingNames] = React.useState(false);
   const [isEditingContact, setIsEditingContact] = React.useState(false);
   const [isEditingService, setIsEditingService] = React.useState(false);
-  const [namesSnapshot, setNamesSnapshot] = React.useState<Record<string, string>>({});
   const [contactSnapshot, setContactSnapshot] = React.useState<Record<string, string>>({});
   const [serviceSnapshot, setServiceSnapshot] = React.useState<Record<string, string>>({});
   const [approvalReason, setApprovalReason] = React.useState('');
@@ -79,26 +83,6 @@ export function SecretaryPendingRequestsViewV2() {
 
   const colMobile = (view: 'list' | 'detail' | 'quickLogs') =>
     mobileView === view ? 'flex' : 'hidden';
-
-  const startEditingNames = () => {
-    setNamesSnapshot({
-      firstName: inquiriesView.guestFirstName,
-      middleName: inquiriesView.guestMiddleName,
-      lastName: inquiriesView.guestLastName,
-      suffix: inquiriesView.guestSuffix,
-      note: inquiriesView.stagedInquiryNote,
-    });
-    setIsEditingNames(true);
-  };
-
-  const cancelEditingNames = () => {
-    inquiriesView.setGuestFirstName(namesSnapshot.firstName || '');
-    inquiriesView.setGuestMiddleName(namesSnapshot.middleName || '');
-    inquiriesView.setGuestLastName(namesSnapshot.lastName || '');
-    inquiriesView.setGuestSuffix(namesSnapshot.suffix || '');
-    inquiriesView.setStagedInquiryNote(namesSnapshot.note || '');
-    setIsEditingNames(false);
-  };
 
   const startEditingContact = () => {
     setContactSnapshot({
@@ -181,69 +165,72 @@ export function SecretaryPendingRequestsViewV2() {
 
               <Card>
                 <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="max-sm:text-sm">Guest Profile</CardTitle>
-                    <CardAction>
-                      {inquiriesView.selectedInquiry?.status === 'NEW' && !isEditingNames ? (
-                        <Button variant="outline" onClick={startEditingNames} className="bg-white hover:bg-slate-50 text-xs text-slate-700 font-medium px-3 py-1.5 border border-slate-200 rounded-lg h-auto">
-                          <Pencil className="size-3.5 mr-1" />
-                          Edit
-                        </Button>
-                      ) : isEditingNames ? (
-                        <div className="flex items-center gap-2">
-                          <Button variant="ghost" size="sm" onClick={cancelEditingNames} className="text-sm text-slate-500 hover:text-slate-700 max-sm:text-xs max-sm:px-3.5 max-sm:py-1.5 px-4 py-2 h-auto">
-                            <X className="size-4 mr-1" />
-                            Cancel
-                          </Button>
-                          <Button size="sm" onClick={() => setIsEditingNames(false)} className="text-sm text-white bg-slate-900 hover:bg-slate-800 rounded-lg max-sm:text-xs max-sm:px-3.5 max-sm:py-1.5 px-5 py-2.5 h-auto shadow-sm">
-                            <Check className="size-4 mr-1" />
-                            Save
-                          </Button>
-                        </div>
-                      ) : null}
-                    </CardAction>
-                  </div>
+                  <CardTitle className="max-sm:text-sm">Guest Profile</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="flex flex-col gap-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                      <div className="flex flex-col gap-1.5">
-                        <Label className={`${!isEditingNames ? "text-text-muted" : ""} max-sm:text-xs`}>First name</Label>
-                        {!isEditingNames ? <span className="max-sm:text-xs text-sm font-semibold text-slate-800">{inquiriesView.guestFirstName || '-'}</span>
-                          :             <Input value={inquiriesView.guestFirstName} onChange={(e) => inquiriesView.setGuestFirstName(e.target.value)} className="max-sm:text-xs text-sm" />}
-                      </div>
-                      <div className="flex flex-col gap-1.5">
-                        <Label className={`${!isEditingNames ? "text-text-muted" : ""} max-sm:text-xs`}>Middle name</Label>
-                        {!isEditingNames ? <span className="max-sm:text-xs text-sm font-semibold text-slate-800">{inquiriesView.guestMiddleName || '-'}</span>
-                          :             <Input value={inquiriesView.guestMiddleName} onChange={(e) => inquiriesView.setGuestMiddleName(e.target.value)} className="max-sm:text-xs text-sm" />}
-                      </div>
-                      <div className="flex flex-col gap-1.5">
-                        <Label className={`${!isEditingNames ? "text-text-muted" : ""} max-sm:text-xs`}>Last name</Label>
-                        {!isEditingNames ? <span className="max-sm:text-xs text-sm font-semibold text-slate-800">{inquiriesView.guestLastName || '-'}</span>
-                          :             <Input value={inquiriesView.guestLastName} onChange={(e) => inquiriesView.setGuestLastName(e.target.value)} className="max-sm:text-xs text-sm" />}
-                      </div>
-                      <div className="flex flex-col gap-1.5">
-                        <Label className={`${!isEditingNames ? "text-text-muted" : ""} max-sm:text-xs`}>Suffix</Label>
-                        {!isEditingNames ? <span className="max-sm:text-xs text-sm font-semibold text-slate-800">{inquiriesView.guestSuffix || '-'}</span>
-                          :             <Input value={inquiriesView.guestSuffix} onChange={(e) => inquiriesView.setGuestSuffix(e.target.value)} className="max-sm:text-xs text-sm" />}
-                      </div>
-                    </div>
-                    <Separator />
-                    <div className="flex flex-col gap-1.5">
-                      <Label className={`${!isEditingNames ? "text-text-muted" : ""} max-sm:text-xs`}>Patient note</Label>
-                      {!isEditingNames ? (
-                        <span className="max-sm:text-xs text-sm text-slate-700">{inquiriesView.stagedInquiryNote ? `"${inquiriesView.stagedInquiryNote}"` : '-'}</span>
-                      ) : (
+                <CardContent className="p-0">
+                  <Accordion type="multiple">
+                    <AccordionItem value="first-name">
+                      <AccordionTrigger>
+                        <div className="flex flex-col items-start gap-0.5">
+                          <span className="max-sm:text-xs text-xs text-text-muted">First name</span>
+                          <span className="max-sm:text-xs text-sm font-semibold text-slate-800">{inquiriesView.guestFirstName || '-'}</span>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <Input value={inquiriesView.guestFirstName} onChange={(e) => inquiriesView.setGuestFirstName(e.target.value)} className="max-sm:text-xs text-sm" />
+                      </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="middle-name">
+                      <AccordionTrigger>
+                        <div className="flex flex-col items-start gap-0.5">
+                          <span className="max-sm:text-xs text-xs text-text-muted">Middle name</span>
+                          <span className="max-sm:text-xs text-sm font-semibold text-slate-800">{inquiriesView.guestMiddleName || '-'}</span>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <Input value={inquiriesView.guestMiddleName} onChange={(e) => inquiriesView.setGuestMiddleName(e.target.value)} className="max-sm:text-xs text-sm" />
+                      </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="last-name">
+                      <AccordionTrigger>
+                        <div className="flex flex-col items-start gap-0.5">
+                          <span className="max-sm:text-xs text-xs text-text-muted">Last name</span>
+                          <span className="max-sm:text-xs text-sm font-semibold text-slate-800">{inquiriesView.guestLastName || '-'}</span>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <Input value={inquiriesView.guestLastName} onChange={(e) => inquiriesView.setGuestLastName(e.target.value)} className="max-sm:text-xs text-sm" />
+                      </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="suffix">
+                      <AccordionTrigger>
+                        <div className="flex flex-col items-start gap-0.5">
+                          <span className="max-sm:text-xs text-xs text-text-muted">Suffix</span>
+                          <span className="max-sm:text-xs text-sm font-semibold text-slate-800">{inquiriesView.guestSuffix || '-'}</span>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <Input value={inquiriesView.guestSuffix} onChange={(e) => inquiriesView.setGuestSuffix(e.target.value)} className="max-sm:text-xs text-sm" />
+                      </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="patient-note">
+                      <AccordionTrigger>
+                        <div className="flex flex-col items-start gap-0.5">
+                          <span className="max-sm:text-xs text-xs text-text-muted">Patient note</span>
+                          <span className="max-sm:text-xs text-sm text-slate-700">{inquiriesView.stagedInquiryNote ? `"${inquiriesView.stagedInquiryNote}"` : '-'}</span>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent>
                         <textarea
                           value={inquiriesView.stagedInquiryNote}
                           onChange={(e) => inquiriesView.setStagedInquiryNote(e.target.value)}
                           rows={2}
-                          className="max-sm:text-xs text-sm text-slate-800 bg-white border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500 transition resize-none w-full"
+                          className="w-full max-sm:text-xs text-sm text-slate-800 bg-white border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500 transition resize-none"
                           placeholder="Add a note..."
                         />
-                      )}
-                    </div>
-                  </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
                 </CardContent>
               </Card>
 
