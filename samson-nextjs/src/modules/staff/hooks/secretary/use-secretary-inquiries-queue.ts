@@ -15,7 +15,7 @@ export type InquiryTab = 'NEW' | 'CONVERTED' | 'DROPPED';
 export function useSecretaryInquiriesQueue() {
   const scheduler = useBookingScheduler();
   const { loadAvailableDates, loadDoctorsForDate, loadAvailableSlots } = scheduler;
-  const [inquiries, setInquiries] = useState<any[]>([]);
+  const [allInquiries, setAllInquiries] = useState<any[]>([]);
   const [selectedInquiryId, setSelectedInquiryId] = useState<string | null>(null);
   const [isLoadingInquiries, setIsLoadingInquiries] = useState(false);
   const [inquiriesError, setInquiriesError] = useState('');
@@ -48,6 +48,20 @@ export function useSecretaryInquiriesQueue() {
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [activeTab, setActiveTab] = useState<InquiryTab>('NEW');
 
+  const inquiries = useMemo(
+    () => allInquiries.filter((i) => i.status === activeTab),
+    [allInquiries, activeTab]
+  );
+
+  const tabCounts = useMemo(
+    () => ({
+      NEW: allInquiries.filter((i) => i.status === 'NEW').length,
+      CONVERTED: allInquiries.filter((i) => i.status === 'CONVERTED').length,
+      DROPPED: allInquiries.filter((i) => i.status === 'DROPPED').length,
+    }),
+    [allInquiries]
+  );
+
   const selectedInquiry = useMemo(
     () => inquiries.find((inquiry) => inquiry.id === selectedInquiryId),
     [inquiries, selectedInquiryId]
@@ -78,16 +92,16 @@ export function useSecretaryInquiriesQueue() {
     }
   }, [patientMode, selectedPatient, stagedInquiryAction, isNotesManual]);
 
-  const loadInquiries = async (status?: InquiryTab) => {
+  const loadInquiries = async () => {
     setIsLoadingInquiries(true);
     setInquiriesError('');
-    const res = await getInquiriesAction(status);
+    const res = await getInquiriesAction();
     setIsLoadingInquiries(false);
-    if (res.success && res.data) setInquiries(res.data);
+    if (res.success && res.data) setAllInquiries(res.data);
     else setInquiriesError(res.error || 'Failed to load inquiries queue.');
   };
 
-  useEffect(() => { loadInquiries(activeTab); }, [activeTab]);
+  useEffect(() => { loadInquiries(); }, []);
 
   useEffect(() => {
     async function loadServices() {
@@ -239,7 +253,7 @@ export function useSecretaryInquiriesQueue() {
           showToast('Inquiry converted to appointment successfully', 'success');
           setSelectedInquiryId(null);
           setStagedInquiryAction('');
-          await loadInquiries(activeTab);
+          await loadInquiries();
         } else {
           setInlineError(res.error || 'Conversion failed');
           showToast(res.error || 'Failed to convert inquiry', 'error');
@@ -250,7 +264,7 @@ export function useSecretaryInquiriesQueue() {
           showToast('Inquiry dropped successfully', 'success');
           setSelectedInquiryId(null);
           setStagedInquiryAction('');
-          await loadInquiries(activeTab);
+          await loadInquiries();
         } else {
           setInlineError(res.error || 'Failed to drop inquiry');
           showToast(res.error || 'Failed to drop inquiry', 'error');
@@ -284,6 +298,6 @@ export function useSecretaryInquiriesQueue() {
     availableDoctors, timeslots, isLoadingServices, isLoadingDays: scheduler.loadingKey === 'dates',
     isLoadingDoctors: scheduler.loadingKey === 'doctors', isLoadingSlots: scheduler.loadingKey === 'slots',
     isSubmitting, inlineError, toast, isAvailabilityLoading, canSubmit, submitReview,
-    activeTab, setActiveTab,
+    activeTab, setActiveTab, tabCounts,
   };
 }

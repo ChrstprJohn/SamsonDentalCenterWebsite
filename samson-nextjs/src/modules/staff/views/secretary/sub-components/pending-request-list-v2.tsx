@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { ArrowUpDown } from 'lucide-react';
+import { ArrowUpDown, ClipboardList, BadgeCheck, XCircle } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatShortDate, formatTimeString } from '@/shared/utils/date.util';
 import type { InquiryTab } from '../../../hooks/secretary/use-secretary-inquiries-queue';
@@ -23,12 +23,13 @@ interface PendingRequestListV2Props {
   onSelectInquiry: (inquiry: any) => void;
   activeTab: InquiryTab;
   setActiveTab: (tab: InquiryTab) => void;
+  tabCounts: Record<InquiryTab, number>;
 }
 
-const TABS: { key: InquiryTab; label: string }[] = [
-  { key: 'NEW', label: 'New' },
-  { key: 'CONVERTED', label: 'Converted' },
-  { key: 'DROPPED', label: 'Dropped' },
+const TABS: { key: InquiryTab; label: string; icon: React.ElementType }[] = [
+  { key: 'NEW', label: 'New', icon: ClipboardList },
+  { key: 'CONVERTED', label: 'Converted', icon: BadgeCheck },
+  { key: 'DROPPED', label: 'Dropped', icon: XCircle },
 ];
 
 const BADGE_LABELS: Record<InquiryTab, string> = {
@@ -109,22 +110,24 @@ export function PendingRequestListV2(props: PendingRequestListV2Props) {
           onChange={(e) => setSearch(e.target.value)}
           className="rounded-md"
         />
-        <div className="flex gap-1 bg-muted/20 p-1 rounded-lg">
-          {TABS.map((tab) => (
-            <Button
-              key={tab.key}
-              onClick={() => props.setActiveTab(tab.key)}
-              variant="ghost"
-              size="sm"
-              className={`flex-1 h-8 text-xs transition-all ${
-                props.activeTab === tab.key
-                  ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              {tab.label}
-            </Button>
-          ))}
+        <div className="flex gap-1 bg-muted/20 p-1 rounded-lg overflow-x-auto [&::-webkit-scrollbar]:hidden">
+          {TABS.map((tab) => {
+            const Icon = tab.icon;
+            return (
+              <button
+                key={tab.key}
+                onClick={() => props.setActiveTab(tab.key)}
+                className={`shrink-0 h-8 text-xs px-3 rounded-xl font-semibold transition-all duration-300 outline-none select-none active:scale-[0.98] flex items-center gap-1.5 ${
+                  props.activeTab === tab.key
+                    ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                <Icon className="size-3.5" />
+                {tab.label} ({props.tabCounts[tab.key]})
+              </button>
+            );
+          })}
         </div>
       </SidebarHeader>
       <SidebarContent 

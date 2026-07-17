@@ -149,6 +149,7 @@ export function SecretaryPendingRequestsViewV2() {
           onSelectInquiry={(inq) => { inquiriesView.selectInquiry(inq); setMobileView('detail'); }}
           activeTab={inquiriesView.activeTab}
           setActiveTab={inquiriesView.setActiveTab}
+          tabCounts={inquiriesView.tabCounts}
         />
       </div>
 
@@ -518,7 +519,7 @@ export function SecretaryPendingRequestsViewV2() {
         </div>
       </>
     ) : (
-      <div className="flex-1 flex-col items-center justify-center text-muted-foreground bg-muted/10 space-y-2 hidden lg:flex">
+      <div className="flex-1 flex-col items-center justify-center text-muted-foreground bg-muted/10 space-y-2 max-lg:hidden flex">
         <ClipboardList className="size-12 text-muted-foreground/40" />
         <p className="text-sm font-medium">Select an inquiry from the left list to view details and process the request.</p>
       </div>

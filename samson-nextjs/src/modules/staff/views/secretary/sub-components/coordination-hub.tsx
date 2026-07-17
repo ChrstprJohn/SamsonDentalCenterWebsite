@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, ClipboardList } from 'lucide-react';
 import { useCoordinationHub } from '../../../hooks/secretary/use-coordination-hub';
 import type { CreateCoordinationLogActionType } from '@/modules/appointments/dtos/coordination/coordination-log-response.dto';
 
@@ -72,8 +72,9 @@ export function CoordinationHub({ inquiryId, hideHeader, hideActions, onBack }: 
       )}
 
       {!inquiryId ? (
-        <div className="flex-1 flex items-center justify-center p-4">
-          <p className="text-xs text-text-muted text-center">Select an inquiry to start logging coordination actions.</p>
+        <div className="flex-1 flex-col items-center justify-center text-muted-foreground bg-muted/10 space-y-2 max-lg:hidden flex">
+          <ClipboardList className="size-12 text-muted-foreground/40" />
+          <p className="text-sm font-medium">Select an inquiry to start logging coordination actions.</p>
         </div>
       ) : (
         <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
