@@ -120,7 +120,7 @@ export function SecretaryPendingRequestsViewV2() {
               )}
 
               <Card>
-                <CardHeader>
+                <CardHeader className="px-4">
                   <CardTitle className="max-sm:text-sm">Guest Profile</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
@@ -191,7 +191,7 @@ export function SecretaryPendingRequestsViewV2() {
               </Card>
 
               <Card>
-                <CardHeader>
+                <CardHeader className="px-4">
                   <CardTitle className="max-sm:text-sm">Contact Information</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
@@ -223,7 +223,7 @@ export function SecretaryPendingRequestsViewV2() {
               </Card>
 
               <Card>
-                <CardHeader>
+                <CardHeader className="px-4">
                   <CardTitle className="max-sm:text-sm">Appointment Details</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
