@@ -6,10 +6,14 @@ import { PendingRequestListV2 } from './sub-components/pending-request-list-v2';
 import { CoordinationHub } from './sub-components/coordination-hub';
 import { InquiryToast } from './sub-components/inquiry-toast';
 import { Button } from '@/components/ui/button';
-import { Select } from '@/components/ui/select';
 import {
   ArrowLeft,
+  Check,
+  ChevronDown,
   EllipsisVertical,
+  Pencil,
+  User,
+  X,
 } from 'lucide-react';
 
 function getServiceName(services: { id: string; name: string }[], serviceId: string): string {
@@ -17,46 +21,14 @@ function getServiceName(services: { id: string; name: string }[], serviceId: str
   return services.find((s) => s.id === serviceId)?.name || 'Unknown service';
 }
 
-function normalizeTo24h(time: string): string {
-  if (!time) return '';
-  const match = time.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
-  if (!match) return time;
-  let hours = parseInt(match[1], 10);
-  const minutes = parseInt(match[2], 10);
-  if (match[3].toUpperCase() === 'PM' && hours !== 12) hours += 12;
-  if (match[3].toUpperCase() === 'AM' && hours === 12) hours = 0;
-  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
-}
-
-function formatTo12h(time: string): string {
+function formatTime(time: string): string {
   if (!time) return '-';
-  const already12h = /^(0?[1-9]|1[0-2]):[0-5]\d\s*(AM|PM)$/i;
-  if (already12h.test(time.trim())) return time.trim();
-  const parts = time.split(':');
-  if (parts.length < 2) return time;
-  const hours = parseInt(parts[0], 10);
-  const minutes = parts[1].replace(/\D/g, '');
-  if (isNaN(hours)) return time;
-  const ampm = hours >= 12 ? 'PM' : 'AM';
-  const h12 = hours % 12 || 12;
-  return `${h12}:${minutes} ${ampm}`;
+  const [h, m] = time.split(':');
+  const hour = parseInt(h, 10);
+  const ampm = hour >= 12 ? 'PM' : 'AM';
+  const h12 = hour % 12 || 12;
+  return `${String(h12).padStart(2, '0')}:${m} ${ampm}`;
 }
-
-function generateTimeOptions(): { value: string; label: string }[] {
-  const options: { value: string; label: string }[] = [];
-  for (let h = 0; h < 24; h++) {
-    for (let m = 0; m < 60; m += 30) {
-      const hour12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
-      const ampm = h < 12 ? 'AM' : 'PM';
-      const val = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
-      const label = `${hour12}:${String(m).padStart(2, '0')} ${ampm}`;
-      options.push({ value: val, label });
-    }
-  }
-  return options;
-}
-
-const TIME_OPTIONS = generateTimeOptions();
 
 const COMMON_REASONS = [
   'Patient request accepted',
@@ -78,10 +50,6 @@ export function SecretaryPendingRequestsViewV2() {
   const colMobile = (view: 'list' | 'detail' | 'quickLogs') =>
     mobileView === view ? 'flex' : 'hidden';
 
-  const startTime24h = normalizeTo24h(inquiriesView.stagedInquiryTime);
-  const endTimeOptions = startTime24h
-    ? TIME_OPTIONS.filter((t) => t.value > startTime24h)
-    : TIME_OPTIONS;
   const isReady = !!inquiriesView.stagedInquiryDoctor && !!inquiriesView.stagedInquiryEndTime;
   const hasSelection = !!inquiriesView.selectedInquiry;
 
@@ -128,7 +96,8 @@ export function SecretaryPendingRequestsViewV2() {
     setIsEditingSchedule(false);
   };
 
-  const saveEditSchedule = () => {
+  const saveEditSchedule = async () => {
+    await inquiriesView.saveInquiryChanges('schedule');
     setIsEditingSchedule(false);
   };
 
@@ -154,7 +123,7 @@ export function SecretaryPendingRequestsViewV2() {
             <button onClick={() => setMobileView('list')} className="lg:hidden p-1 -ml-1 text-muted-foreground hover:text-foreground shrink-0">
               <ArrowLeft className="size-5" />
             </button>
-            <div className="flex-1 text-base font-medium text-foreground">
+            <div className="flex-1 text-base font-medium text-foreground text-left">
               Request Details
             </div>
             <button onClick={() => setMobileView('quickLogs')} className="lg:hidden p-1 -mr-1 text-muted-foreground hover:text-foreground shrink-0">
@@ -166,6 +135,21 @@ export function SecretaryPendingRequestsViewV2() {
           style={{ scrollbarWidth: 'thin' }}
           data-lenis-prevent
         >
+              <div className="flex flex-col items-center pt-6 pb-4">
+                <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center border border-card-border mb-3">
+                  <User className="size-8 text-muted-foreground" />
+                </div>
+                <h2 className="text-lg font-semibold text-foreground">
+                  {inquiriesView.guestFirstName && inquiriesView.guestLastName
+                    ? `${inquiriesView.guestFirstName} ${inquiriesView.guestLastName}`
+                    : inquiriesView.guestFirstName || inquiriesView.guestLastName || 'New Patient'
+                  }
+                </h2>
+                <p className="text-sm text-muted-foreground mt-0.5">Guest</p>
+              </div>
+
+              <hr className="border-card-border/40" />
+
               {inquiriesView.inlineError && (
                 <div className="text-xs font-bold text-destructive bg-destructive/10 p-3 rounded-xl border border-destructive/20 my-3">
                   Error: {inquiriesView.inlineError}
@@ -173,224 +157,221 @@ export function SecretaryPendingRequestsViewV2() {
               )}
 
               {/* Section 1: Patient Information */}
-              <div className="py-3">
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-                    PATIENT INFORMATION
+              <div className="py-4">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-base font-medium text-foreground">
+                    Guest Information
                   </span>
                   {!isEditingPatient ? (
-                    <Button variant="outline" size="sm" onClick={startEditPatient} className="h-auto px-2 py-1 text-xs">
-                      Edit Info
+                    <Button variant="outline" size="sm" onClick={startEditPatient} className="h-auto px-3 py-1.5 text-xs gap-1.5">
+                      <Pencil className="size-3.5" />
+                      Edit
                     </Button>
                   ) : (
                     <div className="flex items-center gap-2">
-                      <Button variant="ghost" size="sm" onClick={cancelEditPatient} className="h-auto px-2 py-1 text-xs">
+                      <Button variant="outline" size="sm" onClick={cancelEditPatient} className="h-auto px-3 py-1.5 text-xs gap-1.5">
+                        <X className="size-3.5" />
                         Cancel
                       </Button>
-                      <Button size="sm" onClick={saveEditPatient} className="h-auto px-3 py-1 text-xs bg-slate-900 text-white rounded-md">
+                      <Button size="sm" onClick={saveEditPatient} className="h-auto px-3 py-1.5 text-xs gap-1.5 bg-slate-900 text-white rounded-md">
+                        <Check className="size-3.5" />
                         Save
                       </Button>
                     </div>
                   )}
                 </div>
-                <hr className="border-card-border/40 mb-3" />
 
                 {!isEditingPatient ? (
-                  <div className="flex flex-col gap-2">
-                    <div className="grid grid-cols-4 gap-3">
+                  <div className="flex flex-col gap-3">
+                    <div className="grid grid-cols-2 gap-3">
                       <div className="flex flex-col gap-0.5">
-                        <span className="text-xs font-medium text-muted-foreground">First Name</span>
-                        <span className="text-sm text-foreground">{inquiriesView.guestFirstName || '-'}</span>
+                        <span className="text-xs text-muted-foreground">First Name</span>
+                        <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{inquiriesView.guestFirstName || '-'}</div>
                       </div>
                       <div className="flex flex-col gap-0.5">
-                        <span className="text-xs font-medium text-muted-foreground">Last Name</span>
-                        <span className="text-sm text-foreground">{inquiriesView.guestLastName || '-'}</span>
-                      </div>
-                      <div className="flex flex-col gap-0.5">
-                        <span className="text-xs font-medium text-muted-foreground">Middle Name</span>
-                        <span className="text-sm text-foreground">{inquiriesView.guestMiddleName || '-'}</span>
-                      </div>
-                      <div className="flex flex-col gap-0.5">
-                        <span className="text-xs font-medium text-muted-foreground">Suffix</span>
-                        <span className="text-sm text-foreground">{inquiriesView.guestSuffix || '-'}</span>
+                        <span className="text-xs text-muted-foreground">Last Name</span>
+                        <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{inquiriesView.guestLastName || '-'}</div>
                       </div>
                     </div>
-                    <div className="flex flex-col gap-0.5">
-                      <span className="text-xs font-medium text-muted-foreground">Email</span>
-                      <span className="text-sm text-foreground">{inquiriesView.guestEmail || '-'}</span>
-                    </div>
-                    <div className="flex flex-col gap-0.5">
-                      <span className="text-xs font-medium text-muted-foreground">Phone</span>
-                      <span className="text-sm text-foreground">{inquiriesView.guestPhone || '-'}</span>
-                    </div>
-                    {inquiriesView.stagedInquiryNote && (
+                    <div className="grid grid-cols-2 gap-3">
                       <div className="flex flex-col gap-0.5">
-                        <span className="text-xs font-medium text-muted-foreground">Note</span>
-                        <span className="text-sm text-muted-foreground italic">&ldquo;{inquiriesView.stagedInquiryNote}&rdquo;</span>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    <div className="grid grid-cols-2 gap-x-3 gap-y-2">
-                      <div className="flex flex-col gap-0.5">
-                        <span className="text-xs text-muted-foreground">Last name</span>
-                        <input value={inquiriesView.guestLastName} onChange={(e) => inquiriesView.setGuestLastName(e.target.value)} className="w-full px-2.5 py-1.5 text-sm border border-card-border rounded-md bg-card focus:outline-none focus:ring-1 focus:ring-blue-500" />
+                        <span className="text-xs text-muted-foreground">Middle Name</span>
+                        <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{inquiriesView.guestMiddleName || '-'}</div>
                       </div>
                       <div className="flex flex-col gap-0.5">
                         <span className="text-xs text-muted-foreground">Suffix</span>
-                        <input value={inquiriesView.guestSuffix} onChange={(e) => inquiriesView.setGuestSuffix(e.target.value)} className="w-full px-2.5 py-1.5 text-sm border border-card-border rounded-md bg-card focus:outline-none focus:ring-1 focus:ring-blue-500" />
-                      </div>
-                      <div className="flex flex-col gap-0.5">
-                        <span className="text-xs text-muted-foreground">First name</span>
-                        <input value={inquiriesView.guestFirstName} onChange={(e) => inquiriesView.setGuestFirstName(e.target.value)} className="w-full px-2.5 py-1.5 text-sm border border-card-border rounded-md bg-card focus:outline-none focus:ring-1 focus:ring-blue-500" />
-                      </div>
-                      <div className="flex flex-col gap-0.5">
-                        <span className="text-xs text-muted-foreground">Middle name</span>
-                        <input value={inquiriesView.guestMiddleName} onChange={(e) => inquiriesView.setGuestMiddleName(e.target.value)} className="w-full px-2.5 py-1.5 text-sm border border-card-border rounded-md bg-card focus:outline-none focus:ring-1 focus:ring-blue-500" />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-x-3 gap-y-2">
-                      <div className="flex flex-col gap-0.5">
-                        <span className="text-xs text-muted-foreground">Email</span>
-                        <input type="email" value={inquiriesView.guestEmail} onChange={(e) => inquiriesView.setGuestEmail(e.target.value)} className="w-full px-2.5 py-1.5 text-sm border border-card-border rounded-md bg-card focus:outline-none focus:ring-1 focus:ring-blue-500" />
-                      </div>
-                      <div className="flex flex-col gap-0.5">
-                        <span className="text-xs text-muted-foreground">Phone</span>
-                        <input value={inquiriesView.guestPhone} onChange={(e) => inquiriesView.setGuestPhone(e.target.value)} className="w-full px-2.5 py-1.5 text-sm border border-card-border rounded-md bg-card focus:outline-none focus:ring-1 focus:ring-blue-500" />
+                        <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{inquiriesView.guestSuffix || '-'}</div>
                       </div>
                     </div>
                   </div>
+                ) : (
+                  <div className="flex flex-col gap-3">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-xs text-muted-foreground">First Name</span>
+                        <input value={inquiriesView.guestFirstName} onChange={(e) => inquiriesView.setGuestFirstName(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border" />
+                      </div>
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-xs text-muted-foreground">Last Name</span>
+                        <input value={inquiriesView.guestLastName} onChange={(e) => inquiriesView.setGuestLastName(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border" />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-xs text-muted-foreground">Middle Name</span>
+                        <input value={inquiriesView.guestMiddleName} onChange={(e) => inquiriesView.setGuestMiddleName(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border" />
+                      </div>
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-xs text-muted-foreground">Suffix</span>
+                        <input value={inquiriesView.guestSuffix} onChange={(e) => inquiriesView.setGuestSuffix(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border" />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Section 1b: Guest Contact */}
+              <div className="py-4">
+                <span className="text-base font-medium text-foreground block mb-3">Guest Contact</span>
+
+                {!isEditingPatient ? (
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-xs text-muted-foreground">Email</span>
+                    <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{inquiriesView.guestEmail || '-'}</div>
+                  </div>
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-xs text-muted-foreground">Phone</span>
+                    <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{inquiriesView.guestPhone || '-'}</div>
+                  </div>
+                  {inquiriesView.stagedInquiryNote && (
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-xs text-muted-foreground">Note</span>
+                      <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default italic">&ldquo;{inquiriesView.stagedInquiryNote}&rdquo;</div>
+                    </div>
+                  )}
+                </div>
+                ) : (
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-xs text-muted-foreground">Email</span>
+                    <input type="email" value={inquiriesView.guestEmail} onChange={(e) => inquiriesView.setGuestEmail(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border" />
+                  </div>
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-xs text-muted-foreground">Phone</span>
+                    <input value={inquiriesView.guestPhone} onChange={(e) => inquiriesView.setGuestPhone(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border" />
+                  </div>
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-xs text-muted-foreground">Note</span>
+                    <textarea value={inquiriesView.stagedInquiryNote || ''} onChange={(e) => inquiriesView.setStagedInquiryNote(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border resize-none" rows={2} />
+                  </div>
+                </div>
                 )}
               </div>
 
               <hr className="border-card-border/40" />
 
               {/* Section 2: Appointment Details */}
-              <div className="py-3">
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-                    APPOINTMENT DETAILS
+              <div className="py-4">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-base font-medium text-foreground">
+                    Request Details
                   </span>
                   {isEditingSchedule ? (
                     <div className="flex items-center gap-2">
-                      <Button variant="ghost" size="sm" onClick={cancelEditSchedule} className="h-auto px-2 py-1 text-xs">
+                      <Button variant="outline" size="sm" onClick={cancelEditSchedule} className="h-auto px-3 py-1.5 text-xs gap-1.5">
+                        <X className="size-3.5" />
                         Cancel
                       </Button>
-                      <Button size="sm" onClick={saveEditSchedule} className="h-auto px-3 py-1 text-xs bg-slate-900 text-white rounded-md">
-                        Save Changes
+                      <Button size="sm" onClick={saveEditSchedule} className="h-auto px-3 py-1.5 text-xs gap-1.5 bg-slate-900 text-white rounded-md">
+                        <Check className="size-3.5" />
+                        Save
                       </Button>
                     </div>
                   ) : (
-                    <Button variant="outline" size="sm" onClick={startEditSchedule} className="h-auto px-2 py-1 text-xs">
-                      Edit Schedule
+                    <Button variant="outline" size="sm" onClick={startEditSchedule} className="h-auto px-3 py-1.5 text-xs gap-1.5">
+                      <Pencil className="size-3.5" />
+                      Edit
                     </Button>
                   )}
                 </div>
-                <hr className="border-card-border/40 mb-3" />
 
                 {isEditingSchedule ? (
-                  <div className="space-y-3">
-                    <div className="flex flex-col gap-0.5">
-                      <span className="text-xs text-muted-foreground">Service</span>
-                      <Select
-                        value={inquiriesView.stagedInquiryService}
-                        onChange={(e) => inquiriesView.selectService(e.target.value)}
-                        options={[
-                          { value: '', label: 'Select service...' },
-                          ...inquiriesView.services.map((s) => ({ value: s.id, label: s.name }))
-                        ]}
-                      />
-                    </div>
-                    <div className="flex flex-col gap-0.5">
-                      <span className="text-xs text-muted-foreground">Appointment Date</span>
-                      <DatePicker value={inquiriesView.stagedInquiryDate} onChange={(v) => inquiriesView.selectDate(v)} />
-                    </div>
-                    <div className="flex flex-col gap-0.5">
-                      <span className="text-xs text-muted-foreground">Time Frame (Start &rarr; End)</span>
-                      <div className="flex items-center gap-2">
-                        <select
-                          value={startTime24h}
-                          onChange={(e) => inquiriesView.setStagedInquiryTime(e.target.value)}
-                          className="flex-1 px-2.5 py-1.5 rounded-md border bg-card text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 border-card-border"
-                        >
-                          <option value="">Start time...</option>
-                          {TIME_OPTIONS.map((t) => (
-                            <option key={t.value} value={t.value}>{t.label}</option>
-                          ))}
-                        </select>
-                        <span className="text-muted-foreground text-sm shrink-0">&rarr;</span>
-                        <select
-                          value={inquiriesView.stagedInquiryEndTime}
-                          onChange={(e) => inquiriesView.setStagedInquiryEndTime(e.target.value)}
-                          className="flex-1 px-2.5 py-1.5 rounded-md border bg-card text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 border-card-border"
-                        >
-                          <option value="">End time...</option>
-                          {endTimeOptions.map((t) => (
-                            <option key={t.value} value={t.value}>{t.label}</option>
-                          ))}
-                        </select>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-xs text-muted-foreground">Service <span className="text-destructive">*</span></span>
+                        <div className="relative">
+                          <select value={inquiriesView.stagedInquiryService} onChange={(e) => inquiriesView.selectService(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border appearance-none">
+                            <option value="">Select service...</option>
+                            {inquiriesView.services.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
+                          </select>
+                          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+                        </div>
+                      </div>
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-xs text-muted-foreground">Date <span className="text-destructive">*</span></span>
+                        <DatePicker value={inquiriesView.stagedInquiryDate} onChange={(v) => inquiriesView.selectDate(v)} />
                       </div>
                     </div>
-                    <div className="flex flex-col gap-0.5">
-                      <span className="text-xs text-muted-foreground">Assign Dentist <span className="text-destructive">*</span></span>
-                      <Select
-                        value={inquiriesView.stagedInquiryDoctor}
-                        onChange={(e) => inquiriesView.selectDoctor(e.target.value)}
-                        options={[
-                          { value: '', label: 'Select available doctor...' },
-                          ...inquiriesView.availableDoctors.map((d) => ({ value: d.doctorId, label: d.doctorName }))
-                        ]}
-                      />
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="flex flex-col gap-0.5">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-muted-foreground">Start Time <span className="text-destructive">*</span></span>
+                          <span className="text-xs text-muted-foreground/60">Prefered time {formatTime(inquiriesView.stagedInquiryTime)}</span>
+                        </div>
+                        <input type="time" value={inquiriesView.stagedInquiryTime} onChange={(e) => inquiriesView.setStagedInquiryTime(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border" />
+                      </div>
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-xs text-muted-foreground">End Time <span className="text-destructive">*</span></span>
+                        <input type="time" value={inquiriesView.stagedInquiryEndTime} onChange={(e) => inquiriesView.setStagedInquiryEndTime(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border" />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-xs text-muted-foreground">Assign Dentist <span className="text-destructive">*</span></span>
+                        <div className="relative">
+                          <select value={inquiriesView.stagedInquiryDoctor} onChange={(e) => inquiriesView.selectDoctor(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border appearance-none">
+                            <option value="">Select available doctor...</option>
+                            {inquiriesView.availableDoctors.map((d) => <option key={d.doctorId} value={d.doctorId}>{d.doctorName}</option>)}
+                          </select>
+                          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 ) : (
-                  <div>
-                    <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Patient Requested</div>
-                    <div className="grid grid-cols-3 gap-3 mb-3">
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-3">
                       <div className="flex flex-col gap-0.5">
-                        <span className="text-xs font-medium text-muted-foreground">Service</span>
-                        <span className="text-sm font-semibold text-foreground">{getServiceName(inquiriesView.services, inquiriesView.stagedInquiryService)}</span>
+                        <span className="text-xs text-muted-foreground">Service <span className="text-destructive">*</span></span>
+                        <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{getServiceName(inquiriesView.services, inquiriesView.stagedInquiryService)}</div>
                       </div>
                       <div className="flex flex-col gap-0.5">
-                        <span className="text-xs font-medium text-muted-foreground">Date</span>
-                        <span className="text-sm font-semibold text-foreground">{inquiriesView.stagedInquiryDate ? new Date(inquiriesView.stagedInquiryDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '-'}</span>
-                      </div>
-                      <div className="flex flex-col gap-0.5">
-                        <span className="text-xs font-medium text-muted-foreground">Start Time</span>
-                        <span className="text-sm font-semibold text-foreground">{formatTo12h(inquiriesView.stagedInquiryTime)}</span>
+                        <span className="text-xs text-muted-foreground">Date <span className="text-destructive">*</span></span>
+                        <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{inquiriesView.stagedInquiryDate ? new Date(inquiriesView.stagedInquiryDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '-'}</div>
                       </div>
                     </div>
 
-                    <hr className="border-card-border/40 my-3" />
-
-                    <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Required Clinic Assignments</div>
-
-                    <div className="flex items-center gap-2 bg-slate-50 rounded-lg px-3 py-2.5 mb-2">
-                      <span className="font-semibold text-foreground text-sm shrink-0">{formatTo12h(inquiriesView.stagedInquiryTime)}</span>
-                      <span className="text-muted-foreground text-sm shrink-0">&rarr;</span>
-                      <select
-                        value={inquiriesView.stagedInquiryEndTime}
-                        onChange={(e) => inquiriesView.setStagedInquiryEndTime(e.target.value)}
-                        className="flex-1 px-2.5 py-1 text-sm rounded-md border bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 border-card-border"
-                      >
-                        <option value="">Select end time...</option>
-                        {endTimeOptions.map((t) => (
-                          <option key={t.value} value={t.value}>{t.label}</option>
-                        ))}
-                      </select>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="flex flex-col gap-0.5">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-muted-foreground">Start Time <span className="text-destructive">*</span></span>
+                          <span className="text-xs text-muted-foreground/60">Prefered time {formatTime(inquiriesView.stagedInquiryTime)}</span>
+                        </div>
+                        <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{formatTime(inquiriesView.stagedInquiryTime)}</div>
+                      </div>
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-xs text-muted-foreground">End Time <span className="text-destructive">*</span></span>
+                        <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{formatTime(inquiriesView.stagedInquiryEndTime)}</div>
+                      </div>
                     </div>
 
-                    <div className="flex flex-col gap-0.5">
-                      <span className="text-xs text-muted-foreground">Assign Dentist <span className="text-destructive">*</span></span>
-                      <Select
-                        value={inquiriesView.stagedInquiryDoctor}
-                        onChange={(e) => inquiriesView.selectDoctor(e.target.value)}
-                        options={[
-                          { value: '', label: 'Select available doctor...' },
-                          ...inquiriesView.availableDoctors.map((d) => ({ value: d.doctorId, label: d.doctorName }))
-                        ]}
-                      />
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-xs text-muted-foreground">Assign Dentist <span className="text-destructive">*</span></span>
+                        <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{inquiriesView.availableDoctors.find(d => d.doctorId === inquiriesView.stagedInquiryDoctor)?.doctorName || 'Select available doctor...'}</div>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -398,47 +379,40 @@ export function SecretaryPendingRequestsViewV2() {
 
               <hr className="border-card-border/40" />
 
+          </div>
+
               {/* Section 3: Master Action Bar */}
               {inquiriesView.selectedInquiry?.status === 'NEW' && (
-                <div className="py-3">
+                <div className="border-t border-card-border/40 px-5 py-4 shrink-0">
                   {!inquiriesView.stagedInquiryAction ? (
-                    !isReady ? (
-                      <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg border bg-slate-50 border-slate-200">
-                        <div className="flex-1 text-xs text-slate-500">
-                          <span className="font-semibold text-slate-700">Fill out assignments above</span> to enable approval
-                        </div>
+                    <div className="flex flex-col gap-3">
+                      {!isReady && (
+                        <p className="text-xs text-muted-foreground">Fill the required fields to enable approval</p>
+                      )}
+                      <div className="flex gap-3">
                         <Button
-                          variant="outline"
-                          size="sm"
-                          className="shrink-0 border-red-200 text-red-700 hover:bg-red-50 h-auto px-2.5 py-1 text-xs"
-                          onClick={() => { inquiriesView.setDecision('DROP'); setApprovalReason(''); }}
-                        >
-                          Reject
-                        </Button>
-                      </div>
-                    ) : (
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          className="flex-1 py-2 text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm"
+                          variant="default"
+                          size="default"
+                          disabled={!isReady}
+                          className="flex-1 py-3 text-sm font-semibold shadow-sm"
                           onClick={() => { inquiriesView.setDecision('CONVERT'); setApprovalReason(''); }}
                         >
-                          Approve & Add to Calendar
+                          Approve/Convert
                         </Button>
                         <Button
                           variant="outline"
-                          size="sm"
-                          className="shrink-0 border-red-200 text-red-700 hover:bg-red-50 h-auto px-2.5 py-1 text-xs"
+                          size="default"
+                          className="shrink-0 border-red-200 text-red-700 hover:bg-red-50 h-auto px-5 py-3 text-sm"
                           onClick={() => { inquiriesView.setDecision('DROP'); setApprovalReason(''); }}
                         >
-                          Reject
+                          Reject/Drop
                         </Button>
                       </div>
-                    )
+                    </div>
                   ) : (
-                    <div className="border border-card-border/40 rounded-lg p-3 space-y-3">
+                    <div className="border border-card-border/40 rounded-lg p-4 space-y-3">
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-semibold">
+                        <span className="text-sm font-semibold">
                           {inquiriesView.stagedInquiryAction === 'CONVERT' ? 'Convert note (Approve)' : 'Drop reason (Reject)'}
                         </span>
                         <Button variant="ghost" size="sm" onClick={() => { inquiriesView.setDecision(''); setApprovalReason(''); }} className="h-auto px-2 py-1 text-xs">
@@ -487,8 +461,8 @@ export function SecretaryPendingRequestsViewV2() {
                         onClick={() => inquiriesView.submitReview(inquiriesView.selectedInquiry.id)}
                         disabled={!inquiriesView.canSubmit}
                         variant={inquiriesView.stagedInquiryAction === 'CONVERT' ? 'primary' : 'destructive'}
-                        size="sm"
-                        className={`w-full py-2 text-xs ${inquiriesView.stagedInquiryAction === 'CONVERT' ? '!bg-slate-900' : ''}`}
+                        size="default"
+                        className={`w-full py-3 text-sm ${inquiriesView.stagedInquiryAction === 'CONVERT' ? '!bg-slate-900' : ''}`}
                       >
                         {inquiriesView.isSubmitting
                           ? 'Saving...'
@@ -499,8 +473,6 @@ export function SecretaryPendingRequestsViewV2() {
                   )}
                 </div>
               )}
-
-          </div>
         </div>
         <div className={`lg:w-[320px] flex-1 lg:flex-none flex-col h-full overflow-hidden ${colMobile('quickLogs')} lg:flex`}>
           <CoordinationHub inquiryId={inquiriesView.selectedInquiryId} hideActions={inquiriesView.selectedInquiry?.status !== 'NEW'} onBack={() => setMobileView('detail')} />
@@ -533,15 +505,24 @@ function DatePicker({ value, onChange }: { value: string; onChange: (v: string) 
 
   return (
     <div className="flex gap-2">
-      <select value={month} onChange={(e) => { const m = parseInt(e.target.value); setMonth(m); emit(m, day, year); }} className="flex-1 px-2.5 py-1.5 rounded-md border bg-card text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 border-card-border">
-        {MONTHS.map((name, i) => <option key={name} value={i}>{name}</option>)}
-      </select>
-      <select value={Math.min(day, daysInMonth)} onChange={(e) => { const d = parseInt(e.target.value); setDay(d); emit(month, d, year); }} className="w-16 px-2 py-1.5 rounded-md border bg-card text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 border-card-border">
-        {Array.from({ length: daysInMonth }, (_, i) => i + 1).map((d) => <option key={d} value={d}>{d}</option>)}
-      </select>
-      <select value={year} onChange={(e) => { const y = parseInt(e.target.value); setYear(y); emit(month, day, y); }} className="w-20 px-2 py-1.5 rounded-md border bg-card text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 border-card-border">
-        {Array.from({ length: 5 }, (_, i) => year - 1 + i).map((y) => <option key={y} value={y}>{y}</option>)}
-      </select>
+      <div className="relative flex-1">
+        <select value={month} onChange={(e) => { const m = parseInt(e.target.value); setMonth(m); emit(m, day, year); }} className="w-full appearance-none px-2.5 py-2.5 rounded-xl border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border">
+          {MONTHS.map((name, i) => <option key={name} value={i}>{name}</option>)}
+        </select>
+        <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+      </div>
+      <div className="relative w-16">
+        <select value={Math.min(day, daysInMonth)} onChange={(e) => { const d = parseInt(e.target.value); setDay(d); emit(month, d, year); }} className="w-full appearance-none px-2 py-2.5 rounded-xl border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border">
+          {Array.from({ length: daysInMonth }, (_, i) => i + 1).map((d) => <option key={d} value={d}>{d}</option>)}
+        </select>
+        <ChevronDown className="absolute right-1.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+      </div>
+      <div className="relative w-20">
+        <select value={year} onChange={(e) => { const y = parseInt(e.target.value); setYear(y); emit(month, day, y); }} className="w-full appearance-none px-2 py-2.5 rounded-xl border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border">
+          {Array.from({ length: 5 }, (_, i) => year - 1 + i).map((y) => <option key={y} value={y}>{y}</option>)}
+        </select>
+        <ChevronDown className="absolute right-1.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+      </div>
     </div>
   );
 }

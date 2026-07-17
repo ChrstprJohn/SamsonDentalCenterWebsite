@@ -15,6 +15,11 @@ export const updateInquirySchema = z.object({
   phoneNumber: cleanOptionalString,
   email: cleanOptionalString,
   patientNote: cleanOptionalString,
+  serviceId: cleanOptionalString,
+  date: cleanOptionalString,
+  startTime: cleanOptionalString,
+  assignedDoctorId: cleanOptionalString,
+  assignedEndTime: cleanOptionalString,
 });
 
 export type UpdateInquiryDto = z.infer<typeof updateInquirySchema>;

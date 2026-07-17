@@ -245,6 +245,12 @@ export function useSecretaryInquiriesQueue() {
         payload.patientNote = stagedInquiryNote;
         payload.phoneNumber = guestPhone;
         payload.email = guestEmail;
+      } else if (section === 'schedule') {
+        payload.serviceId = stagedInquiryService;
+        payload.date = stagedInquiryDate;
+        payload.startTime = stagedInquiryTime;
+        payload.assignedDoctorId = stagedInquiryDoctor;
+        payload.assignedEndTime = stagedInquiryEndTime;
       }
       const res = await updateInquiryAction(payload as any);
       if (res.success) {
