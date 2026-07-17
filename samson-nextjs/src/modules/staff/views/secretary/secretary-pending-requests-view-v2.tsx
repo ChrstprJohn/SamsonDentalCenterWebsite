@@ -22,8 +22,11 @@ import {
 } from '@/components/ui/accordion';
 import {
   ClipboardList,
+  Pencil,
   AlertTriangle,
   BadgeCheck,
+  X,
+  Check,
   ArrowLeft,
   EllipsisVertical,
 } from 'lucide-react';
@@ -70,9 +73,59 @@ export function SecretaryPendingRequestsViewV2() {
   const inquiriesView = useSecretaryInquiriesQueue();
   const [approvalReason, setApprovalReason] = React.useState('');
   const [mobileView, setMobileView] = React.useState<'list' | 'detail' | 'quickLogs'>('list');
+  const [editingSection, setEditingSection] = React.useState<string | null>(null);
+  const [guestSnapshot, setGuestSnapshot] = React.useState<Record<string, string>>({});
+  const [contactSnapshot, setContactSnapshot] = React.useState<Record<string, string>>({});
+  const [appointmentSnapshot, setAppointmentSnapshot] = React.useState<Record<string, string>>({});
 
   const colMobile = (view: 'list' | 'detail' | 'quickLogs') =>
     mobileView === view ? 'flex' : 'hidden';
+
+  const startEditing = (section: string) => {
+    if (section === 'guest') {
+      setGuestSnapshot({
+        firstName: inquiriesView.guestFirstName,
+        middleName: inquiriesView.guestMiddleName,
+        lastName: inquiriesView.guestLastName,
+        suffix: inquiriesView.guestSuffix,
+        note: inquiriesView.stagedInquiryNote,
+      });
+    } else if (section === 'contact') {
+      setContactSnapshot({
+        phone: inquiriesView.guestPhone,
+        email: inquiriesView.guestEmail,
+      });
+    } else if (section === 'appointment') {
+      setAppointmentSnapshot({
+        service: inquiriesView.stagedInquiryService,
+        doctor: inquiriesView.stagedInquiryDoctor,
+        date: inquiriesView.stagedInquiryDate,
+        time: inquiriesView.stagedInquiryTime,
+        endTime: inquiriesView.stagedInquiryEndTime,
+      });
+    }
+    setEditingSection(section);
+  };
+
+  const cancelEditing = () => {
+    if (editingSection === 'guest') {
+      inquiriesView.setGuestFirstName(guestSnapshot.firstName || '');
+      inquiriesView.setGuestMiddleName(guestSnapshot.middleName || '');
+      inquiriesView.setGuestLastName(guestSnapshot.lastName || '');
+      inquiriesView.setGuestSuffix(guestSnapshot.suffix || '');
+      inquiriesView.setStagedInquiryNote(guestSnapshot.note || '');
+    } else if (editingSection === 'contact') {
+      inquiriesView.setGuestPhone(contactSnapshot.phone || '');
+      inquiriesView.setGuestEmail(contactSnapshot.email || '');
+    } else if (editingSection === 'appointment') {
+      inquiriesView.selectService(appointmentSnapshot.service || '');
+      inquiriesView.selectDoctor(appointmentSnapshot.doctor || '');
+      inquiriesView.selectDate(appointmentSnapshot.date || '');
+      inquiriesView.setStagedInquiryTime(appointmentSnapshot.time || '');
+      inquiriesView.setStagedInquiryEndTime(appointmentSnapshot.endTime || '');
+    }
+    setEditingSection(null);
+  };
 
   const isMissingDoctor = !inquiriesView.stagedInquiryDoctor;
   const isMissingTime = !inquiriesView.stagedInquiryTime || !inquiriesView.stagedInquiryEndTime;
@@ -124,66 +177,88 @@ export function SecretaryPendingRequestsViewV2() {
                   <CardTitle className="max-sm:text-sm">Guest Profile</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
-                  <Accordion type="multiple">
-                    <AccordionItem value="first-name">
-                      <AccordionTrigger>
-                        <div className="flex flex-col items-start gap-0.5">
-                          <span className="max-sm:text-xs text-xs text-text-muted">First name</span>
-                          <span className="max-sm:text-xs text-sm font-semibold text-slate-800">{inquiriesView.guestFirstName || '-'}</span>
-                        </div>
+                  <Accordion type="single" collapsible>
+                    <AccordionItem value="guest" className="border-0">
+                      <AccordionTrigger className="px-4 py-2 hover:bg-transparent text-sm text-slate-800 font-semibold [&>svg]:text-muted-foreground">
+                        {[inquiriesView.guestFirstName, inquiriesView.guestMiddleName, inquiriesView.guestLastName].filter(Boolean).join(' ') || 'Guest'}
+                        {inquiriesView.guestSuffix && <span className="text-text-muted font-normal ml-1">({inquiriesView.guestSuffix})</span>}
                       </AccordionTrigger>
-                      <AccordionContent>
-                        <Input value={inquiriesView.guestFirstName} onChange={(e) => inquiriesView.setGuestFirstName(e.target.value)} className="max-sm:text-xs text-sm" />
-                      </AccordionContent>
-                    </AccordionItem>
-                    <AccordionItem value="middle-name">
-                      <AccordionTrigger>
-                        <div className="flex flex-col items-start gap-0.5">
-                          <span className="max-sm:text-xs text-xs text-text-muted">Middle name</span>
-                          <span className="max-sm:text-xs text-sm font-semibold text-slate-800">{inquiriesView.guestMiddleName || '-'}</span>
-                        </div>
-                      </AccordionTrigger>
-                      <AccordionContent>
-                        <Input value={inquiriesView.guestMiddleName} onChange={(e) => inquiriesView.setGuestMiddleName(e.target.value)} className="max-sm:text-xs text-sm" />
-                      </AccordionContent>
-                    </AccordionItem>
-                    <AccordionItem value="last-name">
-                      <AccordionTrigger>
-                        <div className="flex flex-col items-start gap-0.5">
-                          <span className="max-sm:text-xs text-xs text-text-muted">Last name</span>
-                          <span className="max-sm:text-xs text-sm font-semibold text-slate-800">{inquiriesView.guestLastName || '-'}</span>
-                        </div>
-                      </AccordionTrigger>
-                      <AccordionContent>
-                        <Input value={inquiriesView.guestLastName} onChange={(e) => inquiriesView.setGuestLastName(e.target.value)} className="max-sm:text-xs text-sm" />
-                      </AccordionContent>
-                    </AccordionItem>
-                    <AccordionItem value="suffix">
-                      <AccordionTrigger>
-                        <div className="flex flex-col items-start gap-0.5">
-                          <span className="max-sm:text-xs text-xs text-text-muted">Suffix</span>
-                          <span className="max-sm:text-xs text-sm font-semibold text-slate-800">{inquiriesView.guestSuffix || '-'}</span>
-                        </div>
-                      </AccordionTrigger>
-                      <AccordionContent>
-                        <Input value={inquiriesView.guestSuffix} onChange={(e) => inquiriesView.setGuestSuffix(e.target.value)} className="max-sm:text-xs text-sm" />
-                      </AccordionContent>
-                    </AccordionItem>
-                    <AccordionItem value="patient-note">
-                      <AccordionTrigger>
-                        <div className="flex flex-col items-start gap-0.5">
-                          <span className="max-sm:text-xs text-xs text-text-muted">Patient note</span>
-                          <span className="max-sm:text-xs text-sm text-slate-700">{inquiriesView.stagedInquiryNote ? `"${inquiriesView.stagedInquiryNote}"` : '-'}</span>
-                        </div>
-                      </AccordionTrigger>
-                      <AccordionContent>
-                        <textarea
-                          value={inquiriesView.stagedInquiryNote}
-                          onChange={(e) => inquiriesView.setStagedInquiryNote(e.target.value)}
-                          rows={2}
-                          className="w-full max-sm:text-xs text-sm text-slate-800 bg-white border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500 transition resize-none"
-                          placeholder="Add a note..."
-                        />
+                      <AccordionContent className="px-4 pb-4 space-y-3">
+                        {editingSection !== 'guest' ? (
+                          <>
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="grid grid-cols-2 gap-x-4 gap-y-2 flex-1">
+                                <div>
+                                  <span className="max-sm:text-[10px] text-xs text-text-muted">First name</span>
+                                  <p className="max-sm:text-xs text-sm font-semibold text-slate-800">{inquiriesView.guestFirstName || '-'}</p>
+                                </div>
+                                <div>
+                                  <span className="max-sm:text-[10px] text-xs text-text-muted">Middle name</span>
+                                  <p className="max-sm:text-xs text-sm font-semibold text-slate-800">{inquiriesView.guestMiddleName || '-'}</p>
+                                </div>
+                                <div>
+                                  <span className="max-sm:text-[10px] text-xs text-text-muted">Last name</span>
+                                  <p className="max-sm:text-xs text-sm font-semibold text-slate-800">{inquiriesView.guestLastName || '-'}</p>
+                                </div>
+                                <div>
+                                  <span className="max-sm:text-[10px] text-xs text-text-muted">Suffix</span>
+                                  <p className="max-sm:text-xs text-sm font-semibold text-slate-800">{inquiriesView.guestSuffix || '-'}</p>
+                                </div>
+                              </div>
+                              <Button variant="outline" size="sm" onClick={() => startEditing('guest')} className="shrink-0 bg-white hover:bg-slate-50 text-xs text-slate-700 font-medium px-3 py-1.5 border border-slate-200 rounded-lg h-auto">
+                                <Pencil className="size-3.5 mr-1" />
+                                Edit
+                              </Button>
+                            </div>
+                            {inquiriesView.stagedInquiryNote && (
+                              <div>
+                                <span className="max-sm:text-[10px] text-xs text-text-muted">Patient note</span>
+                                <p className="max-sm:text-xs text-sm text-slate-700">&ldquo;{inquiriesView.stagedInquiryNote}&rdquo;</p>
+                              </div>
+                            )}
+                          </>
+                        ) : (
+                          <>
+                            <div className="flex items-center justify-end gap-2">
+                              <Button variant="ghost" size="sm" onClick={cancelEditing} className="text-sm text-slate-500 hover:text-slate-700 h-auto px-3 py-1.5">
+                                <X className="size-4 mr-1" />
+                                Cancel
+                              </Button>
+                              <Button size="sm" onClick={() => setEditingSection(null)} className="text-sm text-white bg-slate-900 hover:bg-slate-800 rounded-lg h-auto px-4 py-1.5 shadow-sm">
+                                <Check className="size-4 mr-1" />
+                                Save Changes
+                              </Button>
+                            </div>
+                            <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+                              <div className="flex flex-col gap-1.5">
+                                <span className="max-sm:text-[10px] text-xs text-text-muted">First name</span>
+                                <Input value={inquiriesView.guestFirstName} onChange={(e) => inquiriesView.setGuestFirstName(e.target.value)} className="max-sm:text-xs text-sm" />
+                              </div>
+                              <div className="flex flex-col gap-1.5">
+                                <span className="max-sm:text-[10px] text-xs text-text-muted">Middle name</span>
+                                <Input value={inquiriesView.guestMiddleName} onChange={(e) => inquiriesView.setGuestMiddleName(e.target.value)} className="max-sm:text-xs text-sm" />
+                              </div>
+                              <div className="flex flex-col gap-1.5">
+                                <span className="max-sm:text-[10px] text-xs text-text-muted">Last name</span>
+                                <Input value={inquiriesView.guestLastName} onChange={(e) => inquiriesView.setGuestLastName(e.target.value)} className="max-sm:text-xs text-sm" />
+                              </div>
+                              <div className="flex flex-col gap-1.5">
+                                <span className="max-sm:text-[10px] text-xs text-text-muted">Suffix</span>
+                                <Input value={inquiriesView.guestSuffix} onChange={(e) => inquiriesView.setGuestSuffix(e.target.value)} className="max-sm:text-xs text-sm" />
+                              </div>
+                            </div>
+                            <div className="flex flex-col gap-1.5">
+                              <span className="max-sm:text-[10px] text-xs text-text-muted">Patient note</span>
+                              <textarea
+                                value={inquiriesView.stagedInquiryNote}
+                                onChange={(e) => inquiriesView.setStagedInquiryNote(e.target.value)}
+                                rows={2}
+                                className="w-full max-sm:text-xs text-sm text-slate-800 bg-white border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500 transition resize-none"
+                                placeholder="Add a note..."
+                              />
+                            </div>
+                          </>
+                        )}
                       </AccordionContent>
                     </AccordionItem>
                   </Accordion>
@@ -195,27 +270,53 @@ export function SecretaryPendingRequestsViewV2() {
                   <CardTitle className="max-sm:text-sm">Contact Information</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
-                  <Accordion type="multiple">
-                    <AccordionItem value="email">
-                      <AccordionTrigger>
-                        <div className="flex flex-col items-start gap-0.5">
-                          <span className="max-sm:text-xs text-xs text-text-muted">Email address</span>
-                          <span className="max-sm:text-xs text-sm font-semibold text-slate-800 truncate">{inquiriesView.guestEmail || '-'}</span>
-                        </div>
+                  <Accordion type="single" collapsible>
+                    <AccordionItem value="contact" className="border-0">
+                      <AccordionTrigger className="px-4 py-2 hover:bg-transparent text-sm text-slate-800 font-semibold [&>svg]:text-muted-foreground">
+                        {inquiriesView.guestEmail || 'No email'}
                       </AccordionTrigger>
-                      <AccordionContent>
-                        <Input type="email" value={inquiriesView.guestEmail} onChange={(e) => inquiriesView.setGuestEmail(e.target.value)} className="max-sm:text-xs text-sm" />
-                      </AccordionContent>
-                    </AccordionItem>
-                    <AccordionItem value="phone">
-                      <AccordionTrigger>
-                        <div className="flex flex-col items-start gap-0.5">
-                          <span className="max-sm:text-xs text-xs text-text-muted">Phone</span>
-                          <span className="max-sm:text-xs text-sm font-semibold text-slate-800">{inquiriesView.guestPhone || '-'}</span>
-                        </div>
-                      </AccordionTrigger>
-                      <AccordionContent>
-                        <Input value={inquiriesView.guestPhone} onChange={(e) => inquiriesView.setGuestPhone(e.target.value)} className="max-sm:text-xs text-sm" />
+                      <AccordionContent className="px-4 pb-4 space-y-3">
+                        {editingSection !== 'contact' ? (
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="grid grid-cols-2 gap-x-4 gap-y-2 flex-1">
+                              <div>
+                                <span className="max-sm:text-[10px] text-xs text-text-muted">Email address</span>
+                                <p className="max-sm:text-xs text-sm font-semibold text-slate-800 truncate">{inquiriesView.guestEmail || '-'}</p>
+                              </div>
+                              <div>
+                                <span className="max-sm:text-[10px] text-xs text-text-muted">Phone</span>
+                                <p className="max-sm:text-xs text-sm font-semibold text-slate-800">{inquiriesView.guestPhone || '-'}</p>
+                              </div>
+                            </div>
+                            <Button variant="outline" size="sm" onClick={() => startEditing('contact')} className="shrink-0 bg-white hover:bg-slate-50 text-xs text-slate-700 font-medium px-3 py-1.5 border border-slate-200 rounded-lg h-auto">
+                              <Pencil className="size-3.5 mr-1" />
+                              Edit
+                            </Button>
+                          </div>
+                        ) : (
+                          <>
+                            <div className="flex items-center justify-end gap-2">
+                              <Button variant="ghost" size="sm" onClick={cancelEditing} className="text-sm text-slate-500 hover:text-slate-700 h-auto px-3 py-1.5">
+                                <X className="size-4 mr-1" />
+                                Cancel
+                              </Button>
+                              <Button size="sm" onClick={() => setEditingSection(null)} className="text-sm text-white bg-slate-900 hover:bg-slate-800 rounded-lg h-auto px-4 py-1.5 shadow-sm">
+                                <Check className="size-4 mr-1" />
+                                Save Changes
+                              </Button>
+                            </div>
+                            <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+                              <div className="flex flex-col gap-1.5">
+                                <span className="max-sm:text-[10px] text-xs text-text-muted">Email address</span>
+                                <Input type="email" value={inquiriesView.guestEmail} onChange={(e) => inquiriesView.setGuestEmail(e.target.value)} className="max-sm:text-xs text-sm" />
+                              </div>
+                              <div className="flex flex-col gap-1.5">
+                                <span className="max-sm:text-[10px] text-xs text-text-muted">Phone</span>
+                                <Input value={inquiriesView.guestPhone} onChange={(e) => inquiriesView.setGuestPhone(e.target.value)} className="max-sm:text-xs text-sm" />
+                              </div>
+                            </div>
+                          </>
+                        )}
                       </AccordionContent>
                     </AccordionItem>
                   </Accordion>
@@ -227,93 +328,109 @@ export function SecretaryPendingRequestsViewV2() {
                   <CardTitle className="max-sm:text-sm">Appointment Details</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
-                  <Accordion type="multiple">
-                    <AccordionItem value="service">
-                      <AccordionTrigger>
-                        <div className="flex flex-col items-start gap-0.5">
-                          <span className="max-sm:text-xs text-xs text-text-muted">Treatment / Service <span className="text-destructive">*</span></span>
-                          <span className="max-sm:text-xs text-sm font-semibold text-slate-800">{getServiceName(inquiriesView.services, inquiriesView.stagedInquiryService)}</span>
-                        </div>
+                  <Accordion type="single" collapsible>
+                    <AccordionItem value="appointment" className="border-0">
+                      <AccordionTrigger className="px-4 py-2 hover:bg-transparent text-sm text-slate-800 font-semibold [&>svg]:text-muted-foreground">
+                        {getServiceName(inquiriesView.services, inquiriesView.stagedInquiryService)}
+                        {inquiriesView.stagedInquiryDate && <span className="text-text-muted font-normal ml-1">&bull; {new Date(inquiriesView.stagedInquiryDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>}
                       </AccordionTrigger>
-                      <AccordionContent>
-                        {inquiriesView.selectedInquiry?.preferredServiceName && (
-                          <p className="max-sm:text-[10px] text-xs text-text-muted mb-2">Preference: {inquiriesView.selectedInquiry.preferredServiceName}</p>
+                      <AccordionContent className="px-4 pb-4 space-y-3">
+                        {editingSection !== 'appointment' ? (
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="space-y-2 flex-1">
+                              <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+                                <div>
+                                  <span className="max-sm:text-[10px] text-xs text-text-muted">Treatment / Service <span className="text-destructive">*</span></span>
+                                  <p className="max-sm:text-xs text-sm font-semibold text-slate-800">{getServiceName(inquiriesView.services, inquiriesView.stagedInquiryService)}</p>
+                                </div>
+                                <div>
+                                  <span className="max-sm:text-[10px] text-xs text-text-muted">Assigned dentist <span className="text-destructive">*</span></span>
+                                  <p className="max-sm:text-xs text-sm font-semibold text-slate-800">{inquiriesView.stagedInquiryDoctor ? inquiriesView.availableDoctors.find((d) => d.doctorId === inquiriesView.stagedInquiryDoctor)?.doctorName || 'Unknown' : '-'}</p>
+                                </div>
+                                <div>
+                                  <span className="max-sm:text-[10px] text-xs text-text-muted">Date <span className="text-destructive">*</span></span>
+                                  <p className="max-sm:text-xs text-sm font-semibold text-slate-800">{inquiriesView.stagedInquiryDate ? new Date(inquiriesView.stagedInquiryDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '-'}</p>
+                                </div>
+                                <div>
+                                  <span className="max-sm:text-[10px] text-xs text-text-muted">Time <span className="text-destructive">*</span></span>
+                                  <p className="max-sm:text-xs text-sm font-semibold text-slate-800">{formatTo12h(inquiriesView.stagedInquiryTime)}{inquiriesView.stagedInquiryEndTime ? ` - ${formatTo12h(inquiriesView.stagedInquiryEndTime)}` : ''}</p>
+                                </div>
+                              </div>
+                            </div>
+                            <Button variant="outline" size="sm" onClick={() => startEditing('appointment')} className="shrink-0 bg-white hover:bg-slate-50 text-xs text-slate-700 font-medium px-3 py-1.5 border border-slate-200 rounded-lg h-auto">
+                              <Pencil className="size-3.5 mr-1" />
+                              Edit Details
+                            </Button>
+                          </div>
+                        ) : (
+                          <>
+                            <div className="flex items-center justify-end gap-2">
+                              <Button variant="ghost" size="sm" onClick={cancelEditing} className="text-sm text-slate-500 hover:text-slate-700 h-auto px-3 py-1.5">
+                                <X className="size-4 mr-1" />
+                                Cancel
+                              </Button>
+                              <Button size="sm" onClick={() => setEditingSection(null)} className="text-sm text-white bg-slate-900 hover:bg-slate-800 rounded-lg h-auto px-4 py-1.5 shadow-sm">
+                                <Check className="size-4 mr-1" />
+                                Save Changes
+                              </Button>
+                            </div>
+                            <div className="flex flex-col gap-3">
+                              <div className="flex flex-col gap-1.5">
+                                <span className="max-sm:text-[10px] text-xs text-text-muted">Procedure / Service <span className="text-destructive">*</span></span>
+                                {inquiriesView.selectedInquiry?.preferredServiceName && (
+                                  <p className="max-sm:text-[10px] text-xs text-text-muted">Preference: {inquiriesView.selectedInquiry.preferredServiceName}</p>
+                                )}
+                                <Select
+                                  value={inquiriesView.stagedInquiryService}
+                                  onChange={(e) => inquiriesView.selectService(e.target.value)}
+                                  options={[
+                                    { value: '', label: 'Select service...' },
+                                    ...inquiriesView.services.map((s) => ({ value: s.id, label: s.name }))
+                                  ]}
+                                />
+                              </div>
+                              <div className="flex flex-col gap-1.5">
+                                <span className="max-sm:text-[10px] text-xs text-text-muted">Assigned doctor <span className="text-destructive">*</span></span>
+                                <Select
+                                  value={inquiriesView.stagedInquiryDoctor}
+                                  onChange={(e) => inquiriesView.selectDoctor(e.target.value)}
+                                  options={[
+                                    { value: '', label: 'Select doctor...' },
+                                    ...inquiriesView.availableDoctors.map((d) => ({ value: d.doctorId, label: d.doctorName }))
+                                  ]}
+                                />
+                              </div>
+                              <div className="flex flex-col gap-1.5">
+                                <span className="max-sm:text-[10px] text-xs text-text-muted">Appointment date <span className="text-destructive">*</span></span>
+                                {inquiriesView.selectedInquiry?.preferredDate && (
+                                  <p className="max-sm:text-[10px] text-xs text-text-muted">Preference: {new Date(inquiriesView.selectedInquiry.preferredDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+                                )}
+                                <DatePicker value={inquiriesView.stagedInquiryDate} onChange={(v) => inquiriesView.selectDate(v)} />
+                              </div>
+                              <div className="flex flex-col gap-1.5">
+                                <span className="max-sm:text-[10px] text-xs text-text-muted">Time / Window <span className="text-destructive">*</span></span>
+                                {inquiriesView.selectedInquiry?.preferredStartTime && (
+                                  <p className="max-sm:text-[10px] text-xs text-text-muted">Preference: {formatTo12h(inquiriesView.selectedInquiry.preferredStartTime)}</p>
+                                )}
+                                <div className="flex gap-2 items-center">
+                                  <input
+                                    type="time"
+                                    value={normalizeTo24h(inquiriesView.stagedInquiryTime)}
+                                    onChange={(e) => inquiriesView.setStagedInquiryTime(e.target.value)}
+                                    className="flex-1 px-4 py-2.5 rounded-xl border bg-card max-sm:text-xs text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-ring transition-all border-card-border focus:border-primary-start/50"
+                                  />
+                                  <span className="text-text-muted">to</span>
+                                  <input
+                                    type="time"
+                                    value={inquiriesView.stagedInquiryEndTime}
+                                    onChange={(e) => inquiriesView.setStagedInquiryEndTime(e.target.value)}
+                                    className="flex-1 px-4 py-2.5 rounded-xl border bg-card max-sm:text-xs text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-ring transition-all border-card-border focus:border-primary-start/50"
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          </>
                         )}
-                        <Select
-                          value={inquiriesView.stagedInquiryService}
-                          onChange={(e) => inquiriesView.selectService(e.target.value)}
-                          options={[
-                            { value: '', label: 'Select service...' },
-                            ...inquiriesView.services.map((s) => ({ value: s.id, label: s.name }))
-                          ]}
-                        />
-                      </AccordionContent>
-                    </AccordionItem>
-                    <AccordionItem value="date">
-                      <AccordionTrigger>
-                        <div className="flex flex-col items-start gap-0.5">
-                          <span className="max-sm:text-xs text-xs text-text-muted">Date <span className="text-destructive">*</span></span>
-                          <span className="max-sm:text-xs text-sm font-semibold text-slate-800">{inquiriesView.stagedInquiryDate ? new Date(inquiriesView.stagedInquiryDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '-'}</span>
-                        </div>
-                      </AccordionTrigger>
-                      <AccordionContent>
-                        {inquiriesView.selectedInquiry?.preferredDate && (
-                          <p className="max-sm:text-[10px] text-xs text-text-muted mb-2">Preference: {new Date(inquiriesView.selectedInquiry.preferredDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
-                        )}
-                        <DatePicker value={inquiriesView.stagedInquiryDate} onChange={(v) => inquiriesView.selectDate(v)} />
-                      </AccordionContent>
-                    </AccordionItem>
-                    <AccordionItem value="dentist">
-                      <AccordionTrigger>
-                        <div className="flex flex-col items-start gap-0.5">
-                          <span className="max-sm:text-xs text-xs text-text-muted">Assign dentist <span className="text-destructive">*</span></span>
-                          <span className="max-sm:text-xs text-sm font-semibold text-slate-800">{inquiriesView.stagedInquiryDoctor ? inquiriesView.availableDoctors.find((d) => d.doctorId === inquiriesView.stagedInquiryDoctor)?.doctorName || 'Unknown' : '-'}</span>
-                        </div>
-                      </AccordionTrigger>
-                      <AccordionContent>
-                        <Select
-                          value={inquiriesView.stagedInquiryDoctor}
-                          onChange={(e) => inquiriesView.selectDoctor(e.target.value)}
-                          options={[
-                            { value: '', label: 'Select doctor...' },
-                            ...inquiriesView.availableDoctors.map((d) => ({ value: d.doctorId, label: d.doctorName }))
-                          ]}
-                        />
-                      </AccordionContent>
-                    </AccordionItem>
-                    <AccordionItem value="start-time">
-                      <AccordionTrigger>
-                        <div className="flex flex-col items-start gap-0.5">
-                          <span className="max-sm:text-xs text-xs text-text-muted">Start time <span className="text-destructive">*</span></span>
-                          <span className="max-sm:text-xs text-sm font-semibold text-slate-800">{formatTo12h(inquiriesView.stagedInquiryTime)}</span>
-                        </div>
-                      </AccordionTrigger>
-                      <AccordionContent>
-                        {inquiriesView.selectedInquiry?.preferredStartTime && (
-                          <p className="max-sm:text-[10px] text-xs text-text-muted mb-2">Preference: {formatTo12h(inquiriesView.selectedInquiry.preferredStartTime)}</p>
-                        )}
-                        <input
-                          type="time"
-                          value={normalizeTo24h(inquiriesView.stagedInquiryTime)}
-                          onChange={(e) => inquiriesView.setStagedInquiryTime(e.target.value)}
-                          className="w-full px-4 py-2.5 rounded-xl border bg-card max-sm:text-xs text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-ring transition-all border-card-border focus:border-primary-start/50"
-                        />
-                      </AccordionContent>
-                    </AccordionItem>
-                    <AccordionItem value="end-time">
-                      <AccordionTrigger>
-                        <div className="flex flex-col items-start gap-0.5">
-                          <span className="max-sm:text-xs text-xs text-text-muted">End time <span className="text-destructive">*</span></span>
-                          <span className="max-sm:text-xs text-sm font-semibold text-slate-800">{formatTo12h(inquiriesView.stagedInquiryEndTime)}</span>
-                        </div>
-                      </AccordionTrigger>
-                      <AccordionContent>
-                        <input
-                          type="time"
-                          value={inquiriesView.stagedInquiryEndTime}
-                          onChange={(e) => inquiriesView.setStagedInquiryEndTime(e.target.value)}
-                          className="w-full px-4 py-2.5 rounded-xl border bg-card max-sm:text-xs text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-ring transition-all border-card-border focus:border-primary-start/50"
-                        />
                       </AccordionContent>
                     </AccordionItem>
                   </Accordion>
