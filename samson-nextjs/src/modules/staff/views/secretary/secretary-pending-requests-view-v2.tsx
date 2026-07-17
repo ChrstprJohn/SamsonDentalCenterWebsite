@@ -165,17 +165,17 @@ export function SecretaryPendingRequestsViewV2() {
                     Guest Information
                   </span>
                   {!isEditingPatient ? (
-                    <Button variant="outline" size="sm" onClick={startEditPatient} className="h-auto px-4 py-2 text-sm gap-1.5">
+                    <Button variant="outline" size="sm" onClick={startEditPatient} className="h-auto px-4 py-2 text-sm gap-1.5 max-sm:px-3 max-sm:py-1.5 max-sm:text-xs">
                       <Pencil className="size-4" />
                       Edit
                     </Button>
                   ) : (
                     <div className="flex items-center gap-2">
-                      <Button variant="outline" size="sm" onClick={cancelEditPatient} className="h-auto px-4 py-2 text-sm gap-1.5">
+                      <Button variant="outline" size="sm" onClick={cancelEditPatient} className="h-auto px-4 py-2 text-sm gap-1.5 max-sm:px-3 max-sm:py-1.5 max-sm:text-xs">
                         <X className="size-4" />
                         Cancel
                       </Button>
-                      <Button size="sm" onClick={saveEditPatient} className="h-auto px-4 py-2 text-sm gap-1.5 bg-slate-900 text-white rounded-md">
+                      <Button size="sm" onClick={saveEditPatient} className="h-auto px-4 py-2 text-sm gap-1.5 max-sm:px-3 max-sm:py-1.5 max-sm:text-xs bg-slate-900 text-white rounded-md">
                         <Check className="size-4" />
                         Save
                       </Button>
@@ -281,17 +281,17 @@ export function SecretaryPendingRequestsViewV2() {
                   </span>
                   {isEditingSchedule ? (
                     <div className="flex items-center gap-2">
-                      <Button variant="outline" size="sm" onClick={cancelEditSchedule} className="h-auto px-4 py-2 text-sm gap-1.5">
+                      <Button variant="outline" size="sm" onClick={cancelEditSchedule} className="h-auto px-4 py-2 text-sm gap-1.5 max-sm:px-3 max-sm:py-1.5 max-sm:text-xs">
                         <X className="size-4" />
                         Cancel
                       </Button>
-                      <Button size="sm" onClick={saveEditSchedule} className="h-auto px-4 py-2 text-sm gap-1.5 bg-slate-900 text-white rounded-md">
+                      <Button size="sm" onClick={saveEditSchedule} className="h-auto px-4 py-2 text-sm gap-1.5 max-sm:px-3 max-sm:py-1.5 max-sm:text-xs bg-slate-900 text-white rounded-md">
                         <Check className="size-4" />
                         Save
                       </Button>
                     </div>
                   ) : (
-                    <Button variant="outline" size="sm" onClick={startEditSchedule} className="h-auto px-4 py-2 text-sm gap-1.5">
+                    <Button variant="outline" size="sm" onClick={startEditSchedule} className="h-auto px-4 py-2 text-sm gap-1.5 max-sm:px-3 max-sm:py-1.5 max-sm:text-xs">
                       <Pencil className="size-4" />
                       Edit
                     </Button>
@@ -406,7 +406,7 @@ export function SecretaryPendingRequestsViewV2() {
                           variant="default"
                           size="default"
                           disabled={isEditing || !isReady}
-                          className="flex-1 py-3 text-sm font-semibold shadow-sm"
+                          className="flex-1 py-3 text-sm font-semibold shadow-sm !from-slate-900 !to-slate-900 !text-white hover:!from-slate-800 hover:!to-slate-800 disabled:!from-slate-400 disabled:!to-slate-400"
                           onClick={() => { inquiriesView.setDecision('CONVERT'); setApprovalReason(''); }}
                         >
                           Approve/Convert
