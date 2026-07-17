@@ -18,8 +18,8 @@ export const updateInquirySchema = z.object({
   serviceId: cleanOptionalString,
   date: cleanOptionalString,
   startTime: cleanOptionalString,
-  assignedDoctorId: cleanOptionalString,
-  assignedEndTime: cleanOptionalString,
+  assignedDoctorId: z.string().nullable().optional(),
+  assignedEndTime: z.string().nullable().optional(),
 });
 
 export type UpdateInquiryDto = z.infer<typeof updateInquirySchema>;

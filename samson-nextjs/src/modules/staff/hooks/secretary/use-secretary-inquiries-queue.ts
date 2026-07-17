@@ -153,7 +153,7 @@ export function useSecretaryInquiriesQueue() {
     setStagedInquiryService(inquiry.preferredServiceId);
     setStagedInquiryDate(inquiry.preferredDate || '');
     setStagedInquiryDoctor(inquiry.assignedDoctorId || '');
-    setStagedInquiryTime(inquiry.preferredStartTime || '');
+    setStagedInquiryTime(inquiry.preferredStartTime?.includes(':') ? inquiry.preferredStartTime : '');
     setStagedInquiryEndTime(inquiry.assignedEndTime || '');
     setStagedInquiryNote(inquiry.patientNote || '');
     setStagedSecretaryNotes('');
@@ -249,8 +249,8 @@ export function useSecretaryInquiriesQueue() {
         payload.serviceId = stagedInquiryService;
         payload.date = stagedInquiryDate;
         payload.startTime = stagedInquiryTime;
-        payload.assignedDoctorId = stagedInquiryDoctor;
-        payload.assignedEndTime = stagedInquiryEndTime;
+        payload.assignedDoctorId = stagedInquiryDoctor || null;
+        payload.assignedEndTime = stagedInquiryEndTime || null;
       }
       const res = await updateInquiryAction(payload as any);
       if (res.success) {

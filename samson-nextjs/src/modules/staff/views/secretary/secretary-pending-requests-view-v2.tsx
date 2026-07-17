@@ -51,6 +51,7 @@ export function SecretaryPendingRequestsViewV2() {
   const colMobile = (view: 'list' | 'detail' | 'quickLogs') =>
     mobileView === view ? 'flex' : 'hidden';
 
+  const isEditing = isEditingSchedule || isEditingPatient;
   const isReady = !!inquiriesView.selectedInquiry?.assignedDoctorId && !!inquiriesView.selectedInquiry?.assignedEndTime;
   const hasSelection = !!inquiriesView.selectedInquiry;
 
@@ -132,7 +133,7 @@ export function SecretaryPendingRequestsViewV2() {
             </button>
           </div>
         </div>
-        <div className="flex-1 !overflow-y-auto max-sm:px-3 px-5 space-y-0 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
+        <div className="flex-1 !overflow-y-auto max-md:px-5 px-5 space-y-0 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
           style={{ scrollbarWidth: 'thin' }}
           data-lenis-prevent
         >
@@ -164,18 +165,18 @@ export function SecretaryPendingRequestsViewV2() {
                     Guest Information
                   </span>
                   {!isEditingPatient ? (
-                    <Button variant="outline" size="sm" onClick={startEditPatient} className="h-auto px-3 py-1.5 text-xs gap-1.5">
-                      <Pencil className="size-3.5" />
+                    <Button variant="outline" size="sm" onClick={startEditPatient} className="h-auto px-4 py-2 text-sm gap-1.5">
+                      <Pencil className="size-4" />
                       Edit
                     </Button>
                   ) : (
                     <div className="flex items-center gap-2">
-                      <Button variant="outline" size="sm" onClick={cancelEditPatient} className="h-auto px-3 py-1.5 text-xs gap-1.5">
-                        <X className="size-3.5" />
+                      <Button variant="outline" size="sm" onClick={cancelEditPatient} className="h-auto px-4 py-2 text-sm gap-1.5">
+                        <X className="size-4" />
                         Cancel
                       </Button>
-                      <Button size="sm" onClick={saveEditPatient} className="h-auto px-3 py-1.5 text-xs gap-1.5 bg-slate-900 text-white rounded-md">
-                        <Check className="size-3.5" />
+                      <Button size="sm" onClick={saveEditPatient} className="h-auto px-4 py-2 text-sm gap-1.5 bg-slate-900 text-white rounded-md">
+                        <Check className="size-4" />
                         Save
                       </Button>
                     </div>
@@ -184,7 +185,7 @@ export function SecretaryPendingRequestsViewV2() {
 
                 {!isEditingPatient ? (
                   <div className="flex flex-col gap-3">
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="flex flex-col gap-0.5">
                         <span className="text-xs text-muted-foreground">First Name</span>
                         <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{inquiriesView.guestFirstName || '-'}</div>
@@ -194,7 +195,7 @@ export function SecretaryPendingRequestsViewV2() {
                         <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{inquiriesView.guestLastName || '-'}</div>
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="flex flex-col gap-0.5">
                         <span className="text-xs text-muted-foreground">Middle Name</span>
                         <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{inquiriesView.guestMiddleName || '-'}</div>
@@ -207,7 +208,7 @@ export function SecretaryPendingRequestsViewV2() {
                   </div>
                 ) : (
                   <div className="flex flex-col gap-3">
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="flex flex-col gap-0.5">
                         <span className="text-xs text-muted-foreground">First Name</span>
                         <input value={inquiriesView.guestFirstName} onChange={(e) => inquiriesView.setGuestFirstName(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border" />
@@ -217,7 +218,7 @@ export function SecretaryPendingRequestsViewV2() {
                         <input value={inquiriesView.guestLastName} onChange={(e) => inquiriesView.setGuestLastName(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border" />
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="flex flex-col gap-0.5">
                         <span className="text-xs text-muted-foreground">Middle Name</span>
                         <input value={inquiriesView.guestMiddleName} onChange={(e) => inquiriesView.setGuestMiddleName(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border" />
@@ -236,7 +237,7 @@ export function SecretaryPendingRequestsViewV2() {
                 <span className="text-base font-medium text-foreground block mb-3">Guest Contact</span>
 
                 {!isEditingPatient ? (
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                   <div className="flex flex-col gap-0.5">
                     <span className="text-xs text-muted-foreground">Email</span>
                     <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{inquiriesView.guestEmail || '-'}</div>
@@ -246,14 +247,14 @@ export function SecretaryPendingRequestsViewV2() {
                     <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{inquiriesView.guestPhone || '-'}</div>
                   </div>
                   {inquiriesView.stagedInquiryNote && (
-                    <div className="flex flex-col gap-0.5">
+                    <div className="col-span-full flex flex-col gap-0.5">
                       <span className="text-xs text-muted-foreground">Note</span>
                       <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default italic">&ldquo;{inquiriesView.stagedInquiryNote}&rdquo;</div>
                     </div>
                   )}
                 </div>
                 ) : (
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                   <div className="flex flex-col gap-0.5">
                     <span className="text-xs text-muted-foreground">Email</span>
                     <input type="email" value={inquiriesView.guestEmail} onChange={(e) => inquiriesView.setGuestEmail(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border" />
@@ -262,7 +263,7 @@ export function SecretaryPendingRequestsViewV2() {
                     <span className="text-xs text-muted-foreground">Phone</span>
                     <input value={inquiriesView.guestPhone} onChange={(e) => inquiriesView.setGuestPhone(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border" />
                   </div>
-                  <div className="flex flex-col gap-0.5">
+                  <div className="col-span-full flex flex-col gap-0.5">
                     <span className="text-xs text-muted-foreground">Note</span>
                     <textarea value={inquiriesView.stagedInquiryNote || ''} onChange={(e) => inquiriesView.setStagedInquiryNote(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border resize-none" rows={2} />
                   </div>
@@ -280,18 +281,18 @@ export function SecretaryPendingRequestsViewV2() {
                   </span>
                   {isEditingSchedule ? (
                     <div className="flex items-center gap-2">
-                      <Button variant="outline" size="sm" onClick={cancelEditSchedule} className="h-auto px-3 py-1.5 text-xs gap-1.5">
-                        <X className="size-3.5" />
+                      <Button variant="outline" size="sm" onClick={cancelEditSchedule} className="h-auto px-4 py-2 text-sm gap-1.5">
+                        <X className="size-4" />
                         Cancel
                       </Button>
-                      <Button size="sm" onClick={saveEditSchedule} className="h-auto px-3 py-1.5 text-xs gap-1.5 bg-slate-900 text-white rounded-md">
-                        <Check className="size-3.5" />
+                      <Button size="sm" onClick={saveEditSchedule} className="h-auto px-4 py-2 text-sm gap-1.5 bg-slate-900 text-white rounded-md">
+                        <Check className="size-4" />
                         Save
                       </Button>
                     </div>
                   ) : (
-                    <Button variant="outline" size="sm" onClick={startEditSchedule} className="h-auto px-3 py-1.5 text-xs gap-1.5">
-                      <Pencil className="size-3.5" />
+                    <Button variant="outline" size="sm" onClick={startEditSchedule} className="h-auto px-4 py-2 text-sm gap-1.5">
+                      <Pencil className="size-4" />
                       Edit
                     </Button>
                   )}
@@ -299,7 +300,7 @@ export function SecretaryPendingRequestsViewV2() {
 
                 {isEditingSchedule ? (
                   <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                       <div className="flex flex-col gap-0.5">
                         <span className="text-xs text-muted-foreground">Service <span className="text-destructive">*</span></span>
                         <div className="relative">
@@ -315,25 +316,32 @@ export function SecretaryPendingRequestsViewV2() {
                         <DatePicker value={inquiriesView.stagedInquiryDate} onChange={(v) => inquiriesView.selectDate(v)} />
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="flex flex-col gap-0.5">
                         <div className="flex items-center gap-2">
                           <span className="text-xs text-muted-foreground">Start Time <span className="text-destructive">*</span></span>
-                          <span className="text-xs text-muted-foreground/60">Prefered time {formatTime(inquiriesView.stagedInquiryTime)}</span>
+                          {inquiriesView.stagedInquiryTime.includes(':') && <span className="text-xs text-muted-foreground/60">Prefered time {formatTime(inquiriesView.stagedInquiryTime)}</span>}
                         </div>
                         <input type="time" value={inquiriesView.stagedInquiryTime} onChange={(e) => inquiriesView.setStagedInquiryTime(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border" />
                       </div>
                       <div className="flex flex-col gap-0.5">
-                        <span className="text-xs text-muted-foreground">End Time <span className="text-destructive">*</span></span>
-                        <input type="time" value={inquiriesView.stagedInquiryEndTime} onChange={(e) => inquiriesView.setStagedInquiryEndTime(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border" />
+                        <span className="text-xs text-muted-foreground">End Time</span>
+                        <div className="relative">
+                          <input type="time" value={inquiriesView.stagedInquiryEndTime} onChange={(e) => inquiriesView.setStagedInquiryEndTime(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border" />
+                          {inquiriesView.stagedInquiryEndTime && (
+                            <button type="button" onClick={() => inquiriesView.setStagedInquiryEndTime('')} className="absolute right-10 top-1/2 -translate-y-1/2 size-5 flex items-center justify-center text-muted-foreground hover:text-foreground z-10">
+                              <X className="size-4" />
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="flex flex-col gap-0.5">
-                        <span className="text-xs text-muted-foreground">Assign Dentist <span className="text-destructive">*</span></span>
+                        <span className="text-xs text-muted-foreground">Assign Dentist</span>
                         <div className="relative">
                           <select value={inquiriesView.stagedInquiryDoctor} onChange={(e) => { inquiriesView.selectDoctor(e.target.value); setAssignedDoctorName(e.target.options[e.target.selectedIndex].text); }} className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border appearance-none">
-                            <option value="">Select available doctor...</option>
+                            <option value="">Not assigned</option>
                             {inquiriesView.availableDoctors.map((d) => <option key={d.doctorId} value={d.doctorId}>{d.doctorName}</option>)}
                           </select>
                           <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
@@ -343,7 +351,7 @@ export function SecretaryPendingRequestsViewV2() {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                       <div className="flex flex-col gap-0.5">
                         <span className="text-xs text-muted-foreground">Service <span className="text-destructive">*</span></span>
                         <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{getServiceName(inquiriesView.services, inquiriesView.stagedInquiryService)}</div>
@@ -354,24 +362,24 @@ export function SecretaryPendingRequestsViewV2() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="flex flex-col gap-0.5">
                         <div className="flex items-center gap-2">
                           <span className="text-xs text-muted-foreground">Start Time <span className="text-destructive">*</span></span>
-                          <span className="text-xs text-muted-foreground/60">Prefered time {formatTime(inquiriesView.stagedInquiryTime)}</span>
+                          {inquiriesView.stagedInquiryTime.includes(':') && <span className="text-xs text-muted-foreground/60">Prefered time {formatTime(inquiriesView.stagedInquiryTime)}</span>}
                         </div>
                         <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{formatTime(inquiriesView.stagedInquiryTime)}</div>
                       </div>
                       <div className="flex flex-col gap-0.5">
-                        <span className="text-xs text-muted-foreground">End Time <span className="text-destructive">*</span></span>
+                        <span className="text-xs text-muted-foreground">End Time</span>
                         <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{formatTime(inquiriesView.stagedInquiryEndTime)}</div>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="flex flex-col gap-0.5">
-                        <span className="text-xs text-muted-foreground">Assign Dentist <span className="text-destructive">*</span></span>
-                        <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{assignedDoctorName || inquiriesView.availableDoctors.find(d => d.doctorId === inquiriesView.stagedInquiryDoctor)?.doctorName || inquiriesView.selectedInquiry?.assignedDoctorId || '-'}</div>
+                        <span className="text-xs text-muted-foreground">Assign Dentist</span>
+                        <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{assignedDoctorName || inquiriesView.availableDoctors.find(d => d.doctorId === inquiriesView.stagedInquiryDoctor)?.doctorName || '-'}</div>
                       </div>
                     </div>
                   </div>
@@ -387,14 +395,17 @@ export function SecretaryPendingRequestsViewV2() {
                 <div className="border-t border-card-border/40 px-5 py-4 shrink-0">
                   {!inquiriesView.stagedInquiryAction ? (
                     <div className="flex flex-col gap-3">
-                      {!isReady && (
+                      {isEditing && (
+                        <p className="text-xs text-muted-foreground">Press Save to apply changes before approving or rejecting</p>
+                      )}
+                      {!isEditing && !isReady && (
                         <p className="text-xs text-muted-foreground">Fill the required fields to enable approval</p>
                       )}
                       <div className="flex gap-3">
                         <Button
                           variant="default"
                           size="default"
-                          disabled={!isReady}
+                          disabled={isEditing || !isReady}
                           className="flex-1 py-3 text-sm font-semibold shadow-sm"
                           onClick={() => { inquiriesView.setDecision('CONVERT'); setApprovalReason(''); }}
                         >
@@ -403,6 +414,7 @@ export function SecretaryPendingRequestsViewV2() {
                         <Button
                           variant="outline"
                           size="default"
+                          disabled={isEditing}
                           className="shrink-0 border-red-200 text-red-700 hover:bg-red-50 h-auto px-5 py-3 text-sm"
                           onClick={() => { inquiriesView.setDecision('DROP'); setApprovalReason(''); }}
                         >
