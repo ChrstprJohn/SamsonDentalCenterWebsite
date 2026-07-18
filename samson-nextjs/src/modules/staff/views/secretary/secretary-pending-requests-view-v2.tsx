@@ -22,6 +22,11 @@ function getServiceName(services: { id: string; name: string }[], serviceId: str
   return services.find((s) => s.id === serviceId)?.name || 'Unknown service';
 }
 
+function formatPatientName(firstName?: string | null, middleName?: string | null, lastName?: string | null, suffix?: string | null): string {
+  const initial = middleName ? ` ${middleName.charAt(0).toUpperCase()}.` : '';
+  return `${firstName || ''}${initial} ${lastName || ''}`.trim() + (suffix ? `, ${suffix}` : '');
+}
+
 function formatTime(time: string): string {
   if (!time) return '-';
   const [h, m] = time.split(':');
@@ -145,8 +150,8 @@ export function SecretaryPendingRequestsViewV2() {
                 </div>
                 <h2 className="text-lg font-semibold text-foreground">
                   {isEditingPatient
-                    ? [patientSnapshot.firstName, patientSnapshot.middleName, patientSnapshot.lastName].filter(Boolean).join(' ') + (patientSnapshot.suffix ? `, ${patientSnapshot.suffix}` : '')
-                    : [inquiriesView.guestFirstName, inquiriesView.guestMiddleName, inquiriesView.guestLastName].filter(Boolean).join(' ') + (inquiriesView.guestSuffix ? `, ${inquiriesView.guestSuffix}` : '')
+                    ? formatPatientName(patientSnapshot.firstName, patientSnapshot.middleName, patientSnapshot.lastName, patientSnapshot.suffix)
+                    : formatPatientName(inquiriesView.guestFirstName, inquiriesView.guestMiddleName, inquiriesView.guestLastName, inquiriesView.guestSuffix)
                   }
                 </h2>
                 <p className="text-sm text-muted-foreground mt-0.5">Guest</p>
@@ -499,7 +504,7 @@ export function SecretaryPendingRequestsViewV2() {
                 </div>
               )}
         </div>
-        <div className={`lg:w-[320px] flex-1 lg:flex-none flex-col h-full overflow-hidden ${colMobile('quickLogs')} hidden xl:flex`}>
+        <div className={`lg:w-[320px] flex-1 lg:flex-none flex-col h-full overflow-hidden ${colMobile('quickLogs')} xl:flex`}>
           <CoordinationHub inquiryId={inquiriesView.selectedInquiryId} hideActions={inquiriesView.selectedInquiry?.status !== 'NEW'} onBack={() => setMobileView('detail')} />
         </div>
       </>

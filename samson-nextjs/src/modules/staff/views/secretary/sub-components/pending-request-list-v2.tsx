@@ -163,7 +163,8 @@ export function PendingRequestListV2(props: PendingRequestListV2Props) {
             ) : (
               filteredInquiries.map((inq) => {
                 const isSelected = props.selectedInquiryId === inq.id;
-                const name = `${inq.firstName || ''} ${inq.middleName ? inq.middleName + ' ' : ''}${inq.lastName || ''} ${inq.suffix || ''}`.trim() || 'Guest';
+                const initial = inq.middleName ? ` ${inq.middleName.charAt(0).toUpperCase()}.` : '';
+                const name = `${inq.firstName || ''}${initial} ${inq.lastName || ''}`.trim() + (inq.suffix ? `, ${inq.suffix}` : '') || 'Guest';
                 const status = inq.status as InquiryTab || 'NEW';
 
                 const timeDisplay = inq.preferredStartTime

@@ -21,6 +21,7 @@ import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import SkeletonLib, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
+import { InquiryToast } from './sub-components/inquiry-toast';
 import { Search, Mail, Archive, MessageSquare, Calendar, XCircle, CheckCircle, AlertCircle, ArrowLeft, UserRound, Pencil, Check, X } from 'lucide-react';
 import {
     Sidebar,
@@ -86,65 +87,80 @@ function ChatMessagesSkeleton() {
 }
 
 function DetailSkeleton() {
-    // Each skeleton row/height mirrors the real content exactly to prevent layout shift.
-    // Real section label: text-xs font-semibold → ~16px tall
-    // Real card rows: text-xs in flex items-center → ~20px per row with space-y-2
-    // Real card wrapper: border rounded-xl p-3 space-y-2
-    const SectionLabel = ({ width }: { width: string }) => (
-        <Skeleton className={`h-4 ${width} rounded-md !bg-slate-200`} />
-    );
-    const Row = ({ labelWidth, valueWidth }: { labelWidth: string; valueWidth: string }) => (
-        <div className="flex justify-between items-center">
-            <Skeleton className={`h-4 ${labelWidth} rounded-sm !bg-slate-200`} />
-            <Skeleton className={`h-4 ${valueWidth} rounded-sm !bg-slate-200`} />
+    const FieldRow = () => (
+        <div className="flex flex-col gap-0.5">
+            <Skeleton className="h-3 w-16 rounded !bg-slate-200" />
+            <Skeleton className="w-full h-[42px] rounded-xl !bg-slate-200" />
         </div>
     );
     return (
         <>
             <div
-                className="flex-1 !overflow-y-auto p-5 flex flex-col gap-6 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
+                className="flex-1 !overflow-y-auto px-5 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
                 style={{ scrollbarWidth: 'thin' }}
                 data-lenis-prevent
             >
-                <div className="space-y-6">
-                    <div className="flex flex-col gap-5 text-xs">
-                        {/* Patient Info */}
-                        <div className="space-y-2">
-                            <SectionLabel width="w-20" />
-                            <div className="border border-card-border/60 bg-muted/10 rounded-xl p-3 space-y-2">
-                                <Row labelWidth="w-10" valueWidth="w-20" />
-                                <Row labelWidth="w-14" valueWidth="w-20" />
-                                <Row labelWidth="w-8"  valueWidth="w-24" />
-                                <Row labelWidth="w-12" valueWidth="w-16" />
-                            </div>
-                        </div>
-                        {/* Contact Info */}
-                        <div className="space-y-2">
-                            <SectionLabel width="w-20" />
-                            <div className="border border-card-border/60 bg-muted/10 rounded-xl p-3 space-y-2">
-                                <Row labelWidth="w-10" valueWidth="w-20" />
-                                <Row labelWidth="w-10" valueWidth="w-36" />
-                            </div>
-                        </div>
-                        {/* Schedule & Status */}
-                        <div className="space-y-2">
-                            <SectionLabel width="w-28" />
-                            <div className="border border-card-border/60 bg-muted/10 rounded-xl p-3 space-y-2">
-                                <Row labelWidth="w-16" valueWidth="w-20" />
-                                <Row labelWidth="w-8"  valueWidth="w-24" />
-                                <Row labelWidth="w-16" valueWidth="w-20" />
-                                <Row labelWidth="w-14" valueWidth="w-20" />
-                                <Row labelWidth="w-12" valueWidth="w-28" />
-                                <Row labelWidth="w-12" valueWidth="w-16" />
-                            </div>
-                        </div>
+                {/* Profile */}
+                <div className="flex flex-col items-center pt-6 pb-4">
+                    <Skeleton className="size-16 rounded-full !bg-slate-200 mb-3" />
+                    <Skeleton className="h-7 w-40 rounded !bg-slate-200" />
+                    <Skeleton className="h-5 w-10 rounded !bg-slate-200 mt-0.5" />
+                </div>
+
+                <div className="h-px bg-border/10 w-full" />
+
+                {/* Current Status */}
+                <div className="flex items-center justify-between py-4">
+                    <Skeleton className="h-6 w-28 rounded !bg-slate-200" />
+                    <Skeleton className="h-6 w-24 rounded-full !bg-slate-200" />
+                </div>
+
+                <div className="h-px bg-border/10 w-full" />
+
+                {/* Guest Information */}
+                <div className="py-4">
+                    <div className="flex items-center justify-between mb-3">
+                        <Skeleton className="h-6 w-32 rounded !bg-slate-200" />
+                        <Skeleton className="h-9 w-16 rounded-md !bg-slate-200" />
+                    </div>
+                    <div className="flex flex-col gap-3">
+                        <FieldRow />
+                        <FieldRow />
+                        <FieldRow />
+                        <FieldRow />
+                    </div>
+                </div>
+
+                <div className="h-px bg-border/10 w-full" />
+
+                {/* Guest Contact */}
+                <div className="py-4">
+                    <Skeleton className="h-6 w-28 rounded !bg-slate-200 mb-3" />
+                    <div className="flex flex-col gap-3">
+                        <FieldRow />
+                        <FieldRow />
+                    </div>
+                </div>
+
+                <div className="h-px bg-border/10 w-full" />
+
+                {/* Service & Schedule */}
+                <div className="py-4">
+                    <Skeleton className="h-6 w-36 rounded !bg-slate-200 mb-3" />
+                    <div className="flex flex-col gap-3">
+                        <FieldRow />
+                        <FieldRow />
+                        <FieldRow />
+                        <FieldRow />
+                        <FieldRow />
                     </div>
                 </div>
             </div>
+
             <div className="p-4 border-t border-border bg-sidebar shrink-0">
                 <div className="flex gap-2">
-                    <Skeleton className="flex-1 h-9 rounded-md !bg-slate-200" />
-                    <Skeleton className="flex-1 h-9 rounded-md !bg-slate-200" />
+                    <Skeleton className="flex-1 h-10 rounded-md !bg-slate-200" />
+                    <Skeleton className="flex-1 h-10 rounded-md !bg-slate-200" />
                 </div>
             </div>
         </>
@@ -223,6 +239,11 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
     const [isEditingGuestInfo, setIsEditingGuestInfo] = useState(false);
     const [guestInfoDraft, setGuestInfoDraft] = useState({ firstName: '', middleName: '', lastName: '', suffix: '', email: '', phone: '' });
     const [savingGuestInfo, setSavingGuestInfo] = useState(false);
+    const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+    const showToast = React.useCallback((message: string, type: 'success' | 'error') => {
+        setToast({ message, type });
+        setTimeout(() => setToast(null), 3000);
+    }, []);
 
     const fetchThreads = useCallback(async () => {
         setFetchingThreads(true);
@@ -367,6 +388,14 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
         }), [threads, searchQuery, activeTab, showOnlyUnreads]);
 
     const selectedThread = threads.find((t) => t.appointmentId === selectedThreadId);
+    const hasGuestInfoChanges = isEditingGuestInfo && (
+        guestInfoDraft.firstName !== (selectedThread?.patientFirstName || '') ||
+        guestInfoDraft.middleName !== (selectedThread?.patientMiddleName || '') ||
+        guestInfoDraft.lastName !== (selectedThread?.patientLastName || '') ||
+        guestInfoDraft.suffix !== (selectedThread?.patientSuffix || '') ||
+        guestInfoDraft.email !== (selectedThread?.patientEmail || '') ||
+        guestInfoDraft.phone !== (selectedThread?.patientPhone || '')
+    );
 
     const formatTime = (timeStr?: string | null) => {
         if (!timeStr) return 'TBD';
@@ -507,6 +536,11 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
         }
     };
 
+    const formatPatientName = (firstName?: string | null, middleName?: string | null, lastName?: string | null, suffix?: string | null) => {
+        const initial = middleName ? ` ${middleName.charAt(0).toUpperCase()}.` : '';
+        return `${firstName || ''}${initial} ${lastName || ''}`.trim() + (suffix ? `, ${suffix}` : '');
+    };
+
     const colMobile = (view: 'list' | 'chat' | 'detail') =>
         mobileView === view ? 'flex' : 'hidden';
 
@@ -542,10 +576,13 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
         if (res.success) {
             setThreads(prev => prev.map(t =>
                 t.appointmentId === selectedThreadId
-                    ? { ...t, patientFirstName: guestInfoDraft.firstName, patientMiddleName: guestInfoDraft.middleName, patientLastName: guestInfoDraft.lastName, patientSuffix: guestInfoDraft.suffix, patientEmail: guestInfoDraft.email, patientPhone: guestInfoDraft.phone, patientName: `${guestInfoDraft.firstName} ${guestInfoDraft.lastName}` }
+                    ? { ...t, patientFirstName: guestInfoDraft.firstName, patientMiddleName: guestInfoDraft.middleName, patientLastName: guestInfoDraft.lastName, patientSuffix: guestInfoDraft.suffix, patientEmail: guestInfoDraft.email, patientPhone: guestInfoDraft.phone, patientName: formatPatientName(guestInfoDraft.firstName, guestInfoDraft.middleName, guestInfoDraft.lastName, guestInfoDraft.suffix) }
                     : t
             ));
             setIsEditingGuestInfo(false);
+            showToast('Guest info updated successfully', 'success');
+        } else {
+            showToast(res.error || 'Failed to update guest info', 'error');
         }
         setSavingGuestInfo(false);
     };
@@ -555,10 +592,10 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
             {loadingMessages ? (
                 <div className="p-4 border-b border-border bg-sidebar shrink-0">
                     <div className="flex items-center gap-2">
-                        <div className="lg:hidden size-[42px] shrink-0" />
-                        <div className="flex flex-col gap-1 min-w-0">
+                        <Skeleton className="xl:hidden size-7 shrink-0 rounded !bg-slate-200" />
+                        <div className="flex flex-col min-w-0">
                             <Skeleton className="h-6 w-36 rounded-md !bg-slate-200" />
-                            <Skeleton className="h-3.5 w-24 rounded-md !bg-slate-200" />
+                            <Skeleton className="h-4 w-24 rounded-md !bg-slate-200" />
                         </div>
                     </div>
                 </div>
@@ -592,7 +629,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                                 <UserRound className="size-14 text-muted-foreground/70 translate-y-0.5" />
                             </div>
                             <h2 className="text-lg font-semibold text-foreground">
-                                {[selectedThread.patientFirstName, selectedThread.patientMiddleName, selectedThread.patientLastName].filter(Boolean).join(' ') + (selectedThread.patientSuffix ? `, ${selectedThread.patientSuffix}` : '')}
+                                {formatPatientName(selectedThread.patientFirstName, selectedThread.patientMiddleName, selectedThread.patientLastName, selectedThread.patientSuffix)}
                             </h2>
                             <p className="text-sm text-muted-foreground mt-0.5">Guest</p>
                         </div>
@@ -616,12 +653,12 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                                         <Pencil className="size-4" /> Edit
                                     </Button>
                                 ) : (
-                                    <div className="flex items-center gap-2">
-                                        <Button variant="outline" size="sm" onClick={cancelEditGuestInfo} className="h-auto px-4 py-2 text-sm gap-1.5 max-sm:px-3 max-sm:py-1.5 max-sm:text-xs">
-                                            <X className="size-4" /> Cancel
+                                        <div className="flex items-center gap-2">
+                                        <Button variant="outline" size="sm" onClick={cancelEditGuestInfo} className="h-auto px-3 py-1.5 text-xs gap-1 max-sm:px-2 max-sm:py-1">
+                                            <X className="size-3.5" /> Cancel
                                         </Button>
-                                        <Button size="sm" onClick={saveGuestInfo} disabled={savingGuestInfo} className="h-auto px-4 py-2 text-sm gap-1.5 max-sm:px-3 max-sm:py-1.5 max-sm:text-xs bg-slate-900 text-white rounded-md">
-                                            <Check className="size-4" /> {savingGuestInfo ? 'Saving...' : 'Save'}
+                                        <Button size="sm" onClick={saveGuestInfo} disabled={savingGuestInfo || !hasGuestInfoChanges} className="h-auto px-3 py-1.5 text-xs gap-1 max-sm:px-2 max-sm:py-1 bg-slate-900 text-white rounded-md disabled:cursor-not-allowed">
+                                            <Check className="size-3.5" /> {savingGuestInfo ? 'Saving...' : 'Save'}
                                         </Button>
                                     </div>
                                 )}
@@ -964,7 +1001,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                                             <div className="flex flex-col min-w-0 flex-1 gap-1.5">
                                                 <div className="flex w-full items-center justify-between gap-2">
                                                     <span className={t.unreadCount > 0 ? 'font-semibold truncate' : 'truncate'}>
-                                                        {t.patientName}
+                                                        {formatPatientName(t.patientFirstName, t.patientMiddleName, t.patientLastName, t.patientSuffix)}
                                                     </span>
                                                     <span className="text-[10px] text-muted-foreground font-medium whitespace-nowrap shrink-0">
                                                         {t.latestMessage ? formatMessageTime(t.latestMessage.createdAt) : ''}
@@ -1014,7 +1051,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                 <>
                     {/* Column 2: Dialogue Stream */}
                     <div className={`flex-1 flex-col bg-muted/20 border-r border-border relative ${colMobile('chat')} lg:flex`}>
-                        {mobileView === 'detail' ? detailPanelContent : loadingMessages ? (
+                        {loadingMessages ? (
                             <ChatMessagesSkeleton />
                         ) : (
                             <PatientChatView
@@ -1043,7 +1080,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                     </div>
 
                     {/* Column 3: Context & Action Control Dock */}
-                    <div className={`${colMobile('detail')} flex-1 lg:flex-none lg:w-80 flex-col border-l border-border bg-sidebar h-full overflow-hidden hidden xl:flex`}>
+                    <div className={`${colMobile('detail')} flex-1 lg:flex-none lg:w-80 flex-col border-l border-border bg-sidebar h-full overflow-hidden xl:flex`}>
                         {detailPanelContent}
                     </div>
                 </>
@@ -1053,6 +1090,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                     <p className="text-sm font-medium">Select a thread from the inbox list to start chatting.</p>
                 </div>
             )}
+            <InquiryToast toast={toast} />
         </div>
     );
 }

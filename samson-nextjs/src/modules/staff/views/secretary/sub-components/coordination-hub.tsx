@@ -55,7 +55,7 @@ export function CoordinationHub({ inquiryId, hideHeader, hideActions, onBack }: 
   const { logs, isLoading, error, customNote, setCustomNote, addLog, removeLog, addCustomNote } = useCoordinationHub(inquiryId);
 
   return (
-    <div className="flex flex-col h-full overflow-hidden border-r border-card-border/40 bg-card/50">
+    <div className="flex flex-col h-full overflow-hidden border-r border-card-border/40 bg-sidebar">
       {!hideHeader && (
         <div className="p-4 border-b border-card-border/40 shrink-0">
           <div className="flex items-center gap-2">
