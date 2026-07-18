@@ -10,18 +10,18 @@ import { MessageResponseDto } from '@/modules/appointments/dtos/chat/message-res
 import { PatientChatView } from '@/modules/appointments/views/chat/patient-chat-view';
 import { getDoctorsAction } from '@/modules/staff/actions/management/get-doctors.action';
 import { updateAppointmentStatusAction } from '@/modules/appointments/actions/status/update-appointment-status.action';
+import { updateGuestContactAction } from '@/modules/appointments/actions/booking/update-guest-contact.action';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import SkeletonLib, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
-import { Search, Mail, Archive, MessageSquare, Calendar, XCircle, CheckCircle, User, Stethoscope, Clock, ChevronUp, ChevronDown, AlertCircle, ArrowLeft, UserRound } from 'lucide-react';
+import { Search, Mail, Archive, MessageSquare, Calendar, XCircle, CheckCircle, AlertCircle, ArrowLeft, UserRound, Pencil, Check, X } from 'lucide-react';
 import {
     Sidebar,
     SidebarHeader,
@@ -219,6 +219,10 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
     const [actionLoading, setActionLoading] = useState(false);
     const [actionError, setActionError] = useState<string | null>(null);
     const [actionSuccess, setActionSuccess] = useState<string | null>(null);
+
+    const [isEditingGuestInfo, setIsEditingGuestInfo] = useState(false);
+    const [guestInfoDraft, setGuestInfoDraft] = useState({ firstName: '', middleName: '', lastName: '', suffix: '', email: '', phone: '' });
+    const [savingGuestInfo, setSavingGuestInfo] = useState(false);
 
     const fetchThreads = useCallback(async () => {
         setFetchingThreads(true);
@@ -506,6 +510,46 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
     const colMobile = (view: 'list' | 'chat' | 'detail') =>
         mobileView === view ? 'flex' : 'hidden';
 
+    const startEditGuestInfo = () => {
+        if (!selectedThread) return;
+        setGuestInfoDraft({
+            firstName: selectedThread.patientFirstName || '',
+            middleName: selectedThread.patientMiddleName || '',
+            lastName: selectedThread.patientLastName || '',
+            suffix: selectedThread.patientSuffix || '',
+            email: selectedThread.patientEmail || '',
+            phone: selectedThread.patientPhone || '',
+        });
+        setIsEditingGuestInfo(true);
+    };
+
+    const cancelEditGuestInfo = () => {
+        setIsEditingGuestInfo(false);
+    };
+
+    const saveGuestInfo = async () => {
+        if (!selectedThreadId) return;
+        setSavingGuestInfo(true);
+        const res = await updateGuestContactAction({
+            appointmentId: selectedThreadId,
+            firstName: guestInfoDraft.firstName,
+            middleName: guestInfoDraft.middleName,
+            lastName: guestInfoDraft.lastName,
+            suffix: guestInfoDraft.suffix,
+            email: guestInfoDraft.email,
+            phone: guestInfoDraft.phone,
+        });
+        if (res.success) {
+            setThreads(prev => prev.map(t =>
+                t.appointmentId === selectedThreadId
+                    ? { ...t, patientFirstName: guestInfoDraft.firstName, patientMiddleName: guestInfoDraft.middleName, patientLastName: guestInfoDraft.lastName, patientSuffix: guestInfoDraft.suffix, patientEmail: guestInfoDraft.email, patientPhone: guestInfoDraft.phone, patientName: `${guestInfoDraft.firstName} ${guestInfoDraft.lastName}` }
+                    : t
+            ));
+            setIsEditingGuestInfo(false);
+        }
+        setSavingGuestInfo(false);
+    };
+
     const detailPanelContent = selectedThreadId && selectedThread ? (
         <div className="flex flex-col h-full overflow-hidden">
             {loadingMessages ? (
@@ -521,7 +565,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
             ) : (
                 <div className="p-4 border-b border-border bg-sidebar shrink-0">
                     <div className="flex items-center gap-2">
-                        <button onClick={handleBackToChat} className="lg:hidden p-1 -ml-1 text-muted-foreground hover:text-foreground shrink-0">
+                        <button onClick={handleBackToChat} className="xl:hidden p-1 -ml-1 text-muted-foreground hover:text-foreground shrink-0">
                             <ArrowLeft className="size-5" />
                         </button>
                         <div className="flex flex-col min-w-0">
@@ -539,88 +583,152 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
             ) : (
                 <>
                     <div 
-                        className="flex-1 !overflow-y-auto p-5 flex flex-col justify-between gap-6 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent" 
+                        className="flex-1 !overflow-y-auto px-5 space-y-0 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent" 
                         style={{ scrollbarWidth: 'thin' }}
                         data-lenis-prevent
                     >
-                        <div className="space-y-6">
-                            <div className="flex flex-col gap-5 text-xs">
-                                <div className="space-y-2">
-                                    <div className="text-xs font-semibold text-muted-foreground flex justify-between items-center">
-                                        <span>Patient Info</span>
-                                        {selectedThread.chatToken && (
-                                            <Badge variant="warning" className="text-[9px] px-1.5 py-0">
-                                                GUEST
-                                            </Badge>
-                                        )}
+                        <div className="flex flex-col items-center pt-6 pb-4">
+                            <div className="size-16 shrink-0 rounded-full bg-muted-foreground/10 flex items-center justify-center border-2 border-border/60 overflow-hidden mb-3">
+                                <UserRound className="size-14 text-muted-foreground/70 translate-y-0.5" />
+                            </div>
+                            <h2 className="text-lg font-semibold text-foreground">
+                                {[selectedThread.patientFirstName, selectedThread.patientMiddleName, selectedThread.patientLastName].filter(Boolean).join(' ') + (selectedThread.patientSuffix ? `, ${selectedThread.patientSuffix}` : '')}
+                            </h2>
+                            <p className="text-sm text-muted-foreground mt-0.5">Guest</p>
+                        </div>
+
+                        <hr className="border-card-border/40" />
+
+                        <div className="flex items-center justify-between py-4">
+                            <span className="text-base font-medium text-foreground">Current Status</span>
+                            <Badge variant={activeStates.includes(selectedThread.status) ? 'success' : 'error'} className="text-xs px-3 py-1">
+                                {selectedThread.status}
+                            </Badge>
+                        </div>
+
+                        <hr className="border-card-border/40" />
+
+                        <div className="py-4">
+                            <div className="flex items-center justify-between mb-3">
+                                <span className="text-base font-medium text-foreground">Guest Information</span>
+                                {!isEditingGuestInfo ? (
+                                    <Button variant="outline" size="sm" onClick={startEditGuestInfo} className="h-auto px-4 py-2 text-sm gap-1.5 max-sm:px-3 max-sm:py-1.5 max-sm:text-xs">
+                                        <Pencil className="size-4" /> Edit
+                                    </Button>
+                                ) : (
+                                    <div className="flex items-center gap-2">
+                                        <Button variant="outline" size="sm" onClick={cancelEditGuestInfo} className="h-auto px-4 py-2 text-sm gap-1.5 max-sm:px-3 max-sm:py-1.5 max-sm:text-xs">
+                                            <X className="size-4" /> Cancel
+                                        </Button>
+                                        <Button size="sm" onClick={saveGuestInfo} disabled={savingGuestInfo} className="h-auto px-4 py-2 text-sm gap-1.5 max-sm:px-3 max-sm:py-1.5 max-sm:text-xs bg-slate-900 text-white rounded-md">
+                                            <Check className="size-4" /> {savingGuestInfo ? 'Saving...' : 'Save'}
+                                        </Button>
                                     </div>
-                                    <div className="border border-card-border/60 bg-muted/10 rounded-xl p-3 space-y-2">
-                                        <div className="flex justify-between items-center">
-                                            <span className="text-text-muted">First</span>
-                                            <span className="font-semibold text-text-primary">{selectedThread.patientFirstName || selectedThread.patientName.split(' ')[0] || '-'}</span>
-                                        </div>
-                                        <div className="flex justify-between items-center">
-                                            <span className="text-text-muted">Middle</span>
-                                            <span className="font-semibold text-text-primary">{selectedThread.patientMiddleName || '-'}</span>
-                                        </div>
-                                        <div className="flex justify-between items-center">
-                                            <span className="text-text-muted">Last</span>
-                                            <span className="font-semibold text-text-primary">{selectedThread.patientLastName || selectedThread.patientName.split(' ')[1] || '-'}</span>
-                                        </div>
-                                        <div className="flex justify-between items-center">
-                                            <span className="text-text-muted">Suffix</span>
-                                            <span className="font-semibold text-text-primary">{selectedThread.patientSuffix || '-'}</span>
-                                        </div>
+                                )}
+                            </div>
+
+                            {!isEditingGuestInfo ? (
+                                <div className="flex flex-col gap-3">
+                                    <div className="flex flex-col gap-0.5">
+                                        <span className="text-xs text-muted-foreground">First Name</span>
+                                        <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{selectedThread.patientFirstName || '-'}</div>
+                                    </div>
+                                    <div className="flex flex-col gap-0.5">
+                                        <span className="text-xs text-muted-foreground">Last Name</span>
+                                        <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{selectedThread.patientLastName || '-'}</div>
+                                    </div>
+                                    <div className="flex flex-col gap-0.5">
+                                        <span className="text-xs text-muted-foreground">Middle Name</span>
+                                        <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{selectedThread.patientMiddleName || '-'}</div>
+                                    </div>
+                                    <div className="flex flex-col gap-0.5">
+                                        <span className="text-xs text-muted-foreground">Suffix</span>
+                                        <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{selectedThread.patientSuffix || '-'}</div>
                                     </div>
                                 </div>
-
-                                <div className="space-y-2">
-                                    <div className="text-xs font-semibold text-muted-foreground">Contact Info</div>
-                                    <div className="border border-card-border/60 bg-muted/10 rounded-xl p-3 space-y-2">
-                                        <div className="flex justify-between items-center">
-                                            <span className="text-text-muted">Phone</span>
-                                            <span className="font-semibold text-text-primary">{selectedThread.patientPhone || 'No Phone'}</span>
-                                        </div>
-                                        <div className="flex justify-between items-center gap-4">
-                                            <span className="text-text-muted shrink-0">Email</span>
-                                            <span className="font-semibold text-text-primary truncate max-w-[150px]" title={selectedThread.patientEmail}>{selectedThread.patientEmail || '-'}</span>
-                                        </div>
+                            ) : (
+                                <div className="flex flex-col gap-3">
+                                    <div className="flex flex-col gap-0.5">
+                                        <span className="text-xs text-muted-foreground">First Name</span>
+                                        <input value={guestInfoDraft.firstName} onChange={(e) => setGuestInfoDraft(prev => ({ ...prev, firstName: e.target.value }))} className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border" />
+                                    </div>
+                                    <div className="flex flex-col gap-0.5">
+                                        <span className="text-xs text-muted-foreground">Last Name</span>
+                                        <input value={guestInfoDraft.lastName} onChange={(e) => setGuestInfoDraft(prev => ({ ...prev, lastName: e.target.value }))} className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border" />
+                                    </div>
+                                    <div className="flex flex-col gap-0.5">
+                                        <span className="text-xs text-muted-foreground">Middle Name</span>
+                                        <input value={guestInfoDraft.middleName} onChange={(e) => setGuestInfoDraft(prev => ({ ...prev, middleName: e.target.value }))} className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border" />
+                                    </div>
+                                    <div className="flex flex-col gap-0.5">
+                                        <span className="text-xs text-muted-foreground">Suffix</span>
+                                        <input value={guestInfoDraft.suffix} onChange={(e) => setGuestInfoDraft(prev => ({ ...prev, suffix: e.target.value }))} className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border" />
                                     </div>
                                 </div>
+                            )}
+                        </div>
 
-                                <div className="space-y-2">
-                                    <div className="text-xs font-semibold text-muted-foreground">Schedule & Status</div>
-                                    <div className="border border-card-border/60 bg-muted/10 rounded-xl p-3 space-y-2">
-                                        <div className="flex justify-between items-center">
-                                            <span className="text-text-muted">Treatment</span>
-                                            <span className="font-semibold text-text-primary text-right">{selectedThread.serviceName || 'Treatment'}</span>
-                                        </div>
-                                        <div className="flex justify-between items-center">
-                                            <span className="text-text-muted">Date</span>
-                                            <span className="font-semibold text-text-primary">{selectedThread.date}</span>
-                                        </div>
-                                        <div className="flex justify-between items-center">
-                                            <span className="text-text-muted">Start Time</span>
-                                            <span className="font-semibold text-text-primary">{formatTime(selectedThread.startTime) || selectedThread.preferredStartTime || 'TBD'}</span>
-                                        </div>
-                                        <div className="flex justify-between items-center">
-                                            <span className="text-text-muted">End Time</span>
-                                            <span className="font-semibold text-text-primary">{formatTime(selectedThread.endTime) || 'TBD'}</span>
-                                        </div>
-                                        <div className="flex justify-between items-center">
-                                            <span className="text-text-muted">Doctor</span>
-                                            <span className="font-semibold text-text-primary text-right">{selectedThread.doctorName || 'Unassigned'}</span>
-                                        </div>
-                                        <div className="flex justify-between items-center">
-                                            <span className="text-text-muted">Status</span>
-                                            <Badge variant={activeStates.includes(selectedThread.status) ? 'success' : 'error'}>
-                                                {selectedThread.status}
-                                            </Badge>
-                                        </div>
+                        <div className="py-4">
+                            <span className="text-base font-medium text-foreground block mb-3">Guest Contact</span>
+                            {!isEditingGuestInfo ? (
+                                <div className="flex flex-col gap-3">
+                                    <div className="flex flex-col gap-0.5">
+                                        <span className="text-xs text-muted-foreground">Email</span>
+                                        <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{selectedThread.patientEmail || '-'}</div>
                                     </div>
+                                    <div className="flex flex-col gap-0.5">
+                                        <span className="text-xs text-muted-foreground">Phone</span>
+                                        <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{selectedThread.patientPhone || '-'}</div>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="flex flex-col gap-3">
+                                    <div className="flex flex-col gap-0.5">
+                                        <span className="text-xs text-muted-foreground">Email</span>
+                                        <input type="email" value={guestInfoDraft.email} onChange={(e) => setGuestInfoDraft(prev => ({ ...prev, email: e.target.value }))} className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border" />
+                                    </div>
+                                    <div className="flex flex-col gap-0.5">
+                                        <span className="text-xs text-muted-foreground">Phone</span>
+                                        <input value={guestInfoDraft.phone} onChange={(e) => setGuestInfoDraft(prev => ({ ...prev, phone: e.target.value }))} className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border" />
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        <hr className="border-card-border/40" />
+
+                        <div className="py-4">
+                            <div className="flex items-center justify-between mb-3">
+                                <span className="text-base font-medium text-foreground">Service & Schedule</span>
+                            </div>
+                            <div className="flex flex-col gap-3">
+                                <div className="flex flex-col gap-0.5">
+                                    <span className="text-xs text-muted-foreground">Service <span className="text-destructive">*</span></span>
+                                    <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{selectedThread.serviceName || '-'}</div>
+                                </div>
+                                <div className="flex flex-col gap-0.5">
+                                    <span className="text-xs text-muted-foreground">Date <span className="text-destructive">*</span></span>
+                                    <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{selectedThread.date ? new Date(selectedThread.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '-'}</div>
+                                </div>
+                                <div className="flex flex-col gap-0.5">
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-xs text-muted-foreground">Start Time <span className="text-destructive">*</span></span>
+                                        {selectedThread.preferredStartTime && <span className="text-xs text-muted-foreground/60">Prefered time {formatTime(selectedThread.preferredStartTime)}</span>}
+                                    </div>
+                                    <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{formatTime(selectedThread.startTime)}</div>
+                                </div>
+                                <div className="flex flex-col gap-0.5">
+                                    <span className="text-xs text-muted-foreground">End Time <span className="text-destructive">*</span></span>
+                                    <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{formatTime(selectedThread.endTime)}</div>
+                                </div>
+                                <div className="flex flex-col gap-0.5">
+                                    <span className="text-xs text-muted-foreground">Assign Dentist <span className="text-destructive">*</span></span>
+                                    <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{selectedThread.doctorName || '-'}</div>
                                 </div>
                             </div>
                         </div>
+
+                        <hr className="border-card-border/40" />
 
                     </div>
 
@@ -642,7 +750,9 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                             <div className="w-full">
                                 {activeStates.includes(selectedThread.status) ? (
                                     <div className="flex gap-2">
-                                        <Button 
+                                        <Button
+                                            variant="outline"
+                                            className="flex-1"
                                             onClick={() => {
                                                 setActiveAction('RESCHEDULE');
                                                 setRescheduleDate(selectedThread.date);
@@ -650,18 +760,16 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                                                 setActionError(null);
                                                 setActionSuccess(null);
                                             }}
-                                            variant="outline" 
-                                            className="flex-1"
                                         >
-                                            Reschedule
+                                            <Calendar className="size-4" /> Reschedule
                                         </Button>
-                                        <Button 
+                                        <Button
                                             onClick={() => {
                                                 setActiveAction('CANCEL');
                                                 setActionError(null);
                                                 setActionSuccess(null);
                                             }}
-                                            variant="outline" 
+                                            variant="outline"
                                             className="flex-1 border-destructive/50 text-destructive hover:bg-destructive/10"
                                         >
                                             Cancel
@@ -935,7 +1043,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                     </div>
 
                     {/* Column 3: Context & Action Control Dock */}
-                    <div className={`${colMobile('detail')} flex-1 lg:flex-none lg:w-80 flex-col border-l border-border bg-sidebar h-full overflow-hidden lg:flex`}>
+                    <div className={`${colMobile('detail')} flex-1 lg:flex-none lg:w-80 flex-col border-l border-border bg-sidebar h-full overflow-hidden hidden xl:flex`}>
                         {detailPanelContent}
                     </div>
                 </>

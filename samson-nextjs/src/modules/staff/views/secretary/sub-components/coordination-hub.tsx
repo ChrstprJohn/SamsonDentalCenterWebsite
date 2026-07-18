@@ -60,7 +60,7 @@ export function CoordinationHub({ inquiryId, hideHeader, hideActions, onBack }: 
         <div className="p-4 border-b border-card-border/40 shrink-0">
           <div className="flex items-center gap-2">
             {onBack && (
-              <button onClick={onBack} className="lg:hidden p-1 -ml-1 text-muted-foreground hover:text-foreground shrink-0">
+              <button onClick={onBack} className="xl:hidden p-1 -ml-1 text-muted-foreground hover:text-foreground shrink-0">
                 <ArrowLeft className="size-5" />
               </button>
             )}

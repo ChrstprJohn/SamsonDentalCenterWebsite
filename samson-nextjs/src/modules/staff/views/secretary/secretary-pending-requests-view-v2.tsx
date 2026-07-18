@@ -5,6 +5,7 @@ import { useSecretaryInquiriesQueue } from '../../hooks/secretary/use-secretary-
 import { PendingRequestListV2 } from './sub-components/pending-request-list-v2';
 import { CoordinationHub } from './sub-components/coordination-hub';
 import { InquiryToast } from './sub-components/inquiry-toast';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   ArrowLeft,
@@ -128,7 +129,7 @@ export function SecretaryPendingRequestsViewV2() {
             <div className="flex-1 text-base font-medium text-foreground text-left">
               Request Details
             </div>
-            <button onClick={() => setMobileView('quickLogs')} className="lg:hidden p-1 -mr-1 text-muted-foreground hover:text-foreground shrink-0 flex flex-col items-center gap-0.5">
+            <button onClick={() => setMobileView('quickLogs')} className="xl:hidden p-1 -mr-1 text-muted-foreground hover:text-foreground shrink-0 flex flex-col items-center gap-0.5">
               <ClipboardList className="size-5" />
               <span className="text-[10px] leading-none">Notes</span>
             </button>
@@ -158,6 +159,16 @@ export function SecretaryPendingRequestsViewV2() {
                   Error: {inquiriesView.inlineError}
                 </div>
               )}
+
+              {/* Section: Current Status */}
+              <div className="flex items-center justify-between py-4">
+                <span className="text-base font-medium text-foreground">Current Status</span>
+                <Badge variant={inquiriesView.selectedInquiry?.status === 'NEW' ? 'warning' : inquiriesView.selectedInquiry?.status === 'CONVERTED' ? 'success' : 'error'} className="text-xs px-3 py-1">
+                  {inquiriesView.selectedInquiry?.status === 'NEW' ? 'NEW / PENDING' : inquiriesView.selectedInquiry?.status === 'CONVERTED' ? 'CONVERTED / APPROVED' : 'DROPPED / REJECTED'}
+                </Badge>
+              </div>
+
+              <hr className="border-card-border/40" />
 
               {/* Section 1: Patient Information */}
               <div className="py-4">
@@ -278,7 +289,7 @@ export function SecretaryPendingRequestsViewV2() {
               <div className="py-4">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-base font-medium text-foreground">
-                    Request Details
+                    Service & Schedule
                   </span>
                   {isEditingSchedule ? (
                     <div className="flex items-center gap-2">
@@ -326,7 +337,7 @@ export function SecretaryPendingRequestsViewV2() {
                         <input type="time" value={inquiriesView.stagedInquiryTime} onChange={(e) => inquiriesView.setStagedInquiryTime(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border" />
                       </div>
                       <div className="flex flex-col gap-0.5">
-                        <span className="text-xs text-muted-foreground">End Time</span>
+                        <span className="text-xs text-muted-foreground">End Time <span className="text-destructive">*</span></span>
                         <div className="relative">
                           <input type="time" value={inquiriesView.stagedInquiryEndTime} onChange={(e) => inquiriesView.setStagedInquiryEndTime(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border" />
                           {inquiriesView.stagedInquiryEndTime && (
@@ -339,7 +350,7 @@ export function SecretaryPendingRequestsViewV2() {
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="flex flex-col gap-0.5">
-                        <span className="text-xs text-muted-foreground">Assign Dentist</span>
+                        <span className="text-xs text-muted-foreground">Assign Dentist <span className="text-destructive">*</span></span>
                         <div className="relative">
                           <select value={inquiriesView.stagedInquiryDoctor} onChange={(e) => { inquiriesView.selectDoctor(e.target.value); setAssignedDoctorName(e.target.options[e.target.selectedIndex].text); }} className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border appearance-none">
                             <option value="">Not assigned</option>
@@ -372,14 +383,14 @@ export function SecretaryPendingRequestsViewV2() {
                         <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{formatTime(inquiriesView.stagedInquiryTime)}</div>
                       </div>
                       <div className="flex flex-col gap-0.5">
-                        <span className="text-xs text-muted-foreground">End Time</span>
+                        <span className="text-xs text-muted-foreground">End Time <span className="text-destructive">*</span></span>
                         <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{formatTime(inquiriesView.stagedInquiryEndTime)}</div>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="flex flex-col gap-0.5">
-                        <span className="text-xs text-muted-foreground">Assign Dentist</span>
+                        <span className="text-xs text-muted-foreground">Assign Dentist <span className="text-destructive">*</span></span>
                         <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{assignedDoctorName || inquiriesView.availableDoctors.find(d => d.doctorId === inquiriesView.stagedInquiryDoctor)?.doctorName || '-'}</div>
                       </div>
                     </div>
@@ -488,7 +499,7 @@ export function SecretaryPendingRequestsViewV2() {
                 </div>
               )}
         </div>
-        <div className={`lg:w-[320px] flex-1 lg:flex-none flex-col h-full overflow-hidden ${colMobile('quickLogs')} lg:flex`}>
+        <div className={`lg:w-[320px] flex-1 lg:flex-none flex-col h-full overflow-hidden ${colMobile('quickLogs')} hidden xl:flex`}>
           <CoordinationHub inquiryId={inquiriesView.selectedInquiryId} hideActions={inquiriesView.selectedInquiry?.status !== 'NEW'} onBack={() => setMobileView('detail')} />
         </div>
       </>
