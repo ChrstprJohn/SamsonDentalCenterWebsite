@@ -1,11 +1,13 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import { createManualBookingAction } from '@/modules/appointments/actions/booking/create-manual-booking.action';
 import { useBookingScheduler } from '@/modules/appointments/hooks/shared/use-booking-scheduler';
 import { getUserDependentsAction } from '@/modules/patients/actions/dependents/get-user-dependents.action';
 import { searchPatientsAction } from '@/modules/patients/actions/profile/search-patients.action';
 import { getServicesAction } from '@/modules/services/actions/management/get-services.action';
+import { getDoctorsAction } from '@/modules/staff/actions/management/get-doctors.action';
+import { getClinicAppointmentsAction } from '@/modules/appointments/actions/clinic/get-clinic-appointments.action';
 
 export type BookingFor = 'SELF' | 'EXISTING_DEP' | 'NEW_DEP';
 export type PatientMode = 'SEARCH' | 'GUEST';
@@ -37,7 +39,17 @@ export function useSecretaryBookAppointment() {
   const [services, setServices] = useState<{ id: string; name: string }[]>([]);
   const [selectedService, setSelectedService] = useState('');
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
-  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedDate, setSelectedDate] = useState<string>(() => {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  });
+  const [doctorsList, setDoctorsList] = useState<any[]>([]);
+  const [appointments, setAppointments] = useState<any[]>([]);
+  const [isLoadingAppointments, setIsLoadingAppointments] = useState(false);
+  const [selectedAppointmentDetails, setSelectedAppointmentDetails] = useState<any | null>(null);
   const [selectedDoctor, setSelectedDoctor] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
   const [selectedEndTime, setSelectedEndTime] = useState('');
@@ -68,6 +80,30 @@ export function useSecretaryBookAppointment() {
     }
     loadServices();
   }, []);
+
+  const loadTimelineData = useCallback(async (date: string) => {
+    if (!date) return;
+    setIsLoadingAppointments(true);
+    const res = await getClinicAppointmentsAction({ date });
+    setIsLoadingAppointments(false);
+    if (res.success && res.data) {
+      setAppointments(res.data);
+    }
+  }, []);
+
+  useEffect(() => {
+    async function loadDoctors() {
+      const res = await getDoctorsAction();
+      if (res.success && res.data) {
+        setDoctorsList(res.data);
+      }
+    }
+    loadDoctors();
+  }, []);
+
+  useEffect(() => {
+    loadTimelineData(selectedDate);
+  }, [selectedDate, loadTimelineData]);
 
   useEffect(() => {
     if (!selectedService) return;
@@ -195,7 +231,6 @@ export function useSecretaryBookAppointment() {
     setPhoneNumber('');
     setEmail('');
     setSelectedService('');
-    setSelectedDate('');
     setSelectedDoctor('');
     setSelectedTime('');
     setSelectedEndTime('');
@@ -203,6 +238,7 @@ export function useSecretaryBookAppointment() {
     setBooked(false);
     setInlineError('');
     setConfirmationChannel('EMAIL');
+    setSelectedAppointmentDetails(null);
   };
 
   const isReadyToSubmit = useMemo(() => {
@@ -248,6 +284,7 @@ export function useSecretaryBookAppointment() {
       if (res.success) {
         setBooked(true);
         setToast({ message: 'Appointment booked successfully!', type: 'success' });
+        loadTimelineData(selectedDate);
       } else {
         setInlineError(res.error || 'Booking failed');
         setToast({ message: res.error || 'Booking failed', type: 'error' });
@@ -272,5 +309,6 @@ export function useSecretaryBookAppointment() {
     isLoadingDoctors: scheduler.loadingKey === 'doctors', isLoadingSlots: scheduler.loadingKey === 'slots', isSubmitting,
     inlineError, toast, booked, isReadyToSubmit, bookedPatientLabel, resetForm, submit,
     confirmationChannel, setConfirmationChannel,
+    doctorsList, appointments, isLoadingAppointments, selectedAppointmentDetails, setSelectedAppointmentDetails
   };
 }

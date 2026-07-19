@@ -1,116 +1,205 @@
 'use client';
 
+import React from 'react';
 import { useSecretaryBookAppointment } from '../../hooks/secretary/use-secretary-book-appointment';
-import { BookPatientIdentityPanel } from './sub-components/book-patient-identity-panel';
-import { BookSchedulePanel } from './sub-components/book-schedule-panel';
-import { BookSuccessPanel } from './sub-components/book-success-panel';
-import { BookToast } from './sub-components/book-toast';
+import { DoctorTimeline } from './sub-components/doctor-timeline';
+import { SidebarAppointmentDetails } from './sub-components/sidebar-appointment-details';
+import { Calendar } from '@/components/ui/calendar';
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarHeader,
+  SidebarFooter,
+  SidebarSeparator,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+} from '@/components/ui/sidebar';
+
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
+import {
+  Plus,
+  ChevronRight,
+  Check,
+} from 'lucide-react';
+
+const calendarsData = [
+  {
+    name: 'Dentists',
+    items: ['Dr. Adams', 'Dr. Brown', 'Dr. Carter'],
+  },
+  {
+    name: 'Services',
+    items: ['Cleaning', 'Filling', 'Orthodontics'],
+  },
+  {
+    name: 'Filters',
+    items: ['Confirmed', 'Pending', 'Cancelled'],
+  },
+];
+
 
 export function SecretaryBookAppointmentView() {
   const view = useSecretaryBookAppointment();
 
   return (
-    <div className="flex flex-col gap-8 h-full p-6 md:p-8 overflow-y-auto">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-2xl md:text-3xl font-extrabold text-text-primary tracking-tight">Book Appointment</h1>
-        <p className="text-xs text-text-muted">Manually book appointment for walk-in or phone-in patient.</p>
+    <div className="flex h-full w-full overflow-hidden bg-background">
+      {/* Left Column: Doctor Schedules Timeline */}
+      <div className="flex-1 flex flex-col h-full min-h-0 bg-white overflow-hidden">
+        {/* Left Column Header */}
+        <div className="p-4 border-b border-card-border/40 shrink-0">
+          <h1 className="text-base font-medium text-foreground">Doctor Schedules</h1>
+        </div>
+
+        {/* Left Column Body */}
+        <div className="flex-1 min-h-0 flex flex-col">
+          <DoctorTimeline
+            doctors={view.doctorsList}
+            appointments={view.appointments}
+            isLoading={view.isLoadingAppointments}
+            selectedAppointmentId={view.selectedAppointmentDetails?.id}
+            onSelectAppointment={view.setSelectedAppointmentDetails}
+          />
+        </div>
       </div>
 
-      {view.booked ? (
-        <BookSuccessPanel
-          patientLabel={view.bookedPatientLabel}
-          selectedDate={view.selectedDate}
-          selectedTime={view.selectedTime}
-          onReset={view.resetForm}
-        />
-      ) : (
-        <>
-          {view.inlineError && (
-            <div className="text-xs font-bold text-rose-500 bg-rose-500/10 p-3 rounded-xl border border-rose-500/20">
-              {view.inlineError}
+      {/* Right Column: Booking Console Sidebar (styled 1-1 like AppSidebar in md file, but on the right) */}
+      <Sidebar collapsible="none" side="right" className="flex-1 lg:flex-none lg:w-[var(--sidebar-width)] border-l border-card-border/40 shrink-0 flex flex-col h-full bg-sidebar">
+        {view.selectedAppointmentDetails ? (
+          <>
+            <SidebarHeader className="h-16 border-b border-sidebar-border px-4 flex items-center justify-between">
+              <h2 className="text-base font-medium text-foreground">Appointment Details</h2>
+            </SidebarHeader>
+            <SidebarContent className="p-4">
+              <SidebarAppointmentDetails
+                appointment={view.selectedAppointmentDetails}
+                onClose={() => view.setSelectedAppointmentDetails(null)}
+              />
+            </SidebarContent>
+          </>
+        ) : (
+          <>
+            <div className="p-4 border-b border-card-border/40 shrink-0">
+              <h1 className="text-base font-medium text-foreground">Booking Console</h1>
             </div>
-          )}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start flex-1">
-            <BookPatientIdentityPanel
-              patientMode={view.patientMode}
-              switchPatientMode={view.switchPatientMode}
-              patientSearchQuery={view.patientSearchQuery}
-              setPatientSearchQuery={view.setPatientSearchQuery}
-              patientSearchResults={view.patientSearchResults}
-              isSearchingPatients={view.isSearchingPatients}
-              selectedPatient={view.selectedPatient}
-              selectPatient={view.selectPatient}
-              clearSelectedPatient={view.clearSelectedPatient}
-              dependents={view.dependents}
-              isLoadingDependents={view.isLoadingDependents}
-              bookingFor={view.bookingFor}
-              setBookingFor={view.setBookingFor}
-              selectedDependent={view.selectedDependent}
-              setSelectedDependent={view.setSelectedDependent}
-              resetNewDepForm={view.resetNewDepForm}
-              newDependent={{
-                firstName: view.newDepFirstName,
-                setFirstName: view.setNewDepFirstName,
-                middleName: view.newDepMiddleName,
-                setMiddleName: view.setNewDepMiddleName,
-                lastName: view.newDepLastName,
-                setLastName: view.setNewDepLastName,
-                suffix: view.newDepSuffix,
-                setSuffix: view.setNewDepSuffix,
-                dob: view.newDepDOB,
-                setDob: view.setNewDepDOB,
-                relationship: view.newDepRelationship,
-                setRelationship: view.setNewDepRelationship,
-              }}
-              guest={{
-                firstName: view.firstName,
-                setFirstName: view.setFirstName,
-                middleName: view.middleName,
-                setMiddleName: view.setMiddleName,
-                lastName: view.lastName,
-                setLastName: view.setLastName,
-                suffix: view.suffix,
-                setSuffix: view.setSuffix,
-                phoneNumber: view.phoneNumber,
-                setPhoneNumber: view.setPhoneNumber,
-                email: view.email,
-                setEmail: view.setEmail,
-              }}
-            />
-            <BookSchedulePanel
-              services={view.services}
-              selectedService={view.selectedService}
-              selectService={view.selectService}
-              currentMonth={view.currentMonth}
-              setCurrentMonth={view.setCurrentMonth}
-              availableDates={view.availableDates}
-              selectedDate={view.selectedDate}
-              selectDate={view.selectDate}
-              availableDoctors={view.availableDoctors}
-              selectedDoctor={view.selectedDoctor}
-              selectDoctor={view.selectDoctor}
-              timeslots={view.timeslots}
-              selectedTime={view.selectedTime}
-              selectedEndTime={view.selectedEndTime}
-              selectTimeslot={view.selectTimeslot}
-              onStartTimeChange={view.setSelectedTime}
-              onEndTimeChange={view.setSelectedEndTime}
-              patientNote={view.patientNote}
-              setPatientNote={view.setPatientNote}
-              isLoadingServices={view.isLoadingServices}
-              isLoadingDays={view.isLoadingDays}
-              isLoadingDoctors={view.isLoadingDoctors}
-              isLoadingSlots={view.isLoadingSlots}
-              isSubmitting={view.isSubmitting}
-              isReadyToSubmit={view.isReadyToSubmit}
-              onSubmit={view.submit}
-              confirmationChannel={view.confirmationChannel}
-              setConfirmationChannel={view.setConfirmationChannel}
-            />
-          </div>
-          <BookToast toast={view.toast} />
-        </>
-      )}
+            <SidebarContent>
+              <DatePicker
+                selectedDate={view.selectedDate}
+                onSelectDate={view.selectDate}
+              />
+              <SidebarSeparator className="mx-0" />
+              <Calendars calendars={calendarsData} />
+            </SidebarContent>
+            <SidebarFooter>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton>
+                    <Plus className="size-4 mr-2" />
+                    <span>New Calendar</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarFooter>
+          </>
+        )}
+      </Sidebar>
     </div>
   );
 }
+
+// Sub-components matching websitedesign.md 1-1
+function DatePicker({
+  selectedDate,
+  onSelectDate,
+}: {
+  selectedDate: string;
+  onSelectDate: (date: string) => void;
+}) {
+  const date = selectedDate ? new Date(selectedDate + 'T00:00:00') : undefined;
+
+  return (
+    <SidebarGroup className="px-0">
+      <SidebarGroupContent>
+        <Calendar
+          mode="single"
+          selected={date}
+          onSelect={(d) => {
+            if (d) {
+              const y = d.getFullYear();
+              const m = String(d.getMonth() + 1).padStart(2, '0');
+              const day = String(d.getDate()).padStart(2, '0');
+              onSelectDate(`${y}-${m}-${day}`);
+}
+
+
+          }}
+          className="[&_[role=gridcell]]:w-[33px] [&_[role=gridcell].bg-accent]:bg-sidebar-primary [&_[role=gridcell].bg-accent]:text-sidebar-primary-foreground"
+        />
+      </SidebarGroupContent>
+    </SidebarGroup>
+  );
+}
+
+// Sub-components matching websitedesign.md 1-1
+function Calendars({
+  calendars,
+}: {
+  calendars: {
+    name: string;
+    items: string[];
+  }[];
+}) {
+  return (
+    <>
+      {calendars.map((calendar, index) => (
+        <React.Fragment key={calendar.name}>
+          <SidebarGroup className="py-0">
+            <Collapsible
+              defaultOpen={index === 0}
+              className="group/collapsible"
+            >
+              <SidebarGroupLabel
+                asChild
+                className="group/label w-full text-sm text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+              >
+                <CollapsibleTrigger>
+                  {calendar.name}{' '}
+                  <ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
+                </CollapsibleTrigger>
+              </SidebarGroupLabel>
+              <CollapsibleContent>
+                <SidebarGroupContent>
+                  <SidebarMenu>
+                    {calendar.items.map((item, idx) => (
+                      <SidebarMenuItem key={item}>
+                        <SidebarMenuButton>
+                          <div
+                            data-active={idx < 2}
+                            className="group/calendar-item flex aspect-square size-4 shrink-0 items-center justify-center rounded-sm border border-sidebar-border text-sidebar-primary-foreground data-[active=true]:border-sidebar-primary data-[active=true]:bg-sidebar-primary"
+                          >
+                            <Check className="hidden size-3 group-data-[active=true]/calendar-item:block" />
+                          </div>
+                          {item}
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    ))}
+                  </SidebarMenu>
+                </SidebarGroupContent>
+              </CollapsibleContent>
+            </Collapsible>
+          </SidebarGroup>
+          <SidebarSeparator className="mx-0" />
+        </React.Fragment>
+      ))}
+    </>
+  );
+}
+
+

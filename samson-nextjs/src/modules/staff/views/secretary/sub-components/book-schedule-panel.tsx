@@ -32,18 +32,19 @@ interface BookSchedulePanelProps {
   onSubmit: () => void;
   confirmationChannel?: 'EMAIL' | 'SMS' | 'NONE';
   setConfirmationChannel?: (channel: 'EMAIL' | 'SMS' | 'NONE') => void;
+  hideCalendar?: boolean;
 }
 
 export function BookSchedulePanel(props: BookSchedulePanelProps) {
   return (
-    <div className="lg:col-span-7 border border-card-border bg-card rounded-3xl p-6 shadow-md flex flex-col gap-5 justify-between">
+    <div className="w-full flex flex-col gap-5 justify-between">
       <div className="flex flex-col gap-5">
         <div className="flex flex-col gap-1">
           <h2 className="text-sm font-bold text-text-secondary">Service & Schedule</h2>
           <p className="text-xs text-text-muted">Select service, date, doctor, and time slot.</p>
         </div>
         <ServiceChips {...props} />
-        <ScheduleCalendar {...props} />
+        {!props.hideCalendar && <ScheduleCalendar {...props} />}
         <ConfirmationChannelPicker confirmationChannel={props.confirmationChannel} setConfirmationChannel={props.setConfirmationChannel} />
         <PatientNote value={props.patientNote} onChange={props.setPatientNote} />
       </div>

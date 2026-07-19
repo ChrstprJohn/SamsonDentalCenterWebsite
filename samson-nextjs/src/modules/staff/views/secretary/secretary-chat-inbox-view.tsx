@@ -620,11 +620,11 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
             ) : (
                 <>
                     <div 
-                        className="flex-1 !overflow-y-auto px-5 space-y-0 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent" 
+                        className="flex-1 !overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent" 
                         style={{ scrollbarWidth: 'thin' }}
                         data-lenis-prevent
                     >
-                        <div className="flex flex-col items-center pt-6 pb-4">
+                        <div className="flex flex-col items-center pt-6 pb-4 px-5">
                             <div className="size-16 shrink-0 rounded-full bg-muted-foreground/10 flex items-center justify-center border-2 border-border/60 overflow-hidden mb-3">
                                 <UserRound className="size-14 text-muted-foreground/70 translate-y-0.5" />
                             </div>
@@ -634,18 +634,18 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                             <p className="text-sm text-muted-foreground mt-0.5">Guest</p>
                         </div>
 
-                        <hr className="border-card-border/40" />
+                        <hr className="border-card-border/40 mx-5" />
 
-                        <div className="flex items-center justify-between py-4">
+                        <div className="flex items-center justify-between py-4 px-5">
                             <span className="text-base font-medium text-foreground">Current Status</span>
                             <Badge variant={activeStates.includes(selectedThread.status) ? 'success' : 'error'} className="text-xs px-3 py-1">
                                 {selectedThread.status}
                             </Badge>
                         </div>
 
-                        <hr className="border-card-border/40" />
+                        <hr className="border-card-border/40 mx-5" />
 
-                        <div className="py-4">
+                        <div className="py-4 px-5">
                             <div className="flex items-center justify-between mb-3">
                                 <span className="text-base font-medium text-foreground">Guest Information</span>
                                 {!isEditingGuestInfo ? (
@@ -705,7 +705,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                             )}
                         </div>
 
-                        <div className="py-4">
+                        <div className="py-4 px-5">
                             <span className="text-base font-medium text-foreground block mb-3">Guest Contact</span>
                             {!isEditingGuestInfo ? (
                                 <div className="flex flex-col gap-3">
@@ -732,9 +732,9 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                             )}
                         </div>
 
-                        <hr className="border-card-border/40" />
+                        <hr className="border-card-border/40 mx-5" />
 
-                        <div className="py-4">
+                        <div className="py-4 px-5">
                             <div className="flex items-center justify-between mb-3">
                                 <span className="text-base font-medium text-foreground">Service & Schedule</span>
                             </div>
@@ -765,7 +765,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                             </div>
                         </div>
 
-                        <hr className="border-card-border/40" />
+                        <hr className="border-card-border/40 mx-5" />
 
                     </div>
 
