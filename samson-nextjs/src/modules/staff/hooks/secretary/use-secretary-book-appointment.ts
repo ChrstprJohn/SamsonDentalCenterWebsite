@@ -189,23 +189,14 @@ export function useSecretaryBookAppointment() {
 
   const selectService = (serviceId: string) => {
     setSelectedService(serviceId);
-    setSelectedDate('');
-    setSelectedDoctor('');
-    setSelectedTime('');
-    setSelectedEndTime('');
   };
 
   const selectDate = (date: string) => {
     setSelectedDate(date);
-    setSelectedDoctor('');
-    setSelectedTime('');
-    setSelectedEndTime('');
   };
 
   const selectDoctor = (doctorId: string) => {
     setSelectedDoctor(doctorId);
-    setSelectedTime('');
-    setSelectedEndTime('');
   };
 
   const selectTimeslot = (slot: { startTime: string; endTime: string }) => {

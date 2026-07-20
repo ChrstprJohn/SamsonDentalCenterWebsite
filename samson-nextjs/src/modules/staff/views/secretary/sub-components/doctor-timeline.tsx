@@ -29,6 +29,7 @@ interface DoctorTimelineProps {
   isLoading: boolean;
   selectedAppointmentId?: string;
   onSelectAppointment: (appointment: AppointmentDto) => void;
+  onSlotClick?: (slot: { doctorId: string; date: string; startTime: string }) => void;
   viewMode: 'day' | 'week';
   selectedDate: string;
 }
@@ -39,6 +40,7 @@ export function DoctorTimeline({
   isLoading,
   selectedAppointmentId,
   onSelectAppointment,
+  onSlotClick,
   viewMode = 'day',
   selectedDate,
 }: DoctorTimelineProps) {
@@ -290,13 +292,24 @@ export function DoctorTimeline({
 
                 {/* Empty columns behind appointment cards */}
                 {(viewMode === 'week' ? daysOfWeek : doctors).map((item, colIndex) => {
+                  const doctorId = viewMode === 'day' ? (item as any).id : '';
+                  const date = viewMode === 'week' ? (item as any).dateStr : selectedDate;
                   return (
                     <div
                       key={viewMode === 'week' ? (item as any).dateStr : (item as any).id}
                       className={`border-r border-r-slate-300 transition-colors ${
                         isLineRow ? 'border-b border-border' : 'border-b border-border/25'
-                      } ${isHourMark ? 'bg-muted/10' : 'bg-transparent'}`}
+                      } ${isHourMark ? 'bg-muted/10' : 'bg-transparent'} ${onSlotClick ? 'cursor-crosshair' : ''}`}
                       style={{ gridColumn: colIndex + 2, gridRow: rowIndex + 2 }}
+                      onClick={(e) => {
+                        if (!onSlotClick) return;
+                        // Snap to the 5-min slot this row represents
+                        const snappedMins = startTimeMins + rowIndex * slotDuration;
+                        const h = Math.floor(snappedMins / 60);
+                        const m = snappedMins % 60;
+                        const startTime = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+                        onSlotClick({ doctorId, date, startTime });
+                      }}
                     />
                   );
                 })}

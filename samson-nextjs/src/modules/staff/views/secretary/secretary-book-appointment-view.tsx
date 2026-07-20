@@ -285,6 +285,15 @@ export function SecretaryBookAppointmentView() {
             onSelectAppointment={view.setSelectedAppointmentDetails}
             viewMode={viewMode}
             selectedDate={view.selectedDate}
+            onSlotClick={({ doctorId, date, startTime }) => {
+              // Pre-fill form from clicked slot
+              if (date) view.selectDate(date);
+              if (doctorId) view.selectDoctor(doctorId);
+              if (startTime) view.setSelectedTime(startTime);
+              // Close appointment detail if open, open booking panel
+              view.setSelectedAppointmentDetails(null);
+              setIsBookingOpen(true);
+            }}
           />
         </div>
       </div>
