@@ -4,12 +4,32 @@ import React, { useMemo } from 'react';
 import type { AppointmentDto } from '@/modules/appointments/dtos/shared/appointment.dto';
 import { formatClinicTime } from '@/shared/utils/date.util';
 
+const COLORS_LIST = [
+  { bg: 'bg-blue-50/80', border: 'border-blue-200/80', hover: 'hover:bg-blue-100/90', accent: 'bg-blue-500', text: 'text-blue-950', subtext: 'text-blue-700/90' },
+  { bg: 'bg-emerald-50/80', border: 'border-emerald-200/80', hover: 'hover:bg-emerald-100/90', accent: 'bg-emerald-500', text: 'text-emerald-950', subtext: 'text-emerald-700/90' },
+  { bg: 'bg-violet-50/80', border: 'border-violet-200/80', hover: 'hover:bg-violet-100/90', accent: 'bg-violet-500', text: 'text-violet-950', subtext: 'text-violet-700/90' },
+  { bg: 'bg-amber-50/80', border: 'border-amber-200/80', hover: 'hover:bg-amber-100/90', accent: 'bg-amber-500', text: 'text-amber-950', subtext: 'text-amber-700/90' },
+  { bg: 'bg-rose-50/80', border: 'border-rose-200/80', hover: 'hover:bg-rose-100/90', accent: 'bg-rose-500', text: 'text-rose-950', subtext: 'text-rose-700/90' },
+];
+
+const getDoctorColor = (doctorId: string) => {
+  if (!doctorId) return COLORS_LIST[0];
+  let hash = 0;
+  for (let i = 0; i < doctorId.length; i++) {
+    hash = doctorId.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const index = Math.abs(hash) % COLORS_LIST.length;
+  return COLORS_LIST[index];
+};
+
 interface DoctorTimelineProps {
   doctors: any[];
   appointments: AppointmentDto[];
   isLoading: boolean;
   selectedAppointmentId?: string;
   onSelectAppointment: (appointment: AppointmentDto) => void;
+  viewMode: 'day' | 'week';
+  selectedDate: string;
 }
 
 export function DoctorTimeline({
@@ -18,6 +38,8 @@ export function DoctorTimeline({
   isLoading,
   selectedAppointmentId,
   onSelectAppointment,
+  viewMode = 'day',
+  selectedDate,
 }: DoctorTimelineProps) {
   // 5-minute intervals from 07:50 AM (470 mins) to 05:00 PM (1020 mins)
   const startTimeMins = 470;
@@ -59,6 +81,29 @@ export function DoctorTimeline({
 
   const totalMinutes = endTimeMins - startTimeMins; // 540
 
+  // Calculate 5 days from selectedDate
+  const daysOfWeek = useMemo(() => {
+    if (!selectedDate) return [];
+    const date = new Date(selectedDate + 'T00:00:00');
+
+    const days = [];
+    const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    for (let i = 0; i < 5; i++) {
+      const nextDay = new Date(date);
+      nextDay.setDate(date.getDate() + i);
+      const y = nextDay.getFullYear();
+      const m = String(nextDay.getMonth() + 1).padStart(2, '0');
+      const d = String(nextDay.getDate()).padStart(2, '0');
+      const dayOfWeekName = weekdays[nextDay.getDay()];
+      days.push({
+        dateStr: `${y}-${m}-${d}`,
+        label: dayOfWeekName,
+        shortLabel: `${dayOfWeekName.substring(0, 3)} ${m}/${d}`,
+      });
+    }
+    return days;
+  }, [selectedDate]);
+
   // Pre-calculate positions of appointments
   const placedAppointments = useMemo(() => {
     return appointments
@@ -81,24 +126,45 @@ export function DoctorTimeline({
         const heightPercent = ((clampedEnd - clampedStart) / totalMinutes) * 100;
         const isSmallCard = (clampedEnd - clampedStart) <= 20;
 
+        let col = -1;
+        let left = '0%';
+        let width = '100%';
+
+        if (viewMode === 'week') {
+          const dayIdx = daysOfWeek.findIndex((d) => d.dateStr === app.date);
+          if (dayIdx === -1) return null;
+          col = dayIdx + 2;
+
+          if (doctors.length > 0) {
+            width = `${100 / doctors.length}%`;
+            left = `${(docIndex * 100) / doctors.length}%`;
+          }
+        } else {
+          col = docIndex + 2;
+        }
+
         return {
           appointment: app,
-          col: docIndex + 2,
+          col,
           topPercent,
           heightPercent,
           isSmallCard,
+          width,
+          left,
         };
       })
       .filter((x): x is NonNullable<typeof x> => x !== null);
-  }, [appointments, doctors]);
+  }, [appointments, doctors, viewMode, daysOfWeek]);
 
-  if (doctors.length === 0) {
+  if (viewMode === 'day' && doctors.length === 0) {
     return (
       <div className="flex items-center justify-center h-96 border border-card-border bg-card/50 rounded-3xl">
-        <p className="text-xs text-text-muted">No active doctors available.</p>
+        <p className="text-xs text-text-muted">No active doctors selected.</p>
       </div>
     );
   }
+
+  const columnsCount = viewMode === 'week' ? 5 : doctors.length;
 
   return (
     <div className="flex flex-col flex-1 min-h-0 bg-card overflow-hidden">
@@ -107,7 +173,7 @@ export function DoctorTimeline({
         <div
           className="grid relative"
           style={{
-            gridTemplateColumns: `35px repeat(${doctors.length}, minmax(180px, 1fr)) 35px`,
+            gridTemplateColumns: `35px repeat(${columnsCount}, minmax(${viewMode === 'week' ? '140px' : '180px'}, 1fr)) 35px`,
             gridTemplateRows: `auto repeat(${totalSlots}, 10px)`,
           }}
         >
@@ -118,21 +184,38 @@ export function DoctorTimeline({
           >
             &nbsp;
           </div>
-          {doctors.map((doctor, index) => {
-            const count = appointments.filter((app) => app.doctorId === doctor.id).length;
-            return (
-              <div
-                key={doctor.id}
-                className="sticky top-0 bg-card border-r border-r-slate-300 border-b border-border px-4 py-2 text-center text-sm font-bold text-text-primary tracking-wide truncate z-20"
-                style={{ gridColumn: index + 2, gridRow: 1 }}
-              >
-                Dr. {doctor.firstName} {doctor.lastName} ({count})
-              </div>
-            );
-          })}
+
+          {viewMode === 'week' ? (
+            daysOfWeek.map((day, index) => {
+              const count = appointments.filter((app) => app.date === day.dateStr && doctors.some(d => d.id === app.doctorId)).length;
+              return (
+                <div
+                  key={day.dateStr}
+                  className="sticky top-0 bg-card border-r border-r-slate-300 border-b border-border px-4 py-2 text-center text-sm font-normal text-sidebar-foreground truncate z-20"
+                  style={{ gridColumn: index + 2, gridRow: 1 }}
+                >
+                  {day.shortLabel} ({count})
+                </div>
+              );
+            })
+          ) : (
+            doctors.map((doctor, index) => {
+              const count = appointments.filter((app) => app.doctorId === doctor.id).length;
+              return (
+                <div
+                  key={doctor.id}
+                  className="sticky top-0 bg-card border-r border-r-slate-300 border-b border-border px-4 py-2 text-center text-sm font-normal text-sidebar-foreground truncate z-20"
+                  style={{ gridColumn: index + 2, gridRow: 1 }}
+                >
+                  Dr. {doctor.firstName} {doctor.lastName} ({count})
+                </div>
+              );
+            })
+          )}
+
           <div
             className="sticky top-0 right-0 bg-card border-l border-l-slate-300 border-b border-border px-0.5 py-2 text-center text-xs font-bold text-text-primary tracking-wide z-30"
-            style={{ gridColumn: doctors.length + 2, gridRow: 1 }}
+            style={{ gridColumn: columnsCount + 2, gridRow: 1 }}
           >
             &nbsp;
           </div>
@@ -150,9 +233,9 @@ export function DoctorTimeline({
                 {/* Left Time Label column */}
                 <div
                   className={`sticky left-0 bg-card border-r border-r-slate-300 z-10 transition-colors flex items-start justify-end px-0.5 text-right h-full ${
-                    isHourMark ? 'text-text-primary font-bold bg-muted/20 text-[11px]' : 'text-text-secondary font-normal text-[10px]'
-                  } ${isLineRow ? 'border-b border-border' : 'border-b border-border/25'}`}
-                  style={{ gridColumn: 1, gridRow: rowIndex + 2 }}
+                    isHourMark ? 'text-foreground bg-muted/20 text-[11px]' : 'text-text-secondary font-normal text-[10px]'
+                   } ${isLineRow ? 'border-b border-border' : 'border-b border-border/25'}`}
+                   style={{ gridColumn: 1, gridRow: rowIndex + 2 }}
                 >
                   {isTenMinMark && minutes >= 480 ? (
                     <span style={{ transform: 'translateY(-50%)', display: 'inline-block', lineHeight: 1 }}>
@@ -162,14 +245,14 @@ export function DoctorTimeline({
                 </div>
 
                 {/* Empty columns behind appointment cards */}
-                {doctors.map((doctor, docIndex) => {
+                {(viewMode === 'week' ? daysOfWeek : doctors).map((item, colIndex) => {
                   return (
                     <div
-                      key={doctor.id}
+                      key={viewMode === 'week' ? (item as any).dateStr : (item as any).id}
                       className={`border-r border-r-slate-300 transition-colors ${
                         isLineRow ? 'border-b border-border' : 'border-b border-border/25'
                       } ${isHourMark ? 'bg-muted/10' : 'bg-transparent'}`}
-                      style={{ gridColumn: docIndex + 2, gridRow: rowIndex + 2 }}
+                      style={{ gridColumn: colIndex + 2, gridRow: rowIndex + 2 }}
                     />
                   );
                 })}
@@ -177,9 +260,9 @@ export function DoctorTimeline({
                 {/* Right Time Label column */}
                 <div
                   className={`sticky right-0 bg-card border-l border-l-slate-300 z-10 transition-colors flex items-start justify-start px-0.5 text-left h-full ${
-                    isHourMark ? 'text-text-primary font-bold bg-muted/20 text-[11px]' : 'text-text-secondary font-normal text-[10px]'
-                  } ${isLineRow ? 'border-b border-border' : 'border-b border-border/25'}`}
-                  style={{ gridColumn: doctors.length + 2, gridRow: rowIndex + 2 }}
+                    isHourMark ? 'text-foreground bg-muted/20 text-[11px]' : 'text-text-secondary font-normal text-[10px]'
+                   } ${isLineRow ? 'border-b border-border' : 'border-b border-border/25'}`}
+                   style={{ gridColumn: columnsCount + 2, gridRow: rowIndex + 2 }}
                 >
                   {isTenMinMark && minutes >= 480 ? (
                     <span style={{ transform: 'translateY(-50%)', display: 'inline-block', lineHeight: 1 }}>
@@ -192,14 +275,14 @@ export function DoctorTimeline({
           })}
 
           {/* Card overlay per column — absolute positioned at exact minute */}
-          {doctors.map((doctor, docIndex) => {
-            const col = docIndex + 2;
+          {(viewMode === 'week' ? daysOfWeek : doctors).map((item, colIndex) => {
+            const col = colIndex + 2;
             const colCards = placedAppointments.filter(c => c.col === col);
             if (colCards.length === 0) return null;
 
             return (
               <div
-                key={`card-layer-${doctor.id}`}
+                key={viewMode === 'week' ? `card-layer-${(item as any).dateStr}` : `card-layer-${(item as any).id}`}
                 className="z-10"
                 style={{
                   gridColumn: col,
@@ -208,13 +291,18 @@ export function DoctorTimeline({
                   pointerEvents: 'none',
                 }}
               >
-                {colCards.map(({ appointment, topPercent, heightPercent, isSmallCard }) => {
+                {colCards.map(({ appointment, topPercent, heightPercent, isSmallCard, left, width }) => {
                   const isSelected = selectedAppointmentId === appointment.id;
                   const patientName = formatPatientName(appointment);
                   const serviceName = appointment.service?.name || 'Treatment';
                   const timeRange = appointment.startTime && appointment.endTime
                     ? `${formatClinicTime(appointment.startTime)} - ${formatClinicTime(appointment.endTime)}`
                     : '';
+                  const doctorName = viewMode === 'week'
+                    ? ` | Dr. ${appointment.doctor?.lastName || ''}`
+                    : '';
+
+                  const color = getDoctorColor(appointment.doctorId || '');
 
                   return (
                     <div
@@ -222,38 +310,35 @@ export function DoctorTimeline({
                       onClick={() => onSelectAppointment(appointment)}
                       className={`absolute pl-0 pr-1.5 py-0 flex flex-row justify-start items-stretch text-left text-xs transition-all cursor-pointer shadow-sm border select-none overflow-hidden hover:shadow ${
                         isSelected
-                          ? 'bg-slate-300 border-slate-700 text-slate-950 ring-2 ring-slate-700/20 font-semibold'
-                          : 'bg-slate-100 hover:bg-slate-200 border-slate-400 text-slate-950'
+                          ? `${color.bg} ${color.hover} ${color.border} ${color.text} ring-2 ring-slate-800/10 font-semibold scale-[1.01]`
+                          : `${color.bg} ${color.hover} ${color.border} ${color.text}`
                       }`}
                       style={{
                         top: `calc(${topPercent}% + 1px)`,
                         height: `calc(${heightPercent}% - 2px)`,
-                        left: '0px',
-                        right: '0px',
+                        left: left,
+                        width: width,
                         pointerEvents: 'auto',
                       }}
                     >
                       {/* Left Accent Bar */}
                       <div 
                         className={`w-1 shrink-0 mr-1.5 ${
-                          isSelected ? 'bg-slate-800' : 'bg-slate-500'
+                          isSelected ? 'bg-slate-900' : color.accent
                         }`} 
                       />
 
                       {/* Content Column */}
                       <div className="flex-1 min-w-0 flex flex-col justify-start py-1 px-1 h-full min-h-0 gap-[2px]">
-                        {/* Top Row: Name on Left, Time on Right */}
+                        {/* Top Row: Name on Left */}
                         <div className="flex justify-between items-start gap-2 w-full">
-                          <div className="font-semibold text-slate-950 truncate text-[12px] leading-none" title={patientName}>
+                          <div className={`font-normal truncate text-sm leading-none ${isSelected ? 'font-medium' : ''} ${color.text}`} title={patientName}>
                             {patientName}
-                          </div>
-                          <div className="text-[9.5px] text-slate-700 font-mono leading-none font-medium shrink-0 pt-[1px]">
-                            {timeRange}
                           </div>
                         </div>
 
                         {/* Bottom Row: Service */}
-                        <div className="text-slate-800 truncate text-[11px] leading-none font-medium" title={serviceName}>
+                        <div className={`truncate text-xs leading-none font-normal ${color.subtext}`} title={serviceName}>
                           {serviceName}
                         </div>
                       </div>
