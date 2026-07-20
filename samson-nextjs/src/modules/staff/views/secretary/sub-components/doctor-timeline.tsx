@@ -329,7 +329,7 @@ export function DoctorTimeline({
                       />
 
                       {/* Content Column */}
-                      <div className="flex-1 min-w-0 flex flex-col justify-center py-1 px-1 h-full min-h-0 gap-[3px]">
+                      <div className="flex-1 min-w-0 flex flex-col justify-start py-1 px-1 h-full min-h-0 gap-[3px]">
                         {/* Row 1: Name */}
                         <div className={`font-normal truncate text-sm leading-none ${isSelected ? 'font-medium' : ''} ${color.text}`} title={patientName}>
                           {patientName}
