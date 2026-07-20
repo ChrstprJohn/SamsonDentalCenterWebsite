@@ -331,28 +331,28 @@ export function DoctorTimeline({
 
                       {/* Content Column */}
                       <div className="flex-1 min-w-0 flex flex-col justify-start py-1 px-1 h-full min-h-0 gap-[3px]">
-                        {/* Row 1: Name & Time (Time on top-right only if card duration <= 20 mins) */}
+                        {/* Row 1: Name (left) + Status / Time (right) */}
                         <div className="flex justify-between items-start gap-2 w-full">
                           <div className={`font-normal truncate text-sm leading-none ${isSelected ? 'font-medium' : ''} ${color.text}`} title={patientName}>
                             {patientName}
                           </div>
-                          {timeRange && isSmallCard && !(viewMode === 'week' && doctors.length > 1) && (
-                            <span className={`text-[10px] leading-none shrink-0 pt-0.5 font-normal ${color.subtext}`}>
-                              {timeRange.toLowerCase().replace(/ /g, '')}
-                            </span>
-                          )}
+                          <div className="flex flex-col items-end gap-0 shrink-0">
+                            {timeRange && isSmallCard && !(viewMode === 'week' && doctors.length > 1) && (
+                              <span className={`text-[10px] leading-none font-normal ${color.subtext}`}>
+                                {timeRange.toLowerCase().replace(/ /g, '')}
+                              </span>
+                            )}
+                            {appointment.status && (
+                              <span className={`text-[9px] leading-none font-semibold uppercase tracking-wider ${isSmallCard ? 'opacity-70' : color.subtext}`}>
+                                {appointment.status}
+                              </span>
+                            )}
+                          </div>
                         </div>
 
-                        {/* Row 2: Service + Status */}
-                        <div className="flex items-center gap-1.5 w-full">
-                          <div className={`truncate text-[11px] leading-none font-normal ${color.subtext}`} title={serviceName}>
-                            {serviceName}
-                          </div>
-                          {appointment.status && (
-                            <span className="shrink-0 text-[9px] leading-none font-semibold uppercase tracking-wider opacity-75">
-                              {appointment.status}
-                            </span>
-                          )}
+                        {/* Row 2: Service */}
+                        <div className={`truncate text-[11px] leading-none font-normal ${color.subtext}`} title={serviceName}>
+                          {serviceName}
                         </div>
 
                         {/* Row 3: Time (Under service name, hidden if duration <= 20m or multiple doctors in week view) */}
