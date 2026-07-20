@@ -343,12 +343,12 @@ export function DoctorTimeline({
                           ) : isSmallCard ? (
                             <div className="flex flex-col items-end gap-px shrink-0">
                               {timeRange && !(viewMode === 'week' && doctors.length > 1) && (
-                                <span className={`text-[9px] leading-none font-normal ${color.subtext}`}>
+                                <span className={`text-[10px] leading-none font-normal ${color.subtext}`}>
                                   {timeRange.toLowerCase().replace(/ /g, '')}
                                 </span>
                               )}
                               {appointment.status && viewMode === 'day' && (
-                                <span className="text-[8px] leading-none font-semibold uppercase tracking-wider opacity-70">
+                                <span className="text-[9px] leading-none font-semibold uppercase tracking-wider opacity-75">
                                   {appointment.status}
                                 </span>
                               )}
