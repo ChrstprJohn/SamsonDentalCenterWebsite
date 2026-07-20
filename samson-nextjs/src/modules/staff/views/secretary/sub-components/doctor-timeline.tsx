@@ -357,7 +357,7 @@ export function DoctorTimeline({
                         </div>
 
                         {/* Row 2: Service */}
-                        <div className={`truncate ${isSmallCard ? 'text-[10px]' : 'text-[11px]'} leading-none font-normal ${color.subtext}`} title={serviceName}>
+                        <div className={`truncate text-[11px] leading-none font-normal ${color.subtext}`} title={serviceName}>
                           {serviceName}
                         </div>
 
