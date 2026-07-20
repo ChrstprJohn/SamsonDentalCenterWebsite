@@ -331,34 +331,39 @@ export function DoctorTimeline({
 
                       {/* Content Column */}
                       <div className="flex-1 min-w-0 flex flex-col justify-start py-1 px-1 h-full min-h-0 gap-[3px]">
-                        {/* Row 1: Name (left) + Time on top-right (small cards only) */}
+                        {/* Row 1: Name (left) */}
                         <div className="flex justify-between items-start gap-2 w-full">
                           <div className={`font-normal truncate text-sm leading-none ${isSelected ? 'font-medium' : ''} ${color.text}`} title={patientName}>
                             {patientName}
                           </div>
-                          {timeRange && isSmallCard && !(viewMode === 'week' && doctors.length > 1) && (
-                            <span className={`text-[10px] leading-none shrink-0 pt-0.5 font-normal ${color.subtext}`}>
-                              {timeRange.toLowerCase().replace(/ /g, '')}
-                            </span>
-                          )}
-                        </div>
-
-                        {/* Row 2: Service + Status (day view only) */}
-                        <div className="flex items-center gap-1.5 w-full">
-                          <div className={`truncate text-[11px] leading-none font-normal ${color.subtext}`} title={serviceName}>
-                            {serviceName}
-                          </div>
-                          {appointment.status && viewMode === 'day' && (
+                          {/* Large cards: status on top-right; small cards: time on top-right */}
+                          {!isSmallCard && appointment.status && viewMode === 'day' ? (
                             <span className="shrink-0 text-[9px] leading-none font-semibold uppercase tracking-wider opacity-75">
                               {appointment.status}
                             </span>
-                          )}
+                          ) : timeRange && isSmallCard && !(viewMode === 'week' && doctors.length > 1) ? (
+                            <span className={`text-[10px] leading-none shrink-0 pt-0.5 font-normal ${color.subtext}`}>
+                              {timeRange.toLowerCase().replace(/ /g, '')}
+                            </span>
+                          ) : null}
                         </div>
 
-                        {/* Row 3: Time (Under service name, hidden if duration <= 20m or multiple doctors in week view) */}
-                        {timeRange && !isSmallCard && !(viewMode === 'week' && doctors.length > 1) && (
+                        {/* Row 2: Service */}
+                        <div className={`truncate text-[11px] leading-none font-normal ${color.subtext}`} title={serviceName}>
+                          {serviceName}
+                        </div>
+
+                        {/* Row 3: Time for large cards; Status for small cards */}
+                        {!isSmallCard && timeRange && !(viewMode === 'week' && doctors.length > 1) && (
                           <div className={`truncate text-[10px] leading-none font-normal opacity-80 ${color.subtext}`}>
                             {timeRange.toLowerCase().replace(/ /g, '')}
+                          </div>
+                        )}
+                        {isSmallCard && appointment.status && viewMode === 'day' && (
+                          <div className="flex justify-end w-full mt-auto">
+                            <span className="text-[9px] leading-none font-semibold uppercase tracking-wider opacity-70">
+                              {appointment.status}
+                            </span>
                           </div>
                         )}
                       </div>
