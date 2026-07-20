@@ -159,7 +159,7 @@ export function SecretaryBookAppointmentView() {
                   viewMode === 'day' ? 'bg-white shadow text-foreground' : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
-                Day
+                1 Day
               </button>
               <button
                 onClick={() => setViewMode('week')}
