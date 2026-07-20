@@ -137,7 +137,7 @@ export function SecretaryBookAppointmentView() {
             <select
               value={selectedDoctorId}
               onChange={(e) => setSelectedDoctorId(e.target.value)}
-              className="text-sm bg-muted border-none rounded-lg py-2 px-3 font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-ring cursor-pointer"
+              className="text-xs bg-muted border-none rounded-lg py-1.5 px-2.5 font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-ring cursor-pointer"
             >
               <option value="ALL">All Doctors</option>
               {view.doctorsList.map((doc) => (
@@ -148,10 +148,10 @@ export function SecretaryBookAppointmentView() {
             </select>
 
             {/* Day / 5 Days Toggle Slider */}
-            <div className="flex bg-muted p-1 rounded-lg text-sm font-medium">
+            <div className="flex bg-muted p-0.5 rounded-lg text-xs font-medium">
               <button
                 onClick={() => setViewMode('day')}
-                className={`px-4 py-2 rounded-md transition-colors ${
+                className={`px-3.5 py-1.5 rounded-md transition-colors ${
                   viewMode === 'day' ? 'bg-white shadow text-foreground' : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
@@ -159,7 +159,7 @@ export function SecretaryBookAppointmentView() {
               </button>
               <button
                 onClick={() => setViewMode('week')}
-                className={`px-4 py-2 rounded-md transition-colors ${
+                className={`px-3.5 py-1.5 rounded-md transition-colors ${
                   viewMode === 'week' ? 'bg-white shadow text-foreground' : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
