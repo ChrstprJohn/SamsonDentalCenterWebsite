@@ -5,13 +5,14 @@ import { NavMainSecretary } from "@/components/nav-main-secretary"
 import { NavProjectsSecretary } from "@/components/nav-projects-secretary"
 import { NavUserSecretary } from "@/components/nav-user-secretary"
 import { TeamSwitcherSecretary } from "@/components/team-switcher-secretary"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
+  useSidebar,
 } from "@/components/ui/sidebar"
 import {
   CalendarDays,
@@ -132,7 +133,32 @@ interface SecretarySidebarProps extends React.ComponentProps<typeof Sidebar> {
 
 export function SecretarySidebar({ userProfile, ...props }: SecretarySidebarProps) {
   const router = useRouter()
+  const pathname = usePathname()
+  const { setOpen } = useSidebar()
   const [isPending, startTransition] = React.useTransition()
+
+  React.useEffect(() => {
+    const checkViewport = () => {
+      const isTargetPage = [
+        '/secretary-v2/chat',
+        '/secretary-v2/pending',
+        '/secretary-v2/book',
+        '/secretary-v2/appointments',
+      ].some(path => pathname === path || pathname.startsWith(path + '/'));
+
+      if (isTargetPage) {
+        if (window.innerWidth >= 1440) {
+          setOpen(true);
+        } else {
+          setOpen(false);
+        }
+      }
+    };
+
+    checkViewport();
+    window.addEventListener('resize', checkViewport);
+    return () => window.removeEventListener('resize', checkViewport);
+  }, [pathname, setOpen]);
 
   const handleNavigate = React.useCallback((url: string, e?: React.MouseEvent) => {
     if (!url || url === "#") return
