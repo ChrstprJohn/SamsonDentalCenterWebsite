@@ -71,8 +71,8 @@ describe('updateAppointmentStatusTransactionCommand', () => {
 
     expect(mockRpc).toHaveBeenCalledWith('update_appointment_status_transaction', expect.objectContaining({
       p_reschedule_date:   '2026-07-01',
-      p_reschedule_start:  '09:00',
-      p_reschedule_end:    '09:30',
+      p_reschedule_start:  '2026-07-01T09:00:00Z',
+      p_reschedule_end:    '2026-07-01T09:30:00Z',
       p_reschedule_doctor: DOCTOR_ID,
       p_reschedule_count:  1,
     }));

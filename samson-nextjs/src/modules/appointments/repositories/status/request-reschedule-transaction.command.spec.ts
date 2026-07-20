@@ -50,8 +50,8 @@ describe('requestRescheduleTransactionCommand', () => {
       p_actor_role:          'PATIENT',
       p_reason:              'Schedule conflict',
       p_proposed_date:       PROPOSED.date,
-      p_proposed_start_time: PROPOSED.startTime,
-      p_proposed_end_time:   PROPOSED.endTime,
+      p_proposed_start_time: '2026-07-01T09:00:00Z',
+      p_proposed_end_time:   '2026-07-01T09:30:00Z',
       p_proposed_doctor_id:  PROPOSED.doctorId,
       p_proposed_preferred_start_time: null,
     });

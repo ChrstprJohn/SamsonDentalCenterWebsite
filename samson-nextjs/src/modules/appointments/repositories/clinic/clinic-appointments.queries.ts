@@ -13,6 +13,14 @@ export const getAppointmentsByClinicQuery = (supabase: SupabaseClient) => {
         service:service_id (id, name, duration_minutes),
         patient:patient_id (id, first_name, last_name),
         dependent:dependents!appointments_dependent_id_fkey (id, first_name, last_name, relationship, date_of_birth),
+        guest_contacts (
+          first_name,
+          middle_name,
+          last_name,
+          suffix,
+          email,
+          phone_number
+        ),
         status_history:appointment_status_history (
           id,
           previous_status,

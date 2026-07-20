@@ -485,8 +485,12 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                     throw new Error('A reason is required for rescheduling.');
                 }
 
-                const startUtc = new Date(`${rescheduleDate}T${rescheduleStartTime}`).toISOString();
-                const endUtc = new Date(`${rescheduleDate}T${rescheduleEndTime}`).toISOString();
+                const startUtc = rescheduleStartTime.includes(':00') || rescheduleStartTime.split(':').length === 3
+                    ? `${rescheduleDate}T${rescheduleStartTime}Z`
+                    : `${rescheduleDate}T${rescheduleStartTime}:00Z`;
+                const endUtc = rescheduleEndTime.includes(':00') || rescheduleEndTime.split(':').length === 3
+                    ? `${rescheduleDate}T${rescheduleEndTime}Z`
+                    : `${rescheduleDate}T${rescheduleEndTime}:00Z`;
 
                 res = await updateAppointmentStatusAction({
                     appointmentId: selectedThreadId,

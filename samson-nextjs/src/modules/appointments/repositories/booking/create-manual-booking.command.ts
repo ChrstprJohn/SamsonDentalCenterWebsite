@@ -1,6 +1,7 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { DomainError } from '@/shared/errors';
 import { CreateManualBookingDto } from '../../dtos/exports';
+import { formatToTimestamptz } from '../../utils/time.utils';
 
 export const createManualBookingCommand = (supabase: SupabaseClient) => {
   return async (data: CreateManualBookingDto & { secretaryUserId: string }): Promise<{ appointmentId: string }> => {
@@ -9,8 +10,8 @@ export const createManualBookingCommand = (supabase: SupabaseClient) => {
       p_service_id: data.serviceId,
       p_doctor_id: data.doctorId,
       p_date: data.date,
-      p_start_time: data.startTime,
-      p_end_time: data.endTime,
+      p_start_time: formatToTimestamptz(data.date, data.startTime),
+      p_end_time: formatToTimestamptz(data.date, data.endTime),
       p_first_name: data.firstName || null,
       p_middle_name: data.middleName || null,
       p_last_name: data.lastName || null,

@@ -18,6 +18,7 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarTrigger,
 } from '@/components/ui/sidebar';
 
 import {
@@ -29,6 +30,8 @@ import {
   Plus,
   ChevronRight,
   Check,
+  Calendar as CalendarIcon,
+  Users,
 } from 'lucide-react';
 
 function getDaysOfWeek(dateStr: string) {
@@ -52,6 +55,15 @@ export function SecretaryBookAppointmentView() {
   const [viewMode, setViewMode] = React.useState<'day' | 'week'>('day');
   const [weekAppointments, setWeekAppointments] = React.useState<any[]>([]);
   const [isWeekLoading, setIsWeekLoading] = React.useState(false);
+  const [mobileView, setMobileView] = React.useState<'timeline' | 'detail'>('timeline');
+
+  React.useEffect(() => {
+    if (view.selectedAppointmentDetails) {
+      setMobileView('detail');
+    } else {
+      setMobileView('timeline');
+    }
+  }, [view.selectedAppointmentDetails]);
 
   React.useEffect(() => {
     if (view.doctorsList.length > 0) {
@@ -142,16 +154,17 @@ export function SecretaryBookAppointmentView() {
   return (
     <div className="flex h-full w-full overflow-hidden bg-background">
       {/* Left Column: Doctor Schedules Timeline */}
-      <div className="flex-1 flex flex-col h-full min-h-0 bg-white overflow-hidden">
+      <div className={`flex-1 flex flex-col h-full min-h-0 bg-white overflow-hidden ${mobileView === 'detail' ? 'max-lg:hidden' : ''}`}>
         {/* Left Column Header */}
         <div className="p-4 border-b border-border shrink-0 flex justify-between items-center">
           <div className="flex flex-col gap-0.5">
-            <h1 className="text-base font-medium text-foreground">Doctor Schedules</h1>
-            <p className="text-xs text-muted-foreground">{getHeaderDateString()}</p>
+            <div className="flex items-center gap-2">
+              <SidebarTrigger className="lg:hidden -ml-1 text-muted-foreground hover:text-foreground" />
+              <h1 className="text-base font-medium text-foreground">Doctor Schedules</h1>
+            </div>
+            <p className="text-xs text-muted-foreground max-lg:hidden">{getHeaderDateString()}</p>
           </div>
           <div className="flex items-center gap-2">
-
-            {/* Day / 5 Days Toggle Slider */}
             <div className="flex bg-muted p-0.5 rounded-lg text-xs font-medium">
               <button
                 onClick={() => setViewMode('day')}
@@ -173,6 +186,48 @@ export function SecretaryBookAppointmentView() {
           </div>
         </div>
 
+        {/* Tablet: Calendar + Dentist picker above timeline */}
+        <div className="lg:hidden border-b border-border shrink-0">
+          <div className="flex gap-3 p-3 items-center">
+            <div className="flex items-center gap-1.5">
+              <CalendarIcon className="size-3.5 text-muted-foreground shrink-0" />
+              <input
+                type="date"
+                value={view.selectedDate}
+                onChange={(e) => view.selectDate(e.target.value)}
+                className="text-xs bg-transparent border border-border rounded-md px-2 py-1.5 text-foreground w-[140px]"
+              />
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Users className="size-3.5 text-muted-foreground shrink-0" />
+              <select
+                value={isAllDoctorsChecked ? 'all' : view.doctorsList.find(d => checkedDoctorIds[d.id])?.id ?? 'all'}
+                onChange={(e) => {
+                  const id = e.target.value;
+                  if (id === 'all') {
+                    if (!isAllDoctorsChecked) toggleAllDoctors();
+                    return;
+                  }
+                  if (!id) return;
+                  setCheckedDoctorIds(prev => {
+                    const next: Record<string, boolean> = {};
+                    view.doctorsList.forEach(d => { next[d.id] = d.id === id; });
+                    return next;
+                  });
+                }}
+                className="text-xs bg-transparent border border-border rounded-md px-2 py-1.5 text-foreground w-[140px]"
+              >
+                <option value="all">All Doctors</option>
+                {view.doctorsList.map((doctor) => (
+                  <option key={doctor.id} value={doctor.id}>
+                    Dr. {doctor.firstName} {doctor.lastName}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
+
         {/* Left Column Body */}
         <div className="flex-1 min-h-0 flex flex-col">
           <DoctorTimeline
@@ -187,20 +242,13 @@ export function SecretaryBookAppointmentView() {
         </div>
       </div>
 
-      {/* Right Column: Booking Console Sidebar (styled 1-1 like AppSidebar in md file, but on the right) */}
-      <Sidebar collapsible="none" side="right" className="flex-1 lg:flex-none lg:w-[var(--sidebar-width)] border-l border-border shrink-0 flex flex-col h-full bg-sidebar">
+      {/* Right Column: Booking Console Sidebar */}
+      <Sidebar collapsible="none" side="right" className={`flex-1 lg:flex-none lg:w-80 border-l border-border shrink-0 flex-col h-full bg-sidebar ${mobileView === 'timeline' ? 'max-lg:hidden' : ''}`}>
         {view.selectedAppointmentDetails ? (
-          <>
-            <SidebarHeader className="h-16 border-b border-sidebar-border px-4 flex items-center justify-between">
-              <h2 className="text-base font-medium text-foreground">Appointment Details</h2>
-            </SidebarHeader>
-            <SidebarContent className="p-4">
-              <SidebarAppointmentDetails
-                appointment={view.selectedAppointmentDetails}
-                onClose={() => view.setSelectedAppointmentDetails(null)}
-              />
-            </SidebarContent>
-          </>
+          <SidebarAppointmentDetails
+            appointment={view.selectedAppointmentDetails}
+            onClose={() => view.setSelectedAppointmentDetails(null)}
+          />
         ) : (
           <>
             <div className="p-4 border-b border-border shrink-0 flex flex-col gap-0.5">
@@ -213,8 +261,6 @@ export function SecretaryBookAppointmentView() {
                 onSelectDate={view.selectDate}
               />
               <SidebarSeparator className="mx-0" />
-
-              {/* Dentists Group Accordion */}
               <SidebarGroup className="py-0">
                 <Collapsible defaultOpen className="group/collapsible">
                   <SidebarGroupLabel asChild className="group/label w-full text-sm text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
@@ -226,7 +272,6 @@ export function SecretaryBookAppointmentView() {
                   <CollapsibleContent>
                     <SidebarGroupContent>
                       <SidebarMenu>
-                        {/* All Option */}
                         <SidebarMenuItem>
                           <SidebarMenuButton onClick={toggleAllDoctors}>
                             <div
@@ -238,7 +283,6 @@ export function SecretaryBookAppointmentView() {
                             All Doctors
                           </SidebarMenuButton>
                         </SidebarMenuItem>
-                        {/* Individual Doctors */}
                         {view.doctorsList.map((doctor) => {
                           const isChecked = !!checkedDoctorIds[doctor.id];
                           return (
@@ -260,8 +304,6 @@ export function SecretaryBookAppointmentView() {
                   </CollapsibleContent>
                 </Collapsible>
               </SidebarGroup>
-
-
             </SidebarContent>
             <SidebarFooter>
               <SidebarMenu>
@@ -291,7 +333,7 @@ function DatePicker({
   const date = selectedDate ? new Date(selectedDate + 'T00:00:00') : undefined;
 
   return (
-    <SidebarGroup className="px-0">
+    <SidebarGroup className="px-0 flex justify-center">
       <SidebarGroupContent>
         <Calendar
           mode="single"
@@ -304,7 +346,7 @@ function DatePicker({
               onSelectDate(`${y}-${m}-${day}`);
             }
           }}
-          className="[&_[role=gridcell]]:w-[33px] [&_[role=gridcell].bg-accent]:bg-sidebar-primary [&_[role=gridcell].bg-accent]:text-sidebar-primary-foreground"
+          className="w-full [&_table]:w-full [&_td]:w-[14.285%] [&_th]:w-[14.285%] [&_th]:text-center [&_[role=gridcell].bg-accent]:bg-sidebar-primary [&_[role=gridcell].bg-accent]:text-sidebar-primary-foreground"
         />
       </SidebarGroupContent>
     </SidebarGroup>

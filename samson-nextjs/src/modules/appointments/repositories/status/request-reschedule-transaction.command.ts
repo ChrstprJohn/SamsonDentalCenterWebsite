@@ -1,6 +1,7 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { DomainError } from '@/shared/errors';
 import { AppointmentDto, mapAppointmentRecord } from '../../dtos/exports';
+import { formatToTimestamptz } from '../../utils/time.utils';
 
 export const requestRescheduleTransactionCommand = (supabase: SupabaseClient) => {
   return async (
@@ -22,8 +23,8 @@ export const requestRescheduleTransactionCommand = (supabase: SupabaseClient) =>
       p_actor_role:           actorRole,
       p_reason:               reason,
       p_proposed_date:        proposedMetadata.date,
-      p_proposed_start_time:  proposedMetadata.startTime || null,
-      p_proposed_end_time:    proposedMetadata.endTime || null,
+      p_proposed_start_time:  formatToTimestamptz(proposedMetadata.date, proposedMetadata.startTime),
+      p_proposed_end_time:    formatToTimestamptz(proposedMetadata.date, proposedMetadata.endTime),
       p_proposed_doctor_id:   proposedMetadata.doctorId || null,
       p_proposed_preferred_start_time: proposedMetadata.preferredStartTime || null,
     });

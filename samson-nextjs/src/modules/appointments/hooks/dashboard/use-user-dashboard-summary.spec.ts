@@ -33,6 +33,9 @@ const appointment = (id: string, status: AppointmentDto['status'], date: string,
     patient: null,
     dependent: null,
     statusHistory: [],
+    preferredStartTime: null,
+    proposedPreferredStartTime: null,
+    guestContact: null,
   });
 
 describe('useUserDashboardSummary', () => {

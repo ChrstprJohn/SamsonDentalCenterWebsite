@@ -41,6 +41,15 @@ export const appointmentPatientSchema = appointmentPatientDbSchema.transform((da
   lastName: data.last_name,
 }));
 
+const guestContactDbSchema = z.object({
+  first_name: z.string(),
+  middle_name: z.string().nullable().optional(),
+  last_name: z.string(),
+  suffix: z.string().nullable().optional(),
+  email: z.string().nullable().optional(),
+  phone_number: z.string().nullable().optional(),
+});
+
 const appointmentDbSchema = z.object({
   id: z.string().uuid(),
   patient_id: z.string().uuid().nullable().optional(),
@@ -74,6 +83,7 @@ const appointmentDbSchema = z.object({
     relationship: z.string(),
     date_of_birth: z.string().optional().nullable(),
   }).nullable().optional(),
+  guest_contacts: z.array(guestContactDbSchema).nullable().optional(),
   status_history: z.array(z.object({
     id: z.string(),
     previous_status: z.string().nullable().optional(),
@@ -125,6 +135,14 @@ export const appointmentDtoSchema = appointmentDbSchema.transform((data) => ({
     createdAt: h.created_at,
     actorRole: h.actor_role,
   })) : [],
+  guestContact: data.guest_contacts && data.guest_contacts.length > 0 ? {
+    firstName: data.guest_contacts[0].first_name,
+    middleName: data.guest_contacts[0].middle_name || null,
+    lastName: data.guest_contacts[0].last_name,
+    suffix: data.guest_contacts[0].suffix || null,
+    email: data.guest_contacts[0].email || null,
+    phone: data.guest_contacts[0].phone_number || null,
+  } : null,
 }));
 
 export type AppointmentDto = z.infer<typeof appointmentDtoSchema>;

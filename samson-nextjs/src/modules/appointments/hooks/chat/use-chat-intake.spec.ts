@@ -57,15 +57,19 @@ describe('useChatIntake', () => {
     });
 
     expect(onPatientMessageSent).toHaveBeenCalledWith(
-      expect.stringContaining('reschedule for my appointment to Jul 20, 2026 at 10:00 AM')
+      expect.stringContaining(`I would like to request a reschedule for my appointment:
+New Date: Jul 20, 2026
+Preferred Time: 10:00 AM`)
     );
-    expect(sendMessageAction).toHaveBeenCalledWith({
-      appointmentId: 'appt-123',
-      message: 'Got it. The clinic will review this and reply here shortly.',
-      senderRole: 'STAFF',
-      senderName: 'System',
-      chatToken: 'token-456',
-    });
+    expect(sendMessageAction).toHaveBeenCalledWith(
+      {
+        appointmentId: 'appt-123',
+        message: 'Your request to reschedule has been submitted to the clinic staff. We will reply to this chat as soon as we have confirmed the new date and time.',
+        senderRole: 'STAFF',
+        senderName: 'System',
+      },
+      'token-456'
+    );
     expect(result.current.activeWorkflow).toBe('NONE');
   });
 
@@ -90,7 +94,8 @@ describe('useChatIntake', () => {
     });
 
     expect(onPatientMessageSent).toHaveBeenCalledWith(
-      'I would like to request a cancellation for this appointment. Reason: "Feeling sick"'
+      `I would like to request a cancellation for this appointment.
+Reason: Feeling sick`
     );
     expect(sendMessageAction).toHaveBeenCalled();
     expect(result.current.activeWorkflow).toBe('NONE');

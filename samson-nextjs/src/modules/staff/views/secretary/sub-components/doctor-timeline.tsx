@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
+import { Stethoscope } from 'lucide-react';
 import type { AppointmentDto } from '@/modules/appointments/dtos/shared/appointment.dto';
 import { formatClinicTime } from '@/shared/utils/date.util';
 
@@ -73,6 +74,9 @@ export function DoctorTimeline({
       const holder = appointment.patient ? `${appointment.patient.firstName} ${appointment.patient.lastName}` : 'Unknown';
       return `${appointment.dependent.firstName} ${appointment.dependent.lastName} (Dep. of ${holder})`;
     }
+    if (appointment.guestContact) {
+      return `${appointment.guestContact.firstName} ${appointment.guestContact.lastName}`;
+    }
     if (appointment.source === 'STAFF_CREATED' && !appointment.patientId) {
       return `${appointment.patient?.firstName ?? 'Guest'} ${appointment.patient?.lastName ?? ''} (Guest)`;
     }
@@ -104,45 +108,70 @@ export function DoctorTimeline({
     return days;
   }, [selectedDate]);
 
+  // Per-day active doctors for week view
+  const perDayDoctorIds = useMemo(() => {
+    if (viewMode !== 'week') return {};
+    const activeStatuses = ['APPROVED', 'CHECKED_IN', 'COMPLETED', 'NO_SHOW'];
+    const result: Record<string, string[]> = {};
+    for (const app of appointments) {
+      if (!activeStatuses.includes(app.status) || !app.doctorId || !doctors.some(d => d.id === app.doctorId)) continue;
+      if (!result[app.date]) result[app.date] = [];
+      if (!result[app.date].includes(app.doctorId)) {
+        result[app.date].push(app.doctorId);
+      }
+    }
+    return result;
+  }, [appointments, doctors, viewMode]);
+
+  // Proportional column widths for week view based on active doctor count per day
+  const dayFrUnits = useMemo(() => {
+    if (viewMode !== 'week') return [];
+    return daysOfWeek.map(day =>
+      Math.max(perDayDoctorIds[day.dateStr]?.length || 1, 1)
+    );
+  }, [daysOfWeek, perDayDoctorIds, viewMode]);
+
   // Pre-calculate positions of appointments
   const placedAppointments = useMemo(() => {
-    return appointments
-      .filter((app) => ['APPROVED', 'CHECKED_IN', 'COMPLETED', 'NO_SHOW'].includes(app.status))
-      .map((app) => {
-        if (!app.doctorId) return null;
-        const docIndex = doctors.findIndex((d) => d.id === app.doctorId);
-        if (docIndex === -1) return null;
+    const activeStatuses = ['APPROVED', 'CHECKED_IN', 'COMPLETED', 'NO_SHOW'];
+    const relevant = appointments.filter((app) => activeStatuses.includes(app.status) && app.doctorId && doctors.some(d => d.id === app.doctorId));
 
-        const startMin = parseTimeToMinutes(app.startTime);
-        const endMin = parseTimeToMinutes(app.endTime);
+    return relevant.map((app) => {
+      const docIndex = doctors.findIndex((d) => d.id === app.doctorId);
 
-        if (startMin === null || endMin === null) return null;
+      const startMin = parseTimeToMinutes(app.startTime);
+      const endMin = parseTimeToMinutes(app.endTime);
 
-        const clampedStart = Math.max(startTimeMins, Math.min(endTimeMins, startMin));
-        const clampedEnd = Math.max(startTimeMins, Math.min(endTimeMins, endMin));
+      if (startMin === null || endMin === null) return null;
 
-        if (clampedEnd <= clampedStart) return null;
+      const clampedStart = Math.max(startTimeMins, Math.min(endTimeMins, startMin));
+      const clampedEnd = Math.max(startTimeMins, Math.min(endTimeMins, endMin));
 
-        const topPercent = ((clampedStart - startTimeMins) / totalMinutes) * 100;
-        const heightPercent = ((clampedEnd - clampedStart) / totalMinutes) * 100;
-        const isSmallCard = (clampedEnd - clampedStart) <= 20;
+      if (clampedEnd <= clampedStart) return null;
 
-        let col = -1;
-        let left = '0%';
-        let width = '100%';
+      const topPercent = ((clampedStart - startTimeMins) / totalMinutes) * 100;
+      const heightPercent = ((clampedEnd - clampedStart) / totalMinutes) * 100;
+      const isSmallCard = (clampedEnd - clampedStart) <= 20;
 
-        if (viewMode === 'week') {
-          const dayIdx = daysOfWeek.findIndex((d) => d.dateStr === app.date);
-          if (dayIdx === -1) return null;
-          col = dayIdx + 2;
+      let col = -1;
+      let left = '0%';
+      let width = '100%';
 
-          if (doctors.length > 0) {
-            width = `${100 / doctors.length}%`;
-            left = `${(docIndex * 100) / doctors.length}%`;
-          }
-        } else {
-          col = docIndex + 2;
+      if (viewMode === 'week') {
+        const dayIdx = daysOfWeek.findIndex((d) => d.dateStr === app.date);
+        if (dayIdx === -1) return null;
+        col = dayIdx + 2;
+
+        const activeDoctors = perDayDoctorIds[app.date] || [];
+        const activeCount = activeDoctors.length;
+        if (activeCount > 0) {
+          const activeIdx = activeDoctors.indexOf(app.doctorId!);
+          width = `${100 / activeCount}%`;
+          left = `${(activeIdx * 100) / activeCount}%`;
         }
+      } else {
+        col = docIndex + 2;
+      }
 
         return {
           appointment: app,
@@ -152,15 +181,19 @@ export function DoctorTimeline({
           isSmallCard,
           width,
           left,
+          activeDoctorCount: viewMode === 'week' ? (perDayDoctorIds[app.date] || []).length : doctors.length,
+          durationMins: clampedEnd - clampedStart,
         };
-      })
+    })
       .filter((x): x is NonNullable<typeof x> => x !== null);
   }, [appointments, doctors, viewMode, daysOfWeek]);
 
-  if (viewMode === 'day' && doctors.length === 0) {
+  if (doctors.length === 0) {
     return (
-      <div className="flex items-center justify-center h-96 border border-card-border bg-card/50 rounded-3xl">
-        <p className="text-xs text-text-muted">No active doctors selected.</p>
+      <div className="flex-1 flex-col items-center justify-center text-muted-foreground bg-muted/10 space-y-2 flex">
+        <Stethoscope className="size-12 text-muted-foreground/40" />
+        <p className="text-sm font-medium">No active doctors selected.</p>
+        <p className="text-xs text-muted-foreground">Select doctors from the sidebar to view their schedules.</p>
       </div>
     );
   }
@@ -174,7 +207,9 @@ export function DoctorTimeline({
         <div
           className="grid relative"
           style={{
-            gridTemplateColumns: `35px repeat(${columnsCount}, minmax(${viewMode === 'week' ? '140px' : '180px'}, 1fr)) 35px`,
+            gridTemplateColumns: viewMode === 'week'
+              ? `35px ${dayFrUnits.map(f => `minmax(140px, ${f}fr)`).join(' ')} 35px`
+              : `35px repeat(${doctors.length}, minmax(180px, 1fr)) 35px`,
             gridTemplateRows: `auto repeat(${totalSlots}, 10px)`,
           }}
         >
@@ -233,9 +268,7 @@ export function DoctorTimeline({
               <React.Fragment key={rowIndex}>
                 {/* Left Time Label column */}
                 <div
-                  className={`sticky left-0 bg-card border-r border-r-slate-300 z-10 transition-colors flex items-start justify-end px-0.5 text-right h-full ${
-                    isHourMark ? 'text-foreground bg-muted/20 text-[11px]' : 'text-text-secondary font-normal text-[10px]'
-                   } ${isLineRow ? 'border-b border-border' : 'border-b border-border/25'}`}
+                  className={"sticky left-0 bg-card border-r border-r-slate-300 z-20 transition-colors flex items-start justify-end px-0.5 text-right h-full " + (isHourMark ? 'text-foreground text-[11px]' : 'text-text-secondary font-normal text-[10px]') + " " + (isLineRow ? 'border-b border-border' : 'border-b border-border/25')}
                    style={{ gridColumn: 1, gridRow: rowIndex + 2 }}
                 >
                   {isTenMinMark && minutes >= 480 ? (
@@ -260,9 +293,7 @@ export function DoctorTimeline({
 
                 {/* Right Time Label column */}
                 <div
-                  className={`sticky right-0 bg-card border-l border-l-slate-300 z-10 transition-colors flex items-start justify-start px-0.5 text-left h-full ${
-                    isHourMark ? 'text-foreground bg-muted/20 text-[11px]' : 'text-text-secondary font-normal text-[10px]'
-                   } ${isLineRow ? 'border-b border-border' : 'border-b border-border/25'}`}
+                  className={"sticky right-0 bg-card border-l border-l-slate-300 z-20 transition-colors flex items-start justify-start px-0.5 text-left h-full " + (isHourMark ? 'text-foreground text-[11px]' : 'text-text-secondary font-normal text-[10px]') + " " + (isLineRow ? 'border-b border-border' : 'border-b border-border/25')}
                    style={{ gridColumn: columnsCount + 2, gridRow: rowIndex + 2 }}
                 >
                   {isTenMinMark && minutes >= 480 ? (
@@ -284,7 +315,7 @@ export function DoctorTimeline({
             return (
               <div
                 key={viewMode === 'week' ? `card-layer-${(item as any).dateStr}` : `card-layer-${(item as any).id}`}
-                className="z-10"
+                className="z-0"
                 style={{
                   gridColumn: col,
                   gridRow: `2 / span ${totalSlots}`,
@@ -292,7 +323,7 @@ export function DoctorTimeline({
                   pointerEvents: 'none',
                 }}
               >
-                {colCards.map(({ appointment, topPercent, heightPercent, isSmallCard, left, width }) => {
+                {colCards.map(({ appointment, topPercent, heightPercent, isSmallCard, left, width, activeDoctorCount, durationMins }) => {
                   const isSelected = selectedAppointmentId === appointment.id;
                   const patientName = formatPatientName(appointment);
                   const serviceName = appointment.service?.name || 'Treatment';
@@ -304,6 +335,7 @@ export function DoctorTimeline({
                     : '';
 
                   const color = getDoctorColor(appointment.doctorId || '');
+                  const showTime = viewMode === 'day' || activeDoctorCount <= 1;
 
                   return (
                     <div
@@ -336,7 +368,7 @@ export function DoctorTimeline({
                           <div className={`font-normal truncate text-sm leading-none ${isSelected ? 'font-medium' : ''} ${color.text}`} title={patientName}>
                             {patientName}
                           </div>
-                          {timeRange && isSmallCard && !(viewMode === 'week' && doctors.length > 1) && (
+                          {timeRange && isSmallCard && showTime && (
                             <span className={`text-[10px] leading-none shrink-0 pt-0.5 font-normal ${color.subtext}`}>
                               {timeRange.toLowerCase().replace(/ /g, '')}
                             </span>
@@ -344,12 +376,14 @@ export function DoctorTimeline({
                         </div>
 
                         {/* Row 2: Service */}
-                        <div className={`truncate text-[11px] leading-none font-normal ${color.subtext}`} title={serviceName}>
-                          {serviceName}
-                        </div>
+                        {durationMins > 15 && (
+                          <div className={`truncate text-[11px] leading-none font-normal ${color.subtext}`} title={serviceName}>
+                            {serviceName}
+                          </div>
+                        )}
 
                         {/* Row 3: Time (Under service name, hidden if duration <= 20m or multiple doctors in week view) */}
-                        {timeRange && !isSmallCard && !(viewMode === 'week' && doctors.length > 1) && (
+                        {timeRange && !isSmallCard && showTime && (
                           <div className={`truncate text-[10px] leading-none font-normal opacity-80 ${color.subtext}`}>
                             {timeRange.toLowerCase().replace(/ /g, '')}
                           </div>

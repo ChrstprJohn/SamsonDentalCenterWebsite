@@ -126,7 +126,9 @@ export function useSecretaryCheckInOutTracker() {
   const handleRescheduleSubmit = () => {
     if (!rescheduleAppt || !rescheduleDate || !rescheduleTime || !rescheduleDoctor) return;
     startTransition(async () => {
-      const startIso = new Date(`${rescheduleDate}T${rescheduleTime}:00`).toISOString();
+      const startIso = rescheduleTime.includes(':00') || rescheduleTime.split(':').length === 3
+        ? `${rescheduleDate}T${rescheduleTime}Z`
+        : `${rescheduleDate}T${rescheduleTime}:00Z`;
       const endIso = new Date(new Date(startIso).getTime() + 30 * 60 * 1000).toISOString();
       const res = await updateAppointmentStatusAction({
         appointmentId: rescheduleAppt.id,

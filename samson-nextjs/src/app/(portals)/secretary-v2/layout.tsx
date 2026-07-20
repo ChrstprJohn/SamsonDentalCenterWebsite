@@ -70,7 +70,7 @@ export default async function SecretaryPortalV2Layout({
   };
 
   return (
-    <SidebarProvider className="h-svh overflow-hidden">
+    <SidebarProvider defaultOpen={false} className="h-svh overflow-hidden">
       <RealtimeListener userId={userId} />
       <SecretarySidebar userProfile={sidebarUser} />
 

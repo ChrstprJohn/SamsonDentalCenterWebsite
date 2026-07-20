@@ -1,6 +1,7 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { DomainError } from '@/shared/errors';
 import { SubmitBookingDto, AppointmentDto, mapAppointmentRecord } from '../../dtos/exports';
+import { formatToTimestamptz } from '../../utils/time.utils';
 
 export const executeBookingTransactionCommand = (supabase: SupabaseClient) => {
   return async (userId: string, data: SubmitBookingDto): Promise<{ appointmentId: string }> => {
@@ -10,8 +11,8 @@ export const executeBookingTransactionCommand = (supabase: SupabaseClient) => {
       p_service_id: data.serviceId,
       p_doctor_id: data.doctorId ?? null,
       p_date: data.date,
-      p_start_time: data.startTime,
-      p_end_time: data.endTime,
+      p_start_time: formatToTimestamptz(data.date, data.startTime),
+      p_end_time: formatToTimestamptz(data.date, data.endTime),
       p_user_note: data.userNote || null,
       p_existing_dependent_id: data.patientType === 'EXISTING_DEPENDENT' ? data.dependentId : null,
       p_new_dependent_first_name: data.patientType === 'NEW_DEPENDENT' ? data.dependentFirstName : null,
