@@ -54,8 +54,7 @@ export const onRescheduleBookingSubscriber = {
     }
 
     const dateStr = formatShortDate(date);
-    const start = new Date(startTime);
-    const timeRangeStr = formatClinicTime(start);
+    const timeRangeStr = formatClinicTime(startTime);
     const baseUrl = getBaseUrl();
     const chatToken = appt.chat_token;
 

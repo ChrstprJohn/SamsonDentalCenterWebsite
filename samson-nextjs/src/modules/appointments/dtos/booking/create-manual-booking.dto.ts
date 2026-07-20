@@ -33,8 +33,8 @@ export const createManualBookingSchema = z
     serviceId: z.string().uuid('Invalid service ID format'),
     doctorId: z.string().uuid('Invalid doctor ID format').nullable().optional(),
     date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format'),
-    startTime: z.string().datetime('Must be a valid ISO string'),
-    endTime: z.string().datetime('Must be a valid ISO string'),
+    startTime: z.string().regex(/^\d{2}:\d{2}$/, 'Must be HH:MM format (e.g. 09:00)'),
+    endTime: z.string().regex(/^\d{2}:\d{2}$/, 'Must be HH:MM format (e.g. 09:25)'),
     patientNote: cleanOptionalString,
     statusReason: cleanOptionalString,
     doctorAssignmentSource: z.enum(['SYSTEM', 'USER']).optional().default('SYSTEM'),
@@ -54,8 +54,8 @@ export const createManualBookingSchema = z
       .optional(),
   })
   .superRefine((data, ctx) => {
-    // 1. Start time must be before end time
-    if (new Date(data.startTime) >= new Date(data.endTime)) {
+    // 1. Start time must be before end time (HH:MM strings compare correctly lexicographically)
+    if (data.startTime >= data.endTime) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: 'Start time must be before end time',

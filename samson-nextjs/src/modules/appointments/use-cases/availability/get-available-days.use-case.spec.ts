@@ -29,16 +29,16 @@ describe('getAvailableDaysUseCase', () => {
       {
         id: 'appt-1',
         doctorId: doctorId,
-        startTime: '2024-12-02T09:00:00Z',
-        endTime: '2024-12-02T09:30:00Z',
+        startTime: '09:00',
+        endTime: '09:30',
         status: 'APPROVED',
         date: '2024-12-02',
       },
       {
         id: 'appt-2',
         doctorId: doctorId,
-        startTime: '2024-12-02T09:30:00Z',
-        endTime: '2024-12-02T10:00:00Z',
+        startTime: '09:30',
+        endTime: '10:00',
         status: 'APPROVED',
         date: '2024-12-02',
       },
@@ -115,8 +115,8 @@ describe('getAvailableDaysUseCase', () => {
     const getAvailableTimeSlots = vi.fn().mockResolvedValue({
       availableSlots: [
         {
-          startTime: '2024-12-01T09:00:00.000Z',
-          endTime: '2024-12-01T09:30:00.000Z',
+          startTime: '09:00',
+          endTime: '09:30',
           doctorId,
           doctorName: 'Dr. Jane Doe',
         },

@@ -33,10 +33,17 @@ export function formatShortDate(date: Date | string): string {
 
 /**
  * Formats a Date object or ISO string into a standard time string.
+ * Also handles bare "HH:MM" or "HH:MM:SS" naive local strings (no timezone).
  * Example: '2:30 PM'
  */
 export function formatClinicTime(date: Date | string | null): string {
   if (!date) return '';
+
+  // Fast-path: bare HH:MM or HH:MM:SS naive local time — route through formatTimeString
+  if (typeof date === 'string' && /^\d{2}:\d{2}(:\d{2})?$/.test(date)) {
+    return formatTimeString(date);
+  }
+
   const d = typeof date === 'string' ? new Date(date) : date;
 
   if (Number.isNaN(d.getTime())) {
@@ -76,9 +83,23 @@ export function formatTimeString(timeStr: string): string {
 /**
  * Calculates the end time given an ISO string and duration in minutes.
  * Returns a new Date object representing the end time, safely preserving timezone.
+ * @deprecated Use calculateEndTime for HH:MM naive local time strings.
  */
 export function calculateEndTimeFromIso(isoString: string, durationMinutes: number): Date {
   return new Date(new Date(isoString).getTime() + durationMinutes * 60000);
+}
+
+/**
+ * Calculates the end time given a naive HH:MM start time and duration in minutes.
+ * Returns the end time as an HH:MM string.
+ * Example: calculateEndTime('09:00', 25) -> '09:25'
+ */
+export function calculateEndTime(startTime: string, durationMinutes: number): string {
+  const [hStr, mStr] = startTime.split(':');
+  const totalMinutes = parseInt(hStr, 10) * 60 + parseInt(mStr, 10) + durationMinutes;
+  const h = Math.floor(totalMinutes / 60) % 24;
+  const m = totalMinutes % 60;
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
 }
 
 /**

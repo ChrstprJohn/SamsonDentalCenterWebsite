@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import type { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
 import type { BookingSlot } from '../../hooks/booking/use-user-booking';
 
-import { formatShortDate, formatClinicTime, calculateEndTimeFromIso, formatTimeString } from '@/shared/utils/date.util';
+import { formatShortDate, formatTimeString } from '@/shared/utils/date.util';
 
 interface BookingSuccessViewProps {
   appointmentId: string | null;

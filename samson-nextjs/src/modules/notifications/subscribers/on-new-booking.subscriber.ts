@@ -1,12 +1,13 @@
 import { createAdminClient } from '@/shared/database/server';
 import { createNotificationUseCase } from '../use-cases/management/create-notification.use-case';
+import { formatClinicTime } from '@/shared/utils/date.util';
 
 export const onNewBookingSubscriber = {
   async handle(payload: Record<string, any>): Promise<void> {
     const { appointmentId, patientName, serviceName, date, startTime } = payload;
     const supabaseAdmin = await createAdminClient();
 
-    const formattedTime = startTime ? new Date(startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+    const formattedTime = startTime ? formatClinicTime(startTime) : '';
 
     await createNotificationUseCase(supabaseAdmin)({
       recipientRole: 'SECRETARY',

@@ -16,7 +16,7 @@ describe('onManualBookingSmsSubscriber', () => {
       patientName: 'John Doe',
       phoneNumber: '0917-111-2222',
       date: '2026-07-20',
-      startTime: '2026-07-20T10:00:00.000Z',
+      startTime: '10:00',
       serviceName: 'Teeth Whitening',
     };
 

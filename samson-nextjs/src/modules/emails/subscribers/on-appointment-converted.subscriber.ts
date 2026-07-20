@@ -1,7 +1,7 @@
 import { createAdminClient } from '@/shared/database/server';
 import { ResendService } from '@/shared/services/email/resend.service';
 import { appointmentConvertedEventSchema } from '../dtos/events/appointment-converted.event.dto';
-import { formatShortDate, formatClinicTime, calculateEndTimeFromIso } from '@/shared/utils/date.util';
+import { formatShortDate, formatClinicTime, calculateEndTime } from '@/shared/utils/date.util';
 import { getBaseUrl } from '@/shared/utils/get-base-url.util';
 
 export const onAppointmentConvertedSubscriber = {
@@ -42,8 +42,8 @@ export const onAppointmentConvertedSubscriber = {
     const doctorName = `Dr. ${doctor.first_name} ${doctor.last_name}`;
     const dateStr = formatShortDate(date);
 
-    const start = new Date(startTime);
-    const end = calculateEndTimeFromIso(startTime, durationMinutes);
+    const start = startTime;
+    const end = calculateEndTime(startTime, durationMinutes);
     const timeRangeStr = `${formatClinicTime(start)} - ${formatClinicTime(end)}`;
 
     const subject = 'Appointment Confirmed – Samson Dental Center';

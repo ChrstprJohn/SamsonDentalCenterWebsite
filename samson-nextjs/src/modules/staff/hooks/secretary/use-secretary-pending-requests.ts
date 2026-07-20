@@ -83,8 +83,8 @@ export function useSecretaryPendingRequests() {
     return patientDetails.history.find((appointment: any) => {
       if (appointment.id === selectedAppointment.id || appointment.date !== selectedAppointment.date) return false;
       if (['CANCELLED', 'REJECTED', 'DISPLACED'].includes(appointment.status)) return false;
-      return new Date(selectedAppointment.startTime).getTime() < new Date(appointment.endTime).getTime()
-        && new Date(selectedAppointment.endTime).getTime() > new Date(appointment.startTime).getTime();
+      return (selectedAppointment.startTime || '') < (appointment.endTime || '')
+        && (selectedAppointment.endTime || '') > (appointment.startTime || '');
     });
   }, [selectedAppointment, patientDetails]);
 

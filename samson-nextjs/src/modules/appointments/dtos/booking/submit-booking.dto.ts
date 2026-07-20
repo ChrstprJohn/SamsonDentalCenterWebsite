@@ -14,8 +14,8 @@ export const submitBookingSchema = z
         doctorAssignmentSource: z.enum(['SYSTEM', 'USER']).optional().default('SYSTEM'),
 
         date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format'),
-        startTime: z.string().datetime('Must be a valid ISO string').optional().or(emptyStringToUndefined),
-        endTime: z.string().datetime('Must be a valid ISO string').optional().or(emptyStringToUndefined),
+        startTime: z.string().regex(/^\d{2}:\d{2}$/, 'Must be HH:MM format (e.g. 09:00)').optional().or(emptyStringToUndefined),
+        endTime: z.string().regex(/^\d{2}:\d{2}$/, 'Must be HH:MM format (e.g. 09:25)').optional().or(emptyStringToUndefined),
         preferredStartTime: z.string().regex(/^(?:[01]\d|2[0-3]):[0-5]\d$/, {
             message: 'Preferred start time is required (HH:MM)',
         }),
@@ -43,9 +43,9 @@ export const submitBookingSchema = z
         dependentRelationship: dependentRelationshipEnum.optional(),
     })
     .superRefine((data, ctx) => {
-        // 1. Chronological Ordering Boundary Guard
+        // 1. Chronological Ordering Boundary Guard (HH:MM strings compare correctly lexicographically)
         if (data.startTime && data.endTime) {
-            if (new Date(data.startTime) >= new Date(data.endTime)) {
+            if (data.startTime >= data.endTime) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
                     message: 'Start time must be before end time',

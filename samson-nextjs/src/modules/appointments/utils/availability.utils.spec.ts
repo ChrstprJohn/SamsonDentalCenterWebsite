@@ -24,13 +24,13 @@ describe('generateAvailableSlotsForDay', () => {
 
     expect(slots).toHaveLength(4);
     expect(slots[0]).toEqual({
-      startTime: '2024-12-25T09:00:00.000Z',
-      endTime: '2024-12-25T09:30:00.000Z',
+      startTime: '09:00',
+      endTime: '09:30',
       doctorId,
     });
     expect(slots[3]).toEqual({
-      startTime: '2024-12-25T10:30:00.000Z',
-      endTime: '2024-12-25T11:00:00.000Z',
+      startTime: '10:30',
+      endTime: '11:00',
       doctorId,
     });
   });
@@ -54,7 +54,7 @@ describe('generateAvailableSlotsForDay', () => {
     const slots = generateAvailableSlotsForDay(params);
 
     expect(slots).toHaveLength(3);
-    expect(slots.map((s) => s.startTime)).not.toContain('2024-12-25T10:00:00.000Z');
+    expect(slots.map((s) => s.startTime)).not.toContain('10:00');
   });
 
   it('should exclude slots that overlap with active appointments', () => {
@@ -74,8 +74,8 @@ describe('generateAvailableSlotsForDay', () => {
         {
           id: 'appt-1',
           doctorId,
-          startTime: '2024-12-25T09:30:00Z',
-          endTime: '2024-12-25T10:00:00Z',
+          startTime: '09:30',
+          endTime: '10:00',
           status: 'APPROVED',
           date: '2024-12-25',
         },
@@ -85,6 +85,6 @@ describe('generateAvailableSlotsForDay', () => {
     const slots = generateAvailableSlotsForDay(params);
 
     expect(slots).toHaveLength(3);
-    expect(slots.map((s) => s.startTime)).not.toContain('2024-12-25T09:30:00.000Z');
+    expect(slots.map((s) => s.startTime)).not.toContain('09:30');
   });
 });

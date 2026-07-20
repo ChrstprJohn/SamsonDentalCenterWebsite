@@ -13,8 +13,8 @@ const DB_ROW = {
   doctor_id: DOCTOR_ID,
   status: 'APPROVED',
   date: '2026-07-01',
-  start_time: '2026-07-01T09:00:00Z',
-  end_time: '2026-07-01T09:30:00Z',
+  start_time: '09:00',
+  end_time: '09:30',
   proposed_date: null,
   proposed_start_time: null,
   proposed_end_time: null,
@@ -64,15 +64,15 @@ describe('updateAppointmentStatusTransactionCommand', () => {
     const command = updateAppointmentStatusTransactionCommand(supabase);
     await command(APPT_ID, ACTOR_ID, 'STAFF', 'APPROVED', 'Rescheduled', {
       date: '2026-07-01',
-      startTime: '2026-07-01T09:00:00Z',
-      endTime: '2026-07-01T09:30:00Z',
+      startTime: '09:00',
+      endTime: '09:30',
       doctorId: DOCTOR_ID,
     }, false, 1);
 
     expect(mockRpc).toHaveBeenCalledWith('update_appointment_status_transaction', expect.objectContaining({
       p_reschedule_date:   '2026-07-01',
-      p_reschedule_start:  '2026-07-01T09:00:00Z',
-      p_reschedule_end:    '2026-07-01T09:30:00Z',
+      p_reschedule_start:  '09:00',
+      p_reschedule_end:    '09:30',
       p_reschedule_doctor: DOCTOR_ID,
       p_reschedule_count:  1,
     }));

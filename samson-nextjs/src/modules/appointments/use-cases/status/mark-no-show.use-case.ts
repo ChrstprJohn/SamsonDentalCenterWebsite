@@ -32,7 +32,7 @@ export const markNoShowUseCase = (deps: {
 
     const getCurrentTime = deps.getCurrentTime || (() => getClinicNaiveDate(new Date()));
     const now = getCurrentTime();
-    const endTime = new Date(appointment.endTime);
+    const endTime = new Date(`${appointment.date}T${appointment.endTime}:00+08:00`);
 
     if (now <= endTime) {
       throw new ValidationError(

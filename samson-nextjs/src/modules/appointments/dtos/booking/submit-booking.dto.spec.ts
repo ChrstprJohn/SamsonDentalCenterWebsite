@@ -8,8 +8,8 @@ describe('submitBookingSchema', () => {
         doctorId: '823e4567-e89b-12d3-a456-426614174001',
         isPreferredDoctor: false,
         date: '2026-05-28',
-        startTime: '2026-05-28T09:00:00Z',
-        endTime: '2026-05-28T09:30:00Z',
+        startTime: '09:00',
+        endTime: '09:30',
         preferredStartTime: '09:00',
     };
 
@@ -125,8 +125,8 @@ describe('submitBookingSchema', () => {
         const result = submitBookingSchema.safeParse({
             ...baseValidData,
             patientType: 'SELF',
-            startTime: '2026-05-28T09:30:00Z',
-            endTime: '2026-05-28T09:30:00Z',
+            startTime: '09:30',
+            endTime: '09:30',
         });
         expect(result.success).toBe(false);
     });
@@ -135,8 +135,8 @@ describe('submitBookingSchema', () => {
         const result = submitBookingSchema.safeParse({
             ...baseValidData,
             patientType: 'SELF',
-            startTime: '2026-05-28T10:00:00Z',
-            endTime: '2026-05-28T09:30:00Z',
+            startTime: '10:00',
+            endTime: '09:30',
         });
         expect(result.success).toBe(false);
     });

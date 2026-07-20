@@ -38,8 +38,8 @@ const appointment = {
   serviceId: 'service-1',
   doctorId: 'doctor-1',
   date: '2026-07-01',
-  startTime: '2026-07-01T08:00:00Z',
-  endTime: '2026-07-01T08:30:00Z',
+  startTime: '08:00',
+  endTime: '08:30',
 };
 
 describe('useSecretaryPendingRequests', () => {

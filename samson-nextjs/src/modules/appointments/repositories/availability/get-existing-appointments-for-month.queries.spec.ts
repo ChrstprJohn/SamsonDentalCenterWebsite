@@ -26,8 +26,8 @@ describe('getExistingAppointmentsForMonthQuery', () => {
   it('should fetch appointments for the whole month and exclude cancelled/rejected/displaced', async () => {
     const mockData = [{
       id: apptUuid,
-      start_time: '2024-11-11T09:00:00Z',
-      end_time: '2024-11-11T09:30:00Z',
+      start_time: '09:00',
+      end_time: '09:30',
       doctor_id: doctorUuid,
       status: 'APPROVED',
       date: '2024-11-11',
@@ -43,8 +43,8 @@ describe('getExistingAppointmentsForMonthQuery', () => {
     expect(mockSupabase.not).toHaveBeenCalledWith('status', 'in', '("CANCELLED","REJECTED","DISPLACED")');
     expect(result).toEqual([{
       id: apptUuid,
-      startTime: '2024-11-11T09:00:00Z',
-      endTime: '2024-11-11T09:30:00Z',
+      startTime: '09:00',
+      endTime: '09:30',
       doctorId: doctorUuid,
       status: 'APPROVED',
       date: '2024-11-11',

@@ -27,8 +27,8 @@ describe('AppointmentBookingCommands', () => {
       isPreferredDoctor: true,
       doctorAssignmentSource: 'USER',
       date: '2024-12-25',
-      startTime: '2024-12-25T10:00:00Z',
-      endTime: '2024-12-25T10:30:00Z',
+      startTime: '10:00',
+      endTime: '10:30',
       userNote: 'Dental checkup',
       patientType: 'SELF',
     };

@@ -10,7 +10,6 @@ import { useBookingState } from './use-booking-state';
 import { useBookingData } from './use-booking-data';
 import { createBookingPayload } from './submit-booking-payload.mapper';
 import { requestRescheduleAction } from '../../actions/status/request-reschedule.action';
-import { calculateEndTimeFromIso } from '@/shared/utils/date.util';
 
 export type BookingStep = 1 | 2 | 3 | 4;
 

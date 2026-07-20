@@ -34,14 +34,14 @@ describe('getAvailableTimeSlotsUseCase', () => {
 
     expect(result.availableSlots).toHaveLength(4);
     expect(result.availableSlots[0]).toEqual({
-      startTime: '2024-12-25T09:00:00.000Z',
-      endTime: '2024-12-25T09:30:00.000Z',
+      startTime: '09:00',
+      endTime: '09:30',
       doctorId,
       doctorName: 'Dr. John Doe',
     });
     expect(result.availableSlots[3]).toEqual({
-      startTime: '2024-12-25T10:30:00.000Z',
-      endTime: '2024-12-25T11:00:00.000Z',
+      startTime: '10:30',
+      endTime: '11:00',
       doctorId,
       doctorName: 'Dr. John Doe',
     });
@@ -76,7 +76,7 @@ describe('getAvailableTimeSlotsUseCase', () => {
 
     expect(result.availableSlots).toHaveLength(3);
     expect(result.availableSlots.map((s) => s.startTime)).not.toContain(
-      '2024-12-25T10:00:00.000Z'
+      '10:00'
     );
   });
 
@@ -97,8 +97,8 @@ describe('getAvailableTimeSlotsUseCase', () => {
       {
         id: 'appt-1',
         doctorId: doctorId,
-        startTime: '2024-12-25T09:30:00Z',
-        endTime: '2024-12-25T10:00:00Z',
+        startTime: '09:30',
+        endTime: '10:00',
         status: 'APPROVED',
         date: '2024-12-25',
       },
@@ -118,7 +118,7 @@ describe('getAvailableTimeSlotsUseCase', () => {
 
     expect(result.availableSlots).toHaveLength(3);
     expect(result.availableSlots.map((s) => s.startTime)).not.toContain(
-      '2024-12-25T09:30:00.000Z'
+      '09:30'
     );
   });
 });

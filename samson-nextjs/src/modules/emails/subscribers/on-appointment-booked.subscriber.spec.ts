@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { onAppointmentBookedSubscriber } from './on-appointment-booked.subscriber';
 import { ResendService } from '@/shared/services/email/resend.service';
 import { createAdminClient } from '@/shared/database/server';
-import { formatClinicTime } from '@/shared/utils/date.util';
+import { formatClinicTime, calculateEndTime } from '@/shared/utils/date.util';
 import { z } from 'zod';
 
 vi.mock('server-only', () => ({}));
@@ -27,7 +27,7 @@ describe('onAppointmentBookedSubscriber', () => {
       serviceId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd3',
       doctorId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd4',
       date: '2026-06-04',
-      startTime: '2026-06-04T09:00:00.000Z',
+      startTime: '09:00',
       durationMinutes: 30,
       // dependentId omitted — self booking
     };
@@ -46,9 +46,10 @@ describe('onAppointmentBookedSubscriber', () => {
         error: null,
       }); // doctor
 
-    const start = new Date(validPayload.startTime);
-    const end = new Date(start.getTime() + validPayload.durationMinutes * 60000);
+    const start = validPayload.startTime;
+    const end = calculateEndTime(start, validPayload.durationMinutes);
     const expectedTimeRange = `${formatClinicTime(start)} - ${formatClinicTime(end)}`;
+
 
     await onAppointmentBookedSubscriber.handle(validPayload);
 
@@ -79,7 +80,7 @@ describe('onAppointmentBookedSubscriber', () => {
       serviceId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd3',
       doctorId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd4',
       date: '2026-06-04',
-      startTime: '2026-06-04T09:00:00.000Z',
+      startTime: '09:00',
       durationMinutes: 30,
       dependentId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd5',
     };
@@ -102,9 +103,10 @@ describe('onAppointmentBookedSubscriber', () => {
         error: null,
       }); // dependent
 
-    const start = new Date(validPayload.startTime);
-    const end = new Date(start.getTime() + validPayload.durationMinutes * 60000);
+    const start = validPayload.startTime;
+    const end = calculateEndTime(start, validPayload.durationMinutes);
     const expectedTimeRange = `${formatClinicTime(start)} - ${formatClinicTime(end)}`;
+
 
     await onAppointmentBookedSubscriber.handle(validPayload);
 

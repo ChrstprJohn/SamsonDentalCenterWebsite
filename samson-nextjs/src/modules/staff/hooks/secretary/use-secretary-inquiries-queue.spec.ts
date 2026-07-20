@@ -12,7 +12,7 @@ const scheduler = {
   availableDates: ['2026-07-09'],
   availabilityMap: {},
   availableDoctors: [{ doctorId: 'doctor-1', doctorName: 'Dr. Santos' }],
-  availableSlots: [{ startTime: '2026-07-09T08:00:00Z', endTime: '2026-07-09T08:30:00Z' }],
+  availableSlots: [{ startTime: '08:00', endTime: '08:30' }],
   error: null,
   loadingKey: null,
   loadDoctorsForService: vi.fn(),
@@ -69,7 +69,7 @@ describe('useSecretaryInquiriesQueue', () => {
       result.current.setDecision('CONVERT');
       result.current.selectDate('2026-07-09');
       result.current.selectDoctor('doctor-1');
-      result.current.selectSlot({ startTime: '2026-07-09T08:00:00Z', endTime: '2026-07-09T08:30:00Z' });
+      result.current.selectSlot({ startTime: '08:00', endTime: '08:30' });
       result.current.setSecretaryNotes('Confirmed by phone');
     });
     await act(async () => result.current.submitReview('inq-1'));
@@ -79,8 +79,8 @@ describe('useSecretaryInquiriesQueue', () => {
       serviceId: 'service-1',
       doctorId: 'doctor-1',
       date: '2026-07-09',
-      startTime: '2026-07-09T08:00:00Z',
-      endTime: '2026-07-09T08:30:00Z',
+      startTime: '08:00',
+      endTime: '08:30',
       patientNote: 'Sensitive tooth',
       secretaryNotes: 'Confirmed by phone',
       linkedPatientId: undefined,

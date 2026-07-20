@@ -204,12 +204,13 @@ export function useSecretaryBookAppointment() {
   };
 
   const selectTimeslot = (slot: { startTime: string; endTime: string }) => {
+    // Slots are now HH:MM strings; extractTimePart handles both HH:MM and legacy ISO as a fallback
     const extractTimePart = (isoOrTime: string) => {
       if (!isoOrTime) return '';
       if (isoOrTime.includes('T')) {
         return isoOrTime.split('T')[1].substring(0, 5);
       }
-      return isoOrTime;
+      return isoOrTime.substring(0, 5); // already HH:MM or HH:MM:SS
     };
     setSelectedTime(extractTimePart(slot.startTime));
     setSelectedEndTime(extractTimePart(slot.endTime));
@@ -277,8 +278,8 @@ export function useSecretaryBookAppointment() {
             }
           : {};
       const payload = patientMode === 'SEARCH' && selectedPatient
-        ? { patientId: selectedPatient.id, serviceId: selectedService, doctorId: selectedDoctor, date: selectedDate, startTime: `${selectedDate}T${selectedTime}:00Z`, endTime: `${selectedDate}T${selectedEndTime}:00Z`, patientNote: patientNote || undefined, confirmationChannel, ...dependentPayload }
-        : { serviceId: selectedService, doctorId: selectedDoctor, date: selectedDate, startTime: `${selectedDate}T${selectedTime}:00Z`, endTime: `${selectedDate}T${selectedEndTime}:00Z`, patientNote: patientNote || undefined, firstName, middleName: middleName || undefined, lastName, suffix: suffix || undefined, phoneNumber, email: email || undefined, confirmationChannel };
+        ? { patientId: selectedPatient.id, serviceId: selectedService, doctorId: selectedDoctor, date: selectedDate, startTime: selectedTime, endTime: selectedEndTime, patientNote: patientNote || undefined, confirmationChannel, ...dependentPayload }
+        : { serviceId: selectedService, doctorId: selectedDoctor, date: selectedDate, startTime: selectedTime, endTime: selectedEndTime, patientNote: patientNote || undefined, firstName, middleName: middleName || undefined, lastName, suffix: suffix || undefined, phoneNumber, email: email || undefined, confirmationChannel };
 
       const res = await createManualBookingAction(payload as any);
       if (res.success) {

@@ -21,8 +21,8 @@ describe('ClinicAppointmentsQueries', () => {
         service_id: '123e4567-e89b-12d3-a456-426614174001',
         doctor_id: '123e4567-e89b-12d3-a456-426614174002',
         date: '2026-06-01',
-        start_time: '2026-06-01T10:00:00Z',
-        end_time: '2026-06-01T11:00:00Z',
+        start_time: '10:00',
+        end_time: '11:00',
         status: 'APPROVED',
         doctor_assignment_source: 'SYSTEM',
         status_history: [

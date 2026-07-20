@@ -11,8 +11,7 @@ export const onManualBookingSmsSubscriber = {
     if (!phoneNumber) return;
 
     const dateStr = formatShortDate(date);
-    const start = new Date(startTime);
-    const timeStr = formatClinicTime(start);
+    const timeStr = formatClinicTime(startTime);
 
     // Premium 160-character confirmation text
     const message = `Samson Dental: Appt confirmed ${dateStr}, ${timeStr}. To reschedule or ask questions, call 0917-123-4567.`;

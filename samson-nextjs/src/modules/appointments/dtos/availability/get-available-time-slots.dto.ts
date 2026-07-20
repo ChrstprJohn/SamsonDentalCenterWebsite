@@ -15,8 +15,8 @@ export type GetAvailableTimeSlotsDto = z.infer<typeof getAvailableTimeSlotsSchem
 
 // Shared Slot Entity
 export const availableSlotSchema = z.object({
-  startTime: z.string().datetime({ message: 'Must be a valid ISO UTC timestamp' }),
-  endTime: z.string().datetime({ message: 'Must be a valid ISO UTC timestamp' }),
+  startTime: z.string().regex(/^\d{2}:\d{2}$/, { message: 'Must be HH:MM format' }),
+  endTime: z.string().regex(/^\d{2}:\d{2}$/, { message: 'Must be HH:MM format' }),
   // Houses the implicitly assigned least-busy doctor if 'Any Doctor' was picked
   doctorId: z.string().uuid(),
   doctorName: z.string().trim(),

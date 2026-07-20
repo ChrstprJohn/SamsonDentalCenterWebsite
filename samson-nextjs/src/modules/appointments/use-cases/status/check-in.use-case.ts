@@ -32,8 +32,23 @@ export const checkInUseCase = (deps: {
 
     const getCurrentTime = deps.getCurrentTime || (() => getClinicNaiveDate(new Date()));
     const now = getCurrentTime();
-    const startTime = new Date(appointment.startTime);
-    const endTime = new Date(appointment.endTime);
+
+    // Parse naive HH:MM local times by combining with the appointment date at UTC+8
+    const parseLocalTime = (date: string, time: string | null): Date | null => {
+      if (!time) return null;
+      const t = time.substring(0, 5); // normalize HH:MM:SS → HH:MM
+      return new Date(`${date}T${t}:00+08:00`);
+    };
+    const startTime = parseLocalTime(appointment.date, appointment.startTime);
+    const endTime = parseLocalTime(appointment.date, appointment.endTime);
+
+    if (!startTime || !endTime) {
+      throw new ValidationError(
+        'Appointment start or end time is missing or invalid.',
+        'INVALID_TIME_WINDOW'
+      );
+    }
+
     const windowStart = new Date(startTime.getTime() - 30 * 60 * 1000);
 
     if (now < windowStart || now > endTime) {

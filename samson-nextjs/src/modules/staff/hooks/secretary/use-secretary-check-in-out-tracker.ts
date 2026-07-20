@@ -78,8 +78,15 @@ export function useSecretaryCheckInOutTracker() {
 
   const getCheckInStatus = (appointment: AppointmentDto) => {
     if (!currentTime) return { enabled: false, message: 'Check In' };
-    const startTime = new Date(appointment.startTime);
-    const endTime = new Date(appointment.endTime);
+    // Parse naive HH:MM local time combined with the appointment date (clinic is UTC+8)
+    const parseLocalTime = (date: string, time: string | null) => {
+      if (!time) return null;
+      const t = time.substring(0, 5); // normalize HH:MM:SS → HH:MM
+      return new Date(`${date}T${t}:00+08:00`);
+    };
+    const startTime = parseLocalTime(appointment.date, appointment.startTime);
+    const endTime = parseLocalTime(appointment.date, appointment.endTime);
+    if (!startTime || !endTime) return { enabled: false, message: 'Check In' };
     const windowStart = new Date(startTime.getTime() - 30 * 60 * 1000);
     if (currentTime < windowStart) return { enabled: false, message: `In ${Math.ceil((windowStart.getTime() - currentTime.getTime()) / 60000)}m` };
     if (currentTime > endTime) return { enabled: false, message: 'Expired' };

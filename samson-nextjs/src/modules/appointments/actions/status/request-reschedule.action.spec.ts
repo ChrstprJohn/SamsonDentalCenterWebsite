@@ -32,8 +32,8 @@ describe('requestRescheduleAction', () => {
     status: 'RESCHEDULE_REQUESTED',
     statusReason: 'Conflict in schedule',
     newDate: '2026-06-01',
-    newStartTime: '2026-06-01T09:00:00Z',
-    newEndTime: '2026-06-01T09:30:00Z',
+    newStartTime: '09:00',
+    newEndTime: '09:30',
     newDoctorId: doctorId,
   };
 
@@ -69,8 +69,8 @@ describe('requestRescheduleAction', () => {
       'Conflict in schedule',
       {
         date: '2026-06-01',
-        startTime: '2026-06-01T09:00:00Z',
-        endTime: '2026-06-01T09:30:00Z',
+        startTime: '09:00',
+        endTime: '09:30',
         doctorId,
         preferredStartTime: undefined,
       }

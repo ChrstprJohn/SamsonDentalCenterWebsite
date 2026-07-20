@@ -1,7 +1,6 @@
 import type { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
 import type { BookingSlot, NewDependentInput } from './use-user-booking';
 import type { SubmitBookingDto } from '../../dtos/booking/submit-booking.dto';
-import { calculateEndTimeFromIso } from '@/shared/utils/date.util';
 
 interface PayloadMapperParams {
   selectedService: ServiceResponseDto;

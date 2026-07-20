@@ -11,7 +11,7 @@ const scheduler = {
   availableDates: ['2026-07-04'],
   availabilityMap: {},
   availableDoctors: [{ doctorId: 'doctor-1', doctorName: 'Dr. Reyes' }],
-  availableSlots: [{ startTime: '2026-07-04T08:00:00Z', endTime: '2026-07-04T08:30:00Z' }],
+  availableSlots: [{ startTime: '08:00', endTime: '08:30' }],
   error: null,
   loadingKey: null,
   loadDoctorsForService: vi.fn(),
@@ -55,7 +55,7 @@ describe('useSecretaryBookAppointment', () => {
       result.current.selectService('service-1');
       result.current.selectDate('2026-07-04');
       result.current.selectDoctor('doctor-1');
-      result.current.selectTimeslot({ startTime: '2026-07-04T08:00:00Z', endTime: '2026-07-04T08:30:00Z' });
+      result.current.selectTimeslot({ startTime: '08:00', endTime: '08:30' });
       result.current.setPatientNote('Prefers morning visit');
     });
 
@@ -65,8 +65,8 @@ describe('useSecretaryBookAppointment', () => {
       serviceId: 'service-1',
       doctorId: 'doctor-1',
       date: '2026-07-04',
-      startTime: '2026-07-04T08:00:00Z',
-      endTime: '2026-07-04T08:30:00Z',
+      startTime: '08:00',
+      endTime: '08:30',
       patientNote: 'Prefers morning visit',
       firstName: 'Lia',
       middleName: 'Mae',

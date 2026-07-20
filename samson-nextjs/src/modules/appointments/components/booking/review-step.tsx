@@ -3,7 +3,7 @@
 import React from 'react';
 import type { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
 import type { BookingSlot, NewDependentInput } from '../../hooks/booking/use-user-booking';
-import { formatClinicTime, calculateEndTimeFromIso } from '@/shared/utils/date.util';
+import { formatClinicTime } from '@/shared/utils/date.util';
 import { ReviewPatientDetails } from './sub-components/review-patient-details';
 import { ReviewServiceDetails } from './sub-components/review-service-details';
 import { ReviewAppointmentDetails } from './sub-components/review-appointment-details';

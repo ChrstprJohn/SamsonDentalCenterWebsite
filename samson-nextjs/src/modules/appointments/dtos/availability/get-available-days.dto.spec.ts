@@ -71,8 +71,8 @@ describe('getAvailableDaysResponseSchema', () => {
         availabilityMap: {
           '2026-05-01': [
             {
-              startTime: '2026-05-01T09:00:00.000Z',
-              endTime: '2026-05-01T09:30:00.000Z',
+              startTime: '09:00',
+              endTime: '09:30',
               doctorId: VALID_DOCTOR_ID,
               doctorName: 'Dr. Jane Doe',
             },

@@ -40,8 +40,8 @@ async function fetchTimeBlocksAsAppointments(
         id: block.id,
         doctorId: docId,
         date: block.date,
-        startTime: new Date(`${block.date}T${block.start_time}Z`).toISOString(),
-        endTime: new Date(`${block.date}T${block.end_time}Z`).toISOString(),
+        startTime: block.start_time.substring(0, 5),   // 'HH:MM:SS' → 'HH:MM'
+        endTime: block.end_time.substring(0, 5),
         status: 'APPROVED',
       });
     }
