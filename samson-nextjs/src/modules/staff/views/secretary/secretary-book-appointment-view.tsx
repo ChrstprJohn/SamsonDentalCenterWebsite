@@ -133,19 +133,6 @@ export function SecretaryBookAppointmentView() {
             <p className="text-xs text-muted-foreground">{getHeaderDateString()}</p>
           </div>
           <div className="flex items-center gap-2">
-            {/* Doctor Selector Dropdown */}
-            <select
-              value={selectedDoctorId}
-              onChange={(e) => setSelectedDoctorId(e.target.value)}
-              className="text-xs bg-muted border-none rounded-lg py-1.5 px-2.5 font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-ring cursor-pointer"
-            >
-              <option value="ALL">All Doctors</option>
-              {view.doctorsList.map((doc) => (
-                <option key={doc.id} value={doc.id}>
-                  Dr. {doc.firstName} {doc.lastName}
-                </option>
-              ))}
-            </select>
 
             {/* Day / 5 Days Toggle Slider */}
             <div className="flex bg-muted p-0.5 rounded-lg text-xs font-medium">
@@ -209,6 +196,53 @@ export function SecretaryBookAppointmentView() {
                 onSelectDate={view.selectDate}
               />
               <SidebarSeparator className="mx-0" />
+
+              {/* Dentists Group Accordion */}
+              <SidebarGroup className="py-0">
+                <Collapsible defaultOpen className="group/collapsible">
+                  <SidebarGroupLabel asChild className="group/label w-full text-sm text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
+                    <CollapsibleTrigger>
+                      Dentists
+                      <ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
+                    </CollapsibleTrigger>
+                  </SidebarGroupLabel>
+                  <CollapsibleContent>
+                    <SidebarGroupContent>
+                      <SidebarMenu>
+                        {/* All Option */}
+                        <SidebarMenuItem>
+                          <SidebarMenuButton onClick={() => setSelectedDoctorId('ALL')}>
+                            <div
+                              data-active={selectedDoctorId === 'ALL'}
+                              className="group/calendar-item flex aspect-square size-4 shrink-0 items-center justify-center rounded-sm border border-sidebar-border text-sidebar-primary-foreground data-[active=true]:border-sidebar-primary data-[active=true]:bg-sidebar-primary"
+                            >
+                              <Check className="hidden size-3 group-data-[active=true]/calendar-item:block" />
+                            </div>
+                            All Doctors
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                        {/* Individual Doctors */}
+                        {view.doctorsList.map((doctor) => {
+                          const isSelected = selectedDoctorId === doctor.id;
+                          return (
+                            <SidebarMenuItem key={doctor.id}>
+                              <SidebarMenuButton onClick={() => setSelectedDoctorId(doctor.id)}>
+                                <div
+                                  data-active={isSelected}
+                                  className="group/calendar-item flex aspect-square size-4 shrink-0 items-center justify-center rounded-sm border border-sidebar-border text-sidebar-primary-foreground data-[active=true]:border-sidebar-primary data-[active=true]:bg-sidebar-primary"
+                                >
+                                  <Check className="hidden size-3 group-data-[active=true]/calendar-item:block" />
+                                </div>
+                                Dr. {doctor.firstName} {doctor.lastName}
+                              </SidebarMenuButton>
+                            </SidebarMenuItem>
+                          );
+                        })}
+                      </SidebarMenu>
+                    </SidebarGroupContent>
+                  </CollapsibleContent>
+                </Collapsible>
+              </SidebarGroup>
 
 
             </SidebarContent>
