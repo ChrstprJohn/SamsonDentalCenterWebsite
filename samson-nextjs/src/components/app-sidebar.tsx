@@ -247,7 +247,8 @@ export function AppSidebar({ appointments = [], userProfile, ...props }: AppSide
                       const dateStr = new Date(appt.date).toLocaleDateString('en-US', {
                         month: 'short',
                         day: 'numeric',
-                        year: 'numeric'
+                        year: 'numeric',
+                        timeZone: 'UTC'
                       });
                       const isSelected = currentApptId === appt.id;
                       return (
