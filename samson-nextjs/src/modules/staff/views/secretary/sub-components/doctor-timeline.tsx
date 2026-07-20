@@ -330,12 +330,12 @@ export function DoctorTimeline({
 
                       {/* Content Column */}
                       <div className="flex-1 min-w-0 flex flex-col justify-start py-1 px-1 h-full min-h-0 gap-[3px]">
-                        {/* Row 1: Name & Time (Time on top-right only in Today view) */}
+                        {/* Row 1: Name & Time (Time on top-right only if card duration <= 20 mins) */}
                         <div className="flex justify-between items-start gap-2 w-full">
                           <div className={`font-normal truncate text-sm leading-none ${isSelected ? 'font-medium' : ''} ${color.text}`} title={patientName}>
                             {patientName}
                           </div>
-                          {viewMode === 'day' && timeRange && (
+                          {timeRange && isSmallCard && !(viewMode === 'week' && doctors.length > 1) && (
                             <span className={`text-[10px] leading-none shrink-0 pt-0.5 font-normal ${color.subtext}`}>
                               {timeRange.toLowerCase().replace(/ /g, '')}
                             </span>
@@ -347,8 +347,8 @@ export function DoctorTimeline({
                           {serviceName}
                         </div>
 
-                        {/* Row 3: Time (Only in 5 Days view, hidden if duration <= 20m or multiple doctors) */}
-                        {viewMode === 'week' && !isSmallCard && timeRange && !(doctors.length > 1) && (
+                        {/* Row 3: Time (Under service name, hidden if duration <= 20m or multiple doctors in week view) */}
+                        {timeRange && !isSmallCard && !(viewMode === 'week' && doctors.length > 1) && (
                           <div className={`truncate text-[10px] leading-none font-normal opacity-80 ${color.subtext}`}>
                             {timeRange.toLowerCase().replace(/ /g, '')}
                           </div>
