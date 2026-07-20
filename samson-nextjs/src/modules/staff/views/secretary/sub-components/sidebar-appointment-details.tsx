@@ -17,11 +17,13 @@ const activeStates = ['APPROVED', 'CHECKED_IN', 'RESCHEDULE_REQUESTED'];
 interface SidebarAppointmentDetailsProps {
   appointment: AppointmentDto;
   onClose: () => void;
+  onSuccess?: () => void;
 }
 
 export function SidebarAppointmentDetails({
   appointment,
   onClose,
+  onSuccess,
 }: SidebarAppointmentDetailsProps) {
   const [doctors, setDoctors] = useState<{ id: string; firstName: string; lastName: string }[]>([]);
   const [activeAction, setActiveAction] = useState<'NONE' | 'RESCHEDULE' | 'CANCEL'>('NONE');
@@ -157,6 +159,7 @@ export function SidebarAppointmentDetails({
 
       if (res && res.success) {
         setActionSuccess('Action executed successfully!');
+        if (onSuccess) onSuccess();
         setTimeout(() => onClose(), 1500);
         setActiveAction('NONE');
         setActionReason('');

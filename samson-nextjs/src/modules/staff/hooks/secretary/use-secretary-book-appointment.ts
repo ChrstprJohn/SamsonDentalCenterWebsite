@@ -310,6 +310,6 @@ export function useSecretaryBookAppointment() {
     isLoadingDoctors: scheduler.loadingKey === 'doctors', isLoadingSlots: scheduler.loadingKey === 'slots', isSubmitting,
     inlineError, toast, booked, isReadyToSubmit, bookedPatientLabel, resetForm, submit,
     confirmationChannel, setConfirmationChannel,
-    doctorsList, appointments, isLoadingAppointments, selectedAppointmentDetails, setSelectedAppointmentDetails
+    doctorsList, appointments, isLoadingAppointments, selectedAppointmentDetails, setSelectedAppointmentDetails, loadTimelineData
   };
 }

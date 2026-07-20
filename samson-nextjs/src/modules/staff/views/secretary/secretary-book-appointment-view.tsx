@@ -248,6 +248,7 @@ export function SecretaryBookAppointmentView() {
           <SidebarAppointmentDetails
             appointment={view.selectedAppointmentDetails}
             onClose={() => view.setSelectedAppointmentDetails(null)}
+            onSuccess={() => view.loadTimelineData(view.selectedDate)}
           />
         ) : (
           <>
