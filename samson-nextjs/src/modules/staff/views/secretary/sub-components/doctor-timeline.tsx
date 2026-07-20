@@ -49,13 +49,11 @@ export function DoctorTimeline({
 
   const parseTimeToMinutes = (timeStr: string | null): number | null => {
     if (!timeStr) return null;
-    const d = new Date(timeStr.includes('T') ? timeStr : timeStr.replace(' ', 'T'));
-    if (!isNaN(d.getTime())) {
-      return d.getHours() * 60 + d.getMinutes();
-    }
     const match = timeStr.match(/(?:T|\b)(\d{2}):(\d{2})/);
     if (!match) return null;
-    return parseInt(match[1], 10) * 60 + parseInt(match[2], 10);
+    const hours = parseInt(match[1], 10);
+    const minutes = parseInt(match[2], 10);
+    return hours * 60 + minutes;
   };
 
   const formatMinutesToTime = (totalMinutes: number): string => {
