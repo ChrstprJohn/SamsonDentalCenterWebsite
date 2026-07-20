@@ -4,6 +4,8 @@ import React, { useMemo } from 'react';
 import type { AppointmentDto } from '@/modules/appointments/dtos/shared/appointment.dto';
 import { formatClinicTime } from '@/shared/utils/date.util';
 
+const PENDING_STYLE = { bg: 'bg-amber-50/80', border: 'border-dashed border-amber-300/80', hover: 'hover:bg-amber-100/90', accent: 'bg-amber-500', text: 'text-amber-950', subtext: 'text-amber-700/90' };
+
 const COLORS_LIST = [
   { bg: 'bg-blue-50/80', border: 'border-blue-200/80', hover: 'hover:bg-blue-100/90', accent: 'bg-blue-500', text: 'text-blue-950', subtext: 'text-blue-700/90' },
   { bg: 'bg-emerald-50/80', border: 'border-emerald-200/80', hover: 'hover:bg-emerald-100/90', accent: 'bg-emerald-500', text: 'text-emerald-950', subtext: 'text-emerald-700/90' },
@@ -302,7 +304,8 @@ export function DoctorTimeline({
                     ? ` | Dr. ${appointment.doctor?.lastName || ''}`
                     : '';
 
-                  const color = getDoctorColor(appointment.doctorId || '');
+                  const isPending = appointment.status === 'PENDING';
+                  const color = isPending ? PENDING_STYLE : getDoctorColor(appointment.doctorId || '');
 
                   return (
                     <div
@@ -330,9 +333,10 @@ export function DoctorTimeline({
 
                       {/* Content Column */}
                       <div className="flex-1 min-w-0 flex flex-col justify-start py-1 px-1 h-full min-h-0 gap-[3px]">
-                        {/* Row 1: Name & Time (Time on top-right only if card duration <= 20 mins) */}
+                        {/* Row 1: Name & Time */}
                         <div className="flex justify-between items-start gap-2 w-full">
                           <div className={`font-normal truncate text-sm leading-none ${isSelected ? 'font-medium' : ''} ${color.text}`} title={patientName}>
+                            {isPending && <span className="inline-block text-[8px] font-bold uppercase tracking-wider text-amber-600 bg-amber-200/60 rounded-sm px-1 mr-1 align-middle leading-[14px]">Pending</span>}
                             {patientName}
                           </div>
                           {timeRange && isSmallCard && !(viewMode === 'week' && doctors.length > 1) && (
@@ -347,7 +351,7 @@ export function DoctorTimeline({
                           {serviceName}
                         </div>
 
-                        {/* Row 3: Time (Under service name, hidden if duration <= 20m or multiple doctors in week view) */}
+                        {/* Row 3: Time */}
                         {timeRange && !isSmallCard && !(viewMode === 'week' && doctors.length > 1) && (
                           <div className={`truncate text-[10px] leading-none font-normal opacity-80 ${color.subtext}`}>
                             {timeRange.toLowerCase().replace(/ /g, '')}
