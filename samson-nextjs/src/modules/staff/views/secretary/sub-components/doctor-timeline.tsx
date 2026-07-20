@@ -335,7 +335,7 @@ export function DoctorTimeline({
                           <div className={`font-normal truncate text-sm leading-none ${isSelected ? 'font-medium' : ''} ${color.text}`} title={patientName}>
                             {patientName}
                           </div>
-                          {timeRange && (
+                          {timeRange && !(viewMode === 'week' && doctors.length > 1) && (
                             <span className={`text-[10px] leading-none shrink-0 pt-0.5 font-normal ${color.subtext}`}>
                               {timeRange.toLowerCase().replace(/ /g, '')}
                             </span>
