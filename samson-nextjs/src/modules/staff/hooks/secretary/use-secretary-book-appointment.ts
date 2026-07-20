@@ -15,7 +15,7 @@ export type PatientMode = 'SEARCH' | 'GUEST';
 export function useSecretaryBookAppointment() {
   const scheduler = useBookingScheduler();
   const { loadAvailableDates, loadDoctorsForDate, loadAvailableSlots } = scheduler;
-  const [patientMode, setPatientMode] = useState<PatientMode>('SEARCH');
+  const [patientMode, setPatientMode] = useState<PatientMode>('GUEST');
   const [patientSearchQuery, setPatientSearchQuery] = useState('');
   const [patientSearchResults, setPatientSearchResults] = useState<any[]>([]);
   const [isSearchingPatients, setIsSearchingPatients] = useState(false);
@@ -59,7 +59,7 @@ export function useSecretaryBookAppointment() {
   const [inlineError, setInlineError] = useState('');
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [booked, setBooked] = useState(false);
-  const [confirmationChannel, setConfirmationChannel] = useState<'EMAIL' | 'SMS' | 'NONE'>('EMAIL');
+  const [confirmationChannel, setConfirmationChannel] = useState<'EMAIL' | 'SMS' | 'NONE' | 'BOTH'>('EMAIL');
 
   const availableDates = selectedService ? scheduler.availableDates : [];
   const availableDoctors = selectedDate ? scheduler.availableDoctors as { doctorId: string; doctorName: string }[] : [];
@@ -88,6 +88,11 @@ export function useSecretaryBookAppointment() {
     setIsLoadingAppointments(false);
     if (res.success && res.data) {
       setAppointments(res.data);
+      setSelectedAppointmentDetails((prev: any) => {
+        if (!prev) return null;
+        const updated = res.data.find((a: any) => a.id === prev.id);
+        return updated || prev;
+      });
     }
   }, []);
 
@@ -218,7 +223,7 @@ export function useSecretaryBookAppointment() {
 
   const resetForm = () => {
     setSelectedPatient(null);
-    setPatientMode('SEARCH');
+    setPatientMode('GUEST');
     setPatientSearchQuery('');
     setPatientSearchResults([]);
     setDependents([]);

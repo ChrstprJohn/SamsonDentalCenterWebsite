@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { InquiryToast } from './inquiry-toast';
 
 const activeStates = ['APPROVED', 'CHECKED_IN', 'RESCHEDULE_REQUESTED'];
 
@@ -26,6 +27,7 @@ export function SidebarAppointmentDetails({
   onClose,
   onSuccess,
 }: SidebarAppointmentDetailsProps) {
+  const [localAppointment, setLocalAppointment] = useState(appointment);
   const [doctors, setDoctors] = useState<{ id: string; firstName: string; lastName: string }[]>([]);
   const [activeAction, setActiveAction] = useState<'NONE' | 'RESCHEDULE' | 'CANCEL'>('NONE');
   const [actionReason, setActionReason] = useState('');
@@ -39,6 +41,21 @@ export function SidebarAppointmentDetails({
   const [isEditingGuestInfo, setIsEditingGuestInfo] = useState(false);
   const [guestInfoDraft, setGuestInfoDraft] = useState({ firstName: '', middleName: '', lastName: '', suffix: '', email: '', phone: '' });
   const [savingGuestInfo, setSavingGuestInfo] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
+  const showToast = (message: string, type: 'success' | 'error') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  useEffect(() => {
+    setLocalAppointment(appointment);
+    setIsEditingGuestInfo(false);
+    setActiveAction('NONE');
+    setActionReason('');
+    setActionError(null);
+    setActionSuccess(null);
+  }, [appointment]);
 
   useEffect(() => {
     getDoctorsAction().then((res) => {
@@ -47,12 +64,22 @@ export function SidebarAppointmentDetails({
   }, []);
 
   const formatPatientName = (app: AppointmentDto): string => {
+    const formatNameWithMiddleAndSuffix = (first?: string | null, middle?: string | null, last?: string | null, suffix?: string | null) => {
+      const initial = middle ? ` ${middle.charAt(0).toUpperCase()}.` : '';
+      return `${first || ''}${initial} ${last || ''}`.trim() + (suffix ? `, ${suffix}` : '');
+    };
+
     if (app.dependent) {
       const holder = app.patient ? `${app.patient.firstName} ${app.patient.lastName}` : 'Unknown';
       return `${app.dependent.firstName} ${app.dependent.lastName}`;
     }
     if (app.guestContact) {
-      return `${app.guestContact.firstName} ${app.guestContact.lastName}`;
+      return formatNameWithMiddleAndSuffix(
+        app.guestContact.firstName,
+        app.guestContact.middleName,
+        app.guestContact.lastName,
+        app.guestContact.suffix
+      );
     }
     if (app.source === 'STAFF_CREATED' && !app.patientId) {
       return `${app.patient?.firstName ?? 'Guest'} ${app.patient?.lastName ?? ''}`;
@@ -60,30 +87,30 @@ export function SidebarAppointmentDetails({
     return app.patient ? `${app.patient.firstName} ${app.patient.lastName}` : 'Guest Patient';
   };
 
-  const getPatientFirstName = () => appointment.guestContact?.firstName || appointment.patient?.firstName || '-';
-  const getPatientMiddleName = () => appointment.guestContact?.middleName || '-';
-  const getPatientLastName = () => appointment.guestContact?.lastName || appointment.patient?.lastName || '-';
-  const getPatientSuffix = () => appointment.guestContact?.suffix || '-';
-  const getPatientEmail = () => appointment.guestContact?.email || '-';
-  const getPatientPhone = () => appointment.guestContact?.phone || '-';
+  const getPatientFirstName = () => localAppointment.guestContact?.firstName || localAppointment.patient?.firstName || '-';
+  const getPatientMiddleName = () => localAppointment.guestContact?.middleName || '-';
+  const getPatientLastName = () => localAppointment.guestContact?.lastName || localAppointment.patient?.lastName || '-';
+  const getPatientSuffix = () => localAppointment.guestContact?.suffix || '-';
+  const getPatientEmail = () => localAppointment.guestContact?.email || '-';
+  const getPatientPhone = () => localAppointment.guestContact?.phone || '-';
 
-  const patientName = formatPatientName(appointment);
-  const serviceName = appointment.service?.name || 'Unassigned Service';
-  const doctorName = appointment.doctor
-    ? `Dr. ${appointment.doctor.firstName} ${appointment.doctor.lastName}`
+  const patientName = formatPatientName(localAppointment);
+  const serviceName = localAppointment.service?.name || 'Unassigned Service';
+  const doctorName = localAppointment.doctor
+    ? `Dr. ${localAppointment.doctor.firstName} ${localAppointment.doctor.lastName}`
     : 'No Doctor Assigned';
-  const isActiveStatus = activeStates.includes(appointment.status);
-  const hasGuestInfo = !!appointment.guestContact;
+  const isActiveStatus = activeStates.includes(localAppointment.status);
+  const hasGuestInfo = !!localAppointment.guestContact;
 
   const startEditGuestInfo = () => {
     if (!hasGuestInfo) return;
     setGuestInfoDraft({
-      firstName: appointment.guestContact?.firstName || '',
-      middleName: appointment.guestContact?.middleName || '',
-      lastName: appointment.guestContact?.lastName || '',
-      suffix: appointment.guestContact?.suffix || '',
-      email: appointment.guestContact?.email || '',
-      phone: appointment.guestContact?.phone || '',
+      firstName: localAppointment.guestContact?.firstName || '',
+      middleName: localAppointment.guestContact?.middleName || '',
+      lastName: localAppointment.guestContact?.lastName || '',
+      suffix: localAppointment.guestContact?.suffix || '',
+      email: localAppointment.guestContact?.email || '',
+      phone: localAppointment.guestContact?.phone || '',
     });
     setIsEditingGuestInfo(true);
   };
@@ -91,18 +118,18 @@ export function SidebarAppointmentDetails({
   const cancelEditGuestInfo = () => setIsEditingGuestInfo(false);
 
   const hasGuestInfoChanges = isEditingGuestInfo && (
-    guestInfoDraft.firstName !== (appointment.guestContact?.firstName || '') ||
-    guestInfoDraft.middleName !== (appointment.guestContact?.middleName || '') ||
-    guestInfoDraft.lastName !== (appointment.guestContact?.lastName || '') ||
-    guestInfoDraft.suffix !== (appointment.guestContact?.suffix || '') ||
-    guestInfoDraft.email !== (appointment.guestContact?.email || '') ||
-    guestInfoDraft.phone !== (appointment.guestContact?.phone || '')
+    guestInfoDraft.firstName !== (localAppointment.guestContact?.firstName || '') ||
+    guestInfoDraft.middleName !== (localAppointment.guestContact?.middleName || '') ||
+    guestInfoDraft.lastName !== (localAppointment.guestContact?.lastName || '') ||
+    guestInfoDraft.suffix !== (localAppointment.guestContact?.suffix || '') ||
+    guestInfoDraft.email !== (localAppointment.guestContact?.email || '') ||
+    guestInfoDraft.phone !== (localAppointment.guestContact?.phone || '')
   );
 
   const saveGuestInfo = async () => {
     setSavingGuestInfo(true);
     const res = await updateGuestContactAction({
-      appointmentId: appointment.id,
+      appointmentId: localAppointment.id,
       firstName: guestInfoDraft.firstName,
       middleName: guestInfoDraft.middleName,
       lastName: guestInfoDraft.lastName,
@@ -111,9 +138,22 @@ export function SidebarAppointmentDetails({
       phone: guestInfoDraft.phone,
     });
     if (res.success) {
+      setLocalAppointment(prev => ({
+        ...prev,
+        guestContact: {
+          firstName: guestInfoDraft.firstName,
+          middleName: guestInfoDraft.middleName,
+          lastName: guestInfoDraft.lastName,
+          suffix: guestInfoDraft.suffix,
+          email: guestInfoDraft.email,
+          phone: guestInfoDraft.phone,
+        }
+      }));
       setIsEditingGuestInfo(false);
+      showToast('Guest info updated successfully', 'success');
+      if (onSuccess) onSuccess();
     } else {
-      alert(res.error || 'Failed to update');
+      showToast(res.error || 'Failed to update guest info', 'error');
     }
     setSavingGuestInfo(false);
   };
@@ -140,19 +180,19 @@ export function SidebarAppointmentDetails({
           : `${rescheduleDate}T${rescheduleEndTime}:00Z`;
 
         res = await updateAppointmentStatusAction({
-          appointmentId: appointment.id,
+          appointmentId: localAppointment.id,
           status: 'APPROVED',
           statusReason: actionReason,
           newDate: rescheduleDate,
           newStartTime: startUtc,
           newEndTime: endUtc,
           newDoctorId: rescheduleDoctorId,
-          newServiceId: appointment.serviceId || undefined,
+          newServiceId: localAppointment.serviceId || undefined,
         });
       } else if (activeAction === 'CANCEL') {
         if (!actionReason.trim()) throw new Error('A cancellation reason is required.');
         res = await updateAppointmentStatusAction({
-          appointmentId: appointment.id,
+          appointmentId: localAppointment.id,
           status: 'CANCELLED',
           statusReason: actionReason,
         });
@@ -198,7 +238,7 @@ export function SidebarAppointmentDetails({
         </button>
         <div className="flex flex-col min-w-0">
           <h3 className="text-base font-medium text-foreground truncate">Appointment Detail</h3>
-          <span className="text-[11px] text-muted-foreground truncate">Ref #{appointment.id.slice(0, 8)}</span>
+          <span className="text-[11px] text-muted-foreground truncate">Ref #{localAppointment.id.slice(0, 8)}</span>
         </div>
       </div>
 
@@ -275,15 +315,15 @@ export function SidebarAppointmentDetails({
             </div>
             <div className="flex flex-col gap-0.5">
               <span className="text-xs text-muted-foreground">Date <span className="text-destructive">*</span></span>
-              <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{new Date(appointment.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</div>
+              <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{new Date(localAppointment.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</div>
             </div>
             <div className="flex flex-col gap-0.5">
               <span className="text-xs text-muted-foreground">Start Time <span className="text-destructive">*</span></span>
-              <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{formatTime(appointment.startTime)}</div>
+              <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{formatTime(localAppointment.startTime)}</div>
             </div>
             <div className="flex flex-col gap-0.5">
               <span className="text-xs text-muted-foreground">End Time <span className="text-destructive">*</span></span>
-              <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{formatTime(appointment.endTime)}</div>
+              <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{formatTime(localAppointment.endTime)}</div>
             </div>
             <div className="flex flex-col gap-0.5">
               <span className="text-xs text-muted-foreground">Assign Dentist <span className="text-destructive">*</span></span>
@@ -385,6 +425,7 @@ export function SidebarAppointmentDetails({
           </form>
         )}
       </div>
+      <InquiryToast toast={toast} />
     </div>
   );
 }

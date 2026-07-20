@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/sidebar"
 import {
   CalendarDays,
+  CalendarRange,
   LayoutDashboard,
   Settings,
   Users,
@@ -23,7 +24,8 @@ import {
   ClipboardList,
   DollarSign,
   Briefcase,
-  MessageSquare
+  MessageSquare,
+  UserCheck
 } from "lucide-react"
 
 const data = {
@@ -52,23 +54,19 @@ const data = {
       icon: <ClipboardList className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
     },
     {
-      title: "Appointments",
-      url: "#",
+      title: "Calendar",
+      url: "/secretary-v2/book",
       icon: <CalendarDays className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
-      items: [
-        {
-          title: "Book Appointment",
-          url: "/secretary-v2/book",
-        },
-        {
-          title: "Appointments Directory",
-          url: "/secretary-v2/appointments",
-        },
-        {
-          title: "Check-In / Out",
-          url: "/secretary-v2/check-in",
-        },
-      ],
+    },
+    {
+      title: "Appointments Directory",
+      url: "/secretary-v2/appointments",
+      icon: <CalendarRange className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
+    },
+    {
+      title: "Check-In / Out",
+      url: "/secretary-v2/check-in",
+      icon: <UserCheck className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
     },
     {
       title: "Clinic & Billing",

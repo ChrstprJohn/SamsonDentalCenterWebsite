@@ -70,12 +70,22 @@ export function DoctorTimeline({
   };
 
   const formatPatientName = (appointment: AppointmentDto): string => {
+    const formatNameWithMiddleAndSuffix = (first?: string | null, middle?: string | null, last?: string | null, suffix?: string | null) => {
+      const initial = middle ? ` ${middle.charAt(0).toUpperCase()}.` : '';
+      return `${first || ''}${initial} ${last || ''}`.trim() + (suffix ? `, ${suffix}` : '');
+    };
+
     if (appointment.dependent) {
       const holder = appointment.patient ? `${appointment.patient.firstName} ${appointment.patient.lastName}` : 'Unknown';
       return `${appointment.dependent.firstName} ${appointment.dependent.lastName} (Dep. of ${holder})`;
     }
     if (appointment.guestContact) {
-      return `${appointment.guestContact.firstName} ${appointment.guestContact.lastName}`;
+      return formatNameWithMiddleAndSuffix(
+        appointment.guestContact.firstName,
+        appointment.guestContact.middleName,
+        appointment.guestContact.lastName,
+        appointment.guestContact.suffix
+      );
     }
     if (appointment.source === 'STAFF_CREATED' && !appointment.patientId) {
       return `${appointment.patient?.firstName ?? 'Guest'} ${appointment.patient?.lastName ?? ''} (Guest)`;
