@@ -333,7 +333,7 @@ export function DoctorTimeline({
                       <div className={`flex-1 min-w-0 flex flex-col justify-start h-full min-h-0 ${isSmallCard ? 'py-0.5 px-0.5 gap-px' : 'py-1 px-1 gap-[3px]'}`}>
                         {/* Row 1: Name (left) + Time/Status (right) */}
                         <div className="flex justify-between items-start gap-1 w-full">
-                          <div className={`truncate ${isSmallCard ? 'text-[11px]' : 'text-sm'} leading-none ${isSelected ? 'font-medium' : 'font-normal'} ${color.text}`} title={patientName}>
+                          <div className={`truncate text-sm leading-none ${isSelected ? 'font-medium' : 'font-normal'} ${color.text}`} title={patientName}>
                             {patientName}
                           </div>
                           {!isSmallCard && appointment.status && viewMode === 'day' ? (
