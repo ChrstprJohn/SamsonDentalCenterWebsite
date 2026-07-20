@@ -48,16 +48,26 @@ function getDaysOfWeek(dateStr: string) {
 export function SecretaryBookAppointmentView() {
   const view = useSecretaryBookAppointment();
 
-  const [selectedDoctorId, setSelectedDoctorId] = React.useState<string>('ALL');
+  const [checkedDoctorIds, setCheckedDoctorIds] = React.useState<Record<string, boolean>>({});
   const [viewMode, setViewMode] = React.useState<'day' | 'week'>('day');
   const [weekAppointments, setWeekAppointments] = React.useState<any[]>([]);
   const [isWeekLoading, setIsWeekLoading] = React.useState(false);
 
   React.useEffect(() => {
-    if (view.doctorsList.length > 0 && !selectedDoctorId) {
-      setSelectedDoctorId('ALL');
+    if (view.doctorsList.length > 0) {
+      setCheckedDoctorIds((prev) => {
+        const next = { ...prev };
+        let updated = false;
+        view.doctorsList.forEach((doc) => {
+          if (next[doc.id] === undefined) {
+            next[doc.id] = true;
+            updated = true;
+          }
+        });
+        return updated ? next : prev;
+      });
     }
-  }, [view.doctorsList, selectedDoctorId]);
+  }, [view.doctorsList]);
 
   const daysOfWeek = React.useMemo(() => {
     return getDaysOfWeek(view.selectedDate);
@@ -87,12 +97,19 @@ export function SecretaryBookAppointmentView() {
     }
   }, [viewMode, daysOfWeek, view.appointments]);
 
+  const isAllDoctorsChecked = view.doctorsList.length > 0 && view.doctorsList.every(d => checkedDoctorIds[d.id]);
+  const toggleAllDoctors = () => {
+    const targetState = !isAllDoctorsChecked;
+    const next: Record<string, boolean> = {};
+    view.doctorsList.forEach(d => {
+      next[d.id] = targetState;
+    });
+    setCheckedDoctorIds(next);
+  };
+
   const filteredDoctors = React.useMemo(() => {
-    if (selectedDoctorId === 'ALL') {
-      return view.doctorsList;
-    }
-    return view.doctorsList.filter(d => d.id === selectedDoctorId);
-  }, [view.doctorsList, selectedDoctorId]);
+    return view.doctorsList.filter(d => checkedDoctorIds[d.id]);
+  }, [view.doctorsList, checkedDoctorIds]);
 
   const getHeaderDateString = () => {
     const todayDate = new Date();
@@ -211,9 +228,9 @@ export function SecretaryBookAppointmentView() {
                       <SidebarMenu>
                         {/* All Option */}
                         <SidebarMenuItem>
-                          <SidebarMenuButton onClick={() => setSelectedDoctorId('ALL')}>
+                          <SidebarMenuButton onClick={toggleAllDoctors}>
                             <div
-                              data-active={selectedDoctorId === 'ALL'}
+                              data-active={isAllDoctorsChecked}
                               className="group/calendar-item flex aspect-square size-4 shrink-0 items-center justify-center rounded-sm border border-sidebar-border text-sidebar-primary-foreground data-[active=true]:border-sidebar-primary data-[active=true]:bg-sidebar-primary"
                             >
                               <Check className="hidden size-3 group-data-[active=true]/calendar-item:block" />
@@ -223,12 +240,12 @@ export function SecretaryBookAppointmentView() {
                         </SidebarMenuItem>
                         {/* Individual Doctors */}
                         {view.doctorsList.map((doctor) => {
-                          const isSelected = selectedDoctorId === doctor.id;
+                          const isChecked = !!checkedDoctorIds[doctor.id];
                           return (
                             <SidebarMenuItem key={doctor.id}>
-                              <SidebarMenuButton onClick={() => setSelectedDoctorId(doctor.id)}>
+                              <SidebarMenuButton onClick={() => setCheckedDoctorIds(prev => ({ ...prev, [doctor.id]: !prev[doctor.id] }))}>
                                 <div
-                                  data-active={isSelected}
+                                  data-active={isChecked}
                                   className="group/calendar-item flex aspect-square size-4 shrink-0 items-center justify-center rounded-sm border border-sidebar-border text-sidebar-primary-foreground data-[active=true]:border-sidebar-primary data-[active=true]:bg-sidebar-primary"
                                 >
                                   <Check className="hidden size-3 group-data-[active=true]/calendar-item:block" />
