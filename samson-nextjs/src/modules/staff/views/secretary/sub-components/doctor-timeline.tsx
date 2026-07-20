@@ -330,26 +330,25 @@ export function DoctorTimeline({
                       />
 
                       {/* Content Column */}
-                      <div className="flex-1 min-w-0 flex flex-col justify-start py-1 px-1 h-full min-h-0 gap-[3px]">
-                        {/* Row 1: Name (left) */}
-                        <div className="flex justify-between items-start gap-2 w-full">
-                          <div className={`font-normal truncate text-sm leading-none ${isSelected ? 'font-medium' : ''} ${color.text}`} title={patientName}>
+                      <div className={`flex-1 min-w-0 flex flex-col justify-start h-full min-h-0 ${isSmallCard ? 'py-0.5 px-0.5 gap-px' : 'py-1 px-1 gap-[3px]'}`}>
+                        {/* Row 1: Name (left) + Time/Status (right) */}
+                        <div className="flex justify-between items-start gap-1 w-full">
+                          <div className={`truncate ${isSmallCard ? 'text-[11px]' : 'text-sm'} leading-none ${isSelected ? 'font-medium' : 'font-normal'} ${color.text}`} title={patientName}>
                             {patientName}
                           </div>
-                          {/* Large cards: status on top-right; small cards: time on top-right */}
                           {!isSmallCard && appointment.status && viewMode === 'day' ? (
                             <span className="shrink-0 text-[9px] leading-none font-semibold uppercase tracking-wider opacity-75">
                               {appointment.status}
                             </span>
-                          ) : timeRange && isSmallCard && !(viewMode === 'week' && doctors.length > 1) ? (
-                            <span className={`text-[10px] leading-none shrink-0 pt-0.5 font-normal ${color.subtext}`}>
+                          ) : isSmallCard && timeRange && !(viewMode === 'week' && doctors.length > 1) ? (
+                            <span className={`text-[9px] leading-none shrink-0 font-normal ${color.subtext}`}>
                               {timeRange.toLowerCase().replace(/ /g, '')}
                             </span>
                           ) : null}
                         </div>
 
                         {/* Row 2: Service */}
-                        <div className={`truncate text-[11px] leading-none font-normal ${color.subtext}`} title={serviceName}>
+                        <div className={`truncate ${isSmallCard ? 'text-[10px]' : 'text-[11px]'} leading-none font-normal ${color.subtext}`} title={serviceName}>
                           {serviceName}
                         </div>
 
@@ -360,8 +359,8 @@ export function DoctorTimeline({
                           </div>
                         )}
                         {isSmallCard && appointment.status && viewMode === 'day' && (
-                          <div className="flex justify-end w-full mt-auto">
-                            <span className="text-[9px] leading-none font-semibold uppercase tracking-wider opacity-70">
+                          <div className="flex justify-end w-full">
+                            <span className="text-[8px] leading-none font-semibold uppercase tracking-wider opacity-70">
                               {appointment.status}
                             </span>
                           </div>
