@@ -305,6 +305,15 @@ export function DoctorTimeline({
 
                   const color = getDoctorColor(appointment.doctorId || '');
 
+                  const statusStyle = {
+                    APPROVED: { accent: color.accent, badge: '' },
+                    CHECKED_IN: { accent: 'bg-cyan-500', badge: 'bg-cyan-100 text-cyan-700 border-cyan-200' },
+                    COMPLETED: { accent: 'bg-gray-400', badge: 'bg-gray-100 text-gray-500 border-gray-200' },
+                    NO_SHOW: { accent: 'bg-red-400', badge: 'bg-red-100 text-red-700 border-red-200' },
+                  }[appointment.status] || { accent: color.accent, badge: '' };
+
+                  const isMuted = appointment.status === 'COMPLETED' || appointment.status === 'NO_SHOW';
+
                   return (
                     <div
                       key={appointment.id}
@@ -312,7 +321,7 @@ export function DoctorTimeline({
                       className={`absolute pl-0 pr-1.5 py-0 flex flex-row justify-start items-stretch text-left text-xs transition-all cursor-pointer shadow-sm border select-none overflow-hidden hover:shadow ${
                         isSelected
                           ? `${color.bg} ${color.hover} ${color.border} ${color.text} ring-2 ring-slate-800/10 font-semibold scale-[1.01]`
-                          : `${color.bg} ${color.hover} ${color.border} ${color.text}`
+                          : `${color.bg} ${color.hover} ${color.border} ${color.text} ${isMuted ? 'opacity-65' : ''}`
                       }`}
                       style={{
                         top: `calc(${topPercent}% + 1px)`,
@@ -325,35 +334,22 @@ export function DoctorTimeline({
                       {/* Left Accent Bar */}
                       <div 
                         className={`w-1 shrink-0 mr-1.5 ${
-                          isSelected ? 'bg-slate-900' : color.accent
+                          isSelected ? 'bg-slate-900' : statusStyle.accent
                         }`} 
                       />
 
                       {/* Content Column */}
-                      <div className={`flex-1 min-w-0 flex flex-col justify-start h-full min-h-0 ${isSmallCard ? 'py-0.5 px-0.5 gap-px' : 'py-1 px-1 gap-[3px]'}`}>
-                        {/* Row 1: Name (left) + Time/Status (right) */}
-                        <div className="flex justify-between items-start gap-1 w-full">
-                          <div className={`truncate text-sm leading-none ${isSelected ? 'font-medium' : 'font-normal'} ${color.text}`} title={patientName}>
+                      <div className="flex-1 min-w-0 flex flex-col justify-start py-1 px-1 h-full min-h-0 gap-[3px]">
+                        {/* Row 1: Name & Status Badge */}
+                        <div className="flex justify-between items-start gap-2 w-full">
+                          <div className={`font-normal truncate text-sm leading-none ${isSelected ? 'font-medium' : ''} ${color.text}`} title={patientName}>
                             {patientName}
                           </div>
-                          {!isSmallCard && appointment.status && viewMode === 'day' ? (
-                            <span className="shrink-0 text-[9px] leading-none font-semibold uppercase tracking-wider opacity-75">
-                              {appointment.status}
+                          {appointment.status !== 'APPROVED' && (
+                            <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full border leading-none shrink-0 ${statusStyle.badge}`}>
+                              {appointment.status === 'CHECKED_IN' ? 'HERE' : appointment.status === 'COMPLETED' ? 'DONE' : 'MISSED'}
                             </span>
-                          ) : isSmallCard ? (
-                            <div className="flex flex-col items-end gap-px shrink-0">
-                              {timeRange && !(viewMode === 'week' && doctors.length > 1) && (
-                                <span className={`text-[10px] leading-none font-normal ${color.subtext}`}>
-                                  {timeRange.toLowerCase().replace(/ /g, '')}
-                                </span>
-                              )}
-                              {appointment.status && viewMode === 'day' && (
-                                <span className="text-[9px] leading-none font-semibold uppercase tracking-wider opacity-75">
-                                  {appointment.status}
-                                </span>
-                              )}
-                            </div>
-                          ) : null}
+                          )}
                         </div>
 
                         {/* Row 2: Service */}
@@ -361,11 +357,16 @@ export function DoctorTimeline({
                           {serviceName}
                         </div>
 
-                        {/* Row 3: Time for large cards */}
-                        {!isSmallCard && timeRange && !(viewMode === 'week' && doctors.length > 1) && (
+                        {/* Row 3: Time */}
+                        {timeRange && !isSmallCard && !(viewMode === 'week' && doctors.length > 1) && (
                           <div className={`truncate text-[10px] leading-none font-normal opacity-80 ${color.subtext}`}>
                             {timeRange.toLowerCase().replace(/ /g, '')}
                           </div>
+                        )}
+                        {timeRange && isSmallCard && !(viewMode === 'week' && doctors.length > 1) && (
+                          <span className={`text-[10px] leading-none font-normal ${color.subtext}`}>
+                            {timeRange.toLowerCase().replace(/ /g, '')}
+                          </span>
                         )}
                       </div>
                     </div>
