@@ -54,7 +54,7 @@ export function SecretaryBookAppointmentView() {
       {/* Left Column: Doctor Schedules Timeline */}
       <div className="flex-1 flex flex-col h-full min-h-0 bg-white overflow-hidden">
         {/* Left Column Header */}
-        <div className="p-4 border-b border-card-border/40 shrink-0">
+        <div className="p-4 border-b border-border shrink-0">
           <h1 className="text-base font-medium text-foreground">Doctor Schedules</h1>
         </div>
 
@@ -71,7 +71,7 @@ export function SecretaryBookAppointmentView() {
       </div>
 
       {/* Right Column: Booking Console Sidebar (styled 1-1 like AppSidebar in md file, but on the right) */}
-      <Sidebar collapsible="none" side="right" className="flex-1 lg:flex-none lg:w-[var(--sidebar-width)] border-l border-card-border/40 shrink-0 flex flex-col h-full bg-sidebar">
+      <Sidebar collapsible="none" side="right" className="flex-1 lg:flex-none lg:w-[var(--sidebar-width)] border-l border-border shrink-0 flex flex-col h-full bg-sidebar">
         {view.selectedAppointmentDetails ? (
           <>
             <SidebarHeader className="h-16 border-b border-sidebar-border px-4 flex items-center justify-between">
@@ -86,7 +86,7 @@ export function SecretaryBookAppointmentView() {
           </>
         ) : (
           <>
-            <div className="p-4 border-b border-card-border/40 shrink-0">
+            <div className="p-4 border-b border-border shrink-0">
               <h1 className="text-base font-medium text-foreground">Booking Console</h1>
             </div>
             <SidebarContent>
