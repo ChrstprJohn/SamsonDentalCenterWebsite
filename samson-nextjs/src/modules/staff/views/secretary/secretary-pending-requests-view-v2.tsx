@@ -125,7 +125,7 @@ export function SecretaryPendingRequestsViewV2() {
 
       {hasSelection ? (
         <>
-      <div className={`flex-1 flex-col min-w-0 border-r border-card-border/40 ${colMobile('detail')} lg:flex`}>
+      <div className={`flex-1 flex-col min-w-0 border-r border-card-border/40 ${colMobile('detail')} xl:flex`}>
         <div className="p-4 border-b border-card-border/40 shrink-0">
           <div className="flex items-center gap-2">
             <button onClick={() => setMobileView('list')} className="lg:hidden p-1 -ml-1 text-muted-foreground hover:text-foreground shrink-0">
@@ -504,7 +504,7 @@ export function SecretaryPendingRequestsViewV2() {
                 </div>
               )}
         </div>
-        <div className={`lg:w-[320px] flex-1 lg:flex-none flex-col h-full overflow-hidden ${colMobile('quickLogs')} xl:flex`}>
+        <div className={`flex-1 xl:w-[320px] xl:flex-none flex-col h-full overflow-hidden ${colMobile('quickLogs')} xl:flex`}>
           <CoordinationHub inquiryId={inquiriesView.selectedInquiryId} hideActions={inquiriesView.selectedInquiry?.status !== 'NEW'} onBack={() => setMobileView('detail')} />
         </div>
       </>

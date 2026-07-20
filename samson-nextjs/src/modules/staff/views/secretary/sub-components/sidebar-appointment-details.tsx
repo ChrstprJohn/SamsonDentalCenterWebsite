@@ -312,7 +312,25 @@ export function SidebarAppointmentDetails({
           <div className="w-full">
             {isActiveStatus ? (
               <div className="flex gap-2">
-                <Button variant="outline" className="flex-1" onClick={() => { setActiveAction('RESCHEDULE'); setActionError(null); setActionSuccess(null); }}>
+                <Button variant="outline" className="flex-1" onClick={() => {
+                  setActiveAction('RESCHEDULE');
+                  
+                  const parseTimeToHHMM = (timeStr?: string | null) => {
+                    if (!timeStr) return '';
+                    if (timeStr.includes('T')) {
+                      const timePart = timeStr.split('T')[1];
+                      if (timePart) return timePart.slice(0, 5);
+                    }
+                    const match = timeStr.match(/^(\d{2}):(\d{2})/);
+                    if (match) return `${match[1]}:${match[2]}`;
+                    return '';
+                  };
+                  
+                  setRescheduleStartTime(parseTimeToHHMM(appointment.startTime));
+                  setRescheduleEndTime(parseTimeToHHMM(appointment.endTime));
+                  setActionError(null);
+                  setActionSuccess(null);
+                }}>
                   <Calendar className="size-4" /> Reschedule
                 </Button>
                 <Button onClick={() => { setActiveAction('CANCEL'); setActionError(null); setActionSuccess(null); }} variant="outline" className="flex-1 border-destructive/50 text-destructive hover:bg-destructive/10">

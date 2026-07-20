@@ -136,30 +136,13 @@ export function SecretarySidebar({ userProfile, ...props }: SecretarySidebarProp
   const pathname = usePathname()
   const { setOpen } = useSidebar()
   const [isPending, startTransition] = React.useTransition()
-
   React.useEffect(() => {
-    const checkViewport = () => {
-      const isTargetPage = [
-        '/secretary-v2/chat',
-        '/secretary-v2/pending',
-        '/secretary-v2/book',
-        '/secretary-v2/appointments',
-      ].some(path => pathname === path || pathname.startsWith(path + '/'));
-
-      if (isTargetPage) {
-        if (window.innerWidth >= 1440) {
-          setOpen(true);
-        } else {
-          setOpen(false);
-        }
-      }
-    };
-
-    checkViewport();
-    window.addEventListener('resize', checkViewport);
-    return () => window.removeEventListener('resize', checkViewport);
-  }, [pathname, setOpen]);
-
+    if (window.innerWidth < 1024) {
+      setOpen(false)
+    } else {
+      setOpen(true)
+    }
+  }, [setOpen])
   const handleNavigate = React.useCallback((url: string, e?: React.MouseEvent) => {
     if (!url || url === "#") return
     if (e) {

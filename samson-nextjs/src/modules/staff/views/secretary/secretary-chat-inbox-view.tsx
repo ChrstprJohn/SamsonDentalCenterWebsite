@@ -783,6 +783,20 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                                                 setActiveAction('RESCHEDULE');
                                                 setRescheduleDate(selectedThread.date);
                                                 setRescheduleDoctorId(selectedThread.doctorId || '');
+                                                
+                                                const parseTimeToHHMM = (timeStr?: string | null) => {
+                                                    if (!timeStr) return '';
+                                                    if (timeStr.includes('T')) {
+                                                        const timePart = timeStr.split('T')[1];
+                                                        if (timePart) return timePart.slice(0, 5);
+                                                    }
+                                                    const match = timeStr.match(/^(\d{2}):(\d{2})/);
+                                                    if (match) return `${match[1]}:${match[2]}`;
+                                                    return '';
+                                                };
+                                                
+                                                setRescheduleStartTime(parseTimeToHHMM(selectedThread.startTime));
+                                                setRescheduleEndTime(parseTimeToHHMM(selectedThread.endTime));
                                                 setActionError(null);
                                                 setActionSuccess(null);
                                             }}
@@ -1039,7 +1053,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
             {selectedThreadId && selectedThread ? (
                 <>
                     {/* Column 2: Dialogue Stream */}
-                    <div className={`flex-1 flex-col bg-muted/20 border-r border-border relative ${colMobile('chat')} lg:flex`}>
+                    <div className={`flex-1 flex-col bg-muted/20 border-r border-border relative ${colMobile('chat')} xl:flex`}>
                         {loadingMessages ? (
                             <ChatMessagesSkeleton />
                         ) : (
@@ -1069,7 +1083,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                     </div>
 
                     {/* Column 3: Context & Action Control Dock */}
-                    <div className={`${colMobile('detail')} flex-1 lg:flex-none lg:w-80 flex-col border-l border-border bg-sidebar h-full overflow-hidden xl:flex`}>
+                    <div className={`${colMobile('detail')} flex-1 xl:flex-none xl:w-80 flex-col border-l border-border bg-sidebar h-full overflow-hidden xl:flex`}>
                         {detailPanelContent}
                     </div>
                 </>

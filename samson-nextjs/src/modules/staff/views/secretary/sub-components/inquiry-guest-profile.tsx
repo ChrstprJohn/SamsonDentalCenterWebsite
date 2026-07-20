@@ -20,7 +20,7 @@ export function InquiryGuestProfile(props: InquiryGuestProfileProps) {
     <div className="flex flex-col gap-6">
       <div>
         <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Guest Profile</h3>
-        <div className="grid grid-cols-1 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-4 gap-4">
           <FieldBlock label="First name">
             {!props.isEditing ? (
               <span className="text-sm font-semibold text-slate-800">{props.firstName || '-'}</span>
@@ -54,7 +54,7 @@ export function InquiryGuestProfile(props: InquiryGuestProfileProps) {
 
       <div>
         <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Contact Information</h3>
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-4">
           <FieldBlock label="Email address">
             {!props.isEditing ? (
               <span className="text-sm font-semibold text-slate-800 truncate">{props.email || '-'}</span>
