@@ -340,10 +340,19 @@ export function DoctorTimeline({
                             <span className="shrink-0 text-[9px] leading-none font-semibold uppercase tracking-wider opacity-75">
                               {appointment.status}
                             </span>
-                          ) : isSmallCard && timeRange && !(viewMode === 'week' && doctors.length > 1) ? (
-                            <span className={`text-[9px] leading-none shrink-0 font-normal ${color.subtext}`}>
-                              {timeRange.toLowerCase().replace(/ /g, '')}
-                            </span>
+                          ) : isSmallCard ? (
+                            <div className="flex flex-col items-end gap-px shrink-0">
+                              {timeRange && !(viewMode === 'week' && doctors.length > 1) && (
+                                <span className={`text-[9px] leading-none font-normal ${color.subtext}`}>
+                                  {timeRange.toLowerCase().replace(/ /g, '')}
+                                </span>
+                              )}
+                              {appointment.status && viewMode === 'day' && (
+                                <span className="text-[8px] leading-none font-semibold uppercase tracking-wider opacity-70">
+                                  {appointment.status}
+                                </span>
+                              )}
+                            </div>
                           ) : null}
                         </div>
 
@@ -352,17 +361,10 @@ export function DoctorTimeline({
                           {serviceName}
                         </div>
 
-                        {/* Row 3: Time for large cards; Status for small cards */}
+                        {/* Row 3: Time for large cards */}
                         {!isSmallCard && timeRange && !(viewMode === 'week' && doctors.length > 1) && (
                           <div className={`truncate text-[10px] leading-none font-normal opacity-80 ${color.subtext}`}>
                             {timeRange.toLowerCase().replace(/ /g, '')}
-                          </div>
-                        )}
-                        {isSmallCard && appointment.status && viewMode === 'day' && (
-                          <div className="flex justify-end w-full">
-                            <span className="text-[8px] leading-none font-semibold uppercase tracking-wider opacity-70">
-                              {appointment.status}
-                            </span>
                           </div>
                         )}
                       </div>
