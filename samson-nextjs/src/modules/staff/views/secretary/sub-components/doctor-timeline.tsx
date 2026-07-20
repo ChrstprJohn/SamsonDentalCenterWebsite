@@ -343,9 +343,16 @@ export function DoctorTimeline({
                           )}
                         </div>
 
-                        {/* Row 2: Service */}
-                        <div className={`truncate text-[11px] leading-none font-normal ${color.subtext}`} title={serviceName}>
-                          {serviceName}
+                        {/* Row 2: Service + Status */}
+                        <div className="flex items-center gap-1.5 w-full">
+                          <div className={`truncate text-[11px] leading-none font-normal ${color.subtext}`} title={serviceName}>
+                            {serviceName}
+                          </div>
+                          {appointment.status && (
+                            <span className="shrink-0 text-[9px] leading-none font-semibold uppercase tracking-wider opacity-75">
+                              {appointment.status}
+                            </span>
+                          )}
                         </div>
 
                         {/* Row 3: Time (Under service name, hidden if duration <= 20m or multiple doctors in week view) */}
