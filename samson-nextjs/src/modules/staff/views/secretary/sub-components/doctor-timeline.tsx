@@ -204,7 +204,7 @@ export function DoctorTimeline({
               return (
                 <div
                   key={doctor.id}
-                  className="sticky top-0 bg-card border-r border-r-slate-300 border-b border-border px-4 py-2 text-center text-sm font-normal text-sidebar-foreground truncate z-20"
+                  className="sticky top-0 bg-card border-r border-r-slate-300 border-b border-border px-4 py-2 text-center text-xs font-bold text-text-primary truncate z-20"
                   style={{ gridColumn: index + 2, gridRow: 1 }}
                 >
                   Dr. {doctor.firstName} {doctor.lastName} ({count})
