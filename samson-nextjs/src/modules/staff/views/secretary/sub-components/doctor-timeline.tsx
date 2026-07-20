@@ -330,11 +330,16 @@ export function DoctorTimeline({
 
                       {/* Content Column */}
                       <div className="flex-1 min-w-0 flex flex-col justify-start py-1 px-1 h-full min-h-0 gap-[2px]">
-                        {/* Top Row: Name on Left */}
+                        {/* Top Row: Name on Left, Time on Right */}
                         <div className="flex justify-between items-start gap-2 w-full">
                           <div className={`font-normal truncate text-sm leading-none ${isSelected ? 'font-medium' : ''} ${color.text}`} title={patientName}>
                             {patientName}
                           </div>
+                          {timeRange && (
+                            <span className={`text-[10px] leading-none shrink-0 pt-0.5 font-normal ${color.subtext}`}>
+                              {timeRange.toLowerCase().replace(/ /g, '')}
+                            </span>
+                          )}
                         </div>
 
                         {/* Bottom Row: Service */}
