@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
 import Link from 'next/link';
 import { Stethoscope, User, Calendar, Clock, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
+import { formatClinicTime } from '@/shared/utils/date.util';
 
 interface ChatContextBannerProps {
   patientName: string;
@@ -37,23 +38,7 @@ export function ChatContextBanner({
   const [isExpanded, setIsExpanded] = React.useState(true);
 
   const formatTime = (timeStr?: string | null) => {
-    if (!timeStr) return '';
-    try {
-      if (timeStr.includes('T')) {
-        return new Date(timeStr).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      }
-      const parts = timeStr.split(':');
-      if (parts.length >= 2) {
-        const hour = parseInt(parts[0], 10);
-        const minute = parts[1];
-        const ampm = hour >= 12 ? 'PM' : 'AM';
-        const formattedHour = hour % 12 || 12;
-        return `${formattedHour}:${minute} ${ampm}`;
-      }
-      return timeStr;
-    } catch {
-      return timeStr;
-    }
+    return formatClinicTime(timeStr ?? null);
   };
 
   return (

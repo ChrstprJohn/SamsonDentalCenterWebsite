@@ -22,6 +22,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import SkeletonLib, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { InquiryToast } from './sub-components/inquiry-toast';
+import { formatClinicTime } from '@/shared/utils/date.util';
 import { Search, Mail, Archive, MessageSquare, Calendar, XCircle, CheckCircle, AlertCircle, ArrowLeft, UserRound, Pencil, Check, X } from 'lucide-react';
 import {
     Sidebar,
@@ -398,23 +399,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
     );
 
     const formatTime = (timeStr?: string | null) => {
-        if (!timeStr) return 'TBD';
-        try {
-            if (timeStr.includes('T')) {
-                return new Date(timeStr).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            }
-            const parts = timeStr.split(':');
-            if (parts.length >= 2) {
-                const hour = parseInt(parts[0], 10);
-                const minute = parts[1];
-                const ampm = hour >= 12 ? 'PM' : 'AM';
-                const formattedHour = hour % 12 || 12;
-                return `${formattedHour}:${minute} ${ampm}`;
-            }
-            return timeStr;
-        } catch {
-            return timeStr;
-        }
+        return formatClinicTime(timeStr ?? null) || 'TBD';
     };
 
     const formatMessageTime = (dateStr: string) => {

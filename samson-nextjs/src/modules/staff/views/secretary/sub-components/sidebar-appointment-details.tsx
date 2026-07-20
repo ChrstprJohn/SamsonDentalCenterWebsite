@@ -6,6 +6,7 @@ import { updateAppointmentStatusAction } from '@/modules/appointments/actions/st
 import { updateGuestContactAction } from '@/modules/appointments/actions/booking/update-guest-contact.action';
 import { getDoctorsAction } from '@/modules/staff/actions/management/get-doctors.action';
 import { UserRound, Calendar, XCircle, CheckCircle, AlertCircle, Pencil, Check, X, ArrowLeft } from 'lucide-react';
+import { formatClinicTime } from '@/shared/utils/date.util';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -174,23 +175,7 @@ export function SidebarAppointmentDetails({
   };
 
   const formatTime = (timeStr?: string | null) => {
-    if (!timeStr) return 'TBD';
-    try {
-      if (timeStr.includes('T')) {
-        return new Date(timeStr).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      }
-      const parts = timeStr.split(':');
-      if (parts.length >= 2) {
-        const hour = parseInt(parts[0], 10);
-        const minute = parts[1];
-        const ampm = hour >= 12 ? 'PM' : 'AM';
-        const formattedHour = hour % 12 || 12;
-        return `${formattedHour}:${minute} ${ampm}`;
-      }
-      return timeStr;
-    } catch {
-      return timeStr;
-    }
+    return formatClinicTime(timeStr ?? null) || 'TBD';
   };
 
   const GuestField = ({ label, value, editValue, onChange }: { label: string; value: string; editValue?: string; onChange?: (v: string) => void }) => (
