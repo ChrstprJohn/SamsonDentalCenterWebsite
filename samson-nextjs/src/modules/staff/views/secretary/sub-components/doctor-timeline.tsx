@@ -329,23 +329,21 @@ export function DoctorTimeline({
                       />
 
                       {/* Content Column */}
-                      <div className="flex-1 min-w-0 flex flex-col justify-start py-1 px-1 h-full min-h-0 gap-[2px]">
-                        {/* Top Row: Name on Left */}
-                        <div className="flex justify-between items-start gap-2 w-full">
-                          <div className={`font-normal truncate text-sm leading-none ${isSelected ? 'font-medium' : ''} ${color.text}`} title={patientName}>
-                            {patientName}
-                          </div>
+                      <div className="flex-1 min-w-0 flex flex-col justify-center py-1 px-1 h-full min-h-0 gap-[3px]">
+                        {/* Row 1: Name */}
+                        <div className={`font-normal truncate text-sm leading-none ${isSelected ? 'font-medium' : ''} ${color.text}`} title={patientName}>
+                          {patientName}
                         </div>
 
-                        {/* Bottom Row: Service and Time */}
-                        {!isSmallCard && (
-                          <div className={`truncate text-xs leading-none font-normal ${color.subtext}`} title={`${serviceName}${timeRange && !(viewMode === 'week' && doctors.length > 1) ? ` (${timeRange})` : ''}`}>
-                            {serviceName}
-                            {timeRange && !(viewMode === 'week' && doctors.length > 1) && (
-                              <span className="opacity-80 ml-1.5 font-normal">
-                                ({timeRange.toLowerCase().replace(/ /g, '')})
-                              </span>
-                            )}
+                        {/* Row 2: Service */}
+                        <div className={`truncate text-[11px] leading-none font-normal ${color.subtext}`} title={serviceName}>
+                          {serviceName}
+                        </div>
+
+                        {/* Row 3: Time (Hidden if duration <= 20m or multiple doctors in week view) */}
+                        {!isSmallCard && timeRange && !(viewMode === 'week' && doctors.length > 1) && (
+                          <div className={`truncate text-[10px] leading-none font-normal opacity-80 ${color.subtext}`}>
+                            {timeRange.toLowerCase().replace(/ /g, '')}
                           </div>
                         )}
                       </div>
