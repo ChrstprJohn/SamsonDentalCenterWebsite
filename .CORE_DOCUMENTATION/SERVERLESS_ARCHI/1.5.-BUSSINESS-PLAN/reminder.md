@@ -87,3 +87,34 @@ To give secretaries full visibility over what patients receive, we will implemen
    * ✉️ **24H Reminder:** [Sent / Pending / Skipped]
 2. **Audit History Log:** Clicking on an appointment shows a timeline of dispatched events (e.g. "SMS dispatched at 9:00 AM", "Email opened at 9:05 AM").
 3. **Manual Trigger Button:** Allow the secretary to manually resend or force dispatch a reminder ahead of schedule in case of system failures.
+
+---
+
+## 6. Project Email Inventory (Non-Auth Communication)
+
+Here is the tracking list of what guest booking & staff response email notification flows are currently implemented vs. missing:
+
+### A. Currently Implemented (Wired & Operational)
+* **Appointment Request Received:** Sent automatically when a guest/patient submits a booking request online.
+  * *Template:* `appointment-request-received-email.tsx`
+  * *Trigger Event:* `APPOINTMENT_BOOKED`
+* **Appointment Confirmed / Approved:** Sent when an inquiry request is accepted/approved by the secretary or booked manually.
+  * *Template:* `appointment-confirmed-email.tsx`
+  * *Trigger Events:* `APPOINTMENT_CONVERTED_FROM_INQUIRY`, `APPOINTMENT_MANUALLY_BOOKED_GUEST`, `APPOINTMENT_MANUALLY_BOOKED_PATIENT`
+* **Appointment Rescheduled:** Sent when appointment time is updated by secretary or patient.
+  * *Template:* `appointment-rescheduled-email.tsx`
+  * *Trigger Event:* `RESCHEDULE_BOOKING`
+* **Appointment Cancelled:** Sent when appointment is cancelled.
+  * *Template:* `appointment-cancelled-email.tsx`
+  * *Trigger Event:* `CANCEL_BOOKING`
+* **Staff Chat Reply:** Sent to patient when clinic staff replies to their chat channel.
+  * *Template:* `staff-reply-email.tsx`
+  * *Trigger Event:* `STAFF_REPLIED_TO_CHAT`
+* **24-Hour & 48-Hour Reminders:** (Newly added) Sent automatically before appointment start.
+  * *Template:* Reuses `appointment-confirmed-email.tsx` layout with customized header subjects.
+  * *Trigger Events:* `APPOINTMENT_REMINDER_24H`, `APPOINTMENT_REMINDER_48H`
+
+### B. Missing / Future Backlog (Not Yet Implemented)
+* **Appointment Rejected:** No separate rejection notification email currently exists if a secretary rejects/deletes a pending request.
+* **Thank You / Post-Treatment Follow-up:** No automated message sent after an appointment is marked completed.
+
