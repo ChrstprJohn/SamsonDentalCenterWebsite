@@ -66,6 +66,13 @@ Double-sending reminders ruins user experience. We prevent this using database-l
     * *Passive Trigger:* Any new outbox insert triggers the webhook (or Next.js after-request handler), which processes all pending items in the queue. This is triggered by **both** guest/patient actions (e.g., submitting inquiries on the landing page) and secretary actions (e.g., manual booking, rescheduling, or confirming requests).
     * *Active Sweep Cron:* A secondary lightweight database cron job runs every 15 minutes to call the `/api/outbox/process` API endpoint directly, acting as a sweeper for failed/stuck `PENDING` events so they retry without relying on website traffic.
 
+### C. Recommended 3-Tier Production Setup
+For maximum reliability, we recommend employing all three triggers together:
+1. **Passive Trigger (Primary Delivery):** Ensures immediate delivery of confirmations and reschedules as soon as the user acts.
+2. **Active Sweep Cron (Automatic Recovery):** Runs every 15 minutes to clean up and automatically retry failed emails due to temporary API rate limits or network hiccups without human intervention.
+3. **Dashboard "Resend" Button (Manual Fail-safe):** Gives clinic staff a manual override to force-send a notification directly to a patient if they complain they haven't received it.
+
+
 
 
 ---
