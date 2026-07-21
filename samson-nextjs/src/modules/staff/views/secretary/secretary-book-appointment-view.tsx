@@ -325,6 +325,34 @@ export function SecretaryBookAppointmentView() {
               <div className="py-4 px-1">
                 <span className="text-base font-medium text-foreground">Service &amp; Schedule</span>
                 <div className="mt-3 flex flex-col gap-3">
+                  {/* Service */}
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-xs text-muted-foreground">Service <span className="text-destructive">*</span></span>
+                    <select
+                      value={view.selectedService}
+                      onChange={(e) => view.selectService(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
+                    >
+                      <option value="">Select Service...</option>
+                      {view.services.map((svc) => (
+                        <option key={svc.id} value={svc.id}>{svc.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  {/* Dentist */}
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-xs text-muted-foreground">Dentist <span className="text-destructive">*</span></span>
+                    <select
+                      value={view.selectedDoctor}
+                      onChange={(e) => view.selectDoctor(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
+                    >
+                      <option value="">Select Dentist...</option>
+                      {view.doctorsList.map((doc) => (
+                        <option key={doc.id} value={doc.id}>Dr. {doc.firstName} {doc.lastName}</option>
+                      ))}
+                    </select>
+                  </div>
                   {/* Date */}
                   <div className="flex flex-col gap-0.5">
                     <span className="text-xs text-muted-foreground">Date <span className="text-destructive">*</span></span>
@@ -356,36 +384,9 @@ export function SecretaryBookAppointmentView() {
                       />
                     </div>
                   </div>
-                  {/* Dentist */}
-                  <div className="flex flex-col gap-0.5">
-                    <span className="text-xs text-muted-foreground">Dentist <span className="text-destructive">*</span></span>
-                    <select
-                      value={view.selectedDoctor}
-                      onChange={(e) => view.selectDoctor(e.target.value)}
-                      className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
-                    >
-                      <option value="">Select Dentist...</option>
-                      {view.doctorsList.map((doc) => (
-                        <option key={doc.id} value={doc.id}>Dr. {doc.firstName} {doc.lastName}</option>
-                      ))}
-                    </select>
-                  </div>
-                  {/* Service */}
-                  <div className="flex flex-col gap-0.5">
-                    <span className="text-xs text-muted-foreground">Service <span className="text-destructive">*</span></span>
-                    <select
-                      value={view.selectedService}
-                      onChange={(e) => view.selectService(e.target.value)}
-                      className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
-                    >
-                      <option value="">Select Service...</option>
-                      {view.services.map((svc) => (
-                        <option key={svc.id} value={svc.id}>{svc.name}</option>
-                      ))}
-                    </select>
-                  </div>
                 </div>
               </div>
+
 
               <hr className="border-card-border/40 mx-1" />
 

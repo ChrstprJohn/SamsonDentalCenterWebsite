@@ -14,6 +14,8 @@ import { onCancelBookingSubscriber as onCancelBookingEmailSubscriber } from '@/m
 import { onRescheduleBookingSubscriber } from '@/modules/emails/subscribers/on-reschedule-booking.subscriber';
 import { onStaffReplySubscriber } from '@/modules/emails/subscribers/on-staff-reply.subscriber';
 import { onManualBookingSmsSubscriber } from '@/modules/emails/subscribers/on-manual-booking-sms.subscriber';
+import { onAppointmentReminder24hSubscriber } from '@/modules/emails/subscribers/on-appointment-reminder-24h.subscriber';
+import { onAppointmentReminder48hSubscriber } from '@/modules/emails/subscribers/on-appointment-reminder-48h.subscriber';
 
 /**
  * Bootstraps the Event Bus Registry.
@@ -45,4 +47,9 @@ export const bootstrapEventSubscribers = () => {
   registerSubscriber('RESCHEDULE_BOOKING', onRescheduleBookingSubscriber.handle);
   registerSubscriber('STAFF_REPLIED_TO_CHAT', onStaffReplySubscriber.handle);
   registerSubscriber('APPOINTMENT_MANUALLY_BOOKED_SMS', onManualBookingSmsSubscriber.handle);
+  
+  // 24h & 48h Reminders
+  registerSubscriber('APPOINTMENT_REMINDER_24H', onAppointmentReminder24hSubscriber.handle);
+  registerSubscriber('APPOINTMENT_REMINDER_48H', onAppointmentReminder48hSubscriber.handle);
 };
+

@@ -1690,8 +1690,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\orchestrators\\event-subscribers.ts": {
-    "mtime": 1784537242.432398,
-    "ast_hash": "1d78dbbc0f45af8d8d64bad13e674bc5",
+    "mtime": 1784603886.57494,
+    "ast_hash": "148c9557a6d86f1f6663f424cbadc9d4",
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\proxy.spec.ts": {
@@ -9000,8 +9000,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\staff\\views\\secretary\\secretary-book-appointment-view.tsx": {
-    "mtime": 1784547189.921177,
-    "ast_hash": "cb6e4151f6e5dd673695442e031c7c58",
+    "mtime": 1784603273.4874794,
+    "ast_hash": "e2ee4ee0e6612e42b98651ac83dc93e2",
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\staff\\views\\secretary\\secretary-check-in-out-tracker-view.tsx": {
@@ -11437,6 +11437,21 @@
   "C:\\Users\\picar\\Desktop\\samson-website\\.CORE_DOCUMENTATION\\SERVERLESS_ARCHI\\1.5.-BUSSINESS-PLAN\\mapping.md": {
     "mtime": 1784602315.5840878,
     "ast_hash": "985c56ada60bfcc43707ec10966cc074",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\app\\api\\outbox\\process\\route.ts": {
+    "mtime": 1784603892.8516314,
+    "ast_hash": "7625c44d75d3a5059dc052bca1c30a3f",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\emails\\subscribers\\on-appointment-reminder-24h.subscriber.ts": {
+    "mtime": 1784603876.495939,
+    "ast_hash": "9f9a7618d212f1e276f54bf43dcfda72",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\emails\\subscribers\\on-appointment-reminder-48h.subscriber.ts": {
+    "mtime": 1784603881.495364,
+    "ast_hash": "9269f33812cda23d8475d956af48e1e4",
     "semantic_hash": ""
   }
 }
