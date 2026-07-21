@@ -63,8 +63,9 @@ Double-sending reminders ruins user experience. We prevent this using database-l
 * **Resend API Failures & Retries:** 
   * The outbox table tracks `status` and `retry_count`. If Resend throws a rate limit error or fails, the handler catches the error, increments `retry_count`, and resets the status to `PENDING` (re-queue).
   * **How Retries are Triggered:**
-    * *Passive Trigger:* Any new outbox insert triggers the webhook, which processes all pending items in the queue.
-    * *Active Sweep Cron:* A secondary lightweight database cron job runs every 15 minutes to call the `/api/outbox/process` API endpoint directly, acting as a sweeper for failed/stuck `PENDING` events.
+    * *Passive Trigger:* Any new outbox insert triggers the webhook (or Next.js after-request handler), which processes all pending items in the queue. This is triggered by **both** guest/patient actions (e.g., submitting inquiries on the landing page) and secretary actions (e.g., manual booking, rescheduling, or confirming requests).
+    * *Active Sweep Cron:* A secondary lightweight database cron job runs every 15 minutes to call the `/api/outbox/process` API endpoint directly, acting as a sweeper for failed/stuck `PENDING` events so they retry without relying on website traffic.
+
 
 
 ---
