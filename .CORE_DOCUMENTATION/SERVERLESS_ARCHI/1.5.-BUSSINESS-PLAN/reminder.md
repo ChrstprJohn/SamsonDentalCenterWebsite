@@ -60,10 +60,12 @@ Double-sending reminders ruins user experience. We prevent this using database-l
 
 ---
 
-## 4. Other Preventive Solutions
+* **Resend API Failures & Retries:** 
+  * The outbox table tracks `status` and `retry_count`. If Resend throws a rate limit error or fails, the handler catches the error, increments `retry_count`, and resets the status to `PENDING` (re-queue).
+  * **How Retries are Triggered:**
+    * *Passive Trigger:* Any new outbox insert triggers the webhook, which processes all pending items in the queue.
+    * *Active Sweep Cron:* A secondary lightweight database cron job runs every 15 minutes to call the `/api/outbox/process` API endpoint directly, acting as a sweeper for failed/stuck `PENDING` events.
 
-* **Timezone Offset Issues:** Database queries compare dates using UTC/Timestamptz. We target the absolute database start time (`start_time`) against the UTC `NOW()` time to prevent drift.
-* **Resend API Failures:** The outbox table tracks `status` and `retry_count`. If Resend throws a rate limit error, the event status is reset to `PENDING` to retry up to 3 times safely.
 
 ---
 
