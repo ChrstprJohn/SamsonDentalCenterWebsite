@@ -6,7 +6,11 @@ import { describe, expect, it, vi } from 'vitest';
 import { convertInquiryAction } from '@/modules/appointments/actions/booking/convert-inquiry.action';
 import { getInquiriesAction } from '@/modules/appointments/actions/booking/get-inquiries.action';
 import { getServicesAction } from '@/modules/services/actions/management/get-services.action';
+import { getDoctorsAction } from '@/modules/staff/actions/management/get-doctors.action';
 import { useSecretaryInquiriesQueue } from './use-secretary-inquiries-queue';
+
+vi.mock('server-only', () => ({}));
+
 
 const scheduler = {
   availableDates: ['2026-07-09'],
@@ -39,6 +43,10 @@ vi.mock('@/modules/services/actions/management/get-services.action', () => ({
 vi.mock('@/modules/patients/actions/profile/search-patients.action', () => ({
   searchPatientsAction: vi.fn(),
 }));
+vi.mock('@/modules/staff/actions/management/get-doctors.action', () => ({
+  getDoctorsAction: vi.fn(),
+}));
+
 
 const inquiry = {
   id: 'inq-1',
@@ -52,14 +60,18 @@ const inquiry = {
   preferredServiceName: 'Cleaning',
   preferredDate: '2026-07-09',
   patientNote: 'Sensitive tooth',
+  status: 'NEW',
 };
+
 
 describe('useSecretaryInquiriesQueue', () => {
   it('converts an inquiry with the expected payload', async () => {
     vi.mocked(getInquiriesAction).mockResolvedValueOnce({ success: true, data: [inquiry] } as any)
       .mockResolvedValue({ success: true, data: [] } as any);
     vi.mocked(getServicesAction).mockResolvedValue({ success: true, data: [{ id: 'service-1', name: 'Cleaning' }] } as any);
+    vi.mocked(getDoctorsAction).mockResolvedValue({ success: true, data: [{ id: 'doctor-1', firstName: 'Santos', lastName: '' }] } as any);
     vi.mocked(convertInquiryAction).mockResolvedValue({ success: true } as any);
+
 
     const { result } = renderHook(() => useSecretaryInquiriesQueue());
 

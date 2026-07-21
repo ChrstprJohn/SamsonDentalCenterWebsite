@@ -168,8 +168,10 @@ export function ChatIntakeWorkflow({
                   ))}
                   {daysArray.map((day) => {
                     const dateStr = `${year}-${(month + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-                    const isAvailable = scheduler.availableDates.includes(dateStr);
+                    const dateObj = new Date(year, month, day);
+                    const isAvailable = dateObj.getDay() !== 0; // Exclude Sundays (0)
                     const isSelected = intake.selectedDate === dateStr;
+
                     return (
                       <button
                         key={day}

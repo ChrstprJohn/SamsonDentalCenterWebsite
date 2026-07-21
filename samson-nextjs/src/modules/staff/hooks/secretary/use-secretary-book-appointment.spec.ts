@@ -5,7 +5,14 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { createManualBookingAction } from '@/modules/appointments/actions/booking/create-manual-booking.action';
 import { getServicesAction } from '@/modules/services/actions/management/get-services.action';
+import { getDoctorsAction } from '@/modules/staff/actions/management/get-doctors.action';
 import { useSecretaryBookAppointment } from './use-secretary-book-appointment';
+
+vi.mock('server-only', () => ({}));
+vi.mock('@/modules/staff/actions/management/get-doctors.action', () => ({
+  getDoctorsAction: vi.fn(),
+}));
+
 
 const scheduler = {
   availableDates: ['2026-07-04'],
@@ -39,7 +46,9 @@ vi.mock('@/modules/patients/actions/dependents/get-user-dependents.action', () =
 describe('useSecretaryBookAppointment', () => {
   it('submits the manual guest booking payload unchanged', async () => {
     vi.mocked(getServicesAction).mockResolvedValue({ success: true, data: [{ id: 'service-1', name: 'Cleaning' }] } as any);
+    vi.mocked(getDoctorsAction).mockResolvedValue({ success: true, data: [{ id: 'doctor-1', firstName: 'Lia', lastName: 'Santos' }] } as any);
     vi.mocked(createManualBookingAction).mockResolvedValue({ success: true } as any);
+
 
     const { result } = renderHook(() => useSecretaryBookAppointment());
 

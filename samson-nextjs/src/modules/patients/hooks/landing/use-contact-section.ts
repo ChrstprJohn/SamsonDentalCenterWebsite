@@ -36,27 +36,24 @@ export function useContactSection({ services, handleRealInquirySubmit }: UseCont
   }, [pathway]);
 
   useEffect(() => {
-    if (!pathway) {
-      setAvailableDates([]);
-      return;
+    setIsLoadingDays(true);
+    const year = currentMonth.getFullYear();
+    const month = currentMonth.getMonth();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const dates: string[] = [];
+    
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dateObj = new Date(year, month, day);
+      if (dateObj.getDay() !== 0) { // Exclude Sundays (0)
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        dates.push(dateStr);
+      }
     }
-
-    let active = true;
-    async function loadDays() {
-      setIsLoadingDays(true);
-      const month = `${currentMonth.getFullYear()}-${String(currentMonth.getMonth() + 1).padStart(2, '0')}`;
-      const response = await getAvailableDaysAction({ serviceId: pathway, month });
-      if (!active) return;
-
-      setIsLoadingDays(false);
-      setAvailableDates(response.success && response.data ? response.data.availableDates || [] : []);
-    }
-    loadDays();
-
-    return () => {
-      active = false;
-    };
+    
+    setAvailableDates(dates);
+    setIsLoadingDays(false);
   }, [currentMonth, pathway]);
+
 
   const submitInquiry = async () => {
     const success = await handleRealInquirySubmit({ phone, pathway, targetDate, notes });

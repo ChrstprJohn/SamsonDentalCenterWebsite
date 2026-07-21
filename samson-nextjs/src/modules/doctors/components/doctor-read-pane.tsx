@@ -56,7 +56,7 @@ export function DoctorReadPane({ doctor }: DoctorReadPaneProps) {
 
       <div className="border-t border-card-border/50 pt-4 flex flex-col gap-3">
         <h4 className="font-bold text-xs text-text-secondary uppercase tracking-wider">
-          Clinician Shifts
+          Clinician Shifts <span className="text-[10px] font-normal text-text-muted lowercase italic">(informational only)</span>
         </h4>
         <div className="flex flex-col gap-1.5 text-[11px] text-text-muted">
           {(() => {

@@ -190,6 +190,7 @@ function getRescheduleProps(view: any) {
     slots: view.timeslots,
     isLoadingSlots: view.isLoadingSlots,
     startTime: view.rescheduleStartTime,
+    endTime: view.rescheduleEndTime,
     justification: view.rescheduleJustification,
     isSubmitting: view.isSubmitting,
     onToggleTreatment: view.toggleChangeTreatment,
@@ -198,9 +199,11 @@ function getRescheduleProps(view: any) {
     onDoctorSelect: view.setRescheduleDoctorId,
     onMonthChange: view.setRescheduleMonth,
     onDateSelect: view.selectRescheduleDate,
-    onSlotSelect: view.selectRescheduleSlot,
+    onStartTimeChange: view.setRescheduleStartTime,
+    onEndTimeChange: view.setRescheduleEndTime,
     onJustificationChange: view.setRescheduleJustification,
     onSubmit: view.submitReschedule,
     onBack: () => view.setShowRescheduleForm(false),
   };
 }
+

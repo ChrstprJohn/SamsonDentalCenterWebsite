@@ -61,9 +61,9 @@ export function useSecretaryBookAppointment() {
   const [booked, setBooked] = useState(false);
   const [confirmationChannel, setConfirmationChannel] = useState<'EMAIL' | 'SMS' | 'NONE' | 'BOTH'>('EMAIL');
 
-  const availableDates = selectedService ? scheduler.availableDates : [];
-  const availableDoctors = selectedDate ? scheduler.availableDoctors as { doctorId: string; doctorName: string }[] : [];
-  const timeslots = selectedDoctor ? scheduler.availableSlots as any[] : [];
+  const availableDates: string[] = [];
+  const availableDoctors: any[] = [];
+  const timeslots: any[] = [];
 
   useEffect(() => {
     if (!toast) return;
@@ -109,22 +109,6 @@ export function useSecretaryBookAppointment() {
   useEffect(() => {
     loadTimelineData(selectedDate);
   }, [selectedDate, loadTimelineData]);
-
-  useEffect(() => {
-    if (!selectedService) return;
-    const month = `${currentMonth.getFullYear()}-${(currentMonth.getMonth() + 1).toString().padStart(2, '0')}`;
-    loadAvailableDates({ serviceId: selectedService, month });
-  }, [selectedService, currentMonth, loadAvailableDates]);
-
-  useEffect(() => {
-    if (!selectedDate || !selectedService) return;
-    loadDoctorsForDate({ date: selectedDate, serviceId: selectedService });
-  }, [selectedDate, selectedService, loadDoctorsForDate]);
-
-  useEffect(() => {
-    if (!selectedService || !selectedDoctor || !selectedDate) return;
-    loadAvailableSlots({ serviceId: selectedService, doctorId: selectedDoctor, date: selectedDate });
-  }, [selectedService, selectedDoctor, selectedDate, loadAvailableSlots]);
 
   useEffect(() => {
     if (patientSearchQuery.trim().length < 2) {

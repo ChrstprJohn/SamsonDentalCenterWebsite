@@ -9,7 +9,9 @@ import { updateAppointmentStatusAction } from '@/modules/appointments/actions/st
 import { getAvailableDoctorsForDateAction } from '@/modules/appointments/actions/availability/get-available-doctors-for-date.action';
 import { getPatientDetailsForStaffAction } from '@/modules/patients/actions/profile/get-patient-details-for-staff.action';
 import { getServicesAction } from '@/modules/services/actions/management/get-services.action';
+import { getDoctorsAction } from '@/modules/staff/actions/management/get-doctors.action';
 import { useSecretaryPendingRequests } from './use-secretary-pending-requests';
+
 
 vi.mock('server-only', () => ({}));
 vi.mock('@/modules/appointments/actions/clinic/get-clinic-appointments.action', () => ({
@@ -30,6 +32,10 @@ vi.mock('@/modules/services/actions/management/get-services.action', () => ({
 vi.mock('@/modules/appointments/actions/availability/get-available-doctors-for-date.action', () => ({
   getAvailableDoctorsForDateAction: vi.fn(),
 }));
+vi.mock('@/modules/staff/actions/management/get-doctors.action', () => ({
+  getDoctorsAction: vi.fn(),
+}));
+
 
 const appointment = {
   id: 'appt-1',
@@ -48,7 +54,9 @@ describe('useSecretaryPendingRequests', () => {
     vi.mocked(getPatientDetailsForStaffAction).mockResolvedValue({ success: true, data: { profile: { firstName: 'Mila' }, history: [] } } as any);
     vi.mocked(getDoctorScheduleAction).mockResolvedValue({ success: true, data: [] } as any);
     vi.mocked(getServicesAction).mockResolvedValue({ success: true, data: [{ id: 'service-2', name: 'Cleaning' }] } as any);
+    vi.mocked(getDoctorsAction).mockResolvedValue({ success: true, data: [{ id: 'doctor-2', firstName: 'Nia', lastName: 'Cruz' }] } as any);
     vi.mocked(getAvailableDoctorsForDateAction).mockResolvedValue({ success: true, data: [{ doctorId: 'doctor-2', doctorName: 'Dr. Nia Cruz' }] } as any);
+
     vi.mocked(updateAppointmentStatusAction).mockResolvedValue({ success: true } as any);
     vi.spyOn(window, 'alert').mockImplementation(() => undefined);
 

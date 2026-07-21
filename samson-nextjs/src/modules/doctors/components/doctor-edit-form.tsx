@@ -125,20 +125,7 @@ export function DoctorEditForm({ doctor, allServices, onSuccess, onCancel }: Doc
         </div>
       )}
 
-      <div className="flex flex-col gap-1.5 border-t border-card-border/50 pt-3">
-        <label className="text-[10px] font-bold text-text-secondary uppercase">Services Mapped</label>
-        <Controller
-          name="serviceIds"
-          control={control}
-          render={({ field }) => (
-            <ServicePillSelector
-              allServices={allServices}
-              selectedServiceIds={field.value || []}
-              onChange={field.onChange}
-            />
-          )}
-        />
-      </div>
+
 
       <div className="flex gap-2 mt-2 pt-3 border-t border-card-border/50">
         <Button

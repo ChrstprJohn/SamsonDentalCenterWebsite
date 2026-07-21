@@ -139,17 +139,17 @@ export function useSecretaryPendingRequests() {
   };
 
   useEffect(() => {
-    if (!isEditing || !editDate || !editServiceId) {
+    if (!isEditing) {
       setEditDoctors([]);
       return;
     }
-    getAvailableDoctorsForDateAction({ date: editDate, serviceId: editServiceId }).then((res) => {
+    getDoctorsAction({ includeHidden: true }).then((res) => {
       if (res.success && res.data) {
-        const mapped = res.data.map((d: any) => ({ id: d.doctorId, firstName: d.doctorName.split(' ')[1] || d.doctorName, lastName: d.doctorName.split(' ')[2] || '' }));
-        setEditDoctors(mapped);
+        setEditDoctors(res.data as any[]);
       }
     });
-  }, [isEditing, editDate, editServiceId]);
+  }, [isEditing]);
+
 
   const setEditService = (serviceId: string) => {
     setEditServiceId(serviceId);

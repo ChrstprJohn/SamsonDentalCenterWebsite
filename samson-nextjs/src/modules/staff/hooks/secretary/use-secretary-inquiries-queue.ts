@@ -8,6 +8,8 @@ import { updateInquiryAction } from '@/modules/appointments/actions/booking/upda
 import { useBookingScheduler } from '@/modules/appointments/hooks/shared/use-booking-scheduler';
 import { searchPatientsAction } from '@/modules/patients/actions/profile/search-patients.action';
 import { getServicesAction } from '@/modules/services/actions/management/get-services.action';
+import { getDoctorsAction } from '@/modules/staff/actions/management/get-doctors.action';
+
 
 export type InquiryDecision = 'CONVERT' | 'DROP' | '';
 export type InquiryPatientMode = 'SEARCH' | 'GUEST';
@@ -42,6 +44,7 @@ export function useSecretaryInquiriesQueue() {
   const [isSearchingPatients, setIsSearchingPatients] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<any | null>(null);
   const [services, setServices] = useState<{ id: string; name: string }[]>([]);
+  const [allDoctors, setAllDoctors] = useState<{ doctorId: string; doctorName: string }[]>([]);
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date(2026, 5, 1));
   const [isLoadingServices, setIsLoadingServices] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -68,11 +71,24 @@ export function useSecretaryInquiriesQueue() {
     [inquiries, selectedInquiryId]
   );
   const availableDates = stagedInquiryService ? scheduler.availableDates : [];
-  const availableDoctors = stagedInquiryDate ? scheduler.availableDoctors as { doctorId: string; doctorName: string }[] : [];
+  const availableDoctors = allDoctors;
   const timeslots = stagedInquiryDoctor ? scheduler.availableSlots as any[] : [];
   const isAvailabilityLoading = isLoadingServices || scheduler.loadingKey !== null;
 
   const showToast = (message: string, type: 'success' | 'error') => setToast({ message, type });
+
+  useEffect(() => {
+    getDoctorsAction({ includeHidden: true }).then((res) => {
+      if (res.success && res.data) {
+        const mapped = res.data.map((d: any) => ({
+          doctorId: d.id,
+          doctorName: `Dr. ${d.firstName} ${d.lastName}`,
+        }));
+        setAllDoctors(mapped);
+      }
+    });
+  }, []);
+
 
   useEffect(() => {
     if (!toast) return;
@@ -121,10 +137,6 @@ export function useSecretaryInquiriesQueue() {
     loadAvailableDates({ serviceId: stagedInquiryService, month });
   }, [stagedInquiryService, currentMonth, loadAvailableDates]);
 
-  useEffect(() => {
-    if (!stagedInquiryDate || !stagedInquiryService) return;
-    loadDoctorsForDate({ date: stagedInquiryDate, serviceId: stagedInquiryService });
-  }, [stagedInquiryDate, stagedInquiryService, loadDoctorsForDate]);
 
   useEffect(() => {
     if (!stagedInquiryService || !stagedInquiryDoctor || !stagedInquiryDate) return;
