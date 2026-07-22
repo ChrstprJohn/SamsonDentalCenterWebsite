@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import { Select } from '@/components/ui/select';
 import type { AppointmentDto } from '@/modules/appointments/dtos/shared/appointment.dto';
 import type { AppointmentDirectoryTab } from '@/modules/staff/hooks/secretary/use-secretary-appointments';
 import { SharedAppointmentDetail } from '@/modules/appointments/components/sub-components/shared-appointment-detail';
@@ -48,7 +49,7 @@ function AppointmentDetails({ appointment, view, activeTab }: { appointment: App
     });
   }, [appointment]);
 
-  const handleResend = async (eventType: 'APPOINTMENT_BOOKED' | 'PAYMENT_RECEIPT' | 'APPOINTMENT_REMINDER_48H' | 'APPOINTMENT_REMINDER_24H') => {
+  const handleResend = async (eventType: 'APPOINTMENT_BOOKED' | 'APPOINTMENT_REMINDER_48H' | 'APPOINTMENT_REMINDER_24H') => {
     setResending(eventType);
     const res = await resendNotificationAction({ appointmentId: appointment.id, eventType });
     if (res.success) {
@@ -57,7 +58,6 @@ function AppointmentDetails({ appointment, view, activeTab }: { appointment: App
         if (eventType === 'APPOINTMENT_REMINDER_48H') updates.reminder48hSent = true;
         else if (eventType === 'APPOINTMENT_REMINDER_24H') updates.reminder24hSent = true;
         else if (eventType === 'APPOINTMENT_BOOKED') updates.confirmationSent = true;
-        else if (eventType === 'PAYMENT_RECEIPT') updates.paymentReceiptSent = true;
         return { ...prev, ...updates };
       });
     }
@@ -86,11 +86,10 @@ function AppointmentDetails({ appointment, view, activeTab }: { appointment: App
   const commEntries: {
     key: string;
     label: string;
-    eventType: 'APPOINTMENT_BOOKED' | 'PAYMENT_RECEIPT' | 'APPOINTMENT_REMINDER_48H' | 'APPOINTMENT_REMINDER_24H';
+    eventType: 'APPOINTMENT_BOOKED' | 'APPOINTMENT_REMINDER_48H' | 'APPOINTMENT_REMINDER_24H';
     sent: boolean;
   }[] = [
     { key: 'confirmation', label: 'Booking Confirmation', eventType: 'APPOINTMENT_BOOKED', sent: commState.confirmationSent },
-    { key: 'receipt', label: 'Payment Receipt', eventType: 'PAYMENT_RECEIPT', sent: commState.paymentReceiptSent },
     { key: 'reminder48h', label: '48-Hour Reminder', eventType: 'APPOINTMENT_REMINDER_48H', sent: commState.reminder48hSent },
     { key: 'reminder24h', label: '24-Hour Reminder', eventType: 'APPOINTMENT_REMINDER_24H', sent: commState.reminder24hSent },
   ];
@@ -101,15 +100,10 @@ function AppointmentDetails({ appointment, view, activeTab }: { appointment: App
       extraSections={
         <>
           <hr className="border-card-border/40 mx-5" />
-          {/* Communication History */}
-          <div className="py-4 px-5 space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="text-base font-medium text-foreground">Communication History</span>
-                <span className="px-2 py-0.5 text-[10px] font-bold rounded-md bg-primary/10 text-primary border border-primary/20">
-                  {channel}
-                </span>
-              </div>
+          {/* Notification Channel */}
+          <div className="py-4 px-5">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-base font-medium text-foreground">Notification Channel</span>
               {!isEditingChannel && (
                 <Button
                   variant="outline"
@@ -132,25 +126,29 @@ function AppointmentDetails({ appointment, view, activeTab }: { appointment: App
               )}
             </div>
 
-            {isEditingChannel && (
-              <div className="flex flex-row gap-4 flex-wrap">
-                {(['EMAIL', 'SMS', 'BOTH', 'NONE'] as const).map((opt) => (
-                  <label key={opt} className="flex items-center gap-2 text-sm text-foreground cursor-pointer">
-                    <input
-                      type="radio"
-                      name="confirmation-channel"
-                      value={opt}
-                      checked={draftChannel === opt}
-                      onChange={() => setDraftChannel(opt)}
-                      className="text-primary focus:ring-primary h-4 w-4"
-                    />
-                    {opt}
-                  </label>
-                ))}
+            {isEditingChannel ? (
+              <Select
+                value={draftChannel}
+                onChange={(e) => setDraftChannel(e.target.value as any)}
+                className="text-xs w-full"
+                options={[
+                  { value: 'EMAIL', label: 'Email' },
+                  { value: 'SMS', label: 'SMS' },
+                  { value: 'BOTH', label: 'Email & SMS' },
+                  { value: 'NONE', label: 'None' },
+                ]}
+              />
+            ) : (
+              <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">
+                {channel === 'EMAIL' ? 'Email' : channel === 'SMS' ? 'SMS' : channel === 'BOTH' ? 'Email & SMS' : 'None'}
               </div>
             )}
+          </div>
 
-            {/* Dispatch log entries */}
+          <hr className="border-card-border/40 mx-5" />
+          {/* Communication History */}
+          <div className="py-4 px-5 space-y-4">
+            <span className="text-base font-medium text-foreground block">Communication History</span>
             <div className="flex flex-col gap-2">
               {commEntries.map((entry) => (
                 <div key={entry.key} className="flex items-center justify-between p-3 bg-secondary-bg/20 border border-card-border/60 rounded-xl">
