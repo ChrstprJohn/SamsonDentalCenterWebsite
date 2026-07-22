@@ -137,10 +137,24 @@ CREATE TABLE appointments (
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
     
     -- ACID CONSTRAINT: Prevent overlapping appointments for the same doctor
+    -- Only active/occupying statuses participate: APPROVED, CONFIRMED, CHECKED_IN, IN_PROGRESS
     CONSTRAINT no_overlapping_appointments EXCLUDE USING gist (
         doctor_id WITH =,
         tstzrange(start_time, end_time) WITH &&
-    ) WHERE (status != 'PENDING' AND status != 'RESCHEDULE_REQUESTED' AND doctor_id IS NOT NULL),
+    ) WHERE (
+        status NOT IN (
+            'PENDING',
+            'RESCHEDULE_REQUESTED',
+            'CANCELLED',
+            'REJECTED',
+            'DISPLACED',
+            'COMPLETED',
+            'NO_SHOW'
+        )
+        AND doctor_id IS NOT NULL
+        AND start_time IS NOT NULL
+        AND end_time IS NOT NULL
+    ),
     CONSTRAINT valid_appointment_time CHECK (start_time < end_time)
 );
 
