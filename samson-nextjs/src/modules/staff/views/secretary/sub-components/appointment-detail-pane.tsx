@@ -134,7 +134,7 @@ function AppointmentDetails({ appointment, view, activeTab }: { appointment: App
               <Select
                 value={draftChannel}
                 onChange={(e) => setDraftChannel(e.target.value as any)}
-                className="text-xs w-full"
+                className="text-sm w-full"
                 options={[
                   { value: 'EMAIL', label: 'Email' },
                   { value: 'SMS', label: 'SMS' },
