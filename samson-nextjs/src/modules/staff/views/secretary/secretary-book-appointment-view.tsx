@@ -303,7 +303,7 @@ export function SecretaryBookAppointmentView() {
         {view.selectedAppointmentDetails ? (
           <div className="flex flex-col h-full overflow-hidden">
             <div className="p-4 border-b border-border flex items-center justify-between shrink-0">
-              <span className="text-sm font-semibold text-foreground">Appointment Details</span>
+              <span className="text-base font-medium text-foreground">Appointment Details</span>
               <button
                 onClick={() => view.setSelectedAppointmentDetails(null)}
                 className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded-md hover:bg-muted"

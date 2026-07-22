@@ -8,9 +8,9 @@ import { SharedAppointmentDetail } from '@/modules/appointments/components/sub-c
 import { AppointmentCancelForm } from './appointment-cancel-form';
 import { AppointmentRescheduleForm } from './appointment-reschedule-form';
 import { AppointmentStatusHistory } from './appointment-status-history';
-import { Send, Calendar, Edit2 } from 'lucide-react';
-import { resendReminderAction } from '@/modules/appointments/actions/status/resend-reminder.action';
+import { Send, Calendar, RotateCw, CheckCircle2, XCircle, Clock } from 'lucide-react';
 import { updateConfirmationChannelAction } from '@/modules/appointments/actions/status/update-confirmation-channel.action';
+import { resendNotificationAction } from '@/modules/appointments/actions/status/resend-notification.action';
 
 interface AppointmentDetailPaneProps {
   view: any;
@@ -23,53 +23,65 @@ export function AppointmentDetailPane({ view }: AppointmentDetailPaneProps) {
 }
 
 function AppointmentDetails({ appointment, view, activeTab }: { appointment: AppointmentDto; view: any; activeTab: AppointmentDirectoryTab }) {
-  const [resendingType, setResendingType] = useState<'24H' | '48H' | null>(null);
-  const [reminderState, setReminderState] = useState({
-    reminder24hSent: appointment.reminder24hSent,
-    reminder48hSent: appointment.reminder48hSent,
-  });
-  const [currentChannel, setCurrentChannel] = useState<'EMAIL' | 'SMS' | 'BOTH' | 'NONE'>(
+  const [resending, setResending] = useState<string | null>(null);
+  const [channel, setChannel] = useState<'EMAIL' | 'SMS' | 'BOTH' | 'NONE'>(
     (appointment.confirmationChannel as any) || 'EMAIL'
   );
-  const [isEditingChannel, setIsEditingChannel] = useState(false);
-  const [isSavingChannel, setIsSavingChannel] = useState(false);
+  const [commState, setCommState] = useState({
+    confirmationSent: appointment.confirmationSent ?? false,
+    paymentReceiptSent: appointment.paymentReceiptSent ?? false,
+    reminder48hSent: appointment.reminder48hSent,
+    reminder24hSent: appointment.reminder24hSent,
+  });
 
   useEffect(() => {
-    setReminderState({
-      reminder24hSent: appointment.reminder24hSent,
+    setChannel(((appointment.confirmationChannel as any) || 'EMAIL'));
+    setCommState({
+      confirmationSent: appointment.confirmationSent ?? false,
+      paymentReceiptSent: appointment.paymentReceiptSent ?? false,
       reminder48hSent: appointment.reminder48hSent,
+      reminder24hSent: appointment.reminder24hSent,
     });
-    setCurrentChannel(((appointment.confirmationChannel as any) || 'EMAIL'));
   }, [appointment]);
 
-  const handleResend = async (type: '24H' | '48H') => {
-    setResendingType(type);
-    const res = await resendReminderAction({
-      appointmentId: appointment.id,
-      reminderType: type,
-    });
+  const handleResend = async (eventType: 'APPOINTMENT_BOOKED' | 'PAYMENT_RECEIPT' | 'APPOINTMENT_REMINDER_48H' | 'APPOINTMENT_REMINDER_24H') => {
+    setResending(eventType);
+    const res = await resendNotificationAction({ appointmentId: appointment.id, eventType });
     if (res.success) {
-      setReminderState((prev) => ({
-        ...prev,
-        ...(type === '48H' ? { reminder48hSent: true } : { reminder24hSent: true }),
-      }));
+      setCommState((prev) => {
+        const updates: Partial<typeof prev> = {};
+        if (eventType === 'APPOINTMENT_REMINDER_48H') updates.reminder48hSent = true;
+        else if (eventType === 'APPOINTMENT_REMINDER_24H') updates.reminder24hSent = true;
+        else if (eventType === 'APPOINTMENT_BOOKED') updates.confirmationSent = true;
+        else if (eventType === 'PAYMENT_RECEIPT') updates.paymentReceiptSent = true;
+        return { ...prev, ...updates };
+      });
     }
-    setResendingType(null);
+    setResending(null);
   };
 
-  const handleUpdateChannel = async (newChannel: 'EMAIL' | 'SMS' | 'BOTH' | 'NONE') => {
-    setIsSavingChannel(true);
+  const handleChannelChange = async (newChannel: 'EMAIL' | 'SMS' | 'BOTH' | 'NONE') => {
     const res = await updateConfirmationChannelAction({
       appointmentId: appointment.id,
       confirmationChannel: newChannel,
     });
     if (res.success) {
-      setCurrentChannel(newChannel);
+      setChannel(newChannel);
       appointment.confirmationChannel = newChannel;
-      setIsEditingChannel(false);
     }
-    setIsSavingChannel(false);
   };
+
+  const commEntries: {
+    key: string;
+    label: string;
+    eventType: 'APPOINTMENT_BOOKED' | 'PAYMENT_RECEIPT' | 'APPOINTMENT_REMINDER_48H' | 'APPOINTMENT_REMINDER_24H';
+    sent: boolean;
+  }[] = [
+    { key: 'confirmation', label: 'Booking Confirmation', eventType: 'APPOINTMENT_BOOKED', sent: commState.confirmationSent },
+    { key: 'receipt', label: 'Payment Receipt', eventType: 'PAYMENT_RECEIPT', sent: commState.paymentReceiptSent },
+    { key: 'reminder48h', label: '48-Hour Reminder', eventType: 'APPOINTMENT_REMINDER_48H', sent: commState.reminder48hSent },
+    { key: 'reminder24h', label: '24-Hour Reminder', eventType: 'APPOINTMENT_REMINDER_24H', sent: commState.reminder24hSent },
+  ];
 
   return (
     <SharedAppointmentDetail
@@ -77,74 +89,63 @@ function AppointmentDetails({ appointment, view, activeTab }: { appointment: App
       extraSections={
         <>
           <hr className="border-card-border/40 mx-5" />
-          {/* Notification Reminders */}
-          <div className="py-4 px-5">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <span className="text-base font-medium text-foreground">Notification Reminders</span>
-                <span className="px-2 py-0.5 text-[10px] font-bold rounded-md bg-primary/10 text-primary border border-primary/20">
-                  {currentChannel}
-                </span>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 px-2 text-xs text-muted-foreground hover:text-foreground gap-1"
-                onClick={() => setIsEditingChannel(!isEditingChannel)}
-              >
-                <Edit2 className="size-3" />
-                {isEditingChannel ? 'Cancel' : 'Edit'}
-              </Button>
+          {/* Communication History */}
+          <div className="py-4 px-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-base font-medium text-foreground">Communication History</span>
             </div>
 
-            {isEditingChannel && (
-              <div className="mb-3 p-3.5 bg-muted/20 border border-card-border/60 rounded-xl space-y-2">
-                <span className="text-xs font-semibold text-muted-foreground block">Select Primary Channel</span>
-                <div className="grid grid-cols-4 gap-1.5">
-                  {(['EMAIL', 'SMS', 'BOTH', 'NONE'] as const).map((channel) => (
-                    <button
-                      key={channel}
-                      type="button"
-                      disabled={isSavingChannel}
-                      onClick={() => handleUpdateChannel(channel)}
-                      className={`py-1.5 text-[10px] font-bold rounded-lg border transition-all ${
-                        currentChannel === channel
-                          ? 'bg-primary text-primary-foreground shadow-sm border-primary'
-                          : 'bg-card text-muted-foreground border-card-border hover:text-foreground'
-                      }`}
-                    >
-                      {channel}
-                    </button>
-                  ))}
-                </div>
+            {/* Channel selector — radio buttons always visible */}
+            <div className="p-3 bg-muted/20 border border-card-border/60 rounded-xl">
+              <span className="text-xs font-semibold text-muted-foreground block mb-2">Notification Channel</span>
+              <div className="flex flex-row gap-4 flex-wrap">
+                {(['EMAIL', 'SMS', 'BOTH', 'NONE'] as const).map((opt) => (
+                  <label key={opt} className="flex items-center gap-2 text-sm text-foreground cursor-pointer">
+                    <input
+                      type="radio"
+                      name="confirmation-channel"
+                      value={opt}
+                      checked={channel === opt}
+                      onChange={() => handleChannelChange(opt)}
+                      className="text-primary focus:ring-primary h-4 w-4"
+                    />
+                    {opt}
+                  </label>
+                ))}
               </div>
-            )}
+            </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="bg-secondary-bg/20 border border-card-border/60 rounded-xl p-3 flex flex-col justify-between gap-2">
-                <div>
-                  <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider block">48H REMINDER</span>
-                  <span className="text-xs font-semibold text-text-primary">
-                    {reminderState.reminder48hSent ? 'Sent / Processed' : 'Pending / Skipped'}
-                  </span>
+            {/* Dispatch log entries */}
+            <div className="flex flex-col gap-2">
+              {commEntries.map((entry) => (
+                <div key={entry.key} className="flex items-center justify-between p-3 bg-secondary-bg/20 border border-card-border/60 rounded-xl">
+                  <div className="flex items-center gap-3 min-w-0">
+                    {entry.sent ? (
+                      <CheckCircle2 className="size-4 shrink-0 text-green-500" />
+                    ) : (
+                      <Clock className="size-4 shrink-0 text-muted-foreground/50" />
+                    )}
+                    <span className="text-xs font-medium text-foreground truncate">{entry.label}</span>
+                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded shrink-0 ${
+                      entry.sent
+                        ? 'bg-green-500/10 text-green-400'
+                        : 'bg-muted text-muted-foreground/60'
+                    }`}>
+                      {entry.sent ? 'SENT' : 'PENDING'}
+                    </span>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={resending === entry.eventType}
+                    onClick={() => handleResend(entry.eventType)}
+                    className="text-[10px] h-7 px-2.5 gap-1 shrink-0"
+                  >
+                    <RotateCw className={`size-3 ${resending === entry.eventType ? 'animate-spin' : ''}`} />
+                    {resending === entry.eventType ? 'Sending...' : 'Resend'}
+                  </Button>
                 </div>
-                <Button variant="outline" size="sm" className="text-[10px] h-7 px-2.5 gap-1 self-start" disabled={resendingType === '48H'} onClick={() => handleResend('48H')}>
-                  <Send className="size-3" />
-                  {resendingType === '48H' ? 'Sending...' : 'Resend'}
-                </Button>
-              </div>
-              <div className="bg-secondary-bg/20 border border-card-border/60 rounded-xl p-3 flex flex-col justify-between gap-2">
-                <div>
-                  <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider block">24H REMINDER</span>
-                  <span className="text-xs font-semibold text-text-primary">
-                    {reminderState.reminder24hSent ? 'Sent / Processed' : 'Pending / Skipped'}
-                  </span>
-                </div>
-                <Button variant="outline" size="sm" className="text-[10px] h-7 px-2.5 gap-1 self-start" disabled={resendingType === '24H'} onClick={() => handleResend('24H')}>
-                  <Send className="size-3" />
-                  {resendingType === '24H' ? 'Sending...' : 'Resend'}
-                </Button>
-              </div>
+              ))}
             </div>
           </div>
           <hr className="border-card-border/40 mx-5" />

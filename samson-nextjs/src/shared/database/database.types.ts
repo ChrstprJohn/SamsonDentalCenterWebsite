@@ -100,6 +100,7 @@ export type Database = {
       appointments: {
         Row: {
           clinical_notes: string | null
+          confirmation_sent: boolean
           created_at: string
           date: string
           dependent_id: string | null
@@ -107,6 +108,7 @@ export type Database = {
           end_time: string
           id: string
           patient_id: string | null
+          payment_receipt_sent: boolean
           reschedule_count: number
           service_id: string
           start_time: string
@@ -118,6 +120,7 @@ export type Database = {
         }
         Insert: {
           clinical_notes?: string | null
+          confirmation_sent?: boolean
           created_at?: string
           date: string
           dependent_id?: string | null
@@ -125,6 +128,7 @@ export type Database = {
           end_time: string
           id?: string
           patient_id?: string | null
+          payment_receipt_sent?: boolean
           reschedule_count?: number
           service_id: string
           start_time: string
@@ -136,6 +140,7 @@ export type Database = {
         }
         Update: {
           clinical_notes?: string | null
+          confirmation_sent?: boolean
           created_at?: string
           date?: string
           dependent_id?: string | null
@@ -143,6 +148,7 @@ export type Database = {
           end_time?: string
           id?: string
           patient_id?: string | null
+          payment_receipt_sent?: boolean
           reschedule_count?: number
           service_id?: string
           start_time?: string
