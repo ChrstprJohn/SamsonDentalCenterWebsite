@@ -10,7 +10,8 @@ import { getPatientDetailsForStaffAction } from '@/modules/patients/actions/prof
 import { AppointmentCancelForm } from './appointment-cancel-form';
 import { AppointmentRescheduleForm } from './appointment-reschedule-form';
 import { AppointmentStatusHistory } from './appointment-status-history';
-import { User, Phone, Calendar, Clock, Stethoscope } from 'lucide-react';
+import { User, Phone, Calendar, Clock, Stethoscope, Mail, Send } from 'lucide-react';
+import { resendReminderAction } from '@/modules/appointments/actions/status/resend-reminder.action';
 
 interface AppointmentDetailPaneProps {
   view: any;
@@ -31,6 +32,33 @@ export function AppointmentDetailPane({ view }: AppointmentDetailPaneProps) {
 
 function AppointmentDetails({ appointment, view, activeTab }: { appointment: AppointmentDto; view: any; activeTab: AppointmentDirectoryTab }) {
   const [patientProfile, setPatientProfile] = useState<{ email?: string; phoneNumber?: string } | null>(null);
+  const [resendingType, setResendingType] = useState<'24H' | '48H' | null>(null);
+  const [reminderState, setReminderState] = useState({
+    reminder24hSent: appointment.reminder24hSent,
+    reminder48hSent: appointment.reminder48hSent,
+  });
+
+  useEffect(() => {
+    setReminderState({
+      reminder24hSent: appointment.reminder24hSent,
+      reminder48hSent: appointment.reminder48hSent,
+    });
+  }, [appointment]);
+
+  const handleResend = async (type: '24H' | '48H') => {
+    setResendingType(type);
+    const res = await resendReminderAction({
+      appointmentId: appointment.id,
+      reminderType: type,
+    });
+    if (res.success) {
+      setReminderState((prev) => ({
+        ...prev,
+        ...(type === '48H' ? { reminder48hSent: true } : { reminder24hSent: true }),
+      }));
+    }
+    setResendingType(null);
+  };
 
   useEffect(() => {
     if (!appointment.patientId) return;
@@ -104,6 +132,49 @@ function AppointmentDetails({ appointment, view, activeTab }: { appointment: App
             label="ASSIGNED PRACTITIONER"
             value={appointment.doctor ? `Dr. ${appointment.doctor.firstName} ${appointment.doctor.lastName}` : '-'}
           />
+        </div>
+      </Section>
+
+      {/* Reminders Status */}
+      <Section icon={Mail} title="NOTIFICATION REMINDERS">
+        <div className="grid grid-cols-2 gap-3">
+          <div className="bg-secondary-bg/20 border border-card-border/60 rounded-xl p-3 flex flex-col justify-between gap-2">
+            <div>
+              <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider block">48H REMINDER</span>
+              <span className="text-xs font-semibold text-text-primary">
+                {reminderState.reminder48hSent ? 'Sent / Processed' : 'Pending / Skipped'}
+              </span>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-[10px] h-7 px-2.5 gap-1 self-start"
+              disabled={resendingType === '48H'}
+              onClick={() => handleResend('48H')}
+            >
+              <Send className="size-3" />
+              {resendingType === '48H' ? 'Sending...' : 'Resend'}
+            </Button>
+          </div>
+
+          <div className="bg-secondary-bg/20 border border-card-border/60 rounded-xl p-3 flex flex-col justify-between gap-2">
+            <div>
+              <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider block">24H REMINDER</span>
+              <span className="text-xs font-semibold text-text-primary">
+                {reminderState.reminder24hSent ? 'Sent / Processed' : 'Pending / Skipped'}
+              </span>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-[10px] h-7 px-2.5 gap-1 self-start"
+              disabled={resendingType === '24H'}
+              onClick={() => handleResend('24H')}
+            >
+              <Send className="size-3" />
+              {resendingType === '24H' ? 'Sending...' : 'Resend'}
+            </Button>
+          </div>
         </div>
       </Section>
 

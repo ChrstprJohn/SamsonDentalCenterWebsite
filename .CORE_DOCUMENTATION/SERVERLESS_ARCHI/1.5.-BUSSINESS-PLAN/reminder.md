@@ -112,7 +112,7 @@ Here is the tracking list of what guest booking & staff response email notificat
   * *Trigger Event:* `STAFF_REPLIED_TO_CHAT`
 * **24-Hour & 48-Hour Reminders:** (Newly added) Sent automatically before appointment start.
   * *Template:* Reuses `appointment-confirmed-email.tsx` layout with customized header subjects.
-  * *Trigger Events:* `APPOINTMENT_REMINDER_24H`, `APPOINTMENT_REMINDER_48H`
+  * *Trigger Events:* `APPOINTMENT_REMI     NDER_24H`, `APPOINTMENT_REMINDER_48H`
 
 ### B. Missing / Future Backlog (Not Yet Implemented)
 * **Appointment Rejected:** No separate rejection notification email currently exists if a secretary rejects/deletes a pending request.

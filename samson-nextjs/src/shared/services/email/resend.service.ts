@@ -9,6 +9,7 @@ import AppointmentConfirmedEmail from '@/components/emails/appointment-confirmed
 import AppointmentCancelledEmail from '@/components/emails/appointment-cancelled-email';
 import AppointmentRescheduledEmail from '@/components/emails/appointment-rescheduled-email';
 import StaffReplyEmail from '@/components/emails/staff-reply-email';
+import AppointmentReminderEmail from '@/components/emails/appointment-reminder-email';
 
 if (!process.env.RESEND_API_KEY) {
   // We don't throw an error at boot, but we will throw when attempting to send if missing.
@@ -35,6 +36,17 @@ type EmailTemplates = {
     dashboardUrl: string;
   };
   'appointment_confirmed': {
+    patientName: string;
+    serviceName: string;
+    doctorName: string;
+    dateStr: string;
+    timeRangeStr: string;
+    appointmentId: string;
+    chatToken?: string;
+    baseUrl?: string;
+  };
+  'appointment_reminder': {
+    reminderTitle?: string;
     patientName: string;
     serviceName: string;
     doctorName: string;
@@ -118,6 +130,21 @@ export const ResendService = {
       case 'appointment_confirmed': {
         const reqPayload = payload as EmailTemplates['appointment_confirmed'];
         html = await render(React.createElement(AppointmentConfirmedEmail, {
+          patientName: reqPayload.patientName,
+          serviceName: reqPayload.serviceName,
+          doctorName: reqPayload.doctorName,
+          dateStr: reqPayload.dateStr,
+          timeRangeStr: reqPayload.timeRangeStr,
+          appointmentId: reqPayload.appointmentId,
+          chatToken: reqPayload.chatToken,
+          baseUrl: reqPayload.baseUrl,
+        }));
+        break;
+      }
+      case 'appointment_reminder': {
+        const reqPayload = payload as EmailTemplates['appointment_reminder'];
+        html = await render(React.createElement(AppointmentReminderEmail, {
+          reminderTitle: reqPayload.reminderTitle,
           patientName: reqPayload.patientName,
           serviceName: reqPayload.serviceName,
           doctorName: reqPayload.doctorName,

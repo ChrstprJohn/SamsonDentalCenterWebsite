@@ -9,8 +9,8 @@ export const onAppointmentReminder48hSubscriber = {
    * Sends confirmation email reminder 48 hours before appointment.
    */
   async handle(payload: Record<string, any>): Promise<void> {
-    const { appointmentId, email } = payload;
-    if (!email) return;
+    const { appointmentId } = payload;
+    let email = payload.email;
 
     const supabaseAdmin = await createAdminClient();
 
@@ -19,13 +19,13 @@ export const onAppointmentReminder48hSubscriber = {
       .from('appointments')
       .select(`
         id,
+        patient_id,
         date,
         start_time,
         service:services(name, duration_minutes),
         doctor:users!appointments_doctor_id_fkey(first_name, last_name),
-        patient:users!appointments_patient_id_fkey(first_name, last_name),
-        first_name,
-        last_name
+        patient:users!appointments_patient_id_fkey(first_name, last_name, email),
+        guest_contacts!guest_contacts_appointment_id_fkey(first_name, last_name, email)
       `)
       .eq('id', appointmentId)
       .single();
@@ -34,9 +34,26 @@ export const onAppointmentReminder48hSubscriber = {
       throw new Error(`Failed to fetch appointment for 48h reminder: ${appError?.message || 'Not found'}`);
     }
 
-    const patientName = appointment.patient
+    if (!email) {
+      const { data: gc } = await supabaseAdmin
+        .from('guest_contacts')
+        .select('email')
+        .eq('appointment_id', appointmentId)
+        .single();
+      email = gc?.email || appointment.patient?.email;
+    }
+
+    if (!email) {
+      console.warn(`[48H Reminder] Skipping email dispatch for appointment ${appointmentId}: No email found.`);
+      return;
+    }
+
+    const gcData = Array.isArray(appointment.guest_contacts) ? appointment.guest_contacts[0] : (appointment.guest_contacts as any);
+    const patientName = gcData
+      ? `${gcData.first_name} ${gcData.last_name}`
+      : appointment.patient
       ? `${appointment.patient.first_name} ${appointment.patient.last_name}`
-      : `${appointment.first_name} ${appointment.last_name}`;
+      : 'Valued Patient';
 
     const serviceName = (appointment.service as any)?.name || 'Dental Appointment';
     const doctorName = appointment.doctor
@@ -61,8 +78,9 @@ export const onAppointmentReminder48hSubscriber = {
     await ResendService.sendTemplatedEmail(
       email,
       'Appointment Reminder (48 Hours) – Samson Dental Center',
-      'appointment_confirmed',
+      'appointment_reminder',
       {
+        reminderTitle: '48-Hour Appointment Reminder',
         patientName,
         serviceName,
         doctorName,

@@ -325,8 +325,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\appointments\\dtos\\shared\\appointment.dto.ts": {
-    "mtime": 1784537241.6919658,
-    "ast_hash": "a3d6763d51bead6a661facfc72ed6517",
+    "mtime": 1784697417.913502,
+    "ast_hash": "24d27927b0a74fd3fee880097c444889",
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\appointments\\dtos\\status\\update-appointment-status.dto.spec.ts": {
@@ -9045,8 +9045,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\staff\\views\\secretary\\sub-components\\appointment-detail-pane.tsx": {
-    "mtime": 1784601920.2088695,
-    "ast_hash": "7aa1203fc80167efe6530ecdcb77add5",
+    "mtime": 1784697453.267839,
+    "ast_hash": "3ae78436dfb6c5940774cb37999058ec",
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\staff\\views\\secretary\\sub-components\\appointment-reschedule-form.tsx": {
@@ -11370,8 +11370,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\staff\\views\\secretary\\sub-components\\sidebar-appointment-details.tsx": {
-    "mtime": 1784542729.3321304,
-    "ast_hash": "a57fea8f9bb56f493347ee847ae55702",
+    "mtime": 1784697440.8087878,
+    "ast_hash": "202b4ecad8383bfe91290147d3c97ed9",
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\shared\\services\\sms\\sms.service.ts": {
@@ -11445,18 +11445,28 @@
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\emails\\subscribers\\on-appointment-reminder-24h.subscriber.ts": {
-    "mtime": 1784603876.495939,
-    "ast_hash": "9f9a7618d212f1e276f54bf43dcfda72",
+    "mtime": 1784697399.8783143,
+    "ast_hash": "5094bdc7e0459aa793f75506d155b10b",
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\emails\\subscribers\\on-appointment-reminder-48h.subscriber.ts": {
-    "mtime": 1784603881.495364,
-    "ast_hash": "9269f33812cda23d8475d956af48e1e4",
+    "mtime": 1784697403.65411,
+    "ast_hash": "529e30b8350f2e1cc83eb57666e0e41c",
     "semantic_hash": ""
   },
   "C:\\Users\\picar\\Desktop\\samson-website\\.CORE_DOCUMENTATION\\SERVERLESS_ARCHI\\1.5.-BUSSINESS-PLAN\\reminder.md": {
-    "mtime": 1784604403.504072,
-    "ast_hash": "4e8ce7f8f292d0d25c6c3bd20e7ea6fc",
+    "mtime": 1784604901.7919497,
+    "ast_hash": "5996573573c9754afa8554c26236c06f",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\migrations\\20260722131500_appointment_reminders.sql": {
+    "mtime": 1784697393.7897356,
+    "ast_hash": "1796368d0dabc34507763f042460b786",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\picar\\Desktop\\samson-website\\samson-nextjs\\src\\modules\\appointments\\actions\\status\\resend-reminder.action.ts": {
+    "mtime": 1784697410.033584,
+    "ast_hash": "10da2a16a66b6d909ee7eab097fb17d8",
     "semantic_hash": ""
   }
 }

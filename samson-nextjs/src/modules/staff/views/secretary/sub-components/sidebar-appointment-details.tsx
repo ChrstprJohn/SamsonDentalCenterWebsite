@@ -4,8 +4,9 @@ import React, { useState, useEffect } from 'react';
 import type { AppointmentDto } from '@/modules/appointments/dtos/shared/appointment.dto';
 import { updateAppointmentStatusAction } from '@/modules/appointments/actions/status/update-appointment-status.action';
 import { updateGuestContactAction } from '@/modules/appointments/actions/booking/update-guest-contact.action';
+import { resendReminderAction } from '@/modules/appointments/actions/status/resend-reminder.action';
 import { getDoctorsAction } from '@/modules/staff/actions/management/get-doctors.action';
-import { UserRound, Calendar, XCircle, CheckCircle, AlertCircle, Pencil, Check, X, ArrowLeft } from 'lucide-react';
+import { UserRound, Calendar, XCircle, CheckCircle, AlertCircle, Pencil, Check, X, ArrowLeft, Mail, Send } from 'lucide-react';
 import { formatClinicTime } from '@/shared/utils/date.util';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -41,6 +42,7 @@ export function SidebarAppointmentDetails({
   const [isEditingGuestInfo, setIsEditingGuestInfo] = useState(false);
   const [guestInfoDraft, setGuestInfoDraft] = useState({ firstName: '', middleName: '', lastName: '', suffix: '', email: '', phone: '' });
   const [savingGuestInfo, setSavingGuestInfo] = useState(false);
+  const [resendingReminder, setResendingReminder] = useState<'24H' | '48H' | null>(null);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   const showToast = (message: string, type: 'success' | 'error') => {
@@ -156,6 +158,24 @@ export function SidebarAppointmentDetails({
       showToast(res.error || 'Failed to update guest info', 'error');
     }
     setSavingGuestInfo(false);
+  };
+
+  const handleManualResend = async (type: '24H' | '48H') => {
+    setResendingReminder(type);
+    const res = await resendReminderAction({
+      appointmentId: localAppointment.id,
+      reminderType: type,
+    });
+    if (res.success) {
+      showToast(res.message || `${type} reminder sent successfully`, 'success');
+      setLocalAppointment((prev) => ({
+        ...prev,
+        ...(type === '48H' ? { reminder48hSent: true } : { reminder24hSent: true }),
+      }));
+    } else {
+      showToast(res.error || 'Failed to send reminder email', 'error');
+    }
+    setResendingReminder(null);
   };
 
   const handleActionSubmit = async (e: React.FormEvent) => {
@@ -328,6 +348,58 @@ export function SidebarAppointmentDetails({
             <div className="flex flex-col gap-0.5">
               <span className="text-xs text-muted-foreground">Assign Dentist <span className="text-destructive">*</span></span>
               <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{doctorName}</div>
+            </div>
+          </div>
+        </div>
+
+        <hr className="border-card-border/40 mx-5" />
+
+        {/* Reminders & Notifications Hub */}
+        <div className="py-4 px-5">
+          <span className="text-base font-medium text-foreground block mb-3">Notification Reminders</span>
+          <div className="flex flex-col gap-3">
+            {/* 48H Reminder Status */}
+            <div className="flex items-center justify-between p-3 rounded-xl border border-card-border bg-muted/30">
+              <div className="flex flex-col">
+                <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                  <Mail className="size-3.5 text-muted-foreground" /> 48-Hour Reminder
+                </span>
+                <span className="text-[11px] text-muted-foreground">
+                  Status: {localAppointment.reminder48hSent ? 'Sent / Processed' : 'Pending / Skipped'}
+                </span>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 px-3 text-xs gap-1"
+                disabled={resendingReminder === '48H'}
+                onClick={() => handleManualResend('48H')}
+              >
+                <Send className="size-3" />
+                {resendingReminder === '48H' ? 'Sending...' : 'Resend'}
+              </Button>
+            </div>
+
+            {/* 24H Reminder Status */}
+            <div className="flex items-center justify-between p-3 rounded-xl border border-card-border bg-muted/30">
+              <div className="flex flex-col">
+                <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                  <Mail className="size-3.5 text-muted-foreground" /> 24-Hour Reminder
+                </span>
+                <span className="text-[11px] text-muted-foreground">
+                  Status: {localAppointment.reminder24hSent ? 'Sent / Processed' : 'Pending / Skipped'}
+                </span>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 px-3 text-xs gap-1"
+                disabled={resendingReminder === '24H'}
+                onClick={() => handleManualResend('24H')}
+              >
+                <Send className="size-3" />
+                {resendingReminder === '24H' ? 'Sending...' : 'Resend'}
+              </Button>
             </div>
           </div>
         </div>
