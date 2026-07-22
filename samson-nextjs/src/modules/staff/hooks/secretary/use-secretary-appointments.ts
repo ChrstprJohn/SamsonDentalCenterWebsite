@@ -89,7 +89,6 @@ export function useSecretaryAppointments() {
   useEffect(() => { resetActionForms(); }, [selectedAppointmentId, resetActionForms]);
 
   useEffect(() => {
-    if (!changeTreatment) return;
     let active = true;
     async function loadServices() {
       setIsLoadingServices(true);
@@ -100,7 +99,7 @@ export function useSecretaryAppointments() {
     }
     loadServices();
     return () => { active = false; };
-  }, [changeTreatment]);
+  }, []);
 
 
   const formatPatientName = (appointment: AppointmentDto): string => {
@@ -191,6 +190,7 @@ export function useSecretaryAppointments() {
         newStartTime: rescheduleStartTime,
         newEndTime: rescheduleEndTime,
         newDoctorId: activeDoctorId,
+        newServiceId: rescheduleServiceId || selectedAppointment.serviceId || undefined,
       });
       if (res.success) {
         alert('Appointment rescheduled successfully.');

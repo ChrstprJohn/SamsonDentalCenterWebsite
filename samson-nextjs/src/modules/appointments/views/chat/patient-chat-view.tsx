@@ -128,7 +128,7 @@ export function PatientChatView({
             />
 
             {/* Workflow / Input Area */}
-            <div className="p-4 border-t border-border bg-white">
+            <div className="p-3 border-t border-border bg-white">
                 {isClosed ? (
                     <div className="p-3 bg-muted border border-border rounded-xl text-center text-xs text-muted-foreground">
                         This chat thread is now closed because the appointment is {appointmentDetails.status}.
@@ -190,7 +190,7 @@ export function PatientChatView({
                                     onKeyDown={handleKeyDown}
                                     placeholder="Type your message here..."
                                     disabled={isSending}
-                                    className="h-[42px] disabled:opacity-50 flex-1"
+                                    className="h-[42px] disabled:opacity-50 flex-1 text-sm"
                                 />
                                 
                                 {currentUserRole === 'PATIENT' && appointmentDetails.status === 'APPROVED' && activeWorkflow === 'NONE' && (
@@ -207,10 +207,10 @@ export function PatientChatView({
                                 <Button
                                     onClick={handleSend}
                                     disabled={isSending || !text.trim()}
-                                    className="h-[42px] px-3 md:px-5 bg-primary text-primary-foreground hover:bg-primary/90 border-0 flex items-center gap-1.5"
+                                    className="h-[42px] px-4 bg-primary text-primary-foreground hover:bg-primary/90 border-0 flex items-center gap-1.5 font-medium text-sm"
                                 >
                                     <Send className="size-4" />
-                                    <span className="hidden md:inline">{isSending ? 'Sending...' : 'Send'}</span>
+                                    <span>{isSending ? 'Sending...' : 'Send'}</span>
                                 </Button>
                             </div>
                         )}

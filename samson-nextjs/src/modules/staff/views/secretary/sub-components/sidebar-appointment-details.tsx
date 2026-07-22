@@ -457,36 +457,36 @@ export function SidebarAppointmentDetails({
           </div>
         ) : (
           <form onSubmit={handleActionSubmit} className="space-y-3 bg-card/60 p-4 rounded-xl border border-border">
-            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
+            <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
               {activeAction === 'RESCHEDULE' ? <Calendar className="size-3" /> : <XCircle className="size-3" />}
               {activeAction === 'RESCHEDULE' ? 'Reschedule Slot' : 'Cancel Booking'}
             </p>
 
             {activeAction === 'RESCHEDULE' && (
-              <div className="space-y-2 text-[10px]">
-                <div>
-                  <label className="text-muted-foreground block mb-1">New Date</label>
+              <div className="space-y-2">
+                <div className="flex flex-col gap-0.5">
+                  <label className="text-xs text-muted-foreground">New Date</label>
                   <Input type="date" value={rescheduleDate} onChange={e => setRescheduleDate(e.target.value)} />
                 </div>
                 <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <label className="text-muted-foreground block mb-1">Start Time</label>
+                  <div className="flex flex-col gap-0.5">
+                    <label className="text-xs text-muted-foreground">Start Time</label>
                     <Input type="time" value={rescheduleStartTime} onChange={e => setRescheduleStartTime(e.target.value)} />
                   </div>
-                  <div>
-                    <label className="text-muted-foreground block mb-1">End Time</label>
+                  <div className="flex flex-col gap-0.5">
+                    <label className="text-xs text-muted-foreground">End Time</label>
                     <Input type="time" value={rescheduleEndTime} onChange={e => setRescheduleEndTime(e.target.value)} />
                   </div>
                 </div>
-                <div>
-                  <label className="text-muted-foreground block mb-1">Assign Doctor</label>
+                <div className="flex flex-col gap-0.5">
+                  <label className="text-xs text-muted-foreground">Assign Doctor</label>
                   <Select value={rescheduleDoctorId} onChange={e => setRescheduleDoctorId(e.target.value)} options={[{ value: '', label: 'Select Doctor...' }, ...doctors.map(d => ({ value: d.id, label: `Dr. ${d.firstName} ${d.lastName}` }))]} />
                 </div>
               </div>
             )}
 
-            <div>
-              <label className="text-[10px] text-muted-foreground block mb-1">Reason / Notes</label>
+            <div className="flex flex-col gap-0.5">
+              <label className="text-xs text-muted-foreground">Reason / Notes</label>
               <Textarea value={actionReason} onChange={e => setActionReason(e.target.value)} placeholder="Provide reason..." className="min-h-[60px] resize-none" required />
             </div>
 

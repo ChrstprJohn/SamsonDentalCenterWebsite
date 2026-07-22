@@ -6,6 +6,9 @@ import { DoctorTimeline } from './sub-components/doctor-timeline';
 import { AppointmentDetailPane } from './sub-components/appointment-detail-pane';
 import { Calendar } from '@/components/ui/calendar';
 import { getClinicAppointmentsAction } from '@/modules/appointments/actions/clinic/get-clinic-appointments.action';
+import { updateAppointmentStatusAction } from '@/modules/appointments/actions/status/update-appointment-status.action';
+import { getDoctorsAction } from '@/modules/staff/actions/management/get-doctors.action';
+import { getServicesAction } from '@/modules/services/actions/management/get-services.action';
 import { Button } from '@/components/ui/button';
 import { InquiryToast } from './sub-components/inquiry-toast';
 import {
@@ -61,6 +64,83 @@ export function SecretaryBookAppointmentView() {
   const [mobileView, setMobileView] = React.useState<'timeline' | 'detail'>('timeline');
   const [isBookingOpen, setIsBookingOpen] = React.useState(false);
   const [isDentistsOpen, setIsDentistsOpen] = React.useState(true);
+
+  const [isRescheduleOpen, setIsRescheduleOpen] = React.useState(false);
+  const [isCancelOpen, setIsCancelOpen] = React.useState(false);
+  const [rescheduleServiceId, setRescheduleServiceId] = React.useState('');
+  const [rescheduleDate, setRescheduleDate] = React.useState('');
+  const [rescheduleDoctorId, setRescheduleDoctorId] = React.useState('');
+  const [rescheduleStartTime, setRescheduleStartTime] = React.useState('');
+  const [rescheduleEndTime, setRescheduleEndTime] = React.useState('');
+  const [rescheduleJustification, setRescheduleJustification] = React.useState('Patient requested reschedule');
+  const [cancelReasonPreset, setCancelReasonPreset] = React.useState('Patient requested reschedule');
+  const [cancelReasonCustom, setCancelReasonCustom] = React.useState('');
+  const [isActionSubmitting, setIsActionSubmitting] = React.useState(false);
+  const [doctors, setDoctors] = React.useState<{ id: string; firstName: string; lastName: string }[]>([]);
+  const [services, setServices] = React.useState<any[]>([]);
+
+  React.useEffect(() => {
+    getDoctorsAction().then((res) => {
+      if (res.success && res.data) setDoctors(res.data);
+    });
+    getServicesAction('BOOKABLE').then((res) => {
+      if (res.data) setServices(res.data);
+    });
+  }, []);
+
+  const handleCalendarReschedule = async () => {
+    if (!view.selectedAppointmentDetails) return;
+    setIsActionSubmitting(true);
+    try {
+      const res = await updateAppointmentStatusAction({
+        appointmentId: view.selectedAppointmentDetails.id,
+        status: 'RESCHEDULED',
+        statusReason: rescheduleJustification,
+        newDate: rescheduleDate,
+        newStartTime: rescheduleStartTime,
+        newEndTime: rescheduleEndTime,
+        newDoctorId: rescheduleDoctorId,
+        newServiceId: rescheduleServiceId,
+      });
+      if (res.success) {
+        setIsRescheduleOpen(false);
+        view.loadTimelineData(view.selectedDate);
+      } else {
+        alert(res.error || 'Failed to reschedule appointment');
+      }
+    } catch (err: any) {
+      alert(err.message || 'An error occurred during reschedule');
+    } finally {
+      setIsActionSubmitting(false);
+    }
+  };
+
+  const handleCalendarCancel = async () => {
+    if (!view.selectedAppointmentDetails) return;
+    const finalReason = cancelReasonPreset === 'CUSTOM' ? cancelReasonCustom : cancelReasonPreset;
+    if (!finalReason?.trim()) {
+      alert('Please select or enter a cancellation reason.');
+      return;
+    }
+    setIsActionSubmitting(true);
+    try {
+      const res = await updateAppointmentStatusAction({
+        appointmentId: view.selectedAppointmentDetails.id,
+        status: 'CANCELLED',
+        statusReason: finalReason.trim(),
+      });
+      if (res.success) {
+        setIsCancelOpen(false);
+        view.loadTimelineData(view.selectedDate);
+      } else {
+        alert(res.error || 'Failed to cancel appointment');
+      }
+    } catch (err: any) {
+      alert(err.message || 'An error occurred during cancellation');
+    } finally {
+      setIsActionSubmitting(false);
+    }
+  };
 
   // Reset email-dependent channel when email is cleared
   React.useEffect(() => {
@@ -303,10 +383,17 @@ export function SecretaryBookAppointmentView() {
         {view.selectedAppointmentDetails ? (
           <div className="flex flex-col h-full overflow-hidden">
             <div className="p-4 border-b border-border flex items-center justify-between shrink-0">
-              <span className="text-base font-medium text-foreground">Appointment Details</span>
+              <div className="flex flex-col min-w-0">
+                <span className="text-base font-medium text-foreground truncate">
+                  Appointment Details
+                </span>
+                <span className="text-[11px] text-muted-foreground truncate">
+                  Ref #{view.selectedAppointmentDetails.id.slice(0, 8)}
+                </span>
+              </div>
               <button
                 onClick={() => view.setSelectedAppointmentDetails(null)}
-                className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded-md hover:bg-muted"
+                className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded-md hover:bg-muted shrink-0"
               >
                 <X className="size-4" />
               </button>
@@ -317,10 +404,75 @@ export function SecretaryBookAppointmentView() {
                 view={{
                   selectedAppointment: view.selectedAppointmentDetails,
                   activeTab: 'upcoming',
-                  showRescheduleForm: false,
-                  showCancelForm: false,
-                  setShowRescheduleForm: () => {},
-                  setShowCancelForm: () => {},
+                  showRescheduleForm: isRescheduleOpen,
+                  setShowRescheduleForm: (show: boolean) => {
+                    if (show) {
+                      setIsRescheduleOpen(true);
+                      setIsCancelOpen(false);
+                      setRescheduleServiceId(view.selectedAppointmentDetails?.serviceId || '');
+                      setRescheduleDate(view.selectedAppointmentDetails?.date || '');
+                      setRescheduleDoctorId(view.selectedAppointmentDetails?.doctorId || '');
+                      const parseTimeToHHMM = (timeStr?: string | null) => {
+                        if (!timeStr) return '';
+                        if (timeStr.includes('T')) {
+                          const timePart = timeStr.split('T')[1];
+                          if (timePart) return timePart.slice(0, 5);
+                        }
+                        const match = timeStr.match(/^(\d{2}):(\d{2})/);
+                        if (match) return `${match[1]}:${match[2]}`;
+                        return '';
+                      };
+                      setRescheduleStartTime(parseTimeToHHMM(view.selectedAppointmentDetails?.startTime));
+                      setRescheduleEndTime(parseTimeToHHMM(view.selectedAppointmentDetails?.endTime));
+                      setRescheduleJustification('Patient requested reschedule');
+                    } else {
+                      setIsRescheduleOpen(false);
+                    }
+                  },
+                  showCancelForm: isCancelOpen,
+                  setShowCancelForm: (show: boolean) => {
+                    if (show) {
+                      setIsCancelOpen(true);
+                      setIsRescheduleOpen(false);
+                    } else {
+                      setIsCancelOpen(false);
+                    }
+                  },
+                  changeTreatment: true,
+                  toggleChangeTreatment: () => {},
+                  services: services,
+                  rescheduleServiceId: rescheduleServiceId,
+                  selectRescheduleService: setRescheduleServiceId,
+                  isLoadingServices: false,
+                  changeDoctor: true,
+                  toggleChangeDoctor: () => {},
+                  rescheduleDoctorId: rescheduleDoctorId,
+                  setRescheduleDoctorId: setRescheduleDoctorId,
+                  availableRescheduleDoctors: doctors.map(d => ({ doctorId: d.id, doctorName: `Dr. ${d.firstName} ${d.lastName}` })),
+                  isLoadingRescheduleDoctors: false,
+                  rescheduleMonth: new Date(),
+                  setRescheduleMonth: () => {},
+                  availableDates: [],
+                  isLoadingDays: false,
+                  rescheduleDate: rescheduleDate,
+                  selectRescheduleDate: setRescheduleDate,
+                  activeServiceId: rescheduleServiceId || view.selectedAppointmentDetails?.serviceId || '',
+                  activeDoctorId: rescheduleDoctorId || view.selectedAppointmentDetails?.doctorId || '',
+                  timeslots: [],
+                  isLoadingSlots: false,
+                  rescheduleStartTime: rescheduleStartTime,
+                  setRescheduleStartTime: setRescheduleStartTime,
+                  rescheduleEndTime: rescheduleEndTime,
+                  setRescheduleEndTime: setRescheduleEndTime,
+                  rescheduleJustification: rescheduleJustification,
+                  setRescheduleJustification: setRescheduleJustification,
+                  isSubmitting: isActionSubmitting,
+                  cancelReasonPreset: cancelReasonPreset,
+                  setCancelReasonPreset: setCancelReasonPreset,
+                  cancelReasonCustom: cancelReasonCustom,
+                  setCancelReasonCustom: setCancelReasonCustom,
+                  submitReschedule: handleCalendarReschedule,
+                  submitCancel: handleCalendarCancel,
                 }}
               />
             </div>

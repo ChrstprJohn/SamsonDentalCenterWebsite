@@ -140,7 +140,7 @@ export function SecretaryPendingRequestsViewV2() {
             </button>
           </div>
         </div>
-        <div className="flex-1 !overflow-y-auto max-md:px-5 px-5 space-y-0 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
+        <div className="flex-1 !overflow-y-auto max-md:px-5 px-5 space-y-0 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
           style={{ scrollbarWidth: 'thin' }}
           data-lenis-prevent
         >

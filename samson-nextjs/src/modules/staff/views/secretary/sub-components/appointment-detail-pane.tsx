@@ -269,17 +269,17 @@ function AppointmentDetails({ appointment, view, activeTab, compact }: { appoint
           </div>
           <hr className={`border-card-border/40 ${compact ? 'mx-4' : 'mx-5'}`} />
           <div className={`${compact ? 'px-4 pb-4 pt-1' : 'px-5 pb-6 pt-2'}`}>
-            <AppointmentStatusHistory appointment={appointment} activeTab={activeTab} />
+            <AppointmentStatusHistory appointment={appointment} activeTab={activeTab} compact={compact} />
           </div>
         </>
       }
       actionsBar={activeTab === 'upcoming' ? (
         !view.showRescheduleForm && !view.showCancelForm ? (
           <div className="flex gap-2">
-            <Button variant="outline" className="flex-1" onClick={() => view.setShowRescheduleForm(true)}>
-              <Calendar className="size-4" /> Reschedule
+            <Button variant="outline" className="flex-1 h-[42px]" onClick={() => view.setShowRescheduleForm(true)}>
+              Reschedule
             </Button>
-            <Button variant="outline" className="flex-1 border-destructive/50 text-destructive hover:bg-destructive/10" onClick={() => view.setShowCancelForm(true)}>
+            <Button variant="outline" className="flex-1 h-[42px] border-destructive/50 text-destructive hover:bg-destructive/10" onClick={() => view.setShowCancelForm(true)}>
               Cancel
             </Button>
           </div>

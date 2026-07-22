@@ -46,13 +46,13 @@ function formatTime(iso: string) {
     ', ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
 }
 
-export function AppointmentStatusHistory({ appointment, activeTab }: { appointment: AppointmentDto; activeTab: 'upcoming' | 'history' }) {
+export function AppointmentStatusHistory({ appointment, activeTab, compact }: { appointment: AppointmentDto; activeTab: 'upcoming' | 'history'; compact?: boolean }) {
   const entries = buildTimelineEntries(appointment);
 
   return (
     <>
       <div className="pt-4 flex flex-col gap-4">
-        <span className="text-base font-medium text-foreground">Appointment Timeline</span>
+        <span className={`${compact ? 'text-sm' : 'text-base'} font-medium text-foreground`}>Appointment Timeline</span>
         {entries.length === 0 ? (
           <span className="text-xs text-text-muted italic">No status changes recorded yet.</span>
         ) : (

@@ -4,6 +4,7 @@ import { MessageResponseDto, messageResponseSchema } from '../../dtos/chat/messa
 
 export interface ChatThreadDto {
     appointmentId: string;
+    patientId?: string | null;
     status: string;
     date: string;
     preferredStartTime: string | null;

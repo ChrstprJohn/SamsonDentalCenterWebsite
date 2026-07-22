@@ -83,14 +83,19 @@ export function SecretaryAppointmentsView() {
       </div>
 
       {hasSelection ? (
-        <div className={`flex-1 flex-col min-w-0 min-h-0 ${colMobile('detail')} lg:flex`}>
+        <div className={`flex flex-1 flex-col min-w-0 min-h-0 h-full ${colMobile('detail')} lg:flex`}>
           <div className="p-4 border-b border-card-border/40 shrink-0">
             <div className="flex items-center gap-2">
               <button onClick={() => setMobileView('list')} className="lg:hidden p-1 -ml-1 text-muted-foreground hover:text-foreground shrink-0">
                 <ArrowLeft className="size-5" />
               </button>
-              <div className="flex-1 text-base font-medium text-foreground text-left">
-                Appointment Details
+              <div className="flex-1 flex flex-col text-left min-w-0">
+                <span className="text-base font-medium text-foreground truncate">
+                  Appointment Details
+                </span>
+                <span className="text-[11px] text-muted-foreground truncate">
+                  {view.selectedAppointment?.id ? `Ref #${view.selectedAppointment.id.slice(0, 8)}` : ''}
+                </span>
               </div>
             </div>
           </div>

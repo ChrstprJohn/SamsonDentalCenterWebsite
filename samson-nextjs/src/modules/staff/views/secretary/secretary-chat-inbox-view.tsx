@@ -9,6 +9,8 @@ import { ChatThreadDto } from '@/modules/appointments/repositories/chat/chat.que
 import { MessageResponseDto } from '@/modules/appointments/dtos/chat/message-response.dto';
 import { PatientChatView } from '@/modules/appointments/views/chat/patient-chat-view';
 import { getDoctorsAction } from '@/modules/staff/actions/management/get-doctors.action';
+import { getServicesAction } from '@/modules/services/actions/management/get-services.action';
+import type { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
 import { updateAppointmentStatusAction } from '@/modules/appointments/actions/status/update-appointment-status.action';
 import { updateGuestContactAction } from '@/modules/appointments/actions/booking/update-guest-contact.action';
 import { Button } from '@/components/ui/button';
@@ -22,8 +24,10 @@ import { Skeleton } from '@/components/ui/skeleton';
 import SkeletonLib, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { InquiryToast } from './sub-components/inquiry-toast';
+import { AppointmentDetailPane } from './sub-components/appointment-detail-pane';
+import type { AppointmentDto } from '@/modules/appointments/dtos/shared/appointment.dto';
 import { formatClinicTime } from '@/shared/utils/date.util';
-import { Search, Mail, Archive, MessageSquare, Calendar, XCircle, CheckCircle, AlertCircle, ArrowLeft, UserRound, Pencil, Check, X } from 'lucide-react';
+import { Search, Mail, Archive, MessageSquare, Calendar, XCircle, CheckCircle, AlertCircle, ArrowLeft, UserRound, Pencil, Check, X, ChevronDown } from 'lucide-react';
 import {
     Sidebar,
     SidebarHeader,
@@ -203,6 +207,14 @@ interface SecretaryChatInboxViewProps {
     initialHasMore?: boolean;
 }
 
+function getBadgeVariant(status: string) {
+  if (status === 'COMPLETED') return 'success';
+  if (status === 'APPROVED') return 'info';
+  if (status === 'NO_SHOW' || status === 'DISPLACED') return 'warning';
+  if (status === 'CANCELLED' || status === 'REJECTED') return 'error';
+  return 'default';
+}
+
 export function SecretaryChatInboxView({ initialThreads, initialHasMore = false }: SecretaryChatInboxViewProps) {
     const [threads, setThreads] = useState<ChatThreadDto[]>(initialThreads);
     const [searchQuery, setSearchQuery] = useState('');
@@ -224,11 +236,16 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
     const [hasMoreThreads, setHasMoreThreads] = useState(initialHasMore);
 
     const [doctors, setDoctors] = useState<{ id: string; firstName: string; lastName: string }[]>([]);
+    const [services, setServices] = useState<ServiceResponseDto[]>([]);
+    const [rescheduleServiceId, setRescheduleServiceId] = useState('');
 
     const [activeAction, setActiveAction] = useState<'NONE' | 'RESCHEDULE' | 'CANCEL' | 'COMPLETE'>('NONE');
     const [actionReason, setActionReason] = useState('');
+    const [actionReasonPreset, setActionReasonPreset] = useState('');
     
     const [rescheduleDate, setRescheduleDate] = useState('');
+    const [rescheduleMonth, setRescheduleMonth] = useState(() => new Date());
+    const [rescheduleAvailableDates] = useState<string[]>([]);
     const [rescheduleStartTime, setRescheduleStartTime] = useState('');
     const [rescheduleEndTime, setRescheduleEndTime] = useState('');
     const [rescheduleDoctorId, setRescheduleDoctorId] = useState('');
@@ -274,9 +291,10 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
 
     useEffect(() => {
         getDoctorsAction().then((res) => {
-            if (res.success && res.data) {
-                setDoctors(res.data);
-            }
+            if (res.success && res.data) setDoctors(res.data);
+        });
+        getServicesAction('BOOKABLE').then((res) => {
+            if (res.data) setServices(res.data as ServiceResponseDto[]);
         });
     }, []);
 
@@ -466,7 +484,8 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                 if (!rescheduleDate || !rescheduleStartTime || !rescheduleEndTime || !rescheduleDoctorId) {
                     throw new Error('All rescheduling fields are required.');
                 }
-                if (!actionReason.trim()) {
+                const finalReason = actionReasonPreset === 'CUSTOM' ? actionReason.trim() : actionReasonPreset;
+                if (!finalReason) {
                     throw new Error('A reason is required for rescheduling.');
                 }
 
@@ -480,7 +499,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                 res = await updateAppointmentStatusAction({
                     appointmentId: selectedThreadId,
                     status: 'APPROVED',
-                    statusReason: actionReason,
+                    statusReason: finalReason,
                     newDate: rescheduleDate,
                     newStartTime: startUtc,
                     newEndTime: endUtc,
@@ -576,336 +595,185 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
         setSavingGuestInfo(false);
     };
 
-    const detailPanelContent = selectedThreadId && selectedThread ? (
+    const appointmentAdapter: AppointmentDto | null = useMemo(() => {
+        if (!selectedThread) return null;
+        const ch = (selectedThread as any).confirmationChannel || (selectedThread as any).confirmation_channel || 'EMAIL';
+        const st = selectedThread as any;
+        const patientIdVal = st?.patientId || null;
+        return {
+            id: selectedThread.appointmentId,
+            patientId: patientIdVal,
+            dependentId: null,
+            serviceId: selectedThread.serviceId || '',
+            doctorId: selectedThread.doctorId || null,
+            date: selectedThread.date,
+            startTime: selectedThread.startTime || null,
+            endTime: selectedThread.endTime || null,
+            preferredStartTime: selectedThread.preferredStartTime || null,
+            status: selectedThread.status as any,
+            source: (patientIdVal ? 'SELF_BOOKED' : 'STAFF_CREATED') as any,
+            doctorAssignmentSource: 'SYSTEM',
+            confirmationChannel: ch,
+            confirmationSent: Boolean((selectedThread as any).emailConfirmationSent || (selectedThread as any).smsConfirmationSent),
+            emailConfirmationSent: Boolean((selectedThread as any).emailConfirmationSent || (selectedThread as any).email_confirmation_sent),
+            smsConfirmationSent: Boolean((selectedThread as any).smsConfirmationSent || (selectedThread as any).sms_confirmation_sent),
+            reminder48hSent: Boolean((selectedThread as any).emailReminder48hSent || (selectedThread as any).smsReminder48hSent),
+            emailReminder48hSent: Boolean((selectedThread as any).emailReminder48hSent || (selectedThread as any).email_reminder_48h_sent),
+            smsReminder48hSent: Boolean((selectedThread as any).smsReminder48hSent || (selectedThread as any).sms_reminder_48h_sent),
+            reminder24hSent: Boolean((selectedThread as any).emailReminder24hSent || (selectedThread as any).smsReminder24hSent),
+            emailReminder24hSent: Boolean((selectedThread as any).emailReminder24hSent || (selectedThread as any).email_reminder_24h_sent),
+            smsReminder24hSent: Boolean((selectedThread as any).smsReminder24hSent || (selectedThread as any).sms_reminder_24h_sent),
+            guestContact: {
+                firstName: selectedThread.patientFirstName || '',
+                middleName: selectedThread.patientMiddleName || '',
+                lastName: selectedThread.patientLastName || '',
+                suffix: selectedThread.patientSuffix || '',
+                email: selectedThread.patientEmail || '',
+                phone: selectedThread.patientPhone || '',
+            },
+            patient: selectedThread.patientFirstName ? {
+                id: patientIdVal || '',
+                firstName: selectedThread.patientFirstName,
+                lastName: selectedThread.patientLastName || '',
+            } : null,
+            doctor: selectedThread.doctorName ? {
+                id: selectedThread.doctorId || '',
+                firstName: selectedThread.doctorName.replace(/^Dr\.\s*/, '').split(' ')[0] || '',
+                lastName: selectedThread.doctorName.replace(/^Dr\.\s*/, '').split(' ').slice(1).join(' ') || '',
+            } : null,
+            service: selectedThread.serviceName ? {
+                id: selectedThread.serviceId || '',
+                name: selectedThread.serviceName,
+                durationMinutes: 30,
+            } : null,
+            dependent: null,
+            statusHistory: [],
+            rescheduleCount: 0,
+            paymentReceiptSent: false,
+            proposedPreferredStartTime: null,
+            userNote: null,
+            statusReason: null,
+            proposedDate: null,
+            proposedStartTime: null,
+            proposedEndTime: null,
+            proposedDoctorId: null,
+        } as unknown as AppointmentDto;
+    }, [selectedThread]);
+
+    const detailPaneView = useMemo(() => {
+        if (!appointmentAdapter) return null;
+        return {
+            selectedAppointment: appointmentAdapter,
+            activeTab: 'upcoming',
+            fetchData: () => fetchThreads(false),
+            showRescheduleForm: activeAction === 'RESCHEDULE',
+            setShowRescheduleForm: (show: boolean) => {
+                if (show) {
+                    setActiveAction('RESCHEDULE');
+                    setRescheduleServiceId(selectedThread?.serviceId || '');
+                    setRescheduleDate(selectedThread?.date || '');
+                    setRescheduleDoctorId(selectedThread?.doctorId || '');
+                    const parseTimeToHHMM = (timeStr?: string | null) => {
+                        if (!timeStr) return '';
+                        if (timeStr.includes('T')) {
+                            const timePart = timeStr.split('T')[1];
+                            if (timePart) return timePart.slice(0, 5);
+                        }
+                        const match = timeStr.match(/^(\d{2}):(\d{2})/);
+                        if (match) return `${match[1]}:${match[2]}`;
+                        return '';
+                    };
+                    setRescheduleStartTime(parseTimeToHHMM(selectedThread?.startTime));
+                    setRescheduleEndTime(parseTimeToHHMM(selectedThread?.endTime));
+                    setActionReasonPreset('Patient requested reschedule');
+                    setActionReason('Patient requested reschedule');
+                    setActionError(null);
+                    setActionSuccess(null);
+                } else {
+                    setActiveAction('NONE');
+                }
+            },
+            showCancelForm: activeAction === 'CANCEL',
+            setShowCancelForm: (show: boolean) => {
+                if (show) {
+                    setActiveAction('CANCEL');
+                    setActionError(null);
+                    setActionSuccess(null);
+                } else {
+                    setActiveAction('NONE');
+                }
+            },
+            changeTreatment: true,
+            toggleChangeTreatment: () => {},
+            services: services,
+            rescheduleServiceId: rescheduleServiceId,
+            selectRescheduleService: setRescheduleServiceId,
+            isLoadingServices: false,
+            changeDoctor: true,
+            toggleChangeDoctor: () => {},
+            rescheduleDoctorId: rescheduleDoctorId,
+            setRescheduleDoctorId: setRescheduleDoctorId,
+            availableRescheduleDoctors: doctors.map(d => ({ doctorId: d.id, doctorName: `Dr. ${d.firstName} ${d.lastName}` })),
+            isLoadingRescheduleDoctors: false,
+            rescheduleMonth: new Date(),
+            setRescheduleMonth: () => {},
+            availableDates: [],
+            isLoadingDays: false,
+            rescheduleDate: rescheduleDate,
+            selectRescheduleDate: setRescheduleDate,
+            activeServiceId: rescheduleServiceId || selectedThread?.serviceId || '',
+            activeDoctorId: rescheduleDoctorId || selectedThread?.doctorId || '',
+            timeslots: [],
+            isLoadingSlots: false,
+            rescheduleStartTime: rescheduleStartTime,
+            setRescheduleStartTime: setRescheduleStartTime,
+            rescheduleEndTime: rescheduleEndTime,
+            setRescheduleEndTime: setRescheduleEndTime,
+            rescheduleJustification: actionReason,
+            setRescheduleJustification: setActionReason,
+            isSubmitting: actionLoading,
+            cancelReasonPreset: actionReasonPreset,
+            setCancelReasonPreset: setActionReasonPreset,
+            cancelReasonCustom: actionReason,
+            setCancelReasonCustom: setActionReason,
+            submitReschedule: () => {
+                const fakeEvent = { preventDefault: () => {} } as any;
+                handleActionSubmit(fakeEvent);
+            },
+            submitCancel: () => {
+                const fakeEvent = { preventDefault: () => {} } as any;
+                handleActionSubmit(fakeEvent);
+            },
+        };
+    }, [appointmentAdapter, activeAction, selectedThread, rescheduleServiceId, rescheduleDate, rescheduleDoctorId, rescheduleStartTime, rescheduleEndTime, doctors, services, actionReason, actionLoading, actionReasonPreset, handleActionSubmit, fetchThreads]);
+
+    const detailPanelContent = selectedThreadId && selectedThread && detailPaneView ? (
         <div className="flex flex-col h-full overflow-hidden">
             {loadingMessages ? (
-                <div className="p-4 border-b border-border bg-sidebar shrink-0">
-                    <div className="flex items-center gap-2">
-                        <Skeleton className="xl:hidden size-7 shrink-0 rounded !bg-slate-200" />
-                        <div className="flex flex-col min-w-0">
-                            <Skeleton className="h-6 w-36 rounded-md !bg-slate-200" />
-                            <Skeleton className="h-4 w-24 rounded-md !bg-slate-200" />
-                        </div>
+                <div className="p-4 border-b border-border flex items-center justify-between shrink-0">
+                    <div className="flex flex-col min-w-0">
+                        <Skeleton className="h-5 w-36 rounded-md !bg-slate-200" />
+                        <Skeleton className="h-3 w-24 rounded-md !bg-slate-200 mt-1" />
                     </div>
                 </div>
             ) : (
-                <div className="p-4 border-b border-border bg-sidebar shrink-0">
-                    <div className="flex items-center gap-2">
-                        <button onClick={handleBackToChat} className="xl:hidden p-1 -ml-1 text-muted-foreground hover:text-foreground shrink-0">
-                            <ArrowLeft className="size-5" />
-                        </button>
-                        <div className="flex flex-col min-w-0">
-                            <h3 className="text-base font-medium text-foreground truncate">
-                                Appointment Detail
-                            </h3>
-                            <span className="text-[11px] text-muted-foreground truncate">Ref #{selectedThread.appointmentId.slice(0, 8)}</span>
-                        </div>
+                <div className="p-4 border-b border-border flex items-center justify-between shrink-0">
+                    <div className="flex flex-col min-w-0">
+                        <span className="text-base font-medium text-foreground truncate">
+                            Appointment Details
+                        </span>
+                        <span className="text-[11px] text-muted-foreground truncate">Ref #{selectedThread.appointmentId.slice(0, 8)}</span>
                     </div>
+                    <button onClick={handleBackToChat} className="xl:hidden p-1 -ml-1 text-muted-foreground hover:text-foreground shrink-0">
+                        <ArrowLeft className="size-5" />
+                    </button>
                 </div>
             )}
 
             {loadingMessages ? (
                 <DetailSkeleton />
             ) : (
-                <>
-                    <div 
-                        className="flex-1 !overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent" 
-                        style={{ scrollbarWidth: 'thin' }}
-                        data-lenis-prevent
-                    >
-                        <div className="flex flex-col items-center pt-6 pb-4 px-5">
-                            <div className="size-16 shrink-0 rounded-full bg-muted-foreground/10 flex items-center justify-center border-2 border-border/60 overflow-hidden mb-3">
-                                <UserRound className="size-14 text-muted-foreground/70 translate-y-0.5" />
-                            </div>
-                            <h2 className="text-lg font-semibold text-foreground">
-                                {formatPatientName(selectedThread.patientFirstName, selectedThread.patientMiddleName, selectedThread.patientLastName, selectedThread.patientSuffix)}
-                            </h2>
-                            <p className="text-sm text-muted-foreground mt-0.5">Guest</p>
-                        </div>
-
-                        <hr className="border-card-border/40 mx-5" />
-
-                        <div className="flex items-center justify-between py-4 px-5">
-                            <span className="text-base font-medium text-foreground">Current Status</span>
-                            <Badge variant={activeStates.includes(selectedThread.status) ? 'success' : 'error'} className="text-xs px-3 py-1">
-                                {selectedThread.status}
-                            </Badge>
-                        </div>
-
-                        <hr className="border-card-border/40 mx-5" />
-
-                        <div className="py-4 px-5">
-                            <div className="flex items-center justify-between mb-3">
-                                <span className="text-base font-medium text-foreground">Guest Information</span>
-                                {!isEditingGuestInfo ? (
-                                    <Button variant="outline" size="sm" onClick={startEditGuestInfo} className="h-auto px-4 py-2 text-sm gap-1.5 max-sm:px-3 max-sm:py-1.5 max-sm:text-xs">
-                                        <Pencil className="size-4" /> Edit
-                                    </Button>
-                                ) : (
-                                        <div className="flex items-center gap-2">
-                                        <Button variant="outline" size="sm" onClick={cancelEditGuestInfo} className="h-auto px-4 py-2 text-sm gap-1.5 max-sm:px-3 max-sm:py-1.5 max-sm:text-xs">
-                                            <X className="size-4" /> Cancel
-                                        </Button>
-                                        <Button size="sm" onClick={saveGuestInfo} disabled={savingGuestInfo || !hasGuestInfoChanges} className="h-auto px-4 py-2 text-sm gap-1.5 max-sm:px-3 max-sm:py-1.5 max-sm:text-xs bg-slate-900 text-white rounded-md disabled:cursor-not-allowed">
-                                            <Check className="size-4" /> {savingGuestInfo ? 'Saving...' : 'Save'}
-                                        </Button>
-                                    </div>
-                                )}
-                            </div>
-
-                            {!isEditingGuestInfo ? (
-                                <div className="flex flex-col gap-3">
-                                    <div className="flex flex-col gap-0.5">
-                                        <span className="text-xs text-muted-foreground">First Name</span>
-                                        <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{selectedThread.patientFirstName || '-'}</div>
-                                    </div>
-                                    <div className="flex flex-col gap-0.5">
-                                        <span className="text-xs text-muted-foreground">Last Name</span>
-                                        <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{selectedThread.patientLastName || '-'}</div>
-                                    </div>
-                                    <div className="flex flex-col gap-0.5">
-                                        <span className="text-xs text-muted-foreground">Middle Name</span>
-                                        <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{selectedThread.patientMiddleName || '-'}</div>
-                                    </div>
-                                    <div className="flex flex-col gap-0.5">
-                                        <span className="text-xs text-muted-foreground">Suffix</span>
-                                        <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{selectedThread.patientSuffix || '-'}</div>
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="flex flex-col gap-3">
-                                    <div className="flex flex-col gap-0.5">
-                                        <span className="text-xs text-muted-foreground">First Name</span>
-                                        <input value={guestInfoDraft.firstName} onChange={(e) => setGuestInfoDraft(prev => ({ ...prev, firstName: e.target.value }))} className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border" />
-                                    </div>
-                                    <div className="flex flex-col gap-0.5">
-                                        <span className="text-xs text-muted-foreground">Last Name</span>
-                                        <input value={guestInfoDraft.lastName} onChange={(e) => setGuestInfoDraft(prev => ({ ...prev, lastName: e.target.value }))} className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border" />
-                                    </div>
-                                    <div className="flex flex-col gap-0.5">
-                                        <span className="text-xs text-muted-foreground">Middle Name</span>
-                                        <input value={guestInfoDraft.middleName} onChange={(e) => setGuestInfoDraft(prev => ({ ...prev, middleName: e.target.value }))} className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border" />
-                                    </div>
-                                    <div className="flex flex-col gap-0.5">
-                                        <span className="text-xs text-muted-foreground">Suffix</span>
-                                        <input value={guestInfoDraft.suffix} onChange={(e) => setGuestInfoDraft(prev => ({ ...prev, suffix: e.target.value }))} className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border" />
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-
-                        <div className="py-4 px-5">
-                            <span className="text-base font-medium text-foreground block mb-3">Guest Contact</span>
-                            {!isEditingGuestInfo ? (
-                                <div className="flex flex-col gap-3">
-                                    <div className="flex flex-col gap-0.5">
-                                        <span className="text-xs text-muted-foreground">Email</span>
-                                        <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{selectedThread.patientEmail || '-'}</div>
-                                    </div>
-                                    <div className="flex flex-col gap-0.5">
-                                        <span className="text-xs text-muted-foreground">Phone</span>
-                                        <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{selectedThread.patientPhone || '-'}</div>
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="flex flex-col gap-3">
-                                    <div className="flex flex-col gap-0.5">
-                                        <span className="text-xs text-muted-foreground">Email</span>
-                                        <input type="email" value={guestInfoDraft.email} onChange={(e) => setGuestInfoDraft(prev => ({ ...prev, email: e.target.value }))} className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border" />
-                                    </div>
-                                    <div className="flex flex-col gap-0.5">
-                                        <span className="text-xs text-muted-foreground">Phone</span>
-                                        <input value={guestInfoDraft.phone} onChange={(e) => setGuestInfoDraft(prev => ({ ...prev, phone: e.target.value }))} className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border" />
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-
-                        <hr className="border-card-border/40 mx-5" />
-
-                        <div className="py-4 px-5">
-                            <div className="flex items-center justify-between mb-3">
-                                <span className="text-base font-medium text-foreground">Service & Schedule</span>
-                            </div>
-                            <div className="flex flex-col gap-3">
-                                <div className="flex flex-col gap-0.5">
-                                    <span className="text-xs text-muted-foreground">Service <span className="text-destructive">*</span></span>
-                                    <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{selectedThread.serviceName || '-'}</div>
-                                </div>
-                                <div className="flex flex-col gap-0.5">
-                                    <span className="text-xs text-muted-foreground">Date <span className="text-destructive">*</span></span>
-                                    <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{selectedThread.date ? new Date(selectedThread.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '-'}</div>
-                                </div>
-                                <div className="grid grid-cols-2 gap-3">
-                                    <div className="flex flex-col gap-0.5">
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-xs text-muted-foreground">Start Time <span className="text-destructive">*</span></span>
-                                            {selectedThread.preferredStartTime && <span className="text-xs text-muted-foreground/60">Prefered time {formatTime(selectedThread.preferredStartTime)}</span>}
-                                        </div>
-                                        <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{formatTime(selectedThread.startTime)}</div>
-                                    </div>
-                                    <div className="flex flex-col gap-0.5">
-                                        <span className="text-xs text-muted-foreground">End Time <span className="text-destructive">*</span></span>
-                                        <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{formatTime(selectedThread.endTime)}</div>
-                                    </div>
-                                </div>
-                                <div className="flex flex-col gap-0.5">
-                                    <span className="text-xs text-muted-foreground">Assign Dentist <span className="text-destructive">*</span></span>
-                                    <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{selectedThread.doctorName || '-'}</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <hr className="border-card-border/40 mx-5" />
-
-                    </div>
-
-                    <div className="p-4 border-t border-border bg-sidebar shrink-0">
-                        {actionError && (
-                            <div className="p-3 mb-3 rounded-lg bg-destructive/10 border border-destructive/20 text-[10px] text-destructive flex items-start gap-2">
-                                <AlertCircle className="size-3.5 mt-0.5 shrink-0" />
-                                <span>{actionError}</span>
-                            </div>
-                        )}
-                        {actionSuccess && (
-                            <div className="p-3 mb-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-[10px] text-emerald-500 flex items-start gap-2">
-                                <CheckCircle className="size-3.5 mt-0.5 shrink-0" />
-                                <span>{actionSuccess}</span>
-                            </div>
-                        )}
-
-                        {activeAction === 'NONE' ? (
-                            <div className="w-full">
-                                {activeStates.includes(selectedThread.status) ? (
-                                    <div className="flex gap-2">
-                                        <Button
-                                            variant="outline"
-                                            className="flex-1"
-                                            onClick={() => {
-                                                setActiveAction('RESCHEDULE');
-                                                setRescheduleDate(selectedThread.date);
-                                                setRescheduleDoctorId(selectedThread.doctorId || '');
-                                                
-                                                const parseTimeToHHMM = (timeStr?: string | null) => {
-                                                    if (!timeStr) return '';
-                                                    if (timeStr.includes('T')) {
-                                                        const timePart = timeStr.split('T')[1];
-                                                        if (timePart) return timePart.slice(0, 5);
-                                                    }
-                                                    const match = timeStr.match(/^(\d{2}):(\d{2})/);
-                                                    if (match) return `${match[1]}:${match[2]}`;
-                                                    return '';
-                                                };
-                                                
-                                                setRescheduleStartTime(parseTimeToHHMM(selectedThread.startTime));
-                                                setRescheduleEndTime(parseTimeToHHMM(selectedThread.endTime));
-                                                setActionError(null);
-                                                setActionSuccess(null);
-                                            }}
-                                        >
-                                            <Calendar className="size-4" /> Reschedule
-                                        </Button>
-                                        <Button
-                                            onClick={() => {
-                                                setActiveAction('CANCEL');
-                                                setActionError(null);
-                                                setActionSuccess(null);
-                                            }}
-                                            variant="outline"
-                                            className="flex-1 border-destructive/50 text-destructive hover:bg-destructive/10"
-                                        >
-                                            Cancel
-                                        </Button>
-                                    </div>
-                                ) : (
-                                    <div className="p-3 bg-muted border border-border rounded-xl text-center text-xs text-muted-foreground">
-                                        Action disabled
-                                    </div>
-                                )}
-                            </div>
-                        ) : (
-                            <form onSubmit={handleActionSubmit} className="space-y-3 bg-card/60 p-4 rounded-xl border border-border">
-                                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
-                                    {activeAction === 'RESCHEDULE' ? <Calendar className="size-3" /> : <XCircle className="size-3" />}
-                                    {activeAction === 'RESCHEDULE' ? 'Reschedule Slot' : 'Cancel Booking'}
-                                </p>
-
-                                {activeAction === 'RESCHEDULE' && (
-                                    <div className="space-y-2 text-[10px]">
-                                        <div>
-                                            <label className="text-muted-foreground block mb-1">New Date</label>
-                                            <Input 
-                                                type="date" 
-                                                value={rescheduleDate}
-                                                onChange={e => setRescheduleDate(e.target.value)}
-                                            />
-                                        </div>
-                                        <div className="grid grid-cols-2 gap-2">
-                                            <div>
-                                                <label className="text-muted-foreground block mb-1">Start Time</label>
-                                                <Input 
-                                                    type="time" 
-                                                    value={rescheduleStartTime}
-                                                    onChange={e => setRescheduleStartTime(e.target.value)}
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="text-muted-foreground block mb-1">End Time</label>
-                                                <Input 
-                                                    type="time" 
-                                                    value={rescheduleEndTime}
-                                                    onChange={e => setRescheduleEndTime(e.target.value)}
-                                                />
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <label className="text-muted-foreground block mb-1">Assign Doctor</label>
-                                            <Select
-                                                value={rescheduleDoctorId}
-                                                onChange={e => setRescheduleDoctorId(e.target.value)}
-                                                options={[
-                                                    { value: '', label: 'Select Doctor...' },
-                                                    ...doctors.map(d => ({ value: d.id, label: `Dr. ${d.firstName} ${d.lastName}` }))
-                                                ]}
-                                            />
-                                        </div>
-                                    </div>
-                                )}
-
-                                <div>
-                                    <label className="text-[10px] text-muted-foreground block mb-1">Reason / Notes</label>
-                                    <Textarea
-                                        value={actionReason}
-                                        onChange={e => setActionReason(e.target.value)}
-                                        placeholder="Provide reason..."
-                                        className="min-h-[60px] resize-none"
-                                        required
-                                    />
-                                </div>
-
-                                <div className="flex gap-2">
-                                    <Button 
-                                        type="button" 
-                                        onClick={() => setActiveAction('NONE')}
-                                        variant="outline" 
-                                        size="sm"
-                                        className="flex-1"
-                                    >
-                                        Cancel
-                                    </Button>
-                                    <Button 
-                                        type="submit" 
-                                        disabled={actionLoading}
-                                        size="sm"
-                                        className="flex-1"
-                                    >
-                                        {actionLoading ? 'Saving...' : 'Confirm'}
-                                    </Button>
-                                </div>
-                            </form>
-                        )}
-                    </div>
-                </>
+                <AppointmentDetailPane view={detailPaneView} compact />
             )}
         </div>
     ) : null;
