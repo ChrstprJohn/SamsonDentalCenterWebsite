@@ -8,6 +8,7 @@ import { bootstrapEventSubscribers } from '@/orchestrators/event-subscribers';
 export interface ResendNotificationInput {
   appointmentId: string;
   eventType: 'APPOINTMENT_BOOKED' | 'APPOINTMENT_REMINDER_48H' | 'APPOINTMENT_REMINDER_24H';
+  targetChannel?: 'EMAIL' | 'SMS' | 'BOTH';
 }
 
 export async function resendNotificationAction(input: ResendNotificationInput) {
@@ -42,7 +43,8 @@ export async function resendNotificationAction(input: ResendNotificationInput) {
         start_time,
         end_time,
         source,
-        patient:users!appointments_patient_id_fkey(email, first_name, last_name)
+        confirmation_channel,
+        patient:users!appointments_patient_id_fkey(email, phone_number, first_name, last_name)
       `)
       .eq('id', input.appointmentId)
       .single();
@@ -53,14 +55,23 @@ export async function resendNotificationAction(input: ResendNotificationInput) {
 
     const { data: gc } = await supabaseAdmin
       .from('guest_contacts')
-      .select('email, first_name, last_name')
+      .select('id, email, phone_number, first_name, last_name')
       .eq('appointment_id', input.appointmentId)
       .single();
 
-    const recipientEmail = gc?.email || appointment.patient?.email;
+    const channelToUse = input.targetChannel || (appointment.confirmation_channel as any) || 'EMAIL';
+    const shouldSendEmail = channelToUse === 'EMAIL' || channelToUse === 'BOTH';
+    const shouldSendSms = channelToUse === 'SMS' || channelToUse === 'BOTH';
 
-    if (!recipientEmail) {
+    const recipientEmail = gc?.email || appointment.patient?.email;
+    const recipientPhone = gc?.phone_number || appointment.patient?.phone_number;
+
+    if (shouldSendEmail && !recipientEmail) {
       return { success: false, error: 'No contact email found for this appointment.' };
+    }
+
+    if (shouldSendSms && !recipientPhone) {
+      return { success: false, error: 'No phone number found for SMS notification.' };
     }
 
     const { data: service } = await supabaseAdmin
@@ -70,67 +81,87 @@ export async function resendNotificationAction(input: ResendNotificationInput) {
       .single();
 
     const outbox = outboxCommands(supabaseAdmin);
+    let dispatchedEvents: string[] = [];
 
-    let eventType: string;
-    let payload: Record<string, any>;
+    // Dispatch Email Event
+    if (shouldSendEmail && recipientEmail) {
+      let eventType: string;
+      let payload: Record<string, any>;
 
-    if (input.eventType === 'APPOINTMENT_REMINDER_24H' || input.eventType === 'APPOINTMENT_REMINDER_48H') {
-      eventType = input.eventType === 'APPOINTMENT_REMINDER_48H' ? 'APPOINTMENT_REMINDER_48H' : 'APPOINTMENT_REMINDER_24H';
-      payload = { appointmentId: input.appointmentId, email: recipientEmail };
-    } else {
-      // Determine confirmation event type based on appointment source
-      if (appointment.patient_id && appointment.source === 'STAFF_CREATED') {
-        eventType = 'APPOINTMENT_MANUALLY_BOOKED_PATIENT';
-        payload = {
-          appointmentId: input.appointmentId,
-          patientId: appointment.patient_id,
-          serviceId: appointment.service_id,
-          doctorId: appointment.doctor_id,
-          date: appointment.date,
-          startTime: appointment.start_time,
-          durationMinutes: service?.duration_minutes || 60,
-        };
-      } else if (!appointment.patient_id) {
-        eventType = 'APPOINTMENT_MANUALLY_BOOKED_GUEST';
-        payload = {
-          appointmentId: input.appointmentId,
-          serviceId: appointment.service_id,
-          doctorId: appointment.doctor_id,
-          date: appointment.date,
-          startTime: appointment.start_time,
-          durationMinutes: service?.duration_minutes || 60,
-          guestName: gc ? `${gc.first_name || ''} ${gc.last_name || ''}`.trim() : 'Guest',
-          guestEmail: gc?.email || '',
-        };
+      if (input.eventType === 'APPOINTMENT_REMINDER_24H' || input.eventType === 'APPOINTMENT_REMINDER_48H') {
+        eventType = input.eventType === 'APPOINTMENT_REMINDER_48H' ? 'APPOINTMENT_REMINDER_48H' : 'APPOINTMENT_REMINDER_24H';
+        payload = { appointmentId: input.appointmentId, email: recipientEmail };
       } else {
-        eventType = 'APPOINTMENT_BOOKED';
-        payload = {
-          appointmentId: input.appointmentId,
-          patientId: appointment.patient_id,
-          serviceId: appointment.service_id,
-          doctorId: appointment.doctor_id,
-          date: appointment.date,
-          startTime: appointment.start_time,
-          durationMinutes: service?.duration_minutes || 60,
-        };
+        if (appointment.patient_id && appointment.source === 'STAFF_CREATED') {
+          eventType = 'APPOINTMENT_MANUALLY_BOOKED_PATIENT';
+          payload = {
+            appointmentId: input.appointmentId,
+            patientId: appointment.patient_id,
+            serviceId: appointment.service_id,
+            doctorId: appointment.doctor_id,
+            date: appointment.date,
+            startTime: appointment.start_time,
+            durationMinutes: service?.duration_minutes || 60,
+          };
+        } else if (!appointment.patient_id) {
+          eventType = 'APPOINTMENT_MANUALLY_BOOKED_GUEST';
+          payload = {
+            appointmentId: input.appointmentId,
+            serviceId: appointment.service_id,
+            doctorId: appointment.doctor_id,
+            date: appointment.date,
+            startTime: appointment.start_time,
+            durationMinutes: service?.duration_minutes || 60,
+            guestContactId: gc?.id || input.appointmentId,
+            guestName: gc ? `${gc.first_name || ''} ${gc.last_name || ''}`.trim() : 'Guest',
+            guestEmail: gc?.email || recipientEmail || null,
+            guestPhone: gc?.phone_number || recipientPhone || 'N/A',
+          };
+        } else {
+          eventType = 'APPOINTMENT_BOOKED';
+          payload = {
+            appointmentId: input.appointmentId,
+            patientId: appointment.patient_id,
+            serviceId: appointment.service_id,
+            doctorId: appointment.doctor_id,
+            date: appointment.date,
+            startTime: appointment.start_time,
+            durationMinutes: service?.duration_minutes || 60,
+          };
+        }
       }
+
+      const emittedEmailEvent = await outbox.emitEvent(eventType, payload);
+      dispatchedEvents.push(`Email (${eventType})`);
+      bootstrapEventSubscribers();
+      await globalOutboxDispatcher(supabaseAdmin, true, emittedEmailEvent.id)();
     }
 
-    const emittedEvent = await outbox.emitEvent(eventType, payload);
+    // Dispatch SMS Event
+    if (shouldSendSms && recipientPhone) {
+      const smsPayload = {
+        phoneNumber: recipientPhone,
+        date: appointment.date,
+        startTime: appointment.start_time,
+        appointmentId: appointment.id,
+      };
+
+      const emittedSmsEvent = await outbox.emitEvent('APPOINTMENT_MANUALLY_BOOKED_SMS', smsPayload);
+      dispatchedEvents.push(`SMS (${recipientPhone})`);
+      bootstrapEventSubscribers();
+      await globalOutboxDispatcher(supabaseAdmin, true, emittedSmsEvent.id)();
+    }
 
     const update: Record<string, boolean> = {};
-    if (eventType === 'APPOINTMENT_REMINDER_48H') update.reminder_48h_sent = true;
-    else if (eventType === 'APPOINTMENT_REMINDER_24H') update.reminder_24h_sent = true;
+    if (input.eventType === 'APPOINTMENT_REMINDER_48H') update.reminder_48h_sent = true;
+    else if (input.eventType === 'APPOINTMENT_REMINDER_24H') update.reminder_24h_sent = true;
     else update.confirmation_sent = true;
 
     await supabaseAdmin.from('appointments').update(update).eq('id', input.appointmentId);
 
-    bootstrapEventSubscribers();
-    await globalOutboxDispatcher(supabaseAdmin, true, emittedEvent.id)();
-
     return {
       success: true,
-      message: `Confirmation notification dispatched to ${recipientEmail}.`,
+      message: `Notification sent via ${dispatchedEvents.join(' & ')}.`,
     };
   } catch (error: any) {
     console.error('[resendNotificationAction] Error:', error);
