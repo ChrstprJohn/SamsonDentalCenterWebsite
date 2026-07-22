@@ -157,13 +157,13 @@ function AppointmentDetails({ appointment, view, activeTab }: { appointment: App
 
                 return (
                   <div key={entry.key} className="space-y-2">
-                    <span className="text-xs font-semibold text-foreground">{entry.label}</span>
+                    <span className="text-xs text-muted-foreground">{entry.label}</span>
                     <div className={hasEmail && hasSms ? 'grid grid-cols-2 gap-2' : 'flex flex-col gap-2'}>
                       {hasSms && (
                         <div className="flex items-center justify-between p-3 bg-secondary-bg/20 border border-card-border/60 rounded-xl">
                           <div className="flex items-center gap-2 min-w-0">
                             <MessageSquare className="size-3.5 text-muted-foreground shrink-0" />
-                            <span className="text-xs font-medium text-foreground">SMS</span>
+                            <span className="text-sm text-foreground">SMS</span>
                             <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
                               entry.sent ? 'bg-green-500/10 text-green-500' : 'bg-muted text-muted-foreground/60'
                             }`}>
@@ -186,7 +186,7 @@ function AppointmentDetails({ appointment, view, activeTab }: { appointment: App
                         <div className="flex items-center justify-between p-3 bg-secondary-bg/20 border border-card-border/60 rounded-xl">
                           <div className="flex items-center gap-2 min-w-0">
                             <Mail className="size-3.5 text-muted-foreground shrink-0" />
-                            <span className="text-xs font-medium text-foreground">Email</span>
+                            <span className="text-sm text-foreground">Email</span>
                             <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
                               entry.sent ? 'bg-green-500/10 text-green-500' : 'bg-muted text-muted-foreground/60'
                             }`}>
