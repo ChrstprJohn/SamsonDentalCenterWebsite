@@ -39,14 +39,16 @@ export const onAppointmentBookedSubscriber = {
     }
 
     // 3. Fetch Doctor details
-    const { data: doctor, error: doctorError } = await supabaseAdmin
-      .from('users')
-      .select('first_name, last_name')
-      .eq('id', doctorId)
-      .single();
-
-    if (doctorError || !doctor) {
-      throw new Error(`Failed to fetch doctor for outbox email: ${doctorError?.message || 'Not found'}`);
+    let doctorName = 'Assigned Dentist';
+    if (doctorId) {
+      const { data: doctor } = await supabaseAdmin
+        .from('users')
+        .select('first_name, last_name')
+        .eq('id', doctorId)
+        .single();
+      if (doctor) {
+        doctorName = `Dr. ${doctor.first_name} ${doctor.last_name}`;
+      }
     }
 
     // 4. Resolve patient identity — account holder vs. dependent
@@ -81,12 +83,14 @@ export const onAppointmentBookedSubscriber = {
     }
 
     // Calculations & Formats
-    const doctorName = `Dr. ${doctor.first_name} ${doctor.last_name}`;
     const dateStr = formatShortDate(date);
 
-    const start = startTime;
-    const end = calculateEndTime(startTime, durationMinutes);
-    const timeRangeStr = `${formatClinicTime(start)} - ${formatClinicTime(end)}`;
+    let timeRangeStr = 'To be scheduled';
+    if (startTime) {
+      const start = startTime;
+      const end = calculateEndTime(startTime, durationMinutes || 60);
+      timeRangeStr = `${formatClinicTime(start)} - ${formatClinicTime(end)}`;
+    }
 
     const baseUrl = getBaseUrl();
 
@@ -113,5 +117,19 @@ export const onAppointmentBookedSubscriber = {
         dashboardUrl: `${baseUrl}/user`,
       }
     );
+
+    await supabaseAdmin
+      .from('appointments')
+      .update({ confirmation_sent: true })
+      .eq('id', appointmentId);
+
+    try {
+      await supabaseAdmin
+        .from('appointments')
+        .update({ email_confirmation_sent: true })
+        .eq('id', appointmentId);
+    } catch {
+      // Ignore if optional column doesn't exist
+    }
   }
 };

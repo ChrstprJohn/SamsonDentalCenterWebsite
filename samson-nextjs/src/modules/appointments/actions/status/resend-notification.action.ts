@@ -83,6 +83,31 @@ export async function resendNotificationAction(input: ResendNotificationInput) {
     const outbox = outboxCommands(supabaseAdmin);
     let dispatchedEvents: string[] = [];
 
+    // Update primary sent flag on appointments table (guaranteed column)
+    if (input.eventType === 'APPOINTMENT_BOOKED') {
+      await supabaseAdmin.from('appointments').update({ confirmation_sent: true }).eq('id', input.appointmentId);
+    } else if (input.eventType === 'APPOINTMENT_REMINDER_48H') {
+      await supabaseAdmin.from('appointments').update({ reminder_48h_sent: true }).eq('id', input.appointmentId);
+    } else if (input.eventType === 'APPOINTMENT_REMINDER_24H') {
+      await supabaseAdmin.from('appointments').update({ reminder_24h_sent: true }).eq('id', input.appointmentId);
+    }
+
+    // Safely attempt optional channel-specific columns if present in DB schema
+    try {
+      if (input.eventType === 'APPOINTMENT_BOOKED') {
+        if (shouldSendEmail) await supabaseAdmin.from('appointments').update({ email_confirmation_sent: true }).eq('id', input.appointmentId);
+        if (shouldSendSms) await supabaseAdmin.from('appointments').update({ sms_confirmation_sent: true }).eq('id', input.appointmentId);
+      } else if (input.eventType === 'APPOINTMENT_REMINDER_48H') {
+        if (shouldSendEmail) await supabaseAdmin.from('appointments').update({ email_reminder_48h_sent: true }).eq('id', input.appointmentId);
+        if (shouldSendSms) await supabaseAdmin.from('appointments').update({ sms_reminder_48h_sent: true }).eq('id', input.appointmentId);
+      } else if (input.eventType === 'APPOINTMENT_REMINDER_24H') {
+        if (shouldSendEmail) await supabaseAdmin.from('appointments').update({ email_reminder_24h_sent: true }).eq('id', input.appointmentId);
+        if (shouldSendSms) await supabaseAdmin.from('appointments').update({ sms_reminder_24h_sent: true }).eq('id', input.appointmentId);
+      }
+    } catch (e: any) {
+      console.warn('[resendNotificationAction] Channel column update notice:', e?.message || e);
+    }
+
     // Dispatch Email Event
     if (shouldSendEmail && recipientEmail) {
       let eventType: string;
@@ -123,9 +148,9 @@ export async function resendNotificationAction(input: ResendNotificationInput) {
             appointmentId: input.appointmentId,
             patientId: appointment.patient_id,
             serviceId: appointment.service_id,
-            doctorId: appointment.doctor_id,
+            doctorId: appointment.doctor_id || null,
             date: appointment.date,
-            startTime: appointment.start_time,
+            startTime: appointment.start_time || null,
             durationMinutes: service?.duration_minutes || 60,
           };
         }
@@ -151,13 +176,6 @@ export async function resendNotificationAction(input: ResendNotificationInput) {
       bootstrapEventSubscribers();
       await globalOutboxDispatcher(supabaseAdmin, true, emittedSmsEvent.id)();
     }
-
-    const update: Record<string, boolean> = {};
-    if (input.eventType === 'APPOINTMENT_REMINDER_48H') update.reminder_48h_sent = true;
-    else if (input.eventType === 'APPOINTMENT_REMINDER_24H') update.reminder_24h_sent = true;
-    else update.confirmation_sent = true;
-
-    await supabaseAdmin.from('appointments').update(update).eq('id', input.appointmentId);
 
     return {
       success: true,

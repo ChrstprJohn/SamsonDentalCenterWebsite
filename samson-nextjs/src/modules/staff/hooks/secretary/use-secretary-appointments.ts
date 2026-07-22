@@ -241,7 +241,7 @@ export function useSecretaryAppointments() {
     isLoadingDays: scheduler.loadingKey === 'dates', rescheduleDate, timeslots, isLoadingSlots: scheduler.loadingKey === 'slots',
     rescheduleStartTime, rescheduleEndTime, setRescheduleEndTime, cancelReasonPreset, setCancelReasonPreset, cancelReasonCustom, setCancelReasonCustom,
     showCancelForm, setShowCancelForm, activeServiceId, activeDoctorId, formatPatientName, toggleChangeTreatment,
-    toggleChangeDoctor, selectRescheduleService, selectRescheduleDate, selectRescheduleSlot, submitReschedule, submitCancel,
+    toggleChangeDoctor, selectRescheduleService, selectRescheduleDate, selectRescheduleSlot, submitReschedule, submitCancel, fetchData,
   };
 }
 

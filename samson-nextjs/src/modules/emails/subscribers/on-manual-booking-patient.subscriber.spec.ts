@@ -25,7 +25,9 @@ describe('onManualBookingPatientSubscriber', () => {
     const mockSingle = vi.fn().mockImplementation(() => Promise.resolve(singleResults[callIndex++] ?? { data: null, error: { message: 'Unexpected call' } }));
     const mockEq = vi.fn(() => ({ single: mockSingle }));
     const mockSelect = vi.fn(() => ({ eq: mockEq }));
-    return { from: vi.fn(() => ({ select: mockSelect })) } as any;
+    const mockUpdateEq = vi.fn().mockResolvedValue({ error: null });
+    const mockUpdate = vi.fn(() => ({ eq: mockUpdateEq }));
+    return { from: vi.fn(() => ({ select: mockSelect, update: mockUpdate })) } as any;
   }
 
   beforeEach(() => {

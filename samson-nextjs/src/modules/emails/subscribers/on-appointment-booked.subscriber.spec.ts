@@ -11,9 +11,11 @@ vi.mock('@/shared/database/server');
 
 describe('onAppointmentBookedSubscriber', () => {
   const mockSingle = vi.fn();
+  const mockUpdateEq = vi.fn().mockResolvedValue({ error: null });
+  const mockUpdate = vi.fn(() => ({ eq: mockUpdateEq }));
   const mockEq = vi.fn(() => ({ single: mockSingle }));
   const mockSelect = vi.fn(() => ({ eq: mockEq }));
-  const mockSupabase = { from: vi.fn(() => ({ select: mockSelect })) } as any;
+  const mockSupabase = { from: vi.fn(() => ({ select: mockSelect, update: mockUpdate })) } as any;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -125,6 +127,39 @@ describe('onAppointmentBookedSubscriber', () => {
         dateStr: 'Jun 4, 2026',
         timeRangeStr: expectedTimeRange,
         appointmentId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd1',
+      })
+    );
+  });
+
+  it('handles null doctorId and null startTime gracefully', async () => {
+    const payloadWithNulls = {
+      appointmentId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd1',
+      patientId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd2',
+      serviceId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd3',
+      doctorId: null,
+      date: '2026-06-04',
+      startTime: null,
+    };
+
+    mockSingle
+      .mockResolvedValueOnce({
+        data: { email: 'patient@example.com', first_name: 'John', middle_name: null, last_name: 'Doe', suffix: null },
+        error: null,
+      }) // patient
+      .mockResolvedValueOnce({
+        data: { name: 'Teeth Cleaning' },
+        error: null,
+      }); // service
+
+    await onAppointmentBookedSubscriber.handle(payloadWithNulls);
+
+    expect(ResendService.sendTemplatedEmail).toHaveBeenCalledWith(
+      'patient@example.com',
+      'Appointment Request Received – Samson Dental Center',
+      'appointment_request_received',
+      expect.objectContaining({
+        doctorName: 'Assigned Dentist',
+        timeRangeStr: 'To be scheduled',
       })
     );
   });

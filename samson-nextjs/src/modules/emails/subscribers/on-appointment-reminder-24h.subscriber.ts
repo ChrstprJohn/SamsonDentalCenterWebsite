@@ -97,5 +97,12 @@ export const onAppointmentReminder24hSubscriber = {
         baseUrl,
       }
     );
+
+    if (appointmentId) {
+      await supabaseAdmin
+        .from('appointments')
+        .update({ reminder_24h_sent: true, email_reminder_24h_sent: true })
+        .eq('id', appointmentId);
+    }
   },
 };

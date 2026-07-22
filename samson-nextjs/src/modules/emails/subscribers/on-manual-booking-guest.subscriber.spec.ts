@@ -13,7 +13,9 @@ describe('onManualBookingGuestSubscriber', () => {
   const mockSingle = vi.fn();
   const mockEq = vi.fn(() => ({ single: mockSingle }));
   const mockSelect = vi.fn(() => ({ eq: mockEq }));
-  const mockSupabase = { from: vi.fn(() => ({ select: mockSelect })) } as any;
+  const mockUpdateEq = vi.fn().mockResolvedValue({ error: null });
+  const mockUpdate = vi.fn(() => ({ eq: mockUpdateEq }));
+  const mockSupabase = { from: vi.fn(() => ({ select: mockSelect, update: mockUpdate })) } as any;
 
   const validPayload = {
     appointmentId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd1',

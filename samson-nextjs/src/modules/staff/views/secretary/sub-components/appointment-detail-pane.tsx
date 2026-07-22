@@ -32,20 +32,24 @@ function AppointmentDetails({ appointment, view, activeTab }: { appointment: App
   const [isEditingChannel, setIsEditingChannel] = useState(false);
   const [isSavingChannel, setIsSavingChannel] = useState(false);
   const [commState, setCommState] = useState({
-    confirmationSent: appointment.confirmationSent ?? false,
-    paymentReceiptSent: appointment.paymentReceiptSent ?? false,
-    reminder48hSent: appointment.reminder48hSent,
-    reminder24hSent: appointment.reminder24hSent,
+    emailConfirmationSent: Boolean((appointment as any).emailConfirmationSent || (appointment as any).email_confirmation_sent || appointment.confirmationSent || (appointment as any).confirmation_sent),
+    smsConfirmationSent: Boolean((appointment as any).smsConfirmationSent || (appointment as any).sms_confirmation_sent || appointment.confirmationSent || (appointment as any).confirmation_sent),
+    emailReminder48hSent: Boolean((appointment as any).emailReminder48hSent || (appointment as any).email_reminder_48h_sent || appointment.reminder48hSent || (appointment as any).reminder_48h_sent),
+    smsReminder48hSent: Boolean((appointment as any).smsReminder48hSent || (appointment as any).sms_reminder_48h_sent || appointment.reminder48hSent || (appointment as any).reminder_48h_sent),
+    emailReminder24hSent: Boolean((appointment as any).emailReminder24hSent || (appointment as any).email_reminder_24h_sent || appointment.reminder24hSent || (appointment as any).reminder_24h_sent),
+    smsReminder24hSent: Boolean((appointment as any).smsReminder24hSent || (appointment as any).sms_reminder_24h_sent || appointment.reminder24hSent || (appointment as any).reminder_24h_sent),
   });
 
   useEffect(() => {
-    setChannel(((appointment.confirmationChannel as any) || 'EMAIL'));
-    setDraftChannel(((appointment.confirmationChannel as any) || 'EMAIL'));
+    setChannel(((appointment.confirmationChannel as any) || (appointment as any).confirmation_channel || 'EMAIL'));
+    setDraftChannel(((appointment.confirmationChannel as any) || (appointment as any).confirmation_channel || 'EMAIL'));
     setCommState({
-      confirmationSent: appointment.confirmationSent ?? false,
-      paymentReceiptSent: appointment.paymentReceiptSent ?? false,
-      reminder48hSent: appointment.reminder48hSent,
-      reminder24hSent: appointment.reminder24hSent,
+      emailConfirmationSent: Boolean((appointment as any).emailConfirmationSent || (appointment as any).email_confirmation_sent || appointment.confirmationSent || (appointment as any).confirmation_sent),
+      smsConfirmationSent: Boolean((appointment as any).smsConfirmationSent || (appointment as any).sms_confirmation_sent || appointment.confirmationSent || (appointment as any).confirmation_sent),
+      emailReminder48hSent: Boolean((appointment as any).emailReminder48hSent || (appointment as any).email_reminder_48h_sent || appointment.reminder48hSent || (appointment as any).reminder_48h_sent),
+      smsReminder48hSent: Boolean((appointment as any).smsReminder48hSent || (appointment as any).sms_reminder_48h_sent || appointment.reminder48hSent || (appointment as any).reminder_48h_sent),
+      emailReminder24hSent: Boolean((appointment as any).emailReminder24hSent || (appointment as any).email_reminder_24h_sent || appointment.reminder24hSent || (appointment as any).reminder_24h_sent),
+      smsReminder24hSent: Boolean((appointment as any).smsReminder24hSent || (appointment as any).sms_reminder_24h_sent || appointment.reminder24hSent || (appointment as any).reminder_24h_sent),
     });
   }, [appointment]);
 
@@ -54,13 +58,61 @@ function AppointmentDetails({ appointment, view, activeTab }: { appointment: App
     setResending(key);
     const res = await resendNotificationAction({ appointmentId: appointment.id, eventType, targetChannel });
     if (res.success) {
+      if (eventType === 'APPOINTMENT_REMINDER_48H') {
+        if (targetChannel === 'EMAIL') {
+          (appointment as any).emailReminder48hSent = true;
+          (appointment as any).email_reminder_48h_sent = true;
+        }
+        if (targetChannel === 'SMS') {
+          (appointment as any).smsReminder48hSent = true;
+          (appointment as any).sms_reminder_48h_sent = true;
+        }
+        appointment.reminder48hSent = true;
+        (appointment as any).reminder_48h_sent = true;
+      } else if (eventType === 'APPOINTMENT_REMINDER_24H') {
+        if (targetChannel === 'EMAIL') {
+          (appointment as any).emailReminder24hSent = true;
+          (appointment as any).email_reminder_24h_sent = true;
+        }
+        if (targetChannel === 'SMS') {
+          (appointment as any).smsReminder24hSent = true;
+          (appointment as any).sms_reminder_24h_sent = true;
+        }
+        appointment.reminder24hSent = true;
+        (appointment as any).reminder_24h_sent = true;
+      } else if (eventType === 'APPOINTMENT_BOOKED') {
+        if (targetChannel === 'EMAIL') {
+          (appointment as any).emailConfirmationSent = true;
+          (appointment as any).email_confirmation_sent = true;
+        }
+        if (targetChannel === 'SMS') {
+          (appointment as any).smsConfirmationSent = true;
+          (appointment as any).sms_confirmation_sent = true;
+        }
+        appointment.confirmationSent = true;
+        (appointment as any).confirmation_sent = true;
+      }
+
       setCommState((prev) => {
         const updates: Partial<typeof prev> = {};
-        if (eventType === 'APPOINTMENT_REMINDER_48H') updates.reminder48hSent = true;
-        else if (eventType === 'APPOINTMENT_REMINDER_24H') updates.reminder24hSent = true;
-        else if (eventType === 'APPOINTMENT_BOOKED') updates.confirmationSent = true;
+        if (eventType === 'APPOINTMENT_REMINDER_48H') {
+          if (targetChannel === 'EMAIL') updates.emailReminder48hSent = true;
+          if (targetChannel === 'SMS') updates.smsReminder48hSent = true;
+        } else if (eventType === 'APPOINTMENT_REMINDER_24H') {
+          if (targetChannel === 'EMAIL') updates.emailReminder24hSent = true;
+          if (targetChannel === 'SMS') updates.smsReminder24hSent = true;
+        } else if (eventType === 'APPOINTMENT_BOOKED') {
+          if (targetChannel === 'EMAIL') updates.emailConfirmationSent = true;
+          if (targetChannel === 'SMS') updates.smsConfirmationSent = true;
+        }
         return { ...prev, ...updates };
       });
+
+      if (view?.fetchData) {
+        view.fetchData();
+      }
+    } else {
+      alert(res.error || 'Failed to resend notification.');
     }
     setResending(null);
   };
@@ -88,11 +140,12 @@ function AppointmentDetails({ appointment, view, activeTab }: { appointment: App
     key: string;
     label: string;
     eventType: 'APPOINTMENT_BOOKED' | 'APPOINTMENT_REMINDER_48H' | 'APPOINTMENT_REMINDER_24H';
-    sent: boolean;
+    emailSent: boolean;
+    smsSent: boolean;
   }[] = [
-    { key: 'confirmation', label: 'Booking Confirmation', eventType: 'APPOINTMENT_BOOKED', sent: commState.confirmationSent },
-    { key: 'reminder48h', label: '48-Hour Reminder', eventType: 'APPOINTMENT_REMINDER_48H', sent: commState.reminder48hSent },
-    { key: 'reminder24h', label: '24-Hour Reminder', eventType: 'APPOINTMENT_REMINDER_24H', sent: commState.reminder24hSent },
+    { key: 'confirmation', label: 'Booking Confirmation', eventType: 'APPOINTMENT_BOOKED', emailSent: commState.emailConfirmationSent, smsSent: commState.smsConfirmationSent },
+    { key: 'reminder48h', label: '48-Hour Reminder', eventType: 'APPOINTMENT_REMINDER_48H', emailSent: commState.emailReminder48hSent, smsSent: commState.smsReminder48hSent },
+    { key: 'reminder24h', label: '24-Hour Reminder', eventType: 'APPOINTMENT_REMINDER_24H', emailSent: commState.emailReminder24hSent, smsSent: commState.smsReminder24hSent },
   ];
 
   return (
@@ -117,10 +170,10 @@ function AppointmentDetails({ appointment, view, activeTab }: { appointment: App
               )}
               {isEditingChannel && (
                 <div className="flex items-center gap-2">
-                  <Button variant="outline" size="sm" onClick={handleCancelChannel} className="h-auto px-4 py-2 text-sm gap-1.5 max-sm:px-3 max-sm:py-1.5 max-sm:text-xs">
+                  <Button variant="outline" size="sm" onClick={handleCancelChannel} className="h-auto px-3 py-1.5 text-xs gap-1">
                     <X className="size-3.5" /> Cancel
                   </Button>
-                  <Button size="sm" onClick={handleSaveChannel} disabled={isSavingChannel || draftChannel === channel} className="h-auto px-4 py-2 text-sm gap-1.5 max-sm:px-3 max-sm:py-1.5 max-sm:text-xs bg-slate-900 text-white rounded-md disabled:cursor-not-allowed">
+                  <Button size="sm" onClick={handleSaveChannel} disabled={isSavingChannel || draftChannel === channel} className="h-auto px-3 py-1.5 text-xs gap-1 bg-slate-900 text-white rounded-md disabled:cursor-not-allowed">
                     <Check className="size-3.5" /> {isSavingChannel ? 'Saving...' : 'Save'}
                   </Button>
                 </div>
@@ -131,7 +184,7 @@ function AppointmentDetails({ appointment, view, activeTab }: { appointment: App
               <Select
                 value={draftChannel}
                 onChange={(e) => setDraftChannel(e.target.value as any)}
-                className="text-sm w-full"
+                className="text-xs w-full"
                 options={[
                   { value: 'EMAIL', label: 'Email' },
                   { value: 'SMS', label: 'SMS' },
@@ -165,9 +218,9 @@ function AppointmentDetails({ appointment, view, activeTab }: { appointment: App
                             <MessageSquare className="size-3.5 text-muted-foreground shrink-0" />
                             <span className="text-sm text-foreground">SMS</span>
                             <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
-                              entry.sent ? 'bg-green-500/10 text-green-500' : 'bg-muted text-muted-foreground/60'
+                              entry.smsSent ? 'bg-green-500/10 text-green-500' : 'bg-muted text-muted-foreground/60'
                             }`}>
-                              {entry.sent ? 'SENT' : 'PENDING'}
+                              {entry.smsSent ? 'SENT' : 'PENDING'}
                             </span>
                           </div>
                           <Button
@@ -188,9 +241,9 @@ function AppointmentDetails({ appointment, view, activeTab }: { appointment: App
                             <Mail className="size-3.5 text-muted-foreground shrink-0" />
                             <span className="text-sm text-foreground">Email</span>
                             <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
-                              entry.sent ? 'bg-green-500/10 text-green-500' : 'bg-muted text-muted-foreground/60'
+                              entry.emailSent ? 'bg-green-500/10 text-green-500' : 'bg-muted text-muted-foreground/60'
                             }`}>
-                              {entry.sent ? 'SENT' : 'PENDING'}
+                              {entry.emailSent ? 'SENT' : 'PENDING'}
                             </span>
                           </div>
                           <Button
