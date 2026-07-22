@@ -1,44 +1,106 @@
 'use client';
 
+import { useMemo, useState } from 'react';
 import { useSecretaryAppointments } from '../../hooks/secretary/use-secretary-appointments';
 import { AppointmentDetailPane } from './sub-components/appointment-detail-pane';
 import { AppointmentsTable } from './sub-components/appointments-table';
-import { AppointmentsTabsFilters } from './sub-components/appointments-tabs-filters';
+import { ArrowLeft, CalendarClock, History } from 'lucide-react';
+import { SidebarHeader, SidebarInput } from '@/components/ui/sidebar';
 
 export function SecretaryAppointmentsView() {
   const view = useSecretaryAppointments();
+  const [mobileView, setMobileView] = useState<'list' | 'detail'>('list');
+  const [search, setSearch] = useState('');
+
+  const colMobile = (v: 'list' | 'detail') =>
+    mobileView === v ? 'flex' : 'hidden';
+
+  const hasSelection = !!view.selectedAppointment;
+
+  const handleSearch = (val: string) => {
+    setSearch(val);
+    view.setSearchTerm(val);
+  };
+
+  const upcomingCount = useMemo(() =>
+    view.appointments.filter((a) => a.status === 'APPROVED').length,
+    [view.appointments]
+  );
+  const historyCount = useMemo(() =>
+    view.appointments.filter((a) => ['COMPLETED', 'CANCELLED', 'REJECTED', 'DISPLACED', 'NO_SHOW'].includes(a.status)).length,
+    [view.appointments]
+  );
+
+  const TABS = [
+    { key: 'upcoming' as const, label: 'Upcoming', icon: CalendarClock, count: upcomingCount },
+    { key: 'history' as const, label: 'History', icon: History, count: historyCount },
+  ];
 
   return (
-    <div className="flex flex-col gap-8 h-full p-6 md:p-8 overflow-y-auto">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-2xl md:text-3xl font-extrabold text-text-primary tracking-tight">Appointments Directory</h1>
-        <p className="text-xs text-text-muted">
-          Search and manage all clinic bookings, past records, and status change history ledger logs.
-        </p>
-      </div>
-      <AppointmentsTabsFilters
-        activeTab={view.activeTab}
-        onTabChange={view.selectTab}
-        searchTerm={view.searchTerm}
-        setSearchTerm={view.setSearchTerm}
-        dateFilter={view.dateFilter}
-        setDateFilter={view.setDateFilter}
-        doctorFilter={view.doctorFilter}
-        setDoctorFilter={view.setDoctorFilter}
-        historyStatusFilter={view.historyStatusFilter}
-        setHistoryStatusFilter={view.setHistoryStatusFilter}
-        doctors={view.doctors}
-      />
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch flex-1">
+    <div className="flex flex-1 min-h-0 w-full overflow-hidden">
+      <div className={`lg:w-[350px] flex-1 lg:flex-none flex-col border-r border-card-border/40 bg-sidebar min-h-0 overflow-hidden ${colMobile('list')} lg:flex`}>
+        <SidebarHeader className="gap-3.5 border-b border-card-border/40 p-4 shrink-0">
+          <div className="flex w-full items-center justify-between">
+            <div className="text-base font-medium text-foreground">
+              Appointments Directory
+            </div>
+          </div>
+          <div className="px-1">
+            <SidebarInput
+              placeholder="Type to search..."
+              value={search}
+              onChange={(e) => handleSearch(e.target.value)}
+              className="rounded-md"
+            />
+          </div>
+          <div className="flex gap-1 bg-muted/20 p-1 rounded-lg">
+            {TABS.map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.key}
+                  onClick={() => view.selectTab(tab.key)}
+                  className={`flex-1 h-8 text-xs rounded-xl font-semibold transition-all duration-300 outline-none select-none active:scale-[0.98] flex items-center justify-center gap-1.5 ${
+                    view.activeTab === tab.key
+                      ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  <Icon className="size-3.5" />
+                  {tab.label} ({tab.count})
+                </button>
+              );
+            })}
+          </div>
+        </SidebarHeader>
         <AppointmentsTable
           appointments={view.filteredAppointments}
           selectedAppointmentId={view.selectedAppointmentId}
           isLoading={view.isLoading}
           formatPatientName={view.formatPatientName}
-          onSelect={view.setSelectedAppointmentId}
+          onSelect={(id) => { view.setSelectedAppointmentId(id); setMobileView('detail'); }}
         />
-        <AppointmentDetailPane view={view} />
       </div>
+
+      {hasSelection ? (
+        <div className={`flex-1 flex-col min-w-0 min-h-0 ${colMobile('detail')} lg:flex`}>
+          <div className="p-4 border-b border-card-border/40 shrink-0">
+            <div className="flex items-center gap-2">
+              <button onClick={() => setMobileView('list')} className="lg:hidden p-1 -ml-1 text-muted-foreground hover:text-foreground shrink-0">
+                <ArrowLeft className="size-5" />
+              </button>
+              <div className="flex-1 text-base font-medium text-foreground text-left">
+                Appointment Details
+              </div>
+            </div>
+          </div>
+          <AppointmentDetailPane view={view} />
+        </div>
+      ) : (
+        <div className="flex-1 flex-col items-center justify-center text-muted-foreground bg-muted/10 max-lg:hidden flex">
+          <p className="text-xs font-medium">Select an appointment from the list to view details.</p>
+        </div>
+      )}
     </div>
   );
 }
