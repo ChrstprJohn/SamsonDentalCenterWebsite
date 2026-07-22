@@ -32,9 +32,11 @@ export const getAvailableTimeSlotsUseCase = (deps: {
         date,
         duration,
         schedules: [{
-          ...schedule,
-          startTime: schedule.startTime || '09:00',
-          endTime: schedule.endTime || '17:00',
+          doctorId: schedule.doctorId!,
+          startTime: schedule.startTime ?? '09:00',
+          endTime: schedule.endTime ?? '17:00',
+          breakStartTime: schedule.breakStartTime ?? null,
+          breakEndTime: schedule.breakEndTime ?? null,
         }],
         appointments,
       });
