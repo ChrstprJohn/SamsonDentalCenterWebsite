@@ -44,8 +44,8 @@ export function useSecretaryAppointments() {
   const [showCancelForm, setShowCancelForm] = useState(false);
 
   const selectedAppointment = appointments.find((appointment) => appointment.id === selectedAppointmentId);
-  const activeServiceId = changeTreatment ? rescheduleServiceId : (selectedAppointment?.serviceId ?? '');
-  const activeDoctorId = changeDoctor ? rescheduleDoctorId : (selectedAppointment?.doctorId ?? '');
+  const activeServiceId = rescheduleServiceId || (selectedAppointment?.serviceId ?? '');
+  const activeDoctorId = rescheduleDoctorId || (selectedAppointment?.doctorId ?? '');
   const availableDates: string[] = [];
   const availableRescheduleDoctors = useMemo(() => {
     return doctors.map((d) => ({
@@ -71,6 +71,37 @@ export function useSecretaryAppointments() {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
+  const openRescheduleForm = useCallback(() => {
+    if (selectedAppointment) {
+      setRescheduleServiceId(selectedAppointment.serviceId || '');
+      setRescheduleDoctorId(selectedAppointment.doctorId || '');
+      setRescheduleDate(selectedAppointment.date || '');
+      const parseTimeToHHMM = (timeStr?: string | null) => {
+        if (!timeStr) return '';
+        if (timeStr.includes('T')) {
+          const timePart = timeStr.split('T')[1];
+          if (timePart) return timePart.slice(0, 5);
+        }
+        const match = timeStr.match(/^(\d{2}):(\d{2})/);
+        if (match) return `${match[1]}:${match[2]}`;
+        return '';
+      };
+      setRescheduleStartTime(parseTimeToHHMM(selectedAppointment.startTime));
+      setRescheduleEndTime(parseTimeToHHMM(selectedAppointment.endTime));
+      setRescheduleJustification('Patient requested reschedule');
+    }
+    setShowRescheduleForm(true);
+    setShowCancelForm(false);
+  }, [selectedAppointment]);
+
+  const handleSetShowRescheduleForm = useCallback((show: boolean) => {
+    if (show) {
+      openRescheduleForm();
+    } else {
+      setShowRescheduleForm(false);
+    }
+  }, [openRescheduleForm]);
+
   const resetActionForms = useCallback(() => {
     setShowRescheduleForm(false);
     setShowCancelForm(false);
@@ -95,7 +126,7 @@ export function useSecretaryAppointments() {
       const res = await getServicesAction('BOOKABLE');
       if (!active) return;
       setIsLoadingServices(false);
-      if (res.data) setServices(res.data as ServiceResponseDto[]);
+      if (res?.data) setServices(res.data as ServiceResponseDto[]);
     }
     loadServices();
     return () => { active = false; };
@@ -142,32 +173,18 @@ export function useSecretaryAppointments() {
 
   const toggleChangeTreatment = () => {
     setChangeTreatment((current) => !current);
-    setRescheduleServiceId('');
-    resetRescheduleSlot();
   };
 
   const toggleChangeDoctor = () => {
     setChangeDoctor((current) => !current);
-    resetRescheduleSlot();
-  };
-
-  const resetRescheduleSlot = () => {
-    setRescheduleDate('');
-    setRescheduleDoctorId('');
-    setRescheduleStartTime('');
-    setRescheduleEndTime('');
   };
 
   const selectRescheduleService = (serviceId: string) => {
     setRescheduleServiceId(serviceId);
-    resetRescheduleSlot();
   };
 
   const selectRescheduleDate = (date: string) => {
     setRescheduleDate(date);
-    setRescheduleDoctorId('');
-    setRescheduleStartTime('');
-    setRescheduleEndTime('');
   };
 
   const selectRescheduleSlot = (slot: AvailableSlotDto) => {
@@ -182,13 +199,20 @@ export function useSecretaryAppointments() {
     if (!rescheduleJustification.trim()) return alert('Justification note is required.');
     setIsSubmitting(true);
     try {
+      const startUtc = rescheduleStartTime.includes(':00') || rescheduleStartTime.split(':').length === 3
+        ? `${rescheduleDate}T${rescheduleStartTime}Z`
+        : `${rescheduleDate}T${rescheduleStartTime}:00Z`;
+      const endUtc = rescheduleEndTime.includes(':00') || rescheduleEndTime.split(':').length === 3
+        ? `${rescheduleDate}T${rescheduleEndTime}Z`
+        : `${rescheduleDate}T${rescheduleEndTime}:00Z`;
+
       const res = await updateAppointmentStatusAction({
         appointmentId: selectedAppointment.id,
         status: 'APPROVED',
         statusReason: rescheduleJustification.trim(),
         newDate: rescheduleDate,
-        newStartTime: rescheduleStartTime,
-        newEndTime: rescheduleEndTime,
+        newStartTime: startUtc,
+        newEndTime: endUtc,
         newDoctorId: activeDoctorId,
         newServiceId: rescheduleServiceId || selectedAppointment.serviceId || undefined,
       });
@@ -234,12 +258,12 @@ export function useSecretaryAppointments() {
   return {
     appointments, filteredAppointments, doctors, selectedAppointment, selectedAppointmentId, setSelectedAppointmentId,
     isLoading, isSubmitting, activeTab, selectTab, searchTerm, setSearchTerm, doctorFilter, setDoctorFilter, dateFilter,
-    setDateFilter, historyStatusFilter, setHistoryStatusFilter, showRescheduleForm, setShowRescheduleForm,
+    setDateFilter, historyStatusFilter, setHistoryStatusFilter, showRescheduleForm, setShowRescheduleForm: handleSetShowRescheduleForm,
     rescheduleJustification, setRescheduleJustification, changeTreatment, services, rescheduleServiceId,
     isLoadingServices, changeDoctor, rescheduleDoctorId, setRescheduleDoctorId, availableRescheduleDoctors,
     isLoadingRescheduleDoctors: scheduler.loadingKey === 'doctors', rescheduleMonth, setRescheduleMonth, availableDates,
     isLoadingDays: scheduler.loadingKey === 'dates', rescheduleDate, timeslots, isLoadingSlots: scheduler.loadingKey === 'slots',
-    rescheduleStartTime, rescheduleEndTime, setRescheduleEndTime, cancelReasonPreset, setCancelReasonPreset, cancelReasonCustom, setCancelReasonCustom,
+    rescheduleStartTime, setRescheduleStartTime, rescheduleEndTime, setRescheduleEndTime, cancelReasonPreset, setCancelReasonPreset, cancelReasonCustom, setCancelReasonCustom,
     showCancelForm, setShowCancelForm, activeServiceId, activeDoctorId, formatPatientName, toggleChangeTreatment,
     toggleChangeDoctor, selectRescheduleService, selectRescheduleDate, selectRescheduleSlot, submitReschedule, submitCancel, fetchData,
   };

@@ -92,13 +92,19 @@ export function SecretaryBookAppointmentView() {
     if (!view.selectedAppointmentDetails) return;
     setIsActionSubmitting(true);
     try {
+      const formatIso = (dateStr: string, timeStr: string) => {
+        if (!dateStr || !timeStr) return undefined;
+        const timeFormatted = timeStr.length === 5 ? `${timeStr}:00` : timeStr;
+        return `${dateStr}T${timeFormatted}Z`;
+      };
+
       const res = await updateAppointmentStatusAction({
         appointmentId: view.selectedAppointmentDetails.id,
-        status: 'RESCHEDULED',
+        status: 'APPROVED',
         statusReason: rescheduleJustification,
         newDate: rescheduleDate,
-        newStartTime: rescheduleStartTime,
-        newEndTime: rescheduleEndTime,
+        newStartTime: formatIso(rescheduleDate, rescheduleStartTime),
+        newEndTime: formatIso(rescheduleDate, rescheduleEndTime),
         newDoctorId: rescheduleDoctorId,
         newServiceId: rescheduleServiceId,
       });
