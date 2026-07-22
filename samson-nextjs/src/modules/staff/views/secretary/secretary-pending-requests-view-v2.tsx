@@ -440,85 +440,102 @@ export function SecretaryPendingRequestsViewV2() {
                       </div>
                     </div>
                   ) : (
-                    <div className="border border-card-border/40 rounded-lg p-4 space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-semibold">
-                          {inquiriesView.stagedInquiryAction === 'CONVERT' ? 'Convert note (Approve)' : 'Drop reason (Reject)'}
-                        </span>
-                        <Button variant="ghost" size="sm" onClick={() => { inquiriesView.setDecision(''); setApprovalReason(''); }} className="h-auto px-2 py-1 text-xs">
+                    <form
+                      onSubmit={(e) => { e.preventDefault(); inquiriesView.submitReview(inquiriesView.selectedInquiry.id); }}
+                      className="flex flex-col gap-4"
+                    >
+                      <div className="flex flex-col gap-0.5">
+                        <h3 className={`text-base font-medium ${inquiriesView.stagedInquiryAction === 'CONVERT' ? 'text-foreground' : 'text-destructive'}`}>
+                          {inquiriesView.stagedInquiryAction === 'CONVERT' ? 'Approve & Convert' : 'Reject / Drop'}
+                        </h3>
+                        <p className="text-xs text-muted-foreground">
+                          {inquiriesView.stagedInquiryAction === 'CONVERT'
+                            ? 'Select notification channel and add an optional note before confirming.'
+                            : 'Provide a reason for dropping this inquiry.'}
+                        </p>
+                      </div>
+
+                      {inquiriesView.stagedInquiryAction === 'CONVERT' && (
+                        <div className="flex flex-col gap-1.5">
+                          <label className="text-xs text-muted-foreground">Notification Channel</label>
+                          <div className="grid grid-cols-4 gap-1 bg-muted/20 p-1 rounded-lg border border-card-border/40">
+                            {(['EMAIL', 'SMS', 'BOTH', 'NONE'] as const).map((channel) => (
+                              <button
+                                key={channel}
+                                type="button"
+                                onClick={() => inquiriesView.setConfirmationChannel?.(channel)}
+                                className={`py-1.5 text-[10px] font-bold rounded-md transition-all ${
+                                  (inquiriesView.confirmationChannel || 'EMAIL') === channel
+                                    ? 'bg-primary text-primary-foreground shadow-sm'
+                                    : 'text-muted-foreground hover:text-foreground'
+                                }`}
+                              >
+                                {channel}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-xs text-muted-foreground">
+                          {inquiriesView.stagedInquiryAction === 'CONVERT' ? 'Approval Note' : 'Drop Reason'}{' '}
+                          <span className="text-destructive">*</span>
+                        </label>
+                        <select
+                          value={approvalReason}
+                          onChange={(e) => {
+                            setApprovalReason(e.target.value);
+                            if (e.target.value !== 'Others') {
+                              inquiriesView.setStagedInquiryNote(e.target.value);
+                            } else {
+                              inquiriesView.setStagedInquiryNote('');
+                            }
+                          }}
+                          className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
+                          required
+                        >
+                          <option value="">
+                            {inquiriesView.stagedInquiryAction === 'CONVERT' ? 'Select approval note...' : 'Select drop reason...'}
+                          </option>
+                          {COMMON_REASONS.map((r) => (
+                            <option key={r} value={r}>{r}</option>
+                          ))}
+                        </select>
+                        {approvalReason === 'Others' && (
+                          <textarea
+                            value={inquiriesView.stagedInquiryNote}
+                            onChange={(e) => inquiriesView.setStagedInquiryNote(e.target.value)}
+                            placeholder="Enter custom reason..."
+                            rows={2}
+                            className="w-full text-sm border border-card-border rounded-xl px-4 py-2.5 bg-card focus:outline-none focus:ring-2 focus:ring-primary-ring resize-none"
+                          />
+                        )}
+                      </div>
+
+                      <div className="flex gap-2 pt-1">
+                        <Button
+                          type="submit"
+                          disabled={!inquiriesView.canSubmit || inquiriesView.isSubmitting}
+                          className={`flex-1 h-[42px] text-sm font-medium rounded-xl disabled:opacity-50 ${
+                            inquiriesView.stagedInquiryAction === 'CONVERT'
+                              ? 'bg-slate-900 text-white hover:bg-slate-800'
+                              : 'bg-destructive text-white hover:bg-destructive/90'
+                          }`}
+                        >
+                          {inquiriesView.isSubmitting
+                            ? 'Saving...'
+                            : `Confirm ${inquiriesView.stagedInquiryAction === 'CONVERT' ? 'Approve' : 'Reject'}`}
+                        </Button>
+                        <Button
+                          type="button"
+                          onClick={() => { inquiriesView.setDecision(''); setApprovalReason(''); }}
+                          className="flex-1 h-[42px] text-sm font-medium border border-card-border text-foreground bg-transparent hover:bg-muted rounded-xl"
+                        >
                           Cancel
                         </Button>
                       </div>
-                      {inquiriesView.stagedInquiryAction === 'CONVERT' ? (
-                        <div className="space-y-2">
-                          <div className="flex flex-col gap-1.5 mb-2">
-                            <span className="text-xs text-muted-foreground font-medium">Notification Channel</span>
-                            <div className="grid grid-cols-4 gap-1 bg-muted/20 p-1 rounded-lg border border-card-border/40">
-                              {(['EMAIL', 'SMS', 'BOTH', 'NONE'] as const).map((channel) => (
-                                <button
-                                  key={channel}
-                                  type="button"
-                                  onClick={() => inquiriesView.setConfirmationChannel?.(channel)}
-                                  className={`py-1.5 text-[10px] font-bold rounded-md transition-all ${
-                                    (inquiriesView.confirmationChannel || 'EMAIL') === channel
-                                      ? 'bg-primary text-primary-foreground shadow-sm'
-                                      : 'text-muted-foreground hover:text-foreground'
-                                  }`}
-                                >
-                                  {channel}
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-                          <select
-                            value={approvalReason}
-                            onChange={(e) => {
-                              setApprovalReason(e.target.value);
-                              if (e.target.value !== 'Others') {
-                                inquiriesView.setStagedInquiryNote(e.target.value);
-                              } else {
-                                inquiriesView.setStagedInquiryNote('');
-                              }
-                            }}
-                            className="w-full px-3 py-2 rounded-lg border bg-card text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 border-card-border"
-                          >
-                            <option value="">Select a reason...</option>
-                            {COMMON_REASONS.map((r) => (
-                              <option key={r} value={r}>{r}</option>
-                            ))}
-                          </select>
-                          {approvalReason === 'Others' && (
-                            <textarea
-                              value={inquiriesView.stagedInquiryNote}
-                              onChange={(e) => inquiriesView.setStagedInquiryNote(e.target.value)}
-                              placeholder="Enter custom reason..."
-                              rows={2}
-                              className="w-full text-sm border border-card-border rounded-lg px-3 py-2 bg-card focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
-                            />
-                          )}
-                        </div>
-                      ) : (
-                        <textarea
-                          value={inquiriesView.stagedInquiryNote}
-                          onChange={(e) => inquiriesView.setStagedInquiryNote(e.target.value)}
-                          placeholder="Reason for rejection..."
-                          rows={2}
-                          className="w-full text-sm border border-card-border rounded-lg px-3 py-2 bg-card focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
-                        />
-                      )}
-                      <Button
-                        onClick={() => inquiriesView.submitReview(inquiriesView.selectedInquiry.id)}
-                        disabled={!inquiriesView.canSubmit}
-                        variant={inquiriesView.stagedInquiryAction === 'CONVERT' ? 'primary' : 'destructive'}
-                        size="default"
-                        className={`w-full py-3 text-sm ${inquiriesView.stagedInquiryAction === 'CONVERT' ? '!bg-slate-900' : ''}`}
-                      >
-                        {inquiriesView.isSubmitting
-                          ? 'Saving...'
-                          : `Confirm ${inquiriesView.stagedInquiryAction === 'CONVERT' ? 'Approve' : 'Reject'}`
-                        }
-                      </Button>
-                    </div>
+                    </form>
                   )}
                 </div>
               )}

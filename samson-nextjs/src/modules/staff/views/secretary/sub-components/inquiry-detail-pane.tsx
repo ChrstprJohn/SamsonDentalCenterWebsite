@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { InquiryDecisionCard } from './inquiry-decision-card';
-import { InquiryDropReason } from './inquiry-notes-panels';
+import { InquiryDropReason, InquirySecretaryNotes } from './inquiry-notes-panels';
 import { InquiryGuestProfile } from './inquiry-guest-profile';
 import { InquiryPatientLinking } from './inquiry-patient-linking';
 import { InquiryRequestContext } from './inquiry-request-context';
@@ -53,44 +53,9 @@ function SelectedInquiry({ view, inquiry }: { view: any; inquiry: any }) {
   );
 }
 
-const CHANNEL_OPTIONS = [
-  { value: 'EMAIL', label: 'Email' },
-  { value: 'SMS', label: 'SMS' },
-  { value: 'BOTH', label: 'Both' },
-  { value: 'NONE', label: 'None' },
-] as const;
-
 function ConvertPanels({ view }: { view: any }) {
   return (
-    <div className="flex flex-col gap-4 border-t border-card-border/60 pt-4 animate-fadeIn">
-      {/* Header */}
-      <div className="flex flex-col gap-0.5">
-        <h3 className="text-base font-medium text-foreground">Convert to Appointment</h3>
-        <p className="text-xs text-muted-foreground">Assign a schedule and confirm notification preferences before finalising.</p>
-      </div>
-
-      {/* Notification Channel */}
-      <div className="flex flex-col gap-1.5">
-        <label className="text-xs text-muted-foreground">Notification Channel</label>
-        <div className="grid grid-cols-4 gap-1 bg-muted/20 p-1 rounded-xl border border-card-border/40">
-          {CHANNEL_OPTIONS.map(({ value, label }) => (
-            <button
-              key={value}
-              type="button"
-              onClick={() => view.setConfirmationChannel(value)}
-              className={`py-1.5 text-[10px] font-bold rounded-lg transition-all ${
-                (view.confirmationChannel || 'EMAIL') === value
-                  ? 'bg-primary text-primary-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Schedule + Patient */}
+    <div className="flex flex-col gap-3 animate-fadeIn">
       <InquirySchedulePanel
         services={view.services}
         selectedService={view.stagedInquiryService}
@@ -125,18 +90,7 @@ function ConvertPanels({ view }: { view: any }) {
         onSelectPatient={view.selectPatient}
         onClearPatient={view.clearPatient}
       />
-
-      {/* Secretary Notes */}
-      <div className="flex flex-col gap-1.5">
-        <label className="text-xs text-muted-foreground">Secretary Call Notes (Status Reason)</label>
-        <textarea
-          value={view.stagedSecretaryNotes}
-          onChange={(e) => view.setSecretaryNotes(e.target.value)}
-          placeholder="Add notes about the conversion or call details..."
-          rows={3}
-          className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border resize-none"
-        />
-      </div>
+      <InquirySecretaryNotes value={view.stagedSecretaryNotes} onChange={view.setSecretaryNotes} />
     </div>
   );
 }
