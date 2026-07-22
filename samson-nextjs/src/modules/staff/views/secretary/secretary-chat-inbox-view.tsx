@@ -643,10 +643,10 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                                     </Button>
                                 ) : (
                                         <div className="flex items-center gap-2">
-                                        <Button variant="outline" size="sm" onClick={cancelEditGuestInfo} className="h-auto px-3 py-1.5 text-xs gap-1 max-sm:px-2 max-sm:py-1">
+                                        <Button variant="outline" size="sm" onClick={cancelEditGuestInfo} className="h-auto px-4 py-2 text-sm gap-1.5 max-sm:px-3 max-sm:py-1.5 max-sm:text-xs">
                                             <X className="size-3.5" /> Cancel
                                         </Button>
-                                        <Button size="sm" onClick={saveGuestInfo} disabled={savingGuestInfo || !hasGuestInfoChanges} className="h-auto px-3 py-1.5 text-xs gap-1 max-sm:px-2 max-sm:py-1 bg-slate-900 text-white rounded-md disabled:cursor-not-allowed">
+                                        <Button size="sm" onClick={saveGuestInfo} disabled={savingGuestInfo || !hasGuestInfoChanges} className="h-auto px-4 py-2 text-sm gap-1.5 max-sm:px-3 max-sm:py-1.5 max-sm:text-xs bg-slate-900 text-white rounded-md disabled:cursor-not-allowed">
                                             <Check className="size-3.5" /> {savingGuestInfo ? 'Saving...' : 'Save'}
                                         </Button>
                                     </div>
