@@ -289,17 +289,17 @@ export function SidebarAppointmentDetails({
           <div className="flex items-center justify-between mb-3">
             <span className="text-base font-medium text-foreground">Guest Information</span>
             {hasGuestInfo && !isEditingGuestInfo && (
-              <Button variant="outline" size="sm" onClick={startEditGuestInfo} className="h-auto px-4 py-2 text-sm gap-1.5 max-sm:px-3 max-sm:py-1.5 max-sm:text-xs">
-                <Pencil className="size-4" /> Edit
+              <Button variant="outline" size="sm" onClick={startEditGuestInfo} className="h-7 px-2.5 text-xs gap-1">
+                <Pencil className="size-3.5" /> Edit
               </Button>
             )}
             {isEditingGuestInfo && (
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" onClick={cancelEditGuestInfo} className="h-auto px-4 py-2 text-sm gap-1.5 max-sm:px-3 max-sm:py-1.5 max-sm:text-xs">
-                  <X className="size-4" /> Cancel
+                <Button variant="outline" size="sm" onClick={cancelEditGuestInfo} className="h-7 px-2.5 text-xs gap-1">
+                  <X className="size-3.5" /> Cancel
                 </Button>
-                <Button size="sm" onClick={saveGuestInfo} disabled={savingGuestInfo || !hasGuestInfoChanges} className="h-auto px-4 py-2 text-sm gap-1.5 max-sm:px-3 max-sm:py-1.5 max-sm:text-xs bg-slate-900 text-white rounded-md disabled:cursor-not-allowed">
-                  <Check className="size-4" /> {savingGuestInfo ? 'Saving...' : 'Save'}
+                <Button size="sm" onClick={saveGuestInfo} disabled={savingGuestInfo || !hasGuestInfoChanges} className="h-7 px-2.5 text-xs gap-1 bg-slate-900 text-white rounded-md disabled:cursor-not-allowed">
+                  <Check className="size-3.5" /> {savingGuestInfo ? 'Saving...' : 'Save'}
                 </Button>
               </div>
             )}

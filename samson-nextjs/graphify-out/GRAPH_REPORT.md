@@ -1,16 +1,16 @@
 # Graph Report - samson-nextjs  (2026-07-22)
 
 ## Corpus Check
-- 1128 files · ~691,801 words
+- 1128 files · ~691,817 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 3569 nodes · 8316 edges · 231 communities (204 shown, 27 thin omitted)
+- 3569 nodes · 8316 edges · 230 communities (203 shown, 27 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 29 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `1ebd2c29`
+- Built from commit: `c6a48a70`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -200,7 +200,6 @@
 - [[_COMMUNITY_Community 194|Community 194]]
 - [[_COMMUNITY_Community 195|Community 195]]
 - [[_COMMUNITY_Community 196|Community 196]]
-- [[_COMMUNITY_Community 197|Community 197]]
 - [[_COMMUNITY_Community 198|Community 198]]
 - [[_COMMUNITY_Community 199|Community 199]]
 - [[_COMMUNITY_Community 200|Community 200]]
@@ -260,7 +259,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (231 total, 27 thin omitted)
+## Communities (230 total, 27 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.15
@@ -312,7 +311,7 @@ Nodes (8): capitalize(), isDefined(), getErrorMessage(), isError(), omit(), slee
 
 ### Community 12 - "Community 12"
 Cohesion: 0.08
-Nodes (32): createStaffAction(), updateStaffAction(), authorizeRole(), ROLE_HIERARCHY, { mockGetDoctorSchedules }, mockGetExistingAppointments, { mockConvertInquiry, mockGetServiceDuration }, { mockCreateManualBooking, mockGetServiceDuration } (+24 more)
+Nodes (33): createStaffAction(), updateStaffAction(), authorizeRole(), ROLE_HIERARCHY, { mockGetDoctorSchedules }, mockGetExistingAppointments, { mockConvertInquiry, mockGetServiceDuration }, { mockCreateManualBooking, mockGetServiceDuration } (+25 more)
 
 ### Community 13 - "Community 13"
 Cohesion: 0.33
@@ -361,10 +360,6 @@ Nodes (18): getClinicConfigQuery(), mockEq, mockFrom, mockMaybeSingle, mockSelec
 ### Community 24 - "Community 24"
 Cohesion: 0.11
 Nodes (17): 1. Database RPC Updates, 2. Application Layer & DTO Updates, 3. Unit & Integration Testing, 4.1 Database Layer — Migration, 4.2 Repository Layer — New Command File, 4.3 Repository Exports Barrel, 4.4 Use-Case Layer — Refactor, 4.5 Action Layer — Wire New Command (+9 more)
-
-### Community 25 - "Community 25"
-Cohesion: 0.27
-Nodes (3): CreateStaffDto, createStaffUseCase(), StaffProfileCommands
 
 ### Community 26 - "Community 26"
 Cohesion: 0.12
@@ -459,8 +454,8 @@ Cohesion: 0.11
 Nodes (20): metadata, ActivePatient, AvailableServiceItem, CLINIC_SERVICES, INITIAL_QUEUE, PatientHistoryRecord, mockAddToast, useDoctorDashboard() (+12 more)
 
 ### Community 50 - "Community 50"
-Cohesion: 0.27
-Nodes (7): loginAction(), loginCommand(), LoginInput, loginSchema, loginUseCase(), useLoginForm(), UseLoginViewReturn
+Cohesion: 0.33
+Nodes (4): loginAction(), loginCommand(), loginSchema, loginUseCase()
 
 ### Community 51 - "Community 51"
 Cohesion: 0.25
@@ -795,7 +790,7 @@ Cohesion: 0.17
 Nodes (17): getAvailableDaysAction(), { mockGetAvailableDays }, { mockGetAvailableDaysUseCase, mockGetServiceDuration }, AvailabilityMapDto, getAvailableTimeSlotsAction(), { mockGetAvailableTimeSlots }, { mockGetAvailableTimeSlotsUseCase, mockGetServiceDuration }, getAvailableTimeSlotsUseCase() (+9 more)
 
 ### Community 159 - "Community 159"
-Cohesion: 0.24
+Cohesion: 0.27
 Nodes (4): CreateDependentDto, createDependentUseCase(), addDependentCommand(), PatientDependentsCommands
 
 ### Community 160 - "Community 160"
@@ -831,7 +826,7 @@ Cohesion: 0.12
 Nodes (17): GetAvailableTimeSlotsResponseDto, BookingFor, createManualBookingAction(), cleanOptionalString, CreateManualBookingDto, createManualBookingSchema, emailOrEmpty, createManualBookingUseCase() (+9 more)
 
 ### Community 169 - "Community 169"
-Cohesion: 0.23
+Cohesion: 0.21
 Nodes (3): getUserDependentsUseCase(), getDependentsByPatientIdQuery(), PatientDependentsQueries
 
 ### Community 171 - "Community 171"
@@ -871,8 +866,8 @@ Cohesion: 0.25
 Nodes (7): 🗄️ 1. Database & Server Actions (Backend), 🎨 2. Component & Hook Architecture (Frontend), 🖥️ 3. Layout details (Split-pane and Sub-panes), 🔒 4. First-Login Security Flow (Force Password Change), 🧪 5. Testing & Verification, 🔄 6. Doctor Status States (Active, Hidden, Archived), Task: Secretary Portal - Doctor Management Page Implementation
 
 ### Community 180 - "Community 180"
-Cohesion: 0.23
-Nodes (4): getStaffProfileUseCase(), StaffProfileDto, getProfileByIdQuery(), StaffProfileQueries
+Cohesion: 0.25
+Nodes (3): getStaffProfileUseCase(), getProfileByIdQuery(), StaffProfileQueries
 
 ### Community 181 - "Community 181"
 Cohesion: 0.18
@@ -895,8 +890,8 @@ Cohesion: 0.28
 Nodes (8): CreateCoordinationLogActionType, useCoordinationHub(), CALENDAR_ACTIONS, COMMS_ACTIONS, CoordinationHub(), CoordinationHubProps, QuickAction, TIMELINE_COLORS
 
 ### Community 187 - "Community 187"
-Cohesion: 0.09
-Nodes (11): createManualBookingCommand(), DomainError, NotFoundError, UnauthorizedError, mockGetAppointments, mockGetProfile, getPatientProfileForStaffQuery(), getPatientProfileByIdQuery() (+3 more)
+Cohesion: 0.08
+Nodes (14): getInquiriesQuery(), InquiryStatus, createManualBookingCommand(), getInquiriesAction(), { mockGetInquiriesQuery }, DomainError, NotFoundError, UnauthorizedError (+6 more)
 
 ### Community 188 - "Community 188"
 Cohesion: 0.08
@@ -915,8 +910,8 @@ Cohesion: 0.29
 Nodes (6): 1. Backend: Domain Outbox Email Logs & Actions, 2. Backend: Domain Invoices Queries, 3. Frontend: Secretary Email Logs Portal (`/secretary/emails`), 4. Frontend: Secretary Invoice Management Portal (`/secretary/invoices`), Task List: Secretary Email Logs and Invoice Management, Verification and Bug Fixes Done
 
 ### Community 193 - "Community 193"
-Cohesion: 0.36
-Nodes (4): LoginForm(), LoginFormProps, useLoginView(), LoginView()
+Cohesion: 0.28
+Nodes (7): LoginInput, LoginForm(), LoginFormProps, useLoginForm(), useLoginView(), UseLoginViewReturn, LoginView()
 
 ### Community 194 - "Community 194"
 Cohesion: 0.28
@@ -930,17 +925,17 @@ Nodes (6): SecretaryPendingRequestsView(), PENDING_CLINIC_HOURS, PendingDoctorSc
 Cohesion: 0.14
 Nodes (11): terminateStaffAction(), assignDoctorServicesAction(), assignDoctorServicesCommand(), mockDelete, mockEq, mockFrom, mockInsert, mockSupabase (+3 more)
 
-### Community 197 - "Community 197"
-Cohesion: 0.39
-Nodes (4): getInquiriesQuery(), InquiryStatus, getInquiriesAction(), { mockGetInquiriesQuery }
-
 ### Community 198 - "Community 198"
 Cohesion: 0.40
 Nodes (3): mockAddToast, mockPush, validData
 
+### Community 199 - "Community 199"
+Cohesion: 0.26
+Nodes (4): StaffProfileCommands, StaffProfileDto, UpdateStaffDto, updateStaffUseCase()
+
 ### Community 200 - "Community 200"
-Cohesion: 0.13
-Nodes (14): getAuthenticatedUser(), BookingPage(), metadata, createDependentAction(), getUserDependentsAction(), getAllUsersAction(), getPatientProfileAction(), { mockExecute } (+6 more)
+Cohesion: 0.12
+Nodes (15): getAuthenticatedUser(), BookingPage(), metadata, createDependentAction(), getUserDependentsAction(), getAllUsersAction(), getPatientProfileAction(), { mockExecute } (+7 more)
 
 ### Community 201 - "Community 201"
 Cohesion: 0.15
@@ -979,8 +974,8 @@ Cohesion: 0.09
 Nodes (18): appt, mockAddToast, mockRefresh, useAppointmentDetail(), UseAppointmentDetailProps, appointmentDbSchema, appointmentDoctorDbSchema, appointmentDoctorSchema (+10 more)
 
 ### Community 216 - "Community 216"
-Cohesion: 0.09
-Nodes (19): ValidationError, checkInAction(), { mockCheckIn }, CheckInDto, checkInSchema, checkInUseCase(), markNoShowAction(), { mockMarkNoShow } (+11 more)
+Cohesion: 0.10
+Nodes (18): ValidationError, checkInAction(), { mockCheckIn }, CheckInDto, checkInSchema, checkInUseCase(), markNoShowAction(), MarkNoShowDto (+10 more)
 
 ### Community 218 - "Community 218"
 Cohesion: 0.33
@@ -1032,7 +1027,7 @@ _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `Button()` connect `Community 184` to `Community 0`, `Community 130`, `Community 8`, `Community 138`, `Community 139`, `Community 140`, `Community 16`, `Community 21`, `Community 149`, `Community 153`, `Community 158`, `Community 162`, `Community 37`, `Community 38`, `Community 167`, `Community 171`, `Community 43`, `Community 173`, `Community 49`, `Community 56`, `Community 57`, `Community 185`, `Community 59`, `Community 58`, `Community 193`, `Community 66`, `Community 67`, `Community 71`, `Community 76`, `Community 77`, `Community 206`, `Community 207`, `Community 211`, `Community 213`, `Community 106`, `Community 114`, `Community 115`, `Community 117`, `Community 118`, `Community 127`?**
   _High betweenness centrality (0.077) - this node is a cross-community bridge._
-- **Why does `createClient` connect `Community 12` to `Community 130`, `Community 3`, `Community 132`, `Community 5`, `Community 6`, `Community 4`, `Community 7`, `Community 138`, `Community 13`, `Community 14`, `Community 17`, `Community 18`, `Community 148`, `Community 22`, `Community 158`, `Community 34`, `Community 35`, `Community 165`, `Community 166`, `Community 167`, `Community 40`, `Community 172`, `Community 45`, `Community 47`, `Community 50`, `Community 178`, `Community 52`, `Community 187`, `Community 196`, `Community 197`, `Community 71`, `Community 200`, `Community 203`, `Community 76`, `Community 77`, `Community 216`, `Community 222`, `Community 98`, `Community 103`, `Community 113`, `Community 114`, `Community 118`?**
+- **Why does `createClient` connect `Community 12` to `Community 130`, `Community 3`, `Community 132`, `Community 5`, `Community 6`, `Community 4`, `Community 7`, `Community 138`, `Community 13`, `Community 14`, `Community 17`, `Community 18`, `Community 148`, `Community 22`, `Community 158`, `Community 34`, `Community 35`, `Community 165`, `Community 166`, `Community 167`, `Community 40`, `Community 172`, `Community 45`, `Community 47`, `Community 50`, `Community 178`, `Community 52`, `Community 187`, `Community 196`, `Community 71`, `Community 200`, `Community 203`, `Community 76`, `Community 77`, `Community 216`, `Community 222`, `Community 98`, `Community 103`, `Community 113`, `Community 114`, `Community 118`?**
   _High betweenness centrality (0.050) - this node is a cross-community bridge._
 - **Why does `cn()` connect `Community 21` to `Community 162`, `Community 37`, `Community 41`, `Community 138`, `Community 43`, `Community 15`, `Community 184`?**
   _High betweenness centrality (0.045) - this node is a cross-community bridge._

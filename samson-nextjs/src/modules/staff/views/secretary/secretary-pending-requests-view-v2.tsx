@@ -182,18 +182,18 @@ export function SecretaryPendingRequestsViewV2() {
                     Guest Information
                   </span>
                   {!isEditingPatient ? (
-                    <Button variant="outline" size="sm" onClick={startEditPatient} className="h-auto px-4 py-2 text-sm gap-1.5 max-sm:px-3 max-sm:py-1.5 max-sm:text-xs">
-                      <Pencil className="size-4" />
+                    <Button variant="outline" size="sm" onClick={startEditPatient} className="h-7 px-2.5 text-xs gap-1">
+                      <Pencil className="size-3.5" />
                       Edit
                     </Button>
                   ) : (
                     <div className="flex items-center gap-2">
-                      <Button variant="outline" size="sm" onClick={cancelEditPatient} className="h-auto px-4 py-2 text-sm gap-1.5 max-sm:px-3 max-sm:py-1.5 max-sm:text-xs">
-                        <X className="size-4" />
+                      <Button variant="outline" size="sm" onClick={cancelEditPatient} className="h-7 px-2.5 text-xs gap-1">
+                        <X className="size-3.5" />
                         Cancel
                       </Button>
-                      <Button size="sm" onClick={saveEditPatient} className="h-auto px-4 py-2 text-sm gap-1.5 max-sm:px-3 max-sm:py-1.5 max-sm:text-xs bg-slate-900 text-white rounded-md">
-                        <Check className="size-4" />
+                      <Button size="sm" onClick={saveEditPatient} className="h-7 px-2.5 text-xs gap-1 bg-slate-900 text-white rounded-md">
+                        <Check className="size-3.5" />
                         Save
                       </Button>
                     </div>
@@ -298,18 +298,18 @@ export function SecretaryPendingRequestsViewV2() {
                   </span>
                   {isEditingSchedule ? (
                     <div className="flex items-center gap-2">
-                      <Button variant="outline" size="sm" onClick={cancelEditSchedule} className="h-auto px-4 py-2 text-sm gap-1.5 max-sm:px-3 max-sm:py-1.5 max-sm:text-xs">
-                        <X className="size-4" />
+                      <Button variant="outline" size="sm" onClick={cancelEditSchedule} className="h-7 px-2.5 text-xs gap-1">
+                        <X className="size-3.5" />
                         Cancel
                       </Button>
-                      <Button size="sm" onClick={saveEditSchedule} className="h-auto px-4 py-2 text-sm gap-1.5 max-sm:px-3 max-sm:py-1.5 max-sm:text-xs bg-slate-900 text-white rounded-md">
-                        <Check className="size-4" />
+                      <Button size="sm" onClick={saveEditSchedule} className="h-7 px-2.5 text-xs gap-1 bg-slate-900 text-white rounded-md">
+                        <Check className="size-3.5" />
                         Save
                       </Button>
                     </div>
                   ) : (
-                    <Button variant="outline" size="sm" onClick={startEditSchedule} className="h-auto px-4 py-2 text-sm gap-1.5 max-sm:px-3 max-sm:py-1.5 max-sm:text-xs">
-                      <Pencil className="size-4" />
+                    <Button variant="outline" size="sm" onClick={startEditSchedule} className="h-7 px-2.5 text-xs gap-1">
+                      <Pencil className="size-3.5" />
                       Edit
                     </Button>
                   )}

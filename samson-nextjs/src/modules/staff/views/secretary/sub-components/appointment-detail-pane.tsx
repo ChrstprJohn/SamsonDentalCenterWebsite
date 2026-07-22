@@ -15,15 +15,16 @@ import { resendNotificationAction } from '@/modules/appointments/actions/status/
 
 interface AppointmentDetailPaneProps {
   view: any;
+  compact?: boolean;
 }
 
-export function AppointmentDetailPane({ view }: AppointmentDetailPaneProps) {
+export function AppointmentDetailPane({ view, compact }: AppointmentDetailPaneProps) {
   const appointment = view.selectedAppointment as AppointmentDto | undefined;
   if (!appointment) return null;
-  return <AppointmentDetails appointment={appointment} view={view} activeTab={view.activeTab} />;
+  return <AppointmentDetails appointment={appointment} view={view} activeTab={view.activeTab} compact={compact} />;
 }
 
-function AppointmentDetails({ appointment, view, activeTab }: { appointment: AppointmentDto; view: any; activeTab: AppointmentDirectoryTab }) {
+function AppointmentDetails({ appointment, view, activeTab, compact }: { appointment: AppointmentDto; view: any; activeTab: AppointmentDirectoryTab; compact?: boolean }) {
   const [resending, setResending] = useState<string | null>(null);
   const [channel, setChannel] = useState<'EMAIL' | 'SMS' | 'BOTH' | 'NONE'>(
     (appointment.confirmationChannel as any) || 'EMAIL'
@@ -149,29 +150,30 @@ function AppointmentDetails({ appointment, view, activeTab }: { appointment: App
   return (
     <SharedAppointmentDetail
       appointment={appointment}
+      compact={compact}
       extraSections={
         <>
-          <hr className="border-card-border/40 mx-5" />
+          <hr className={`border-card-border/40 ${compact ? 'mx-4' : 'mx-5'}`} />
           {/* Notification Channel */}
-          <div className="py-4 px-5">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-base font-medium text-foreground">Notification Channel</span>
+          <div className={`${compact ? 'py-3 px-4' : 'py-4 px-5'}`}>
+            <div className={`flex items-center justify-between ${compact ? 'mb-2' : 'mb-3'}`}>
+              <span className={`${compact ? 'text-sm' : 'text-base'} font-medium text-foreground`}>Notification Channel</span>
               {!isEditingChannel && (
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setIsEditingChannel(true)}
-                  className="h-auto px-4 py-2 text-sm gap-1.5 max-sm:px-3 max-sm:py-1.5 max-sm:text-xs"
+                  className="h-7 px-2.5 text-xs gap-1"
                 >
-                  <Pencil className="size-4" /> Edit
+                  <Pencil className="size-3.5" /> Edit
                 </Button>
               )}
               {isEditingChannel && (
                 <div className="flex items-center gap-2">
-                  <Button variant="outline" size="sm" onClick={handleCancelChannel} className="h-auto px-3 py-1.5 text-xs gap-1">
+                  <Button variant="outline" size="sm" onClick={handleCancelChannel} className="h-7 px-2.5 text-xs gap-1">
                     <X className="size-3.5" /> Cancel
                   </Button>
-                  <Button size="sm" onClick={handleSaveChannel} disabled={isSavingChannel || draftChannel === channel} className="h-auto px-3 py-1.5 text-xs gap-1 bg-slate-900 text-white rounded-md disabled:cursor-not-allowed">
+                  <Button size="sm" onClick={handleSaveChannel} disabled={isSavingChannel || draftChannel === channel} className="h-7 px-2.5 text-xs gap-1 bg-slate-900 text-white rounded-md disabled:cursor-not-allowed">
                     <Check className="size-3.5" /> {isSavingChannel ? 'Saving...' : 'Save'}
                   </Button>
                 </div>
@@ -182,7 +184,7 @@ function AppointmentDetails({ appointment, view, activeTab }: { appointment: App
               <Select
                 value={draftChannel}
                 onChange={(e) => setDraftChannel(e.target.value as any)}
-                className="text-xs w-full"
+                className="text-sm w-full"
                 options={[
                   { value: 'EMAIL', label: 'Email' },
                   { value: 'SMS', label: 'SMS' },
@@ -197,23 +199,23 @@ function AppointmentDetails({ appointment, view, activeTab }: { appointment: App
             )}
           </div>
 
-          <hr className="border-card-border/40 mx-5" />
-          {/* Communication History */}
-          <div className="py-4 px-5 space-y-3">
-            <span className="text-base font-medium text-foreground block">Communication History</span>
-            <div className="flex flex-col gap-3">
+          <hr className={`border-card-border/40 ${compact ? 'mx-4' : 'mx-5'}`} />
+          {/* Notification History */}
+          <div className={`${compact ? 'py-3 px-4 space-y-2' : 'py-4 px-5 space-y-3'}`}>
+            <span className={`${compact ? 'text-sm' : 'text-base'} font-medium text-foreground block`}>Notification History</span>
+            <div className={`flex flex-col ${compact ? 'gap-2' : 'gap-3'}`}>
               {commEntries.map((entry) => {
                 const hasEmail = channel === 'EMAIL' || channel === 'BOTH';
                 const hasSms = channel === 'SMS' || channel === 'BOTH';
 
                 return (
-                  <div key={entry.key} className="space-y-2">
+                  <div key={entry.key} className={compact ? 'space-y-1' : 'space-y-2'}>
                     <span className="text-xs text-muted-foreground">{entry.label}</span>
-                    <div className={hasEmail && hasSms ? 'grid grid-cols-2 gap-2' : 'flex flex-col gap-2'}>
+                    <div className={!compact && hasEmail && hasSms ? 'grid grid-cols-2 gap-2' : 'flex flex-col gap-2'}>
                       {hasSms && (
-                        <div className="flex items-center justify-between p-3 bg-secondary-bg/20 border border-card-border/60 rounded-xl">
+                        <div className={`flex items-center justify-between ${compact ? 'p-2' : 'p-3'} bg-secondary-bg/20 border border-card-border/60 rounded-xl`}>
                           <div className="flex items-center gap-2 min-w-0">
-                            <MessageSquare className="size-3.5 text-muted-foreground shrink-0" />
+                            <MessageSquare className={`${compact ? 'size-3' : 'size-3.5'} text-muted-foreground shrink-0`} />
                             <span className="text-sm text-foreground">SMS</span>
                             <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
                               entry.smsSent ? 'bg-green-500/10 text-green-500' : 'bg-muted text-muted-foreground/60'
@@ -226,7 +228,7 @@ function AppointmentDetails({ appointment, view, activeTab }: { appointment: App
                             size="sm"
                             disabled={resending === `${entry.eventType}_SMS`}
                             onClick={() => handleResend(entry.eventType, 'SMS')}
-                            className="text-[10px] h-7 px-2.5 gap-1 shrink-0"
+                            className={`${compact ? 'text-[9px] h-6 px-2 gap-0.5' : 'text-[10px] h-7 px-2.5 gap-1'} shrink-0`}
                           >
                             <RotateCw className={`size-3 ${resending === `${entry.eventType}_SMS` ? 'animate-spin' : ''}`} />
                             {resending === `${entry.eventType}_SMS` ? 'Sending...' : 'Resend'}
@@ -234,9 +236,9 @@ function AppointmentDetails({ appointment, view, activeTab }: { appointment: App
                         </div>
                       )}
                       {hasEmail && (
-                        <div className="flex items-center justify-between p-3 bg-secondary-bg/20 border border-card-border/60 rounded-xl">
+                        <div className={`flex items-center justify-between ${compact ? 'p-2' : 'p-3'} bg-secondary-bg/20 border border-card-border/60 rounded-xl`}>
                           <div className="flex items-center gap-2 min-w-0">
-                            <Mail className="size-3.5 text-muted-foreground shrink-0" />
+                            <Mail className={`${compact ? 'size-3' : 'size-3.5'} text-muted-foreground shrink-0`} />
                             <span className="text-sm text-foreground">Email</span>
                             <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
                               entry.emailSent ? 'bg-green-500/10 text-green-500' : 'bg-muted text-muted-foreground/60'
@@ -249,7 +251,7 @@ function AppointmentDetails({ appointment, view, activeTab }: { appointment: App
                             size="sm"
                             disabled={resending === `${entry.eventType}_EMAIL`}
                             onClick={() => handleResend(entry.eventType, 'EMAIL')}
-                            className="text-[10px] h-7 px-2.5 gap-1 shrink-0"
+                            className={`${compact ? 'text-[9px] h-6 px-2 gap-0.5' : 'text-[10px] h-7 px-2.5 gap-1'} shrink-0`}
                           >
                             <RotateCw className={`size-3 ${resending === `${entry.eventType}_EMAIL` ? 'animate-spin' : ''}`} />
                             {resending === `${entry.eventType}_EMAIL` ? 'Sending...' : 'Resend'}
@@ -265,8 +267,8 @@ function AppointmentDetails({ appointment, view, activeTab }: { appointment: App
               )}
             </div>
           </div>
-          <hr className="border-card-border/40 mx-5" />
-          <div className="px-5 pb-6 pt-2">
+          <hr className={`border-card-border/40 ${compact ? 'mx-4' : 'mx-5'}`} />
+          <div className={`${compact ? 'px-4 pb-4 pt-1' : 'px-5 pb-6 pt-2'}`}>
             <AppointmentStatusHistory appointment={appointment} activeTab={activeTab} />
           </div>
         </>

@@ -13,9 +13,10 @@ interface SharedAppointmentDetailProps {
   appointment: AppointmentDto;
   extraSections?: ReactNode;
   actionsBar?: ReactNode;
+  compact?: boolean;
 }
 
-export function SharedAppointmentDetail({ appointment, extraSections, actionsBar }: SharedAppointmentDetailProps) {
+export function SharedAppointmentDetail({ appointment, extraSections, actionsBar, compact }: SharedAppointmentDetailProps) {
   const [patientProfile, setPatientProfile] = useState<{ email?: string; phoneNumber?: string } | null>(null);
   const [isEditingGuestInfo, setIsEditingGuestInfo] = useState(false);
   const [guestInfoDraft, setGuestInfoDraft] = useState({ firstName: '', middleName: '', lastName: '', suffix: '', email: '', phone: '' });
@@ -103,74 +104,69 @@ export function SharedAppointmentDetail({ appointment, extraSections, actionsBar
         style={{ scrollbarWidth: 'thin' }}
         data-lenis-prevent
       >
-        {/* Profile */}
-        <div className="flex flex-col items-center pt-6 pb-4 px-5">
-          <div className="size-16 shrink-0 rounded-full bg-muted-foreground/10 flex items-center justify-center border-2 border-border/60 overflow-hidden mb-3">
-            <UserRound className="size-14 text-muted-foreground/70 translate-y-0.5" />
+        <div className={`flex flex-col items-center ${compact ? 'pt-4 pb-3 px-4' : 'pt-6 pb-4 px-5'}`}>
+          <div className={`${compact ? 'size-12' : 'size-16'} shrink-0 rounded-full bg-muted-foreground/10 flex items-center justify-center border-2 border-border/60 overflow-hidden mb-3`}>
+            <UserRound className={`${compact ? 'size-10' : 'size-14'} text-muted-foreground/70 translate-y-0.5`} />
           </div>
-          <h2 className="text-lg font-semibold text-foreground">{formatName()}</h2>
+          <h2 className={`${compact ? 'text-base' : 'text-lg'} font-semibold text-foreground`}>{formatName()}</h2>
           <p className="text-sm text-muted-foreground mt-0.5">{isGuest ? 'Guest' : 'Patient'}</p>
         </div>
 
-        <hr className="border-card-border/40 mx-5" />
+        <hr className={`border-card-border/40 ${compact ? 'mx-4' : 'mx-5'}`} />
 
-        {/* Current Status */}
-        <div className="flex items-center justify-between py-4 px-5">
-          <span className="text-base font-medium text-foreground">Current Status</span>
+        <div className={`flex items-center justify-between ${compact ? 'py-3 px-4' : 'py-4 px-5'}`}>
+          <span className={`${compact ? 'text-sm' : 'text-base'} font-medium text-foreground`}>Current Status</span>
           <Badge variant={getBadgeVariant(appointment.status)} className="text-xs px-3 py-1">{appointment.status}</Badge>
         </div>
 
-        <hr className="border-card-border/40 mx-5" />
+        <hr className={`border-card-border/40 ${compact ? 'mx-4' : 'mx-5'}`} />
 
-        {/* Guest Information */}
-        <div className="py-4 px-5">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-base font-medium text-foreground">Guest Information</span>
+        <div className={`${compact ? 'py-3 px-4' : 'py-4 px-5'}`}>
+          <div className={`flex items-center justify-between ${compact ? 'mb-2' : 'mb-3'}`}>
+            <span className={`${compact ? 'text-sm' : 'text-base'} font-medium text-foreground`}>Guest Information</span>
             {hasGuestInfo && !isEditingGuestInfo && (
-              <Button variant="outline" size="sm" onClick={startEditGuestInfo} className="h-auto px-4 py-2 text-sm gap-1.5 max-sm:px-3 max-sm:py-1.5 max-sm:text-xs">
-                <Pencil className="size-4" /> Edit
+              <Button variant="outline" size="sm" onClick={startEditGuestInfo} className="h-7 px-2.5 text-xs gap-1">
+                <Pencil className="size-3.5" /> Edit
               </Button>
             )}
             {isEditingGuestInfo && (
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" onClick={cancelEditGuestInfo} className="h-auto px-4 py-2 text-sm gap-1.5 max-sm:px-3 max-sm:py-1.5 max-sm:text-xs">
-                  <X className="size-4" /> Cancel
+                <Button variant="outline" size="sm" onClick={cancelEditGuestInfo} className="h-7 px-2.5 text-xs gap-1">
+                  <X className="size-3.5" /> Cancel
                 </Button>
-                <Button size="sm" onClick={saveGuestInfo} disabled={savingGuestInfo || !hasGuestInfoChanges} className="h-auto px-4 py-2 text-sm gap-1.5 max-sm:px-3 max-sm:py-1.5 max-sm:text-xs bg-slate-900 text-white rounded-md disabled:cursor-not-allowed">
-                  <Check className="size-4" /> {savingGuestInfo ? 'Saving...' : 'Save'}
+                <Button size="sm" onClick={saveGuestInfo} disabled={savingGuestInfo || !hasGuestInfoChanges} className="h-7 px-2.5 text-xs gap-1 bg-slate-900 text-white rounded-md disabled:cursor-not-allowed">
+                  <Check className="size-3.5" /> {savingGuestInfo ? 'Saving...' : 'Save'}
                 </Button>
               </div>
             )}
           </div>
-          <div className="flex flex-col gap-3">
-            <div className="grid grid-cols-2 gap-3">
+          <div className={`flex flex-col ${compact ? 'gap-2' : 'gap-3'}`}>
+            <div className={`grid ${compact ? 'grid-cols-1 gap-2' : 'grid-cols-2 gap-3'}`}>
               <GuestField label="First Name" value={getFirstName()} editValue={guestInfoDraft.firstName} onChange={(v) => setGuestInfoDraft(p => ({ ...p, firstName: v }))} isEditing={isEditingGuestInfo} />
               <GuestField label="Last Name" value={getLastName()} editValue={guestInfoDraft.lastName} onChange={(v) => setGuestInfoDraft(p => ({ ...p, lastName: v }))} isEditing={isEditingGuestInfo} />
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className={`grid ${compact ? 'grid-cols-1 gap-2' : 'grid-cols-2 gap-3'}`}>
               <GuestField label="Middle Name" value={getMiddleName()} editValue={guestInfoDraft.middleName} onChange={(v) => setGuestInfoDraft(p => ({ ...p, middleName: v }))} isEditing={isEditingGuestInfo} />
               <GuestField label="Suffix" value={getSuffix()} editValue={guestInfoDraft.suffix} onChange={(v) => setGuestInfoDraft(p => ({ ...p, suffix: v }))} isEditing={isEditingGuestInfo} />
             </div>
           </div>
         </div>
 
-        <hr className="border-card-border/40 mx-5" />
+        <hr className={`border-card-border/40 ${compact ? 'mx-4' : 'mx-5'}`} />
 
-        {/* Guest Contact */}
-        <div className="py-4 px-5">
-          <span className="text-base font-medium text-foreground block mb-3">Guest Contact</span>
-          <div className="flex flex-col gap-3">
+        <div className={`${compact ? 'py-3 px-4' : 'py-4 px-5'}`}>
+          <span className={`${compact ? 'text-sm' : 'text-base'} font-medium text-foreground block ${compact ? 'mb-2' : 'mb-3'}`}>Guest Contact</span>
+          <div className={`flex flex-col ${compact ? 'gap-2' : 'gap-3'}`}>
             <GuestField label="Email" value={getEmail()} editValue={guestInfoDraft.email} onChange={(v) => setGuestInfoDraft(p => ({ ...p, email: v }))} isEditing={isEditingGuestInfo} />
             <GuestField label="Phone" value={getPhone()} editValue={guestInfoDraft.phone} onChange={(v) => setGuestInfoDraft(p => ({ ...p, phone: v }))} isEditing={isEditingGuestInfo} />
           </div>
         </div>
 
-        <hr className="border-card-border/40 mx-5" />
+        <hr className={`border-card-border/40 ${compact ? 'mx-4' : 'mx-5'}`} />
 
-        {/* Service & Schedule */}
-        <div className="py-4 px-5">
-          <span className="text-base font-medium text-foreground block mb-3">Service & Schedule</span>
-          <div className="flex flex-col gap-3">
+        <div className={`${compact ? 'py-3 px-4' : 'py-4 px-5'}`}>
+          <span className={`${compact ? 'text-sm' : 'text-base'} font-medium text-foreground block ${compact ? 'mb-2' : 'mb-3'}`}>Service & Schedule</span>
+          <div className={`flex flex-col ${compact ? 'gap-2' : 'gap-3'}`}>
             <div className="flex flex-col gap-0.5">
               <span className="text-xs text-muted-foreground">Service</span>
               <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{appointment.service?.name || 'Selected Treatment'}</div>
@@ -179,15 +175,17 @@ export function SharedAppointmentDetail({ appointment, extraSections, actionsBar
               <span className="text-xs text-muted-foreground">Date</span>
               <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{formatShortDate(appointment.date)}</div>
             </div>
-            <div className="flex flex-col gap-0.5">
-              <span className="text-xs text-muted-foreground">Start Time</span>
-              <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">
-                {appointment.startTime ? formatClinicTime(appointment.startTime) : appointment.preferredStartTime ? `Pref: ${formatTimeString(appointment.preferredStartTime)}` : '-'}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="flex flex-col gap-0.5">
+                <span className="text-xs text-muted-foreground">Start Time</span>
+                <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">
+                  {appointment.startTime ? formatClinicTime(appointment.startTime) : appointment.preferredStartTime ? `Pref: ${formatTimeString(appointment.preferredStartTime)}` : '-'}
+                </div>
               </div>
-            </div>
-            <div className="flex flex-col gap-0.5">
-              <span className="text-xs text-muted-foreground">End Time</span>
-              <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{appointment.endTime ? formatClinicTime(appointment.endTime) : '-'}</div>
+              <div className="flex flex-col gap-0.5">
+                <span className="text-xs text-muted-foreground">End Time</span>
+                <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{appointment.endTime ? formatClinicTime(appointment.endTime) : '-'}</div>
+              </div>
             </div>
             <div className="flex flex-col gap-0.5">
               <span className="text-xs text-muted-foreground">Assign Dentist</span>
@@ -202,7 +200,7 @@ export function SharedAppointmentDetail({ appointment, extraSections, actionsBar
       </div>
 
       {actionsBar && (
-        <div className="shrink-0 border-t border-border bg-sidebar p-4">
+        <div className={`shrink-0 border-t border-border bg-sidebar ${compact ? 'p-3' : 'p-4'}`}>
           {actionsBar}
         </div>
       )}

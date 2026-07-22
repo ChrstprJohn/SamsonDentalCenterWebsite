@@ -736,16 +736,18 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                                     <span className="text-xs text-muted-foreground">Date <span className="text-destructive">*</span></span>
                                     <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{selectedThread.date ? new Date(selectedThread.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '-'}</div>
                                 </div>
-                                <div className="flex flex-col gap-0.5">
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-xs text-muted-foreground">Start Time <span className="text-destructive">*</span></span>
-                                        {selectedThread.preferredStartTime && <span className="text-xs text-muted-foreground/60">Prefered time {formatTime(selectedThread.preferredStartTime)}</span>}
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div className="flex flex-col gap-0.5">
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-xs text-muted-foreground">Start Time <span className="text-destructive">*</span></span>
+                                            {selectedThread.preferredStartTime && <span className="text-xs text-muted-foreground/60">Prefered time {formatTime(selectedThread.preferredStartTime)}</span>}
+                                        </div>
+                                        <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{formatTime(selectedThread.startTime)}</div>
                                     </div>
-                                    <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{formatTime(selectedThread.startTime)}</div>
-                                </div>
-                                <div className="flex flex-col gap-0.5">
-                                    <span className="text-xs text-muted-foreground">End Time <span className="text-destructive">*</span></span>
-                                    <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{formatTime(selectedThread.endTime)}</div>
+                                    <div className="flex flex-col gap-0.5">
+                                        <span className="text-xs text-muted-foreground">End Time <span className="text-destructive">*</span></span>
+                                        <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{formatTime(selectedThread.endTime)}</div>
+                                    </div>
                                 </div>
                                 <div className="flex flex-col gap-0.5">
                                     <span className="text-xs text-muted-foreground">Assign Dentist <span className="text-destructive">*</span></span>
