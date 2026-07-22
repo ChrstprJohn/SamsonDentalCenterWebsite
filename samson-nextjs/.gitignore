@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Tool & AI-generated output
+graphify-out/
+.graphify_labels.json
+.graphify_root
+GRAPH_REPORT.md
+.agents/
