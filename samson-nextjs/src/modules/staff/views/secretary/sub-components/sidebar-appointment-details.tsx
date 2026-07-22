@@ -296,10 +296,10 @@ export function SidebarAppointmentDetails({
             {isEditingGuestInfo && (
               <div className="flex items-center gap-2">
                 <Button variant="outline" size="sm" onClick={cancelEditGuestInfo} className="h-auto px-4 py-2 text-sm gap-1.5 max-sm:px-3 max-sm:py-1.5 max-sm:text-xs">
-                  <X className="size-3.5" /> Cancel
+                  <X className="size-4" /> Cancel
                 </Button>
                 <Button size="sm" onClick={saveGuestInfo} disabled={savingGuestInfo || !hasGuestInfoChanges} className="h-auto px-4 py-2 text-sm gap-1.5 max-sm:px-3 max-sm:py-1.5 max-sm:text-xs bg-slate-900 text-white rounded-md disabled:cursor-not-allowed">
-                  <Check className="size-3.5" /> {savingGuestInfo ? 'Saving...' : 'Save'}
+                  <Check className="size-4" /> {savingGuestInfo ? 'Saving...' : 'Save'}
                 </Button>
               </div>
             )}

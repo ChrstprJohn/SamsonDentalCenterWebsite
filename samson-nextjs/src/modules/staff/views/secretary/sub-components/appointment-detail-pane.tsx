@@ -31,25 +31,29 @@ function AppointmentDetails({ appointment, view, activeTab }: { appointment: App
   const [draftChannel, setDraftChannel] = useState<'EMAIL' | 'SMS' | 'BOTH' | 'NONE'>(channel);
   const [isEditingChannel, setIsEditingChannel] = useState(false);
   const [isSavingChannel, setIsSavingChannel] = useState(false);
+  const ch = (appointment.confirmationChannel as any) || (appointment as any).confirmation_channel || 'EMAIL';
+  const isEmailCh = ch === 'EMAIL' || ch === 'BOTH';
+  const isSmsCh = ch === 'SMS' || ch === 'BOTH';
+
   const [commState, setCommState] = useState({
-    emailConfirmationSent: Boolean((appointment as any).emailConfirmationSent || (appointment as any).email_confirmation_sent || appointment.confirmationSent || (appointment as any).confirmation_sent),
-    smsConfirmationSent: Boolean((appointment as any).smsConfirmationSent || (appointment as any).sms_confirmation_sent || appointment.confirmationSent || (appointment as any).confirmation_sent),
-    emailReminder48hSent: Boolean((appointment as any).emailReminder48hSent || (appointment as any).email_reminder_48h_sent || appointment.reminder48hSent || (appointment as any).reminder_48h_sent),
-    smsReminder48hSent: Boolean((appointment as any).smsReminder48hSent || (appointment as any).sms_reminder_48h_sent || appointment.reminder48hSent || (appointment as any).reminder_48h_sent),
-    emailReminder24hSent: Boolean((appointment as any).emailReminder24hSent || (appointment as any).email_reminder_24h_sent || appointment.reminder24hSent || (appointment as any).reminder_24h_sent),
-    smsReminder24hSent: Boolean((appointment as any).smsReminder24hSent || (appointment as any).sms_reminder_24h_sent || appointment.reminder24hSent || (appointment as any).reminder_24h_sent),
+    emailConfirmationSent: Boolean((appointment as any).emailConfirmationSent || (appointment as any).email_confirmation_sent || (appointment.confirmationSent && isEmailCh)),
+    smsConfirmationSent: Boolean((appointment as any).smsConfirmationSent || (appointment as any).sms_confirmation_sent || (appointment.confirmationSent && isSmsCh)),
+    emailReminder48hSent: Boolean((appointment as any).emailReminder48hSent || (appointment as any).email_reminder_48h_sent || (appointment.reminder48hSent && isEmailCh)),
+    smsReminder48hSent: Boolean((appointment as any).smsReminder48hSent || (appointment as any).sms_reminder_48h_sent || (appointment.reminder48hSent && isSmsCh)),
+    emailReminder24hSent: Boolean((appointment as any).emailReminder24hSent || (appointment as any).email_reminder_24h_sent || (appointment.reminder24hSent && isEmailCh)),
+    smsReminder24hSent: Boolean((appointment as any).smsReminder24hSent || (appointment as any).sms_reminder_24h_sent || (appointment.reminder24hSent && isSmsCh)),
   });
 
   useEffect(() => {
-    setChannel(((appointment.confirmationChannel as any) || (appointment as any).confirmation_channel || 'EMAIL'));
-    setDraftChannel(((appointment.confirmationChannel as any) || (appointment as any).confirmation_channel || 'EMAIL'));
+    setChannel(ch);
+    setDraftChannel(ch);
     setCommState({
-      emailConfirmationSent: Boolean((appointment as any).emailConfirmationSent || (appointment as any).email_confirmation_sent || appointment.confirmationSent || (appointment as any).confirmation_sent),
-      smsConfirmationSent: Boolean((appointment as any).smsConfirmationSent || (appointment as any).sms_confirmation_sent || appointment.confirmationSent || (appointment as any).confirmation_sent),
-      emailReminder48hSent: Boolean((appointment as any).emailReminder48hSent || (appointment as any).email_reminder_48h_sent || appointment.reminder48hSent || (appointment as any).reminder_48h_sent),
-      smsReminder48hSent: Boolean((appointment as any).smsReminder48hSent || (appointment as any).sms_reminder_48h_sent || appointment.reminder48hSent || (appointment as any).reminder_48h_sent),
-      emailReminder24hSent: Boolean((appointment as any).emailReminder24hSent || (appointment as any).email_reminder_24h_sent || appointment.reminder24hSent || (appointment as any).reminder_24h_sent),
-      smsReminder24hSent: Boolean((appointment as any).smsReminder24hSent || (appointment as any).sms_reminder_24h_sent || appointment.reminder24hSent || (appointment as any).reminder_24h_sent),
+      emailConfirmationSent: Boolean((appointment as any).emailConfirmationSent || (appointment as any).email_confirmation_sent || (appointment.confirmationSent && isEmailCh)),
+      smsConfirmationSent: Boolean((appointment as any).smsConfirmationSent || (appointment as any).sms_confirmation_sent || (appointment.confirmationSent && isSmsCh)),
+      emailReminder48hSent: Boolean((appointment as any).emailReminder48hSent || (appointment as any).email_reminder_48h_sent || (appointment.reminder48hSent && isEmailCh)),
+      smsReminder48hSent: Boolean((appointment as any).smsReminder48hSent || (appointment as any).sms_reminder_48h_sent || (appointment.reminder48hSent && isSmsCh)),
+      emailReminder24hSent: Boolean((appointment as any).emailReminder24hSent || (appointment as any).email_reminder_24h_sent || (appointment.reminder24hSent && isEmailCh)),
+      smsReminder24hSent: Boolean((appointment as any).smsReminder24hSent || (appointment as any).sms_reminder_24h_sent || (appointment.reminder24hSent && isSmsCh)),
     });
   }, [appointment]);
 
@@ -67,8 +71,6 @@ function AppointmentDetails({ appointment, view, activeTab }: { appointment: App
           (appointment as any).smsReminder48hSent = true;
           (appointment as any).sms_reminder_48h_sent = true;
         }
-        appointment.reminder48hSent = true;
-        (appointment as any).reminder_48h_sent = true;
       } else if (eventType === 'APPOINTMENT_REMINDER_24H') {
         if (targetChannel === 'EMAIL') {
           (appointment as any).emailReminder24hSent = true;
@@ -78,8 +80,6 @@ function AppointmentDetails({ appointment, view, activeTab }: { appointment: App
           (appointment as any).smsReminder24hSent = true;
           (appointment as any).sms_reminder_24h_sent = true;
         }
-        appointment.reminder24hSent = true;
-        (appointment as any).reminder_24h_sent = true;
       } else if (eventType === 'APPOINTMENT_BOOKED') {
         if (targetChannel === 'EMAIL') {
           (appointment as any).emailConfirmationSent = true;
@@ -89,8 +89,6 @@ function AppointmentDetails({ appointment, view, activeTab }: { appointment: App
           (appointment as any).smsConfirmationSent = true;
           (appointment as any).sms_confirmation_sent = true;
         }
-        appointment.confirmationSent = true;
-        (appointment as any).confirmation_sent = true;
       }
 
       setCommState((prev) => {

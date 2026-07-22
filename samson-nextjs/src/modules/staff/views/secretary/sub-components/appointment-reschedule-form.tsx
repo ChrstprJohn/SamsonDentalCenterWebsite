@@ -57,7 +57,7 @@ export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps)
           type="date"
           value={props.date}
           onChange={(e) => props.onDateSelect(e.target.value)}
-          className="text-xs border border-card-border rounded-xl px-3 py-2 bg-secondary-bg/20 text-text-primary focus:outline-none focus:border-primary-start/60 w-full"
+          className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
           required
         />
       </div>
@@ -69,7 +69,7 @@ export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps)
           <select
             value={props.doctorId}
             onChange={(e) => props.onDoctorSelect(e.target.value)}
-            className="text-xs border border-card-border rounded-xl px-3 py-2 bg-secondary-bg/20 text-text-primary focus:outline-none focus:border-primary-start/60 w-full"
+            className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
             required
           >
             <option value="">Select Dentist...</option>
@@ -88,7 +88,7 @@ export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps)
             type="time"
             value={props.startTime}
             onChange={(e) => props.onStartTimeChange(e.target.value)}
-            className="text-xs border border-card-border rounded-xl px-3 py-2 bg-secondary-bg/20 text-text-primary focus:outline-none focus:border-primary-start/60"
+            className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
             required
           />
         </div>
@@ -98,7 +98,7 @@ export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps)
             type="time"
             value={props.endTime}
             onChange={(e) => props.onEndTimeChange(e.target.value)}
-            className="text-xs border border-card-border rounded-xl px-3 py-2 bg-secondary-bg/20 text-text-primary focus:outline-none focus:border-primary-start/60"
+            className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
             required
           />
         </div>
@@ -107,12 +107,12 @@ export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps)
       {/* 4. Justification */}
       <div>
         <label className="text-[10px] text-text-muted mb-0.5 block font-bold uppercase">Justification Reason <span className="text-red-400">*</span></label>
-        <Textarea placeholder="Why is this being rescheduled?" value={props.justification} onChange={(event) => props.onJustificationChange(event.target.value)} className="text-xs w-full min-h-[60px]" required />
+        <Textarea placeholder="Why is this being rescheduled?" value={props.justification} onChange={(event) => props.onJustificationChange(event.target.value)} className="w-full min-h-[60px]" required />
       </div>
       
       <div className="flex gap-2">
-        <Button type="submit" disabled={props.isSubmitting || !props.date || !props.activeDoctorId || !props.startTime || !props.endTime || !props.justification.trim()} className="text-xs py-1.5 flex-1 bg-primary text-white">{props.isSubmitting ? 'Saving...' : 'Confirm Reschedule'}</Button>
-        <Button type="button" onClick={props.onBack} className="text-xs py-1.5 flex-1 border border-card-border text-text-primary bg-transparent">Back</Button>
+        <Button type="submit" disabled={props.isSubmitting || !props.date || !props.activeDoctorId || !props.startTime || !props.endTime || !props.justification.trim()} className="text-sm py-1.5 flex-1 bg-primary text-white">{props.isSubmitting ? 'Saving...' : 'Confirm Reschedule'}</Button>
+        <Button type="button" onClick={props.onBack} className="text-sm py-1.5 flex-1 border border-card-border text-text-primary bg-transparent">Back</Button>
       </div>
     </form>
   );

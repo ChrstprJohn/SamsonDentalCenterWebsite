@@ -105,38 +105,43 @@ const appointmentDbSchema = z.object({
   })).nullable().optional(),
 });
 
-export const appointmentDtoSchema = appointmentDbSchema.transform((data) => ({
-  id: data.id,
-  patientId: data.patient_id || null,
-  dependentId: data.dependent_id || null,
-  serviceId: data.service_id,
-  doctorId: data.doctor_id || null,
-  date: data.date,
-  startTime: data.start_time || null,
-  endTime: data.end_time || null,
-  status: data.status,
-  source: data.source,
-  doctorAssignmentSource: data.doctor_assignment_source ?? 'SYSTEM',
-  preferredStartTime: data.preferred_start_time || null,
-  proposedPreferredStartTime: data.proposed_preferred_start_time || null,
-  userNote: data.user_note || null,
-  statusReason: data.status_reason || null,
-  proposedDate: data.proposed_date || null,
-  proposedStartTime: data.proposed_start_time || null,
-  proposedEndTime: data.proposed_end_time || null,
-  proposedDoctorId: data.proposed_doctor_id || null,
-  rescheduleCount: data.reschedule_count ?? 0,
-  reminder24hSent: data.reminder_24h_sent ?? false,
-  reminder48hSent: data.reminder_48h_sent ?? false,
-  confirmationChannel: (data.confirmation_channel as 'EMAIL' | 'SMS' | 'BOTH' | 'NONE') ?? 'EMAIL',
-  confirmationSent: data.confirmation_sent ?? false,
-  emailConfirmationSent: Boolean(data.email_confirmation_sent || data.confirmation_sent),
-  smsConfirmationSent: Boolean(data.sms_confirmation_sent || data.confirmation_sent),
-  emailReminder48hSent: Boolean(data.email_reminder_48h_sent || data.reminder_48h_sent),
-  smsReminder48hSent: Boolean(data.sms_reminder_48h_sent || data.reminder_48h_sent),
-  emailReminder24hSent: Boolean(data.email_reminder_24h_sent || data.reminder_24h_sent),
-  smsReminder24hSent: Boolean(data.sms_reminder_24h_sent || data.reminder_24h_sent),
-  paymentReceiptSent: data.payment_receipt_sent ?? false,
+export const appointmentDtoSchema = appointmentDbSchema.transform((data) => {
+  const ch = (data.confirmation_channel as string) || 'EMAIL';
+  const isEmailCh = ch === 'EMAIL' || ch === 'BOTH';
+  const isSmsCh = ch === 'SMS' || ch === 'BOTH';
+
+  return {
+    id: data.id,
+    patientId: data.patient_id || null,
+    dependentId: data.dependent_id || null,
+    serviceId: data.service_id,
+    doctorId: data.doctor_id || null,
+    date: data.date,
+    startTime: data.start_time || null,
+    endTime: data.end_time || null,
+    status: data.status,
+    source: data.source,
+    doctorAssignmentSource: data.doctor_assignment_source ?? 'SYSTEM',
+    preferredStartTime: data.preferred_start_time || null,
+    proposedPreferredStartTime: data.proposed_preferred_start_time || null,
+    userNote: data.user_note || null,
+    statusReason: data.status_reason || null,
+    proposedDate: data.proposed_date || null,
+    proposedStartTime: data.proposed_start_time || null,
+    proposedEndTime: data.proposed_end_time || null,
+    proposedDoctorId: data.proposed_doctor_id || null,
+    rescheduleCount: data.reschedule_count ?? 0,
+    reminder24hSent: data.reminder_24h_sent ?? false,
+    reminder48hSent: data.reminder_48h_sent ?? false,
+    confirmationChannel: (data.confirmation_channel as 'EMAIL' | 'SMS' | 'BOTH' | 'NONE') ?? 'EMAIL',
+    confirmationSent: data.confirmation_sent ?? false,
+    emailConfirmationSent: Boolean(data.email_confirmation_sent || (data.confirmation_sent && isEmailCh)),
+    smsConfirmationSent: Boolean(data.sms_confirmation_sent || (data.confirmation_sent && isSmsCh)),
+    emailReminder48hSent: Boolean(data.email_reminder_48h_sent || (data.reminder_48h_sent && isEmailCh)),
+    smsReminder48hSent: Boolean(data.sms_reminder_48h_sent || (data.reminder_48h_sent && isSmsCh)),
+    emailReminder24hSent: Boolean(data.email_reminder_24h_sent || (data.reminder_24h_sent && isEmailCh)),
+    smsReminder24hSent: Boolean(data.sms_reminder_24h_sent || (data.reminder_24h_sent && isSmsCh)),
+    paymentReceiptSent: data.payment_receipt_sent ?? false,
   createdAt: data.created_at,
   updatedAt: data.updated_at,
   doctor: data.doctor ? appointmentDoctorSchema.parse(data.doctor) : null,
@@ -165,7 +170,8 @@ export const appointmentDtoSchema = appointmentDbSchema.transform((data) => ({
     email: data.guest_contacts[0].email || null,
     phone: data.guest_contacts[0].phone_number || null,
   } : null,
-}));
+  };
+});
 
 export type AppointmentDto = z.infer<typeof appointmentDtoSchema>;
 

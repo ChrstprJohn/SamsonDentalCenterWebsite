@@ -134,10 +134,10 @@ export function SharedAppointmentDetail({ appointment, extraSections, actionsBar
             {isEditingGuestInfo && (
               <div className="flex items-center gap-2">
                 <Button variant="outline" size="sm" onClick={cancelEditGuestInfo} className="h-auto px-4 py-2 text-sm gap-1.5 max-sm:px-3 max-sm:py-1.5 max-sm:text-xs">
-                  <X className="size-3.5" /> Cancel
+                  <X className="size-4" /> Cancel
                 </Button>
                 <Button size="sm" onClick={saveGuestInfo} disabled={savingGuestInfo || !hasGuestInfoChanges} className="h-auto px-4 py-2 text-sm gap-1.5 max-sm:px-3 max-sm:py-1.5 max-sm:text-xs bg-slate-900 text-white rounded-md disabled:cursor-not-allowed">
-                  <Check className="size-3.5" /> {savingGuestInfo ? 'Saving...' : 'Save'}
+                  <Check className="size-4" /> {savingGuestInfo ? 'Saving...' : 'Save'}
                 </Button>
               </div>
             )}
@@ -215,9 +215,9 @@ function GuestField({ label, value, editValue, onChange, isEditing }: { label: s
     <div className="flex flex-col gap-0.5">
       <span className="text-xs text-muted-foreground">{label}</span>
       {isEditing && onChange ? (
-        <input value={editValue} onChange={(e) => onChange(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border" />
+        <input value={editValue} onChange={(e) => onChange(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground leading-5 focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border" />
       ) : (
-        <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{value}</div>
+        <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground leading-5 border-card-border cursor-default">{value}</div>
       )}
     </div>
   );
