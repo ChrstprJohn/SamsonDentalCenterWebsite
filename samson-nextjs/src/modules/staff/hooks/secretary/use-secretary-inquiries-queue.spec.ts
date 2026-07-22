@@ -103,6 +103,7 @@ describe('useSecretaryInquiriesQueue', () => {
       guestPhone: '+639171111111',
       guestEmail: 'ella@example.com',
       doctorAssignmentSource: 'USER',
+      confirmationChannel: 'EMAIL',
     });
   });
 });

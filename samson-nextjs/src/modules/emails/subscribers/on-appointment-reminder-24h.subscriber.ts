@@ -22,6 +22,7 @@ export const onAppointmentReminder24hSubscriber = {
         patient_id,
         date,
         start_time,
+        confirmation_channel,
         service:services(name, duration_minutes),
         doctor:users!appointments_doctor_id_fkey(first_name, last_name),
         patient:users!appointments_patient_id_fkey(first_name, last_name, email),
@@ -32,6 +33,12 @@ export const onAppointmentReminder24hSubscriber = {
 
     if (appError || !appointment) {
       throw new Error(`Failed to fetch appointment for 24h reminder: ${appError?.message || 'Not found'}`);
+    }
+
+    const channel = (appointment as any).confirmation_channel || 'EMAIL';
+    if (channel === 'NONE' || channel === 'SMS') {
+      console.info(`[24H Reminder] Skipping email dispatch for appointment ${appointmentId}: Confirmation channel is ${channel}.`);
+      return;
     }
 
     if (!email) {

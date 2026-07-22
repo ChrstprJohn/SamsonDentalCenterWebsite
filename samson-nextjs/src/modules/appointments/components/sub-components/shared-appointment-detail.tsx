@@ -143,10 +143,14 @@ export function SharedAppointmentDetail({ appointment, extraSections, actionsBar
             )}
           </div>
           <div className="flex flex-col gap-3">
-            <GuestField label="First Name" value={getFirstName()} editValue={guestInfoDraft.firstName} onChange={(v) => setGuestInfoDraft(p => ({ ...p, firstName: v }))} isEditing={isEditingGuestInfo} />
-            <GuestField label="Last Name" value={getLastName()} editValue={guestInfoDraft.lastName} onChange={(v) => setGuestInfoDraft(p => ({ ...p, lastName: v }))} isEditing={isEditingGuestInfo} />
-            <GuestField label="Middle Name" value={getMiddleName()} editValue={guestInfoDraft.middleName} onChange={(v) => setGuestInfoDraft(p => ({ ...p, middleName: v }))} isEditing={isEditingGuestInfo} />
-            <GuestField label="Suffix" value={getSuffix()} editValue={guestInfoDraft.suffix} onChange={(v) => setGuestInfoDraft(p => ({ ...p, suffix: v }))} isEditing={isEditingGuestInfo} />
+            <div className="grid grid-cols-2 gap-3">
+              <GuestField label="First Name" value={getFirstName()} editValue={guestInfoDraft.firstName} onChange={(v) => setGuestInfoDraft(p => ({ ...p, firstName: v }))} isEditing={isEditingGuestInfo} />
+              <GuestField label="Last Name" value={getLastName()} editValue={guestInfoDraft.lastName} onChange={(v) => setGuestInfoDraft(p => ({ ...p, lastName: v }))} isEditing={isEditingGuestInfo} />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <GuestField label="Middle Name" value={getMiddleName()} editValue={guestInfoDraft.middleName} onChange={(v) => setGuestInfoDraft(p => ({ ...p, middleName: v }))} isEditing={isEditingGuestInfo} />
+              <GuestField label="Suffix" value={getSuffix()} editValue={guestInfoDraft.suffix} onChange={(v) => setGuestInfoDraft(p => ({ ...p, suffix: v }))} isEditing={isEditingGuestInfo} />
+            </div>
           </div>
         </div>
 

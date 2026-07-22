@@ -26,6 +26,7 @@ export function useSecretaryPendingRequests() {
   const [stagedStatus, setStagedStatus] = useState<PendingDecision>('');
   const [stagedReason, setStagedReason] = useState('');
   const [customReason, setCustomReason] = useState('');
+  const [confirmationChannel, setConfirmationChannel] = useState<'EMAIL' | 'SMS' | 'BOTH' | 'NONE'>('EMAIL');
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
@@ -242,10 +243,10 @@ export function useSecretaryPendingRequests() {
 
   return {
     appointments, selectedAppointment, selectedAppointmentId, patientDetails, doctorSchedule, conflictingAppointment,
-    stagedStatus, stagedReason, customReason, isLoading, isSubmitting, isLoadingDetails, isEditing,
+    stagedStatus, stagedReason, customReason, confirmationChannel, isLoading, isSubmitting, isLoadingDetails, isEditing,
     editServices, editServiceId, editDoctors, editDoctorId, editAvailableDates, editDate, editCurrentMonth,
     editStartTime, editEndTime, editNote, isLoadingEditDays,
-    selectAppointment, setDecision, setReason, setCustomReason, toggleEditing, setEditService, setEditDoctor,
+    selectAppointment, setDecision, setReason, setCustomReason, setConfirmationChannel, toggleEditing, setEditService, setEditDoctor,
     setEditAppointmentDate, setEditCurrentMonth, setEditNote, finishAppointmentReview,
     setEditStartTime, setEditEndTime,
   };

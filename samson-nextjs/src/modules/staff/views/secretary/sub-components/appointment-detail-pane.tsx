@@ -8,8 +8,9 @@ import { SharedAppointmentDetail } from '@/modules/appointments/components/sub-c
 import { AppointmentCancelForm } from './appointment-cancel-form';
 import { AppointmentRescheduleForm } from './appointment-reschedule-form';
 import { AppointmentStatusHistory } from './appointment-status-history';
-import { Send, Calendar } from 'lucide-react';
+import { Send, Calendar, Edit2 } from 'lucide-react';
 import { resendReminderAction } from '@/modules/appointments/actions/status/resend-reminder.action';
+import { updateConfirmationChannelAction } from '@/modules/appointments/actions/status/update-confirmation-channel.action';
 
 interface AppointmentDetailPaneProps {
   view: any;
@@ -27,12 +28,18 @@ function AppointmentDetails({ appointment, view, activeTab }: { appointment: App
     reminder24hSent: appointment.reminder24hSent,
     reminder48hSent: appointment.reminder48hSent,
   });
+  const [currentChannel, setCurrentChannel] = useState<'EMAIL' | 'SMS' | 'BOTH' | 'NONE'>(
+    (appointment.confirmationChannel as any) || 'EMAIL'
+  );
+  const [isEditingChannel, setIsEditingChannel] = useState(false);
+  const [isSavingChannel, setIsSavingChannel] = useState(false);
 
   useEffect(() => {
     setReminderState({
       reminder24hSent: appointment.reminder24hSent,
       reminder48hSent: appointment.reminder48hSent,
     });
+    setCurrentChannel(((appointment.confirmationChannel as any) || 'EMAIL'));
   }, [appointment]);
 
   const handleResend = async (type: '24H' | '48H') => {
@@ -50,6 +57,20 @@ function AppointmentDetails({ appointment, view, activeTab }: { appointment: App
     setResendingType(null);
   };
 
+  const handleUpdateChannel = async (newChannel: 'EMAIL' | 'SMS' | 'BOTH' | 'NONE') => {
+    setIsSavingChannel(true);
+    const res = await updateConfirmationChannelAction({
+      appointmentId: appointment.id,
+      confirmationChannel: newChannel,
+    });
+    if (res.success) {
+      setCurrentChannel(newChannel);
+      appointment.confirmationChannel = newChannel;
+      setIsEditingChannel(false);
+    }
+    setIsSavingChannel(false);
+  };
+
   return (
     <SharedAppointmentDetail
       appointment={appointment}
@@ -58,7 +79,47 @@ function AppointmentDetails({ appointment, view, activeTab }: { appointment: App
           <hr className="border-card-border/40 mx-5" />
           {/* Notification Reminders */}
           <div className="py-4 px-5">
-            <span className="text-base font-medium text-foreground block mb-3">Notification Reminders</span>
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <span className="text-base font-medium text-foreground">Notification Reminders</span>
+                <span className="px-2 py-0.5 text-[10px] font-bold rounded-md bg-primary/10 text-primary border border-primary/20">
+                  {currentChannel}
+                </span>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 px-2 text-xs text-muted-foreground hover:text-foreground gap-1"
+                onClick={() => setIsEditingChannel(!isEditingChannel)}
+              >
+                <Edit2 className="size-3" />
+                {isEditingChannel ? 'Cancel' : 'Edit'}
+              </Button>
+            </div>
+
+            {isEditingChannel && (
+              <div className="mb-3 p-3.5 bg-muted/20 border border-card-border/60 rounded-xl space-y-2">
+                <span className="text-xs font-semibold text-muted-foreground block">Select Primary Channel</span>
+                <div className="grid grid-cols-4 gap-1.5">
+                  {(['EMAIL', 'SMS', 'BOTH', 'NONE'] as const).map((channel) => (
+                    <button
+                      key={channel}
+                      type="button"
+                      disabled={isSavingChannel}
+                      onClick={() => handleUpdateChannel(channel)}
+                      className={`py-1.5 text-[10px] font-bold rounded-lg border transition-all ${
+                        currentChannel === channel
+                          ? 'bg-primary text-primary-foreground shadow-sm border-primary'
+                          : 'bg-card text-muted-foreground border-card-border hover:text-foreground'
+                      }`}
+                    >
+                      {channel}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="bg-secondary-bg/20 border border-card-border/60 rounded-xl p-3 flex flex-col justify-between gap-2">
                 <div>

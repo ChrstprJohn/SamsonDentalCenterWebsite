@@ -114,6 +114,7 @@ export type Database = {
           status_reason: string | null
           updated_at: string
           user_note: string | null
+          confirmation_channel: string
         }
         Insert: {
           clinical_notes?: string | null
@@ -131,6 +132,7 @@ export type Database = {
           status_reason?: string | null
           updated_at?: string
           user_note?: string | null
+          confirmation_channel?: string
         }
         Update: {
           clinical_notes?: string | null
@@ -148,6 +150,7 @@ export type Database = {
           status_reason?: string | null
           updated_at?: string
           user_note?: string | null
+          confirmation_channel?: string
         }
         Relationships: [
           {

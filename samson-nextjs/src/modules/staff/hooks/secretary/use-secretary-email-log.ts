@@ -14,29 +14,33 @@ export function useSecretaryEmailLog() {
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
   const [selectedEmailId, setSelectedEmailId] = useState<string | null>(null);
   const [resendingId, setResendingId] = useState<string | null>(null);
+  const [isRetryingAll, setIsRetryingAll] = useState(false);
+  const [onlyAppointments, setOnlyAppointments] = useState(true);
+
+  const fetchLogs = async () => {
+    setIsLoading(true);
+    const res = await getOutboxLogsAction();
+    if (res.success && res.data) {
+      const mapped: EmailLog[] = res.data.map((log: any) => ({
+        id: log.id,
+        recipient: (log.payload as any)?.email || (log.payload as any)?.guestEmail || 'system',
+        subject: log.eventType,
+        type: log.eventType,
+        timestamp: log.createdAt,
+        status: log.status === 'PROCESSED' ? 'Sent' : log.status === 'FAILED' ? 'Failed' : 'Pending',
+        rawStatus: log.status,
+        content: JSON.stringify(log.payload, null, 2),
+        errorLogs: log.errorLogs || null,
+        retryCount: log.retryCount || 0,
+      }));
+      setLiveEmails(mapped);
+    } else {
+      setLiveEmails([]);
+    }
+    setIsLoading(false);
+  };
 
   useEffect(() => {
-    async function fetchLogs() {
-      setIsLoading(true);
-      const res = await getOutboxLogsAction();
-      console.log('Email logs response:', res);
-      if (res.success && res.data) {
-        // Map database outbox fields to EmailLog view schema fields
-        const mapped: EmailLog[] = res.data.map((log: any) => ({
-          id: log.id,
-          recipient: (log.payload as any)?.email || (log.payload as any)?.guestEmail || 'system',
-          subject: log.eventType,
-          type: log.eventType,
-          timestamp: log.createdAt,
-          status: log.status === 'PROCESSED' ? 'Sent' : log.status === 'FAILED' ? 'Failed' : 'Pending',
-          content: JSON.stringify(log.payload, null, 2),
-        }));
-        setLiveEmails(mapped);
-      } else {
-        setLiveEmails([]);
-      }
-      setIsLoading(false);
-    }
     fetchLogs();
   }, []);
 
@@ -45,10 +49,17 @@ export function useSecretaryEmailLog() {
     [liveEmails, selectedEmailId]
   );
 
+  const AUTH_EVENT_TYPES = ['PATIENT_REGISTERED', 'PASSWORD_RESET_REQUESTED'];
+
   const filteredEmails = useMemo(() => {
     const normalizedSearch = searchTerm.toLowerCase();
 
     return liveEmails.filter((email) => {
+      // Filter out auth events if onlyAppointments is enabled
+      if (onlyAppointments && AUTH_EVENT_TYPES.includes(email.type)) {
+        return false;
+      }
+
       const matchesSearch =
         email.recipient.toLowerCase().includes(normalizedSearch) ||
         email.subject.toLowerCase().includes(normalizedSearch);
@@ -58,34 +69,37 @@ export function useSecretaryEmailLog() {
 
       return matchesSearch && matchesStatus;
     });
-  }, [liveEmails, searchTerm, statusFilter]);
+  }, [liveEmails, searchTerm, statusFilter, onlyAppointments]);
 
   const handleResend = async (id: string) => {
     setResendingId(id);
     const res = await resendEmailAction({ id });
     if (res.error) {
       alert(res.error);
-      // Refresh logs to show updated status
-      const refreshRes = await getOutboxLogsAction();
-      if (refreshRes.success && refreshRes.data) {
-        const mapped: EmailLog[] = refreshRes.data.map((log: any) => ({
-          id: log.id,
-          recipient: (log.payload as any)?.email || (log.payload as any)?.guestEmail || 'system',
-          subject: log.eventType,
-          type: log.eventType,
-          timestamp: log.createdAt,
-          status: log.status === 'PROCESSED' ? 'Sent' : log.status === 'FAILED' ? 'Failed' : 'Pending',
-          content: JSON.stringify(log.payload, null, 2),
-        }));
-        setLiveEmails(mapped);
-      }
+      await fetchLogs();
     } else {
       alert('Email resent successfully!');
-      setLiveEmails((prev) =>
-        prev.map((e) => (e.id === id ? { ...e, status: 'Sent' } : e))
-      );
+      await fetchLogs();
     }
     setResendingId(null);
+  };
+
+  const handleRetryAllFailed = async () => {
+    const failedEmails = filteredEmails.filter((e) => e.status === 'Failed');
+    if (failedEmails.length === 0) {
+      alert('No failed emails to retry.');
+      return;
+    }
+
+    setIsRetryingAll(true);
+    let successCount = 0;
+    for (const eml of failedEmails) {
+      const res = await resendEmailAction({ id: eml.id });
+      if (!res.error) successCount++;
+    }
+    alert(`Batch retry complete. ${successCount}/${failedEmails.length} resent successfully.`);
+    await fetchLogs();
+    setIsRetryingAll(false);
   };
 
   return {
@@ -98,8 +112,13 @@ export function useSecretaryEmailLog() {
     selectedEmail,
     filteredEmails,
     handleResend,
+    handleRetryAllFailed,
+    refreshLogs: fetchLogs,
     resendingId,
+    isRetryingAll,
     isLoading,
+    onlyAppointments,
+    setOnlyAppointments,
   };
 }
 

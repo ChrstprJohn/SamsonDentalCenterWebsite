@@ -9,10 +9,12 @@ interface PendingDecisionFormProps {
   stagedStatus: PendingDecision;
   stagedReason: string;
   customReason: string;
+  confirmationChannel?: 'EMAIL' | 'SMS' | 'BOTH' | 'NONE';
   isSubmitting: boolean;
   onDecisionChange: (status: Exclude<PendingDecision, ''>) => void;
   onReasonChange: (reason: string) => void;
   onCustomReasonChange: (reason: string) => void;
+  onConfirmationChannelChange?: (channel: 'EMAIL' | 'SMS' | 'BOTH' | 'NONE') => void;
   onConfirm: () => void;
   isLockedForApproval?: boolean;
 }
@@ -71,12 +73,35 @@ export function PendingDecisionForm(props: PendingDecisionFormProps) {
         </div>
       </div>
       {props.stagedStatus && (
-        <div className="flex flex-col gap-2 transition-all">
-          <span className="text-xs font-bold text-text-secondary">Remarks / Reason (Required)</span>
-          <Select value={props.stagedReason} onChange={(event) => props.onReasonChange(event.target.value)} className="text-xs py-2 px-3 rounded-lg border border-card-border" options={REASONS[props.stagedStatus]} />
-          {props.stagedReason === 'CUSTOM' && (
-            <Textarea value={props.customReason} onChange={(event) => props.onCustomReasonChange(event.target.value)} placeholder="Enter your custom justification reason..." rows={2} className="text-xs mt-1" />
+        <div className="flex flex-col gap-3 transition-all">
+          {props.stagedStatus === 'APPROVED' && (
+            <div className="flex flex-col gap-1.5">
+              <span className="text-xs font-bold text-text-secondary">Notification Channel</span>
+              <div className="grid grid-cols-4 gap-1 bg-muted/20 p-1 rounded-lg border border-card-border/40">
+                {(['EMAIL', 'SMS', 'BOTH', 'NONE'] as const).map((channel) => (
+                  <button
+                    key={channel}
+                    type="button"
+                    onClick={() => props.onConfirmationChannelChange?.(channel)}
+                    className={`py-1.5 text-[10px] font-bold rounded-md transition-all ${
+                      (props.confirmationChannel || 'EMAIL') === channel
+                        ? 'bg-primary text-primary-foreground shadow-sm'
+                        : 'text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    {channel}
+                  </button>
+                ))}
+              </div>
+            </div>
           )}
+          <div className="flex flex-col gap-1.5">
+            <span className="text-xs font-bold text-text-secondary">Remarks / Reason (Required)</span>
+            <Select value={props.stagedReason} onChange={(event) => props.onReasonChange(event.target.value)} className="text-xs py-2 px-3 rounded-lg border border-card-border" options={REASONS[props.stagedStatus]} />
+            {props.stagedReason === 'CUSTOM' && (
+              <Textarea value={props.customReason} onChange={(event) => props.onCustomReasonChange(event.target.value)} placeholder="Enter your custom justification reason..." rows={2} className="text-xs mt-1" />
+            )}
+          </div>
         </div>
       )}
       <Button

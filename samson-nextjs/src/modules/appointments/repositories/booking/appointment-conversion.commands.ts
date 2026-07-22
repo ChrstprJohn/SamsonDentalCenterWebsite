@@ -22,6 +22,7 @@ export const convertInquiryToAppointmentCommand = (supabase: SupabaseClient) => 
       p_phone_number: data.guestPhone || null,
       p_email: data.guestEmail || null,
       p_doctor_assignment_source: data.doctorAssignmentSource,
+      p_confirmation_channel: data.confirmationChannel || 'EMAIL',
     });
 
     if (error || !appointmentId) {

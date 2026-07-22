@@ -90,6 +90,9 @@ export interface EmailLog {
   timestamp: string;
   status: 'Sent' | 'Failed' | 'Pending';
   content?: string;
+  errorLogs?: string | null;
+  retryCount?: number;
+  rawStatus?: 'PENDING' | 'PROCESSING' | 'PROCESSED' | 'FAILED';
 }
 
 export interface AuditLog {

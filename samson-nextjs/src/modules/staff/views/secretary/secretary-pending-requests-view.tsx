@@ -63,10 +63,12 @@ export function SecretaryPendingRequestsView() {
                   stagedStatus={view.stagedStatus}
                   stagedReason={view.stagedReason}
                   customReason={view.customReason}
+                  confirmationChannel={view.confirmationChannel}
                   isSubmitting={view.isSubmitting}
                   onDecisionChange={view.setDecision}
                   onReasonChange={view.setReason}
                   onCustomReasonChange={view.setCustomReason}
+                  onConfirmationChannelChange={view.setConfirmationChannel}
                   onConfirm={() => view.finishAppointmentReview(view.selectedAppointment.id)}
                 />
               </div>

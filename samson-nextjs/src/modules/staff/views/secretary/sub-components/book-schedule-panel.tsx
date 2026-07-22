@@ -186,7 +186,7 @@ function formatTimeLabel(isoStr: string) {
 }
 
 function ConfirmationChannelPicker({
-  confirmationChannel = 'EMAIL',
+  confirmationChannel = 'NONE',
   setConfirmationChannel,
 }: {
   confirmationChannel?: 'EMAIL' | 'SMS' | 'NONE';
@@ -195,7 +195,7 @@ function ConfirmationChannelPicker({
   if (!setConfirmationChannel) return null;
   return (
     <div className="border border-card-border/60 rounded-2xl p-4 bg-secondary-bg/10 flex flex-col gap-2">
-      <label className="text-[9px] font-bold text-text-secondary uppercase">Confirmation Channel</label>
+      <label className="text-[9px] font-bold text-text-secondary uppercase">Notification Channel</label>
       <div className="flex gap-2">
         {(['EMAIL', 'SMS', 'NONE'] as const).map((channel) => (
           <button

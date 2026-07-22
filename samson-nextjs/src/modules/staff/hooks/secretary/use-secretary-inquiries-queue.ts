@@ -38,6 +38,7 @@ export function useSecretaryInquiriesQueue() {
   const [guestSuffix, setGuestSuffix] = useState('');
   const [guestPhone, setGuestPhone] = useState('');
   const [guestEmail, setGuestEmail] = useState('');
+  const [confirmationChannel, setConfirmationChannel] = useState<'EMAIL' | 'SMS' | 'BOTH' | 'NONE'>('EMAIL');
   const [patientMode, setPatientMode] = useState<InquiryPatientMode>('GUEST');
   const [patientSearchQuery, setPatientSearchQuery] = useState('');
   const [patientSearchResults, setPatientSearchResults] = useState<any[]>([]);
@@ -306,6 +307,7 @@ export function useSecretaryInquiriesQueue() {
           guestPhone: guestPhone || undefined,
           guestEmail: guestEmail || undefined,
           doctorAssignmentSource: (stagedInquiryDoctor && stagedInquiryDoctor !== 'ANY') ? 'USER' as const : 'SYSTEM' as const,
+          confirmationChannel: confirmationChannel || 'EMAIL',
         };
         const res = await convertInquiryAction(payload);
         if (res.success) {
@@ -352,6 +354,7 @@ export function useSecretaryInquiriesQueue() {
     selectSlot, stagedInquiryNote, setStagedInquiryNote,
     stagedSecretaryNotes, setSecretaryNotes, guestFirstName, setGuestFirstName, guestMiddleName, setGuestMiddleName,
     guestLastName, setGuestLastName, guestSuffix, setGuestSuffix, guestPhone, setGuestPhone, guestEmail, setGuestEmail,
+    confirmationChannel, setConfirmationChannel,
     patientMode, setPatientMode, patientSearchQuery, setPatientSearchQuery, patientSearchResults, isSearchingPatients,
     selectedPatient, selectPatient, clearPatient, services, currentMonth, setCurrentMonth, availableDates,
     availableDoctors, timeslots, isLoadingServices, isLoadingDays: scheduler.loadingKey === 'dates',

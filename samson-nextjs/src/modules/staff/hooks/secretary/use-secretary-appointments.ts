@@ -109,9 +109,16 @@ export function useSecretaryAppointments() {
       return `${appointment.dependent.firstName} ${appointment.dependent.lastName} (Dependent: ${holder})`;
     }
     if (appointment.source === 'STAFF_CREATED' && !appointment.patientId) {
-      return `${appointment.patient?.firstName ?? 'Guest'} ${appointment.patient?.lastName ?? ''} (Guest)`;
+      if (appointment.guestContact) {
+        return `${appointment.guestContact.firstName ?? ''} ${appointment.guestContact.lastName ?? ''}`.trim() || 'Guest Patient';
+      }
+      return 'Guest Patient';
     }
-    return appointment.patient ? `${appointment.patient.firstName} ${appointment.patient.lastName}` : 'Guest Patient';
+    return appointment.patient
+      ? `${appointment.patient.firstName} ${appointment.patient.lastName}`
+      : appointment.guestContact
+        ? `${appointment.guestContact.firstName ?? ''} ${appointment.guestContact.lastName ?? ''}`.trim() || 'Guest Patient'
+        : 'Guest Patient';
   };
 
   const filteredAppointments = useMemo(() => appointments.filter((appointment) => {

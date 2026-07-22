@@ -83,7 +83,7 @@ describe('useSecretaryBookAppointment', () => {
       suffix: 'Jr.',
       phoneNumber: '+639171234567',
       email: 'lia@example.com',
-      confirmationChannel: 'EMAIL',
+      confirmationChannel: 'NONE',
     });
     expect(result.current.booked).toBe(true);
   });

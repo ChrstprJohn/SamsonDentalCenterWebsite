@@ -250,11 +250,11 @@ export function SecretaryPendingRequestsViewV2() {
               </div>
 
               {/* Section 1b: Guest Contact */}
-              <div className="py-4">
-                <span className="text-base font-medium text-foreground block mb-3">Guest Contact</span>
+              <div className="py-4 space-y-3">
+                <span className="text-base font-medium text-foreground block">Guest Contact</span>
 
                 {!isEditingPatient ? (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                   <div className="flex flex-col gap-0.5">
                     <span className="text-xs text-muted-foreground">Email</span>
                     <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{inquiriesView.guestEmail || '-'}</div>
@@ -451,6 +451,25 @@ export function SecretaryPendingRequestsViewV2() {
                       </div>
                       {inquiriesView.stagedInquiryAction === 'CONVERT' ? (
                         <div className="space-y-2">
+                          <div className="flex flex-col gap-1.5 mb-2">
+                            <span className="text-xs text-muted-foreground font-medium">Notification Channel</span>
+                            <div className="grid grid-cols-4 gap-1 bg-muted/20 p-1 rounded-lg border border-card-border/40">
+                              {(['EMAIL', 'SMS', 'BOTH', 'NONE'] as const).map((channel) => (
+                                <button
+                                  key={channel}
+                                  type="button"
+                                  onClick={() => inquiriesView.setConfirmationChannel?.(channel)}
+                                  className={`py-1.5 text-[10px] font-bold rounded-md transition-all ${
+                                    (inquiriesView.confirmationChannel || 'EMAIL') === channel
+                                      ? 'bg-primary text-primary-foreground shadow-sm'
+                                      : 'text-muted-foreground hover:text-foreground'
+                                  }`}
+                                >
+                                  {channel}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
                           <select
                             value={approvalReason}
                             onChange={(e) => {

@@ -25,6 +25,7 @@ export const convertInquirySchema = z
     guestPhone: cleanOptionalString,
     guestEmail: cleanOptionalString,
     doctorAssignmentSource: z.enum(['SYSTEM', 'USER']).optional().default('SYSTEM'),
+    confirmationChannel: z.enum(['EMAIL', 'SMS', 'BOTH', 'NONE']).optional().default('EMAIL'),
   })
   .superRefine((data, ctx) => {
     // Chronological guard — HH:MM strings compare correctly lexicographically

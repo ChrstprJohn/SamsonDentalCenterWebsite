@@ -59,7 +59,7 @@ export function useSecretaryBookAppointment() {
   const [inlineError, setInlineError] = useState('');
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [booked, setBooked] = useState(false);
-  const [confirmationChannel, setConfirmationChannel] = useState<'EMAIL' | 'SMS' | 'NONE' | 'BOTH'>('EMAIL');
+  const [confirmationChannel, setConfirmationChannel] = useState<'EMAIL' | 'SMS' | 'NONE' | 'BOTH'>('NONE');
 
   const availableDates: string[] = [];
   const availableDoctors: any[] = [];
@@ -218,7 +218,7 @@ export function useSecretaryBookAppointment() {
     setPatientNote('');
     setBooked(false);
     setInlineError('');
-    setConfirmationChannel('EMAIL');
+    setConfirmationChannel('NONE');
     setSelectedAppointmentDetails(null);
   };
 

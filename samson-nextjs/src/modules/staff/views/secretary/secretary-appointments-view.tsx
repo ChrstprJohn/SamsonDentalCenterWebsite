@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import { useSecretaryAppointments } from '../../hooks/secretary/use-secretary-appointments';
 import { AppointmentDetailPane } from './sub-components/appointment-detail-pane';
 import { AppointmentsTable } from './sub-components/appointments-table';
-import { ArrowLeft, CalendarClock, History } from 'lucide-react';
+import { ArrowLeft, CalendarClock, CalendarDays, History } from 'lucide-react';
 import { SidebarHeader, SidebarInput } from '@/components/ui/sidebar';
 
 export function SecretaryAppointmentsView() {
@@ -97,7 +97,8 @@ export function SecretaryAppointmentsView() {
           <AppointmentDetailPane view={view} />
         </div>
       ) : (
-        <div className="flex-1 flex-col items-center justify-center text-muted-foreground bg-muted/10 max-lg:hidden flex">
+        <div className="flex-1 flex-col items-center justify-center text-muted-foreground bg-muted/10 max-lg:hidden flex gap-3">
+          <CalendarDays className="size-10 text-muted-foreground/40" />
           <p className="text-xs font-medium">Select an appointment from the list to view details.</p>
         </div>
       )}

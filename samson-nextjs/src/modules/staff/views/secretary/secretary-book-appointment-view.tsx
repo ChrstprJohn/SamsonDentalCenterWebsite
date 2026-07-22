@@ -3,7 +3,7 @@
 import React from 'react';
 import { useSecretaryBookAppointment } from '../../hooks/secretary/use-secretary-book-appointment';
 import { DoctorTimeline } from './sub-components/doctor-timeline';
-import { SidebarAppointmentDetails } from './sub-components/sidebar-appointment-details';
+import { AppointmentDetailPane } from './sub-components/appointment-detail-pane';
 import { Calendar } from '@/components/ui/calendar';
 import { getClinicAppointmentsAction } from '@/modules/appointments/actions/clinic/get-clinic-appointments.action';
 import { Button } from '@/components/ui/button';
@@ -65,7 +65,7 @@ export function SecretaryBookAppointmentView() {
   // Reset email-dependent channel when email is cleared
   React.useEffect(() => {
     if (!view.email && (view.confirmationChannel === 'EMAIL' || view.confirmationChannel === 'BOTH')) {
-      view.setConfirmationChannel('SMS');
+      view.setConfirmationChannel('NONE');
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [view.email]);
@@ -301,11 +301,29 @@ export function SecretaryBookAppointmentView() {
       {/* Right Column: Booking Console Sidebar */}
       <Sidebar collapsible="none" side="right" className={`flex-1 lg:flex-none lg:w-80 border-l border-border shrink-0 flex-col h-full bg-sidebar ${mobileView === 'timeline' ? 'max-lg:hidden' : ''}`}>
         {view.selectedAppointmentDetails ? (
-          <SidebarAppointmentDetails
-            appointment={view.selectedAppointmentDetails}
-            onClose={() => view.setSelectedAppointmentDetails(null)}
-            onSuccess={() => view.loadTimelineData(view.selectedDate)}
-          />
+          <div className="flex flex-col h-full overflow-hidden">
+            <div className="p-4 border-b border-border flex items-center justify-between shrink-0">
+              <span className="text-sm font-semibold text-foreground">Appointment Details</span>
+              <button
+                onClick={() => view.setSelectedAppointmentDetails(null)}
+                className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded-md hover:bg-muted"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto min-h-0">
+              <AppointmentDetailPane
+                view={{
+                  selectedAppointment: view.selectedAppointmentDetails,
+                  activeTab: 'upcoming',
+                  showRescheduleForm: false,
+                  showCancelForm: false,
+                  setShowRescheduleForm: () => {},
+                  setShowCancelForm: () => {},
+                }}
+              />
+            </div>
+          </div>
         ) : isBookingOpen ? (
           <>
             <div className="p-4 border-b border-border shrink-0 flex items-center justify-between">
@@ -469,9 +487,9 @@ export function SecretaryBookAppointmentView() {
                       className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
                     />
                   </div>
-                  {/* Send Confirmation Via — radio group */}
+                  {/* Notification Channel — radio group */}
                   <div className="flex flex-col gap-1.5">
-                    <span className="text-xs text-muted-foreground">Send Confirmation Via</span>
+                    <span className="text-xs text-muted-foreground">Notification Channel</span>
                     <div className="flex flex-col gap-2">
                       {([
                         { value: 'NONE', label: 'None' },
