@@ -28,6 +28,16 @@ export interface ChatThreadDto {
         senderRole: 'PATIENT' | 'STAFF';
     } | null;
     unreadCount: number;
+    // Notification tracking fields
+    confirmationChannel?: string | null;
+    emailConfirmationSent?: boolean;
+    smsConfirmationSent?: boolean;
+    reminder48hSent?: boolean;
+    emailReminder48hSent?: boolean;
+    smsReminder48hSent?: boolean;
+    reminder24hSent?: boolean;
+    emailReminder24hSent?: boolean;
+    smsReminder24hSent?: boolean;
 }
 
 export const getMessagesByAppointmentIdQuery = (supabase: SupabaseClient) => {
@@ -138,6 +148,16 @@ export const getChatThreadsForSecretaryQuery = (supabase: SupabaseClient) => {
                       }
                     : null,
                 unreadCount: Number(row.unread_count),
+                // Notification tracking fields from RPC
+                confirmationChannel: row.confirmation_channel || 'EMAIL',
+                emailConfirmationSent: Boolean(row.email_confirmation_sent),
+                smsConfirmationSent: Boolean(row.sms_confirmation_sent),
+                reminder48hSent: Boolean(row.reminder_48h_sent),
+                emailReminder48hSent: Boolean(row.email_reminder_48h_sent),
+                smsReminder48hSent: Boolean(row.sms_reminder_48h_sent),
+                reminder24hSent: Boolean(row.reminder_24h_sent),
+                emailReminder24hSent: Boolean(row.email_reminder_24h_sent),
+                smsReminder24hSent: Boolean(row.sms_reminder_24h_sent),
             };
         });
 
