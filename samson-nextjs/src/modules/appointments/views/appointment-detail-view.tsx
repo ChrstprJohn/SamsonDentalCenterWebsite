@@ -4,6 +4,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { CancelAppointmentModal } from '../components/dashboard/cancel-appointment-modal';
 import { RescheduleBlockedModal } from '../components/dashboard/reschedule-blocked-modal';
+import Link from 'next/link';
 import type { AppointmentDto } from '../dtos/shared/appointment.dto';
 import { useAppointmentDetail } from '../hooks/detail/use-appointment-detail';
 import { AppointmentStatusHero } from '../components/sub-components/appointment-status-hero';
@@ -32,6 +33,7 @@ export function AppointmentDetailView({ appt, maxReschedules }: AppointmentDetai
   return (
     <div className="flex flex-col gap-8 max-w-4xl mx-auto w-full animate-in fade-in duration-300">
       <AppointmentDetailHeader
+        appt={currentAppt}
         isApproved={isApproved}
         isPending={isPending}
         isRescheduleDisabled={appt.rescheduleCount >= maxReschedules}
@@ -75,6 +77,7 @@ export function AppointmentDetailView({ appt, maxReschedules }: AppointmentDetai
 }
 
 interface AppointmentDetailHeaderProps {
+  appt: AppointmentDto;
   isApproved: boolean;
   isPending: boolean;
   isRescheduleDisabled: boolean;
@@ -83,6 +86,7 @@ interface AppointmentDetailHeaderProps {
 }
 
 function AppointmentDetailHeader({
+  appt,
   isApproved,
   isPending,
   isRescheduleDisabled,
@@ -101,15 +105,12 @@ function AppointmentDetailHeader({
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white">Appointment Profile</h2>
         <div className="flex gap-3">
-          {(isApproved || isPending) && (
-            <Button variant="secondary" onClick={onCancel}>
-              {isPending ? 'Cancel Request' : 'Cancel'}
-            </Button>
-          )}
-          {isApproved && (
-            <Button variant={isRescheduleDisabled ? 'secondary' : 'primary'} onClick={onReschedule}>
-              {isRescheduleDisabled ? 'Reschedule Disabled' : 'Reschedule'}
-            </Button>
+          {appt.status !== 'PENDING' && (
+            <Link href={`/appointments/chat/${appt.id}`}>
+              <Button variant="primary">
+                Chat with Secretary
+              </Button>
+            </Link>
           )}
         </div>
       </div>

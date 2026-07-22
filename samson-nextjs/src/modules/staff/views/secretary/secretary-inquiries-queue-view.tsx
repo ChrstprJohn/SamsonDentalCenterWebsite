@@ -9,7 +9,7 @@ export function SecretaryInquiriesQueueView() {
   const view = useSecretaryInquiriesQueue();
 
   return (
-    <div className="flex flex-col gap-8 h-full">
+    <div className="flex flex-col gap-8 h-full p-6 md:p-8 overflow-y-auto">
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl md:text-3xl font-extrabold text-text-primary tracking-tight">Inquiries Queue</h1>
         <p className="text-xs text-text-muted">Manage guest inquiries. Convert them directly into appointments or drop/archive the records.</p>

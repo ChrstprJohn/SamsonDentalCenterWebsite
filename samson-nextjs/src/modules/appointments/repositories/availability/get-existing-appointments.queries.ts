@@ -40,8 +40,8 @@ async function fetchTimeBlocksAsAppointments(
         id: block.id,
         doctorId: docId,
         date: block.date,
-        startTime: new Date(`${block.date}T${block.start_time}Z`).toISOString(),
-        endTime: new Date(`${block.date}T${block.end_time}Z`).toISOString(),
+        startTime: block.start_time.substring(0, 5),   // 'HH:MM:SS' → 'HH:MM'
+        endTime: block.end_time.substring(0, 5),
         status: 'APPROVED',
       });
     }
@@ -56,7 +56,7 @@ export const getExistingAppointmentsQuery = (supabase: SupabaseClient) => {
       .from('appointments')
       .select('id, start_time, end_time, doctor_id, status, date')
       .eq('date', date)
-      .not('status', 'in', '("CANCELLED","REJECTED","DISPLACED")');
+      .not('status', 'in', '(CANCELLED,REJECTED,DISPLACED)');
 
     if (doctorId) {
       query = query.eq('doctor_id', doctorId);

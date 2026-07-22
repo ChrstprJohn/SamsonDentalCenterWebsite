@@ -110,115 +110,115 @@ export default async function SecretaryPortalLayout({
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Secretary sub sidebar */}
-        <aside className="lg:col-span-3 flex flex-col gap-1.5 border-r border-card-border/50 pr-4">
-          <div className="text-[10px] font-bold text-text-muted uppercase tracking-widest px-4 mb-2">
+        <aside className="lg:col-span-3 flex flex-col gap-1.5 border-r border-slate-700/50 pr-4 bg-slate-900/95 rounded-2xl p-4 text-white">
+          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-4 mb-2">
             Operations
           </div>
           <Link
             href="/secretary"
-            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-secondary-bg transition-colors text-text-secondary hover:text-text-primary"
+            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-slate-700/60 transition-colors text-slate-300 hover:text-white"
           >
             <span>🏠</span>
             Dashboard
           </Link>
           <Link
             href="/secretary/pending"
-            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-secondary-bg transition-colors text-text-secondary hover:text-text-primary"
+            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-slate-700/60 transition-colors text-slate-300 hover:text-white"
           >
             <span>📋</span>
             Appointment Requests
           </Link>
           <Link
             href="/secretary/reschedule-requests"
-            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-secondary-bg transition-colors text-text-secondary hover:text-text-primary"
+            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-slate-700/60 transition-colors text-slate-300 hover:text-white"
           >
             <span>🔄</span>
             Reschedule Requests
           </Link>
           <Link
             href="/secretary/inquiries"
-            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-secondary-bg transition-colors text-text-secondary hover:text-text-primary"
+            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-slate-700/60 transition-colors text-slate-300 hover:text-white"
           >
             <span>💬</span>
             Inquiries Queue
           </Link>
           <Link
             href="/secretary/book"
-            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-secondary-bg transition-colors text-text-secondary hover:text-text-primary"
+            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-slate-700/60 transition-colors text-slate-300 hover:text-white"
           >
             <span>📅</span>
             Book Appointment
           </Link>
           <Link
             href="/secretary/appointments"
-            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-secondary-bg transition-colors text-text-secondary hover:text-text-primary"
+            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-slate-700/60 transition-colors text-slate-300 hover:text-white"
           >
             <span>🗂️</span>
             Appointments Directory
           </Link>
           <Link
             href="/secretary/check-in"
-            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-secondary-bg transition-colors text-text-secondary hover:text-text-primary"
+            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-slate-700/60 transition-colors text-slate-300 hover:text-white"
           >
             <span>🚀</span>
             Check-In / Out
           </Link>
           <Link
             href="/secretary/invoices"
-            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-secondary-bg transition-colors text-text-secondary hover:text-text-primary"
+            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-slate-700/60 transition-colors text-slate-300 hover:text-white"
           >
             <span>💵</span>
             Invoices
           </Link>
           <Link
             href="/secretary/services"
-            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-secondary-bg transition-colors text-text-secondary hover:text-text-primary"
+            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-slate-700/60 transition-colors text-slate-300 hover:text-white"
           >
             <span>🦷</span>
             Services Catalog
           </Link>
           <Link
             href="/secretary/doctors"
-            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-secondary-bg transition-colors text-text-secondary hover:text-text-primary"
+            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-slate-700/60 transition-colors text-slate-300 hover:text-white"
           >
             <span>👨‍⚕️</span>
             Doctors Directory
           </Link>
           <Link
             href="/secretary/schedules"
-            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-secondary-bg transition-colors text-text-secondary hover:text-text-primary"
+            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-slate-700/60 transition-colors text-slate-300 hover:text-white"
           >
             <span>⏰</span>
             Doctor Schedules
           </Link>
           
-          <div className="text-[10px] font-bold text-text-muted uppercase tracking-widest px-4 mt-4 mb-2">
+          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-4 mt-4 mb-2">
             System & Logs
           </div>
           <Link
             href="/secretary/notifications"
-            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-secondary-bg transition-colors text-text-secondary hover:text-text-primary"
+            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-slate-700/60 transition-colors text-slate-300 hover:text-white"
           >
             <span>🔔</span>
             Notifications
           </Link>
           <Link
             href="/secretary/emails"
-            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-secondary-bg transition-colors text-text-secondary hover:text-text-primary"
+            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-slate-700/60 transition-colors text-slate-300 hover:text-white"
           >
             <span>✉️</span>
             Email Logs
           </Link>
           <Link
             href="/secretary/audits"
-            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-secondary-bg transition-colors text-text-secondary hover:text-text-primary"
+            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-slate-700/60 transition-colors text-slate-300 hover:text-white"
           >
             <span>🛡️</span>
             Audit Logs
           </Link>
           <Link
             href="/secretary/profile"
-            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-secondary-bg transition-colors text-text-secondary hover:text-text-primary"
+            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-slate-700/60 transition-colors text-slate-300 hover:text-white"
           >
             <span>👤</span>
             Profile Settings

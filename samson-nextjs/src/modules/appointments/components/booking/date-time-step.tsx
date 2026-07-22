@@ -8,29 +8,27 @@ import { AvailableTimeSlots } from './sub-components/available-time-slots';
 
 interface DateTimeStepProps {
   selectedDate: string | null;
-  selectedSlot: BookingSlot | null;
+  preferredStartTime: string;
   selectedDoctorId: string;
   doctors?: UserProfileResponseDto[];
   availableDates?: string[];
-  availableSlots?: BookingSlot[];
   isLoading?: boolean;
   isLoadingDoctors?: boolean;
   onSelectDate: (date: string) => void;
-  onSelectSlot: (slot: BookingSlot) => void;
+  onSelectPreferredStartTime: (time: string) => void;
   onSelectDoctor: (doctorId: string) => void;
 }
 
 export function DateTimeStep({
   selectedDate,
-  selectedSlot,
+  preferredStartTime,
   selectedDoctorId,
   doctors = [],
   availableDates = [],
-  availableSlots = [],
   isLoading = false,
   isLoadingDoctors = false,
   onSelectDate,
-  onSelectSlot,
+  onSelectPreferredStartTime,
   onSelectDoctor,
 }: DateTimeStepProps) {
   // Create Date objects from available YYYY-MM-DD strings to format them
@@ -38,6 +36,10 @@ export function DateTimeStep({
 
   const getDayName = (date: Date) => {
     return date.toLocaleDateString('en-US', { weekday: 'short', timeZone: 'UTC' });
+  };
+
+  const getMonthName = (date: Date) => {
+    return date.toLocaleDateString('en-US', { month: 'short', timeZone: 'UTC' });
   };
 
   const getDayNum = (date: Date) => {
@@ -48,7 +50,7 @@ export function DateTimeStep({
     <div className="flex flex-col gap-6 text-left">
       <div className="flex flex-col gap-1">
         <h3 className="text-lg font-bold text-slate-900 dark:text-white">Select Date & Time</h3>
-        <p className="text-xs text-slate-505">Pick an available day and convenient timing slot.</p>
+        <p className="text-xs text-slate-500">Pick an available day and convenient timing window.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
@@ -61,8 +63,8 @@ export function DateTimeStep({
 
         {/* Right Side: Date Carousel / Custom Calendar Grid */}
         <div className="md:col-span-3 flex flex-col gap-3">
-          <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-505">Select Date</h4>
-          {isLoading && (!selectedDate || availableSlots.length === 0) && (
+          <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Select Date</h4>
+          {isLoading && !selectedDate && (
             <div className="text-xs text-slate-400 animate-pulse py-2">Checking clinic schedule...</div>
           )}
 
@@ -82,8 +84,8 @@ export function DateTimeStep({
                         : 'border-slate-200 dark:border-white/10 bg-card/50 dark:bg-slate-900/30 text-slate-700 dark:text-slate-350 hover:border-slate-300 dark:hover:border-white/20'
                     }`}
                   >
-                    <span className="text-[9px] uppercase tracking-wider font-bold text-slate-405 dark:text-slate-500">
-                      {getDayName(date)}
+                    <span className="text-[9px] uppercase tracking-wider font-bold text-slate-400 dark:text-slate-500">
+                      {getDayName(date)} • {getMonthName(date)}
                     </span>
                     <span className="text-base font-extrabold mt-0.5">{getDayNum(date)}</span>
                   </button>
@@ -91,7 +93,7 @@ export function DateTimeStep({
               })
             ) : (
               !isLoading && (
-                <div className="col-span-3 text-xs text-slate-450 dark:text-slate-505 py-6 border border-dashed border-slate-200 dark:border-white/10 w-full text-center rounded-2xl bg-slate-50/50 dark:bg-slate-900/10">
+                <div className="col-span-3 text-xs text-slate-400 dark:text-slate-500 py-6 border border-dashed border-slate-200 dark:border-white/10 w-full text-center rounded-2xl bg-slate-50/50 dark:bg-slate-900/10">
                   No upcoming days with availability.
                 </div>
               )
@@ -100,13 +102,17 @@ export function DateTimeStep({
         </div>
       </div>
 
-      <AvailableTimeSlots
-        selectedDate={selectedDate}
-        selectedSlot={selectedSlot}
-        availableSlots={availableSlots}
-        isLoading={isLoading}
-        onSelectSlot={onSelectSlot}
-      />
+      {/* Preferred Start Time Selection */}
+      <div className="flex flex-col gap-3">
+        <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Preferred Start Time</h4>
+        <input
+          type="time"
+          required
+          value={preferredStartTime}
+          onChange={(event) => onSelectPreferredStartTime(event.target.value)}
+          className="w-full sm:w-64 bg-card border border-slate-200 dark:border-white/10 px-4 py-3 rounded-2xl text-xs sm:text-sm focus:outline-none focus:border-blue-500 text-slate-705 dark:text-slate-300 transition-colors"
+        />
+      </div>
     </div>
   );
 }

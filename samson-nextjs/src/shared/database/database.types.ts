@@ -100,6 +100,7 @@ export type Database = {
       appointments: {
         Row: {
           clinical_notes: string | null
+          confirmation_sent: boolean
           created_at: string
           date: string
           dependent_id: string | null
@@ -107,6 +108,7 @@ export type Database = {
           end_time: string
           id: string
           patient_id: string | null
+          payment_receipt_sent: boolean
           reschedule_count: number
           service_id: string
           start_time: string
@@ -114,9 +116,11 @@ export type Database = {
           status_reason: string | null
           updated_at: string
           user_note: string | null
+          confirmation_channel: string
         }
         Insert: {
           clinical_notes?: string | null
+          confirmation_sent?: boolean
           created_at?: string
           date: string
           dependent_id?: string | null
@@ -124,6 +128,7 @@ export type Database = {
           end_time: string
           id?: string
           patient_id?: string | null
+          payment_receipt_sent?: boolean
           reschedule_count?: number
           service_id: string
           start_time: string
@@ -131,9 +136,11 @@ export type Database = {
           status_reason?: string | null
           updated_at?: string
           user_note?: string | null
+          confirmation_channel?: string
         }
         Update: {
           clinical_notes?: string | null
+          confirmation_sent?: boolean
           created_at?: string
           date?: string
           dependent_id?: string | null
@@ -141,6 +148,7 @@ export type Database = {
           end_time?: string
           id?: string
           patient_id?: string | null
+          payment_receipt_sent?: boolean
           reschedule_count?: number
           service_id?: string
           start_time?: string
@@ -148,6 +156,7 @@ export type Database = {
           status_reason?: string | null
           updated_at?: string
           user_note?: string | null
+          confirmation_channel?: string
         }
         Relationships: [
           {
@@ -574,6 +583,41 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      coordination_logs: {
+        Row: {
+          id: string
+          inquiry_id: string
+          action_type: string
+          message: string
+          created_at: string
+          created_by: string | null
+        }
+        Insert: {
+          id?: string
+          inquiry_id: string
+          action_type: string
+          message: string
+          created_at?: string
+          created_by?: string | null
+        }
+        Update: {
+          id?: string
+          inquiry_id?: string
+          action_type?: string
+          message?: string
+          created_at?: string
+          created_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coordination_logs_inquiry_id_fkey"
+            columns: ["inquiry_id"]
+            isOneToOne: false
+            referencedRelation: "appointment_inquiries"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

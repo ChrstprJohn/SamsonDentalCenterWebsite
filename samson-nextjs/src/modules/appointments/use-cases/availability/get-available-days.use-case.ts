@@ -26,12 +26,12 @@ export const getAvailableDaysUseCase = (deps: {
     const { month, serviceId, doctorId } = dto;
 
     const appointmentsPromise =
-      deps.getExistingAppointmentsForMonth?.(month, doctorId) ?? Promise.resolve([]);
+      deps.getExistingAppointmentsForMonth?.(month, doctorId ?? undefined) ?? Promise.resolve([]);
 
     // Eliminate async waterfall by running initial fetches concurrently in parallel
     const [duration, schedules, appointments] = await Promise.all([
       deps.duration,
-      deps.getWorkingSchedulesForMonth(month, doctorId, serviceId),
+      deps.getWorkingSchedulesForMonth(month, doctorId ?? undefined, serviceId),
       appointmentsPromise,
     ]);
 
@@ -85,7 +85,7 @@ export const getAvailableDaysUseCase = (deps: {
         const checkAvailabilityPromises = datesWithSchedules.map(async (date) => {
           const slotsResponse = await deps.getAvailableTimeSlots!({
             serviceId,
-            doctorId,
+            doctorId: doctorId ?? undefined,
             date,
           });
           return slotsResponse.availableSlots.length > 0

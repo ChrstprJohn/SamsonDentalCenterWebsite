@@ -31,7 +31,7 @@
   --accent-blue-text: #2563eb;
 
   /* Fonts */
-  --font-sans: var(--font-geist-sans), Inter, system-ui, sans-serif;
+  --font-sans: var(--font-outfit), Inter, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), monospace;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);

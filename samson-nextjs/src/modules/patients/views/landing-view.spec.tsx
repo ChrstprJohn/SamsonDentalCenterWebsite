@@ -30,7 +30,7 @@ describe('LandingView', () => {
       handleBookingCTA: vi.fn(),
     });
 
-    render(<LandingView services={[]} config={mockConfig} isAuthenticated={false} />);
+    render(<LandingView services={[]} config={mockConfig} />);
 
     expect(screen.getByTestId('hero-section-v1')).toBeDefined();
     expect(screen.getByTestId('services-section')).toBeDefined();
@@ -48,7 +48,7 @@ describe('LandingView', () => {
       handleBookingCTA: vi.fn(),
     });
 
-    render(<LandingView services={[]} config={mockConfig} isAuthenticated={false} />);
+    render(<LandingView services={[]} config={mockConfig} />);
 
     expect(screen.getByTestId('modal')).toBeDefined();
     expect(screen.getByText('Test')).toBeDefined();

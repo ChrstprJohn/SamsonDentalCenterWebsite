@@ -44,7 +44,7 @@ interface GuestFields {
 
 export function BookPatientIdentityPanel(props: BookPatientIdentityPanelProps) {
   return (
-    <div className="lg:col-span-5 border border-card-border bg-card rounded-3xl p-6 shadow-md flex flex-col gap-4">
+    <div className="w-full flex flex-col gap-4">
       <div className="flex flex-col gap-1">
         <h2 className="text-sm font-bold text-text-secondary">Patient Identity</h2>
         <p className="text-xs text-text-muted">Search registered patient or fill guest info.</p>

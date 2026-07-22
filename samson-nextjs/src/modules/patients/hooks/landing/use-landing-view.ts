@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, type PathValue } from 'react-hook-form';
 import { z } from 'zod';
@@ -10,7 +9,6 @@ import type { ServiceResponseDto } from '@/modules/services/dtos/management/serv
 import { submitInquiryAction } from '@/modules/appointments/actions/booking/submit-inquiry.action';
 
 interface UseLandingViewProps {
-  isAuthenticated: boolean;
   services: ServiceResponseDto[];
 }
 
@@ -27,15 +25,21 @@ const contactInquirySchema = z.object({
   pathway: z.string().trim().min(1, 'Treatment service is required'),
   targetDate: z.string().trim().min(1, 'Target date is required'),
   notes: z.string().trim().optional(),
+  dateOfBirth: z
+    .string()
+    .trim()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format')
+    .or(z.literal(''))
+    .optional(),
+  preferredStartTime: z.string().regex(/^\d{2}:\d{2}$/, 'Preferred start time must be in HH:MM format'),
 });
 
 type ContactInquiryFormValues = z.infer<typeof contactInquirySchema>;
 
-export function useLandingView({ isAuthenticated, services }: UseLandingViewProps) {
+export function useLandingView({ services }: UseLandingViewProps) {
   const [selectedService, setSelectedService] = useState<ServiceResponseDto | null>(null);
   const [isContactSubmitting, setIsContactSubmitting] = useState(false);
   const { addToast } = useToast();
-  const router = useRouter();
   const form = useForm<ContactInquiryFormValues>({
     resolver: zodResolver(contactInquirySchema),
     defaultValues: {
@@ -49,6 +53,8 @@ export function useLandingView({ isAuthenticated, services }: UseLandingViewProp
       pathway: '',
       targetDate: '',
       notes: '',
+      dateOfBirth: '',
+      preferredStartTime: '09:00',
     },
   });
 
@@ -58,6 +64,8 @@ export function useLandingView({ isAuthenticated, services }: UseLandingViewProp
   const suffix = form.watch('suffix') ?? '';
   const contactEmail = form.watch('contactEmail');
   const contactMessage = form.watch('contactMessage') ?? '';
+  const dateOfBirth = form.watch('dateOfBirth') ?? '';
+  const preferredStartTime = form.watch('preferredStartTime') ?? '09:00';
   const setField = <TName extends keyof ContactInquiryFormValues>(name: TName) =>
     (value: ContactInquiryFormValues[TName]) =>
       form.setValue(name, value as PathValue<ContactInquiryFormValues, TName>, {
@@ -65,14 +73,17 @@ export function useLandingView({ isAuthenticated, services }: UseLandingViewProp
         shouldValidate: false,
       });
 
-  const handleBookingCTA = (serviceId?: string) => {
+  // Per new booking strategy (Flow 1): guests submit inquiries via the contact form.
+  // No auth wall — scroll to the contact section instead.
+  const handleBookingCTA = (_serviceId?: string) => {
     setSelectedService(null);
-    const targetUrl = serviceId ? `/user?service=${serviceId}` : '/user';
-
-    if (isAuthenticated) {
-      router.push(targetUrl);
-    } else {
-      router.push(`/auth/login?redirect=${encodeURIComponent(targetUrl)}`);
+    const contactSection = document.getElementById('contact');
+    if (contactSection) {
+      if (typeof window !== 'undefined' && (window as any).lenis) {
+        (window as any).lenis.scrollTo(contactSection, { offset: -80 });
+      } else {
+        contactSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     }
   };
 
@@ -128,6 +139,8 @@ export function useLandingView({ isAuthenticated, services }: UseLandingViewProp
         preferredServiceId: serviceId,
         preferredDate: values.targetDate,
         patientNote: values.notes || undefined,
+        dateOfBirth: values.dateOfBirth || undefined,
+        preferredStartTime: values.preferredStartTime,
       });
 
       if (res.success) {
@@ -153,16 +166,14 @@ export function useLandingView({ isAuthenticated, services }: UseLandingViewProp
     contactForm: {
       firstName,
       setFirstName: setField('firstName'),
-      middleName,
-      setMiddleName: setField('middleName'),
       lastName,
       setLastName: setField('lastName'),
-      suffix,
-      setSuffix: setField('suffix'),
       contactEmail,
       setContactEmail: setField('contactEmail'),
       contactMessage,
       setContactMessage: setField('contactMessage'),
+      preferredStartTime,
+      setPreferredStartTime: setField('preferredStartTime'),
       isContactSubmitting,
       handleRealInquirySubmit,
     },

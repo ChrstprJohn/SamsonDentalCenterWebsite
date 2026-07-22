@@ -41,18 +41,29 @@ export const appointmentPatientSchema = appointmentPatientDbSchema.transform((da
   lastName: data.last_name,
 }));
 
+const guestContactDbSchema = z.object({
+  first_name: z.string(),
+  middle_name: z.string().nullable().optional(),
+  last_name: z.string(),
+  suffix: z.string().nullable().optional(),
+  email: z.string().nullable().optional(),
+  phone_number: z.string().nullable().optional(),
+});
+
 const appointmentDbSchema = z.object({
   id: z.string().uuid(),
   patient_id: z.string().uuid().nullable().optional(),
   dependent_id: z.string().uuid().nullable().optional(),
   service_id: z.string().uuid(),
-  doctor_id: z.string().uuid(),
+  doctor_id: z.string().uuid().nullable().optional(),
   date: z.string(),
-  start_time: z.string(),
-  end_time: z.string(),
+  start_time: z.string().nullable().optional(),
+  end_time: z.string().nullable().optional(),
   status: appointmentStatusEnum,
   source: z.enum(['SELF_BOOKED', 'STAFF_CREATED']).optional().default('SELF_BOOKED'),
   doctor_assignment_source: z.enum(['SYSTEM', 'USER']).optional().default('SYSTEM'),
+  preferred_start_time: z.string().nullable().optional(),
+  proposed_preferred_start_time: z.string().nullable().optional(),
   user_note: z.string().nullable().optional(),
   status_reason: z.string().nullable().optional(),
   proposed_date: z.string().nullable().optional(),
@@ -60,6 +71,17 @@ const appointmentDbSchema = z.object({
   proposed_end_time: z.string().nullable().optional(),
   proposed_doctor_id: z.string().uuid().nullable().optional(),
   reschedule_count: z.number().int().nonnegative().optional().default(0),
+  reminder_24h_sent: z.boolean().optional().default(false),
+  reminder_48h_sent: z.boolean().optional().default(false),
+  confirmation_channel: z.enum(['EMAIL', 'SMS', 'BOTH', 'NONE']).optional().default('EMAIL'),
+  confirmation_sent: z.boolean().optional().default(false),
+  email_confirmation_sent: z.boolean().optional().default(false),
+  sms_confirmation_sent: z.boolean().optional().default(false),
+  email_reminder_48h_sent: z.boolean().optional().default(false),
+  sms_reminder_48h_sent: z.boolean().optional().default(false),
+  email_reminder_24h_sent: z.boolean().optional().default(false),
+  sms_reminder_24h_sent: z.boolean().optional().default(false),
+  payment_receipt_sent: z.boolean().optional().default(false),
   created_at: z.string().optional(),
   updated_at: z.string().optional(),
   doctor: appointmentDoctorDbSchema.nullable().optional(),
@@ -72,6 +94,7 @@ const appointmentDbSchema = z.object({
     relationship: z.string(),
     date_of_birth: z.string().optional().nullable(),
   }).nullable().optional(),
+  guest_contacts: z.array(guestContactDbSchema).nullable().optional(),
   status_history: z.array(z.object({
     id: z.string(),
     previous_status: z.string().nullable().optional(),
@@ -82,25 +105,43 @@ const appointmentDbSchema = z.object({
   })).nullable().optional(),
 });
 
-export const appointmentDtoSchema = appointmentDbSchema.transform((data) => ({
-  id: data.id,
-  patientId: data.patient_id || null,
-  dependentId: data.dependent_id || null,
-  serviceId: data.service_id,
-  doctorId: data.doctor_id,
-  date: data.date,
-  startTime: data.start_time,
-  endTime: data.end_time,
-  status: data.status,
-  source: data.source,
-  doctorAssignmentSource: data.doctor_assignment_source ?? 'SYSTEM',
-  userNote: data.user_note || null,
-  statusReason: data.status_reason || null,
-  proposedDate: data.proposed_date || null,
-  proposedStartTime: data.proposed_start_time || null,
-  proposedEndTime: data.proposed_end_time || null,
-  proposedDoctorId: data.proposed_doctor_id || null,
-  rescheduleCount: data.reschedule_count ?? 0,
+export const appointmentDtoSchema = appointmentDbSchema.transform((data) => {
+  const ch = (data.confirmation_channel as string) || 'EMAIL';
+  const isEmailCh = ch === 'EMAIL' || ch === 'BOTH';
+  const isSmsCh = ch === 'SMS' || ch === 'BOTH';
+
+  return {
+    id: data.id,
+    patientId: data.patient_id || null,
+    dependentId: data.dependent_id || null,
+    serviceId: data.service_id,
+    doctorId: data.doctor_id || null,
+    date: data.date,
+    startTime: data.start_time || null,
+    endTime: data.end_time || null,
+    status: data.status,
+    source: data.source,
+    doctorAssignmentSource: data.doctor_assignment_source ?? 'SYSTEM',
+    preferredStartTime: data.preferred_start_time || null,
+    proposedPreferredStartTime: data.proposed_preferred_start_time || null,
+    userNote: data.user_note || null,
+    statusReason: data.status_reason || null,
+    proposedDate: data.proposed_date || null,
+    proposedStartTime: data.proposed_start_time || null,
+    proposedEndTime: data.proposed_end_time || null,
+    proposedDoctorId: data.proposed_doctor_id || null,
+    rescheduleCount: data.reschedule_count ?? 0,
+    reminder24hSent: data.reminder_24h_sent ?? false,
+    reminder48hSent: data.reminder_48h_sent ?? false,
+    confirmationChannel: (data.confirmation_channel as 'EMAIL' | 'SMS' | 'BOTH' | 'NONE') ?? 'EMAIL',
+    confirmationSent: data.confirmation_sent ?? false,
+    emailConfirmationSent: Boolean(data.email_confirmation_sent || (data.confirmation_sent && isEmailCh)),
+    smsConfirmationSent: Boolean(data.sms_confirmation_sent || (data.confirmation_sent && isSmsCh)),
+    emailReminder48hSent: Boolean(data.email_reminder_48h_sent),
+    smsReminder48hSent: Boolean(data.sms_reminder_48h_sent),
+    emailReminder24hSent: Boolean(data.email_reminder_24h_sent),
+    smsReminder24hSent: Boolean(data.sms_reminder_24h_sent),
+    paymentReceiptSent: data.payment_receipt_sent ?? false,
   createdAt: data.created_at,
   updatedAt: data.updated_at,
   doctor: data.doctor ? appointmentDoctorSchema.parse(data.doctor) : null,
@@ -121,7 +162,16 @@ export const appointmentDtoSchema = appointmentDbSchema.transform((data) => ({
     createdAt: h.created_at,
     actorRole: h.actor_role,
   })) : [],
-}));
+  guestContact: data.guest_contacts && data.guest_contacts.length > 0 ? {
+    firstName: data.guest_contacts[0].first_name,
+    middleName: data.guest_contacts[0].middle_name || null,
+    lastName: data.guest_contacts[0].last_name,
+    suffix: data.guest_contacts[0].suffix || null,
+    email: data.guest_contacts[0].email || null,
+    phone: data.guest_contacts[0].phone_number || null,
+  } : null,
+  };
+});
 
 export type AppointmentDto = z.infer<typeof appointmentDtoSchema>;
 

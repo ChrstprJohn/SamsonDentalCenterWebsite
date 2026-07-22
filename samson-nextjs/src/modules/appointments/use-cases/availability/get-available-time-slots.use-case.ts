@@ -15,8 +15,8 @@ export const getAvailableTimeSlotsUseCase = (deps: {
     // Execute initial asynchronous fetches concurrently in parallel
     const [duration, schedules, appointments] = await Promise.all([
       deps.duration,
-      deps.getDoctorSchedules(date, doctorId, serviceId),
-      deps.getExistingAppointments(date, doctorId),
+      deps.getDoctorSchedules(date, doctorId ?? undefined, serviceId),
+      deps.getExistingAppointments(date, doctorId ?? undefined),
     ]);
 
     const availableSlots: AvailableSlotDto[] = [];
@@ -31,7 +31,11 @@ export const getAvailableTimeSlotsUseCase = (deps: {
       const rawSlots = generateAvailableSlotsForDay({
         date,
         duration,
-        schedules: [schedule],
+        schedules: [{
+          ...schedule,
+          startTime: schedule.startTime || '09:00',
+          endTime: schedule.endTime || '17:00',
+        }],
         appointments,
       });
 

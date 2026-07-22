@@ -8,8 +8,8 @@ describe('requestRescheduleSchema', () => {
       status: 'RESCHEDULE_REQUESTED',
       statusReason: 'Need another day',
       newDate: '2026-06-01',
-      newStartTime: '2026-06-01T09:00:00Z',
-      newEndTime: '2026-06-01T09:30:00Z',
+      newStartTime: '09:00',
+      newEndTime: '09:30',
       newDoctorId: 'c3fabe0d-bd2c-4d35-acc0-48afe5b22673',
     };
     expect(() => requestRescheduleSchema.parse(validData)).not.toThrow();
@@ -21,10 +21,22 @@ describe('requestRescheduleSchema', () => {
       status: 'RESCHEDULE_REQUESTED',
       statusReason: '',
       newDate: '2026-06-01',
-      newStartTime: '2026-06-01T09:00:00Z',
-      newEndTime: '2026-06-01T09:30:00Z',
+      newStartTime: '09:00',
+      newEndTime: '09:30',
       newDoctorId: 'c3fabe0d-bd2c-4d35-acc0-48afe5b22673',
     };
     expect(() => requestRescheduleSchema.parse(invalidData)).toThrow();
+  });
+
+  it('should validate when times are omitted and preferredStartTime is provided', () => {
+    const validData = {
+      appointmentId: 'c3fabe0d-bd2c-4d35-acc0-48afe5b22673',
+      status: 'RESCHEDULE_REQUESTED',
+      statusReason: 'Need another day',
+      newDate: '2026-06-01',
+      newDoctorId: 'c3fabe0d-bd2c-4d35-acc0-48afe5b22673',
+      preferredStartTime: '13:00',
+    };
+    expect(() => requestRescheduleSchema.parse(validData)).not.toThrow();
   });
 });

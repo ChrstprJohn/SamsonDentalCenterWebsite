@@ -3,8 +3,8 @@ import { requestRescheduleTransactionCommand } from './request-reschedule-transa
 
 const PROPOSED = {
   date: '2026-07-01',
-  startTime: '2026-07-01T09:00:00Z',
-  endTime: '2026-07-01T09:30:00Z',
+  startTime: '09:00',
+  endTime: '09:30',
   doctorId: 'doctor-uuid-001',
 };
 
@@ -20,11 +20,11 @@ const DB_ROW = {
   doctor_id: DOCTOR_ID,
   status: 'RESCHEDULE_REQUESTED',
   date: '2026-07-01',
-  start_time: '2026-07-01T09:00:00Z',
-  end_time: '2026-07-01T09:30:00Z',
+  start_time: '09:00',
+  end_time: '09:30',
   proposed_date: '2026-07-01',
-  proposed_start_time: '2026-07-01T09:00:00Z',
-  proposed_end_time: '2026-07-01T09:30:00Z',
+  proposed_start_time: '09:00',
+  proposed_end_time: '09:30',
   proposed_doctor_id: DOCTOR_ID,
   reschedule_count: 1,
   status_reason: 'Schedule conflict',
@@ -50,9 +50,10 @@ describe('requestRescheduleTransactionCommand', () => {
       p_actor_role:          'PATIENT',
       p_reason:              'Schedule conflict',
       p_proposed_date:       PROPOSED.date,
-      p_proposed_start_time: PROPOSED.startTime,
-      p_proposed_end_time:   PROPOSED.endTime,
+      p_proposed_start_time: '2026-07-01T09:00:00Z',
+      p_proposed_end_time:   '2026-07-01T09:30:00Z',
       p_proposed_doctor_id:  PROPOSED.doctorId,
+      p_proposed_preferred_start_time: null,
     });
 
     expect(result.id).toBe(APPT_ID);

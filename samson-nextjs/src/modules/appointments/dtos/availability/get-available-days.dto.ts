@@ -8,7 +8,7 @@ const MONTH_REGEX = /^\d{4}-\d{2}$/;
 export const getAvailableDaysSchema = z.object({
   serviceId: z.string().uuid('Invalid Service ID format'),
   // Omit or pass undefined for 'Any Doctor'
-  doctorId: z.string().uuid('Invalid Doctor ID format').optional().or(emptyStringToUndefined),
+  doctorId: z.string().uuid('Invalid Doctor ID format').optional().nullable().or(emptyStringToUndefined),
   // Expects YYYY-MM to query an entire calendar page efficiently
   month: z.string().regex(MONTH_REGEX, 'Month must be in YYYY-MM format'),
 });

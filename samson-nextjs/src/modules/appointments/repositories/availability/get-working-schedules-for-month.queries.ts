@@ -2,6 +2,7 @@ import { SupabaseClient } from '@supabase/supabase-js';
 import { DomainError } from '@/shared/errors';
 import { doctorScheduleResponseSchema } from '../../dtos/exports';
 import { unstable_cache } from 'next/cache';
+import { createAdminClient } from '@/shared/database/server';
 
 export const getWorkingSchedulesForMonthQuery = (supabase: SupabaseClient) => {
   const fetchSchedules = async (month: string, doctorId?: string, serviceId?: string, includeHidden = false) => {
@@ -58,7 +59,6 @@ export const getWorkingSchedulesForMonthQuery = (supabase: SupabaseClient) => {
     }
 
     // 2. Fetch clinic config
-    const { createAdminClient } = require('@/shared/database/server');
     const adminDb = isMockClient ? supabase : await createAdminClient();
     const { data: configData, error: configError } = await adminDb
       .from('clinic_config')

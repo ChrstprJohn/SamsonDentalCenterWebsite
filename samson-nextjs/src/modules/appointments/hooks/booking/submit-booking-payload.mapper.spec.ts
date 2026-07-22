@@ -26,13 +26,14 @@ describe('createBookingPayload Mapper', () => {
   it('should create a valid payload for a SELF booking', () => {
     const payload = createBookingPayload({
       selectedService: mockService,
-      selectedSlot: mockSlot,
       selectedDate: '2025-01-01',
       patientType: 'SELF',
       selectedDependentId: null,
       newDependentData: null,
       userNote: 'Extra note',
       selectedDoctorId: 'doc-1',
+      preferredStartTime: '09:00',
+      resolvedDoctorId: 'doc-1',
     });
 
     expect(payload.serviceId).toBe('service-1');
@@ -44,29 +45,31 @@ describe('createBookingPayload Mapper', () => {
     expect(payload.dependentId).toBeUndefined();
     
     // Check time mappings
-    expect(payload.startTime).toBe('2025-01-01T10:00:00.000Z');
-    expect(payload.endTime).toBe('2025-01-01T10:30:00.000Z');
+    expect(payload.preferredStartTime).toBe('09:00');
+    expect(payload.startTime).toBeUndefined();
+    expect(payload.endTime).toBeUndefined();
   });
 
-  it('should map doctorAssignmentSource as SYSTEM when selectedDoctorId is ANY', () => {
+  it('should map doctorAssignmentSource as SYSTEM and doctorId as null when selectedDoctorId is ANY', () => {
     const payload = createBookingPayload({
       selectedService: mockService,
-      selectedSlot: mockSlot,
       selectedDate: '2025-01-01',
       patientType: 'SELF',
       selectedDependentId: null,
       newDependentData: null,
       userNote: '',
       selectedDoctorId: 'ANY',
+      preferredStartTime: '09:00',
+      resolvedDoctorId: null, // null = ANY doctor — no fallback UUID
     });
 
     expect(payload.doctorAssignmentSource).toBe('SYSTEM');
+    expect(payload.doctorId).toBeNull();
   });
 
   it('should map dependent fields for NEW_DEPENDENT', () => {
     const payload = createBookingPayload({
       selectedService: mockService,
-      selectedSlot: mockSlot,
       selectedDate: '2025-01-01',
       patientType: 'NEW_DEPENDENT',
       selectedDependentId: null,
@@ -75,12 +78,13 @@ describe('createBookingPayload Mapper', () => {
         lastName: 'Doe',
         middleName: '',
         suffix: '',
-
         relationship: 'DAUGHTER',
         birthday: '2015-01-01',
       },
       userNote: '',
       selectedDoctorId: 'doc-1',
+      preferredStartTime: '09:00',
+      resolvedDoctorId: 'doc-1',
     });
 
     expect(payload.patientType).toBe('NEW_DEPENDENT');
@@ -91,13 +95,14 @@ describe('createBookingPayload Mapper', () => {
   it('should map dependent ID for EXISTING_DEPENDENT', () => {
     const payload = createBookingPayload({
       selectedService: mockService,
-      selectedSlot: mockSlot,
       selectedDate: '2025-01-01',
       patientType: 'EXISTING_DEPENDENT',
       selectedDependentId: 'dep-1',
       newDependentData: null,
       userNote: '',
       selectedDoctorId: 'doc-1',
+      preferredStartTime: '09:00',
+      resolvedDoctorId: 'doc-1',
     });
 
     expect(payload.patientType).toBe('EXISTING_DEPENDENT');

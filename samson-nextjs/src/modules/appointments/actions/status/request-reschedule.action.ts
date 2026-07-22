@@ -49,6 +49,7 @@ export async function requestRescheduleAction(formData: RequestRescheduleDto) {
         startTime: validData.newStartTime,
         endTime: validData.newEndTime,
         doctorId: validData.newDoctorId,
+        preferredStartTime: validData.preferredStartTime,
       }
     );
 

@@ -78,10 +78,21 @@ describe('updateAppointmentStatusUseCase', () => {
     const { useCase, mockTransaction } = makeUseCase({ rescheduleCount: 1 });
 
     await expect(
-      useCase('appt-uuid-001', null, 'STAFF', 'APPROVED', 'reason', RESCHEDULE_META)
+      useCase('appt-uuid-001', null, 'PATIENT', 'APPROVED', 'reason', RESCHEDULE_META)
     ).rejects.toThrow('Maximum reschedule limit of 1 has been reached.');
 
     expect(mockTransaction).not.toHaveBeenCalled();
+  });
+
+  it('allows STAFF to bypass reschedule count limit and increments rescheduleCount', async () => {
+    const { useCase, mockTransaction } = makeUseCase({ rescheduleCount: 2 });
+
+    await useCase('appt-uuid-001', 'staff-id', 'STAFF', 'APPROVED', 'reason', RESCHEDULE_META);
+
+    expect(mockTransaction).toHaveBeenCalledWith(
+      'appt-uuid-001', 'staff-id', 'STAFF', 'APPROVED', 'reason', RESCHEDULE_META,
+      false, 3
+    );
   });
 
   it('Hold-and-Swap APPROVED: swaps proposed→actual and sets clearProposedMetadata=true', async () => {

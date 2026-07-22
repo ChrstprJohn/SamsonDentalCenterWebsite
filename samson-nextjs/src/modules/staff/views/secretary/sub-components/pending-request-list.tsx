@@ -1,6 +1,6 @@
 'use client';
 
-import { formatClinicTime, formatShortDate } from '@/shared/utils/date.util';
+import { formatClinicTime, formatShortDate, formatTimeString } from '@/shared/utils/date.util';
 
 interface PendingRequestListProps {
   appointments: any[];
@@ -58,7 +58,7 @@ function PendingRequestRow({ appointment, isSelected, onSelect }: { appointment:
       <td className="py-3.5 px-2 font-semibold text-text-primary">{patientName}</td>
       <td className="py-3.5 px-2 text-text-secondary">{appointment.service?.name}</td>
       <td className="py-3.5 px-2 text-text-muted">
-        {formatShortDate(appointment.date)} | {formatClinicTime(appointment.startTime)} - {formatClinicTime(appointment.endTime)}
+        {formatShortDate(appointment.date)} | {appointment.preferredStartTime ? formatTimeString(appointment.preferredStartTime) : 'Time Pending'}
       </td>
     </tr>
   );

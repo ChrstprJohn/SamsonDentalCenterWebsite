@@ -1,6 +1,6 @@
 'use client';
 
-import { formatClinicTime, formatShortDate } from '@/shared/utils/date.util';
+import { formatClinicTime, formatShortDate, formatTimeString } from '@/shared/utils/date.util';
 
 export function PendingRequestOverview({ appointment, patientDetails, conflictingAppointment }: { appointment: any; patientDetails: any; conflictingAppointment: any }) {
   return (
@@ -15,7 +15,7 @@ export function PendingRequestOverview({ appointment, patientDetails, conflictin
         </div>
       )}
       <ReliabilityCounters reliability={patientDetails?.reliability} />
-      <PatientHistory history={patientDetails?.history || []} />
+      {/* <PatientHistory history={patientDetails?.history || []} /> */}
     </div>
   );
 }
@@ -58,13 +58,21 @@ function PatientIdentity({ appointment, patientDetails }: { appointment: any; pa
 }
 
 function RequestFacts({ appointment, patientDetails }: { appointment: any; patientDetails: any }) {
-  const dentist = appointment.doctor ? `${appointment.doctor.prefix || 'Dr.'} ${appointment.doctor.firstName} ${appointment.doctor.lastName}` : 'No doctor assigned';
+  const assignmentInfo = appointment.doctorAssignmentSource === 'USER' ? ' (Patient Choice)' : ' (Auto-Assigned)';
+  const dentist = appointment.doctor 
+    ? `${appointment.doctor.prefix || 'Dr.'} ${appointment.doctor.firstName} ${appointment.doctor.lastName}${assignmentInfo}` 
+    : 'No doctor assigned';
   const birthday = appointment.dependent?.dateOfBirth || patientDetails?.profile.dateOfBirth;
+  
+  const timeDisplay = appointment.preferredStartTime
+    ? `Preference: ${formatTimeString(appointment.preferredStartTime)}`
+    : 'No time preference';
+
   return (
     <div className="grid grid-cols-2 gap-3 text-xs border-b border-card-border pb-3">
       <Fact label="Requested Service" value={appointment.service?.name} />
       <Fact label="Requested Dentist" value={dentist} />
-      <Fact label="Desired Date & Time" value={`${formatShortDate(appointment.date)} | ${formatClinicTime(appointment.startTime)} - ${formatClinicTime(appointment.endTime)}`} />
+      <Fact label="Desired Date & Time" value={`${formatShortDate(appointment.date)} | ${timeDisplay}`} />
       {birthday && <Fact label="Patient Date of Birth" value={formatShortDate(birthday)} />}
     </div>
   );

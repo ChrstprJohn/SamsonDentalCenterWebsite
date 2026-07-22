@@ -4,17 +4,21 @@ import { useEffect, useMemo, useState } from 'react';
 import { convertInquiryAction } from '@/modules/appointments/actions/booking/convert-inquiry.action';
 import { dropInquiryAction } from '@/modules/appointments/actions/booking/drop-inquiry.action';
 import { getInquiriesAction } from '@/modules/appointments/actions/booking/get-inquiries.action';
+import { updateInquiryAction } from '@/modules/appointments/actions/booking/update-inquiry.action';
 import { useBookingScheduler } from '@/modules/appointments/hooks/shared/use-booking-scheduler';
 import { searchPatientsAction } from '@/modules/patients/actions/profile/search-patients.action';
 import { getServicesAction } from '@/modules/services/actions/management/get-services.action';
+import { getDoctorsAction } from '@/modules/staff/actions/management/get-doctors.action';
+
 
 export type InquiryDecision = 'CONVERT' | 'DROP' | '';
 export type InquiryPatientMode = 'SEARCH' | 'GUEST';
+export type InquiryTab = 'NEW' | 'CONVERTED' | 'DROPPED';
 
 export function useSecretaryInquiriesQueue() {
   const scheduler = useBookingScheduler();
   const { loadAvailableDates, loadDoctorsForDate, loadAvailableSlots } = scheduler;
-  const [inquiries, setInquiries] = useState<any[]>([]);
+  const [allInquiries, setAllInquiries] = useState<any[]>([]);
   const [selectedInquiryId, setSelectedInquiryId] = useState<string | null>(null);
   const [isLoadingInquiries, setIsLoadingInquiries] = useState(false);
   const [inquiriesError, setInquiriesError] = useState('');
@@ -34,28 +38,58 @@ export function useSecretaryInquiriesQueue() {
   const [guestSuffix, setGuestSuffix] = useState('');
   const [guestPhone, setGuestPhone] = useState('');
   const [guestEmail, setGuestEmail] = useState('');
+  const [confirmationChannel, setConfirmationChannel] = useState<'EMAIL' | 'SMS' | 'BOTH' | 'NONE'>('EMAIL');
   const [patientMode, setPatientMode] = useState<InquiryPatientMode>('GUEST');
   const [patientSearchQuery, setPatientSearchQuery] = useState('');
   const [patientSearchResults, setPatientSearchResults] = useState<any[]>([]);
   const [isSearchingPatients, setIsSearchingPatients] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<any | null>(null);
   const [services, setServices] = useState<{ id: string; name: string }[]>([]);
+  const [allDoctors, setAllDoctors] = useState<{ doctorId: string; doctorName: string }[]>([]);
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date(2026, 5, 1));
   const [isLoadingServices, setIsLoadingServices] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [inlineError, setInlineError] = useState('');
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [activeTab, setActiveTab] = useState<InquiryTab>('NEW');
+
+  const inquiries = useMemo(
+    () => allInquiries.filter((i) => i.status === activeTab),
+    [allInquiries, activeTab]
+  );
+
+  const tabCounts = useMemo(
+    () => ({
+      NEW: allInquiries.filter((i) => i.status === 'NEW').length,
+      CONVERTED: allInquiries.filter((i) => i.status === 'CONVERTED').length,
+      DROPPED: allInquiries.filter((i) => i.status === 'DROPPED').length,
+    }),
+    [allInquiries]
+  );
 
   const selectedInquiry = useMemo(
     () => inquiries.find((inquiry) => inquiry.id === selectedInquiryId),
     [inquiries, selectedInquiryId]
   );
   const availableDates = stagedInquiryService ? scheduler.availableDates : [];
-  const availableDoctors = stagedInquiryDate ? scheduler.availableDoctors as { doctorId: string; doctorName: string }[] : [];
+  const availableDoctors = allDoctors;
   const timeslots = stagedInquiryDoctor ? scheduler.availableSlots as any[] : [];
   const isAvailabilityLoading = isLoadingServices || scheduler.loadingKey !== null;
 
   const showToast = (message: string, type: 'success' | 'error') => setToast({ message, type });
+
+  useEffect(() => {
+    getDoctorsAction({ includeHidden: true }).then((res) => {
+      if (res.success && res.data) {
+        const mapped = res.data.map((d: any) => ({
+          doctorId: d.id,
+          doctorName: `Dr. ${d.firstName} ${d.lastName}`,
+        }));
+        setAllDoctors(mapped);
+      }
+    });
+  }, []);
+
 
   useEffect(() => {
     if (!toast) return;
@@ -81,7 +115,7 @@ export function useSecretaryInquiriesQueue() {
     setInquiriesError('');
     const res = await getInquiriesAction();
     setIsLoadingInquiries(false);
-    if (res.success && res.data) setInquiries(res.data);
+    if (res.success && res.data) setAllInquiries(res.data);
     else setInquiriesError(res.error || 'Failed to load inquiries queue.');
   };
 
@@ -104,10 +138,6 @@ export function useSecretaryInquiriesQueue() {
     loadAvailableDates({ serviceId: stagedInquiryService, month });
   }, [stagedInquiryService, currentMonth, loadAvailableDates]);
 
-  useEffect(() => {
-    if (!stagedInquiryDate || !stagedInquiryService) return;
-    loadDoctorsForDate({ date: stagedInquiryDate, serviceId: stagedInquiryService });
-  }, [stagedInquiryDate, stagedInquiryService, loadDoctorsForDate]);
 
   useEffect(() => {
     if (!stagedInquiryService || !stagedInquiryDoctor || !stagedInquiryDate) return;
@@ -132,12 +162,22 @@ export function useSecretaryInquiriesQueue() {
 
   const selectInquiry = (inquiry: any) => {
     setSelectedInquiryId(inquiry.id);
-    setStagedInquiryAction('CONVERT');
+    setStagedInquiryAction('');
     setStagedInquiryService(inquiry.preferredServiceId);
-    setStagedInquiryDate('');
-    setStagedInquiryDoctor('');
-    setStagedInquiryTime('');
-    setStagedInquiryEndTime('');
+    setStagedInquiryDate(inquiry.preferredDate || '');
+    setStagedInquiryDoctor(inquiry.assignedDoctorId || '');
+    const parseHHMM = (timeStr?: string | null) => {
+      if (!timeStr) return '';
+      if (timeStr.includes('T')) {
+        const timePart = timeStr.split('T')[1];
+        if (timePart) return timePart.slice(0, 5);
+      }
+      const match = timeStr.match(/^(\d{2}):(\d{2})/);
+      if (match) return `${match[1]}:${match[2]}`;
+      return '';
+    };
+    setStagedInquiryTime(parseHHMM(inquiry.preferredStartTime));
+    setStagedInquiryEndTime(parseHHMM(inquiry.assignedEndTime));
     setStagedInquiryNote(inquiry.patientNote || '');
     setStagedSecretaryNotes('');
     setIsNotesManual(false);
@@ -168,28 +208,26 @@ export function useSecretaryInquiriesQueue() {
 
   const selectService = (serviceId: string) => {
     setStagedInquiryService(serviceId);
-    setStagedInquiryDate('');
-    setStagedInquiryDoctor('');
-    setStagedInquiryTime('');
-    setStagedInquiryEndTime('');
   };
 
   const selectDate = (date: string) => {
     setStagedInquiryDate(date);
-    setStagedInquiryDoctor('');
-    setStagedInquiryTime('');
-    setStagedInquiryEndTime('');
   };
 
   const selectDoctor = (doctorId: string) => {
     setStagedInquiryDoctor(doctorId);
-    setStagedInquiryTime('');
-    setStagedInquiryEndTime('');
   };
 
   const selectSlot = (slot: { startTime: string; endTime: string }) => {
-    setStagedInquiryTime(slot.startTime);
-    setStagedInquiryEndTime(slot.endTime);
+    const extractTimePart = (isoOrTime: string) => {
+      if (!isoOrTime) return '';
+      if (isoOrTime.includes('T')) {
+        return isoOrTime.split('T')[1].substring(0, 5);
+      }
+      return isoOrTime;
+    };
+    setStagedInquiryTime(extractTimePart(slot.startTime));
+    setStagedInquiryEndTime(extractTimePart(slot.endTime));
   };
 
   const selectPatient = (patient: any) => {
@@ -205,6 +243,52 @@ export function useSecretaryInquiriesQueue() {
   const setSecretaryNotes = (notes: string) => {
     setStagedSecretaryNotes(notes);
     setIsNotesManual(true);
+  };
+
+  const saveInquiryChanges = async (section: string) => {
+    if (!selectedInquiryId) return;
+    setInlineError('');
+    setIsSubmitting(true);
+    try {
+      const payload: Record<string, any> = { inquiryId: selectedInquiryId };
+      if (section === 'guest') {
+        payload.firstName = guestFirstName;
+        payload.middleName = guestMiddleName;
+        payload.lastName = guestLastName;
+        payload.suffix = guestSuffix;
+        payload.patientNote = stagedInquiryNote;
+      } else if (section === 'contact') {
+        payload.phoneNumber = guestPhone;
+        payload.email = guestEmail;
+      } else if (section === 'patient') {
+        payload.firstName = guestFirstName;
+        payload.middleName = guestMiddleName;
+        payload.lastName = guestLastName;
+        payload.suffix = guestSuffix;
+        payload.patientNote = stagedInquiryNote;
+        payload.phoneNumber = guestPhone;
+        payload.email = guestEmail;
+      } else if (section === 'schedule') {
+        payload.serviceId = stagedInquiryService;
+        payload.date = stagedInquiryDate;
+        payload.startTime = stagedInquiryTime;
+        payload.assignedDoctorId = stagedInquiryDoctor || null;
+        payload.assignedEndTime = stagedInquiryEndTime || null;
+      }
+      const res = await updateInquiryAction(payload as any);
+      if (res.success) {
+        showToast('Changes saved', 'success');
+        await loadInquiries();
+      } else {
+        setInlineError(res.error || 'Failed to save changes');
+        showToast(res.error || 'Failed to save changes', 'error');
+      }
+    } catch (err: any) {
+      setInlineError(err.message || 'Failed to save changes');
+      showToast(err.message || 'Failed to save changes', 'error');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const submitReview = async (inquiryId: string) => {
@@ -233,6 +317,7 @@ export function useSecretaryInquiriesQueue() {
           guestPhone: guestPhone || undefined,
           guestEmail: guestEmail || undefined,
           doctorAssignmentSource: (stagedInquiryDoctor && stagedInquiryDoctor !== 'ANY') ? 'USER' as const : 'SYSTEM' as const,
+          confirmationChannel: confirmationChannel || 'EMAIL',
         };
         const res = await convertInquiryAction(payload);
         if (res.success) {
@@ -267,20 +352,24 @@ export function useSecretaryInquiriesQueue() {
   const canSubmit = !isSubmitting
     && !isAvailabilityLoading
     && !!stagedInquiryAction
+    && !!stagedInquiryNote.trim()
     && (stagedInquiryAction === 'DROP'
-      ? !!stagedInquiryNote.trim()
-      : !!(stagedInquiryService && stagedInquiryDate && stagedInquiryDoctor && stagedInquiryTime));
+      ? true
+      : !!(stagedInquiryService && stagedInquiryDate && stagedInquiryDoctor && stagedInquiryTime && stagedInquiryEndTime));
 
   return {
     inquiries, selectedInquiry, selectedInquiryId, selectInquiry, isLoadingInquiries, inquiriesError, loadInquiries,
     stagedInquiryAction, setDecision, stagedInquiryService, selectService, stagedInquiryDoctor, selectDoctor,
-    stagedInquiryDate, selectDate, stagedInquiryTime, selectSlot, stagedInquiryNote, setStagedInquiryNote,
+    stagedInquiryDate, selectDate, stagedInquiryTime, setStagedInquiryTime, stagedInquiryEndTime, setStagedInquiryEndTime,
+    selectSlot, stagedInquiryNote, setStagedInquiryNote,
     stagedSecretaryNotes, setSecretaryNotes, guestFirstName, setGuestFirstName, guestMiddleName, setGuestMiddleName,
     guestLastName, setGuestLastName, guestSuffix, setGuestSuffix, guestPhone, setGuestPhone, guestEmail, setGuestEmail,
+    confirmationChannel, setConfirmationChannel,
     patientMode, setPatientMode, patientSearchQuery, setPatientSearchQuery, patientSearchResults, isSearchingPatients,
     selectedPatient, selectPatient, clearPatient, services, currentMonth, setCurrentMonth, availableDates,
     availableDoctors, timeslots, isLoadingServices, isLoadingDays: scheduler.loadingKey === 'dates',
     isLoadingDoctors: scheduler.loadingKey === 'doctors', isLoadingSlots: scheduler.loadingKey === 'slots',
-    isSubmitting, inlineError, toast, isAvailabilityLoading, canSubmit, submitReview,
+    isSubmitting, inlineError, toast, isAvailabilityLoading, canSubmit, submitReview, saveInquiryChanges,
+    activeTab, setActiveTab, tabCounts,
   };
 }

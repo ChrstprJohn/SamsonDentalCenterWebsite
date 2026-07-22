@@ -75,8 +75,7 @@ describe('submitBookingAction', () => {
       serviceId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd2',
       doctorId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd2',
       date: '2026-06-01',
-      startTime: '2026-06-01T09:00:00Z',
-      endTime: '2026-06-01T09:30:00Z',
+      preferredStartTime: '09:00',
       patientType: 'SELF',
     };
 
@@ -90,6 +89,26 @@ describe('submitBookingAction', () => {
     expect(mockSubmitBooking).toHaveBeenCalledWith('user_123', expect.objectContaining({
       patientType: 'SELF',
     }));
+  });
+
+  it('accepts null doctorId (ANY doctor) and flows through successfully', async () => {
+    vi.mocked(createClient).mockResolvedValue({} as any);
+    vi.mocked(getAuthenticatedUser).mockResolvedValue({ id: 'user_123' } as any);
+    mockGetServiceDuration.mockResolvedValueOnce(30);
+    mockSubmitBooking.mockResolvedValue({ appointmentId: 'appt_888' });
+
+    const payload = {
+      idempotencyKey: 'da95a63c-333e-4b68-98e3-82bdf1a07bd3',
+      serviceId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd2',
+      doctorId: null,
+      doctorAssignmentSource: 'SYSTEM',
+      date: '2026-06-01',
+      preferredStartTime: '14:00',
+      patientType: 'SELF',
+    };
+
+    const result = await submitBookingAction(payload as any);
+    expect(result.success).toBe(true);
   });
 
   it('returns validation error if validation fails', async () => {

@@ -15,6 +15,8 @@ describe('createInquiryCommand', () => {
       status: 'NEW',
       created_at: '2026-06-22T04:00:00Z',
       updated_at: '2026-06-22T04:00:00Z',
+      date_of_birth: '1990-01-01',
+      preferred_start_time: '09:00',
     };
 
     const mockSingle = vi.fn().mockResolvedValue({ data: mockDbRecord, error: null });
@@ -32,6 +34,8 @@ describe('createInquiryCommand', () => {
       email: 'john@example.com',
       preferredServiceId: 'b3b07384-d113-4ec2-a5e6-ec083b0f5cc1',
       preferredDate: '2026-06-25',
+      dateOfBirth: '1990-01-01',
+      preferredStartTime: '09:00',
     };
 
     const result = await command(payload);
@@ -41,6 +45,8 @@ describe('createInquiryCommand', () => {
         first_name: 'John',
         last_name: 'Doe',
         phone_number: '+639171234567',
+        date_of_birth: '1990-01-01',
+        preferred_start_time: '09:00',
       }),
     ]);
     expect(result.firstName).toBe('John');

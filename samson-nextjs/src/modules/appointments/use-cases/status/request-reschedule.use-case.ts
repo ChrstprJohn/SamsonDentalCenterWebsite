@@ -11,9 +11,10 @@ export const requestRescheduleUseCase = (deps: {
     reason: string,
     proposedMetadata: {
       date: string;
-      startTime: string;
-      endTime: string;
-      doctorId: string;
+      startTime?: string;
+      endTime?: string;
+      doctorId: string | null;
+      preferredStartTime?: string;
     }
   ) => Promise<AppointmentDto>;
 }) => {
@@ -24,9 +25,10 @@ export const requestRescheduleUseCase = (deps: {
     reason: string,
     proposedMetadata: {
       date: string;
-      startTime: string;
-      endTime: string;
-      doctorId: string;
+      startTime?: string;
+      endTime?: string;
+      doctorId: string | null;
+      preferredStartTime?: string;
     }
   ) => {
     const appointment = await deps.getAppointmentById(appointmentId);

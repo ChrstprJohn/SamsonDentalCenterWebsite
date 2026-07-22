@@ -32,9 +32,6 @@ vi.mock('../../use-cases/exports', async (importOriginal) => {
   const original = await importOriginal<any>();
   return {
     ...original,
-    getAvailableTimeSlotsUseCase: () => vi.fn().mockResolvedValue({
-      availableSlots: [{ startTime: '2026-06-25T10:00:00.000Z', endTime: '2026-06-25T10:30:00.000Z' }],
-    }),
   };
 });
 

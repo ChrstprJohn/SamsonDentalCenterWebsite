@@ -1,38 +1,38 @@
 import type { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
 import type { BookingSlot, NewDependentInput } from './use-user-booking';
 import type { SubmitBookingDto } from '../../dtos/booking/submit-booking.dto';
-import { calculateEndTimeFromIso } from '@/shared/utils/date.util';
 
 interface PayloadMapperParams {
   selectedService: ServiceResponseDto;
-  selectedSlot: BookingSlot;
   selectedDate: string;
   patientType: 'SELF' | 'EXISTING_DEPENDENT' | 'NEW_DEPENDENT';
   selectedDependentId: string | null;
   newDependentData: NewDependentInput | null;
   userNote: string;
   selectedDoctorId: string;
+  preferredStartTime: string;
+  resolvedDoctorId: string | null; // null when 'ANY' is selected
 }
 
 export function createBookingPayload({
   selectedService,
-  selectedSlot,
   selectedDate,
   patientType,
   selectedDependentId,
   newDependentData,
   userNote,
   selectedDoctorId,
+  preferredStartTime,
+  resolvedDoctorId,
 }: PayloadMapperParams): SubmitBookingDto {
   const payload: SubmitBookingDto = {
     idempotencyKey: crypto.randomUUID(),
     serviceId: selectedService.id,
-    doctorId: selectedSlot.doctorId,
-    isPreferredDoctor: selectedSlot.isPreferred ?? false,
+    doctorId: resolvedDoctorId,
+    isPreferredDoctor: selectedDoctorId !== 'ANY',
     doctorAssignmentSource: selectedDoctorId === 'ANY' ? 'SYSTEM' : 'USER',
     date: selectedDate,
-    startTime: selectedSlot.originalStartTime,
-    endTime: calculateEndTimeFromIso(selectedSlot.originalStartTime, selectedService.durationMinutes).toISOString(),
+    preferredStartTime,
     patientType,
     userNote: userNote || undefined,
   };

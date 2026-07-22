@@ -12,11 +12,21 @@ describe('submitBookingUseCase', () => {
     serviceId: '1111f111-1111-1111-1111-111111111111',
     doctorId: '22222222-2222-2222-2222-222222222222',
     isPreferredDoctor: true,
+    doctorAssignmentSource: 'USER',
+    date: '2024-12-25',
+    preferredStartTime: '09:00',
+    userNote: 'Dental checkup',
+    patientType: 'SELF',
+  };
+
+  const mockDtoAnyDoctor: SubmitBookingDto = {
+    idempotencyKey: '11111111-0000-0000-0000-000000000000',
+    serviceId: '1111f111-1111-1111-1111-111111111111',
+    doctorId: null,
+    isPreferredDoctor: false,
     doctorAssignmentSource: 'SYSTEM',
     date: '2024-12-25',
-    startTime: '2024-12-25T10:00:00.000Z',
-    endTime: '2024-12-25T10:30:00.000Z',
-    userNote: 'Dental checkup',
+    preferredStartTime: '14:00',
     patientType: 'SELF',
   };
 
@@ -25,21 +35,7 @@ describe('submitBookingUseCase', () => {
     mockGetAvailableTimeSlots = vi.fn();
   });
 
-  it('should successfully book an appointment if the slot is completely available', async () => {
-    // Mock the slot as available
-    mockGetAvailableTimeSlots.mockResolvedValueOnce({
-      date: '2024-12-25',
-      serviceId: mockDto.serviceId,
-      availableSlots: [
-        {
-          startTime: mockDto.startTime,
-          endTime: mockDto.endTime,
-          doctorId: mockDto.doctorId,
-          doctorName: 'Dr. John Doe',
-        },
-      ],
-    });
-
+  it('should successfully delegate to executeBookingTransaction (specific doctor)', async () => {
     const mockCreatedAppt = { appointmentId: 'appt-123' };
     mockExecuteBookingTransaction.mockResolvedValueOnce(mockCreatedAppt);
 
@@ -54,41 +50,26 @@ describe('submitBookingUseCase', () => {
     expect(mockExecuteBookingTransaction).toHaveBeenCalledWith('user-123', mockDto);
   });
 
-  it('should throw ValidationError if the requested slot is not in the list of available slots', async () => {
-    // Mock availability returning no slots (slot is taken)
-    mockGetAvailableTimeSlots.mockResolvedValueOnce({
-      date: '2024-12-25',
-      serviceId: mockDto.serviceId,
-      availableSlots: [],
-    });
+  it('should delegate null doctorId (ANY doctor) payload without modification', async () => {
+    const mockCreatedAppt = { appointmentId: 'appt-456' };
+    mockExecuteBookingTransaction.mockResolvedValueOnce(mockCreatedAppt);
 
     const useCase = submitBookingUseCase({
       executeBookingTransaction: mockExecuteBookingTransaction,
       getAvailableTimeSlots: mockGetAvailableTimeSlots,
     });
 
-    await expect(useCase('user-123', mockDto)).rejects.toThrow(
-      ValidationError
-    );
+    const result = await useCase('user-123', mockDtoAnyDoctor);
 
-    expect(mockExecuteBookingTransaction).not.toHaveBeenCalled();
+    expect(result).toEqual(mockCreatedAppt);
+    // null doctorId flows through without rejection
+    expect(mockExecuteBookingTransaction).toHaveBeenCalledWith('user-123', expect.objectContaining({
+      doctorId: null,
+      doctorAssignmentSource: 'SYSTEM',
+    }));
   });
 
   it('should throw ValidationError if a database unique constraint violation occurs', async () => {
-    // Mock availability returning the slot as available (simulating race condition before DB insert)
-    mockGetAvailableTimeSlots.mockResolvedValueOnce({
-      date: '2024-12-25',
-      serviceId: mockDto.serviceId,
-      availableSlots: [
-        {
-          startTime: mockDto.startTime,
-          endTime: mockDto.endTime,
-          doctorId: mockDto.doctorId,
-          doctorName: 'Dr. John Doe',
-        },
-      ],
-    });
-
     // Mock DB unique constraint violation
     const dbError = new Error('duplicate key value violates unique constraint') as any;
     dbError.code = '23P01';

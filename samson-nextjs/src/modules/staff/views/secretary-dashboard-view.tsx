@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useSecretary } from '../hooks/use-secretary';
 import { Button } from '@/components/ui/button';
 
-export function SecretaryDashboardView() {
+export function SecretaryDashboardView({ basePath = '/secretary' }: { basePath?: string }) {
   const { appointments, inquiries, invoices } = useSecretary();
 
   // Metrics calculations
@@ -107,27 +107,27 @@ export function SecretaryDashboardView() {
         <div className="lg:col-span-4 border border-card-border bg-card rounded-3xl p-6 shadow-md flex flex-col gap-4">
           <h2 className="text-base font-bold text-text-primary border-b border-card-border pb-3">Quick Actions</h2>
           <div className="flex flex-col gap-2">
-            <Link href="/secretary/book" className="w-full">
+            <Link href={`${basePath}/book`} className="w-full">
               <Button className="w-full justify-start text-xs font-semibold py-3 gap-2" variant="primary">
                 <span>📅</span> Book New Walk-In
               </Button>
             </Link>
-            <Link href="/secretary/pending" className="w-full">
+            <Link href={`${basePath}/pending`} className="w-full">
               <Button className="w-full justify-start text-xs font-semibold py-3 gap-2" variant="secondary">
                 <span>📋</span> Review Request Queue
               </Button>
             </Link>
-            <Link href="/secretary/reschedule-requests" className="w-full">
+            <Link href={`${basePath}/reschedule-requests`} className="w-full">
               <Button className="w-full justify-start text-xs font-semibold py-3 gap-2" variant="secondary">
                 <span>🔄</span> Reschedule Requests Queue
               </Button>
             </Link>
-            <Link href="/secretary/inquiries" className="w-full">
+            <Link href={`${basePath}/inquiries`} className="w-full">
               <Button className="w-full justify-start text-xs font-semibold py-3 gap-2" variant="secondary">
                 <span>💬</span> Convert Guest Inquiries
               </Button>
             </Link>
-            <Link href="/secretary/check-in" className="w-full">
+            <Link href={`${basePath}/check-in`} className="w-full">
               <Button className="w-full justify-start text-xs font-semibold py-3 gap-2" variant="secondary">
                 <span>🚀</span> Run Checkout Tracker
               </Button>

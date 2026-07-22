@@ -32,9 +32,6 @@ vi.mock('../../use-cases/exports', async (importOriginal) => {
   const original = await importOriginal<any>();
   return {
     ...original,
-    getAvailableTimeSlotsUseCase: () => vi.fn().mockResolvedValue({
-      availableSlots: [{ startTime: '2026-06-25T10:00:00.000Z', endTime: '2026-06-25T10:30:00.000Z' }],
-    }),
   };
 });
 
@@ -65,8 +62,8 @@ describe('convertInquiryAction', () => {
       doctorId: '5f89c670-8b1e-4505-8854-3e9a593e82d1',
       doctorAssignmentSource: 'SYSTEM' as const,
       date: '2026-06-25',
-      startTime: '2026-06-25T10:00:00.000Z',
-      endTime: '2026-06-25T10:30:00.000Z',
+      startTime: '10:00',
+      endTime: '10:30',
       patientNote: 'Tooth pain',
       secretaryNotes: 'Call coordinated',
     };
@@ -88,8 +85,8 @@ describe('convertInquiryAction', () => {
       doctorId: '5f89c670-8b1e-4505-8854-3e9a593e82d1',
       doctorAssignmentSource: 'SYSTEM' as const,
       date: '2026-06-25',
-      startTime: '2026-06-25T10:00:00.000Z',
-      endTime: '2026-06-25T10:30:00.000Z',
+      startTime: '10:00',
+      endTime: '10:30',
     };
 
     const response = await convertInquiryAction(payload);

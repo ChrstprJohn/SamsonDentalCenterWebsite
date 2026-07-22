@@ -11,7 +11,7 @@ export function SecretaryPendingRequestsView() {
   const view = useSecretaryPendingRequests();
 
   return (
-    <div className="flex flex-col gap-8 h-full">
+    <div className="flex flex-col gap-8 flex-1 min-h-0">
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl md:text-3xl font-extrabold text-text-primary tracking-tight">Appointment Requests</h1>
         <p className="text-xs text-text-muted">Review patient self-bookings and choose to Approve, Reject, or Displace requests.</p>
@@ -46,27 +46,29 @@ export function SecretaryPendingRequestsView() {
                   availableDates={view.editAvailableDates}
                   date={view.editDate}
                   currentMonth={view.editCurrentMonth}
-                  slots={view.editSlots}
                   startTime={view.editStartTime}
+                  endTime={view.editEndTime}
                   note={view.editNote}
                   isLoadingDays={view.isLoadingEditDays}
-                  isLoadingSlots={view.isLoadingEditSlots}
                   onToggle={view.toggleEditing}
                   onServiceChange={view.setEditService}
                   onDoctorChange={view.setEditDoctor}
                   onDateChange={view.setEditAppointmentDate}
                   onMonthChange={view.setEditCurrentMonth}
-                  onSlotChange={view.setEditSlot}
+                  onStartTimeChange={view.setEditStartTime}
+                  onEndTimeChange={view.setEditEndTime}
                   onNoteChange={view.setEditNote}
                 />
                 <PendingDecisionForm
                   stagedStatus={view.stagedStatus}
                   stagedReason={view.stagedReason}
                   customReason={view.customReason}
+                  confirmationChannel={view.confirmationChannel}
                   isSubmitting={view.isSubmitting}
                   onDecisionChange={view.setDecision}
                   onReasonChange={view.setReason}
                   onCustomReasonChange={view.setCustomReason}
+                  onConfirmationChannelChange={view.setConfirmationChannel}
                   onConfirm={() => view.finishAppointmentReview(view.selectedAppointment.id)}
                 />
               </div>

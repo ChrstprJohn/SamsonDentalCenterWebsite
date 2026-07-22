@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { onManualBookingPatientSubscriber } from './on-manual-booking-patient.subscriber';
 import { ResendService } from '@/shared/services/email/resend.service';
 import { createAdminClient } from '@/shared/database/server';
-import { formatClinicTime } from '@/shared/utils/date.util';
+import { formatClinicTime, calculateEndTime } from '@/shared/utils/date.util';
 import { z } from 'zod';
 
 vi.mock('server-only', () => ({}));
@@ -16,7 +16,7 @@ describe('onManualBookingPatientSubscriber', () => {
     serviceId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd3',
     doctorId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd4',
     date: '2026-06-25',
-    startTime: '2026-06-25T09:00:00.000Z',
+    startTime: '09:00',
     durationMinutes: 30,
   };
 
@@ -25,7 +25,9 @@ describe('onManualBookingPatientSubscriber', () => {
     const mockSingle = vi.fn().mockImplementation(() => Promise.resolve(singleResults[callIndex++] ?? { data: null, error: { message: 'Unexpected call' } }));
     const mockEq = vi.fn(() => ({ single: mockSingle }));
     const mockSelect = vi.fn(() => ({ eq: mockEq }));
-    return { from: vi.fn(() => ({ select: mockSelect })) } as any;
+    const mockUpdateEq = vi.fn().mockResolvedValue({ error: null });
+    const mockUpdate = vi.fn(() => ({ eq: mockUpdateEq }));
+    return { from: vi.fn(() => ({ select: mockSelect, update: mockUpdate })) } as any;
   }
 
   beforeEach(() => {
@@ -37,11 +39,12 @@ describe('onManualBookingPatientSubscriber', () => {
       { data: { email: 'john@example.com', first_name: 'John', middle_name: null, last_name: 'Doe', suffix: null }, error: null },
       { data: { name: 'Teeth Cleaning' }, error: null },
       { data: { first_name: 'Jane', last_name: 'Smith' }, error: null },
+      { data: { chat_token: 'chat-tok' }, error: null },
     ]);
     vi.mocked(createAdminClient).mockResolvedValue(mockSupabase);
 
-    const start = new Date(validPayload.startTime);
-    const end = new Date(start.getTime() + validPayload.durationMinutes * 60000);
+    const start = validPayload.startTime;
+    const end = calculateEndTime(start, validPayload.durationMinutes);
     const expectedTimeRange = `${formatClinicTime(start)} - ${formatClinicTime(end)}`;
 
     await onManualBookingPatientSubscriber.handle(validPayload);
@@ -66,6 +69,7 @@ describe('onManualBookingPatientSubscriber', () => {
       { data: { email: 'john@example.com', first_name: 'John', middle_name: null, last_name: 'Santos', suffix: null }, error: null },
       { data: { name: 'Teeth Cleaning' }, error: null },
       { data: { first_name: 'Jane', last_name: 'Smith' }, error: null },
+      { data: { chat_token: 'chat-tok' }, error: null },
     ]);
     vi.mocked(createAdminClient).mockResolvedValue(mockSupabase);
 

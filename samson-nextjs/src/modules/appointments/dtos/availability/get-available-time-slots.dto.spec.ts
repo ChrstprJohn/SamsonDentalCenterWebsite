@@ -66,8 +66,8 @@ describe('getAvailableTimeSlotsResponseSchema', () => {
         serviceId: VALID_SERVICE_ID,
         availableSlots: [
           {
-            startTime: '2026-05-28T09:00:00Z',
-            endTime: '2026-05-28T09:30:00Z',
+            startTime: '09:00',
+            endTime: '09:30',
             doctorId: VALID_DOCTOR_ID,
             doctorName: 'Dr. Samson',
           },

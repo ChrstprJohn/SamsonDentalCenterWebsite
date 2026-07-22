@@ -27,8 +27,8 @@ describe('AppointmentBookingCommands', () => {
       isPreferredDoctor: true,
       doctorAssignmentSource: 'USER',
       date: '2024-12-25',
-      startTime: '2024-12-25T10:00:00Z',
-      endTime: '2024-12-25T10:30:00Z',
+      startTime: '10:00',
+      endTime: '10:30',
       userNote: 'Dental checkup',
       patientType: 'SELF',
     };
@@ -42,8 +42,8 @@ describe('AppointmentBookingCommands', () => {
         p_service_id: mockDto.serviceId,
         p_doctor_id: mockDto.doctorId,
         p_date: mockDto.date,
-        p_start_time: mockDto.startTime,
-        p_end_time: mockDto.endTime,
+        p_start_time: '2024-12-25T10:00:00Z',
+        p_end_time: '2024-12-25T10:30:00Z',
         p_user_note: mockDto.userNote,
         p_existing_dependent_id: null,
         p_new_dependent_first_name: null,
@@ -53,6 +53,7 @@ describe('AppointmentBookingCommands', () => {
         p_new_dependent_middle_name: null,
         p_new_dependent_suffix: null,
         p_doctor_assignment_source: 'USER',
+        p_preferred_start_time: null,
       });
       expect(result).toMatchObject({ appointmentId: validApptId });
     });

@@ -19,7 +19,7 @@ describe('getInquiriesQuery', () => {
     mockSupabase.order.mockReturnValue(mockSupabase);
   });
 
-  it('should fetch inquiries in NEW status ordered by created_at DESC', async () => {
+  it('should fetch inquiries filtered by status', async () => {
     const mockDbRow = {
       id: inquiryId,
       first_name: 'John',
@@ -41,7 +41,7 @@ describe('getInquiriesQuery', () => {
     mockSupabase.then = vi.fn((resolve) => resolve({ data: [mockDbRow], error: null }));
 
     const query = getInquiriesQuery(mockSupabase as unknown as SupabaseClient);
-    const result = await query();
+    const result = await query('NEW');
 
     expect(mockSupabase.from).toHaveBeenCalledWith('appointment_inquiries');
     expect(mockSupabase.select).toHaveBeenCalledWith('*, services:preferred_service_id(name)');
@@ -66,6 +66,15 @@ describe('getInquiriesQuery', () => {
         updatedAt: '2026-06-23T20:56:20Z',
       },
     ]);
+  });
+
+  it('should fetch all inquiries when no status filter', async () => {
+    mockSupabase.then = vi.fn((resolve) => resolve({ data: [], error: null }));
+
+    const query = getInquiriesQuery(mockSupabase as unknown as SupabaseClient);
+    await query();
+
+    expect(mockSupabase.eq).not.toHaveBeenCalled();
   });
 
   it('should throw DomainError on database error', async () => {

@@ -6,7 +6,7 @@ const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 export const getAvailableTimeSlotsSchema = z.object({
   serviceId: z.string().uuid('Invalid Service ID format'),
   // Omit or pass undefined for 'Any Doctor'
-  doctorId: z.string().uuid('Invalid Doctor ID format').optional().or(emptyStringToUndefined),
+  doctorId: z.string().uuid('Invalid Doctor ID format').optional().nullable().or(emptyStringToUndefined),
   // Specific date clicked on the calendar wizard
   date: z.string().regex(DATE_REGEX, 'Date must be in YYYY-MM-DD format'),
 });
@@ -15,8 +15,8 @@ export type GetAvailableTimeSlotsDto = z.infer<typeof getAvailableTimeSlotsSchem
 
 // Shared Slot Entity
 export const availableSlotSchema = z.object({
-  startTime: z.string().datetime({ message: 'Must be a valid ISO UTC timestamp' }),
-  endTime: z.string().datetime({ message: 'Must be a valid ISO UTC timestamp' }),
+  startTime: z.string().regex(/^\d{2}:\d{2}$/, { message: 'Must be HH:MM format' }),
+  endTime: z.string().regex(/^\d{2}:\d{2}$/, { message: 'Must be HH:MM format' }),
   // Houses the implicitly assigned least-busy doctor if 'Any Doctor' was picked
   doctorId: z.string().uuid(),
   doctorName: z.string().trim(),

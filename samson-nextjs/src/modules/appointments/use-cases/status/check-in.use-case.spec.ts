@@ -11,8 +11,8 @@ describe('checkInUseCase', () => {
     serviceId: 'service-id',
     status: 'APPROVED',
     date: '2026-06-26',
-    startTime: '2026-06-26T12:00:00.000Z',
-    endTime: '2026-06-26T13:00:00.000Z',
+    startTime: '12:00',
+    endTime: '13:00',
     rescheduleCount: 0,
     source: 'SELF_BOOKED',
     doctorAssignmentSource: 'SYSTEM',
@@ -29,8 +29,8 @@ describe('checkInUseCase', () => {
   });
 
   it('successfully transitions to CHECKED_IN within allowed window', async () => {
-    // Set system time to 11:45 AM (15 minutes before startTime)
-    vi.setSystemTime(new Date('2026-06-26T11:45:00.000Z'));
+    // Set system time to 11:45 +08:00 (15 minutes before startTime 12:00 +08:00)
+    vi.setSystemTime(new Date('2026-06-26T03:45:00.000Z'));
 
     const getAppointmentById = vi.fn().mockResolvedValue(mockAppointment);
     const updateAppointmentStatusTransaction = vi.fn().mockResolvedValue({
@@ -78,8 +78,8 @@ describe('checkInUseCase', () => {
   });
 
   it('fails check-in if checked in too early (e.g. 45 mins before)', async () => {
-    // Set system time to 11:10 AM (50 minutes before startTime)
-    vi.setSystemTime(new Date('2026-06-26T11:10:00.000Z'));
+    // Set system time to 11:15 +08:00 (45 minutes before startTime 12:00 +08:00)
+    vi.setSystemTime(new Date('2026-06-26T03:15:00.000Z'));
 
     const getAppointmentById = vi.fn().mockResolvedValue(mockAppointment);
     const updateAppointmentStatusTransaction = vi.fn();
@@ -97,8 +97,8 @@ describe('checkInUseCase', () => {
   });
 
   it('fails check-in if checked in too late (e.g. after endTime)', async () => {
-    // Set system time to 1:05 PM (5 minutes after endTime)
-    vi.setSystemTime(new Date('2026-06-26T13:05:00.000Z'));
+    // Set system time to 13:05 +08:00 (5 minutes after endTime 13:00 +08:00)
+    vi.setSystemTime(new Date('2026-06-26T05:05:00.000Z'));
 
     const getAppointmentById = vi.fn().mockResolvedValue(mockAppointment);
     const updateAppointmentStatusTransaction = vi.fn();

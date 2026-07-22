@@ -1,7 +1,7 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 
 interface AppointmentCancelFormProps {
@@ -14,24 +14,96 @@ interface AppointmentCancelFormProps {
   onBack: () => void;
 }
 
+const CANCEL_REASONS = [
+  { value: 'Patient requested reschedule / cancellation', label: 'Patient requested' },
+  { value: 'Assigned dentist unavailable today', label: 'Dentist unavailable' },
+  { value: 'Unexpected clinic emergency / closure', label: 'Clinic emergency/holiday' },
+  { value: 'CUSTOM', label: 'Other / Custom Reason...' },
+];
+
 export function AppointmentCancelForm(props: AppointmentCancelFormProps) {
+  const [preset, setPreset] = useState<string>(props.reasonPreset || CANCEL_REASONS[0].value);
+  const [customText, setCustomText] = useState<string>(props.reasonCustom || '');
+
+  useEffect(() => {
+    props.setReasonPreset(preset);
+  }, [preset]);
+
+  useEffect(() => {
+    props.setReasonCustom(customText);
+  }, [customText]);
+
+  const handleSelectChange = (val: string) => {
+    setPreset(val);
+    props.setReasonPreset(val);
+    if (val !== 'CUSTOM') {
+      props.setReasonCustom('');
+    }
+  };
+
+  const handleCustomChange = (val: string) => {
+    setCustomText(val);
+    props.setReasonCustom(val);
+  };
+
+  const activeReason = preset === 'CUSTOM' ? customText : preset;
+
   return (
-    <form onSubmit={(event) => { event.preventDefault(); props.onSubmit(); }} className="flex flex-col gap-3 border-t border-card-border/60 pt-3">
-      <h4 className="text-xs font-bold text-red-500">Cancel Appointment Slot</h4>
-      <div>
-        <label className="text-[10px] text-text-muted mb-0.5 block">Select Reason</label>
-        <Select value={props.reasonPreset} onChange={(event) => props.setReasonPreset(event.target.value)} className="text-xs w-full" options={[{ value: '', label: 'Select cancellation reason...' }, { value: 'Patient requested reschedule / cancellation', label: 'Patient requested' }, { value: 'Assigned dentist unavailable today', label: 'Dentist unavailable' }, { value: 'Unexpected clinic emergency / closure', label: 'Clinic emergency/holiday' }, { value: 'CUSTOM', label: 'Other (write below)' }]} />
+    <form
+      onSubmit={(event) => {
+        event.preventDefault();
+        props.onSubmit();
+      }}
+      className="flex flex-col gap-4 pt-1"
+    >
+      <div className="flex flex-col gap-0.5">
+        <h3 className="text-base font-medium text-destructive">Cancel Slot</h3>
+        <p className="text-xs text-muted-foreground">Select a cancellation reason to confirm.</p>
       </div>
-      {props.reasonPreset === 'CUSTOM' && (
-        <div>
-          <label className="text-[10px] text-text-muted mb-0.5 block">Details</label>
-          <Textarea placeholder="Write custom cancellation reason..." value={props.reasonCustom} onChange={(event) => props.setReasonCustom(event.target.value)} className="text-xs w-full min-h-[60px]" required />
-        </div>
-      )}
-      <div className="flex gap-2">
-        <Button type="submit" disabled={props.isSubmitting} className="text-xs py-1.5 flex-1 bg-red-500 text-white hover:bg-red-600">{props.isSubmitting ? 'Processing...' : 'Cancel Appointment'}</Button>
-        <Button type="button" onClick={props.onBack} className="text-xs py-1.5 flex-1 border border-card-border text-text-primary bg-transparent">Back</Button>
+
+      <div className="flex flex-col gap-1.5">
+        <label className="text-xs text-muted-foreground">Reason <span className="text-destructive">*</span></label>
+        <select
+          value={preset}
+          onChange={(e) => handleSelectChange(e.target.value)}
+          className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
+          required
+        >
+          {CANCEL_REASONS.map((r) => (
+            <option key={r.value} value={r.value}>
+              {r.label}
+            </option>
+          ))}
+        </select>
+
+        {preset === 'CUSTOM' && (
+          <Textarea
+            placeholder="Enter custom cancellation reason..."
+            value={customText}
+            onChange={(e) => handleCustomChange(e.target.value)}
+            className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border min-h-[60px] resize-none"
+            required
+          />
+        )}
+      </div>
+
+      <div className="flex gap-2 pt-1">
+        <Button
+          type="submit"
+          disabled={props.isSubmitting || !activeReason.trim()}
+          className="flex-1 h-[42px] text-sm font-medium bg-destructive text-white hover:bg-destructive/90 rounded-xl disabled:opacity-50"
+        >
+          {props.isSubmitting ? 'Canceling...' : 'Confirm'}
+        </Button>
+        <Button
+          type="button"
+          onClick={props.onBack}
+          className="flex-1 h-[42px] text-sm font-medium border border-card-border text-foreground bg-transparent hover:bg-muted rounded-xl"
+        >
+          Cancel
+        </Button>
       </div>
     </form>
   );
 }
+

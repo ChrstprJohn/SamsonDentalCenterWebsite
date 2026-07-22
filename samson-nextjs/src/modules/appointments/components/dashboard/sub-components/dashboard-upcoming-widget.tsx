@@ -48,7 +48,7 @@ export function DashboardUpcomingWidget({
               <p className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-semibold mt-2">
                 <span>📅</span>
                 <span>
-                  {nextAppointment.date} at {formatTime(nextAppointment.startTime)}
+                  {nextAppointment.date} at {nextAppointment.startTime ? formatTime(nextAppointment.startTime) : (nextAppointment.preferredStartTime ? `${nextAppointment.preferredStartTime} (Preference)` : 'Time Pending')}
                 </span>
               </p>
             </div>

@@ -9,13 +9,16 @@ export const submitBookingSchema = z
     .object({
         idempotencyKey: z.string().uuid('Idempotency key must be a valid UUID'),
         serviceId: z.string().uuid('Invalid Service ID format'),
-        doctorId: z.string().uuid('Invalid Doctor ID format'), // Comes precisely from the availability slot data
+        doctorId: z.string().uuid('Invalid Doctor ID format').nullable().optional(), // null = 'ANY' doctor preference
         isPreferredDoctor: z.boolean().optional().default(false), // Optional tracking metric for database telemetry
         doctorAssignmentSource: z.enum(['SYSTEM', 'USER']).optional().default('SYSTEM'),
 
         date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format'),
-        startTime: z.string().datetime('Must be a valid ISO string'),
-        endTime: z.string().datetime('Must be a valid ISO string'),
+        startTime: z.string().regex(/^\d{2}:\d{2}$/, 'Must be HH:MM format (e.g. 09:00)').optional().or(emptyStringToUndefined),
+        endTime: z.string().regex(/^\d{2}:\d{2}$/, 'Must be HH:MM format (e.g. 09:25)').optional().or(emptyStringToUndefined),
+        preferredStartTime: z.string().regex(/^(?:[01]\d|2[0-3]):[0-5]\d$/, {
+            message: 'Preferred start time is required (HH:MM)',
+        }),
         userNote: cleanOptionalString,
 
         patientType: z.enum(['SELF', 'EXISTING_DEPENDENT', 'NEW_DEPENDENT']),
@@ -40,13 +43,15 @@ export const submitBookingSchema = z
         dependentRelationship: dependentRelationshipEnum.optional(),
     })
     .superRefine((data, ctx) => {
-        // 1. Chronological Ordering Boundary Guard
-        if (new Date(data.startTime) >= new Date(data.endTime)) {
-            ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                message: 'Start time must be before end time',
-                path: ['endTime'],
-            });
+        // 1. Chronological Ordering Boundary Guard (HH:MM strings compare correctly lexicographically)
+        if (data.startTime && data.endTime) {
+            if (data.startTime >= data.endTime) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: 'Start time must be before end time',
+                    path: ['endTime'],
+                });
+            }
         }
 
         // 2. Bound Family Verification Verification Rule

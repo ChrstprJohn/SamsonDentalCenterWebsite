@@ -2,6 +2,7 @@ import { SupabaseClient } from '@supabase/supabase-js';
 import { DomainError } from '@/shared/errors';
 import { AppointmentDto, mapAppointmentRecord } from '../../dtos/exports';
 import { AppointmentStatusValue } from './update-status.commands';
+import { formatToTimestamptz } from '../../utils/time.utils';
 
 export const updateAppointmentStatusTransactionCommand = (supabase: SupabaseClient) => {
   return async (
@@ -31,8 +32,8 @@ export const updateAppointmentStatusTransactionCommand = (supabase: SupabaseClie
       p_new_status:        newStatus,
       p_reason:            reason ?? null,
       p_reschedule_date:   rescheduleMetadata?.date ?? null,
-      p_reschedule_start:  rescheduleMetadata?.startTime ?? null,
-      p_reschedule_end:    rescheduleMetadata?.endTime ?? null,
+      p_reschedule_start:  rescheduleMetadata ? formatToTimestamptz(rescheduleMetadata.date, rescheduleMetadata.startTime) : null,
+      p_reschedule_end:    rescheduleMetadata ? formatToTimestamptz(rescheduleMetadata.date, rescheduleMetadata.endTime) : null,
       p_reschedule_doctor: rescheduleMetadata?.doctorId ?? null,
       p_reschedule_service: rescheduleMetadata?.serviceId ?? null,
       p_clear_proposed:    clearProposedMetadata ?? false,

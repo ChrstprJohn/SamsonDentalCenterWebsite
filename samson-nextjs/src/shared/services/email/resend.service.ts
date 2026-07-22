@@ -6,6 +6,10 @@ import SignupOtpEmail from '@/components/emails/signup-otp-email';
 import ResetPasswordOtpEmail from '@/components/emails/reset-password-otp-email';
 import AppointmentRequestReceivedEmail from '@/components/emails/appointment-request-received-email';
 import AppointmentConfirmedEmail from '@/components/emails/appointment-confirmed-email';
+import AppointmentCancelledEmail from '@/components/emails/appointment-cancelled-email';
+import AppointmentRescheduledEmail from '@/components/emails/appointment-rescheduled-email';
+import StaffReplyEmail from '@/components/emails/staff-reply-email';
+import AppointmentReminderEmail from '@/components/emails/appointment-reminder-email';
 
 if (!process.env.RESEND_API_KEY) {
   // We don't throw an error at boot, but we will throw when attempting to send if missing.
@@ -38,6 +42,35 @@ type EmailTemplates = {
     dateStr: string;
     timeRangeStr: string;
     appointmentId: string;
+    chatToken?: string;
+    baseUrl?: string;
+  };
+  'appointment_reminder': {
+    reminderTitle?: string;
+    patientName: string;
+    serviceName: string;
+    doctorName: string;
+    dateStr: string;
+    timeRangeStr: string;
+    appointmentId: string;
+    chatToken?: string;
+    baseUrl?: string;
+  };
+  'appointment_cancelled': {
+    patientName: string;
+    dateStr: string;
+  };
+  'appointment_rescheduled': {
+    patientName: string;
+    dateStr: string;
+    timeRangeStr: string;
+    chatToken: string;
+    baseUrl: string;
+  };
+  'staff_reply': {
+    patientName: string;
+    chatToken: string;
+    baseUrl: string;
   };
 };
 
@@ -103,6 +136,51 @@ export const ResendService = {
           dateStr: reqPayload.dateStr,
           timeRangeStr: reqPayload.timeRangeStr,
           appointmentId: reqPayload.appointmentId,
+          chatToken: reqPayload.chatToken,
+          baseUrl: reqPayload.baseUrl,
+        }));
+        break;
+      }
+      case 'appointment_reminder': {
+        const reqPayload = payload as EmailTemplates['appointment_reminder'];
+        html = await render(React.createElement(AppointmentReminderEmail, {
+          reminderTitle: reqPayload.reminderTitle,
+          patientName: reqPayload.patientName,
+          serviceName: reqPayload.serviceName,
+          doctorName: reqPayload.doctorName,
+          dateStr: reqPayload.dateStr,
+          timeRangeStr: reqPayload.timeRangeStr,
+          appointmentId: reqPayload.appointmentId,
+          chatToken: reqPayload.chatToken,
+          baseUrl: reqPayload.baseUrl,
+        }));
+        break;
+      }
+      case 'appointment_cancelled': {
+        const reqPayload = payload as EmailTemplates['appointment_cancelled'];
+        html = await render(React.createElement(AppointmentCancelledEmail, {
+          patientName: reqPayload.patientName,
+          dateStr: reqPayload.dateStr,
+        }));
+        break;
+      }
+      case 'appointment_rescheduled': {
+        const reqPayload = payload as EmailTemplates['appointment_rescheduled'];
+        html = await render(React.createElement(AppointmentRescheduledEmail, {
+          patientName: reqPayload.patientName,
+          dateStr: reqPayload.dateStr,
+          timeRangeStr: reqPayload.timeRangeStr,
+          chatToken: reqPayload.chatToken,
+          baseUrl: reqPayload.baseUrl,
+        }));
+        break;
+      }
+      case 'staff_reply': {
+        const reqPayload = payload as EmailTemplates['staff_reply'];
+        html = await render(React.createElement(StaffReplyEmail, {
+          patientName: reqPayload.patientName,
+          chatToken: reqPayload.chatToken,
+          baseUrl: reqPayload.baseUrl,
         }));
         break;
       }

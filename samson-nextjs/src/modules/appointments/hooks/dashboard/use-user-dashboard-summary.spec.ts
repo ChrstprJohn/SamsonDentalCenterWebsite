@@ -33,15 +33,18 @@ const appointment = (id: string, status: AppointmentDto['status'], date: string,
     patient: null,
     dependent: null,
     statusHistory: [],
+    preferredStartTime: null,
+    proposedPreferredStartTime: null,
+    guestContact: null,
   });
 
 describe('useUserDashboardSummary', () => {
   it('selects the nearest actionable upcoming appointment', () => {
     const { result } = renderHook(() =>
       useUserDashboardSummary([
-        appointment('later', 'APPROVED', '2026-07-20', '10:00'),
-        appointment('cancelled', 'CANCELLED', '2026-07-01', '09:00'),
-        appointment('soon', 'CHECKED_IN', '2026-07-02', '08:30'),
+        appointment('later', 'APPROVED', '2026-08-20', '10:00'),
+        appointment('cancelled', 'CANCELLED', '2026-08-01', '09:00'),
+        appointment('soon', 'CHECKED_IN', '2026-08-02', '08:30'),
       ])
     );
 

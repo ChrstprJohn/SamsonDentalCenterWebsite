@@ -10,6 +10,7 @@ import {
   NameFields,
   NotesField,
   PathwaySelect,
+  PreferenceFields,
   SubmitButton,
   type ContactFormFields,
 } from './contact-form-fields';
@@ -59,6 +60,7 @@ export function ContactFormCard(props: ContactFormCardProps) {
               <NameFields fields={fields} />
               <ContactFields fields={fields} phone={props.phone} setPhone={props.setPhone} />
               <PathwaySelect services={props.services} pathway={props.pathway} setPathway={props.setPathway} />
+              <PreferenceFields fields={fields} />
               <div className="flex flex-col gap-2 font-sans">
                 <label className="text-[10px] tracking-wider uppercase font-semibold text-gray-500">Preferred Target Date *</label>
                 <ContactCalendar

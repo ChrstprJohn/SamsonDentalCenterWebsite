@@ -1,7 +1,8 @@
 import { createAdminClient } from '@/shared/database/server';
 import { ResendService } from '@/shared/services/email/resend.service';
 import { manualBookingGuestEventSchema } from '../dtos/events/manual-booking-guest.event.dto';
-import { formatShortDate, formatClinicTime, calculateEndTimeFromIso } from '@/shared/utils/date.util';
+import { formatShortDate, formatClinicTime, calculateEndTime } from '@/shared/utils/date.util';
+import { getBaseUrl } from '@/shared/utils/get-base-url.util';
 
 export const onManualBookingGuestSubscriber = {
   /**
@@ -39,9 +40,18 @@ export const onManualBookingGuestSubscriber = {
 
     const doctorName = `Dr. ${doctor.first_name} ${doctor.last_name}`;
     const dateStr = formatShortDate(date);
-    const start = new Date(startTime);
-    const end = calculateEndTimeFromIso(startTime, durationMinutes);
+    const start = startTime;
+    const end = calculateEndTime(startTime, durationMinutes);
     const timeRangeStr = `${formatClinicTime(start)} - ${formatClinicTime(end)}`;
+
+    const { data: appt } = await supabaseAdmin
+      .from('appointments')
+      .select('chat_token')
+      .eq('id', appointmentId)
+      .single();
+
+    const chatToken = appt?.chat_token || '';
+    const baseUrl = getBaseUrl();
 
     await ResendService.sendTemplatedEmail(
       guestEmail,
@@ -54,7 +64,23 @@ export const onManualBookingGuestSubscriber = {
         dateStr,
         timeRangeStr,
         appointmentId,
+        chatToken,
+        baseUrl,
       }
     );
+
+    await supabaseAdmin
+      .from('appointments')
+      .update({ confirmation_sent: true })
+      .eq('id', appointmentId);
+
+    try {
+      await supabaseAdmin
+        .from('appointments')
+        .update({ email_confirmation_sent: true })
+        .eq('id', appointmentId);
+    } catch {
+      // Ignore if optional column doesn't exist
+    }
   },
 };

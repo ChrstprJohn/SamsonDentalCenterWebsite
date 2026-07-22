@@ -17,7 +17,10 @@ interface BookSchedulePanelProps {
   selectDoctor: (doctorId: string) => void;
   timeslots: { startTime: string; endTime: string }[];
   selectedTime: string;
+  selectedEndTime?: string;
   selectTimeslot: (slot: { startTime: string; endTime: string }) => void;
+  onStartTimeChange?: (time: string) => void;
+  onEndTimeChange?: (time: string) => void;
   patientNote: string;
   setPatientNote: (value: string) => void;
   isLoadingServices: boolean;
@@ -27,18 +30,22 @@ interface BookSchedulePanelProps {
   isSubmitting: boolean;
   isReadyToSubmit: boolean;
   onSubmit: () => void;
+  confirmationChannel?: 'EMAIL' | 'SMS' | 'NONE';
+  setConfirmationChannel?: (channel: 'EMAIL' | 'SMS' | 'NONE') => void;
+  hideCalendar?: boolean;
 }
 
 export function BookSchedulePanel(props: BookSchedulePanelProps) {
   return (
-    <div className="lg:col-span-7 border border-card-border bg-card rounded-3xl p-6 shadow-md flex flex-col gap-5 justify-between">
+    <div className="w-full flex flex-col gap-5 justify-between">
       <div className="flex flex-col gap-5">
         <div className="flex flex-col gap-1">
           <h2 className="text-sm font-bold text-text-secondary">Service & Schedule</h2>
           <p className="text-xs text-text-muted">Select service, date, doctor, and time slot.</p>
         </div>
         <ServiceChips {...props} />
-        <ScheduleCalendar {...props} />
+        {!props.hideCalendar && <ScheduleCalendar {...props} />}
+        <ConfirmationChannelPicker confirmationChannel={props.confirmationChannel} setConfirmationChannel={props.setConfirmationChannel} />
         <PatientNote value={props.patientNote} onChange={props.setPatientNote} />
       </div>
       <Button type="button" variant="primary" className="w-full text-xs font-bold py-3 mt-2" disabled={props.isSubmitting || !props.isReadyToSubmit} onClick={props.onSubmit}>
@@ -97,7 +104,28 @@ function ScheduleCalendar(props: BookSchedulePanelProps) {
         </div>
       </div>
       {props.selectedDate && <DoctorPicker {...props} />}
-      {props.selectedDoctor && <TimeslotPicker {...props} />}
+      {props.selectedDoctor && (
+        <div className="grid grid-cols-2 gap-4 mt-2">
+          <div className="flex flex-col gap-1.5">
+            <span className="text-[10px] font-bold uppercase text-text-muted tracking-wider">Start Time</span>
+            <input
+              type="time"
+              value={props.selectedTime}
+              onChange={(event) => props.onStartTimeChange?.(event.target.value)}
+              className="text-xs border border-card-border rounded-xl px-3 py-2 bg-secondary-bg/20 text-text-primary focus:outline-none focus:border-primary-start/60"
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <span className="text-[10px] font-bold uppercase text-text-muted tracking-wider">End Time</span>
+            <input
+              type="time"
+              value={props.selectedEndTime || ''}
+              onChange={(event) => props.onEndTimeChange?.(event.target.value)}
+              className="text-xs border border-card-border rounded-xl px-3 py-2 bg-secondary-bg/20 text-text-primary focus:outline-none focus:border-primary-start/60"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -122,10 +150,6 @@ function CalendarDay({ day, date, isAvailable, isSelected, onSelect }: { day: nu
 
 function DoctorPicker(props: BookSchedulePanelProps) {
   return <ChoiceGrid label="Available Dentist" isLoading={props.isLoadingDoctors} loadingLabel="Scanning schedules..." emptyLabel="No doctors scheduled for this service on this date." items={props.availableDoctors} selectedId={props.selectedDoctor} getId={(doctor) => doctor.doctorId} getTitle={(doctor) => doctor.doctorName} getCaption={() => 'Shift scheduled'} onSelect={props.selectDoctor} />;
-}
-
-function TimeslotPicker(props: BookSchedulePanelProps) {
-  return <ChoiceGrid label="Timeslot" isLoading={props.isLoadingSlots} loadingLabel="Retrieving slots..." emptyLabel="No available timeslots for this dentist on this date." items={props.timeslots} selectedId={props.selectedTime} getId={(slot) => slot.startTime} getTitle={(slot) => formatTimeLabel(slot.startTime)} getCaption={() => ''} onSelect={(startTime) => props.selectTimeslot(props.timeslots.find((slot) => slot.startTime === startTime)!)} />;
 }
 
 function ChoiceGrid<T>({ label, isLoading, loadingLabel, emptyLabel, items, selectedId, getId, getTitle, getCaption, onSelect }: { label: string; isLoading: boolean; loadingLabel: string; emptyLabel: string; items: T[]; selectedId: string; getId: (item: T) => string; getTitle: (item: T) => string; getCaption: (item: T) => string; onSelect: (id: string) => void }) {
@@ -159,4 +183,35 @@ function formatTimeLabel(isoStr: string) {
   } catch {
     return isoStr;
   }
+}
+
+function ConfirmationChannelPicker({
+  confirmationChannel = 'NONE',
+  setConfirmationChannel,
+}: {
+  confirmationChannel?: 'EMAIL' | 'SMS' | 'NONE';
+  setConfirmationChannel?: (channel: 'EMAIL' | 'SMS' | 'NONE') => void;
+}) {
+  if (!setConfirmationChannel) return null;
+  return (
+    <div className="border border-card-border/60 rounded-2xl p-4 bg-secondary-bg/10 flex flex-col gap-2">
+      <label className="text-[9px] font-bold text-text-secondary uppercase">Notification Channel</label>
+      <div className="flex gap-2">
+        {(['EMAIL', 'SMS', 'NONE'] as const).map((channel) => (
+          <button
+            key={channel}
+            type="button"
+            onClick={() => setConfirmationChannel(channel)}
+            className={`px-3 py-2 rounded-lg text-xs font-semibold border transition-all ${
+              confirmationChannel === channel
+                ? 'bg-primary-start text-white border-primary-start shadow-sm'
+                : 'bg-card border-card-border text-text-secondary hover:text-text-primary'
+            }`}
+          >
+            {channel === 'EMAIL' ? 'Email' : channel === 'SMS' ? 'SMS' : 'None'}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
 }

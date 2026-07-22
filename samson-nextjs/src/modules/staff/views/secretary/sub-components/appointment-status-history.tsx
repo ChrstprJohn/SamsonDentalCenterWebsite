@@ -2,25 +2,85 @@
 
 import type { AppointmentDto } from '@/modules/appointments/dtos/shared/appointment.dto';
 
-export function AppointmentStatusHistory({ appointment, activeTab }: { appointment: AppointmentDto; activeTab: 'upcoming' | 'history' }) {
+type TimelineEntry = {
+  id: string;
+  status: string;
+  label: string;
+  time: string;
+  reason: string | null;
+  actor: string;
+};
+
+const statusLabels: Record<string, string> = {
+  PENDING: 'Requested',
+  APPROVED: 'Approved',
+  REJECTED: 'Rejected',
+  CANCELLED: 'Cancelled',
+  RESCHEDULE_REQUESTED: 'Reschedule Requested',
+  DISPLACED: 'Displaced',
+  CHECKED_IN: 'Checked In',
+  TREATMENT_RENDERED: 'Treatment Rendered',
+  COMPLETED: 'Completed',
+  NO_SHOW: 'No Show',
+};
+
+function getStatusStyle(status: string) {
+  switch (status) {
+    case 'PENDING': return { dot: '#f59e0b', bg: '#fef3c7' };
+    case 'APPROVED': return { dot: '#22c55e', bg: '#dcfce7' };
+    case 'REJECTED':
+    case 'CANCELLED': return { dot: '#ef4444', bg: '#fee2e2' };
+    case 'RESCHEDULE_REQUESTED': return { dot: '#06b6d4', bg: '#cffafe' };
+    case 'DISPLACED':
+    case 'NO_SHOW': return { dot: '#f97316', bg: '#ffedd5' };
+    case 'CHECKED_IN': return { dot: '#8b5cf6', bg: '#ede9fe' };
+    case 'TREATMENT_RENDERED': return { dot: '#14b8a6', bg: '#ccfbf1' };
+    case 'COMPLETED': return { dot: '#22c55e', bg: '#dcfce7' };
+    default: return { dot: '#6b7280', bg: '#f3f4f6' };
+  }
+}
+
+function formatTime(iso: string) {
+  const d = new Date(iso);
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) +
+    ', ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+}
+
+export function AppointmentStatusHistory({ appointment, activeTab, compact }: { appointment: AppointmentDto; activeTab: 'upcoming' | 'history'; compact?: boolean }) {
+  const entries = buildTimelineEntries(appointment);
+
   return (
     <>
-      <div className="border-t border-card-border/80 pt-4 flex flex-col gap-3">
-        <span className="text-xs font-bold text-text-secondary">Immutable Status History Logs</span>
-        {!appointment.statusHistory || appointment.statusHistory.length === 0 ? (
-          <span className="text-[11px] text-text-muted italic">No state changes recorded yet.</span>
+      <div className="pt-4 flex flex-col gap-4">
+        <span className={`${compact ? 'text-sm' : 'text-base'} font-medium text-foreground`}>Appointment Timeline</span>
+        {entries.length === 0 ? (
+          <span className="text-xs text-text-muted italic">No status changes recorded yet.</span>
         ) : (
-          <div className="flex flex-col gap-3">
-            {appointment.statusHistory.map((history) => (
-              <div key={history.id} className="border border-card-border/40 rounded-xl p-2.5 bg-secondary-bg/10 flex flex-col gap-1">
-                <div className="flex justify-between text-[10px]">
-                  <span className="font-bold text-text-primary">{history.previousStatus ? `${history.previousStatus} -> ` : ''}{history.newStatus}</span>
-                  <span className="text-text-muted">{new Date(history.createdAt).toLocaleDateString()}</span>
-                </div>
-                {history.reason && <p className="text-[11px] text-text-secondary leading-relaxed">&quot;{history.reason}&quot;</p>}
-                <span className="text-[9px] text-text-muted text-right">- {history.actorRole}</span>
-              </div>
-            ))}
+          <div className="relative">
+            <div className="absolute left-[11px] top-2 bottom-2 w-px bg-border/60" />
+            <div className="flex flex-col">
+              {entries.map((entry, i) => {
+                const style = getStatusStyle(entry.status);
+                return (
+                  <div key={entry.id} className="relative pl-8 pb-5 last:pb-0">
+                    <div
+                      className="absolute left-[5px] top-[5px] size-3 rounded-full border-2 z-10"
+                      style={{ borderColor: style.dot, backgroundColor: style.bg }}
+                    />
+                    <div className="flex flex-col gap-0.5">
+                      <div className="flex items-baseline gap-2 flex-wrap">
+                        <span className="text-xs font-semibold" style={{ color: style.dot }}>{statusLabels[entry.status] || entry.status}</span>
+                        <span className="text-xs text-text-muted">{formatTime(entry.time)}</span>
+                      </div>
+                      {entry.reason && (
+                        <p className="text-xs text-text-secondary leading-relaxed">&ldquo;{entry.reason}&rdquo;</p>
+                      )}
+                      <span className="text-[10px] text-text-muted">- {entry.actor}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
       </div>
@@ -35,4 +95,39 @@ export function AppointmentStatusHistory({ appointment, activeTab }: { appointme
       )}
     </>
   );
+}
+
+function buildTimelineEntries(appointment: AppointmentDto): TimelineEntry[] {
+  const history = appointment.statusHistory || [];
+  const entries: TimelineEntry[] = [];
+
+  const needsPendingPrepend = history.length === 0 ||
+    !(history[0].previousStatus === 'PENDING' || history[0].newStatus === 'PENDING');
+
+  if (needsPendingPrepend) {
+    const isStaffCreated = appointment.source === 'STAFF_CREATED';
+    entries.push({
+      id: 'initial',
+      status: 'PENDING',
+      label: 'Requested',
+      time: appointment.createdAt || new Date().toISOString(),
+      reason: null,
+      actor: isStaffCreated ? 'Secretary' : 'Patient',
+    });
+  }
+
+  for (const h of history) {
+    const rawActor = h.actorRole || 'System';
+    const displayActor = rawActor === 'STAFF' || rawActor === 'SECRETARY' ? 'Secretary' : rawActor;
+    entries.push({
+      id: h.id,
+      status: h.newStatus,
+      label: statusLabels[h.newStatus] || h.newStatus,
+      time: h.createdAt,
+      reason: h.reason,
+      actor: displayActor,
+    });
+  }
+
+  return entries;
 }

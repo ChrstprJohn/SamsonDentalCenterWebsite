@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import type { AppointmentDto } from '../../dtos/shared/appointment.dto';
-import { formatShortDate, formatClinicTime } from '@/shared/utils/date.util';
+import { formatShortDate, formatClinicTime, formatTimeString } from '@/shared/utils/date.util';
 
 interface AppointmentTeaserCardProps {
   appt: AppointmentDto;
@@ -16,7 +16,11 @@ export function AppointmentTeaserCard({ appt }: AppointmentTeaserCardProps) {
     : 'Unknown Patient';
 
   const dateStr = formatShortDate(appt.date);
-  const timeWindow = `${formatClinicTime(appt.startTime)} - ${formatClinicTime(appt.endTime)}`;
+  const timeWindow = appt.startTime && appt.endTime
+    ? `${formatClinicTime(appt.startTime)} - ${formatClinicTime(appt.endTime)}`
+    : appt.preferredStartTime
+      ? `Preference: ${formatTimeString(appt.preferredStartTime)}`
+      : 'Time pending';
 
   const getStatusLabel = (status: string) => {
     switch (status) {

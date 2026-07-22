@@ -7,29 +7,38 @@ import type { ServiceResponseDto } from '@/modules/services/dtos/management/serv
 export interface ContactFormFields {
   firstName: string;
   setFirstName: (val: string) => void;
-  middleName: string;
-  setMiddleName: (val: string) => void;
   lastName: string;
   setLastName: (val: string) => void;
-  suffix: string;
-  setSuffix: (val: string) => void;
   contactEmail: string;
   setContactEmail: (val: string) => void;
+  preferredStartTime: string;
+  setPreferredStartTime: (val: string) => void;
   isContactSubmitting: boolean;
+  contactMessage: string;
+  setContactMessage: (val: string) => void;
+}
+
+export function PreferenceFields({ fields }: { fields: ContactFormFields }) {
+  return (
+    <div className="flex flex-col gap-2 font-sans">
+      <label className="text-[10px] tracking-wider uppercase font-semibold text-gray-500">Preferred Start Time *</label>
+      <input
+        type="time"
+        required
+        value={fields.preferredStartTime}
+        onChange={(event) => fields.setPreferredStartTime(event.target.value)}
+        className="w-full bg-white border border-[#E4E4DC] px-4 py-3 rounded-none text-xs sm:text-sm focus:outline-none focus:border-[#D94E4E] transition-colors"
+      />
+    </div>
+  );
 }
 
 export function NameFields({ fields }: { fields: ContactFormFields }) {
   return (
-    <>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <TextField label="First Name *" value={fields.firstName} onChange={fields.setFirstName} required placeholder="Eleanor" />
-        <TextField label="Middle Name" value={fields.middleName} onChange={fields.setMiddleName} placeholder="Jean" />
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <TextField label="Last Name *" value={fields.lastName} onChange={fields.setLastName} required placeholder="Vance" />
-        <TextField label="Suffix" value={fields.suffix} onChange={fields.setSuffix} placeholder="Jr. / III" />
-      </div>
-    </>
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <TextField label="First Name *" value={fields.firstName} onChange={fields.setFirstName} required placeholder="Eleanor" />
+      <TextField label="Last Name *" value={fields.lastName} onChange={fields.setLastName} required placeholder="Vance" />
+    </div>
   );
 }
 

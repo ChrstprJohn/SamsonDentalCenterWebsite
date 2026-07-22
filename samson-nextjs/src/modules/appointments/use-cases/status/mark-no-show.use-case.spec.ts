@@ -11,8 +11,8 @@ describe('markNoShowUseCase', () => {
     serviceId: 'service-id',
     status: 'APPROVED',
     date: '2026-06-26',
-    startTime: '2026-06-26T12:00:00.000Z',
-    endTime: '2026-06-26T13:00:00.000Z',
+    startTime: '12:00',
+    endTime: '13:00',
     rescheduleCount: 0,
     source: 'SELF_BOOKED',
     doctorAssignmentSource: 'SYSTEM',
@@ -29,8 +29,8 @@ describe('markNoShowUseCase', () => {
   });
 
   it('successfully transitions to NO_SHOW after endTime has passed', async () => {
-    // Set system time to 1:05 PM (5 minutes after endTime)
-    vi.setSystemTime(new Date('2026-06-26T13:05:00.000Z'));
+    // Set system time to 13:05 +08:00 (5 minutes after endTime 13:00 +08:00)
+    vi.setSystemTime(new Date('2026-06-26T05:05:00.000Z'));
 
     const getAppointmentById = vi.fn().mockResolvedValue(mockAppointment);
     const updateAppointmentStatusTransaction = vi.fn().mockResolvedValue({
@@ -59,8 +59,8 @@ describe('markNoShowUseCase', () => {
   });
 
   it('fails if slot end time has not passed yet', async () => {
-    // Set system time to 12:30 PM (during appointment slot)
-    vi.setSystemTime(new Date('2026-06-26T12:30:00.000Z'));
+    // Set system time to 12:30 +08:00 (during appointment slot)
+    vi.setSystemTime(new Date('2026-06-26T04:30:00.000Z'));
 
     const getAppointmentById = vi.fn().mockResolvedValue(mockAppointment);
     const updateAppointmentStatusTransaction = vi.fn();

@@ -24,8 +24,8 @@ describe('PatientAppointmentsQueries', () => {
         doctor_id: '3a95a63c-333e-4b68-98e3-82bdf1a07bd2',
         status: 'PENDING',
         date: '2023-10-10',
-        start_time: '2023-10-10T10:00:00Z',
-        end_time: '2023-10-10T10:30:00Z'
+        start_time: '10:00',
+        end_time: '10:30'
       }];
       mockSupabase.order.mockResolvedValueOnce({ data: mockData, error: null });
 
@@ -37,7 +37,7 @@ describe('PatientAppointmentsQueries', () => {
       expect(result).toEqual([
         expect.objectContaining({
           id: '1a95a63c-333e-4b68-98e3-82bdf1a07bd2',
-          startTime: '2023-10-10T10:00:00Z',
+          startTime: '10:00',
         }),
       ]);
     });

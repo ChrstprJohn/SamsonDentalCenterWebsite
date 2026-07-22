@@ -40,6 +40,9 @@ const appt = {
   service: null,
   patient: null,
   dependent: null,
+  preferredStartTime: null,
+  proposedPreferredStartTime: null,
+  guestContact: null,
 } as AppointmentDto;
 
 describe('useAppointmentDetail', () => {

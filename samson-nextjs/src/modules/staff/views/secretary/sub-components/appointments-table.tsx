@@ -1,8 +1,16 @@
 'use client';
 
-import { Badge } from '@/components/ui/badge';
 import type { AppointmentDto } from '@/modules/appointments/dtos/shared/appointment.dto';
-import { formatClinicTime, formatShortDate } from '@/shared/utils/date.util';
+import { formatClinicTime, formatShortDate, formatTimeString } from '@/shared/utils/date.util';
+
+const BADGE_STYLES: Record<string, string> = {
+  APPROVED: 'text-blue-600 bg-blue-500/10 dark:text-blue-400',
+  COMPLETED: 'text-emerald-600 bg-emerald-500/10 dark:text-emerald-400',
+  CANCELLED: 'text-rose-600 bg-rose-500/10 dark:text-rose-400',
+  REJECTED: 'text-rose-600 bg-rose-500/10 dark:text-rose-400',
+  NO_SHOW: 'text-amber-600 bg-amber-500/10 dark:text-amber-400',
+  DISPLACED: 'text-amber-600 bg-amber-500/10 dark:text-amber-400',
+};
 
 interface AppointmentsTableProps {
   appointments: AppointmentDto[];
@@ -13,47 +21,70 @@ interface AppointmentsTableProps {
 }
 
 export function AppointmentsTable(props: AppointmentsTableProps) {
+  if (props.isLoading) {
+    return (
+      <div className="flex-1 flex items-center justify-center text-xs text-text-muted p-4">Loading appointments...</div>
+    );
+  }
+
+  if (props.appointments.length === 0) {
+    return (
+      <div className="flex-1 flex items-center justify-center text-xs text-text-muted p-4">No matching appointments found.</div>
+    );
+  }
+
   return (
-    <div className="lg:col-span-7 border border-card-border bg-card rounded-3xl p-5 shadow-sm overflow-hidden flex flex-col min-h-[40vh]">
-      {props.isLoading ? (
-        <div className="flex-1 flex items-center justify-center text-xs text-text-muted">Loading appointments...</div>
-      ) : (
-        <div className="overflow-x-auto flex-1">
-          <table className="w-full text-left text-xs border-collapse">
-            <thead>
-              <tr className="border-b border-card-border text-text-muted font-semibold uppercase tracking-wider">
-                <th className="py-3 px-2">Patient</th><th className="py-3 px-2">Service</th><th className="py-3 px-2">Doctor</th><th className="py-3 px-2">Date & Time</th><th className="py-3 px-2">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {props.appointments.length === 0 ? (
-                <tr><td colSpan={5} className="py-12 text-center text-text-muted">No matching appointments found.</td></tr>
-              ) : (
-                props.appointments.map((appointment) => <AppointmentRow key={appointment.id} appointment={appointment} isSelected={props.selectedAppointmentId === appointment.id} formatPatientName={props.formatPatientName} onSelect={props.onSelect} />)
-              )}
-            </tbody>
-          </table>
-        </div>
-      )}
+    <div className="flex-1 min-h-0 overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
+      style={{ scrollbarWidth: 'thin' }}
+      data-lenis-prevent
+    >
+      <div className="flex flex-col">
+        {props.appointments.map((appointment) => (
+          <AppointmentRow
+            key={appointment.id}
+            appointment={appointment}
+            isSelected={props.selectedAppointmentId === appointment.id}
+            formatPatientName={props.formatPatientName}
+            onSelect={props.onSelect}
+          />
+        ))}
+      </div>
     </div>
   );
 }
 
 function AppointmentRow({ appointment, isSelected, formatPatientName, onSelect }: { appointment: AppointmentDto; isSelected: boolean; formatPatientName: (appointment: AppointmentDto) => string; onSelect: (id: string) => void }) {
-  return (
-    <tr onClick={() => onSelect(appointment.id)} className={`border-b border-card-border/40 hover:bg-secondary-bg/20 cursor-pointer transition-colors ${isSelected ? 'bg-secondary-bg/50' : ''}`}>
-      <td className="py-3.5 px-2 font-semibold text-text-primary">{formatPatientName(appointment)}</td>
-      <td className="py-3.5 px-2 text-text-secondary">{appointment.service?.name || '-'}</td>
-      <td className="py-3.5 px-2 text-text-muted">{appointment.doctor ? `Dr. ${appointment.doctor.lastName}` : '-'}</td>
-      <td className="py-3.5 px-2 text-text-muted text-[11px]">{formatShortDate(appointment.date)} | {formatClinicTime(appointment.startTime)} - {formatClinicTime(appointment.endTime)}</td>
-      <td className="py-3.5 px-2"><Badge variant={getBadgeVariant(appointment.status)}>{appointment.status}</Badge></td>
-    </tr>
-  );
-}
+  const status = appointment.status;
+  const timeDisplay = appointment.startTime && appointment.endTime
+    ? `${formatClinicTime(appointment.startTime)} - ${formatClinicTime(appointment.endTime)}`
+    : appointment.preferredStartTime
+      ? `Pref: ${formatTimeString(appointment.preferredStartTime)}`
+      : 'Time Pending';
 
-function getBadgeVariant(status: string) {
-  if (status === 'COMPLETED') return 'success';
-  if (status === 'APPROVED') return 'info';
-  if (status === 'NO_SHOW' || status === 'DISPLACED') return 'warning';
-  return 'error';
+  const dateDisplay = formatShortDate(appointment.date);
+
+  return (
+    <button
+      onClick={() => onSelect(appointment.id)}
+      className={`flex flex-col items-start w-full gap-2 border-b border-card-border/40 p-4 text-sm leading-tight text-left transition-colors last:border-b-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${
+        isSelected
+          ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+          : 'text-foreground'
+      }`}
+    >
+      <div className="flex w-full items-center gap-2">
+        <span>{formatPatientName(appointment)}</span>
+        <span className={`ml-auto text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded shrink-0 ${BADGE_STYLES[status] || 'text-muted-foreground bg-muted/20'}`}>
+          {status}
+        </span>
+      </div>
+      <span className="font-medium">
+        {appointment.service?.name || 'Treatment'}
+      </span>
+      <div className="w-full flex items-center justify-between gap-2 text-xs">
+        <span className="truncate">{dateDisplay} &bull; {timeDisplay}</span>
+        <span className="text-[10px] text-muted-foreground shrink-0">{appointment.doctor ? `Dr. ${appointment.doctor.lastName}` : ''}</span>
+      </div>
+    </button>
+  );
 }
