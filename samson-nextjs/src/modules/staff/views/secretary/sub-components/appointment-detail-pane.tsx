@@ -8,7 +8,7 @@ import { SharedAppointmentDetail } from '@/modules/appointments/components/sub-c
 import { AppointmentCancelForm } from './appointment-cancel-form';
 import { AppointmentRescheduleForm } from './appointment-reschedule-form';
 import { AppointmentStatusHistory } from './appointment-status-history';
-import { Send, Calendar, RotateCw, CheckCircle2, XCircle, Clock } from 'lucide-react';
+import { Send, Calendar, RotateCw, CheckCircle2, XCircle, Clock, Pencil, X, Check } from 'lucide-react';
 import { updateConfirmationChannelAction } from '@/modules/appointments/actions/status/update-confirmation-channel.action';
 import { resendNotificationAction } from '@/modules/appointments/actions/status/resend-notification.action';
 
@@ -27,6 +27,9 @@ function AppointmentDetails({ appointment, view, activeTab }: { appointment: App
   const [channel, setChannel] = useState<'EMAIL' | 'SMS' | 'BOTH' | 'NONE'>(
     (appointment.confirmationChannel as any) || 'EMAIL'
   );
+  const [draftChannel, setDraftChannel] = useState<'EMAIL' | 'SMS' | 'BOTH' | 'NONE'>(channel);
+  const [isEditingChannel, setIsEditingChannel] = useState(false);
+  const [isSavingChannel, setIsSavingChannel] = useState(false);
   const [commState, setCommState] = useState({
     confirmationSent: appointment.confirmationSent ?? false,
     paymentReceiptSent: appointment.paymentReceiptSent ?? false,
@@ -36,6 +39,7 @@ function AppointmentDetails({ appointment, view, activeTab }: { appointment: App
 
   useEffect(() => {
     setChannel(((appointment.confirmationChannel as any) || 'EMAIL'));
+    setDraftChannel(((appointment.confirmationChannel as any) || 'EMAIL'));
     setCommState({
       confirmationSent: appointment.confirmationSent ?? false,
       paymentReceiptSent: appointment.paymentReceiptSent ?? false,
@@ -60,15 +64,23 @@ function AppointmentDetails({ appointment, view, activeTab }: { appointment: App
     setResending(null);
   };
 
-  const handleChannelChange = async (newChannel: 'EMAIL' | 'SMS' | 'BOTH' | 'NONE') => {
+  const handleSaveChannel = async () => {
+    setIsSavingChannel(true);
     const res = await updateConfirmationChannelAction({
       appointmentId: appointment.id,
-      confirmationChannel: newChannel,
+      confirmationChannel: draftChannel,
     });
     if (res.success) {
-      setChannel(newChannel);
-      appointment.confirmationChannel = newChannel;
+      setChannel(draftChannel);
+      appointment.confirmationChannel = draftChannel;
+      setIsEditingChannel(false);
     }
+    setIsSavingChannel(false);
+  };
+
+  const handleCancelChannel = () => {
+    setDraftChannel(channel);
+    setIsEditingChannel(false);
   };
 
   const commEntries: {
@@ -92,12 +104,35 @@ function AppointmentDetails({ appointment, view, activeTab }: { appointment: App
           {/* Communication History */}
           <div className="py-4 px-5 space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-base font-medium text-foreground">Communication History</span>
+              <div className="flex items-center gap-2">
+                <span className="text-base font-medium text-foreground">Communication History</span>
+                <span className="px-2 py-0.5 text-[10px] font-bold rounded-md bg-primary/10 text-primary border border-primary/20">
+                  {channel}
+                </span>
+              </div>
+              {!isEditingChannel && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsEditingChannel(true)}
+                  className="h-auto px-4 py-2 text-sm gap-1.5 max-sm:px-3 max-sm:py-1.5 max-sm:text-xs"
+                >
+                  <Pencil className="size-4" /> Edit
+                </Button>
+              )}
+              {isEditingChannel && (
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" size="sm" onClick={handleCancelChannel} className="h-auto px-3 py-1.5 text-xs gap-1">
+                    <X className="size-3.5" /> Cancel
+                  </Button>
+                  <Button size="sm" onClick={handleSaveChannel} disabled={isSavingChannel || draftChannel === channel} className="h-auto px-3 py-1.5 text-xs gap-1 bg-slate-900 text-white rounded-md disabled:cursor-not-allowed">
+                    <Check className="size-3.5" /> {isSavingChannel ? 'Saving...' : 'Save'}
+                  </Button>
+                </div>
+              )}
             </div>
 
-            {/* Channel selector — radio buttons always visible */}
-            <div className="p-3 bg-muted/20 border border-card-border/60 rounded-xl">
-              <span className="text-xs font-semibold text-muted-foreground block mb-2">Notification Channel</span>
+            {isEditingChannel && (
               <div className="flex flex-row gap-4 flex-wrap">
                 {(['EMAIL', 'SMS', 'BOTH', 'NONE'] as const).map((opt) => (
                   <label key={opt} className="flex items-center gap-2 text-sm text-foreground cursor-pointer">
@@ -105,15 +140,15 @@ function AppointmentDetails({ appointment, view, activeTab }: { appointment: App
                       type="radio"
                       name="confirmation-channel"
                       value={opt}
-                      checked={channel === opt}
-                      onChange={() => handleChannelChange(opt)}
+                      checked={draftChannel === opt}
+                      onChange={() => setDraftChannel(opt)}
                       className="text-primary focus:ring-primary h-4 w-4"
                     />
                     {opt}
                   </label>
                 ))}
               </div>
-            </div>
+            )}
 
             {/* Dispatch log entries */}
             <div className="flex flex-col gap-2">
