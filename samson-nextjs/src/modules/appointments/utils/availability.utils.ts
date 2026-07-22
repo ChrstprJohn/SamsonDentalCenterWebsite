@@ -27,9 +27,16 @@ export function generateAvailableSlotsForDay(params: GenerateSlotsParams): Gener
     const docId = schedule.doctorId;
     if (!docId) continue;
 
-    // Pre-parse appointments for this doctor — supports both HH:MM strings and ISO strings
+    // Pre-parse active appointments for this doctor — excludes terminal non-occupying statuses
     const docAppointmentsMs = appointments
-      .filter((appt) => appt.doctorId === docId && appt.date === date && appt.startTime && appt.endTime)
+      .filter(
+        (appt) =>
+          appt.doctorId === docId &&
+          appt.date === date &&
+          appt.startTime &&
+          appt.endTime &&
+          !['CANCELLED', 'REJECTED', 'DISPLACED'].includes(appt.status)
+      )
       .map((appt) => ({
         startMs: parseTimeToMs(date, appt.startTime!),
         endMs: parseTimeToMs(date, appt.endTime!),

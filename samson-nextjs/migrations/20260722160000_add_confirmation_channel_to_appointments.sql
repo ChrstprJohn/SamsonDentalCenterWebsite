@@ -384,7 +384,7 @@ BEGIN
         v_appointment_id,
         p_secretary_user_id,
         'SECRETARY',
-        'NEW'::appointment_status,
+        NULL,
         'APPROVED'::appointment_status,
         'Converted from Inquiry ID ' || p_inquiry_id::text
     );

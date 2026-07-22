@@ -71,7 +71,7 @@ export const getExistingAppointmentsForMonthQuery = (supabase: SupabaseClient) =
       .select('id, start_time, end_time, doctor_id, status, date')
       .gte('date', startDate)
       .lte('date', endDate)
-      .not('status', 'in', '("CANCELLED","REJECTED","DISPLACED")');
+      .not('status', 'in', '(CANCELLED,REJECTED,DISPLACED)');
 
     if (doctorId) {
       query = query.eq('doctor_id', doctorId);

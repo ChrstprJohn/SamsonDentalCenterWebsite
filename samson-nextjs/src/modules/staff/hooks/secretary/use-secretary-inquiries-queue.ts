@@ -166,8 +166,18 @@ export function useSecretaryInquiriesQueue() {
     setStagedInquiryService(inquiry.preferredServiceId);
     setStagedInquiryDate(inquiry.preferredDate || '');
     setStagedInquiryDoctor(inquiry.assignedDoctorId || '');
-    setStagedInquiryTime(inquiry.preferredStartTime?.includes(':') ? inquiry.preferredStartTime : '');
-    setStagedInquiryEndTime(inquiry.assignedEndTime || '');
+    const parseHHMM = (timeStr?: string | null) => {
+      if (!timeStr) return '';
+      if (timeStr.includes('T')) {
+        const timePart = timeStr.split('T')[1];
+        if (timePart) return timePart.slice(0, 5);
+      }
+      const match = timeStr.match(/^(\d{2}):(\d{2})/);
+      if (match) return `${match[1]}:${match[2]}`;
+      return '';
+    };
+    setStagedInquiryTime(parseHHMM(inquiry.preferredStartTime));
+    setStagedInquiryEndTime(parseHHMM(inquiry.assignedEndTime));
     setStagedInquiryNote(inquiry.patientNote || '');
     setStagedSecretaryNotes('');
     setIsNotesManual(false);

@@ -44,8 +44,8 @@ export function useSecretaryAppointments() {
   const [showCancelForm, setShowCancelForm] = useState(false);
 
   const selectedAppointment = appointments.find((appointment) => appointment.id === selectedAppointmentId);
-  const activeServiceId = rescheduleServiceId || (selectedAppointment?.serviceId ?? '');
-  const activeDoctorId = rescheduleDoctorId || (selectedAppointment?.doctorId ?? '');
+  const activeServiceId = changeTreatment ? rescheduleServiceId : (selectedAppointment?.serviceId ?? '');
+  const activeDoctorId = changeDoctor ? rescheduleDoctorId : (selectedAppointment?.doctorId ?? '');
   const availableDates: string[] = [];
   const availableRescheduleDoctors = useMemo(() => {
     return doctors.map((d) => ({
@@ -199,20 +199,20 @@ export function useSecretaryAppointments() {
     if (!rescheduleJustification.trim()) return alert('Justification note is required.');
     setIsSubmitting(true);
     try {
-      const startUtc = rescheduleStartTime.includes(':00') || rescheduleStartTime.split(':').length === 3
-        ? `${rescheduleDate}T${rescheduleStartTime}Z`
-        : `${rescheduleDate}T${rescheduleStartTime}:00Z`;
-      const endUtc = rescheduleEndTime.includes(':00') || rescheduleEndTime.split(':').length === 3
-        ? `${rescheduleDate}T${rescheduleEndTime}Z`
-        : `${rescheduleDate}T${rescheduleEndTime}:00Z`;
+      const formatIso = (dateStr: string, timeStr: string) => {
+        if (!dateStr || !timeStr) return undefined;
+        if (timeStr.includes('T')) return timeStr;
+        const timeFormatted = timeStr.length === 5 ? `${timeStr}:00` : timeStr;
+        return `${dateStr}T${timeFormatted}Z`;
+      };
 
       const res = await updateAppointmentStatusAction({
         appointmentId: selectedAppointment.id,
         status: 'APPROVED',
         statusReason: rescheduleJustification.trim(),
         newDate: rescheduleDate,
-        newStartTime: startUtc,
-        newEndTime: endUtc,
+        newStartTime: formatIso(rescheduleDate, rescheduleStartTime),
+        newEndTime: formatIso(rescheduleDate, rescheduleEndTime),
         newDoctorId: activeDoctorId,
         newServiceId: rescheduleServiceId || selectedAppointment.serviceId || undefined,
       });

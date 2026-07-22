@@ -56,9 +56,15 @@ export async function updateAppointmentStatusAction(formData: StaffUpdateAppoint
       return { success: false, error: 'Validation failed: ' + error.issues[0].message };
     }
     if (error instanceof DomainError) {
+      if (error.message.includes('no_overlapping_appointments') || error.message.includes('23P01')) {
+        return {
+          success: false,
+          error: 'The selected dentist already has a confirmed appointment at this date and time. Please choose another time slot or dentist.',
+        };
+      }
       return { success: false, error: error.message };
     }
     console.error('ACTION ERROR (updateAppointmentStatus):', error);
-    return { success: false, error: 'An unexpected system error occurred' };
+    return { success: false, error: error.message || 'An unexpected system error occurred' };
   }
 }

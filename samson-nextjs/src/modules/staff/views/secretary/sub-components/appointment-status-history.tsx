@@ -105,24 +105,27 @@ function buildTimelineEntries(appointment: AppointmentDto): TimelineEntry[] {
     !(history[0].previousStatus === 'PENDING' || history[0].newStatus === 'PENDING');
 
   if (needsPendingPrepend) {
+    const isStaffCreated = appointment.source === 'STAFF_CREATED';
     entries.push({
       id: 'initial',
       status: 'PENDING',
       label: 'Requested',
       time: appointment.createdAt || new Date().toISOString(),
       reason: null,
-      actor: 'System',
+      actor: isStaffCreated ? 'Secretary' : 'Patient',
     });
   }
 
   for (const h of history) {
+    const rawActor = h.actorRole || 'System';
+    const displayActor = rawActor === 'STAFF' || rawActor === 'SECRETARY' ? 'Secretary' : rawActor;
     entries.push({
       id: h.id,
       status: h.newStatus,
       label: statusLabels[h.newStatus] || h.newStatus,
       time: h.createdAt,
       reason: h.reason,
-      actor: h.actorRole || 'System',
+      actor: displayActor,
     });
   }
 

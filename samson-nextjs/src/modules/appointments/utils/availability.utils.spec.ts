@@ -87,4 +87,44 @@ describe('generateAvailableSlotsForDay', () => {
     expect(slots).toHaveLength(3);
     expect(slots.map((s) => s.startTime)).not.toContain('09:30');
   });
+
+  it('should NOT exclude slots for CANCELLED, REJECTED, or DISPLACED appointments', () => {
+    const params = {
+      date: '2024-12-25',
+      duration: 30,
+      schedules: [
+        {
+          doctorId,
+          startTime: '09:00:00',
+          endTime: '11:00:00',
+          breakStartTime: null,
+          breakEndTime: null,
+        },
+      ],
+      appointments: [
+        {
+          id: 'appt-cancelled',
+          doctorId,
+          startTime: '09:30',
+          endTime: '10:00',
+          status: 'CANCELLED',
+          date: '2024-12-25',
+        },
+        {
+          id: 'appt-rejected',
+          doctorId,
+          startTime: '10:00',
+          endTime: '10:30',
+          status: 'REJECTED',
+          date: '2024-12-25',
+        },
+      ],
+    };
+
+    const slots = generateAvailableSlotsForDay(params);
+
+    expect(slots).toHaveLength(4);
+    expect(slots.map((s) => s.startTime)).toContain('09:30');
+    expect(slots.map((s) => s.startTime)).toContain('10:00');
+  });
 });

@@ -31,7 +31,11 @@ export const getAvailableTimeSlotsUseCase = (deps: {
       const rawSlots = generateAvailableSlotsForDay({
         date,
         duration,
-        schedules: [schedule],
+        schedules: [{
+          ...schedule,
+          startTime: schedule.startTime || '09:00',
+          endTime: schedule.endTime || '17:00',
+        }],
         appointments,
       });
 

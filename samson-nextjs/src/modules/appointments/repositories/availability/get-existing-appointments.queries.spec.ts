@@ -35,7 +35,7 @@ describe('getExistingAppointmentsQuery', () => {
 
     expect(mockSupabase.from).toHaveBeenCalledWith('appointments');
     expect(mockSupabase.eq).toHaveBeenCalledWith('date', '2024-11-11');
-    expect(mockSupabase.not).toHaveBeenCalledWith('status', 'in', '("CANCELLED","REJECTED","DISPLACED")');
+    expect(mockSupabase.not).toHaveBeenCalledWith('status', 'in', '(CANCELLED,REJECTED,DISPLACED)');
     expect(result).toEqual([{
       id: apptUuid,
       startTime: '09:00',
