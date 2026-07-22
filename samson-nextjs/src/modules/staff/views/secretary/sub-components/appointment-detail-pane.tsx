@@ -9,7 +9,7 @@ import { SharedAppointmentDetail } from '@/modules/appointments/components/sub-c
 import { AppointmentCancelForm } from './appointment-cancel-form';
 import { AppointmentRescheduleForm } from './appointment-reschedule-form';
 import { AppointmentStatusHistory } from './appointment-status-history';
-import { Send, Calendar, RotateCw, CheckCircle2, XCircle, Clock, Pencil, X, Check, Mail, MessageSquare } from 'lucide-react';
+import { Send, Calendar, RotateCw, Pencil, X, Check } from 'lucide-react';
 import { updateConfirmationChannelAction } from '@/modules/appointments/actions/status/update-confirmation-channel.action';
 import { resendNotificationAction } from '@/modules/appointments/actions/status/resend-notification.action';
 
@@ -49,13 +49,9 @@ function AppointmentDetails({ appointment, view, activeTab }: { appointment: App
     });
   }, [appointment]);
 
-  const handleResend = async (
-    eventType: 'APPOINTMENT_BOOKED' | 'APPOINTMENT_REMINDER_48H' | 'APPOINTMENT_REMINDER_24H',
-    targetChannel: 'EMAIL' | 'SMS'
-  ) => {
-    const resendKey = `${eventType}_${targetChannel}`;
-    setResending(resendKey);
-    const res = await resendNotificationAction({ appointmentId: appointment.id, eventType, targetChannel });
+  const handleResend = async (eventType: 'APPOINTMENT_BOOKED' | 'APPOINTMENT_REMINDER_48H' | 'APPOINTMENT_REMINDER_24H') => {
+    setResending(eventType);
+    const res = await resendNotificationAction({ appointmentId: appointment.id, eventType, targetChannel: channel });
     if (res.success) {
       setCommState((prev) => {
         const updates: Partial<typeof prev> = {};
@@ -153,79 +149,31 @@ function AppointmentDetails({ appointment, view, activeTab }: { appointment: App
           {/* Communication History */}
           <div className="py-4 px-5 space-y-3">
             <span className="text-base font-medium text-foreground block">Communication History</span>
-            <div className="flex flex-col gap-3">
-              {commEntries.map((entry) => {
-                const emailActive = channel === 'EMAIL' || channel === 'BOTH';
-                const smsActive = channel === 'SMS' || channel === 'BOTH';
-                const resendingSmsKey = `${entry.eventType}_SMS`;
-                const resendingEmailKey = `${entry.eventType}_EMAIL`;
-
-                return (
-                  <div key={entry.key} className="space-y-2">
-                    <span className="text-xs font-semibold text-foreground block">{entry.label}</span>
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="flex flex-col gap-2">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-1.5 min-w-0">
-                            <MessageSquare className="size-3.5 text-muted-foreground shrink-0" />
-                            <span className="text-xs font-medium text-foreground">SMS</span>
-                          </div>
-                          {smsActive ? (
-                            <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
-                              entry.sent ? 'bg-green-500/10 text-green-500' : 'bg-muted text-muted-foreground/60'
-                            }`}>
-                              {entry.sent ? 'SENT' : 'PENDING'}
-                            </span>
-                          ) : (
-                            <span className="text-[9px] text-muted-foreground/50 font-mono">N/A</span>
-                          )}
-                        </div>
-                        {smsActive && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            disabled={resending === resendingSmsKey}
-                            onClick={() => handleResend(entry.eventType, 'SMS')}
-                            className="text-[10px] h-6 px-2 gap-1 w-full justify-center"
-                          >
-                            <RotateCw className={`size-2.5 ${resending === resendingSmsKey ? 'animate-spin' : ''}`} />
-                            {resending === resendingSmsKey ? 'Sending...' : 'Resend SMS'}
-                          </Button>
-                        )}
-                      </div>
-                      <div className="flex flex-col gap-2">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-1.5 min-w-0">
-                            <Mail className="size-3.5 text-muted-foreground shrink-0" />
-                            <span className="text-xs font-medium text-foreground">Email</span>
-                          </div>
-                          {emailActive ? (
-                            <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
-                              entry.sent ? 'bg-green-500/10 text-green-500' : 'bg-muted text-muted-foreground/60'
-                            }`}>
-                              {entry.sent ? 'SENT' : 'PENDING'}
-                            </span>
-                          ) : (
-                            <span className="text-[9px] text-muted-foreground/50 font-mono">N/A</span>
-                          )}
-                        </div>
-                        {emailActive && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            disabled={resending === resendingEmailKey}
-                            onClick={() => handleResend(entry.eventType, 'EMAIL')}
-                            className="text-[10px] h-6 px-2 gap-1 w-full justify-center"
-                          >
-                            <RotateCw className={`size-2.5 ${resending === resendingEmailKey ? 'animate-spin' : ''}`} />
-                            {resending === resendingEmailKey ? 'Sending...' : 'Resend Email'}
-                          </Button>
-                        )}
-                      </div>
-                    </div>
+            <div className="flex flex-col gap-2">
+              {commEntries.map((entry) => (
+                <div key={entry.key} className="flex items-center justify-between p-3.5 bg-secondary-bg/20 border border-card-border/60 rounded-xl">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span className="text-xs font-medium text-foreground truncate">{entry.label}</span>
+                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded shrink-0 ${
+                      entry.sent
+                        ? 'bg-green-500/10 text-green-500'
+                        : 'bg-muted text-muted-foreground/60'
+                    }`}>
+                      {entry.sent ? 'SENT' : 'PENDING'}
+                    </span>
                   </div>
-                );
-              })}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={resending === entry.eventType}
+                    onClick={() => handleResend(entry.eventType)}
+                    className="text-[10px] h-7 px-2.5 gap-1 shrink-0"
+                  >
+                    <RotateCw className={`size-3 ${resending === entry.eventType ? 'animate-spin' : ''}`} />
+                    {resending === entry.eventType ? 'Sending...' : 'Resend'}
+                  </Button>
+                </div>
+              ))}
             </div>
           </div>
           <hr className="border-card-border/40 mx-5" />
