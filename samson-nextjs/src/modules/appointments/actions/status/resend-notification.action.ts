@@ -94,11 +94,9 @@ export async function resendNotificationAction(input: ResendNotificationInput) {
       if (shouldSendEmail) updatePayload.email_confirmation_sent = true;
       if (shouldSendSms) updatePayload.sms_confirmation_sent = true;
     } else if (input.eventType === 'APPOINTMENT_REMINDER_48H') {
-      updatePayload.reminder_48h_sent = true;
       if (shouldSendEmail) updatePayload.email_reminder_48h_sent = true;
       if (shouldSendSms) updatePayload.sms_reminder_48h_sent = true;
     } else if (input.eventType === 'APPOINTMENT_REMINDER_24H') {
-      updatePayload.reminder_24h_sent = true;
       if (shouldSendEmail) updatePayload.email_reminder_24h_sent = true;
       if (shouldSendSms) updatePayload.sms_reminder_24h_sent = true;
     }

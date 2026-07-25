@@ -51,7 +51,7 @@ export const onAppointmentReminder24hSmsSubscriber = {
 
     await supabaseAdmin
       .from('appointments')
-      .update({ reminder_24h_sent: true, sms_reminder_24h_sent: true })
+      .update({ sms_reminder_24h_sent: true })
       .eq('id', appointmentId);
   },
 };

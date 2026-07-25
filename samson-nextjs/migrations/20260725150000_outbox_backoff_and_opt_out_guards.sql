@@ -47,15 +47,14 @@ BEGIN
       AND a.start_time IS NOT NULL
       AND a.start_time <= CURRENT_TIMESTAMP + INTERVAL '8 hours' + INTERVAL '48 hours'
       AND a.start_time > CURRENT_TIMESTAMP + INTERVAL '8 hours'
-      AND (a.email_reminder_48h_sent = FALSE OR a.sms_reminder_48h_sent = FALSE OR a.reminder_48h_sent = FALSE)
+      AND (a.email_reminder_48h_sent = FALSE OR a.sms_reminder_48h_sent = FALSE)
   LOOP
     v_channel := COALESCE(v_app.confirmation_channel, 'EMAIL');
 
     -- Opt-Out Guard
     IF v_channel = 'NONE' THEN
       UPDATE public.appointments 
-      SET reminder_48h_sent = TRUE, 
-          email_reminder_48h_sent = TRUE, 
+      SET email_reminder_48h_sent = TRUE, 
           sms_reminder_48h_sent = TRUE 
       WHERE id = v_app.id;
       CONTINUE;
@@ -97,10 +96,6 @@ BEGIN
       WHERE id = v_app.id;
     END IF;
 
-    -- Update summary flag
-    UPDATE public.appointments
-    SET reminder_48h_sent = TRUE
-    WHERE id = v_app.id;
   END LOOP;
 
   -- 2B. Scan for 24-Hour Reminders
@@ -119,15 +114,14 @@ BEGIN
       AND a.start_time IS NOT NULL
       AND a.start_time <= CURRENT_TIMESTAMP + INTERVAL '8 hours' + INTERVAL '24 hours'
       AND a.start_time > CURRENT_TIMESTAMP + INTERVAL '8 hours'
-      AND (a.email_reminder_24h_sent = FALSE OR a.sms_reminder_24h_sent = FALSE OR a.reminder_24h_sent = FALSE)
+      AND (a.email_reminder_24h_sent = FALSE OR a.sms_reminder_24h_sent = FALSE)
   LOOP
     v_channel := COALESCE(v_app.confirmation_channel, 'EMAIL');
 
     -- Opt-Out Guard
     IF v_channel = 'NONE' THEN
       UPDATE public.appointments 
-      SET reminder_24h_sent = TRUE, 
-          email_reminder_24h_sent = TRUE, 
+      SET email_reminder_24h_sent = TRUE, 
           sms_reminder_24h_sent = TRUE 
       WHERE id = v_app.id;
       CONTINUE;
@@ -169,10 +163,6 @@ BEGIN
       WHERE id = v_app.id;
     END IF;
 
-    -- Update summary flag
-    UPDATE public.appointments
-    SET reminder_24h_sent = TRUE
-    WHERE id = v_app.id;
   END LOOP;
 END;
 $$ LANGUAGE plpgsql;

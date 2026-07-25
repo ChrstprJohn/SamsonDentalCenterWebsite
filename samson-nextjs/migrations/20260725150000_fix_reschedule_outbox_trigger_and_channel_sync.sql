@@ -94,29 +94,23 @@ BEGIN
       
       IF v_duration < INTERVAL '24 hours' THEN
         -- Booked or updated < 24h away: skip all 24h & 48h reminders
-        NEW.reminder_24h_sent := TRUE;
-        NEW.reminder_48h_sent := TRUE;
         NEW.email_reminder_24h_sent := TRUE;
         NEW.sms_reminder_24h_sent := TRUE;
         NEW.email_reminder_48h_sent := TRUE;
         NEW.sms_reminder_48h_sent := TRUE;
       ELSIF v_duration >= INTERVAL '24 hours' AND v_duration <= INTERVAL '48 hours' THEN
         -- Booked or updated between 24h and 48h away: skip 48h reminders, keep current 24h state
-        NEW.reminder_48h_sent := TRUE;
         NEW.email_reminder_48h_sent := TRUE;
         NEW.sms_reminder_48h_sent := TRUE;
 
         -- For 24h: only set to FALSE if it hasn't sent yet
         IF TG_OP = 'INSERT' OR NEW.start_time IS DISTINCT FROM OLD.start_time THEN
-          NEW.reminder_24h_sent := FALSE;
           NEW.email_reminder_24h_sent := FALSE;
           NEW.sms_reminder_24h_sent := FALSE;
         END IF;
       ELSE
         -- Booked or updated > 48h away: reset all if date/time changed or new insert
         IF TG_OP = 'INSERT' OR NEW.start_time IS DISTINCT FROM OLD.start_time THEN
-          NEW.reminder_24h_sent := FALSE;
-          NEW.reminder_48h_sent := FALSE;
           NEW.email_reminder_24h_sent := FALSE;
           NEW.sms_reminder_24h_sent := FALSE;
           NEW.email_reminder_48h_sent := FALSE;
@@ -126,8 +120,6 @@ BEGIN
     END IF;
   ELSE
     -- If no start_time set yet, reset all flags
-    NEW.reminder_24h_sent := FALSE;
-    NEW.reminder_48h_sent := FALSE;
     NEW.email_reminder_24h_sent := FALSE;
     NEW.sms_reminder_24h_sent := FALSE;
     NEW.email_reminder_48h_sent := FALSE;

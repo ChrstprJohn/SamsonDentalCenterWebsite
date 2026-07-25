@@ -101,7 +101,7 @@ export const onAppointmentReminder24hSubscriber = {
     if (appointmentId) {
       await supabaseAdmin
         .from('appointments')
-        .update({ reminder_24h_sent: true, email_reminder_24h_sent: true })
+        .update({ email_reminder_24h_sent: true })
         .eq('id', appointmentId);
     }
   },

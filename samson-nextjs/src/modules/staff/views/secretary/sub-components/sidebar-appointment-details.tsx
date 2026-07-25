@@ -367,7 +367,7 @@ export function SidebarAppointmentDetails({
                   <Mail className="size-3.5 text-muted-foreground" /> 48-Hour Reminder
                 </span>
                 <span className="text-[11px] text-muted-foreground">
-                  Status: {(localAppointment.emailReminder48hSent || localAppointment.smsReminder48hSent || localAppointment.reminder48hSent) ? 'Sent / Processed' : 'Pending / Skipped'}
+                  Status: {(localAppointment.emailReminder48hSent || localAppointment.smsReminder48hSent) ? 'Sent / Processed' : 'Pending / Skipped'}
                 </span>
               </div>
               <Button
@@ -389,7 +389,7 @@ export function SidebarAppointmentDetails({
                   <Mail className="size-3.5 text-muted-foreground" /> 24-Hour Reminder
                 </span>
                 <span className="text-[11px] text-muted-foreground">
-                  Status: {(localAppointment.emailReminder24hSent || localAppointment.smsReminder24hSent || localAppointment.reminder24hSent) ? 'Sent / Processed' : 'Pending / Skipped'}
+                  Status: {(localAppointment.emailReminder24hSent || localAppointment.smsReminder24hSent) ? 'Sent / Processed' : 'Pending / Skipped'}
                 </span>
               </div>
               <Button
