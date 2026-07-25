@@ -1,7 +1,7 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { AlertCircle, CheckCircle2, Clock, Undo2, Wrench } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Clock, Undo2, Wrench, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { AppointmentDto } from '@/modules/appointments/dtos/exports';
 import { formatClinicTime } from '@/shared/utils/date.util';
@@ -10,7 +10,6 @@ const TONE_CLASSES: Record<string, { dot: string; badge: string }> = {
   cyan: { dot: 'bg-cyan-500', badge: 'bg-cyan-500/10 text-cyan-600' },
   red: { dot: 'bg-red-500', badge: 'bg-red-500/10 text-red-500' },
   indigo: { dot: 'bg-indigo-500', badge: 'bg-indigo-500/10 text-indigo-500' },
-  amber: { dot: 'bg-amber-500', badge: 'bg-amber-500/10 text-amber-500' },
   emerald: { dot: 'bg-emerald-500', badge: 'bg-emerald-500/10 text-emerald-500' },
 };
 
@@ -19,11 +18,10 @@ export function CheckInBoard({ view }: { view: any }) {
     { key: 'approved', title: 'Upcoming Today', tone: 'cyan', empty: 'No arrivals expected.' },
     { key: 'noShow', title: 'No-Show', tone: 'red', empty: 'No missed slots today.' },
     { key: 'checkedIn', title: 'Checked In', tone: 'indigo', empty: 'No patients in rooms.' },
-    { key: 'readyCheckout', title: 'Ready Checkout', tone: 'amber', empty: 'No pending checkout visits.' },
     { key: 'completed', title: 'Completed', tone: 'emerald', empty: 'No completed visits today.' },
   ];
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 items-stretch flex-1 min-h-[500px]">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-stretch flex-1 min-h-[500px]">
       {configs.map((config) => (
         <VisitColumn
           key={config.key}
@@ -96,24 +94,24 @@ function VisitCard({ appointment, columnKey, view }: { appointment: AppointmentD
       )}
 
       {columnKey === 'checkedIn' && (
-        <Button
-          onClick={() => view.handleUndoCheckIn(appointment.id)}
-          disabled={view.isPending}
-          variant="secondary"
-          className="w-full text-[10px] h-8 font-bold bg-secondary-bg border-none rounded-xl"
-        >
-          <Undo2 className="h-3 w-3 mr-1" />
-          Undo Check-In
-        </Button>
-      )}
-
-      {columnKey === 'readyCheckout' && (
-        <Button
-          onClick={() => view.setCheckoutAppt(appointment)}
-          className="w-full text-[10px] h-8 font-bold bg-amber-500 border-none rounded-xl text-white"
-        >
-          Checkout & Send Review Msg
-        </Button>
+        <div className="flex flex-col gap-2">
+          <Button
+            onClick={() => view.setCheckoutAppt(appointment)}
+            className="w-full text-[10px] h-8 font-bold bg-amber-500 border-none rounded-xl text-white flex items-center justify-center gap-1.5"
+          >
+            <Send className="h-3 w-3" />
+            <span>Checkout & Send Review Msg</span>
+          </Button>
+          <Button
+            onClick={() => view.handleUndoCheckIn(appointment.id)}
+            disabled={view.isPending}
+            variant="secondary"
+            className="w-full text-[9px] h-6 font-bold bg-secondary-bg text-text-muted hover:text-text-primary border-none rounded-lg flex items-center justify-center"
+          >
+            <Undo2 className="h-2.5 w-2.5 mr-1" />
+            Undo Check-In
+          </Button>
+        </div>
       )}
 
       {columnKey === 'completed' && (

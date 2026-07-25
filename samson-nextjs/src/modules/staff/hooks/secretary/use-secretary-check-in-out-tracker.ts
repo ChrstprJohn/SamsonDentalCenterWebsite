@@ -178,16 +178,14 @@ export function useSecretaryCheckInOutTracker() {
     return {
       approved: appointments.filter((appointment) => appointment.status === 'APPROVED' && !isPastEndTime(appointment)),
       noShow: appointments.filter((appointment) => appointment.status === 'NO_SHOW' || (appointment.status === 'APPROVED' && isPastEndTime(appointment))),
-      checkedIn: appointments.filter((appointment) => appointment.status === 'CHECKED_IN'),
-      readyCheckout: appointments.filter((appointment) => appointment.status === 'TREATMENT_RENDERED'),
+      checkedIn: appointments.filter((appointment) => ['CHECKED_IN', 'TREATMENT_RENDERED'].includes(appointment.status)),
       completed: appointments.filter((appointment) => appointment.status === 'COMPLETED'),
     };
   }, [appointments, currentTime]);
 
   const stats = {
-    totalCheckedInToday: appointments.filter((appointment) => ['CHECKED_IN', 'TREATMENT_RENDERED', 'COMPLETED'].includes(appointment.status)).length,
+    totalCheckedInToday: columns.checkedIn.length,
     completedToday: columns.completed.length,
-    pendingCheckout: columns.readyCheckout.length,
     noShowCountToday: columns.noShow.length,
   };
 
