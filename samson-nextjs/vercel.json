@@ -1,8 +1,4 @@
 {
-  "crons": [
-    {
-      "path": "/api/outbox/process",
-      "schedule": "*/15 * * * *"
-    }
-  ]
+  "crons": []
 }
+
