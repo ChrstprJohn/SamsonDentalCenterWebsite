@@ -74,7 +74,6 @@ const appointmentDbSchema = z.object({
   reminder_24h_sent: z.boolean().optional().default(false),
   reminder_48h_sent: z.boolean().optional().default(false),
   confirmation_channel: z.enum(['EMAIL', 'SMS', 'BOTH', 'NONE']).optional().default('EMAIL'),
-  confirmation_sent: z.boolean().optional().default(false),
   email_confirmation_sent: z.boolean().optional().default(false),
   sms_confirmation_sent: z.boolean().optional().default(false),
   email_reminder_48h_sent: z.boolean().optional().default(false),
@@ -106,10 +105,6 @@ const appointmentDbSchema = z.object({
 });
 
 export const appointmentDtoSchema = appointmentDbSchema.transform((data) => {
-  const ch = (data.confirmation_channel as string) || 'EMAIL';
-  const isEmailCh = ch === 'EMAIL' || ch === 'BOTH';
-  const isSmsCh = ch === 'SMS' || ch === 'BOTH';
-
   return {
     id: data.id,
     patientId: data.patient_id || null,
@@ -134,9 +129,8 @@ export const appointmentDtoSchema = appointmentDbSchema.transform((data) => {
     reminder24hSent: data.reminder_24h_sent ?? false,
     reminder48hSent: data.reminder_48h_sent ?? false,
     confirmationChannel: (data.confirmation_channel as 'EMAIL' | 'SMS' | 'BOTH' | 'NONE') ?? 'EMAIL',
-    confirmationSent: data.confirmation_sent ?? false,
-    emailConfirmationSent: Boolean(data.email_confirmation_sent || (data.confirmation_sent && isEmailCh)),
-    smsConfirmationSent: Boolean(data.sms_confirmation_sent || (data.confirmation_sent && isSmsCh)),
+    emailConfirmationSent: Boolean(data.email_confirmation_sent),
+    smsConfirmationSent: Boolean(data.sms_confirmation_sent),
     emailReminder48hSent: Boolean(data.email_reminder_48h_sent),
     smsReminder48hSent: Boolean(data.sms_reminder_48h_sent),
     emailReminder24hSent: Boolean(data.email_reminder_24h_sent),

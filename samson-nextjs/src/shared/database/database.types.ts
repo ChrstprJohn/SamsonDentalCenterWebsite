@@ -100,63 +100,78 @@ export type Database = {
       appointments: {
         Row: {
           clinical_notes: string | null
-          confirmation_sent: boolean
+          confirmation_channel: string
           created_at: string
           date: string
           dependent_id: string | null
           doctor_id: string
+          email_confirmation_sent: boolean
+          email_reminder_24h_sent: boolean
+          email_reminder_48h_sent: boolean
           end_time: string
           id: string
           patient_id: string | null
           payment_receipt_sent: boolean
           reschedule_count: number
           service_id: string
+          sms_confirmation_sent: boolean
+          sms_reminder_24h_sent: boolean
+          sms_reminder_48h_sent: boolean
           start_time: string
           status: Database["public"]["Enums"]["appointment_status"]
           status_reason: string | null
           updated_at: string
           user_note: string | null
-          confirmation_channel: string
         }
         Insert: {
           clinical_notes?: string | null
-          confirmation_sent?: boolean
+          confirmation_channel?: string
           created_at?: string
           date: string
           dependent_id?: string | null
           doctor_id: string
+          email_confirmation_sent?: boolean
+          email_reminder_24h_sent?: boolean
+          email_reminder_48h_sent?: boolean
           end_time: string
           id?: string
           patient_id?: string | null
           payment_receipt_sent?: boolean
           reschedule_count?: number
           service_id: string
+          sms_confirmation_sent?: boolean
+          sms_reminder_24h_sent?: boolean
+          sms_reminder_48h_sent?: boolean
           start_time: string
           status?: Database["public"]["Enums"]["appointment_status"]
           status_reason?: string | null
           updated_at?: string
           user_note?: string | null
-          confirmation_channel?: string
         }
         Update: {
           clinical_notes?: string | null
-          confirmation_sent?: boolean
+          confirmation_channel?: string
           created_at?: string
           date?: string
           dependent_id?: string | null
           doctor_id?: string
+          email_confirmation_sent?: boolean
+          email_reminder_24h_sent?: boolean
+          email_reminder_48h_sent?: boolean
           end_time?: string
           id?: string
           patient_id?: string | null
           payment_receipt_sent?: boolean
           reschedule_count?: number
           service_id?: string
+          sms_confirmation_sent?: boolean
+          sms_reminder_24h_sent?: boolean
+          sms_reminder_48h_sent?: boolean
           start_time?: string
           status?: Database["public"]["Enums"]["appointment_status"]
           status_reason?: string | null
           updated_at?: string
           user_note?: string | null
-          confirmation_channel?: string
         }
         Relationships: [
           {

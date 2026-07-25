@@ -118,12 +118,13 @@ export const onAppointmentBookedSubscriber = {
       }
     );
 
-    await supabaseAdmin
+    const { error: updateError } = await supabaseAdmin
       .from('appointments')
-      .update({
-        confirmation_sent: true,
-        email_confirmation_sent: true,
-      })
+      .update({ email_confirmation_sent: true })
       .eq('id', appointmentId);
+
+    if (updateError) {
+      throw new Error(`Failed to mark email confirmation sent: ${updateError.message}`);
+    }
   }
 };

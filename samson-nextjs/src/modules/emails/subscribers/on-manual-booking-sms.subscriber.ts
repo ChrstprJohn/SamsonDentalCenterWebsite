@@ -21,10 +21,14 @@ export const onManualBookingSmsSubscriber = {
 
     if (appointmentId) {
       const supabaseAdmin = await createAdminClient();
-      await supabaseAdmin
+      const { error: updateError } = await supabaseAdmin
         .from('appointments')
-        .update({ confirmation_sent: true, sms_confirmation_sent: true })
+        .update({ sms_confirmation_sent: true })
         .eq('id', appointmentId);
+
+      if (updateError) {
+        throw new Error(`Failed to mark SMS confirmation sent: ${updateError.message}`);
+      }
     }
   },
 };

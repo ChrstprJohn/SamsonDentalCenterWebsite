@@ -91,7 +91,6 @@ export async function resendNotificationAction(input: ResendNotificationInput) {
     const updatePayload: Record<string, boolean> = {};
 
     if (input.eventType === 'APPOINTMENT_BOOKED') {
-      updatePayload.confirmation_sent = true;
       if (shouldSendEmail) updatePayload.email_confirmation_sent = true;
       if (shouldSendSms) updatePayload.sms_confirmation_sent = true;
     } else if (input.eventType === 'APPOINTMENT_REMINDER_48H') {
