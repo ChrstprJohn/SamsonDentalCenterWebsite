@@ -84,7 +84,7 @@ DECLARE
   v_duration INTERVAL;
 BEGIN
   IF NEW.start_time IS NOT NULL THEN
-    v_duration := NEW.start_time - CURRENT_TIMESTAMP;
+    v_duration := NEW.start_time - (CURRENT_TIMESTAMP + INTERVAL '8 hours');
 
     IF TG_OP = 'INSERT' 
        OR OLD.start_time IS NULL 

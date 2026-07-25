@@ -14,7 +14,9 @@ async function handleProcess(req: NextRequest) {
     }
 
     bootstrapEventSubscribers();
-    await globalOutboxDispatcher(await createAdminClient())();
+    const supabaseAdmin = await createAdminClient();
+    await supabaseAdmin.rpc('scan_and_queue_appointment_reminders');
+    await globalOutboxDispatcher(supabaseAdmin)();
     return Response.json({ success: true, message: 'Outbox processed successfully.' });
   } catch (error: any) {
     console.error('ERROR (processing outbox webhook):', error);

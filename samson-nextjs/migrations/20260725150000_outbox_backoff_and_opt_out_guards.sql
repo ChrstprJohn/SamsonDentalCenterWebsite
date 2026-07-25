@@ -45,8 +45,8 @@ BEGIN
     LEFT JOIN public.guest_contacts gc ON a.id = gc.appointment_id
     WHERE a.status = 'APPROVED'
       AND a.start_time IS NOT NULL
-      AND a.start_time <= CURRENT_TIMESTAMP + INTERVAL '48 hours'
-      AND a.start_time > CURRENT_TIMESTAMP
+      AND a.start_time <= CURRENT_TIMESTAMP + INTERVAL '8 hours' + INTERVAL '48 hours'
+      AND a.start_time > CURRENT_TIMESTAMP + INTERVAL '8 hours'
       AND (a.email_reminder_48h_sent = FALSE OR a.sms_reminder_48h_sent = FALSE OR a.reminder_48h_sent = FALSE)
   LOOP
     v_channel := COALESCE(v_app.confirmation_channel, 'EMAIL');
@@ -117,8 +117,8 @@ BEGIN
     LEFT JOIN public.guest_contacts gc ON a.id = gc.appointment_id
     WHERE a.status = 'APPROVED'
       AND a.start_time IS NOT NULL
-      AND a.start_time <= CURRENT_TIMESTAMP + INTERVAL '24 hours'
-      AND a.start_time > CURRENT_TIMESTAMP
+      AND a.start_time <= CURRENT_TIMESTAMP + INTERVAL '8 hours' + INTERVAL '24 hours'
+      AND a.start_time > CURRENT_TIMESTAMP + INTERVAL '8 hours'
       AND (a.email_reminder_24h_sent = FALSE OR a.sms_reminder_24h_sent = FALSE OR a.reminder_24h_sent = FALSE)
   LOOP
     v_channel := COALESCE(v_app.confirmation_channel, 'EMAIL');
