@@ -18,15 +18,9 @@ import { onAppointmentReminder24hSubscriber } from '@/modules/emails/subscribers
 import { onAppointmentReminder48hSubscriber } from '@/modules/emails/subscribers/on-appointment-reminder-48h.subscriber';
 import { onAppointmentReminder24hSmsSubscriber } from '@/modules/emails/subscribers/on-appointment-reminder-24h-sms.subscriber';
 import { onAppointmentReminder48hSmsSubscriber } from '@/modules/emails/subscribers/on-appointment-reminder-48h-sms.subscriber';
+import { onPostCareReviewSubscriber } from '@/modules/emails/subscribers/on-post-care-review.subscriber';
+import { onPostCareReviewSmsSubscriber } from '@/modules/emails/subscribers/on-post-care-review-sms.subscriber';
 
-/**
- * Bootstraps the Event Bus Registry.
- * This file acts as the Orchestrator layer, wiring specific Domain Modules 
- * (like Emails or SMS) to the generic Shared Event Bus.
- * 
- * By importing this file in the dispatcher, we guarantee that all subscribers
- * are registered in the Next.js serverless environment before events are processed.
- */
 export const bootstrapEventSubscribers = () => {
   registerSubscriber('PATIENT_REGISTERED', onPatientRegisteredSubscriber.handle);
   registerSubscriber('PASSWORD_RESET_REQUESTED', onPasswordResetRequestedSubscriber.handle);
@@ -36,13 +30,13 @@ export const bootstrapEventSubscribers = () => {
   registerSubscriber('APPOINTMENT_MANUALLY_BOOKED_GUEST', onManualBookingGuestSubscriber.handle);
   registerSubscriber('APPOINTMENT_MANUALLY_BOOKED_PATIENT', onManualBookingPatientSubscriber.handle);
   
-  // Missing notification subscriptions
+  // Notification subscriptions
   registerSubscriber('TREATMENT_RENDERED', onTreatmentRenderedSubscriber.handle);
   registerSubscriber('EMAIL_FAILED', onEmailFailedSubscriber.handle);
   registerSubscriber('SCHEDULE_CONFLICT', onScheduleConflictSubscriber.handle);
   registerSubscriber('NEW_APPOINTMENT_REQUEST', onNewBookingSubscriber.handle);
   
-  // Dual-purpose Cancel subscribers
+  // Cancel subscribers
   registerSubscriber('CANCEL_BOOKING', onCancelBookingNotificationSubscriber.handle);
   registerSubscriber('CANCEL_BOOKING', onCancelBookingEmailSubscriber.handle);
   
@@ -51,10 +45,13 @@ export const bootstrapEventSubscribers = () => {
   registerSubscriber('STAFF_REPLIED_TO_CHAT', onStaffReplySubscriber.handle);
   registerSubscriber('APPOINTMENT_MANUALLY_BOOKED_SMS', onManualBookingSmsSubscriber.handle);
   
-  // 24h & 48h Reminders (Email & SMS)
+  // 24h & 48h Reminders
   registerSubscriber('APPOINTMENT_REMINDER_24H', onAppointmentReminder24hSubscriber.handle);
   registerSubscriber('APPOINTMENT_REMINDER_48H', onAppointmentReminder48hSubscriber.handle);
   registerSubscriber('APPOINTMENT_REMINDER_24H_SMS', onAppointmentReminder24hSmsSubscriber.handle);
   registerSubscriber('APPOINTMENT_REMINDER_48H_SMS', onAppointmentReminder48hSmsSubscriber.handle);
-};
 
+  // Post-Care Review Request (Email & SMS)
+  registerSubscriber('APPOINTMENT_COMPLETED_POST_CARE', onPostCareReviewSubscriber.handle);
+  registerSubscriber('APPOINTMENT_COMPLETED_POST_CARE_SMS', onPostCareReviewSmsSubscriber.handle);
+};

@@ -4,32 +4,19 @@ import { useEffect, useMemo, useState, useTransition } from 'react';
 import { getClinicAppointmentsAction } from '@/modules/appointments/actions/clinic/get-clinic-appointments.action';
 import { checkInAction } from '@/modules/appointments/actions/status/check-in.action';
 import { undoCheckInAction } from '@/modules/appointments/actions/status/undo-check-in.action';
-import { markNoShowAction } from '@/modules/appointments/actions/status/mark-no-show.action';
 import { updateAppointmentStatusAction } from '@/modules/appointments/actions/status/update-appointment-status.action';
-import { checkoutAction } from '@/modules/billing/actions/invoicing/checkout.action';
-import { getInvoicesAction } from '@/modules/billing/actions/invoicing/get-invoices.action';
-import { getServicesAction } from '@/modules/services/actions/management/get-services.action';
+import { resolveNoShowAction } from '@/modules/appointments/actions/status/resolve-no-show.action';
 import { createClient } from '@/shared/database/client';
 import type { AppointmentDto } from '@/modules/appointments/dtos/exports';
-import type { InvoiceResponseDto } from '@/modules/billing/dtos/exports';
 import { getTodayLocalDateStr } from '@/shared/utils/date.util';
 
 export function useSecretaryCheckInOutTracker() {
   const [appointments, setAppointments] = useState<AppointmentDto[]>([]);
-  const [invoices, setInvoices] = useState<InvoiceResponseDto[]>([]);
   const [currentTime, setCurrentTime] = useState<Date | null>(null);
-  const [checkoutInvoice, setCheckoutInvoice] = useState<InvoiceResponseDto | null>(null);
+  const [bypassWindow, setBypassWindow] = useState(false); // Dev/Test toggle for anytime check-in
   const [checkoutAppt, setCheckoutAppt] = useState<AppointmentDto | null>(null);
-  const [discountPercent, setDiscountPercent] = useState(0);
-  const [paymentMethod, setPaymentMethod] = useState<'CASH' | 'CARD' | 'HMO'>('CASH');
-  const [servicesCatalog, setServicesCatalog] = useState<{ id: string; name: string; price: number }[]>([]);
-  const [additionalItems, setAdditionalItems] = useState<{ serviceId?: string; description: string; unitPrice: number; quantity: number }[]>([]);
-  const [selectedServiceId, setSelectedServiceId] = useState('');
-  const [customDescription, setCustomDescription] = useState('');
-  const [customPrice, setCustomPrice] = useState(0);
-  const [customQty, setCustomQty] = useState(1);
   const [viewAppt, setViewAppt] = useState<AppointmentDto | null>(null);
-  const [viewInvoiceItems, setViewInvoiceItems] = useState<any[]>([]);
+  const [resolveAppt, setResolveAppt] = useState<AppointmentDto | null>(null);
   const [rescheduleAppt, setRescheduleAppt] = useState<AppointmentDto | null>(null);
   const [rescheduleDate, setRescheduleDate] = useState('');
   const [rescheduleTime, setRescheduleTime] = useState('');
@@ -39,6 +26,7 @@ export function useSecretaryCheckInOutTracker() {
   const [isPending, startTransition] = useTransition();
   const supabase = useMemo(() => createClient(), []);
   const todayStr = getTodayLocalDateStr();
+
   const toNaiveUtc = (date: Date) => new Date(date.getTime() + (-date.getTimezoneOffset()) * 60000);
 
   const fetchData = async () => {
@@ -46,12 +34,11 @@ export function useSecretaryCheckInOutTracker() {
     setErrorMessage(null);
     try {
       const apptRes = await getClinicAppointmentsAction({ date: todayStr });
-      if (apptRes.success && apptRes.data) setAppointments(apptRes.data);
-      else setErrorMessage(apptRes.error || 'Failed to load appointments');
-      const invRes = await getInvoicesAction({ limit: 100, page: 1 });
-      if (invRes.success && invRes.data) setInvoices(invRes.data);
-      const svcRes = await getServicesAction('BOOKABLE');
-      if (svcRes.data) setServicesCatalog(svcRes.data.map((service: any) => ({ id: service.id, name: service.name, price: Number(service.price || 0) })));
+      if (apptRes.success && apptRes.data) {
+        setAppointments(apptRes.data);
+      } else {
+        setErrorMessage(apptRes.error || 'Failed to load appointments');
+      }
     } catch (err: any) {
       setErrorMessage(err.message || 'An unexpected error occurred');
     } finally {
@@ -65,32 +52,48 @@ export function useSecretaryCheckInOutTracker() {
     return () => clearInterval(tick);
   }, []);
 
-  useEffect(() => { fetchData(); }, []);
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   useEffect(() => {
     const channel = supabase
       .channel('check-in-out-tracker')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'appointments' }, () => fetchData())
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'invoices' }, () => fetchData())
       .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [supabase]);
 
+  const parseLocalTime = (date: string, time: string | null) => {
+    if (!time) return null;
+    const t = time.substring(0, 5);
+    return new Date(`${date}T${t}:00+08:00`);
+  };
+
   const getCheckInStatus = (appointment: AppointmentDto) => {
+    if (bypassWindow) return { enabled: true, message: 'Check In (Bypassed)' };
     if (!currentTime) return { enabled: false, message: 'Check In' };
-    // Parse naive HH:MM local time combined with the appointment date (clinic is UTC+8)
-    const parseLocalTime = (date: string, time: string | null) => {
-      if (!time) return null;
-      const t = time.substring(0, 5); // normalize HH:MM:SS → HH:MM
-      return new Date(`${date}T${t}:00+08:00`);
-    };
     const startTime = parseLocalTime(appointment.date, appointment.startTime);
     const endTime = parseLocalTime(appointment.date, appointment.endTime);
     if (!startTime || !endTime) return { enabled: false, message: 'Check In' };
-    const windowStart = new Date(startTime.getTime() - 30 * 60 * 1000);
-    if (currentTime < windowStart) return { enabled: false, message: `In ${Math.ceil((windowStart.getTime() - currentTime.getTime()) / 60000)}m` };
-    if (currentTime > endTime) return { enabled: false, message: 'Expired' };
+
+    const windowStart = new Date(startTime.getTime() - 15 * 60 * 1000);
+    if (currentTime < windowStart) {
+      return { enabled: false, message: `In ${Math.ceil((windowStart.getTime() - currentTime.getTime()) / 60000)}m` };
+    }
+    if (currentTime > endTime) {
+      return { enabled: false, message: 'Expired' };
+    }
     return { enabled: true, message: 'Check In' };
+  };
+
+  const isPastEndTime = (appointment: AppointmentDto) => {
+    if (!currentTime || !appointment.endTime) return false;
+    const endTime = parseLocalTime(appointment.date, appointment.endTime);
+    if (!endTime) return false;
+    return currentTime > endTime;
   };
 
   const runStatusAction = (action: () => Promise<any>, fallback: string) => {
@@ -101,23 +104,43 @@ export function useSecretaryCheckInOutTracker() {
     });
   };
 
-  const handleCheckIn = (appointmentId: string) => runStatusAction(() => checkInAction({ appointmentId }), 'Failed to check in');
-  const handleMarkNoShow = (appointmentId: string) => runStatusAction(() => markNoShowAction({ appointmentId }), 'Failed to mark no-show');
+  const handleCheckIn = (appointmentId: string) =>
+    runStatusAction(() => checkInAction({ appointmentId }), 'Failed to check in');
+
   const handleUndoCheckIn = (appointmentId: string) => {
     if (!confirm('Are you sure you want to undo this check-in?')) return;
     runStatusAction(() => undoCheckInAction({ appointmentId }), 'Failed to undo check-in');
   };
 
-  const handleCheckoutComplete = () => {
-    if (!checkoutInvoice || !checkoutAppt) return;
+  const handleCheckoutComplete = (appointmentId: string) => {
     startTransition(async () => {
-      const res = await checkoutAction({ invoiceId: checkoutInvoice.id, paymentMethod, discountPercent, additionalItems });
+      const res = await updateAppointmentStatusAction({
+        appointmentId,
+        status: 'COMPLETED',
+        statusReason: 'Checked out patient and dispatched Thank You & Post-Care Review Request message.',
+      });
       if (!res.success) alert(res.error || 'Failed to complete checkout');
       else {
-        setCheckoutInvoice(null);
         setCheckoutAppt(null);
-        setDiscountPercent(0);
-        setAdditionalItems([]);
+        fetchData();
+      }
+    });
+  };
+
+  const handleResolveNoShowSubmit = (payload: {
+    appointmentId: string;
+    resolution: 'COMPLETED' | 'CONFIRMED_NO_SHOW' | 'RESCHEDULE';
+    reason: string;
+    newDate?: string;
+    newStartTime?: string;
+    newEndTime?: string;
+    newDoctorId?: string;
+  }) => {
+    startTransition(async () => {
+      const res = await resolveNoShowAction(payload);
+      if (!res.success) alert(res.error || 'Failed to resolve no-show');
+      else {
+        setResolveAppt(null);
         fetchData();
       }
     });
@@ -147,58 +170,59 @@ export function useSecretaryCheckInOutTracker() {
     });
   };
 
-  const getDraftInvoiceForAppt = (apptId: string) => invoices.find((invoice) => invoice.appointmentId === apptId && invoice.status === 'DRAFT') || null;
-  const getFinalizedInvoiceForAppt = (apptId: string) => invoices.find((invoice) => invoice.appointmentId === apptId && invoice.status === 'FINALIZED') || null;
-  const getSubtotal = () => (checkoutInvoice?.amount || 0) + additionalItems.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
-  const calculateFinalPrice = () => Math.max(0, getSubtotal() - getSubtotal() * (discountPercent / 100));
-
-  const handleViewApptDetails = async (appointment: AppointmentDto) => {
+  const handleViewApptDetails = (appointment: AppointmentDto) => {
     setViewAppt(appointment);
-    setViewInvoiceItems([]);
-    const invoice = getFinalizedInvoiceForAppt(appointment.id);
-    if (!invoice) return;
-    const { data } = await supabase.from('invoice_items').select('*').eq('invoice_id', invoice.id);
-    if (data) setViewInvoiceItems(data);
   };
 
-  const columns = useMemo(() => ({
-    approved: appointments.filter((appointment) => appointment.status === 'APPROVED'),
-    noShow: appointments.filter((appointment) => appointment.status === 'NO_SHOW'),
-    checkedIn: appointments.filter((appointment) => appointment.status === 'CHECKED_IN'),
-    readyCheckout: appointments.filter((appointment) => appointment.status === 'TREATMENT_RENDERED'),
-    completed: appointments.filter((appointment) => appointment.status === 'COMPLETED'),
-  }), [appointments]);
+  const columns = useMemo(() => {
+    return {
+      approved: appointments.filter((appointment) => appointment.status === 'APPROVED' && !isPastEndTime(appointment)),
+      noShow: appointments.filter((appointment) => appointment.status === 'NO_SHOW' || (appointment.status === 'APPROVED' && isPastEndTime(appointment))),
+      checkedIn: appointments.filter((appointment) => appointment.status === 'CHECKED_IN'),
+      readyCheckout: appointments.filter((appointment) => appointment.status === 'TREATMENT_RENDERED'),
+      completed: appointments.filter((appointment) => appointment.status === 'COMPLETED'),
+    };
+  }, [appointments, currentTime]);
 
   const stats = {
     totalCheckedInToday: appointments.filter((appointment) => ['CHECKED_IN', 'TREATMENT_RENDERED', 'COMPLETED'].includes(appointment.status)).length,
     completedToday: columns.completed.length,
     pendingCheckout: columns.readyCheckout.length,
-    totalRevenue: invoices.filter((invoice) => invoice.status === 'FINALIZED' && appointments.some((appointment) => appointment.id === invoice.appointmentId)).reduce((sum, invoice) => sum + (invoice.amount || 0), 0),
-  };
-
-  const addLineItem = () => {
-    if (!customDescription.trim()) return;
-    setAdditionalItems((prev) => [...prev, { serviceId: selectedServiceId === 'custom' ? undefined : selectedServiceId, description: customDescription, unitPrice: customPrice, quantity: customQty }]);
-    setSelectedServiceId('');
-    setCustomDescription('');
-    setCustomPrice(0);
-    setCustomQty(1);
-  };
-
-  const closeCheckout = () => {
-    setCheckoutInvoice(null);
-    setCheckoutAppt(null);
-    setAdditionalItems([]);
+    noShowCountToday: columns.noShow.length,
   };
 
   return {
-    appointments, invoices, columns, stats, currentTime, todayStr, isLoading, errorMessage, isPending,
-    checkoutInvoice, checkoutAppt, setCheckoutInvoice, setCheckoutAppt, discountPercent, setDiscountPercent,
-    paymentMethod, setPaymentMethod, servicesCatalog, additionalItems, setAdditionalItems, selectedServiceId,
-    setSelectedServiceId, customDescription, setCustomDescription, customPrice, setCustomPrice, customQty, setCustomQty,
-    viewAppt, setViewAppt, viewInvoiceItems, rescheduleAppt, setRescheduleAppt, rescheduleDate, setRescheduleDate,
-    rescheduleTime, setRescheduleTime, rescheduleDoctor, setRescheduleDoctor, getCheckInStatus, handleCheckIn,
-    handleUndoCheckIn, handleMarkNoShow, handleCheckoutComplete, handleRescheduleSubmit, calculateFinalPrice,
-    handleViewApptDetails, getDraftInvoiceForAppt, getFinalizedInvoiceForAppt, addLineItem, closeCheckout,
+    appointments,
+    columns,
+    stats,
+    currentTime,
+    todayStr,
+    isLoading,
+    errorMessage,
+    isPending,
+    bypassWindow,
+    setBypassWindow,
+    checkoutAppt,
+    setCheckoutAppt,
+    viewAppt,
+    setViewAppt,
+    resolveAppt,
+    setResolveAppt,
+    rescheduleAppt,
+    setRescheduleAppt,
+    rescheduleDate,
+    setRescheduleDate,
+    rescheduleTime,
+    setRescheduleTime,
+    rescheduleDoctor,
+    setRescheduleDoctor,
+    getCheckInStatus,
+    handleCheckIn,
+    handleUndoCheckIn,
+    handleCheckoutComplete,
+    handleResolveNoShowSubmit,
+    handleRescheduleSubmit,
+    handleViewApptDetails,
+    isPastEndTime,
   };
 }

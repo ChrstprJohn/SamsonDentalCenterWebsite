@@ -8,6 +8,7 @@ import { CheckInDetailsModal } from './sub-components/check-in-details-modal';
 import { CheckInHeader } from './sub-components/check-in-header';
 import { CheckInLoading } from './sub-components/check-in-loading';
 import { CheckInRescheduleModal } from './sub-components/check-in-reschedule-modal';
+import { NoShowResolutionModal } from './sub-components/no-show-resolution-modal';
 
 export function SecretaryCheckInOutTrackerView() {
   const view = useSecretaryCheckInOutTracker();
@@ -16,7 +17,12 @@ export function SecretaryCheckInOutTrackerView() {
 
   return (
     <div className="flex flex-col gap-6 h-full w-full max-w-[1600px] mx-auto p-4 md:p-6">
-      <CheckInHeader todayStr={view.todayStr} stats={view.stats} />
+      <CheckInHeader
+        todayStr={view.todayStr}
+        stats={view.stats}
+        bypassWindow={view.bypassWindow}
+        setBypassWindow={view.setBypassWindow}
+      />
       {view.errorMessage && (
         <div className="p-4 text-xs bg-red-500/10 border border-red-500/20 text-red-500 rounded-2xl flex items-center gap-3">
           <AlertCircle className="h-4 w-4 shrink-0" />
@@ -26,6 +32,7 @@ export function SecretaryCheckInOutTrackerView() {
       <CheckInBoard view={view} />
       <CheckInCheckoutModal view={view} />
       <CheckInRescheduleModal view={view} />
+      <NoShowResolutionModal view={view} />
       <CheckInDetailsModal view={view} />
     </div>
   );
