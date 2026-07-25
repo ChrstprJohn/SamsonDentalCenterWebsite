@@ -51,7 +51,7 @@ export async function updateAppointmentStatusAction(formData: StaffUpdateAppoint
     );
 
     return { success: true, data: result };
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof z.ZodError) {
       return { success: false, error: 'Validation failed: ' + error.issues[0].message };
     }

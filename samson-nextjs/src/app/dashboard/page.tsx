@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import { AppSidebar } from "@/components/app-sidebar"
 import {
   Breadcrumb,
@@ -15,6 +16,14 @@ import {
 } from "@/components/ui/sidebar"
 
 export default function Page() {
+  return (
+    <Suspense fallback={<div className="p-4 text-xs text-muted-foreground">Loading dashboard...</div>}>
+      <DashboardContent />
+    </Suspense>
+  )
+}
+
+function DashboardContent() {
   return (
     <SidebarProvider
       style={
@@ -55,3 +64,4 @@ export default function Page() {
     </SidebarProvider>
   )
 }
+

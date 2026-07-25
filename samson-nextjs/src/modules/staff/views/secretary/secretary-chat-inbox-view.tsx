@@ -665,7 +665,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
         return {
             selectedAppointment: appointmentAdapter,
             activeTab: 'upcoming',
-            fetchData: () => fetchThreads(false),
+            fetchData: () => fetchThreads(),
             showRescheduleForm: activeAction === 'RESCHEDULE',
             setShowRescheduleForm: (show: boolean) => {
                 if (show) {

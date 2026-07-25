@@ -66,6 +66,7 @@ describe('convertInquiryAction', () => {
       endTime: '10:30',
       patientNote: 'Tooth pain',
       secretaryNotes: 'Call coordinated',
+      confirmationChannel: 'EMAIL' as const,
     };
 
     const response = await convertInquiryAction(payload);
@@ -87,6 +88,7 @@ describe('convertInquiryAction', () => {
       date: '2026-06-25',
       startTime: '10:00',
       endTime: '10:30',
+      confirmationChannel: 'EMAIL' as const,
     };
 
     const response = await convertInquiryAction(payload);

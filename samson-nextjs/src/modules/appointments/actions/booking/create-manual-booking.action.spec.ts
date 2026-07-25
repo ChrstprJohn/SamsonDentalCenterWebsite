@@ -56,6 +56,7 @@ describe('createManualBookingAction', () => {
     endTime: '2026-06-25T10:30:00.000Z',
     patientNote: 'Tooth pain',
     statusReason: 'Call coordinated',
+    confirmationChannel: 'EMAIL' as const,
   };
 
   it('should validate inputs, check user role, run use case and return success', async () => {

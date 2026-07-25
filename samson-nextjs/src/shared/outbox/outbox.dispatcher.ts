@@ -7,7 +7,7 @@ export const globalOutboxDispatcher = (supabaseAdmin: SupabaseClient, throwOnErr
     const outbox = outboxCommands(supabaseAdmin);
     
     // If a specific targetEventId is provided, claim/process ONLY that event
-    let events = [];
+    let events: any[] = [];
     if (targetEventId) {
       const { data } = await supabaseAdmin
         .from('outbox')

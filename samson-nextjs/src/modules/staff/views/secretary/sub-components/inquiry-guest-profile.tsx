@@ -10,9 +10,9 @@ interface InquiryGuestProfileProps {
   suffix: string; setSuffix: (value: string) => void;
   phone: string; setPhone: (value: string) => void;
   email: string; setEmail: (value: string) => void;
-  patientNote: string;
-  setPatientNote: (value: string) => void;
-  isEditing: boolean;
+  patientNote?: string;
+  setPatientNote?: (value: string) => void;
+  isEditing?: boolean;
 }
 
 export function InquiryGuestProfile(props: InquiryGuestProfileProps) {
@@ -81,7 +81,7 @@ export function InquiryGuestProfile(props: InquiryGuestProfileProps) {
         ) : (
           <textarea
             value={props.patientNote}
-            onChange={(e) => props.setPatientNote(e.target.value)}
+            onChange={(e) => props.setPatientNote?.(e.target.value)}
             rows={2}
             className="text-sm text-slate-800 bg-white border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500 transition resize-none w-full"
             placeholder="Add a note..."

@@ -46,7 +46,7 @@ function VisitColumn({ config, appointments, view }: { config: any; appointments
 function VisitCard({ appointment, columnKey, view }: { appointment: AppointmentDto; columnKey: string; view: any }) {
   const draftInvoice = view.getDraftInvoiceForAppt(appointment.id);
   const checkInGate = view.getCheckInStatus(appointment);
-  const isPastEnd = !!view.currentTime && view.currentTime > new Date(appointment.endTime);
+  const isPastEnd = Boolean(view.currentTime && appointment.endTime && view.currentTime > new Date(appointment.endTime));
   return (
     <motion.div layout initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }} className="p-4 border border-card-border bg-card rounded-2xl shadow-xs transition-all flex flex-col gap-3">
       <VisitSummary appointment={appointment} />

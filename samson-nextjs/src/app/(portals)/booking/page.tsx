@@ -93,13 +93,15 @@ export default async function BookingPage({ searchParams }: { searchParams: Prom
 
   return (
     <main className="flex-1 flex items-center justify-center p-6 bg-gradient-to-br from-background to-secondary-bg min-h-[80vh]">
-      <BookingView 
-        services={services} 
-        userProfile={userProfile} 
-        userDependents={userDependents} 
-        reschedulingAppointment={reschedulingAppointment}
-        clinicConfig={clinicConfig}
-      />
+      <React.Suspense fallback={<div className="text-center text-sm text-text-muted">Loading booking portal...</div>}>
+        <BookingView 
+          services={services} 
+          userProfile={userProfile} 
+          userDependents={userDependents} 
+          reschedulingAppointment={reschedulingAppointment}
+          clinicConfig={clinicConfig}
+        />
+      </React.Suspense>
     </main>
   );
 }

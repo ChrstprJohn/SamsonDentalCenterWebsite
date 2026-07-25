@@ -20,7 +20,7 @@ export function TimeExclusionsTab({ doctors, initialTimeBlocks }: TimeExclusions
     setMessage(null);
     try {
       const res = await createTimeBlockAction({
-        doctorId: values.scope === 'DOCTOR' ? values.doctorId : null,
+        doctorId: values.scope === 'DOCTOR' ? (values.doctorId || null) : null,
         date: values.date,
         startTime: values.startTime,
         endTime: values.endTime,
@@ -35,7 +35,7 @@ export function TimeExclusionsTab({ doctors, initialTimeBlocks }: TimeExclusions
       const doctorObj = doctors.find((d) => d.id === values.doctorId);
       const newBlock: TimeBlockItem = {
         id: Math.random().toString(), // fallback temporary key
-        doctorId: values.scope === 'DOCTOR' ? values.doctorId : null,
+        doctorId: values.scope === 'DOCTOR' ? (values.doctorId || null) : null,
         doctorName: values.scope === 'DOCTOR' && doctorObj ? doctorObj.name : '🏥 Clinic-wide',
         date: values.date,
         startTime: values.startTime,

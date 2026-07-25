@@ -12,7 +12,7 @@ export const timeBlockFormSchema = z
     date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Please pick a valid date'),
     startTime: TimeStringSchema,
     endTime: TimeStringSchema,
-    isAllDay: z.boolean().default(false),
+    isAllDay: z.boolean(),
     reason: z.string().trim().min(3, 'Reason must be at least 3 characters'),
   })
   .refine(
@@ -46,7 +46,7 @@ interface UseTimeBlockFormProps {
 
 export function useTimeBlockForm({ onSubmit, defaultValues }: UseTimeBlockFormProps) {
   const form = useForm<TimeBlockFormValues>({
-    resolver: zodResolver(timeBlockFormSchema),
+    resolver: zodResolver(timeBlockFormSchema) as any,
     defaultValues: {
       scope: 'CLINIC',
       doctorId: null,
@@ -79,7 +79,7 @@ export function useTimeBlockForm({ onSubmit, defaultValues }: UseTimeBlockFormPr
 
   return {
     register: form.register,
-    handleSubmit: form.handleSubmit(onSubmit),
+    handleSubmit: form.handleSubmit(onSubmit as any),
     errors: form.formState.errors,
     isSubmitting: form.formState.isSubmitting,
     watch: form.watch,
