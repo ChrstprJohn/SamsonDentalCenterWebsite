@@ -64,6 +64,7 @@ describe('useUserBooking Hook Specs', () => {
       price: 100,
       serviceType: 'GENERAL' as const,
       isActive: true,
+      status: 'ACTIVE' as const,
       createdAt: '2026-06-21',
       updatedAt: '2026-06-21',
     },

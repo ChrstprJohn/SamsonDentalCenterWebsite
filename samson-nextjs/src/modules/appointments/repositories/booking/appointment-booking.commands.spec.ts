@@ -31,6 +31,7 @@ describe('AppointmentBookingCommands', () => {
       endTime: '10:30',
       userNote: 'Dental checkup',
       patientType: 'SELF',
+      preferredStartTime: '10:00',
     };
 
     it('should successfully call the rpc for booking transaction', async () => {
@@ -53,7 +54,7 @@ describe('AppointmentBookingCommands', () => {
         p_new_dependent_middle_name: null,
         p_new_dependent_suffix: null,
         p_doctor_assignment_source: 'USER',
-        p_preferred_start_time: null,
+        p_preferred_start_time: '10:00',
       });
       expect(result).toMatchObject({ appointmentId: validApptId });
     });

@@ -74,5 +74,12 @@ export const onAppointmentConvertedSubscriber = {
         baseUrl,
       }
     );
+    await supabaseAdmin
+      .from('appointments')
+      .update({
+        confirmation_sent: true,
+        email_confirmation_sent: true,
+      })
+      .eq('id', appointmentId);
   }
 };

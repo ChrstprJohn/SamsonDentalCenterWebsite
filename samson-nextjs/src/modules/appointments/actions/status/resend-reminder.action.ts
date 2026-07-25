@@ -68,11 +68,11 @@ export async function resendReminderAction(input: ResendReminderInput) {
       email: recipientEmail,
     });
 
-    // Update sent flag on appointments table
+    // Update sent flags on appointments table
     if (input.reminderType === '48H') {
-      await supabaseAdmin.from('appointments').update({ reminder_48h_sent: true }).eq('id', input.appointmentId);
+      await supabaseAdmin.from('appointments').update({ reminder_48h_sent: true, email_reminder_48h_sent: true }).eq('id', input.appointmentId);
     } else {
-      await supabaseAdmin.from('appointments').update({ reminder_24h_sent: true }).eq('id', input.appointmentId);
+      await supabaseAdmin.from('appointments').update({ reminder_24h_sent: true, email_reminder_24h_sent: true }).eq('id', input.appointmentId);
     }
 
     // Trigger immediate outbox processing ONLY for this specific event

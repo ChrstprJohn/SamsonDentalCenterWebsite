@@ -221,6 +221,7 @@ export const validateChatTokenQuery = (supabase: SupabaseClient) => {
             doctorName = `Dr. ${d.first_name ?? ''} ${d.last_name ?? ''}`.trim() || 'Unassigned';
         }
 
+        const s = Array.isArray(data.service) ? data.service[0] : (data.service as any);
         return {
             appointmentId: data.id,
             status: data.status,
@@ -229,8 +230,8 @@ export const validateChatTokenQuery = (supabase: SupabaseClient) => {
             startTime: data.start_time,
             endTime: data.end_time,
             patientName,
-            serviceName: (data.service?.[0]?.name) || 'General Inquiry',
-            serviceId: data.service?.[0]?.id || null,
+            serviceName: s?.name || 'General Inquiry',
+            serviceId: s?.id || null,
             doctorName,
         };
     };

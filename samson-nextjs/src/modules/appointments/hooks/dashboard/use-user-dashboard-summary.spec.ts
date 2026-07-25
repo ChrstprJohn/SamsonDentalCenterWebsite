@@ -36,7 +36,7 @@ const appointment = (id: string, status: AppointmentDto['status'], date: string,
     preferredStartTime: null,
     proposedPreferredStartTime: null,
     guestContact: null,
-  });
+  } as unknown as AppointmentDto);
 
 describe('useUserDashboardSummary', () => {
   it('selects the nearest actionable upcoming appointment', () => {
@@ -55,6 +55,6 @@ describe('useUserDashboardSummary', () => {
     const { result } = renderHook(() => useUserDashboardSummary([]));
 
     expect(result.current.formatTime('13:05')).toBe('1:05 PM');
-    expect(result.current.formatTime()).toBe('');
+    expect(result.current.formatTime('')).toBe('');
   });
 });

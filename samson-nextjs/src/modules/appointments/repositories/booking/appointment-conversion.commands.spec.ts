@@ -19,6 +19,7 @@ describe('convertInquiryToAppointmentCommand', () => {
       secretaryNotes: 'Confirmed over phone',
       linkedPatientId: '9a2f1d60-89ab-4b73-99fb-1d6c3c5a1d44',
       doctorAssignmentSource: 'USER' as const,
+      confirmationChannel: 'EMAIL' as const,
     };
 
     const result = await command(payload, 'secretary-id');
@@ -41,6 +42,7 @@ describe('convertInquiryToAppointmentCommand', () => {
       p_phone_number: null,
       p_email: null,
       p_doctor_assignment_source: 'USER',
+      p_confirmation_channel: 'EMAIL',
     });
     expect(result.appointmentId).toBe('new-app-uuid');
   });

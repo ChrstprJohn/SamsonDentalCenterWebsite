@@ -15,17 +15,19 @@ export const outboxCommands = (supabase: SupabaseClient) => {
      * Emits a domain event into the outbox for background processing.
      */
     async emitEvent(eventType: string, payload: Record<string, any>): Promise<OutboxEvent> {
-      const res = await supabase.from('outbox').insert({
+      const query = supabase.from('outbox').insert({
         event_type: eventType,
         payload,
         status: 'PENDING',
-      }).select?.() as any;
+      });
 
-      const data = res?.data?.[0] || res?.data || { id: 'generated-event-id', event_type: eventType, payload, status: 'PENDING' };
+      const res = await (typeof (query as any).select === 'function' ? (query as any).select() : query);
+
       if (res?.error) {
         throw new Error(`Failed to emit event: ${res.error.message}`);
       }
 
+      const data = res?.data?.[0] || res?.data || { id: 'generated-event-id', event_type: eventType, payload, status: 'PENDING' };
       return data;
     },
 

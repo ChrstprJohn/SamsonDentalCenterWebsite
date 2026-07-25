@@ -170,7 +170,9 @@ export function SidebarAppointmentDetails({
       showToast(res.message || `${type} reminder sent successfully`, 'success');
       setLocalAppointment((prev) => ({
         ...prev,
-        ...(type === '48H' ? { reminder48hSent: true } : { reminder24hSent: true }),
+        ...(type === '48H' 
+          ? { reminder48hSent: true, emailReminder48hSent: true } 
+          : { reminder24hSent: true, emailReminder24hSent: true }),
       }));
     } else {
       showToast(res.error || 'Failed to send reminder email', 'error');
@@ -365,7 +367,7 @@ export function SidebarAppointmentDetails({
                   <Mail className="size-3.5 text-muted-foreground" /> 48-Hour Reminder
                 </span>
                 <span className="text-[11px] text-muted-foreground">
-                  Status: {localAppointment.reminder48hSent ? 'Sent / Processed' : 'Pending / Skipped'}
+                  Status: {(localAppointment.emailReminder48hSent || localAppointment.smsReminder48hSent || localAppointment.reminder48hSent) ? 'Sent / Processed' : 'Pending / Skipped'}
                 </span>
               </div>
               <Button
@@ -387,7 +389,7 @@ export function SidebarAppointmentDetails({
                   <Mail className="size-3.5 text-muted-foreground" /> 24-Hour Reminder
                 </span>
                 <span className="text-[11px] text-muted-foreground">
-                  Status: {localAppointment.reminder24hSent ? 'Sent / Processed' : 'Pending / Skipped'}
+                  Status: {(localAppointment.emailReminder24hSent || localAppointment.smsReminder24hSent || localAppointment.reminder24hSent) ? 'Sent / Processed' : 'Pending / Skipped'}
                 </span>
               </div>
               <Button

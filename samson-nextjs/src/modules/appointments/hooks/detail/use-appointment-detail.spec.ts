@@ -43,7 +43,7 @@ const appt = {
   preferredStartTime: null,
   proposedPreferredStartTime: null,
   guestContact: null,
-} as AppointmentDto;
+} as unknown as AppointmentDto;
 
 describe('useAppointmentDetail', () => {
   beforeEach(() => vi.clearAllMocks());

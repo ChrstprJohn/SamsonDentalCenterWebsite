@@ -34,6 +34,7 @@ describe('createManualBookingCommand', () => {
     statusReason: 'Call booking reason',
     secretaryUserId: 'sec-uuid',
     doctorAssignmentSource: 'USER' as const,
+    confirmationChannel: 'EMAIL' as const,
   };
 
   it('should call RPC with null dependent params when booking for self', async () => {

@@ -83,29 +83,32 @@ export async function resendNotificationAction(input: ResendNotificationInput) {
     const outbox = outboxCommands(supabaseAdmin);
     let dispatchedEvents: string[] = [];
 
-    // Update primary sent flag on appointments table (guaranteed column)
+    // Build atomic update payload based on event type and target channel
+    const updatePayload: Record<string, boolean> = {};
+
     if (input.eventType === 'APPOINTMENT_BOOKED') {
-      await supabaseAdmin.from('appointments').update({ confirmation_sent: true }).eq('id', input.appointmentId);
+      updatePayload.confirmation_sent = true;
+      if (shouldSendEmail) updatePayload.email_confirmation_sent = true;
+      if (shouldSendSms) updatePayload.sms_confirmation_sent = true;
     } else if (input.eventType === 'APPOINTMENT_REMINDER_48H') {
-      await supabaseAdmin.from('appointments').update({ reminder_48h_sent: true }).eq('id', input.appointmentId);
+      updatePayload.reminder_48h_sent = true;
+      if (shouldSendEmail) updatePayload.email_reminder_48h_sent = true;
+      if (shouldSendSms) updatePayload.sms_reminder_48h_sent = true;
     } else if (input.eventType === 'APPOINTMENT_REMINDER_24H') {
-      await supabaseAdmin.from('appointments').update({ reminder_24h_sent: true }).eq('id', input.appointmentId);
+      updatePayload.reminder_24h_sent = true;
+      if (shouldSendEmail) updatePayload.email_reminder_24h_sent = true;
+      if (shouldSendSms) updatePayload.sms_reminder_24h_sent = true;
     }
 
-    // Safely attempt optional channel-specific columns if present in DB schema
-    try {
-      if (input.eventType === 'APPOINTMENT_BOOKED') {
-        if (shouldSendEmail) await supabaseAdmin.from('appointments').update({ email_confirmation_sent: true }).eq('id', input.appointmentId);
-        if (shouldSendSms) await supabaseAdmin.from('appointments').update({ sms_confirmation_sent: true }).eq('id', input.appointmentId);
-      } else if (input.eventType === 'APPOINTMENT_REMINDER_48H') {
-        if (shouldSendEmail) await supabaseAdmin.from('appointments').update({ email_reminder_48h_sent: true }).eq('id', input.appointmentId);
-        if (shouldSendSms) await supabaseAdmin.from('appointments').update({ sms_reminder_48h_sent: true }).eq('id', input.appointmentId);
-      } else if (input.eventType === 'APPOINTMENT_REMINDER_24H') {
-        if (shouldSendEmail) await supabaseAdmin.from('appointments').update({ email_reminder_24h_sent: true }).eq('id', input.appointmentId);
-        if (shouldSendSms) await supabaseAdmin.from('appointments').update({ sms_reminder_24h_sent: true }).eq('id', input.appointmentId);
+    if (Object.keys(updatePayload).length > 0) {
+      const { error: updateErr } = await supabaseAdmin
+        .from('appointments')
+        .update(updatePayload)
+        .eq('id', input.appointmentId);
+
+      if (updateErr) {
+        console.error('[resendNotificationAction] Atomic update error:', updateErr.message);
       }
-    } catch (e: any) {
-      console.warn('[resendNotificationAction] Channel column update notice:', e?.message || e);
     }
 
     // Dispatch Email Event

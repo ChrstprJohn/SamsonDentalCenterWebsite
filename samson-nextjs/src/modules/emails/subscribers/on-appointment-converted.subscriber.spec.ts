@@ -13,7 +13,9 @@ describe('onAppointmentConvertedSubscriber', () => {
   const mockSingle = vi.fn();
   const mockEq = vi.fn(() => ({ single: mockSingle }));
   const mockSelect = vi.fn(() => ({ eq: mockEq }));
-  const mockSupabase = { from: vi.fn(() => ({ select: mockSelect })) } as any;
+  const mockUpdateEq = vi.fn().mockResolvedValue({ error: null });
+  const mockUpdate = vi.fn(() => ({ eq: mockUpdateEq }));
+  const mockSupabase = { from: vi.fn(() => ({ select: mockSelect, update: mockUpdate })) } as any;
 
   beforeEach(() => {
     vi.clearAllMocks();

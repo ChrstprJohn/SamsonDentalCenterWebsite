@@ -117,6 +117,8 @@ describe('useLandingView', () => {
       updatedAt: '2026-06-24T00:00:00.000Z',
       dateOfBirth: '1990-01-01',
       preferredStartTime: '09:00',
+      assignedDoctorId: undefined,
+      assignedEndTime: undefined,
     };
 
     mockSubmitInquiryAction.mockResolvedValue({ success: true, data: mockInquiryResponse });

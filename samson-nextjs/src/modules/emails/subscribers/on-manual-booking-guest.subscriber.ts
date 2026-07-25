@@ -71,16 +71,10 @@ export const onManualBookingGuestSubscriber = {
 
     await supabaseAdmin
       .from('appointments')
-      .update({ confirmation_sent: true })
+      .update({
+        confirmation_sent: true,
+        email_confirmation_sent: true,
+      })
       .eq('id', appointmentId);
-
-    try {
-      await supabaseAdmin
-        .from('appointments')
-        .update({ email_confirmation_sent: true })
-        .eq('id', appointmentId);
-    } catch {
-      // Ignore if optional column doesn't exist
-    }
   },
 };

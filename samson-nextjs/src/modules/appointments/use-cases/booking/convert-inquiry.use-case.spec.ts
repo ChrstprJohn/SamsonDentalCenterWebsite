@@ -14,6 +14,7 @@ describe('convertInquiryUseCase', () => {
       serviceId: 'srv-123',
       doctorId: 'doc-123',
       doctorAssignmentSource: 'SYSTEM' as const,
+      confirmationChannel: 'EMAIL' as const,
       date: '2026-06-25',
       startTime: '2026-06-25T10:00:00Z',
       endTime: '2026-06-25T10:30:00Z',
