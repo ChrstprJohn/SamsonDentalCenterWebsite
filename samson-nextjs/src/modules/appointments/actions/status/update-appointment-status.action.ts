@@ -50,6 +50,17 @@ export async function updateAppointmentStatusAction(formData: StaffUpdateAppoint
       rescheduleMetadata
     );
 
+    // Non-blocking outbox processing for side effects (e.g. reschedule email)
+    const { after } = await import('next/server');
+    const { bootstrapEventSubscribers } = await import('@/orchestrators/event-subscribers');
+    const { globalOutboxDispatcher } = await import('@/shared/outbox/outbox.dispatcher');
+    const { createAdminClient } = await import('@/shared/database/server');
+
+    after(async () => {
+      bootstrapEventSubscribers();
+      await globalOutboxDispatcher(await createAdminClient())();
+    });
+
     return { success: true, data: result };
   } catch (error: any) {
     if (error instanceof z.ZodError) {
