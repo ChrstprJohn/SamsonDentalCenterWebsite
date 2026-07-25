@@ -191,6 +191,7 @@ export function useSecretaryInquiriesQueue() {
     setGuestSuffix(inquiry.suffix || '');
     setGuestPhone(inquiry.phoneNumber);
     setGuestEmail(inquiry.email);
+    setConfirmationChannel(inquiry.confirmationChannel || inquiry.confirmation_channel || 'EMAIL');
     if (inquiry.preferredDate) {
       const parsedDate = new Date(inquiry.preferredDate);
       if (!Number.isNaN(parsedDate.getTime())) setCurrentMonth(new Date(parsedDate.getFullYear(), parsedDate.getMonth(), 1));

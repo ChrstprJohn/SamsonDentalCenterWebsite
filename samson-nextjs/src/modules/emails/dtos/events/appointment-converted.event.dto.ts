@@ -3,7 +3,7 @@ import { z } from 'zod';
 export const appointmentConvertedEventSchema = z.object({
   appointmentId: z.string().uuid(),
   serviceId: z.string().uuid(),
-  doctorId: z.string().uuid(),
+  doctorId: z.string().uuid().nullable().optional(),
   date: z.string(),
   startTime: z.string(),
   durationMinutes: z.number().int().positive(),
