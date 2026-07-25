@@ -30,6 +30,7 @@ export const bootstrapEventSubscribers = () => {
   registerSubscriber('PASSWORD_RESET_REQUESTED', onPasswordResetRequestedSubscriber.handle);
   registerSubscriber('APPOINTMENT_BOOKED', onAppointmentBookedSubscriber.handle);
   registerSubscriber('APPOINTMENT_CONVERTED_FROM_INQUIRY', onAppointmentConvertedSubscriber.handle);
+  registerSubscriber('APPOINTMENT_CONVERTED_FROM_INQUIRY_PATIENT', onManualBookingPatientSubscriber.handle);
   registerSubscriber('APPOINTMENT_MANUALLY_BOOKED_GUEST', onManualBookingGuestSubscriber.handle);
   registerSubscriber('APPOINTMENT_MANUALLY_BOOKED_PATIENT', onManualBookingPatientSubscriber.handle);
   
