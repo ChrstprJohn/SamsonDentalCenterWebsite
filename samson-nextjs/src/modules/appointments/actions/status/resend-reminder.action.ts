@@ -38,6 +38,7 @@ export async function resendReminderAction(input: ResendReminderInput) {
       .select(`
         id,
         patient_id,
+        confirmation_channel,
         patient:users!appointments_patient_id_fkey(email)
       `)
       .eq('id', input.appointmentId)
@@ -47,6 +48,11 @@ export async function resendReminderAction(input: ResendReminderInput) {
       return { success: false, error: 'Appointment not found.' };
     }
 
+    const channel = (appointment as any).confirmation_channel || 'EMAIL';
+    if (channel === 'NONE' || channel === 'SMS') {
+      return { success: false, error: `Email notification disabled for channel ${channel}.` };
+    }
+
     // Pure Guest Focus: Always query guest_contacts first for contact email
     const { data: gc } = await supabaseAdmin
       .from('guest_contacts')
@@ -54,7 +60,7 @@ export async function resendReminderAction(input: ResendReminderInput) {
       .eq('appointment_id', input.appointmentId)
       .single();
 
-    let recipientEmail = gc?.email || appointment.patient?.email;
+    let recipientEmail = gc?.email?.trim() || appointment.patient?.email?.trim();
 
     if (!recipientEmail) {
       return { success: false, error: 'No contact email found for this appointment.' };

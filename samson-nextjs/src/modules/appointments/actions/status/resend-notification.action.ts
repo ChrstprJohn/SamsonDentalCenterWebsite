@@ -60,11 +60,15 @@ export async function resendNotificationAction(input: ResendNotificationInput) {
       .single();
 
     const channelToUse = input.targetChannel || (appointment.confirmation_channel as any) || 'EMAIL';
+    if (channelToUse === 'NONE') {
+      return { success: false, error: 'Notification channel is set to NONE (Opted out).' };
+    }
+
     const shouldSendEmail = channelToUse === 'EMAIL' || channelToUse === 'BOTH';
     const shouldSendSms = channelToUse === 'SMS' || channelToUse === 'BOTH';
 
-    const recipientEmail = gc?.email || appointment.patient?.email;
-    const recipientPhone = gc?.phone_number || appointment.patient?.phone_number;
+    const recipientEmail = gc?.email?.trim() || appointment.patient?.email?.trim();
+    const recipientPhone = gc?.phone_number?.trim() || appointment.patient?.phone_number?.trim();
 
     if (shouldSendEmail && !recipientEmail) {
       return { success: false, error: 'No contact email found for this appointment.' };
