@@ -6,6 +6,8 @@ import { checkInAction } from '@/modules/appointments/actions/status/check-in.ac
 import { undoCheckInAction } from '@/modules/appointments/actions/status/undo-check-in.action';
 import { updateAppointmentStatusAction } from '@/modules/appointments/actions/status/update-appointment-status.action';
 import { resolveNoShowAction } from '@/modules/appointments/actions/status/resolve-no-show.action';
+import { getDoctorsAction } from '@/modules/staff/actions/management/get-doctors.action';
+import { getServicesAction } from '@/modules/services/actions/management/get-services.action';
 import { createClient } from '@/shared/database/client';
 import type { AppointmentDto } from '@/modules/appointments/dtos/exports';
 import { getTodayLocalDateStr } from '@/shared/utils/date.util';
@@ -14,13 +16,18 @@ export function useSecretaryCheckInOutTracker() {
   const [appointments, setAppointments] = useState<AppointmentDto[]>([]);
   const [currentTime, setCurrentTime] = useState<Date | null>(null);
   const [bypassWindow, setBypassWindow] = useState(false); // Dev/Test toggle for anytime check-in
+  const [checkInAppt, setCheckInAppt] = useState<AppointmentDto | null>(null);
   const [checkoutAppt, setCheckoutAppt] = useState<AppointmentDto | null>(null);
   const [viewAppt, setViewAppt] = useState<AppointmentDto | null>(null);
   const [resolveAppt, setResolveAppt] = useState<AppointmentDto | null>(null);
   const [rescheduleAppt, setRescheduleAppt] = useState<AppointmentDto | null>(null);
   const [rescheduleDate, setRescheduleDate] = useState('');
   const [rescheduleTime, setRescheduleTime] = useState('');
+  const [rescheduleEndTime, setRescheduleEndTime] = useState('');
   const [rescheduleDoctor, setRescheduleDoctor] = useState('');
+  const [rescheduleService, setRescheduleService] = useState('');
+  const [rescheduleJustification, setRescheduleJustification] = useState('Patient requested reschedule');
+  const [servicesList, setServicesList] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -29,15 +36,27 @@ export function useSecretaryCheckInOutTracker() {
 
   const toNaiveUtc = (date: Date) => new Date(date.getTime() + (-date.getTimezoneOffset()) * 60000);
 
+  const [doctorsList, setDoctorsList] = useState<any[]>([]);
+
   const fetchData = async () => {
     setIsLoading(true);
     setErrorMessage(null);
     try {
-      const apptRes = await getClinicAppointmentsAction({ date: todayStr });
+      const [apptRes, docRes, svcRes] = await Promise.all([
+        getClinicAppointmentsAction({ date: todayStr }),
+        getDoctorsAction({ includeHidden: true }),
+        getServicesAction('BOOKABLE'),
+      ]);
       if (apptRes.success && apptRes.data) {
         setAppointments(apptRes.data);
       } else {
         setErrorMessage(apptRes.error || 'Failed to load appointments');
+      }
+      if (docRes.success && docRes.data) {
+        setDoctorsList(docRes.data);
+      }
+      if (svcRes && (svcRes as any).data) {
+        setServicesList((svcRes as any).data);
       }
     } catch (err: any) {
       setErrorMessage(err.message || 'An unexpected error occurred');
@@ -147,20 +166,27 @@ export function useSecretaryCheckInOutTracker() {
   };
 
   const handleRescheduleSubmit = () => {
-    if (!rescheduleAppt || !rescheduleDate || !rescheduleTime || !rescheduleDoctor) return;
+    if (!rescheduleAppt || !rescheduleDate || !rescheduleTime) return;
     startTransition(async () => {
-      const startIso = rescheduleTime.includes(':00') || rescheduleTime.split(':').length === 3
-        ? `${rescheduleDate}T${rescheduleTime}Z`
-        : `${rescheduleDate}T${rescheduleTime}:00Z`;
-      const endIso = new Date(new Date(startIso).getTime() + 30 * 60 * 1000).toISOString();
+      const formatIso = (dateStr: string, timeStr: string) => {
+        if (!dateStr || !timeStr) return undefined;
+        const timeFormatted = timeStr.length === 5 ? `${timeStr}:00` : timeStr;
+        return `${dateStr}T${timeFormatted}Z`;
+      };
+      const startIso = formatIso(rescheduleDate, rescheduleTime);
+      const endIso = rescheduleEndTime
+        ? formatIso(rescheduleDate, rescheduleEndTime)
+        : new Date(new Date(startIso!).getTime() + 30 * 60 * 1000).toISOString();
+
       const res = await updateAppointmentStatusAction({
         appointmentId: rescheduleAppt.id,
         status: 'APPROVED',
-        statusReason: 'Rescheduling past no-show appointment',
+        statusReason: rescheduleJustification || 'Rescheduling appointment slot',
         newDate: rescheduleDate,
         newStartTime: startIso,
         newEndTime: endIso,
-        newDoctorId: rescheduleDoctor,
+        newDoctorId: rescheduleDoctor || rescheduleAppt.doctorId,
+        newServiceId: rescheduleService || rescheduleAppt.serviceId,
       });
       if (!res.success) alert(res.error || 'Failed to reschedule');
       else {
@@ -191,6 +217,7 @@ export function useSecretaryCheckInOutTracker() {
 
   return {
     appointments,
+    doctorsList,
     columns,
     stats,
     currentTime,
@@ -200,6 +227,8 @@ export function useSecretaryCheckInOutTracker() {
     isPending,
     bypassWindow,
     setBypassWindow,
+    checkInAppt,
+    setCheckInAppt,
     checkoutAppt,
     setCheckoutAppt,
     viewAppt,
@@ -212,8 +241,15 @@ export function useSecretaryCheckInOutTracker() {
     setRescheduleDate,
     rescheduleTime,
     setRescheduleTime,
+    rescheduleEndTime,
+    setRescheduleEndTime,
     rescheduleDoctor,
     setRescheduleDoctor,
+    rescheduleService,
+    setRescheduleService,
+    rescheduleJustification,
+    setRescheduleJustification,
+    servicesList,
     getCheckInStatus,
     handleCheckIn,
     handleUndoCheckIn,

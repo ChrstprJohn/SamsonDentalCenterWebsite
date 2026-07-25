@@ -74,7 +74,7 @@ function VisitCard({ appointment, columnKey, view }: { appointment: AppointmentD
 
       {columnKey === 'approved' && (
         <Button
-          onClick={() => view.handleCheckIn(appointment.id)}
+          onClick={() => view.setCheckInAppt(appointment)}
           disabled={!checkInGate.enabled || view.isPending}
           className="w-full text-[10px] h-8 font-bold bg-cyan-500 border-none rounded-xl"
         >

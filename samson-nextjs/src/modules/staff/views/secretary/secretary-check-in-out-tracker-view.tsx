@@ -3,6 +3,7 @@
 import { AlertCircle } from 'lucide-react';
 import { useSecretaryCheckInOutTracker } from '../../hooks/secretary/use-secretary-check-in-out-tracker';
 import { CheckInBoard } from './sub-components/check-in-board';
+import { CheckInConfirmModal } from './sub-components/check-in-confirm-modal';
 import { CheckInCheckoutModal } from './sub-components/check-in-checkout-modal';
 import { CheckInDetailsModal } from './sub-components/check-in-details-modal';
 import { CheckInHeader } from './sub-components/check-in-header';
@@ -30,6 +31,7 @@ export function SecretaryCheckInOutTrackerView() {
         </div>
       )}
       <CheckInBoard view={view} />
+      <CheckInConfirmModal view={view} />
       <CheckInCheckoutModal view={view} />
       <CheckInRescheduleModal view={view} />
       <NoShowResolutionModal view={view} />

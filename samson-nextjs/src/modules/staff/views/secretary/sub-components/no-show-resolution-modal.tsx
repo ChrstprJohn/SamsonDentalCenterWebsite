@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { AlertCircle, CheckCircle2, Clock, Calendar, RefreshCw, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { AppointmentRescheduleForm } from './appointment-reschedule-form';
 
 export function NoShowResolutionModal({ view }: { view: any }) {
   const appointment = view.resolveAppt;
@@ -10,6 +11,7 @@ export function NoShowResolutionModal({ view }: { view: any }) {
   const [reason, setReason] = useState('Secretary forgot to click check-in');
   const [newDate, setNewDate] = useState(view.todayStr || '');
   const [newTime, setNewTime] = useState('10:00');
+  const [newEndTime, setNewEndTime] = useState('10:30');
   const [newDoctorId, setNewDoctorId] = useState(appointment?.doctorId || '');
 
   useEffect(() => {
@@ -67,7 +69,7 @@ export function NoShowResolutionModal({ view }: { view: any }) {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
             <label className="text-xs font-bold text-text-primary">Select Resolution Action</label>
             <div className="grid grid-cols-3 gap-2">
@@ -121,44 +123,65 @@ export function NoShowResolutionModal({ view }: { view: any }) {
             </div>
           </div>
 
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-bold text-text-primary">Reason for Resolution</label>
-            <textarea
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-              rows={2}
-              required
-              placeholder="Provide reason for audit log..."
-              className="w-full text-xs p-3 bg-secondary-bg border border-card-border rounded-2xl text-text-primary outline-none focus:border-cyan-500"
-            />
-          </div>
+          {resolution !== 'RESCHEDULE' && (
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-bold text-text-primary">Reason for Resolution</label>
+              <textarea
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                rows={2}
+                required
+                placeholder="Provide reason for audit log..."
+                className="w-full text-xs p-3 bg-secondary-bg border border-card-border rounded-2xl text-text-primary outline-none focus:border-cyan-500"
+              />
+            </div>
+          )}
 
           {resolution === 'RESCHEDULE' && (
-            <div className="flex flex-col gap-3 p-3 bg-secondary-bg border border-card-border rounded-2xl">
-              <span className="text-xs font-extrabold text-cyan-500">New Slot Details</span>
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="text-[10px] text-text-muted">Date</label>
-                  <input
-                    type="date"
-                    value={newDate}
-                    onChange={(e) => setNewDate(e.target.value)}
-                    required
-                    className="w-full text-xs p-2 bg-card border border-card-border rounded-xl text-text-primary"
-                  />
-                </div>
-                <div>
-                  <label className="text-[10px] text-text-muted">Time</label>
-                  <input
-                    type="time"
-                    value={newTime}
-                    onChange={(e) => setNewTime(e.target.value)}
-                    required
-                    className="w-full text-xs p-2 bg-card border border-card-border rounded-xl text-text-primary"
-                  />
-                </div>
-              </div>
-            </div>
+            <AppointmentRescheduleForm
+              appointment={appointment}
+              services={view.servicesList || []}
+              serviceId={appointment.serviceId}
+              doctorId={newDoctorId || appointment.doctorId}
+              doctors={(view.doctorsList || []).map((d: any) => ({
+                doctorId: d.id,
+                doctorName: `${d.prefix || 'Dr.'} ${d.firstName} ${d.lastName}`,
+              }))}
+              date={newDate}
+              activeServiceId={appointment.serviceId}
+              activeDoctorId={appointment.doctorId}
+              startTime={newTime}
+              endTime={newEndTime}
+              justification={reason}
+              isSubmitting={view.isPending}
+              onServiceSelect={() => {}}
+              onDoctorSelect={(docId) => setNewDoctorId(docId)}
+              onDateSelect={(d) => setNewDate(d)}
+              onStartTimeChange={(t) => setNewTime(t)}
+              onEndTimeChange={(t) => setNewEndTime(t)}
+              onJustificationChange={(j) => setReason(j)}
+              onSubmit={() => {
+                const formatIso = (dateStr: string, timeStr: string) => {
+                  if (!dateStr || !timeStr) return undefined;
+                  const timeFormatted = timeStr.length === 5 ? `${timeStr}:00` : timeStr;
+                  return `${dateStr}T${timeFormatted}Z`;
+                };
+                const startIso = formatIso(newDate, newTime);
+                const endIso = newEndTime
+                  ? formatIso(newDate, newEndTime)
+                  : new Date(new Date(startIso!).getTime() + 30 * 60 * 1000).toISOString();
+                view.handleResolveNoShowSubmit({
+                  appointmentId: appointment.id,
+                  resolution: 'RESCHEDULE',
+                  reason: reason.trim(),
+                  newDate,
+                  newStartTime: startIso,
+                  newEndTime: endIso,
+                  newDoctorId,
+                });
+              }}
+              onBack={() => view.setResolveAppt(null)}
+            />
           )}
 
           {resolution === 'COMPLETED' && (
@@ -168,30 +191,31 @@ export function NoShowResolutionModal({ view }: { view: any }) {
             </div>
           )}
 
-          <div className="flex justify-end gap-2 mt-2">
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={() => view.setResolveAppt(null)}
-              className="text-xs h-9 px-4 rounded-xl"
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              disabled={view.isPending}
-              className={`text-xs h-9 px-5 font-bold rounded-xl border-none ${
-                resolution === 'COMPLETED'
-                  ? 'bg-emerald-500 text-white'
-                  : resolution === 'CONFIRMED_NO_SHOW'
-                  ? 'bg-red-500 text-white'
-                  : 'bg-cyan-500 text-white'
-              }`}
-            >
-              Submit Resolution
-            </Button>
-          </div>
-        </form>
+          {resolution !== 'RESCHEDULE' && (
+            <div className="flex justify-end gap-2 mt-2">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => view.setResolveAppt(null)}
+                className="text-xs h-9 px-4 rounded-xl"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                onClick={(e) => handleSubmit(e as any)}
+                disabled={view.isPending}
+                className={`text-xs h-9 px-5 font-bold rounded-xl border-none ${
+                  resolution === 'COMPLETED'
+                    ? 'bg-emerald-500 text-white'
+                    : 'bg-red-500 text-white'
+                }`}
+              >
+                Submit Resolution
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

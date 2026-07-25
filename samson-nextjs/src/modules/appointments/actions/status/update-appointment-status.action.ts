@@ -50,16 +50,42 @@ export async function updateAppointmentStatusAction(formData: StaffUpdateAppoint
       rescheduleMetadata
     );
 
-    // Non-blocking outbox processing for side effects (e.g. reschedule email)
-    const { after } = await import('next/server');
-    const { bootstrapEventSubscribers } = await import('@/orchestrators/event-subscribers');
-    const { globalOutboxDispatcher } = await import('@/shared/outbox/outbox.dispatcher');
-    const { createAdminClient } = await import('@/shared/database/server');
+    // Emit outbox event if appointment is completed
+    if (validData.status === 'COMPLETED') {
+      try {
+        const { outboxCommands } = await import('@/shared/outbox/outbox.commands');
+        const { createAdminClient } = await import('@/shared/database/server');
+        const adminDb = await createAdminClient();
+        await outboxCommands(adminDb).emitEvent('APPOINTMENT_COMPLETED_POST_CARE', {
+          appointmentId: validData.appointmentId,
+        });
+      } catch (err) {
+        console.warn('Failed to emit APPOINTMENT_COMPLETED_POST_CARE event:', err);
+      }
+    }
 
-    after(async () => {
-      bootstrapEventSubscribers();
-      await globalOutboxDispatcher(await createAdminClient())();
-    });
+    // Non-blocking outbox processing for side effects (e.g. reschedule email, post-care review email)
+    try {
+      const { after } = await import('next/server');
+      after(async () => {
+        const { bootstrapEventSubscribers } = await import('@/orchestrators/event-subscribers');
+        const { globalOutboxDispatcher } = await import('@/shared/outbox/outbox.dispatcher');
+        const { createAdminClient } = await import('@/shared/database/server');
+        bootstrapEventSubscribers();
+        await globalOutboxDispatcher(await createAdminClient())();
+      });
+    } catch {
+      // In test environments or outside Next.js request scope, run directly
+      try {
+        const { bootstrapEventSubscribers } = await import('@/orchestrators/event-subscribers');
+        const { globalOutboxDispatcher } = await import('@/shared/outbox/outbox.dispatcher');
+        const { createAdminClient } = await import('@/shared/database/server');
+        bootstrapEventSubscribers();
+        await globalOutboxDispatcher(await createAdminClient())();
+      } catch (err) {
+        console.warn('Could not run outbox dispatcher in background:', err);
+      }
+    }
 
     return { success: true, data: result };
   } catch (error: any) {
