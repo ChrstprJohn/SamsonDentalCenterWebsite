@@ -69,13 +69,13 @@ const data = {
       icon: <UserCheck className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
     },
     {
-      title: "Clinic & Billing",
+      title: "Clinic Catalogs",
       url: "#",
-      icon: <DollarSign className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
+      icon: <Users className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
       items: [
         {
-          title: "Invoices",
-          url: "/secretary-v2/invoices",
+          title: "Doctors Directory",
+          url: "/secretary-v2/doctors",
         },
         {
           title: "Services Catalog",
@@ -107,18 +107,7 @@ const data = {
       ],
     },
   ],
-  projects: [
-    {
-      name: "Doctors Directory",
-      url: "/secretary-v2/doctors",
-      icon: <Users className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
-    },
-    {
-      name: "Doctor Schedules",
-      url: "/secretary-v2/schedules",
-      icon: <Clock className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
-    },
-  ],
+  projects: [],
 }
 
 interface SecretarySidebarProps extends React.ComponentProps<typeof Sidebar> {
@@ -172,7 +161,9 @@ export function SecretarySidebar({ userProfile, ...props }: SecretarySidebarProp
       </SidebarHeader>
       <SidebarContent>
         <NavMainSecretary items={data.navMain} isPending={isPending} onNavigate={handleNavigate} />
-        <NavProjectsSecretary projects={data.projects} label="Roster & Schedules" isPending={isPending} onNavigate={handleNavigate} />
+        {data.projects && data.projects.length > 0 && (
+          <NavProjectsSecretary projects={data.projects} label="Roster & Schedules" isPending={isPending} onNavigate={handleNavigate} />
+        )}
       </SidebarContent>
       <SidebarFooter>
         <NavUserSecretary user={fallbackUser} />
