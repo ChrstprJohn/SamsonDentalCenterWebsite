@@ -4,6 +4,8 @@ import { useState, useEffect, useRef } from 'react';
 import { X, ArrowLeft, UserRound, MessageSquare, Mail, RotateCw, Pencil, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { formatClinicTime, formatShortDate } from '@/shared/utils/date.util';
 import { AppointmentRescheduleForm } from './appointment-reschedule-form';
 import { AppointmentStatusHistory } from './appointment-status-history';
