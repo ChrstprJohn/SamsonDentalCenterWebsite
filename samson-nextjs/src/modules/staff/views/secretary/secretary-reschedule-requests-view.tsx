@@ -1,5 +1,6 @@
 'use client';
 
+import { CalendarClock } from 'lucide-react';
 import { useSecretaryRescheduleRequests } from '../../hooks/secretary/use-secretary-reschedule-requests';
 import { RescheduleDecisionForm } from './sub-components/reschedule-decision-form';
 import { RescheduleDoctorSchedule } from './sub-components/reschedule-doctor-schedule';
@@ -56,8 +57,12 @@ export function SecretaryRescheduleRequestsView() {
               </div>
             )
           ) : (
-            <div className="h-full flex items-center justify-center text-xs text-text-muted text-center py-12">
-              Select a reschedule request from the list to review slot details.
+            <div className="h-full flex flex-col items-center justify-center p-6 text-center text-muted-foreground py-12">
+              <div className="size-14 rounded-full bg-muted/30 flex items-center justify-center mb-3">
+                <CalendarClock className="size-7 text-muted-foreground/50" />
+              </div>
+              <p className="text-sm font-medium text-foreground">No Reschedule Request Selected</p>
+              <p className="text-xs text-muted-foreground max-w-xs mt-1">Select a reschedule request from the list to review slot details.</p>
             </div>
           )}
         </div>

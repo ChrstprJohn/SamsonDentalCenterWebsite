@@ -185,7 +185,7 @@ export function useSecretaryCheckInOutTracker() {
         newDate: rescheduleDate,
         newStartTime: startIso,
         newEndTime: endIso,
-        newDoctorId: rescheduleDoctor || rescheduleAppt.doctorId,
+        newDoctorId: rescheduleDoctor || rescheduleAppt.doctorId || undefined,
         newServiceId: rescheduleService || rescheduleAppt.serviceId,
       });
       if (!res.success) alert(res.error || 'Failed to reschedule');

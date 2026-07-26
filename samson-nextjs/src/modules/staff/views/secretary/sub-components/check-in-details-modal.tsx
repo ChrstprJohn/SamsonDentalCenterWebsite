@@ -5,6 +5,14 @@ import { CheckCircle2, Clock, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatClinicTime } from '@/shared/utils/date.util';
 
+function getPatientDisplayName(app: any): string {
+  if (!app) return 'Patient';
+  if (app.dependent) return `${app.dependent.firstName || ''} ${app.dependent.lastName || ''}`.trim() || 'Dependent';
+  if (app.guestContact) return `${app.guestContact.firstName || ''} ${app.guestContact.lastName || ''}`.trim() || 'Guest Patient';
+  if (app.patient) return `${app.patient.firstName || ''} ${app.patient.lastName || ''}`.trim() || 'Patient';
+  return 'Guest Patient';
+}
+
 export function CheckInDetailsModal({ view }: { view: any }) {
   if (!view.viewAppt) return null;
   const appointment = view.viewAppt;
@@ -35,7 +43,7 @@ export function CheckInDetailsModal({ view }: { view: any }) {
           </div>
 
           <div className="flex flex-col gap-3.5 text-xs text-text-secondary bg-secondary-bg/30 p-4 rounded-2xl border border-card-border/30">
-            <Row label="Patient" value={`${appointment.patient?.firstName || ''} ${appointment.patient?.lastName || ''}`} />
+            <Row label="Patient" value={getPatientDisplayName(appointment)} />
             <Row label="Attending Doctor" value={`Dr. ${appointment.doctor?.firstName || ''} ${appointment.doctor?.lastName || ''}`} />
             <Row label="Service Rendered" value={appointment.service?.name || 'Procedure'} />
             <Row label="Date" value={appointment.date} />

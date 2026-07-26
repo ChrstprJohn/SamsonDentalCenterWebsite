@@ -5,6 +5,14 @@ import { AlertCircle, CheckCircle2, Clock, Calendar, RefreshCw, X } from 'lucide
 import { Button } from '@/components/ui/button';
 import { AppointmentRescheduleForm } from './appointment-reschedule-form';
 
+function getPatientDisplayName(app: any): string {
+  if (!app) return 'Patient';
+  if (app.dependent) return `${app.dependent.firstName || ''} ${app.dependent.lastName || ''}`.trim() || 'Dependent';
+  if (app.guestContact) return `${app.guestContact.firstName || ''} ${app.guestContact.lastName || ''}`.trim() || 'Guest Patient';
+  if (app.patient) return `${app.patient.firstName || ''} ${app.patient.lastName || ''}`.trim() || 'Patient';
+  return 'Guest Patient';
+}
+
 export function NoShowResolutionModal({ view }: { view: any }) {
   const appointment = view.resolveAppt;
   const [resolution, setResolution] = useState<'COMPLETED' | 'CONFIRMED_NO_SHOW' | 'RESCHEDULE'>('COMPLETED');
@@ -62,7 +70,7 @@ export function NoShowResolutionModal({ view }: { view: any }) {
         <div className="flex flex-col gap-1">
           <span className="text-xs font-black text-amber-500 uppercase tracking-wider">No-Show Resolution</span>
           <h3 className="text-lg font-extrabold text-text-primary">
-            Resolve {appointment.patient?.firstName} {appointment.patient?.lastName}'s Slot
+            Resolve {getPatientDisplayName(appointment)}'s Slot
           </h3>
           <p className="text-xs text-text-secondary">
             Original Slot: {appointment.date} ({appointment.startTime?.substring(0, 5)} - {appointment.endTime?.substring(0, 5)})

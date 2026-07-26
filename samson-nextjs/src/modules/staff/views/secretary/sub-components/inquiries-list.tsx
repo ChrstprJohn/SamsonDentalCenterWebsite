@@ -1,5 +1,7 @@
 'use client';
 
+import { ClipboardList } from 'lucide-react';
+
 interface InquiriesListProps {
   inquiries: any[];
   selectedInquiryId: string | null;
@@ -22,7 +24,13 @@ export function InquiriesList(props: InquiriesListProps) {
         ) : props.error ? (
           <div className="py-12 text-center text-xs text-rose-500 font-semibold bg-rose-500/5 rounded-2xl border border-rose-500/10">{props.error}</div>
         ) : props.inquiries.length === 0 ? (
-          <div className="py-12 text-center text-xs text-text-muted">No active inquiries found.</div>
+          <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+            <div className="size-10 rounded-full bg-muted/30 flex items-center justify-center mb-2.5">
+              <ClipboardList className="size-5 text-muted-foreground/60" />
+            </div>
+            <span className="text-xs font-medium text-foreground">No active inquiries</span>
+            <p className="text-[11px] text-muted-foreground mt-0.5 max-w-[220px]">Incoming booking requests will appear here.</p>
+          </div>
         ) : (
           <table className="w-full text-left text-xs border-collapse">
             <thead>

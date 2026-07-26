@@ -38,6 +38,7 @@ import {
   Calendar as CalendarIcon,
   Users,
   X,
+  ArrowLeft,
 } from 'lucide-react';
 
 function getDaysOfWeek(dateStr: string) {
@@ -389,17 +390,28 @@ export function SecretaryBookAppointmentView() {
         {view.selectedAppointmentDetails ? (
           <div className="flex flex-col h-full overflow-hidden">
             <div className="p-4 border-b border-border flex items-center justify-between shrink-0">
-              <div className="flex flex-col min-w-0">
-                <span className="text-base font-medium text-foreground truncate">
-                  Appointment Details
-                </span>
-                <span className="text-[11px] text-muted-foreground truncate">
-                  Ref #{view.selectedAppointmentDetails.id.slice(0, 8)}
-                </span>
+              <div className="flex items-center gap-2 min-w-0">
+                <button
+                  onClick={() => {
+                    view.setSelectedAppointmentDetails(null);
+                    setMobileView('timeline');
+                  }}
+                  className="lg:hidden p-1 -ml-1 text-muted-foreground hover:text-foreground shrink-0"
+                >
+                  <ArrowLeft className="size-5" />
+                </button>
+                <div className="flex flex-col min-w-0">
+                  <span className="text-base font-medium text-foreground truncate">
+                    Appointment Details
+                  </span>
+                  <span className="text-[11px] text-muted-foreground truncate">
+                    Ref #{view.selectedAppointmentDetails.id.slice(0, 8)}
+                  </span>
+                </div>
               </div>
               <button
                 onClick={() => view.setSelectedAppointmentDetails(null)}
-                className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded-md hover:bg-muted shrink-0"
+                className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded-md hover:bg-muted shrink-0 max-lg:hidden"
               >
                 <X className="size-4" />
               </button>

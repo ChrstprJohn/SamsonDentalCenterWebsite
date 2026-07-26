@@ -55,7 +55,7 @@ export function CheckInBoard({ view, columns }: { view: any; columns?: any }) {
 
 function VisitColumn({ col, appointments, view }: { col: typeof COLUMNS[0]; appointments: AppointmentDto[]; view: any }) {
   return (
-    <div className="flex flex-col flex-1 min-w-[140px] sm:min-w-[150px] md:min-w-[150px] lg:min-w-0 h-full min-h-0 border-r border-border last:border-r-0">
+    <div className="flex flex-col flex-1 min-w-[200px] sm:min-w-[220px] md:min-w-[220px] lg:min-w-0 h-full min-h-0 border-r border-border last:border-r-0">
       <div className="flex items-center justify-between px-2.5 xl:px-4 py-2 xl:py-2.5 border-b border-border bg-muted/20 shrink-0">
         <span className="text-xs xl:text-sm font-medium text-foreground truncate">{col.title}</span>
         <span className="text-[10px] font-medium px-1.5 py-0.5 bg-muted/50 text-muted-foreground shrink-0">{appointments.length}</span>
@@ -65,17 +65,37 @@ function VisitColumn({ col, appointments, view }: { col: typeof COLUMNS[0]; appo
             <VisitCard key={appointment.id} appointment={appointment} columnKey={col.key} view={view} />
           ))}
         {appointments.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-12 px-4">
-            {col.key === 'approved' && <Clock className="size-7 text-muted-foreground/30 mb-2" />}
-            {col.key === 'noShow' && <XCircle className="size-7 text-muted-foreground/30 mb-2" />}
-            {col.key === 'checkedIn' && <UserCheck className="size-7 text-muted-foreground/30 mb-2" />}
-            {col.key === 'completed' && <CheckCircle2 className="size-7 text-muted-foreground/30 mb-2" />}
-            <p className="text-xs text-muted-foreground">{col.empty}</p>
+          <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+            <div className="size-10 rounded-full bg-muted/30 flex items-center justify-center mb-2.5">
+              {col.key === 'approved' && <Clock className="size-5 text-muted-foreground/60" />}
+              {col.key === 'noShow' && <XCircle className="size-5 text-muted-foreground/60" />}
+              {col.key === 'checkedIn' && <UserCheck className="size-5 text-muted-foreground/60" />}
+              {col.key === 'completed' && <CheckCircle2 className="size-5 text-muted-foreground/60" />}
+            </div>
+            <span className="text-xs font-medium text-foreground">{col.empty}</span>
           </div>
         )}
       </div>
     </div>
   );
+}
+
+function getPatientDisplayName(app: any): string {
+  if (!app) return 'Guest Patient';
+  if (app.dependent) {
+    return `${app.dependent.firstName || ''} ${app.dependent.lastName || ''}`.trim() || 'Dependent';
+  }
+  if (app.guestContact) {
+    const first = app.guestContact.firstName || '';
+    const last = app.guestContact.lastName || '';
+    return `${first} ${last}`.trim() || 'Guest Patient';
+  }
+  if (app.patient) {
+    const first = app.patient.firstName || '';
+    const last = app.patient.lastName || '';
+    return `${first} ${last}`.trim() || 'Patient';
+  }
+  return 'Guest Patient';
 }
 
 function VisitCard({ appointment, columnKey, view }: { appointment: AppointmentDto; columnKey: string; view: any }) {
@@ -104,7 +124,7 @@ function VisitCard({ appointment, columnKey, view }: { appointment: AppointmentD
         <div className="flex flex-col gap-1 xl:gap-1.5">
           <div className="flex w-full items-center gap-1.5 min-w-0">
             <span className="font-medium text-xs xl:text-sm leading-tight truncate">
-              {appointment.patient?.firstName} {appointment.patient?.lastName}
+              {getPatientDisplayName(appointment)}
             </span>
             <span className={`ml-auto text-[8px] sm:text-[8.5px] xl:text-[10px] font-semibold uppercase tracking-tight xl:tracking-wider px-1 py-0.5 rounded-xs shrink-0 ${statusBadge} ${anySelected ? 'hidden xl:inline-block' : ''}`}>
               {appointment.status === 'CHECKED_IN' ? 'CHECKED IN' : appointment.status}

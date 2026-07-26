@@ -42,7 +42,7 @@ export function SecretaryAppointmentsView() {
         <SidebarHeader className="gap-3.5 border-b border-card-border/40 p-4 shrink-0">
           <div className="flex w-full items-center justify-between">
             <div className="flex items-center gap-2 text-base font-medium text-foreground">
-              <div className="hidden md:block lg:hidden">
+              <div className="lg:hidden">
                 <SidebarTrigger />
               </div>
               <span>Appointments Directory</span>
@@ -105,9 +105,12 @@ export function SecretaryAppointmentsView() {
           <AppointmentDetailPane view={view} />
         </div>
       ) : (
-        <div className="flex-1 flex-col items-center justify-center text-muted-foreground bg-muted/10 max-lg:hidden flex gap-3">
-          <CalendarDays className="size-10 text-muted-foreground/40" />
-          <p className="text-xs font-medium">Select an appointment from the list to view details.</p>
+        <div className="flex-1 flex-col items-center justify-center text-muted-foreground bg-muted/10 max-lg:hidden flex p-6 text-center">
+          <div className="size-14 rounded-full bg-muted/30 flex items-center justify-center mb-3">
+            <CalendarDays className="size-7 text-muted-foreground/50" />
+          </div>
+          <p className="text-sm font-medium text-foreground">No Appointment Selected</p>
+          <p className="text-xs text-muted-foreground max-w-xs mt-1">Select an appointment from the list to view patient details and status.</p>
         </div>
       )}
     </div>

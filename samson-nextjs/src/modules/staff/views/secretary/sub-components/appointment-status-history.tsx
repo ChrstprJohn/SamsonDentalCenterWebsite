@@ -1,5 +1,6 @@
 'use client';
 
+import { History } from 'lucide-react';
 import type { AppointmentDto } from '@/modules/appointments/dtos/shared/appointment.dto';
 
 type TimelineEntry = {
@@ -54,7 +55,13 @@ export function AppointmentStatusHistory({ appointment, activeTab, compact }: { 
       <div className="pt-4 flex flex-col gap-4">
         <span className={`${compact ? 'text-sm' : 'text-base'} font-medium text-foreground`}>Appointment Timeline</span>
         {entries.length === 0 ? (
-          <span className="text-xs text-text-muted italic">No status changes recorded yet.</span>
+          <div className="flex flex-col items-center justify-center py-6 px-4 text-center">
+            <div className="size-8 rounded-full bg-muted/30 flex items-center justify-center mb-2">
+              <History className="size-4 text-muted-foreground/60" />
+            </div>
+            <span className="text-xs font-medium text-foreground">No timeline records</span>
+            <p className="text-[10px] text-muted-foreground mt-0.5">Status change history will appear here.</p>
+          </div>
         ) : (
           <div className="relative">
             <div className="absolute left-[11px] top-2 bottom-2 w-px bg-border/60" />

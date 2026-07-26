@@ -157,8 +157,14 @@ export function PendingRequestListV2(props: PendingRequestListV2Props) {
                 ))}
               </div>
             ) : filteredInquiries.length === 0 ? (
-              <div className="py-12 text-center text-text-muted text-xs">
-                {EMPTY_MESSAGES[props.activeTab]}
+              <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+                <div className="size-10 rounded-full bg-muted/30 flex items-center justify-center mb-2.5">
+                  <ClipboardList className="size-5 text-muted-foreground/60" />
+                </div>
+                <span className="text-xs font-medium text-foreground">No requests found</span>
+                <p className="text-[11px] text-muted-foreground mt-0.5 max-w-[220px]">
+                  {EMPTY_MESSAGES[props.activeTab]}
+                </p>
               </div>
             ) : (
               filteredInquiries.map((inq) => {

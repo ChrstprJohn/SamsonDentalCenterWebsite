@@ -145,9 +145,12 @@ export function CoordinationHub({ inquiryId, hideHeader, hideActions, onBack }: 
               {isLoading ? (
                 <div className="py-6 text-center text-xs text-muted-foreground">Loading timeline...</div>
               ) : logs.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-10 text-center">
-                  <ClipboardList className="size-10 text-muted-foreground/40 mb-3" />
-                  <p className="text-xs text-muted-foreground max-w-[200px]">No notes yet. Tap a quick action or write a custom note to get started.</p>
+                <div className="flex flex-col items-center justify-center py-8 text-center">
+                  <div className="size-10 rounded-full bg-muted/30 flex items-center justify-center mb-2.5">
+                    <ClipboardList className="size-5 text-muted-foreground/60" />
+                  </div>
+                  <span className="text-xs font-medium text-foreground">No notes yet</span>
+                  <p className="text-[11px] text-muted-foreground mt-0.5 max-w-[200px]">Tap a quick action or write a custom note to get started.</p>
                 </div>
               ) : (
                 <div className="flex flex-col gap-1.5">

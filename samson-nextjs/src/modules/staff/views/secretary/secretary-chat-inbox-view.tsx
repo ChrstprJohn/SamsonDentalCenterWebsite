@@ -852,8 +852,12 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                             {isInitialLoad ? (
                                 <SidebarThreadSkeleton />
                             ) : filteredThreads.length === 0 ? (
-                                <div className="py-12 text-center text-text-muted text-xs">
-                                    No conversations found.
+                                <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+                                    <div className="size-10 rounded-full bg-muted/30 flex items-center justify-center mb-2.5">
+                                        <MessageSquare className="size-5 text-muted-foreground/60" />
+                                    </div>
+                                    <span className="text-xs font-medium text-foreground">No conversations found</span>
+                                    <p className="text-[11px] text-muted-foreground mt-0.5">Inquiries and patient chats will appear here.</p>
                                 </div>
                             ) : (
                                 filteredThreads.map((t) => {
@@ -958,9 +962,12 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                     </div>
                 </>
             ) : (
-                <div className="flex-1 flex-col items-center justify-center text-muted-foreground bg-muted/10 space-y-2 hidden lg:flex">
-                    <MessageSquare className="size-12 text-muted-foreground/40" />
-                    <p className="text-sm font-medium">Select a thread from the inbox list to start chatting.</p>
+                <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground bg-muted/10 p-6 text-center hidden lg:flex">
+                    <div className="size-14 rounded-full bg-muted/30 flex items-center justify-center mb-3">
+                        <MessageSquare className="size-7 text-muted-foreground/50" />
+                    </div>
+                    <p className="text-sm font-medium text-foreground">No Conversation Selected</p>
+                    <p className="text-xs text-muted-foreground max-w-xs mt-1">Select a thread from the inbox list to view messages and appointment details.</p>
                 </div>
             )}
             <InquiryToast toast={toast} />

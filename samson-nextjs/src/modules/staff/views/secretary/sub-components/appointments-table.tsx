@@ -1,5 +1,6 @@
 'use client';
 
+import { CalendarDays } from 'lucide-react';
 import type { AppointmentDto } from '@/modules/appointments/dtos/shared/appointment.dto';
 import { formatClinicTime, formatShortDate, formatTimeString } from '@/shared/utils/date.util';
 
@@ -29,7 +30,13 @@ export function AppointmentsTable(props: AppointmentsTableProps) {
 
   if (props.appointments.length === 0) {
     return (
-      <div className="flex-1 flex items-center justify-center text-xs text-text-muted p-4">No matching appointments found.</div>
+      <div className="flex-1 flex flex-col items-center justify-center py-12 px-4 text-center">
+        <div className="size-10 rounded-full bg-muted/30 flex items-center justify-center mb-2.5">
+          <CalendarDays className="size-5 text-muted-foreground/60" />
+        </div>
+        <span className="text-xs font-medium text-foreground">No appointments found</span>
+        <p className="text-[11px] text-muted-foreground mt-0.5 max-w-[220px]">Try adjusting your search query or tab filter.</p>
+      </div>
     );
   }
 

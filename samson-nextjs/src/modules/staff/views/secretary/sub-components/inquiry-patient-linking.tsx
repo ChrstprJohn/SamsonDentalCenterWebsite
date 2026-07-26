@@ -1,5 +1,6 @@
 'use client';
 
+import { UserRound } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import type { InquiryPatientMode } from '@/modules/staff/hooks/secretary/use-secretary-inquiries-queue';
 
@@ -53,7 +54,13 @@ function PatientSearch(props: InquiryPatientLinkingProps) {
           ))}
         </div>
       ) : props.patientSearchQuery.trim().length >= 2 && !props.isSearchingPatients ? (
-        <div className="text-center py-4 text-xs text-text-muted bg-card border border-card-border/40 rounded-xl">No patient accounts found.</div>
+        <div className="flex flex-col items-center justify-center py-6 px-4 text-center bg-card border border-card-border/40 rounded-xl">
+          <div className="size-8 rounded-full bg-muted/30 flex items-center justify-center mb-2">
+            <UserRound className="size-4 text-muted-foreground/60" />
+          </div>
+          <span className="text-xs font-medium text-foreground">No patient accounts found</span>
+          <p className="text-[10px] text-muted-foreground mt-0.5">Try searching with a different name or email.</p>
+        </div>
       ) : null}
     </>
   );

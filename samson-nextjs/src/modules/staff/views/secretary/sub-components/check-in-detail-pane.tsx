@@ -16,6 +16,48 @@ const STATUS_BADGE: Record<string, string> = {
   DISPLACED: 'text-amber-600 bg-amber-500/10',
 };
 
+function getPatientDisplayName(app: any): string {
+  if (!app) return 'Guest Patient';
+  if (app.dependent) {
+    return `${app.dependent.firstName || ''} ${app.dependent.lastName || ''}`.trim() || 'Dependent';
+  }
+  if (app.guestContact) {
+    const first = app.guestContact.firstName || '';
+    const last = app.guestContact.lastName || '';
+    return `${first} ${last}`.trim() || 'Guest Patient';
+  }
+  if (app.patient) {
+    const first = app.patient.firstName || '';
+    const last = app.patient.lastName || '';
+    return `${first} ${last}`.trim() || 'Patient';
+  }
+  return 'Guest Patient';
+}
+
+function getPatientFirstName(app: any): string {
+  return app?.guestContact?.firstName || app?.dependent?.firstName || app?.patient?.firstName || '-';
+}
+
+function getPatientLastName(app: any): string {
+  return app?.guestContact?.lastName || app?.dependent?.lastName || app?.patient?.lastName || '-';
+}
+
+function getPatientMiddleName(app: any): string {
+  return app?.guestContact?.middleName || app?.patient?.middleName || '-';
+}
+
+function getPatientSuffix(app: any): string {
+  return app?.guestContact?.suffix || app?.patient?.suffix || '-';
+}
+
+function getPatientEmail(app: any): string {
+  return app?.guestContact?.email || app?.patient?.email || '-';
+}
+
+function getPatientPhone(app: any): string {
+  return app?.guestContact?.phone || app?.guestContact?.phone_number || app?.guestContact?.phoneNumber || app?.patient?.phoneNumber || '-';
+}
+
 export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () => void }) {
   const [showCheckInForm, setShowCheckInForm] = useState(false);
   const [showResolveForm, setShowResolveForm] = useState(false);
@@ -53,9 +95,14 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
 
   if (!appointment) {
     return (
-      <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground gap-2 px-6">
-        <div className="text-xs font-medium">No appointment selected</div>
-        <p className="text-[10px] text-center">Click a card to view details and manage the visit.</p>
+      <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center text-muted-foreground">
+        <div className="size-12 rounded-full bg-muted/40 flex items-center justify-center mb-3">
+          <UserRound className="size-6 text-muted-foreground/60" />
+        </div>
+        <p className="text-xs font-medium text-foreground">No appointment selected</p>
+        <p className="text-[11px] text-muted-foreground mt-1 max-w-[220px]">
+          Click a visit card on the board to view details and manage the visit.
+        </p>
       </div>
     );
   }
@@ -75,7 +122,7 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
             {paneTitle}
           </span>
           <span className="text-xs text-muted-foreground truncate">
-            {paneType === 'details' ? `Ref #${appointment.id?.slice(0, 8) || ''}` : `${appointment.patient?.firstName} ${appointment.patient?.lastName} &mdash; ${appointment.service?.name}`}
+            {paneType === 'details' ? `Ref #${appointment.id?.slice(0, 8) || ''}` : `${getPatientDisplayName(appointment)} &mdash; ${appointment.service?.name}`}
           </span>
         </div>
         <button onClick={onClose} className="p-1 text-muted-foreground hover:text-foreground shrink-0 max-lg:hidden">
@@ -90,9 +137,9 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
               <UserRound className="size-10 text-muted-foreground/70 translate-y-0.5" />
             </div>
             <h2 className="text-base font-semibold text-foreground text-center">
-              {appointment.patient?.firstName} {appointment.patient?.lastName}
+              {getPatientDisplayName(appointment)}
             </h2>
-            <p className="text-sm text-muted-foreground mt-0.5">Patient</p>
+            <p className="text-sm text-muted-foreground mt-0.5">{appointment.guestContact ? 'Guest' : 'Patient'}</p>
           </div>
         )}
         {paneType === 'details' && <hr className="border-card-border/40 mx-4" />}
@@ -343,11 +390,11 @@ function DetailsContent({ appointment }: { appointment: any }) {
       <div>
         <span className="text-sm font-medium text-foreground block mb-3">Guest Information</span>
         <div className="flex flex-col gap-2">
-          <Field label="First Name" value={appointment.patient?.firstName || '-'} />
-          <Field label="Last Name" value={appointment.patient?.lastName || '-'} />
+          <Field label="First Name" value={getPatientFirstName(appointment)} />
+          <Field label="Last Name" value={getPatientLastName(appointment)} />
           <div className="grid grid-cols-2 gap-2">
-            <Field label="Middle Name" value={appointment.patient?.middleName || '-'} />
-            <Field label="Suffix" value={appointment.patient?.suffix || '-'} />
+            <Field label="Middle Name" value={getPatientMiddleName(appointment)} />
+            <Field label="Suffix" value={getPatientSuffix(appointment)} />
           </div>
         </div>
       </div>
@@ -357,8 +404,8 @@ function DetailsContent({ appointment }: { appointment: any }) {
       <div>
         <span className="text-sm font-medium text-foreground block mb-3">Guest Contact</span>
         <div className="flex flex-col gap-2">
-          <Field label="Email" value={appointment.patient?.email || '-'} />
-          <Field label="Phone" value={appointment.patient?.phoneNumber || '-'} />
+          <Field label="Email" value={getPatientEmail(appointment)} />
+          <Field label="Phone" value={getPatientPhone(appointment)} />
         </div>
       </div>
 
@@ -550,7 +597,7 @@ function StandaloneReschedule({ view, onClose }: { view: any; onClose: () => voi
       <div className="flex flex-col gap-1">
         <h3 className="text-sm font-medium text-foreground">Reschedule Appointment</h3>
         <p className="text-xs text-muted-foreground">
-          {appointment.patient?.firstName} {appointment.patient?.lastName} - {appointment.service?.name}
+          {getPatientDisplayName(appointment)} - {appointment.service?.name}
         </p>
       </div>
 

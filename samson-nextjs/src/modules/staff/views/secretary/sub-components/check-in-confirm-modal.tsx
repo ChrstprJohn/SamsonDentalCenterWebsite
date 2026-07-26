@@ -3,6 +3,14 @@
 import { CheckCircle2, UserCheck, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
+function getPatientDisplayName(app: any): string {
+  if (!app) return 'Patient';
+  if (app.dependent) return `${app.dependent.firstName || ''} ${app.dependent.lastName || ''}`.trim() || 'Dependent';
+  if (app.guestContact) return `${app.guestContact.firstName || ''} ${app.guestContact.lastName || ''}`.trim() || 'Guest Patient';
+  if (app.patient) return `${app.patient.firstName || ''} ${app.patient.lastName || ''}`.trim() || 'Patient';
+  return 'Guest Patient';
+}
+
 export function CheckInConfirmModal({ view }: { view: any }) {
   const appointment = view.checkInAppt;
 
@@ -29,7 +37,7 @@ export function CheckInConfirmModal({ view }: { view: any }) {
           </div>
           <span className="text-xs font-black text-cyan-500 uppercase tracking-wider">Patient Check-In</span>
           <h3 className="text-lg font-extrabold text-text-primary">
-            Check In {appointment.patient?.firstName} {appointment.patient?.lastName}?
+            Check In {getPatientDisplayName(appointment)}?
           </h3>
           <p className="text-xs text-text-secondary max-w-xs mt-1">
             Scheduled for {appointment.service?.name} with Dr. {appointment.doctor?.firstName} {appointment.doctor?.lastName}.

@@ -20,7 +20,19 @@ interface AppointmentDetailPaneProps {
 
 export function AppointmentDetailPane({ view, compact }: AppointmentDetailPaneProps) {
   const appointment = view.selectedAppointment as AppointmentDto | undefined;
-  if (!appointment) return null;
+  if (!appointment) {
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center text-muted-foreground">
+        <div className="size-12 rounded-full bg-muted/40 flex items-center justify-center mb-3">
+          <Calendar className="size-6 text-muted-foreground/60" />
+        </div>
+        <p className="text-xs font-medium text-foreground">No appointment selected</p>
+        <p className="text-[11px] text-muted-foreground mt-1 max-w-[220px]">
+          Select an appointment from the list to view details.
+        </p>
+      </div>
+    );
+  }
   return <AppointmentDetails appointment={appointment} view={view} activeTab={view.activeTab} compact={compact} />;
 }
 

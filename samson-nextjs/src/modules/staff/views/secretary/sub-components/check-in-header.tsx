@@ -23,14 +23,14 @@ export function CheckInHeader({
     : '';
 
   return (
-    <div className="p-3 sm:p-4 border-b border-border shrink-0">
+    <div className="p-4 border-b border-border shrink-0">
       <div className="flex items-center justify-between gap-2 sm:gap-4">
         <div className="flex flex-col gap-0.5">
           <div className="flex items-center gap-2">
             <div className="lg:hidden">
               <SidebarTrigger />
             </div>
-            <h1 className="text-sm sm:text-base font-medium text-foreground whitespace-nowrap">Check-In & Out</h1>
+            <h1 className="text-base font-medium text-foreground whitespace-nowrap">Check-In & Out</h1>
           </div>
           <p className="text-xs text-muted-foreground hidden sm:block lg:block md:hidden">{formatted}</p>
         </div>

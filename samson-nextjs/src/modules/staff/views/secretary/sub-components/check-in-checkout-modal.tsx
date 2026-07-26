@@ -3,6 +3,14 @@
 import { CheckCircle2, MessageSquare, Sparkles, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
+function getPatientDisplayName(app: any): string {
+  if (!app) return 'Patient';
+  if (app.dependent) return `${app.dependent.firstName || ''} ${app.dependent.lastName || ''}`.trim() || 'Dependent';
+  if (app.guestContact) return `${app.guestContact.firstName || ''} ${app.guestContact.lastName || ''}`.trim() || 'Guest Patient';
+  if (app.patient) return `${app.patient.firstName || ''} ${app.patient.lastName || ''}`.trim() || 'Patient';
+  return 'Guest Patient';
+}
+
 export function CheckInCheckoutModal({ view }: { view: any }) {
   const appointment = view.checkoutAppt;
 
@@ -28,7 +36,7 @@ export function CheckInCheckoutModal({ view }: { view: any }) {
           </div>
           <span className="text-xs font-black text-amber-500 uppercase tracking-wider">Patient Checkout</span>
           <h3 className="text-lg font-extrabold text-text-primary">
-            Complete Visit for {appointment.patient?.firstName} {appointment.patient?.lastName}?
+            Complete Visit for {getPatientDisplayName(appointment)}?
           </h3>
           <p className="text-xs text-text-secondary max-w-xs mt-1">
             Treatment procedure ({appointment.service?.name}) has been rendered.

@@ -4,6 +4,7 @@ import React, { useMemo } from 'react';
 import { Stethoscope } from 'lucide-react';
 import type { AppointmentDto } from '@/modules/appointments/dtos/shared/appointment.dto';
 import { formatClinicTime } from '@/shared/utils/date.util';
+import { useIsMobile } from '@/shared/hooks/use-mobile';
 
 const COLORS_LIST = [
   { bg: 'bg-blue-50/80', border: 'border-blue-200/80', hover: 'hover:bg-blue-100/90', accent: 'bg-blue-500', text: 'text-blue-950', subtext: 'text-blue-700/90' },
@@ -44,6 +45,9 @@ export function DoctorTimeline({
   viewMode = 'day',
   selectedDate,
 }: DoctorTimelineProps) {
+  const isMobile = useIsMobile();
+  const rightColWidth = isMobile ? '0px' : '35px';
+
   // 5-minute intervals from 07:50 AM (470 mins) to 05:00 PM (1020 mins)
   const startTimeMins = 470;
   const endTimeMins = 1020;
@@ -220,8 +224,8 @@ export function DoctorTimeline({
           className="grid relative"
           style={{
             gridTemplateColumns: viewMode === 'week'
-              ? `35px ${dayFrUnits.map(f => `minmax(140px, ${f}fr)`).join(' ')} 35px`
-              : `35px repeat(${doctors.length}, minmax(180px, 1fr)) 35px`,
+              ? `35px ${dayFrUnits.map(f => `minmax(140px, ${f}fr)`).join(' ')} ${rightColWidth}`
+              : `35px repeat(${doctors.length}, minmax(180px, 1fr)) ${rightColWidth}`,
             gridTemplateRows: `auto repeat(${totalSlots}, 10px)`,
           }}
         >
@@ -262,7 +266,7 @@ export function DoctorTimeline({
           )}
 
           <div
-            className="sticky top-0 right-0 bg-card border-l border-l-slate-300 border-b border-border px-0.5 py-2 text-center text-xs font-bold text-text-primary tracking-wide z-30"
+            className="sticky top-0 right-0 bg-card border-l border-l-slate-300 border-b border-border px-0.5 py-2 text-center text-xs font-bold text-text-primary tracking-wide z-30 max-md:hidden"
             style={{ gridColumn: columnsCount + 2, gridRow: 1 }}
           >
             &nbsp;
@@ -316,7 +320,7 @@ export function DoctorTimeline({
 
                 {/* Right Time Label column */}
                 <div
-                  className={"sticky right-0 bg-card border-l border-l-slate-300 z-20 transition-colors flex items-start justify-start px-0.5 text-left h-full " + (isHourMark ? 'text-foreground text-[11px]' : 'text-text-secondary font-normal text-[10px]') + " " + (isLineRow ? 'border-b border-border' : 'border-b border-border/25')}
+                  className={"sticky right-0 bg-card border-l border-l-slate-300 z-20 transition-colors flex items-start justify-start px-0.5 text-left h-full max-md:hidden " + (isHourMark ? 'text-foreground text-[11px]' : 'text-text-secondary font-normal text-[10px]') + " " + (isLineRow ? 'border-b border-border' : 'border-b border-border/25')}
                    style={{ gridColumn: columnsCount + 2, gridRow: rowIndex + 2 }}
                 >
                   {isTenMinMark && minutes >= 480 ? (

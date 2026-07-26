@@ -1,5 +1,6 @@
 'use client';
 
+import { CalendarClock } from 'lucide-react';
 import { formatClinicTime, formatShortDate } from '@/shared/utils/date.util';
 
 interface RescheduleRequestListProps {
@@ -28,7 +29,15 @@ export function RescheduleRequestList(props: RescheduleRequestListProps) {
             <tbody>
               {props.appointments.length === 0 ? (
                 <tr>
-                  <td colSpan={3} className="py-12 text-center text-text-muted">No pending reschedule requests.</td>
+                  <td colSpan={3} className="py-12 text-center">
+                    <div className="flex flex-col items-center justify-center text-center">
+                      <div className="size-10 rounded-full bg-muted/30 flex items-center justify-center mb-2.5">
+                        <CalendarClock className="size-5 text-muted-foreground/60" />
+                      </div>
+                      <span className="text-xs font-medium text-foreground">No reschedule requests</span>
+                      <p className="text-[11px] text-muted-foreground mt-0.5 max-w-[220px]">Patients requesting slot changes will appear here.</p>
+                    </div>
+                  </td>
                 </tr>
               ) : (
                 props.appointments.map((appointment) => (

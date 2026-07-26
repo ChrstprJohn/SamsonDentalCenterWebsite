@@ -545,8 +545,12 @@ export function SecretaryPendingRequestsViewV2() {
         </div>
       </>
     ) : (
-      <div className="flex-1 flex-col items-center justify-center text-muted-foreground bg-muted/10 max-lg:hidden flex">
-        <p className="text-xs font-medium">Select an inquiry from the left list to view details and process the request.</p>
+      <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground bg-muted/10 max-lg:hidden p-6 text-center">
+        <div className="size-14 rounded-full bg-muted/30 flex items-center justify-center mb-3">
+          <ClipboardList className="size-7 text-muted-foreground/50" />
+        </div>
+        <p className="text-sm font-medium text-foreground">No Request Selected</p>
+        <p className="text-xs text-muted-foreground max-w-xs mt-1">Select an inquiry from the left list to view details and process the request.</p>
       </div>
     )}
       <InquiryToast toast={inquiriesView.toast} />
