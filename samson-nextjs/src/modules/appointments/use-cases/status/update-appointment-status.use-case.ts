@@ -38,7 +38,13 @@ export const updateAppointmentStatusUseCase = (deps: {
     const appointment = await deps.getAppointmentById(appointmentId);
     const currentStatus = appointment.status;
 
-    const terminalStates = ['CANCELLED', 'REJECTED', 'COMPLETED', 'NO_SHOW'] as const;
+    const terminalStates = ['CANCELLED', 'REJECTED', 'COMPLETED'] as const;
+    if (currentStatus === 'NO_SHOW' && !rescheduleMetadata) {
+      throw new ValidationError(
+        'NO_SHOW appointments can only be rescheduled to a new valid slot.',
+        'INVALID_STATUS_TRANSITION'
+      );
+    }
     if (terminalStates.includes(currentStatus as (typeof terminalStates)[number])) {
       throw new ValidationError(
         `Cannot transition appointment from terminal status: ${currentStatus}`,

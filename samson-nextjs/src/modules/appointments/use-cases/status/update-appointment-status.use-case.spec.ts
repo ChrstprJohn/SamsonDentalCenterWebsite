@@ -63,7 +63,7 @@ describe('updateAppointmentStatusUseCase', () => {
   });
 
   it('throws INVALID_STATUS_TRANSITION for terminal statuses', async () => {
-    const terminals = ['CANCELLED', 'REJECTED', 'COMPLETED', 'NO_SHOW'] as const;
+    const terminals = ['CANCELLED', 'REJECTED', 'COMPLETED'] as const;
 
     for (const status of terminals) {
       const { useCase, mockTransaction } = makeUseCase({ status });
@@ -72,6 +72,23 @@ describe('updateAppointmentStatusUseCase', () => {
       ).rejects.toThrow(`Cannot transition appointment from terminal status: ${status}`);
       expect(mockTransaction).not.toHaveBeenCalled();
     }
+
+    const { useCase, mockTransaction } = makeUseCase({ status: 'NO_SHOW' });
+    await expect(
+      useCase('appt-uuid-001', null, 'STAFF', 'APPROVED', 'reason')
+    ).rejects.toThrow('NO_SHOW appointments can only be rescheduled to a new valid slot.');
+    expect(mockTransaction).not.toHaveBeenCalled();
+  });
+
+  it('allows rescheduling a NO_SHOW appointment to a new slot', async () => {
+    const { useCase, mockTransaction } = makeUseCase({ status: 'NO_SHOW', rescheduleCount: 0 });
+
+    await useCase('appt-uuid-001', 'actor-id', 'STAFF', 'APPROVED', 'Reschedule no show', RESCHEDULE_META);
+
+    expect(mockTransaction).toHaveBeenCalledWith(
+      'appt-uuid-001', 'actor-id', 'STAFF', 'APPROVED', 'Reschedule no show',
+      RESCHEDULE_META, false, 1
+    );
   });
 
   it('throws RESCHEDULE_LIMIT_EXCEEDED when rescheduleCount >= 1 and rescheduling', async () => {

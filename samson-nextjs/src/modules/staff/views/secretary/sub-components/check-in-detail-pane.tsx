@@ -349,6 +349,7 @@ function InfoBox({ variant, title, children }: { variant: 'cyan' | 'amber' | 'em
 function DetailsContent({ appointment, view }: { appointment: any; view?: any }) {
   const channel = (appointment.confirmationChannel || appointment.confirmation_channel) as 'EMAIL' | 'SMS' | 'BOTH' | 'NONE' || 'EMAIL';
   const [resending, setResending] = useState<string | null>(null);
+  const [allowOverrideResend, setAllowOverrideResend] = useState(false);
 
   const [commState, setCommState] = useState({
     emailConfirmationSent: Boolean(appointment.emailConfirmationSent || appointment.email_confirmation_sent),
@@ -491,7 +492,17 @@ function DetailsContent({ appointment, view }: { appointment: any; view?: any })
 
       {/* Notification History */}
       <div className="space-y-3">
-        <span className="text-sm font-medium text-foreground block">Notification History</span>
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-medium text-foreground block">Notification History</span>
+          <Label className="flex items-center gap-1.5 text-[11px] text-muted-foreground cursor-pointer select-none">
+            <span>Manual Resend</span>
+            <Switch
+              checked={allowOverrideResend}
+              onCheckedChange={setAllowOverrideResend}
+              className="scale-75 shadow-none"
+            />
+          </Label>
+        </div>
         <div className="flex flex-col gap-2">
           {commEntries.map((entry) => {
             const createdAt = (appointment as any).createdAt || (appointment as any).created_at;
@@ -515,6 +526,9 @@ function DetailsContent({ appointment, view }: { appointment: any; view?: any })
               startTime,
             });
 
+            const isSmsResendAllowed = allowOverrideResend || (entry.smsSent ? false : smsStatus.variant === 'pending');
+            const isEmailResendAllowed = allowOverrideResend || (entry.emailSent ? false : emailStatus.variant === 'pending');
+
             return (
               <div key={entry.key} className="space-y-1.5">
                 <span className="text-xs text-muted-foreground">{entry.label}</span>
@@ -530,9 +544,9 @@ function DetailsContent({ appointment, view }: { appointment: any; view?: any })
                     <Button
                       variant="outline"
                       size="sm"
-                      disabled={resending === `${entry.eventType}_SMS`}
+                      disabled={!isSmsResendAllowed || resending === `${entry.eventType}_SMS`}
                       onClick={() => handleResend(entry.eventType, 'SMS')}
-                      className="text-[10px] h-6 px-2 gap-1 shrink-0"
+                      className="text-[10px] h-6 px-2 gap-1 shrink-0 disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       <RotateCw className={`size-3 ${resending === `${entry.eventType}_SMS` ? 'animate-spin' : ''}`} />
                       {resending === `${entry.eventType}_SMS` ? 'Sending...' : 'Resend'}
@@ -550,9 +564,9 @@ function DetailsContent({ appointment, view }: { appointment: any; view?: any })
                     <Button
                       variant="outline"
                       size="sm"
-                      disabled={resending === `${entry.eventType}_EMAIL`}
+                      disabled={!isEmailResendAllowed || resending === `${entry.eventType}_EMAIL`}
                       onClick={() => handleResend(entry.eventType, 'EMAIL')}
-                      className="text-[10px] h-6 px-2 gap-1 shrink-0"
+                      className="text-[10px] h-6 px-2 gap-1 shrink-0 disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       <RotateCw className={`size-3 ${resending === `${entry.eventType}_EMAIL` ? 'animate-spin' : ''}`} />
                       {resending === `${entry.eventType}_EMAIL` ? 'Sending...' : 'Resend'}

@@ -181,7 +181,7 @@ export function SecretaryPendingRequestsViewV2() {
                   <span className="text-base font-medium text-foreground">
                     Guest Information
                   </span>
-                  {!isEditingPatient ? (
+                  {inquiriesView.selectedInquiry?.status === 'NEW' && (!isEditingPatient ? (
                     <Button variant="outline" size="sm" onClick={startEditPatient} className="h-7 px-2.5 text-xs gap-1">
                       <Pencil className="size-3.5" />
                       Edit
@@ -197,7 +197,7 @@ export function SecretaryPendingRequestsViewV2() {
                         Save
                       </Button>
                     </div>
-                  )}
+                  ))}
                 </div>
 
                 {!isEditingPatient ? (
@@ -296,7 +296,7 @@ export function SecretaryPendingRequestsViewV2() {
                   <span className="text-base font-medium text-foreground">
                     Service & Schedule
                   </span>
-                  {isEditingSchedule ? (
+                  {inquiriesView.selectedInquiry?.status === 'NEW' && (isEditingSchedule ? (
                     <div className="flex items-center gap-2">
                       <Button variant="outline" size="sm" onClick={cancelEditSchedule} className="h-7 px-2.5 text-xs gap-1">
                         <X className="size-3.5" />
@@ -312,7 +312,7 @@ export function SecretaryPendingRequestsViewV2() {
                       <Pencil className="size-3.5" />
                       Edit
                     </Button>
-                  )}
+                  ))}
                 </div>
 
                 {isEditingSchedule ? (

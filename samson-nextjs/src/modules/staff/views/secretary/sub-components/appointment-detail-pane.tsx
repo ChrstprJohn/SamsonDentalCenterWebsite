@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Select } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import type { AppointmentDto } from '@/modules/appointments/dtos/shared/appointment.dto';
 import type { AppointmentDirectoryTab } from '@/modules/staff/hooks/secretary/use-secretary-appointments';
 import { SharedAppointmentDetail } from '@/modules/appointments/components/sub-components/shared-appointment-detail';
@@ -39,6 +41,7 @@ export function AppointmentDetailPane({ view, compact }: AppointmentDetailPanePr
 
 function AppointmentDetails({ appointment, view, activeTab, compact }: { appointment: AppointmentDto; view: any; activeTab: AppointmentDirectoryTab; compact?: boolean }) {
   const [resending, setResending] = useState<string | null>(null);
+  const [allowOverrideResend, setAllowOverrideResend] = useState(false);
   const [channel, setChannel] = useState<'EMAIL' | 'SMS' | 'BOTH' | 'NONE'>(
     (appointment.confirmationChannel as any) || 'EMAIL'
   );
@@ -188,7 +191,7 @@ function AppointmentDetails({ appointment, view, activeTab, compact }: { appoint
           <div className={`${compact ? 'py-3 px-4' : 'py-4 px-5'}`}>
             <div className={`flex items-center justify-between ${compact ? 'mb-2' : 'mb-3'}`}>
               <span className={`${compact ? 'text-sm' : 'text-base'} font-medium text-foreground`}>Notification Channel</span>
-              {!isEditingChannel && (
+              {!isEditingChannel && !['COMPLETED', 'CANCELLED', 'REJECTED', 'NO_SHOW'].includes(appointment.status) && (
                 <Button
                   variant="outline"
                   size="sm"
@@ -232,7 +235,17 @@ function AppointmentDetails({ appointment, view, activeTab, compact }: { appoint
           <hr className={`border-card-border/40 ${compact ? 'mx-4' : 'mx-5'}`} />
           {/* Notification History */}
           <div className={`${compact ? 'py-3 px-4 space-y-2' : 'py-4 px-5 space-y-3'}`}>
-            <span className={`${compact ? 'text-sm' : 'text-base'} font-medium text-foreground block`}>Notification History</span>
+            <div className="flex items-center justify-between">
+              <span className={`${compact ? 'text-sm' : 'text-base'} font-medium text-foreground block`}>Notification History</span>
+              <Label className="flex items-center gap-1.5 text-[11px] text-muted-foreground cursor-pointer select-none">
+                <span>Manual Resend</span>
+                <Switch
+                  checked={allowOverrideResend}
+                  onCheckedChange={setAllowOverrideResend}
+                  className="scale-75 shadow-none"
+                />
+              </Label>
+            </div>
             <div className={`flex flex-col ${compact ? 'gap-2' : 'gap-3'}`}>
               {commEntries.map((entry) => {
                 const createdAt = (appointment as any).createdAt || (appointment as any).created_at;
@@ -256,6 +269,9 @@ function AppointmentDetails({ appointment, view, activeTab, compact }: { appoint
                   startTime,
                 });
 
+                const isSmsResendAllowed = allowOverrideResend || (entry.smsSent ? false : smsStatus.variant === 'pending');
+                const isEmailResendAllowed = allowOverrideResend || (entry.emailSent ? false : emailStatus.variant === 'pending');
+
                 return (
                   <div key={entry.key} className={compact ? 'space-y-1' : 'space-y-2'}>
                     <span className="text-xs text-muted-foreground">{entry.label}</span>
@@ -271,9 +287,9 @@ function AppointmentDetails({ appointment, view, activeTab, compact }: { appoint
                         <Button
                           variant="outline"
                           size="sm"
-                          disabled={resending === `${entry.eventType}_SMS`}
+                          disabled={!isSmsResendAllowed || resending === `${entry.eventType}_SMS`}
                           onClick={() => handleResend(entry.eventType, 'SMS')}
-                          className={`${compact ? 'text-[9px] h-6 px-2 gap-0.5' : 'text-[10px] h-7 px-2.5 gap-1'} shrink-0`}
+                          className={`${compact ? 'text-[9px] h-6 px-2 gap-0.5' : 'text-[10px] h-7 px-2.5 gap-1'} shrink-0 disabled:opacity-40 disabled:cursor-not-allowed`}
                         >
                           <RotateCw className={`size-3 ${resending === `${entry.eventType}_SMS` ? 'animate-spin' : ''}`} />
                           {resending === `${entry.eventType}_SMS` ? 'Sending...' : 'Resend'}
@@ -291,9 +307,9 @@ function AppointmentDetails({ appointment, view, activeTab, compact }: { appoint
                         <Button
                           variant="outline"
                           size="sm"
-                          disabled={resending === `${entry.eventType}_EMAIL`}
+                          disabled={!isEmailResendAllowed || resending === `${entry.eventType}_EMAIL`}
                           onClick={() => handleResend(entry.eventType, 'EMAIL')}
-                          className={`${compact ? 'text-[9px] h-6 px-2 gap-0.5' : 'text-[10px] h-7 px-2.5 gap-1'} shrink-0`}
+                          className={`${compact ? 'text-[9px] h-6 px-2 gap-0.5' : 'text-[10px] h-7 px-2.5 gap-1'} shrink-0 disabled:opacity-40 disabled:cursor-not-allowed`}
                         >
                           <RotateCw className={`size-3 ${resending === `${entry.eventType}_EMAIL` ? 'animate-spin' : ''}`} />
                           {resending === `${entry.eventType}_EMAIL` ? 'Sending...' : 'Resend'}
@@ -314,20 +330,33 @@ function AppointmentDetails({ appointment, view, activeTab, compact }: { appoint
           </div>
         </>
       }
-      actionsBar={activeTab === 'upcoming' ? (
-        !view.showRescheduleForm && !view.showCancelForm ? (
-          <div className="flex gap-2">
-            <Button variant="outline" className="flex-1 h-[42px]" onClick={() => view.setShowRescheduleForm(true)}>
-              Reschedule
-            </Button>
-            <Button variant="outline" className="flex-1 h-[42px] border-destructive/50 text-destructive hover:bg-destructive/10" onClick={() => view.setShowCancelForm(true)}>
-              Cancel
-            </Button>
-          </div>
-        ) : (
+      actionsBar={(() => {
+        const canModify = ['APPROVED', 'PENDING', 'RESCHEDULE_REQUESTED', 'DISPLACED'].includes(appointment.status);
+        const canRescheduleOnly = appointment.status === 'NO_SHOW';
+        const canCancelOnly = appointment.status === 'CHECKED_IN';
+        if (!canModify && !canRescheduleOnly && !canCancelOnly) return undefined;
+
+        if (!view.showRescheduleForm && !view.showCancelForm) {
+          return (
+            <div className="flex gap-2">
+              {(canModify || canRescheduleOnly) && (
+                <Button variant="outline" className={`${canModify ? 'flex-1' : 'w-full'} h-[42px]`} onClick={() => view.setShowRescheduleForm(true)}>
+                  Reschedule
+                </Button>
+              )}
+              {(canModify || canCancelOnly) && (
+                <Button variant="outline" className={`${canModify ? 'flex-1' : 'w-full'} h-[42px] border-destructive/50 text-destructive hover:bg-destructive/10`} onClick={() => view.setShowCancelForm(true)}>
+                  Cancel
+                </Button>
+              )}
+            </div>
+          );
+        }
+
+        return (
           <div className="space-y-3">
-            {view.showRescheduleForm && <AppointmentRescheduleForm appointment={appointment} {...getRescheduleProps(view)} />}
-            {view.showCancelForm && (
+            {view.showRescheduleForm && (canModify || canRescheduleOnly) && <AppointmentRescheduleForm appointment={appointment} {...getRescheduleProps(view)} />}
+            {view.showCancelForm && (canModify || canCancelOnly) && (
               <AppointmentCancelForm
                 reasonPreset={view.cancelReasonPreset}
                 setReasonPreset={view.setCancelReasonPreset}
@@ -339,8 +368,8 @@ function AppointmentDetails({ appointment, view, activeTab, compact }: { appoint
               />
             )}
           </div>
-        )
-      ) : undefined}
+        );
+      })()}
     />
   );
 }

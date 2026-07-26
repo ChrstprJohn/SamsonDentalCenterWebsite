@@ -124,7 +124,7 @@ export function SharedAppointmentDetail({ appointment, extraSections, actionsBar
         <div className={`${compact ? 'py-3 px-4' : 'py-4 px-5'}`}>
           <div className={`flex items-center justify-between ${compact ? 'mb-2' : 'mb-3'}`}>
             <span className={`${compact ? 'text-sm' : 'text-base'} font-medium text-foreground`}>Guest Information</span>
-            {hasGuestInfo && !isEditingGuestInfo && (
+            {hasGuestInfo && !isEditingGuestInfo && !['COMPLETED', 'CANCELLED', 'REJECTED', 'NO_SHOW'].includes(appointment.status) && (
               <Button variant="outline" size="sm" onClick={startEditGuestInfo} className="h-7 px-2.5 text-xs gap-1">
                 <Pencil className="size-3.5" /> Edit
               </Button>
