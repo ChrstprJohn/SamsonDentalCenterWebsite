@@ -50,7 +50,7 @@ export async function updateAppointmentStatusAction(formData: StaffUpdateAppoint
       rescheduleMetadata
     );
 
-    // Emit outbox event if appointment is completed
+    // Emit outbox events if appointment is completed
     if (validData.status === 'COMPLETED') {
       try {
         const { outboxCommands } = await import('@/shared/outbox/outbox.commands');
@@ -59,8 +59,11 @@ export async function updateAppointmentStatusAction(formData: StaffUpdateAppoint
         await outboxCommands(adminDb).emitEvent('APPOINTMENT_COMPLETED_POST_CARE', {
           appointmentId: validData.appointmentId,
         });
+        await outboxCommands(adminDb).emitEvent('APPOINTMENT_COMPLETED_POST_CARE_SMS', {
+          appointmentId: validData.appointmentId,
+        });
       } catch (err) {
-        console.warn('Failed to emit APPOINTMENT_COMPLETED_POST_CARE event:', err);
+        console.warn('Failed to emit post-care completion events:', err);
       }
     }
 

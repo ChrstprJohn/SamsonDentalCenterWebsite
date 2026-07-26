@@ -39,6 +39,43 @@ export async function resolveNoShowAction(formData: ResolveNoShowDto) {
       rescheduleMetadata
     );
 
+    if (validData.resolution === 'COMPLETED') {
+      try {
+        const { outboxCommands } = await import('@/shared/outbox/outbox.commands');
+        const { createAdminClient } = await import('@/shared/database/server');
+        const adminDb = await createAdminClient();
+        await outboxCommands(adminDb).emitEvent('APPOINTMENT_COMPLETED_POST_CARE', {
+          appointmentId: validData.appointmentId,
+        });
+        await outboxCommands(adminDb).emitEvent('APPOINTMENT_COMPLETED_POST_CARE_SMS', {
+          appointmentId: validData.appointmentId,
+        });
+      } catch (err) {
+        console.warn('Failed to emit post-care resolution events:', err);
+      }
+    }
+
+    try {
+      const { after } = await import('next/server');
+      after(async () => {
+        const { bootstrapEventSubscribers } = await import('@/orchestrators/event-subscribers');
+        const { globalOutboxDispatcher } = await import('@/shared/outbox/outbox.dispatcher');
+        const { createAdminClient } = await import('@/shared/database/server');
+        bootstrapEventSubscribers();
+        await globalOutboxDispatcher(await createAdminClient())();
+      });
+    } catch {
+      try {
+        const { bootstrapEventSubscribers } = await import('@/orchestrators/event-subscribers');
+        const { globalOutboxDispatcher } = await import('@/shared/outbox/outbox.dispatcher');
+        const { createAdminClient } = await import('@/shared/database/server');
+        bootstrapEventSubscribers();
+        await globalOutboxDispatcher(await createAdminClient())();
+      } catch (err) {
+        console.warn('Could not run outbox dispatcher in background:', err);
+      }
+    }
+
     return { success: true, data: result };
   } catch (error) {
     if (error instanceof z.ZodError) {

@@ -1,9 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { AlertCircle, CheckCircle2, Clock, Calendar, RefreshCw, X } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Clock, Calendar, RefreshCw, X, Pencil, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Select } from '@/components/ui/select';
 import { AppointmentRescheduleForm } from './appointment-reschedule-form';
+import { updateConfirmationChannelAction } from '@/modules/appointments/actions/status/update-confirmation-channel.action';
 
 function getPatientDisplayName(app: any): string {
   if (!app) return 'Patient';
@@ -15,6 +17,8 @@ function getPatientDisplayName(app: any): string {
 
 export function NoShowResolutionModal({ view }: { view: any }) {
   const appointment = view.resolveAppt;
+  const ch = (appointment?.confirmationChannel || appointment?.confirmation_channel) as 'EMAIL' | 'SMS' | 'BOTH' | 'NONE' || 'EMAIL';
+
   const [resolution, setResolution] = useState<'COMPLETED' | 'CONFIRMED_NO_SHOW' | 'RESCHEDULE'>('COMPLETED');
   const [reason, setReason] = useState('Secretary forgot to click check-in');
   const [newDate, setNewDate] = useState(view.todayStr || '');
@@ -22,19 +26,47 @@ export function NoShowResolutionModal({ view }: { view: any }) {
   const [newEndTime, setNewEndTime] = useState('10:30');
   const [newDoctorId, setNewDoctorId] = useState(appointment?.doctorId || '');
 
+  const [channel, setChannel] = useState(ch);
+  const [draftChannel, setDraftChannel] = useState(ch);
+  const [isEditingChannel, setIsEditingChannel] = useState(false);
+  const [isSavingChannel, setIsSavingChannel] = useState(false);
+
   useEffect(() => {
     if (appointment) {
       setNewDoctorId(appointment.doctorId || '');
+      setChannel(ch);
+      setDraftChannel(ch);
+      setIsEditingChannel(false);
     }
   }, [appointment]);
 
   if (!appointment) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSaveChannel = async () => {
+    setIsSavingChannel(true);
+    const res = await updateConfirmationChannelAction({
+      appointmentId: appointment.id,
+      confirmationChannel: draftChannel,
+    });
+    if (res.success) {
+      setChannel(draftChannel);
+      appointment.confirmationChannel = draftChannel;
+      appointment.confirmation_channel = draftChannel;
+      setIsEditingChannel(false);
+      if (view?.fetchData) view.fetchData();
+    }
+    setIsSavingChannel(false);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!reason.trim()) {
       alert('Please provide a reason for resolving this no-show.');
       return;
+    }
+
+    if (draftChannel !== channel) {
+      await handleSaveChannel();
     }
 
     const payload: any = {
@@ -131,6 +163,47 @@ export function NoShowResolutionModal({ view }: { view: any }) {
             </div>
           </div>
 
+          {/* Notification Channel Block - Only visible on Mark Completed */}
+          {resolution === 'COMPLETED' && (
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-text-primary">Notification Channel</span>
+                {!isEditingChannel ? (
+                  <Button variant="outline" size="sm" onClick={() => setIsEditingChannel(true)} className="h-7 px-2.5 text-xs gap-1">
+                    <Pencil className="size-3.5" /> Edit
+                  </Button>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Button variant="outline" size="sm" onClick={() => { setDraftChannel(channel); setIsEditingChannel(false); }} className="h-7 px-2.5 text-xs gap-1">
+                      Cancel
+                    </Button>
+                    <Button size="sm" onClick={handleSaveChannel} disabled={isSavingChannel || draftChannel === channel} className="h-7 px-2.5 text-xs gap-1 bg-slate-900 text-white rounded-md disabled:cursor-not-allowed">
+                      <Check className="size-3.5" /> {isSavingChannel ? 'Saving...' : 'Save'}
+                    </Button>
+                  </div>
+                )}
+              </div>
+
+              {isEditingChannel ? (
+                <Select
+                  value={draftChannel}
+                  onChange={(e) => setDraftChannel(e.target.value as any)}
+                  className="text-sm w-full"
+                  options={[
+                    { value: 'EMAIL', label: 'Email' },
+                    { value: 'SMS', label: 'SMS' },
+                    { value: 'BOTH', label: 'Email & SMS' },
+                    { value: 'NONE', label: 'None' },
+                  ]}
+                />
+              ) : (
+                <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-text-muted border-card-border cursor-default">
+                  {channel === 'EMAIL' ? 'Email' : channel === 'SMS' ? 'SMS' : channel === 'BOTH' ? 'Email & SMS' : 'None'}
+                </div>
+              )}
+            </div>
+          )}
+
           {resolution !== 'RESCHEDULE' && (
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-bold text-text-primary">Reason for Resolution</label>
@@ -193,9 +266,23 @@ export function NoShowResolutionModal({ view }: { view: any }) {
           )}
 
           {resolution === 'COMPLETED' && (
-            <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-[11px] text-emerald-500 flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 shrink-0" />
-              <span>Will complete appointment and send Thank You & Post-Care Review Request message to patient.</span>
+            <div className="p-4 bg-amber-500/5 border border-amber-500/20 rounded-2xl flex flex-col gap-2">
+              <div className="flex items-center gap-2 text-amber-500 text-xs font-bold">
+                <MessageSquare className="h-4 w-4" />
+                <span>Automated Patient Communication</span>
+              </div>
+              <p className="text-[11px] text-text-secondary leading-relaxed">
+                Clicking <strong>Submit Resolution</strong> will finalize this visit and automatically send a <strong>Thank You & Post-Care Review Request</strong> message to the patient.
+              </p>
+            </div>
+          )}
+
+          {resolution === 'CONFIRMED_NO_SHOW' && (
+            <div className="p-3 border bg-red-500/5 border-red-500/20 rounded-2xl">
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-red-500">No-Show Notice</span>
+              <div className="text-[11px] text-muted-foreground mt-1 leading-relaxed">
+                Clicking Submit Resolution will keep this appointment marked as <strong>Confirmed No-Show</strong> in system audit logs.
+              </div>
             </div>
           )}
 
