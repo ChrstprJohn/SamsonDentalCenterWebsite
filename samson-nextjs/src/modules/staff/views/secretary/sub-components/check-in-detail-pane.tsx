@@ -1,10 +1,15 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { X, ArrowLeft, UserRound } from 'lucide-react';
+import { X, ArrowLeft, UserRound, MessageSquare, Mail, RotateCw, Pencil, Check } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Select } from '@/components/ui/select';
 import { formatClinicTime, formatShortDate } from '@/shared/utils/date.util';
 import { AppointmentRescheduleForm } from './appointment-reschedule-form';
 import { AppointmentStatusHistory } from './appointment-status-history';
+import { updateConfirmationChannelAction } from '@/modules/appointments/actions/status/update-confirmation-channel.action';
+import { resendNotificationAction } from '@/modules/appointments/actions/status/resend-notification.action';
+import { computeNotificationStatus } from '@/modules/notifications/utils/notification-status.util';
 
 const STATUS_BADGE: Record<string, string> = {
   APPROVED: 'text-blue-600 bg-blue-500/10',
@@ -64,7 +69,6 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
   const [showRescheduleForm, setShowRescheduleForm] = useState(false);
   const [showUndoForm, setShowUndoForm] = useState(false);
   const [showCheckoutForm, setShowCheckoutForm] = useState(false);
-  const [showMessageLog, setShowMessageLog] = useState(false);
   const [resolveMode, setResolveMode] = useState<'COMPLETED' | 'CONFIRMED_NO_SHOW'>('COMPLETED');
   const [resolveReason, setResolveReason] = useState('');
   const [showCustomReason, setShowCustomReason] = useState(false);
@@ -85,7 +89,6 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
       setShowRescheduleForm(false);
       setShowUndoForm(false);
       setShowCheckoutForm(false);
-      setShowMessageLog(false);
       setResolveMode('COMPLETED');
       setResolveReason('');
       setShowCustomReason(false);
@@ -153,9 +156,9 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
         )}
         {paneType === 'details' && <hr className="border-card-border/40 mx-4" />}
         <div className="px-4 py-4 space-y-4">
-          {paneType === 'details' && <DetailsContent appointment={appointment} />}
+          {paneType === 'details' && <DetailsContent appointment={appointment} view={view} />}
 
-          {paneType === 'checkout' && <CheckoutContent appointment={appointment} />}
+          {paneType === 'checkout' && <CheckoutContent appointment={appointment} view={view} />}
           {paneType === 'resolve' && <ResolveContent view={view} onClose={onClose} />}
           {paneType === 'reschedule' && <StandaloneReschedule view={view} onClose={onClose} />}
         </div>
@@ -309,28 +312,7 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
               </div>
             )}
             {paneType === 'details' && appointment.status === 'CHECKED_IN' && showCheckoutForm && (
-              <div className="w-full flex flex-col gap-3">
-                <div className="flex flex-col gap-0.5">
-                  <h3 className="text-base font-medium text-foreground">Checkout Patient</h3>
-                  <p className="text-xs text-muted-foreground">
-                    Complete visit & send post-care messages.
-                  </p>
-                </div>
-                <div className="p-3 border bg-amber-500/5 border-amber-500/20">
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-amber-600">Automated Communication</span>
-                  <div className="text-[11px] text-muted-foreground mt-1 leading-relaxed">
-                    Clicking Confirm & Send will complete the visit and send a Thank You and Post-Care Review Request to the patient. Are you sure you want to proceed?
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <button onClick={() => setShowCheckoutForm(false)} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent transition-colors rounded-xl">
-                    Cancel
-                  </button>
-                  <button onClick={() => { view.handleCheckoutComplete(appointment.id); setShowCheckoutForm(false); }} disabled={view.isPending} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl disabled:opacity-40">
-{view.isPending ? 'Sending...' : 'Confirm & Send'}
-                  </button>
-                </div>
-              </div>
+              <InlineCheckoutForm appointment={appointment} view={view} onCancel={() => setShowCheckoutForm(false)} />
             )}
             {paneType === 'checkout' && (
               <>
@@ -341,26 +323,6 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
                   {view.isPending ? 'Sending...' : 'Confirm & Send'}
                 </button>
               </>
-            )}
-            {paneType === 'details' && appointment.status === 'COMPLETED' && !showMessageLog && (
-              <button onClick={() => setShowMessageLog(true)} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent transition-colors rounded-xl">
-                View Message Log
-              </button>
-            )}
-            {paneType === 'details' && appointment.status === 'COMPLETED' && showMessageLog && (
-              <div className="w-full flex flex-col gap-3">
-                <div className="flex flex-col gap-0.5">
-                  <h3 className="text-base font-medium text-foreground">Message Log</h3>
-                  <p className="text-xs text-muted-foreground">
-                    View communication history for this appointment.
-                  </p>
-                </div>
-                <div className="flex gap-2">
-                  <button onClick={() => setShowMessageLog(false)} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent transition-colors rounded-xl">
-                    Back
-                  </button>
-                </div>
-              </div>
             )}
           </div>
         </div>
@@ -384,7 +346,90 @@ function InfoBox({ variant, title, children }: { variant: 'cyan' | 'amber' | 'em
   );
 }
 
-function DetailsContent({ appointment }: { appointment: any }) {
+function DetailsContent({ appointment, view }: { appointment: any; view?: any }) {
+  const channel = (appointment.confirmationChannel || appointment.confirmation_channel) as 'EMAIL' | 'SMS' | 'BOTH' | 'NONE' || 'EMAIL';
+  const [resending, setResending] = useState<string | null>(null);
+
+  const [commState, setCommState] = useState({
+    emailConfirmationSent: Boolean(appointment.emailConfirmationSent || appointment.email_confirmation_sent),
+    smsConfirmationSent: Boolean(appointment.smsConfirmationSent || appointment.sms_confirmation_sent),
+    emailReminder48hSent: Boolean(appointment.emailReminder48hSent || appointment.email_reminder_48h_sent),
+    smsReminder48hSent: Boolean(appointment.smsReminder48hSent || appointment.sms_reminder_48h_sent),
+    emailReminder24hSent: Boolean(appointment.emailReminder24hSent || appointment.email_reminder_24h_sent),
+    smsReminder24hSent: Boolean(appointment.smsReminder24hSent || appointment.sms_reminder_24h_sent),
+    emailCheckoutSent: Boolean(appointment.emailCheckoutSent || appointment.email_checkout_sent),
+    smsCheckoutSent: Boolean(appointment.smsCheckoutSent || appointment.sms_checkout_sent),
+  });
+
+  useEffect(() => {
+    setCommState({
+      emailConfirmationSent: Boolean(appointment.emailConfirmationSent || appointment.email_confirmation_sent),
+      smsConfirmationSent: Boolean(appointment.smsConfirmationSent || appointment.sms_confirmation_sent),
+      emailReminder48hSent: Boolean(appointment.emailReminder48hSent || appointment.email_reminder_48h_sent),
+      smsReminder48hSent: Boolean(appointment.smsReminder48hSent || appointment.sms_reminder_48h_sent),
+      emailReminder24hSent: Boolean(appointment.emailReminder24hSent || appointment.email_reminder_24h_sent),
+      smsReminder24hSent: Boolean(appointment.smsReminder24hSent || appointment.sms_reminder_24h_sent),
+      emailCheckoutSent: Boolean(appointment.emailCheckoutSent || appointment.email_checkout_sent),
+      smsCheckoutSent: Boolean(appointment.smsCheckoutSent || appointment.sms_checkout_sent),
+    });
+  }, [appointment]);
+
+  const handleResend = async (eventType: 'APPOINTMENT_BOOKED' | 'APPOINTMENT_REMINDER_48H' | 'APPOINTMENT_REMINDER_24H' | 'APPOINTMENT_CHECKOUT', targetChannel: 'EMAIL' | 'SMS') => {
+    const key = `${eventType}_${targetChannel}`;
+    setResending(key);
+    const res = await resendNotificationAction({ appointmentId: appointment.id, eventType, targetChannel });
+    if (res.success) {
+      if (eventType === 'APPOINTMENT_REMINDER_48H') {
+        if (targetChannel === 'EMAIL') { (appointment as any).emailReminder48hSent = true; (appointment as any).email_reminder_48h_sent = true; }
+        if (targetChannel === 'SMS') { (appointment as any).smsReminder48hSent = true; (appointment as any).sms_reminder_48h_sent = true; }
+      } else if (eventType === 'APPOINTMENT_REMINDER_24H') {
+        if (targetChannel === 'EMAIL') { (appointment as any).emailReminder24hSent = true; (appointment as any).email_reminder_24h_sent = true; }
+        if (targetChannel === 'SMS') { (appointment as any).smsReminder24hSent = true; (appointment as any).sms_reminder_24h_sent = true; }
+      } else if (eventType === 'APPOINTMENT_BOOKED') {
+        if (targetChannel === 'EMAIL') { (appointment as any).emailConfirmationSent = true; (appointment as any).email_confirmation_sent = true; }
+        if (targetChannel === 'SMS') { (appointment as any).smsConfirmationSent = true; (appointment as any).sms_confirmation_sent = true; }
+      } else if (eventType === 'APPOINTMENT_CHECKOUT') {
+        if (targetChannel === 'EMAIL') { (appointment as any).emailCheckoutSent = true; (appointment as any).email_checkout_sent = true; }
+        if (targetChannel === 'SMS') { (appointment as any).smsCheckoutSent = true; (appointment as any).sms_checkout_sent = true; }
+      }
+
+      setCommState((prev) => {
+        const updates: Partial<typeof prev> = {};
+        if (eventType === 'APPOINTMENT_REMINDER_48H') {
+          if (targetChannel === 'EMAIL') updates.emailReminder48hSent = true;
+          if (targetChannel === 'SMS') updates.smsReminder48hSent = true;
+        } else if (eventType === 'APPOINTMENT_REMINDER_24H') {
+          if (targetChannel === 'EMAIL') updates.emailReminder24hSent = true;
+          if (targetChannel === 'SMS') updates.smsReminder24hSent = true;
+        } else if (eventType === 'APPOINTMENT_BOOKED') {
+          if (targetChannel === 'EMAIL') updates.emailConfirmationSent = true;
+          if (targetChannel === 'SMS') updates.smsConfirmationSent = true;
+        } else if (eventType === 'APPOINTMENT_CHECKOUT') {
+          if (targetChannel === 'EMAIL') updates.emailCheckoutSent = true;
+          if (targetChannel === 'SMS') updates.smsCheckoutSent = true;
+        }
+        return { ...prev, ...updates };
+      });
+      if (view?.fetchData) view.fetchData();
+    } else {
+      alert(res.error || 'Failed to resend notification.');
+    }
+    setResending(null);
+  };
+
+  const commEntries: {
+    key: string;
+    label: string;
+    eventType: 'APPOINTMENT_BOOKED' | 'APPOINTMENT_REMINDER_48H' | 'APPOINTMENT_REMINDER_24H' | 'APPOINTMENT_CHECKOUT';
+    emailSent: boolean;
+    smsSent: boolean;
+  }[] = [
+    { key: 'confirmation', label: 'Booking Confirmation', eventType: 'APPOINTMENT_BOOKED', emailSent: commState.emailConfirmationSent, smsSent: commState.smsConfirmationSent },
+    { key: 'reminder48h', label: '48-Hour Reminder', eventType: 'APPOINTMENT_REMINDER_48H', emailSent: commState.emailReminder48hSent, smsSent: commState.smsReminder48hSent },
+    { key: 'reminder24h', label: '24-Hour Reminder', eventType: 'APPOINTMENT_REMINDER_24H', emailSent: commState.emailReminder24hSent, smsSent: commState.smsReminder24hSent },
+    { key: 'checkout', label: 'Checkout / Thank You', eventType: 'APPOINTMENT_CHECKOUT', emailSent: commState.emailCheckoutSent, smsSent: commState.smsCheckoutSent },
+  ];
+
   return (
     <div className="flex flex-col gap-4">
       <div>
@@ -425,6 +470,102 @@ function DetailsContent({ appointment }: { appointment: any }) {
       </div>
 
       <hr className="border-card-border/40" />
+
+      {/* Read-Only Notification Channel */}
+      <div>
+        <span className="text-sm font-medium text-foreground block mb-2">Notification Channel</span>
+        <div className="p-3 bg-secondary-bg/20 border border-card-border/60 rounded-xl flex items-center justify-between">
+          <span className="text-sm font-medium text-foreground">
+            {channel === 'EMAIL' && 'Email Only'}
+            {channel === 'SMS' && 'SMS Only'}
+            {channel === 'BOTH' && 'Both (Email & SMS)'}
+            {channel === 'NONE' && 'None (Opted Out)'}
+          </span>
+          <span className="text-xs text-muted-foreground">
+            {channel === 'NONE' ? 'Automated messaging disabled' : 'Active dispatch channel'}
+          </span>
+        </div>
+      </div>
+
+      <hr className="border-card-border/40" />
+
+      {/* Notification History */}
+      <div className="space-y-3">
+        <span className="text-sm font-medium text-foreground block">Notification History</span>
+        <div className="flex flex-col gap-2">
+          {commEntries.map((entry) => {
+            const createdAt = (appointment as any).createdAt || (appointment as any).created_at;
+            const startTime = (appointment as any).startTime || (appointment as any).start_time || (appointment as any).date;
+
+            const smsStatus = computeNotificationStatus({
+              eventType: entry.eventType,
+              targetChannel: 'SMS',
+              isSent: entry.smsSent,
+              currentChannel: channel,
+              createdAt,
+              startTime,
+            });
+
+            const emailStatus = computeNotificationStatus({
+              eventType: entry.eventType,
+              targetChannel: 'EMAIL',
+              isSent: entry.emailSent,
+              currentChannel: channel,
+              createdAt,
+              startTime,
+            });
+
+            return (
+              <div key={entry.key} className="space-y-1.5">
+                <span className="text-xs text-muted-foreground">{entry.label}</span>
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center justify-between p-2.5 bg-secondary-bg/20 border border-card-border/60 rounded-xl">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <MessageSquare className="size-3.5 text-muted-foreground shrink-0" />
+                      <span className="text-sm text-foreground">SMS</span>
+                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${smsStatus.badgeClass}`}>
+                        {smsStatus.label}
+                      </span>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={resending === `${entry.eventType}_SMS`}
+                      onClick={() => handleResend(entry.eventType, 'SMS')}
+                      className="text-[10px] h-6 px-2 gap-1 shrink-0"
+                    >
+                      <RotateCw className={`size-3 ${resending === `${entry.eventType}_SMS` ? 'animate-spin' : ''}`} />
+                      {resending === `${entry.eventType}_SMS` ? 'Sending...' : 'Resend'}
+                    </Button>
+                  </div>
+
+                  <div className="flex items-center justify-between p-2.5 bg-secondary-bg/20 border border-card-border/60 rounded-xl">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <Mail className="size-3.5 text-muted-foreground shrink-0" />
+                      <span className="text-sm text-foreground">Email</span>
+                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${emailStatus.badgeClass}`}>
+                        {emailStatus.label}
+                      </span>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={resending === `${entry.eventType}_EMAIL`}
+                      onClick={() => handleResend(entry.eventType, 'EMAIL')}
+                      className="text-[10px] h-6 px-2 gap-1 shrink-0"
+                    >
+                      <RotateCw className={`size-3 ${resending === `${entry.eventType}_EMAIL` ? 'animate-spin' : ''}`} />
+                      {resending === `${entry.eventType}_EMAIL` ? 'Sending...' : 'Resend'}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <hr className="border-card-border/40" />
       <AppointmentStatusHistory appointment={appointment as any} activeTab="upcoming" compact />
     </div>
   );
@@ -441,18 +582,87 @@ function Field({ label, value }: { label: string; value: string }) {
   );
 }
 
-function CheckoutContent({ appointment }: { appointment: any }) {
+function CheckoutContent({ appointment, view }: { appointment: any; view?: any }) {
+  const ch = (appointment?.confirmationChannel || appointment?.confirmation_channel) as 'EMAIL' | 'SMS' | 'BOTH' | 'NONE' || 'EMAIL';
+
+  const [channel, setChannel] = useState(ch);
+  const [draftChannel, setDraftChannel] = useState(ch);
+  const [isEditingChannel, setIsEditingChannel] = useState(false);
+  const [isSavingChannel, setIsSavingChannel] = useState(false);
+
+  useEffect(() => {
+    setChannel(ch);
+    setDraftChannel(ch);
+    setIsEditingChannel(false);
+  }, [appointment?.id]);
+
+  const handleSaveChannel = async () => {
+    setIsSavingChannel(true);
+    const res = await updateConfirmationChannelAction({
+      appointmentId: appointment.id,
+      confirmationChannel: draftChannel,
+    });
+    if (res.success) {
+      setChannel(draftChannel);
+      appointment.confirmationChannel = draftChannel;
+      appointment.confirmation_channel = draftChannel;
+      setIsEditingChannel(false);
+      if (view?.fetchData) view.fetchData();
+    }
+    setIsSavingChannel(false);
+  };
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-0.5">
         <h3 className="text-base font-medium text-foreground">Checkout Patient</h3>
         <p className="text-xs text-muted-foreground">
-          Finalize the visit and automatically send a Thank You and Post-Care Review Request to the patient.
+          Review channel & finalize visit.
         </p>
       </div>
 
+      <hr className="border-card-border/40" />
+
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-sm font-medium text-foreground">Notification Channel</span>
+          {!isEditingChannel ? (
+            <Button variant="outline" size="sm" onClick={() => setIsEditingChannel(true)} className="h-7 px-2.5 text-xs gap-1">
+              <Pencil className="size-3.5" /> Edit
+            </Button>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" onClick={() => { setDraftChannel(channel); setIsEditingChannel(false); }} className="h-7 px-2.5 text-xs gap-1">
+                <X className="size-3.5" /> Cancel
+              </Button>
+              <Button size="sm" onClick={handleSaveChannel} disabled={isSavingChannel || draftChannel === channel} className="h-7 px-2.5 text-xs gap-1 bg-slate-900 text-white rounded-md disabled:cursor-not-allowed">
+                <Check className="size-3.5" /> {isSavingChannel ? 'Saving...' : 'Save'}
+              </Button>
+            </div>
+          )}
+        </div>
+
+        {isEditingChannel ? (
+          <Select
+            value={draftChannel}
+            onChange={(e) => setDraftChannel(e.target.value as any)}
+            className="text-sm w-full"
+            options={[
+              { value: 'EMAIL', label: 'Email' },
+              { value: 'SMS', label: 'SMS' },
+              { value: 'BOTH', label: 'Email & SMS' },
+              { value: 'NONE', label: 'None' },
+            ]}
+          />
+        ) : (
+          <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">
+            {channel === 'EMAIL' ? 'Email' : channel === 'SMS' ? 'SMS' : channel === 'BOTH' ? 'Email & SMS' : 'None'}
+          </div>
+        )}
+      </div>
+
       <InfoBox variant="amber" title="Automated Communication">
-        Confirming checkout will finalize the visit and automatically send a Thank You and Post-Care Review Request message to the patient.
+        Confirming will complete the visit and send a Thank You & Review Request message via the selected channel.
       </InfoBox>
     </div>
   );
@@ -626,6 +836,342 @@ function StandaloneReschedule({ view, onClose }: { view: any; onClose: () => voi
         onSubmit={view.handleRescheduleSubmit}
         onBack={onClose}
       />
+    </div>
+  );
+}
+
+function MessageLogContent({ appointment, view }: { appointment: any; view: any }) {
+  const ch = (appointment.confirmationChannel || appointment.confirmation_channel) as 'EMAIL' | 'SMS' | 'BOTH' | 'NONE' || 'EMAIL';
+  const [channel, setChannel] = useState(ch);
+  const [draftChannel, setDraftChannel] = useState(ch);
+  const [isEditingChannel, setIsEditingChannel] = useState(false);
+  const [isSavingChannel, setIsSavingChannel] = useState(false);
+  const [resending, setResending] = useState<string | null>(null);
+
+  const [commState, setCommState] = useState({
+    emailConfirmationSent: Boolean(appointment.emailConfirmationSent || appointment.email_confirmation_sent),
+    smsConfirmationSent: Boolean(appointment.smsConfirmationSent || appointment.sms_confirmation_sent),
+    emailReminder48hSent: Boolean(appointment.emailReminder48hSent || appointment.email_reminder_48h_sent),
+    smsReminder48hSent: Boolean(appointment.smsReminder48hSent || appointment.sms_reminder_48h_sent),
+    emailReminder24hSent: Boolean(appointment.emailReminder24hSent || appointment.email_reminder_24h_sent),
+    smsReminder24hSent: Boolean(appointment.smsReminder24hSent || appointment.sms_reminder_24h_sent),
+    emailCheckoutSent: Boolean(appointment.emailCheckoutSent || appointment.email_checkout_sent),
+    smsCheckoutSent: Boolean(appointment.smsCheckoutSent || appointment.sms_checkout_sent),
+  });
+
+  useEffect(() => {
+    setChannel(ch);
+    setDraftChannel(ch);
+    setCommState({
+      emailConfirmationSent: Boolean(appointment.emailConfirmationSent || appointment.email_confirmation_sent),
+      smsConfirmationSent: Boolean(appointment.smsConfirmationSent || appointment.sms_confirmation_sent),
+      emailReminder48hSent: Boolean(appointment.emailReminder48hSent || appointment.email_reminder_48h_sent),
+      smsReminder48hSent: Boolean(appointment.smsReminder48hSent || appointment.sms_reminder_48h_sent),
+      emailReminder24hSent: Boolean(appointment.emailReminder24hSent || appointment.email_reminder_24h_sent),
+      smsReminder24hSent: Boolean(appointment.smsReminder24hSent || appointment.sms_reminder_24h_sent),
+      emailCheckoutSent: Boolean(appointment.emailCheckoutSent || appointment.email_checkout_sent),
+      smsCheckoutSent: Boolean(appointment.smsCheckoutSent || appointment.sms_checkout_sent),
+    });
+  }, [appointment]);
+
+  const handleResend = async (eventType: 'APPOINTMENT_BOOKED' | 'APPOINTMENT_REMINDER_48H' | 'APPOINTMENT_REMINDER_24H' | 'APPOINTMENT_CHECKOUT', targetChannel: 'EMAIL' | 'SMS') => {
+    const key = `${eventType}_${targetChannel}`;
+    setResending(key);
+    const res = await resendNotificationAction({ appointmentId: appointment.id, eventType, targetChannel });
+    if (res.success) {
+      if (eventType === 'APPOINTMENT_REMINDER_48H') {
+        if (targetChannel === 'EMAIL') { (appointment as any).emailReminder48hSent = true; (appointment as any).email_reminder_48h_sent = true; }
+        if (targetChannel === 'SMS') { (appointment as any).smsReminder48hSent = true; (appointment as any).sms_reminder_48h_sent = true; }
+      } else if (eventType === 'APPOINTMENT_REMINDER_24H') {
+        if (targetChannel === 'EMAIL') { (appointment as any).emailReminder24hSent = true; (appointment as any).email_reminder_24h_sent = true; }
+        if (targetChannel === 'SMS') { (appointment as any).smsReminder24hSent = true; (appointment as any).sms_reminder_24h_sent = true; }
+      } else if (eventType === 'APPOINTMENT_BOOKED') {
+        if (targetChannel === 'EMAIL') { (appointment as any).emailConfirmationSent = true; (appointment as any).email_confirmation_sent = true; }
+        if (targetChannel === 'SMS') { (appointment as any).smsConfirmationSent = true; (appointment as any).sms_confirmation_sent = true; }
+      } else if (eventType === 'APPOINTMENT_CHECKOUT') {
+        if (targetChannel === 'EMAIL') { (appointment as any).emailCheckoutSent = true; (appointment as any).email_checkout_sent = true; }
+        if (targetChannel === 'SMS') { (appointment as any).smsCheckoutSent = true; (appointment as any).sms_checkout_sent = true; }
+      }
+
+      setCommState((prev) => {
+        const updates: Partial<typeof prev> = {};
+        if (eventType === 'APPOINTMENT_REMINDER_48H') {
+          if (targetChannel === 'EMAIL') updates.emailReminder48hSent = true;
+          if (targetChannel === 'SMS') updates.smsReminder48hSent = true;
+        } else if (eventType === 'APPOINTMENT_REMINDER_24H') {
+          if (targetChannel === 'EMAIL') updates.emailReminder24hSent = true;
+          if (targetChannel === 'SMS') updates.smsReminder24hSent = true;
+        } else if (eventType === 'APPOINTMENT_BOOKED') {
+          if (targetChannel === 'EMAIL') updates.emailConfirmationSent = true;
+          if (targetChannel === 'SMS') updates.smsConfirmationSent = true;
+        } else if (eventType === 'APPOINTMENT_CHECKOUT') {
+          if (targetChannel === 'EMAIL') updates.emailCheckoutSent = true;
+          if (targetChannel === 'SMS') updates.smsCheckoutSent = true;
+        }
+        return { ...prev, ...updates };
+      });
+      if (view?.fetchData) view.fetchData();
+    } else {
+      alert(res.error || 'Failed to resend notification.');
+    }
+    setResending(null);
+  };
+
+  const handleSaveChannel = async () => {
+    setIsSavingChannel(true);
+    const res = await updateConfirmationChannelAction({
+      appointmentId: appointment.id,
+      confirmationChannel: draftChannel,
+    });
+    if (res.success) {
+      setChannel(draftChannel);
+      appointment.confirmationChannel = draftChannel;
+      appointment.confirmation_channel = draftChannel;
+      setIsEditingChannel(false);
+    }
+    setIsSavingChannel(false);
+  };
+
+  const handleCancelChannel = () => {
+    setDraftChannel(channel);
+    setIsEditingChannel(false);
+  };
+
+  const commEntries: {
+    key: string;
+    label: string;
+    eventType: 'APPOINTMENT_BOOKED' | 'APPOINTMENT_REMINDER_48H' | 'APPOINTMENT_REMINDER_24H' | 'APPOINTMENT_CHECKOUT';
+    emailSent: boolean;
+    smsSent: boolean;
+  }[] = [
+    { key: 'confirmation', label: 'Booking Confirmation', eventType: 'APPOINTMENT_BOOKED', emailSent: commState.emailConfirmationSent, smsSent: commState.smsConfirmationSent },
+    { key: 'reminder48h', label: '48-Hour Reminder', eventType: 'APPOINTMENT_REMINDER_48H', emailSent: commState.emailReminder48hSent, smsSent: commState.smsReminder48hSent },
+    { key: 'reminder24h', label: '24-Hour Reminder', eventType: 'APPOINTMENT_REMINDER_24H', emailSent: commState.emailReminder24hSent, smsSent: commState.smsReminder24hSent },
+    { key: 'checkout', label: 'Checkout / Thank You', eventType: 'APPOINTMENT_CHECKOUT', emailSent: commState.emailCheckoutSent, smsSent: commState.smsCheckoutSent },
+  ];
+
+  return (
+    <div className="flex flex-col gap-4">
+      {/* Notification Channel */}
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-sm font-medium text-foreground">Notification Channel</span>
+          {!isEditingChannel && (
+            <Button variant="outline" size="sm" onClick={() => setIsEditingChannel(true)} className="h-7 px-2.5 text-xs gap-1">
+              <Pencil className="size-3.5" /> Edit
+            </Button>
+          )}
+          {isEditingChannel && (
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" onClick={handleCancelChannel} className="h-7 px-2.5 text-xs gap-1">
+                <X className="size-3.5" /> Cancel
+              </Button>
+              <Button size="sm" onClick={handleSaveChannel} disabled={isSavingChannel || draftChannel === channel} className="h-7 px-2.5 text-xs gap-1 bg-slate-900 text-white rounded-md disabled:cursor-not-allowed">
+                <Check className="size-3.5" /> {isSavingChannel ? 'Saving...' : 'Save'}
+              </Button>
+            </div>
+          )}
+        </div>
+
+        {isEditingChannel ? (
+          <Select
+            value={draftChannel}
+            onChange={(e) => setDraftChannel(e.target.value as any)}
+            className="text-sm w-full"
+            options={[
+              { label: 'Email Only', value: 'EMAIL' },
+              { label: 'SMS Only', value: 'SMS' },
+              { label: 'Both (Email & SMS)', value: 'BOTH' },
+              { label: 'None (Opted Out)', value: 'NONE' },
+            ]}
+          />
+        ) : (
+          <div className="p-3 bg-secondary-bg/20 border border-card-border/60 rounded-xl flex items-center justify-between">
+            <span className="text-sm font-medium text-foreground">
+              {channel === 'EMAIL' && 'Email Only'}
+              {channel === 'SMS' && 'SMS Only'}
+              {channel === 'BOTH' && 'Both (Email & SMS)'}
+              {channel === 'NONE' && 'None (Opted Out)'}
+            </span>
+            <span className="text-xs text-muted-foreground">
+              {channel === 'NONE' ? 'Automated messaging disabled' : 'Active dispatch channel'}
+            </span>
+          </div>
+        )}
+      </div>
+
+      <hr className="border-card-border/40" />
+
+      {/* Notification History */}
+      <div className="space-y-3">
+        <span className="text-sm font-medium text-foreground block">Notification History</span>
+        <div className="flex flex-col gap-2">
+          {commEntries.map((entry) => {
+            const hasEmail = channel === 'EMAIL' || channel === 'BOTH';
+            const hasSms = channel === 'SMS' || channel === 'BOTH';
+
+            return (
+              <div key={entry.key} className="space-y-1.5">
+                <span className="text-xs text-muted-foreground">{entry.label}</span>
+                <div className="flex flex-col gap-2">
+                  {hasSms && (
+                    <div className="flex items-center justify-between p-2.5 bg-secondary-bg/20 border border-card-border/60 rounded-xl">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <MessageSquare className="size-3.5 text-muted-foreground shrink-0" />
+                        <span className="text-sm text-foreground">SMS</span>
+                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                          entry.smsSent ? 'bg-green-500/10 text-green-500' : 'bg-muted text-muted-foreground/60'
+                        }`}>
+                          {entry.smsSent ? 'SENT' : 'PENDING'}
+                        </span>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={resending === `${entry.eventType}_SMS`}
+                        onClick={() => handleResend(entry.eventType, 'SMS')}
+                        className="text-[10px] h-6 px-2 gap-1 shrink-0"
+                      >
+                        <RotateCw className={`size-3 ${resending === `${entry.eventType}_SMS` ? 'animate-spin' : ''}`} />
+                        {resending === `${entry.eventType}_SMS` ? 'Sending...' : 'Resend'}
+                      </Button>
+                    </div>
+                  )}
+                  {hasEmail && (
+                    <div className="flex items-center justify-between p-2.5 bg-secondary-bg/20 border border-card-border/60 rounded-xl">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <Mail className="size-3.5 text-muted-foreground shrink-0" />
+                        <span className="text-sm text-foreground">Email</span>
+                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                          entry.emailSent ? 'bg-green-500/10 text-green-500' : 'bg-muted text-muted-foreground/60'
+                        }`}>
+                          {entry.emailSent ? 'SENT' : 'PENDING'}
+                        </span>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={resending === `${entry.eventType}_EMAIL`}
+                        onClick={() => handleResend(entry.eventType, 'EMAIL')}
+                        className="text-[10px] h-6 px-2 gap-1 shrink-0"
+                      >
+                        <RotateCw className={`size-3 ${resending === `${entry.eventType}_EMAIL` ? 'animate-spin' : ''}`} />
+                        {resending === `${entry.eventType}_EMAIL` ? 'Sending...' : 'Resend'}
+                      </Button>
+                    </div>
+                  )}
+                  {!hasEmail && !hasSms && (
+                    <div className="p-2.5 bg-secondary-bg/20 border border-card-border/60 rounded-xl text-xs text-muted-foreground">
+                      Notifications opted out (Channel set to None)
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function InlineCheckoutForm({ appointment, view, onCancel }: { appointment: any; view: any; onCancel: () => void }) {
+  const ch = (appointment?.confirmationChannel || appointment?.confirmation_channel) as 'EMAIL' | 'SMS' | 'BOTH' | 'NONE' || 'EMAIL';
+  const [channel, setChannel] = useState(ch);
+  const [draftChannel, setDraftChannel] = useState(ch);
+  const [isEditingChannel, setIsEditingChannel] = useState(false);
+  const [isSavingChannel, setIsSavingChannel] = useState(false);
+
+  useEffect(() => {
+    setChannel(ch);
+    setDraftChannel(ch);
+    setIsEditingChannel(false);
+  }, [appointment?.id]);
+
+  const handleSaveChannel = async () => {
+    setIsSavingChannel(true);
+    const res = await updateConfirmationChannelAction({
+      appointmentId: appointment.id,
+      confirmationChannel: draftChannel,
+    });
+    if (res.success) {
+      setChannel(draftChannel);
+      appointment.confirmationChannel = draftChannel;
+      appointment.confirmation_channel = draftChannel;
+      setIsEditingChannel(false);
+      if (view?.fetchData) view.fetchData();
+    }
+    setIsSavingChannel(false);
+  };
+
+  return (
+    <div className="w-full flex flex-col gap-3">
+      <div className="flex flex-col gap-0.5">
+        <h3 className="text-base font-medium text-foreground">Checkout Patient</h3>
+        <p className="text-xs text-muted-foreground">
+          Review channel & finalize visit.
+        </p>
+      </div>
+
+      <hr className="border-card-border/40" />
+
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-sm font-medium text-foreground">Notification Channel</span>
+          {!isEditingChannel ? (
+            <Button variant="outline" size="sm" onClick={() => setIsEditingChannel(true)} className="h-7 px-2.5 text-xs gap-1">
+              <Pencil className="size-3.5" /> Edit
+            </Button>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" onClick={() => { setDraftChannel(channel); setIsEditingChannel(false); }} className="h-7 px-2.5 text-xs gap-1">
+                <X className="size-3.5" /> Cancel
+              </Button>
+              <Button size="sm" onClick={handleSaveChannel} disabled={isSavingChannel || draftChannel === channel} className="h-7 px-2.5 text-xs gap-1 bg-slate-900 text-white rounded-md disabled:cursor-not-allowed">
+                <Check className="size-3.5" /> {isSavingChannel ? 'Saving...' : 'Save'}
+              </Button>
+            </div>
+          )}
+        </div>
+
+        {isEditingChannel ? (
+          <Select
+            value={draftChannel}
+            onChange={(e) => setDraftChannel(e.target.value as any)}
+            className="text-sm w-full"
+            options={[
+              { value: 'EMAIL', label: 'Email' },
+              { value: 'SMS', label: 'SMS' },
+              { value: 'BOTH', label: 'Email & SMS' },
+              { value: 'NONE', label: 'None' },
+            ]}
+          />
+        ) : (
+          <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">
+            {channel === 'EMAIL' ? 'Email' : channel === 'SMS' ? 'SMS' : channel === 'BOTH' ? 'Email & SMS' : 'None'}
+          </div>
+        )}
+      </div>
+
+      <div className="p-3 border bg-amber-500/5 border-amber-500/20">
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-amber-600">Automated Communication</span>
+        <div className="text-[11px] text-muted-foreground mt-1 leading-relaxed">
+          Confirming will complete the visit and send a Thank You & Review Request message via the selected channel.
+        </div>
+      </div>
+
+      <div className="flex gap-2">
+        <button onClick={onCancel} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent transition-colors rounded-xl">
+          Cancel
+        </button>
+        <button
+          onClick={() => { view.handleCheckoutComplete(appointment.id); onCancel(); }}
+          disabled={view.isPending || isEditingChannel}
+          className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl disabled:opacity-40"
+        >
+          {view.isPending ? 'Sending...' : 'Confirm & Send'}
+        </button>
+      </div>
     </div>
   );
 }

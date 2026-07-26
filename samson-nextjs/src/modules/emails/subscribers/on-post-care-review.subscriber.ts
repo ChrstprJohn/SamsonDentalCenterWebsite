@@ -78,5 +78,10 @@ export const onPostCareReviewSubscriber = {
         baseUrl,
       }
     );
+
+    await supabaseAdmin
+      .from('appointments')
+      .update({ email_checkout_sent: true })
+      .eq('id', appointmentId);
   },
 };

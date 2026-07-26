@@ -7,7 +7,7 @@ import { bootstrapEventSubscribers } from '@/orchestrators/event-subscribers';
 
 export interface ResendNotificationInput {
   appointmentId: string;
-  eventType: 'APPOINTMENT_BOOKED' | 'APPOINTMENT_REMINDER_48H' | 'APPOINTMENT_REMINDER_24H';
+  eventType: 'APPOINTMENT_BOOKED' | 'APPOINTMENT_REMINDER_48H' | 'APPOINTMENT_REMINDER_24H' | 'APPOINTMENT_CHECKOUT';
   targetChannel?: 'EMAIL' | 'SMS' | 'BOTH';
 }
 
@@ -99,6 +99,9 @@ export async function resendNotificationAction(input: ResendNotificationInput) {
     } else if (input.eventType === 'APPOINTMENT_REMINDER_24H') {
       if (shouldSendEmail) updatePayload.email_reminder_24h_sent = true;
       if (shouldSendSms) updatePayload.sms_reminder_24h_sent = true;
+    } else if (input.eventType === 'APPOINTMENT_CHECKOUT') {
+      if (shouldSendEmail) updatePayload.email_checkout_sent = true;
+      if (shouldSendSms) updatePayload.sms_checkout_sent = true;
     }
 
     if (Object.keys(updatePayload).length > 0) {
@@ -117,7 +120,10 @@ export async function resendNotificationAction(input: ResendNotificationInput) {
       let eventType: string;
       let payload: Record<string, any>;
 
-      if (input.eventType === 'APPOINTMENT_REMINDER_24H' || input.eventType === 'APPOINTMENT_REMINDER_48H') {
+      if (input.eventType === 'APPOINTMENT_CHECKOUT') {
+        eventType = 'APPOINTMENT_COMPLETED_POST_CARE';
+        payload = { appointmentId: input.appointmentId, email: recipientEmail };
+      } else if (input.eventType === 'APPOINTMENT_REMINDER_24H' || input.eventType === 'APPOINTMENT_REMINDER_48H') {
         eventType = input.eventType === 'APPOINTMENT_REMINDER_48H' ? 'APPOINTMENT_REMINDER_48H' : 'APPOINTMENT_REMINDER_24H';
         payload = { appointmentId: input.appointmentId, email: recipientEmail };
       } else {
@@ -168,6 +174,7 @@ export async function resendNotificationAction(input: ResendNotificationInput) {
 
     // Dispatch SMS Event
     if (shouldSendSms && recipientPhone) {
+      const smsEventType = input.eventType === 'APPOINTMENT_CHECKOUT' ? 'APPOINTMENT_COMPLETED_POST_CARE_SMS' : 'APPOINTMENT_MANUALLY_BOOKED_SMS';
       const smsPayload = {
         phoneNumber: recipientPhone,
         date: appointment.date,
@@ -175,7 +182,7 @@ export async function resendNotificationAction(input: ResendNotificationInput) {
         appointmentId: appointment.id,
       };
 
-      const emittedSmsEvent = await outbox.emitEvent('APPOINTMENT_MANUALLY_BOOKED_SMS', smsPayload);
+      const emittedSmsEvent = await outbox.emitEvent(smsEventType, smsPayload);
       dispatchedEvents.push(`SMS (${recipientPhone})`);
       bootstrapEventSubscribers();
       await globalOutboxDispatcher(supabaseAdmin, true, emittedSmsEvent.id)();

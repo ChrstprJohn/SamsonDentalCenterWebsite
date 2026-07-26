@@ -12,6 +12,7 @@ import { AppointmentStatusHistory } from './appointment-status-history';
 import { Send, Calendar, RotateCw, Pencil, X, Check, Mail, MessageSquare } from 'lucide-react';
 import { updateConfirmationChannelAction } from '@/modules/appointments/actions/status/update-confirmation-channel.action';
 import { resendNotificationAction } from '@/modules/appointments/actions/status/resend-notification.action';
+import { computeNotificationStatus } from '@/modules/notifications/utils/notification-status.util';
 
 interface AppointmentDetailPaneProps {
   view: any;
@@ -55,6 +56,8 @@ function AppointmentDetails({ appointment, view, activeTab, compact }: { appoint
     smsReminder48hSent: Boolean((appointment as any).smsReminder48hSent || (appointment as any).sms_reminder_48h_sent),
     emailReminder24hSent: Boolean((appointment as any).emailReminder24hSent || (appointment as any).email_reminder_24h_sent),
     smsReminder24hSent: Boolean((appointment as any).smsReminder24hSent || (appointment as any).sms_reminder_24h_sent),
+    emailCheckoutSent: Boolean((appointment as any).emailCheckoutSent || (appointment as any).email_checkout_sent),
+    smsCheckoutSent: Boolean((appointment as any).smsCheckoutSent || (appointment as any).sms_checkout_sent),
   });
 
   useEffect(() => {
@@ -67,10 +70,12 @@ function AppointmentDetails({ appointment, view, activeTab, compact }: { appoint
       smsReminder48hSent: Boolean((appointment as any).smsReminder48hSent || (appointment as any).sms_reminder_48h_sent),
       emailReminder24hSent: Boolean((appointment as any).emailReminder24hSent || (appointment as any).email_reminder_24h_sent),
       smsReminder24hSent: Boolean((appointment as any).smsReminder24hSent || (appointment as any).sms_reminder_24h_sent),
+      emailCheckoutSent: Boolean((appointment as any).emailCheckoutSent || (appointment as any).email_checkout_sent),
+      smsCheckoutSent: Boolean((appointment as any).smsCheckoutSent || (appointment as any).sms_checkout_sent),
     });
   }, [appointment]);
 
-  const handleResend = async (eventType: 'APPOINTMENT_BOOKED' | 'APPOINTMENT_REMINDER_48H' | 'APPOINTMENT_REMINDER_24H', targetChannel: 'EMAIL' | 'SMS') => {
+  const handleResend = async (eventType: 'APPOINTMENT_BOOKED' | 'APPOINTMENT_REMINDER_48H' | 'APPOINTMENT_REMINDER_24H' | 'APPOINTMENT_CHECKOUT', targetChannel: 'EMAIL' | 'SMS') => {
     const key = `${eventType}_${targetChannel}`;
     setResending(key);
     const res = await resendNotificationAction({ appointmentId: appointment.id, eventType, targetChannel });
@@ -102,6 +107,15 @@ function AppointmentDetails({ appointment, view, activeTab, compact }: { appoint
           (appointment as any).smsConfirmationSent = true;
           (appointment as any).sms_confirmation_sent = true;
         }
+      } else if (eventType === 'APPOINTMENT_CHECKOUT') {
+        if (targetChannel === 'EMAIL') {
+          (appointment as any).emailCheckoutSent = true;
+          (appointment as any).email_checkout_sent = true;
+        }
+        if (targetChannel === 'SMS') {
+          (appointment as any).smsCheckoutSent = true;
+          (appointment as any).sms_checkout_sent = true;
+        }
       }
 
       setCommState((prev) => {
@@ -115,6 +129,9 @@ function AppointmentDetails({ appointment, view, activeTab, compact }: { appoint
         } else if (eventType === 'APPOINTMENT_BOOKED') {
           if (targetChannel === 'EMAIL') updates.emailConfirmationSent = true;
           if (targetChannel === 'SMS') updates.smsConfirmationSent = true;
+        } else if (eventType === 'APPOINTMENT_CHECKOUT') {
+          if (targetChannel === 'EMAIL') updates.emailCheckoutSent = true;
+          if (targetChannel === 'SMS') updates.smsCheckoutSent = true;
         }
         return { ...prev, ...updates };
       });
@@ -150,13 +167,14 @@ function AppointmentDetails({ appointment, view, activeTab, compact }: { appoint
   const commEntries: {
     key: string;
     label: string;
-    eventType: 'APPOINTMENT_BOOKED' | 'APPOINTMENT_REMINDER_48H' | 'APPOINTMENT_REMINDER_24H';
+    eventType: 'APPOINTMENT_BOOKED' | 'APPOINTMENT_REMINDER_48H' | 'APPOINTMENT_REMINDER_24H' | 'APPOINTMENT_CHECKOUT';
     emailSent: boolean;
     smsSent: boolean;
   }[] = [
     { key: 'confirmation', label: 'Booking Confirmation', eventType: 'APPOINTMENT_BOOKED', emailSent: commState.emailConfirmationSent, smsSent: commState.smsConfirmationSent },
     { key: 'reminder48h', label: '48-Hour Reminder', eventType: 'APPOINTMENT_REMINDER_48H', emailSent: commState.emailReminder48hSent, smsSent: commState.smsReminder48hSent },
     { key: 'reminder24h', label: '24-Hour Reminder', eventType: 'APPOINTMENT_REMINDER_24H', emailSent: commState.emailReminder24hSent, smsSent: commState.smsReminder24hSent },
+    { key: 'checkout', label: 'Checkout / Thank You', eventType: 'APPOINTMENT_CHECKOUT', emailSent: commState.emailCheckoutSent, smsSent: commState.smsCheckoutSent },
   ];
 
   return (
@@ -217,59 +235,70 @@ function AppointmentDetails({ appointment, view, activeTab, compact }: { appoint
             <span className={`${compact ? 'text-sm' : 'text-base'} font-medium text-foreground block`}>Notification History</span>
             <div className={`flex flex-col ${compact ? 'gap-2' : 'gap-3'}`}>
               {commEntries.map((entry) => {
-                const hasEmail = channel === 'EMAIL' || channel === 'BOTH';
-                const hasSms = channel === 'SMS' || channel === 'BOTH';
+                const createdAt = (appointment as any).createdAt || (appointment as any).created_at;
+                const startTime = (appointment as any).startTime || (appointment as any).start_time || (appointment as any).date;
+
+                const smsStatus = computeNotificationStatus({
+                  eventType: entry.eventType,
+                  targetChannel: 'SMS',
+                  isSent: entry.smsSent,
+                  currentChannel: channel,
+                  createdAt,
+                  startTime,
+                });
+
+                const emailStatus = computeNotificationStatus({
+                  eventType: entry.eventType,
+                  targetChannel: 'EMAIL',
+                  isSent: entry.emailSent,
+                  currentChannel: channel,
+                  createdAt,
+                  startTime,
+                });
 
                 return (
                   <div key={entry.key} className={compact ? 'space-y-1' : 'space-y-2'}>
                     <span className="text-xs text-muted-foreground">{entry.label}</span>
-                    <div className={!compact && hasEmail && hasSms ? 'grid grid-cols-2 gap-2' : 'flex flex-col gap-2'}>
-                      {hasSms && (
-                        <div className={`flex items-center justify-between ${compact ? 'p-2' : 'p-3'} bg-secondary-bg/20 border border-card-border/60 rounded-xl`}>
-                          <div className="flex items-center gap-2 min-w-0">
-                            <MessageSquare className={`${compact ? 'size-3' : 'size-3.5'} text-muted-foreground shrink-0`} />
-                            <span className="text-sm text-foreground">SMS</span>
-                            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
-                              entry.smsSent ? 'bg-green-500/10 text-green-500' : 'bg-muted text-muted-foreground/60'
-                            }`}>
-                              {entry.smsSent ? 'SENT' : 'PENDING'}
-                            </span>
-                          </div>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            disabled={resending === `${entry.eventType}_SMS`}
-                            onClick={() => handleResend(entry.eventType, 'SMS')}
-                            className={`${compact ? 'text-[9px] h-6 px-2 gap-0.5' : 'text-[10px] h-7 px-2.5 gap-1'} shrink-0`}
-                          >
-                            <RotateCw className={`size-3 ${resending === `${entry.eventType}_SMS` ? 'animate-spin' : ''}`} />
-                            {resending === `${entry.eventType}_SMS` ? 'Sending...' : 'Resend'}
-                          </Button>
+                    <div className={!compact ? 'grid grid-cols-2 gap-2' : 'flex flex-col gap-2'}>
+                      <div className={`flex items-center justify-between ${compact ? 'p-2' : 'p-3'} bg-secondary-bg/20 border border-card-border/60 rounded-xl`}>
+                        <div className="flex items-center gap-2 min-w-0">
+                          <MessageSquare className={`${compact ? 'size-3' : 'size-3.5'} text-muted-foreground shrink-0`} />
+                          <span className="text-sm text-foreground">SMS</span>
+                          <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${smsStatus.badgeClass}`}>
+                            {smsStatus.label}
+                          </span>
                         </div>
-                      )}
-                      {hasEmail && (
-                        <div className={`flex items-center justify-between ${compact ? 'p-2' : 'p-3'} bg-secondary-bg/20 border border-card-border/60 rounded-xl`}>
-                          <div className="flex items-center gap-2 min-w-0">
-                            <Mail className={`${compact ? 'size-3' : 'size-3.5'} text-muted-foreground shrink-0`} />
-                            <span className="text-sm text-foreground">Email</span>
-                            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
-                              entry.emailSent ? 'bg-green-500/10 text-green-500' : 'bg-muted text-muted-foreground/60'
-                            }`}>
-                              {entry.emailSent ? 'SENT' : 'PENDING'}
-                            </span>
-                          </div>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            disabled={resending === `${entry.eventType}_EMAIL`}
-                            onClick={() => handleResend(entry.eventType, 'EMAIL')}
-                            className={`${compact ? 'text-[9px] h-6 px-2 gap-0.5' : 'text-[10px] h-7 px-2.5 gap-1'} shrink-0`}
-                          >
-                            <RotateCw className={`size-3 ${resending === `${entry.eventType}_EMAIL` ? 'animate-spin' : ''}`} />
-                            {resending === `${entry.eventType}_EMAIL` ? 'Sending...' : 'Resend'}
-                          </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={resending === `${entry.eventType}_SMS`}
+                          onClick={() => handleResend(entry.eventType, 'SMS')}
+                          className={`${compact ? 'text-[9px] h-6 px-2 gap-0.5' : 'text-[10px] h-7 px-2.5 gap-1'} shrink-0`}
+                        >
+                          <RotateCw className={`size-3 ${resending === `${entry.eventType}_SMS` ? 'animate-spin' : ''}`} />
+                          {resending === `${entry.eventType}_SMS` ? 'Sending...' : 'Resend'}
+                        </Button>
+                      </div>
+
+                      <div className={`flex items-center justify-between ${compact ? 'p-2' : 'p-3'} bg-secondary-bg/20 border border-card-border/60 rounded-xl`}>
+                        <div className="flex items-center gap-2 min-w-0">
+                          <Mail className={`${compact ? 'size-3' : 'size-3.5'} text-muted-foreground shrink-0`} />
+                          <span className="text-sm text-foreground">Email</span>
+                          <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${emailStatus.badgeClass}`}>
+                            {emailStatus.label}
+                          </span>
                         </div>
-                      )}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={resending === `${entry.eventType}_EMAIL`}
+                          onClick={() => handleResend(entry.eventType, 'EMAIL')}
+                          className={`${compact ? 'text-[9px] h-6 px-2 gap-0.5' : 'text-[10px] h-7 px-2.5 gap-1'} shrink-0`}
+                        >
+                          <RotateCw className={`size-3 ${resending === `${entry.eventType}_EMAIL` ? 'animate-spin' : ''}`} />
+                          {resending === `${entry.eventType}_EMAIL` ? 'Sending...' : 'Resend'}
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 );

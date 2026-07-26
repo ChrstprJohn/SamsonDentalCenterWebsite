@@ -1,7 +1,10 @@
 'use client';
 
-import { CheckCircle2, MessageSquare, Sparkles, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { CheckCircle2, MessageSquare, Sparkles, X, Pencil, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Select } from '@/components/ui/select';
+import { updateConfirmationChannelAction } from '@/modules/appointments/actions/status/update-confirmation-channel.action';
 
 function getPatientDisplayName(app: any): string {
   if (!app) return 'Patient';
@@ -13,8 +16,36 @@ function getPatientDisplayName(app: any): string {
 
 export function CheckInCheckoutModal({ view }: { view: any }) {
   const appointment = view.checkoutAppt;
+  const ch = (appointment?.confirmationChannel || appointment?.confirmation_channel) as 'EMAIL' | 'SMS' | 'BOTH' | 'NONE' || 'EMAIL';
+
+  const [channel, setChannel] = useState(ch);
+  const [draftChannel, setDraftChannel] = useState(ch);
+  const [isEditingChannel, setIsEditingChannel] = useState(false);
+  const [isSavingChannel, setIsSavingChannel] = useState(false);
+
+  useEffect(() => {
+    setChannel(ch);
+    setDraftChannel(ch);
+    setIsEditingChannel(false);
+  }, [appointment?.id]);
 
   if (!appointment) return null;
+
+  const handleSaveChannel = async () => {
+    setIsSavingChannel(true);
+    const res = await updateConfirmationChannelAction({
+      appointmentId: appointment.id,
+      confirmationChannel: draftChannel,
+    });
+    if (res.success) {
+      setChannel(draftChannel);
+      appointment.confirmationChannel = draftChannel;
+      appointment.confirmation_channel = draftChannel;
+      setIsEditingChannel(false);
+      if (view?.fetchData) view.fetchData();
+    }
+    setIsSavingChannel(false);
+  };
 
   const handleConfirmCheckout = () => {
     view.handleCheckoutComplete(appointment.id);
@@ -43,6 +74,45 @@ export function CheckInCheckoutModal({ view }: { view: any }) {
           </p>
         </div>
 
+        {/* Notification Channel Block */}
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-medium text-text-primary">Notification Channel</span>
+            {!isEditingChannel ? (
+              <Button variant="outline" size="sm" onClick={() => setIsEditingChannel(true)} className="h-7 px-2.5 text-xs gap-1">
+                <Pencil className="size-3.5" /> Edit
+              </Button>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" onClick={() => { setDraftChannel(channel); setIsEditingChannel(false); }} className="h-7 px-2.5 text-xs gap-1">
+                  Cancel
+                </Button>
+                <Button size="sm" onClick={handleSaveChannel} disabled={isSavingChannel || draftChannel === channel} className="h-7 px-2.5 text-xs gap-1 bg-slate-900 text-white rounded-md disabled:cursor-not-allowed">
+                  <Check className="size-3.5" /> {isSavingChannel ? 'Saving...' : 'Save'}
+                </Button>
+              </div>
+            )}
+          </div>
+
+          {isEditingChannel ? (
+            <Select
+              value={draftChannel}
+              onChange={(e) => setDraftChannel(e.target.value as any)}
+              className="text-sm w-full"
+              options={[
+                { value: 'EMAIL', label: 'Email' },
+                { value: 'SMS', label: 'SMS' },
+                { value: 'BOTH', label: 'Email & SMS' },
+                { value: 'NONE', label: 'None' },
+              ]}
+            />
+          ) : (
+            <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-text-muted border-card-border cursor-default">
+              {channel === 'EMAIL' ? 'Email' : channel === 'SMS' ? 'SMS' : channel === 'BOTH' ? 'Email & SMS' : 'None'}
+            </div>
+          )}
+        </div>
+
         <div className="p-4 bg-amber-500/5 border border-amber-500/20 rounded-2xl flex flex-col gap-2">
           <div className="flex items-center gap-2 text-amber-500 text-xs font-bold">
             <MessageSquare className="h-4 w-4" />
@@ -65,8 +135,8 @@ export function CheckInCheckoutModal({ view }: { view: any }) {
           <Button
             type="button"
             onClick={handleConfirmCheckout}
-            disabled={view.isPending}
-            className="text-xs h-9 px-5 font-bold rounded-xl border-none bg-amber-500 hover:bg-amber-600 text-white flex items-center gap-1.5"
+            disabled={view.isPending || isEditingChannel}
+            className="text-xs h-9 px-5 font-bold rounded-xl border-none bg-amber-500 hover:bg-amber-600 text-white flex items-center gap-1.5 disabled:opacity-40"
           >
             <CheckCircle2 className="h-4 w-4" />
             <span>Confirm Checkout & Send Msg</span>
