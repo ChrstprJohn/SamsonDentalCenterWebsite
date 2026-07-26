@@ -45,7 +45,7 @@ const COLUMNS = [
 export function CheckInBoard({ view, columns }: { view: any; columns?: any }) {
   const cols = columns || view.columns;
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 items-stretch h-full min-h-0">
+    <div className="flex flex-row items-stretch h-full min-h-0 overflow-x-auto min-w-full [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent" style={{ scrollbarWidth: 'thin' }}>
       {COLUMNS.map((col) => (
         <VisitColumn key={col.key} col={col} appointments={cols[col.key]} view={view} />
       ))}
@@ -55,10 +55,10 @@ export function CheckInBoard({ view, columns }: { view: any; columns?: any }) {
 
 function VisitColumn({ col, appointments, view }: { col: typeof COLUMNS[0]; appointments: AppointmentDto[]; view: any }) {
   return (
-    <div className="flex flex-col h-full min-h-0 border-r border-border last:border-r-0">
-      <div className="flex items-center justify-between px-4 py-2.5 border-b border-border bg-muted/20 shrink-0">
-        <span className="text-sm font-medium text-foreground">{col.title}</span>
-        <span className="text-[10px] font-medium px-1.5 py-0.5 bg-muted/50 text-muted-foreground">{appointments.length}</span>
+    <div className="flex flex-col flex-1 min-w-[140px] sm:min-w-[150px] md:min-w-[150px] lg:min-w-0 h-full min-h-0 border-r border-border last:border-r-0">
+      <div className="flex items-center justify-between px-2.5 xl:px-4 py-2 xl:py-2.5 border-b border-border bg-muted/20 shrink-0">
+        <span className="text-xs xl:text-sm font-medium text-foreground truncate">{col.title}</span>
+        <span className="text-[10px] font-medium px-1.5 py-0.5 bg-muted/50 text-muted-foreground shrink-0">{appointments.length}</span>
       </div>
       <div className="flex flex-col flex-1 min-h-0 overflow-y-auto [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent" style={{ scrollbarWidth: 'thin' }}>
           {appointments.map((appointment) => (
@@ -100,27 +100,27 @@ function VisitCard({ appointment, columnKey, view }: { appointment: AppointmentD
       onClick={() => view.handleViewApptDetails(appointment)}
     >
       <div className={`w-1 shrink-0 ${isSelected ? 'bg-slate-900' : doctorColor.accent}`} />
-      <div className="flex-1 min-w-0 flex flex-col p-3">
-        <div className="flex flex-col gap-1.5">
-          <div className="flex w-full items-center gap-2">
-            <span className="font-medium text-sm leading-tight">
+      <div className="flex-1 min-w-0 flex flex-col p-2 xl:p-3 transition-all">
+        <div className="flex flex-col gap-1 xl:gap-1.5">
+          <div className="flex w-full items-center gap-1.5 min-w-0">
+            <span className="font-medium text-xs xl:text-sm leading-tight truncate">
               {appointment.patient?.firstName} {appointment.patient?.lastName}
             </span>
-            <span className={`ml-auto text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 shrink-0 ${statusBadge} ${anySelected ? 'hidden' : ''}`}>
+            <span className={`ml-auto text-[8px] sm:text-[8.5px] xl:text-[10px] font-semibold uppercase tracking-tight xl:tracking-wider px-1 py-0.5 rounded-xs shrink-0 ${statusBadge} ${anySelected ? 'hidden xl:inline-block' : ''}`}>
               {appointment.status === 'CHECKED_IN' ? 'CHECKED IN' : appointment.status}
             </span>
           </div>
-          <span className="font-medium text-xs leading-tight">
+          <span className="font-medium text-[11px] xl:text-xs leading-tight truncate">
             {appointment.service?.name || 'Treatment'}
           </span>
-          <span className={`text-xs ${doctorColor.subtext} truncate`}>
+          <span className={`text-[10px] xl:text-xs ${doctorColor.subtext} truncate`}>
             {dateDisplay} &bull; {timeDisplay}
           </span>
-          <div className="flex w-full items-center gap-2">
-            <span className={`text-[11px] truncate ${doctorColor.subtext}`}>
+          <div className="flex w-full items-center gap-1">
+            <span className={`text-[10px] xl:text-[11px] truncate ${doctorColor.subtext}`}>
               Dr. {appointment.doctor?.lastName || ''}
             </span>
-            <ChevronRight className={`ml-auto size-5 ${doctorColor.subtext}`} />
+            <ChevronRight className={`ml-auto size-4 xl:size-5 shrink-0 ${doctorColor.subtext}`} />
           </div>
         </div>
       </div>

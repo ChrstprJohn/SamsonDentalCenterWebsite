@@ -53,6 +53,11 @@ export function SecretaryCheckInOutTrackerView() {
 
   if (view.isLoading) return <CheckInLoading />;
 
+  const handleCardClick = (appointment: any) => {
+    view.handleViewApptDetails(appointment);
+    openDetail();
+  };
+
   return (
     <div className="flex h-full w-full overflow-hidden">
       <div className="flex flex-col flex-1 min-h-0 w-full overflow-hidden">
@@ -74,8 +79,8 @@ export function SecretaryCheckInOutTrackerView() {
         </div>
 
         <div className={`flex-1 min-h-0 w-full overflow-hidden ${hasSelection ? 'lg:pr-0' : ''}`}>
-          <div className={`h-full overflow-y-auto ${colMobile('board')} lg:block`}>
-            <CheckInBoard view={view} columns={filteredColumns} />
+          <div className={`h-full w-full overflow-x-auto ${hasSelection ? 'hidden lg:block' : 'block'}`}>
+            <CheckInBoard view={{ ...view, handleViewApptDetails: handleCardClick }} columns={filteredColumns} />
           </div>
         </div>
       </div>
@@ -88,7 +93,7 @@ export function SecretaryCheckInOutTrackerView() {
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: 320, opacity: 0 }}
             transition={{ type: 'tween', duration: 0.2, ease: 'easeOut' }}
-            className={`w-full lg:w-[350px] flex-col bg-sidebar border-l border-border min-h-0 overflow-hidden ${colMobile('detail')} lg:flex`}
+            className="w-full lg:w-[350px] flex-col bg-sidebar border-l border-border min-h-0 overflow-hidden flex"
           >
             <CheckInDetailPane view={view} onClose={closeDetail} />
           </motion.div>

@@ -5,7 +5,7 @@ import { useSecretaryAppointments } from '../../hooks/secretary/use-secretary-ap
 import { AppointmentDetailPane } from './sub-components/appointment-detail-pane';
 import { AppointmentsTable } from './sub-components/appointments-table';
 import { ArrowLeft, CalendarClock, CalendarDays, History } from 'lucide-react';
-import { SidebarHeader, SidebarInput } from '@/components/ui/sidebar';
+import { SidebarHeader, SidebarInput, SidebarTrigger } from '@/components/ui/sidebar';
 
 export function SecretaryAppointmentsView() {
   const view = useSecretaryAppointments();
@@ -41,8 +41,11 @@ export function SecretaryAppointmentsView() {
       <div className={`lg:w-[350px] flex-1 lg:flex-none flex-col border-r border-card-border/40 bg-sidebar min-h-0 overflow-hidden ${colMobile('list')} lg:flex`}>
         <SidebarHeader className="gap-3.5 border-b border-card-border/40 p-4 shrink-0">
           <div className="flex w-full items-center justify-between">
-            <div className="text-base font-medium text-foreground">
-              Appointments Directory
+            <div className="flex items-center gap-2 text-base font-medium text-foreground">
+              <div className="hidden md:block lg:hidden">
+                <SidebarTrigger />
+              </div>
+              <span>Appointments Directory</span>
             </div>
           </div>
           <div className="px-1">

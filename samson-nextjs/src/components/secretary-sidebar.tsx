@@ -131,16 +131,9 @@ interface SecretarySidebarProps extends React.ComponentProps<typeof Sidebar> {
 
 export function SecretarySidebar({ userProfile, ...props }: SecretarySidebarProps) {
   const router = useRouter()
-  const pathname = usePathname()
   const { setOpen } = useSidebar()
   const [isPending, startTransition] = React.useTransition()
-  React.useEffect(() => {
-    if (window.innerWidth < 1024) {
-      setOpen(false)
-    } else {
-      setOpen(true)
-    }
-  }, [setOpen])
+
   const handleNavigate = React.useCallback((url: string, e?: React.MouseEvent) => {
     if (!url || url === "#") return
     if (e) {
