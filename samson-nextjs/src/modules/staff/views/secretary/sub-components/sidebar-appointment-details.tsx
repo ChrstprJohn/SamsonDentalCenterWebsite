@@ -309,8 +309,10 @@ export function SidebarAppointmentDetails({
           <div className="flex flex-col gap-3">
             <GuestField label="First Name" value={getPatientFirstName()} editValue={guestInfoDraft.firstName} onChange={(v) => setGuestInfoDraft(p => ({ ...p, firstName: v }))} />
             <GuestField label="Last Name" value={getPatientLastName()} editValue={guestInfoDraft.lastName} onChange={(v) => setGuestInfoDraft(p => ({ ...p, lastName: v }))} />
-            <GuestField label="Middle Name" value={getPatientMiddleName()} editValue={guestInfoDraft.middleName} onChange={(v) => setGuestInfoDraft(p => ({ ...p, middleName: v }))} />
-            <GuestField label="Suffix" value={getPatientSuffix()} editValue={guestInfoDraft.suffix} onChange={(v) => setGuestInfoDraft(p => ({ ...p, suffix: v }))} />
+            <div className="grid grid-cols-2 gap-2">
+              <GuestField label="Middle Name" value={getPatientMiddleName()} editValue={guestInfoDraft.middleName} onChange={(v) => setGuestInfoDraft(p => ({ ...p, middleName: v }))} />
+              <GuestField label="Suffix" value={getPatientSuffix()} editValue={guestInfoDraft.suffix} onChange={(v) => setGuestInfoDraft(p => ({ ...p, suffix: v }))} />
+            </div>
           </div>
         </div>
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { Eye } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { formatClinicTime, formatShortDate } from '@/shared/utils/date.util';
 import type { AppointmentDto } from '@/modules/appointments/dtos/exports';
 
@@ -16,18 +16,23 @@ const BADGE_STYLES: Record<string, string> = {
 };
 
 const DOCTOR_COLORS = [
-  { bg: 'bg-blue-50/70 border-blue-200/70 hover:bg-blue-100/60', accent: 'bg-blue-500', selected: 'ring-2 ring-blue-500/30' },
-  { bg: 'bg-emerald-50/70 border-emerald-200/70 hover:bg-emerald-100/60', accent: 'bg-emerald-500', selected: 'ring-2 ring-emerald-500/30' },
-  { bg: 'bg-violet-50/70 border-violet-200/70 hover:bg-violet-100/60', accent: 'bg-violet-500', selected: 'ring-2 ring-violet-500/30' },
-  { bg: 'bg-amber-50/70 border-amber-200/70 hover:bg-amber-100/60', accent: 'bg-amber-500', selected: 'ring-2 ring-amber-500/30' },
-  { bg: 'bg-rose-50/70 border-rose-200/70 hover:bg-rose-100/60', accent: 'bg-rose-500', selected: 'ring-2 ring-rose-500/30' },
+  { bg: 'bg-blue-50/80 border-blue-200/80 hover:bg-blue-100/80', accent: 'bg-blue-500', selected: 'ring-2 ring-blue-500/30', text: 'text-blue-950', subtext: 'text-blue-700/90' },
+  { bg: 'bg-emerald-50/80 border-emerald-200/80 hover:bg-emerald-100/80', accent: 'bg-emerald-500', selected: 'ring-2 ring-emerald-500/30', text: 'text-emerald-950', subtext: 'text-emerald-700/90' },
+  { bg: 'bg-violet-50/80 border-violet-200/80 hover:bg-violet-100/80', accent: 'bg-violet-500', selected: 'ring-2 ring-violet-500/30', text: 'text-violet-950', subtext: 'text-violet-700/90' },
+  { bg: 'bg-amber-50/80 border-amber-200/80 hover:bg-amber-100/80', accent: 'bg-amber-500', selected: 'ring-2 ring-amber-500/30', text: 'text-amber-950', subtext: 'text-amber-700/90' },
+  { bg: 'bg-rose-50/80 border-rose-200/80 hover:bg-rose-100/80', accent: 'bg-rose-500', selected: 'ring-2 ring-rose-500/30', text: 'text-rose-950', subtext: 'text-rose-700/90' },
 ];
+
+let doctorColorIdx = 0;
+const doctorColorMap = new Map<string, number>();
 
 function getDoctorColor(doctorId: string | undefined | null) {
   if (!doctorId) return DOCTOR_COLORS[0];
-  let hash = 0;
-  for (let i = 0; i < doctorId.length; i++) hash = (hash * 31 + doctorId.charCodeAt(i)) | 0;
-  return DOCTOR_COLORS[Math.abs(hash) % DOCTOR_COLORS.length];
+  if (doctorColorMap.has(doctorId)) return DOCTOR_COLORS[doctorColorMap.get(doctorId)!];
+  const idx = doctorColorIdx % DOCTOR_COLORS.length;
+  doctorColorIdx++;
+  doctorColorMap.set(doctorId, idx);
+  return DOCTOR_COLORS[idx];
 }
 
 const COLUMNS = [
@@ -37,11 +42,12 @@ const COLUMNS = [
   { key: 'completed', title: 'Completed', empty: 'No completed visits today.' },
 ];
 
-export function CheckInBoard({ view }: { view: any }) {
+export function CheckInBoard({ view, columns }: { view: any; columns?: any }) {
+  const cols = columns || view.columns;
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 items-stretch h-full min-h-0">
       {COLUMNS.map((col) => (
-        <VisitColumn key={col.key} col={col} appointments={view.columns[col.key]} view={view} />
+        <VisitColumn key={col.key} col={col} appointments={cols[col.key]} view={view} />
       ))}
     </div>
   );
@@ -54,7 +60,7 @@ function VisitColumn({ col, appointments, view }: { col: typeof COLUMNS[0]; appo
         <span className="text-sm font-medium text-foreground">{col.title}</span>
         <span className="text-[10px] font-medium px-1.5 py-0.5 bg-muted/50 text-muted-foreground">{appointments.length}</span>
       </div>
-      <div className="flex flex-col overflow-y-auto flex-1 min-h-0">
+      <div className="flex flex-col flex-1 min-h-0 overflow-y-auto [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent" style={{ scrollbarWidth: 'thin' }}>
           {appointments.map((appointment) => (
             <VisitCard key={appointment.id} appointment={appointment} columnKey={col.key} view={view} />
           ))}
@@ -67,7 +73,6 @@ function VisitColumn({ col, appointments, view }: { col: typeof COLUMNS[0]; appo
 }
 
 function VisitCard({ appointment, columnKey, view }: { appointment: AppointmentDto; columnKey: string; view: any }) {
-  const checkInGate = view.getCheckInStatus(appointment);
   const doctorColor = useMemo(() => getDoctorColor(appointment.doctorId), [appointment.doctorId]);
   const isSelected =
     view.checkInAppt?.id === appointment.id ||
@@ -79,96 +84,38 @@ function VisitCard({ appointment, columnKey, view }: { appointment: AppointmentD
   const timeDisplay = `${formatClinicTime(appointment.startTime)} - ${formatClinicTime(appointment.endTime)}`;
   const dateDisplay = formatShortDate(appointment.date);
   const statusBadge = BADGE_STYLES[appointment.status] || 'text-muted-foreground bg-muted/20';
+  const anySelected = !!(view.checkInAppt || view.checkoutAppt || view.viewAppt || view.resolveAppt || view.rescheduleAppt);
 
   return (
     <div
       className={`flex flex-row items-stretch text-left transition-all cursor-pointer select-none overflow-hidden border-b border-border ${
         isSelected ? `${doctorColor.bg} ${doctorColor.selected}` : doctorColor.bg
-      }`}
+      } ${doctorColor.text}`}
       onClick={() => view.handleViewApptDetails(appointment)}
     >
       <div className={`w-1 shrink-0 ${isSelected ? 'bg-slate-900' : doctorColor.accent}`} />
       <div className="flex-1 min-w-0 flex flex-col p-3">
         <div className="flex flex-col gap-1.5">
           <div className="flex w-full items-center gap-2">
-            <span className="font-medium text-foreground text-sm leading-tight">
+            <span className="font-medium text-sm leading-tight">
               {appointment.patient?.firstName} {appointment.patient?.lastName}
             </span>
-            <span className={`ml-auto text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 shrink-0 ${statusBadge}`}>
+            <span className={`ml-auto text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 shrink-0 ${statusBadge} ${anySelected ? 'hidden' : ''}`}>
               {appointment.status === 'CHECKED_IN' ? 'CHECKED IN' : appointment.status}
             </span>
           </div>
-          <span className="font-medium text-xs text-foreground leading-tight">
+          <span className="font-medium text-xs leading-tight">
             {appointment.service?.name || 'Treatment'}
           </span>
-          <div className="flex w-full items-center justify-between gap-2">
-            <span className="text-xs text-muted-foreground truncate">
-              {dateDisplay} &bull; {timeDisplay}
-            </span>
-            <span className="text-[11px] text-muted-foreground shrink-0">
+          <span className={`text-xs ${doctorColor.subtext} truncate`}>
+            {dateDisplay} &bull; {timeDisplay}
+          </span>
+          <div className="flex w-full items-center gap-2">
+            <span className={`text-[11px] truncate ${doctorColor.subtext}`}>
               Dr. {appointment.doctor?.lastName || ''}
             </span>
+            <ChevronRight className={`ml-auto size-5 ${doctorColor.subtext}`} />
           </div>
-        </div>
-
-        <div className="border-b border-border my-2.5" />
-
-        <div className="flex items-stretch gap-2">
-          <div className="flex-1 flex flex-col gap-1">
-            {columnKey === 'approved' && (
-              <button
-                onClick={(e) => { e.stopPropagation(); view.setCheckInAppt(appointment); }}
-                disabled={!checkInGate.enabled || view.isPending}
-                className="w-full h-9 text-xs font-semibold disabled:opacity-40 disabled:cursor-not-allowed transition-colors bg-primary text-primary-foreground hover:bg-primary/90"
-              >
-                {checkInGate.enabled ? 'Check In' : checkInGate.message}
-              </button>
-            )}
-
-            {columnKey === 'noShow' && (
-              <button
-                onClick={(e) => { e.stopPropagation(); view.setResolveAppt(appointment); }}
-                className="w-full h-9 text-xs font-semibold transition-colors bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              >
-                Resolve No-Show
-              </button>
-            )}
-
-            {columnKey === 'checkedIn' && (
-              <>
-                <button
-                  onClick={(e) => { e.stopPropagation(); view.setCheckoutAppt(appointment); }}
-                  className="w-full h-9 text-xs font-semibold transition-colors bg-primary text-primary-foreground hover:bg-primary/90"
-                >
-                  Checkout & Send
-                </button>
-                <button
-                  onClick={(e) => { e.stopPropagation(); view.handleUndoCheckIn(appointment.id); }}
-                  disabled={view.isPending}
-                  className="w-full h-7 text-[10px] font-medium border border-input bg-background text-muted-foreground hover:text-foreground hover:bg-accent transition-colors disabled:opacity-40"
-                >
-                  Undo Check-In
-                </button>
-              </>
-            )}
-
-            {columnKey === 'completed' && (
-              <button
-                onClick={(e) => { e.stopPropagation(); view.handleViewApptDetails(appointment); }}
-                className="w-full h-9 text-xs font-semibold border border-input bg-background text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-              >
-                View Details
-              </button>
-            )}
-          </div>
-
-          <button
-            onClick={(e) => { e.stopPropagation(); view.handleViewApptDetails(appointment); }}
-            className="shrink-0 w-9 h-9 flex items-center justify-center text-muted-foreground hover:text-foreground border border-border/40 hover:border-border transition-colors"
-            title="View details"
-          >
-            <Eye className="size-4" />
-          </button>
         </div>
       </div>
     </div>

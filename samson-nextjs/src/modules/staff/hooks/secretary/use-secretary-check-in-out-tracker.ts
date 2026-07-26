@@ -26,7 +26,7 @@ export function useSecretaryCheckInOutTracker() {
   const [rescheduleEndTime, setRescheduleEndTime] = useState('');
   const [rescheduleDoctor, setRescheduleDoctor] = useState('');
   const [rescheduleService, setRescheduleService] = useState('');
-  const [rescheduleJustification, setRescheduleJustification] = useState('Patient requested reschedule');
+  const [rescheduleJustification, setRescheduleJustification] = useState('');
   const [servicesList, setServicesList] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);

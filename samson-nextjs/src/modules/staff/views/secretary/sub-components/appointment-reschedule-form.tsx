@@ -87,15 +87,16 @@ export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps)
     }
   };
 
-  const isInitialCommon = COMMON_REASONS.filter(r => r !== 'CUSTOM').includes(props.justification);
+  const isInitialCommon = props.justification ? COMMON_REASONS.filter(r => r !== 'CUSTOM').includes(props.justification) : false;
   const [reasonMode, setReasonMode] = useState<string>(
-    props.justification ? (isInitialCommon ? props.justification : 'CUSTOM') : COMMON_REASONS[0]
+    props.justification ? (isInitialCommon ? props.justification : 'CUSTOM') : ''
   );
   const [customReasonText, setCustomReasonText] = useState<string>(
     isInitialCommon ? '' : props.justification
   );
 
   useEffect(() => {
+    if (!reasonMode) return;
     if (reasonMode !== 'CUSTOM') {
       props.onJustificationChange(reasonMode);
     } else {
@@ -251,6 +252,7 @@ export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps)
           onChange={(e) => handleReasonSelect(e.target.value)}
           className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
         >
+          <option value="" disabled>Select reason...</option>
           {COMMON_REASONS.map((reason) => (
             <option key={reason} value={reason}>
               {reason === 'CUSTOM' ? 'Other / Custom Reason...' : reason}

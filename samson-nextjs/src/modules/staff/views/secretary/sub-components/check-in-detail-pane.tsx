@@ -1,38 +1,81 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { X, ArrowLeft } from 'lucide-react';
-import { formatClinicTime } from '@/shared/utils/date.util';
+import { useState, useEffect, useRef } from 'react';
+import { X, ArrowLeft, UserRound } from 'lucide-react';
+import { formatClinicTime, formatShortDate } from '@/shared/utils/date.util';
 import { AppointmentRescheduleForm } from './appointment-reschedule-form';
+import { AppointmentStatusHistory } from './appointment-status-history';
+
+const STATUS_BADGE: Record<string, string> = {
+  APPROVED: 'text-blue-600 bg-blue-500/10',
+  CHECKED_IN: 'text-cyan-600 bg-cyan-500/10',
+  COMPLETED: 'text-emerald-600 bg-emerald-500/10',
+  CANCELLED: 'text-rose-600 bg-rose-500/10',
+  REJECTED: 'text-rose-600 bg-rose-500/10',
+  NO_SHOW: 'text-amber-600 bg-amber-500/10',
+  DISPLACED: 'text-amber-600 bg-amber-500/10',
+};
 
 export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () => void }) {
+  const [showCheckInForm, setShowCheckInForm] = useState(false);
+  const [showResolveForm, setShowResolveForm] = useState(false);
+  const [showRescheduleForm, setShowRescheduleForm] = useState(false);
+  const [showUndoForm, setShowUndoForm] = useState(false);
+  const [showCheckoutForm, setShowCheckoutForm] = useState(false);
+  const [showMessageLog, setShowMessageLog] = useState(false);
+  const [resolveMode, setResolveMode] = useState<'COMPLETED' | 'CONFIRMED_NO_SHOW'>('COMPLETED');
+  const [resolveReason, setResolveReason] = useState('');
+  const [showCustomReason, setShowCustomReason] = useState(false);
+
+  const resolveReasonOptions: Record<string, string[]> = {
+    COMPLETED: ['Secretary forgot to click check-in', 'Patient was seen but not checked in', 'Administrative oversight'],
+    CONFIRMED_NO_SHOW: ['Patient failed to arrive for appointment', 'Patient arrived after closing', 'Patient refused treatment'],
+  };
+  const [selectedPreset, setSelectedPreset] = useState('');
   const appointment = view.checkInAppt || view.checkoutAppt || view.viewAppt || view.resolveAppt || view.rescheduleAppt;
+
+  const prevApptId = useRef(appointment?.id);
+  useEffect(() => {
+    if (appointment?.id !== prevApptId.current) {
+      prevApptId.current = appointment?.id;
+      setShowCheckInForm(false);
+      setShowResolveForm(false);
+      setShowRescheduleForm(false);
+      setShowUndoForm(false);
+      setShowCheckoutForm(false);
+      setShowMessageLog(false);
+      setResolveMode('COMPLETED');
+      setResolveReason('');
+      setShowCustomReason(false);
+      setSelectedPreset('');
+    }
+  }, [appointment?.id]);
 
   if (!appointment) {
     return (
       <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground gap-2 px-6">
         <div className="text-xs font-medium">No appointment selected</div>
-        <p className="text-[10px] text-center">Click an action button on a card to manage the visit.</p>
+        <p className="text-[10px] text-center">Click a card to view details and manage the visit.</p>
       </div>
     );
   }
 
   const paneType = view.checkInAppt ? 'checkin' : view.checkoutAppt ? 'checkout' : view.viewAppt ? 'details' : view.resolveAppt ? 'resolve' : view.rescheduleAppt ? 'reschedule' : null;
 
-  const paneTitle = paneType === 'details' ? 'Visit Details' : paneType === 'checkin' ? 'Check In' : paneType === 'checkout' ? 'Checkout' : paneType === 'resolve' ? 'No-Show Resolution' : paneType === 'reschedule' ? 'Reschedule' : '';
+  const paneTitle = paneType === 'details' ? 'Appointment Details' : paneType === 'checkin' ? 'Check In' : paneType === 'checkout' ? 'Checkout' : paneType === 'resolve' ? 'No-Show Resolution' : paneType === 'reschedule' ? 'Reschedule' : '';
 
   return (
     <div className="w-full h-full flex flex-col min-h-0">
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-border shrink-0">
+      <div className="flex items-center gap-2 p-4 border-b border-border shrink-0">
         <button onClick={onClose} className="lg:hidden p-1 -ml-1 text-muted-foreground hover:text-foreground">
           <ArrowLeft className="size-4" />
         </button>
-        <div className="flex-1 min-w-0">
-          <span className="text-base font-medium text-foreground block truncate">
+        <div className="flex-1 min-w-0 flex flex-col gap-0.5">
+          <span className="text-base font-medium text-foreground truncate">
             {paneTitle}
           </span>
-          <span className="text-[11px] text-muted-foreground block truncate">
-            {appointment.patient?.firstName} {appointment.patient?.lastName} &mdash; {appointment.service?.name}
+          <span className="text-xs text-muted-foreground truncate">
+            {paneType === 'details' ? `Ref #${appointment.id?.slice(0, 8) || ''}` : `${appointment.patient?.firstName} ${appointment.patient?.lastName} &mdash; ${appointment.service?.name}`}
           </span>
         </div>
         <button onClick={onClose} className="p-1 text-muted-foreground hover:text-foreground shrink-0 max-lg:hidden">
@@ -40,22 +83,241 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
-        {paneType === 'details' && <DetailsContent appointment={appointment} />}
-        {paneType === 'checkin' && <CheckInContent appointment={appointment} view={view} onClose={onClose} />}
-        {paneType === 'checkout' && <CheckoutContent appointment={appointment} view={view} onClose={onClose} />}
-        {paneType === 'resolve' && <ResolveContent view={view} onClose={onClose} />}
-        {paneType === 'reschedule' && <StandaloneReschedule view={view} onClose={onClose} />}
-      </div>
-    </div>
-  );
-}
+      <div className="flex-1 min-h-0 overflow-y-auto [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent" style={{ scrollbarWidth: 'thin' }} data-lenis-prevent>
+        {paneType === 'details' && (
+          <div className="flex flex-col items-center pt-4 pb-3 px-4">
+            <div className="size-12 shrink-0 rounded-full bg-muted-foreground/10 flex items-center justify-center border-2 border-border/60 overflow-hidden mb-3">
+              <UserRound className="size-10 text-muted-foreground/70 translate-y-0.5" />
+            </div>
+            <h2 className="text-base font-semibold text-foreground text-center">
+              {appointment.patient?.firstName} {appointment.patient?.lastName}
+            </h2>
+            <p className="text-sm text-muted-foreground mt-0.5">Patient</p>
+          </div>
+        )}
+        {paneType === 'details' && <hr className="border-card-border/40 mx-4" />}
+        {paneType === 'details' && (
+          <div className="flex items-center justify-between py-3 px-4">
+            <span className="text-sm font-medium text-foreground">Current Status</span>
+            <span className={`text-xs font-medium px-3 py-1 rounded-full ${STATUS_BADGE[appointment.status] || 'bg-muted/50 text-muted-foreground'}`}>
+              {appointment.status === 'CHECKED_IN' ? 'CHECKED IN' : appointment.status}
+            </span>
+          </div>
+        )}
+        {paneType === 'details' && <hr className="border-card-border/40 mx-4" />}
+        <div className="px-4 py-4 space-y-4">
+          {paneType === 'details' && <DetailsContent appointment={appointment} />}
 
-function Row({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex justify-between items-center text-xs">
-      <span className="text-muted-foreground">{label}</span>
-      <span className="font-medium text-foreground">{value}</span>
+          {paneType === 'checkout' && <CheckoutContent appointment={appointment} />}
+          {paneType === 'resolve' && <ResolveContent view={view} onClose={onClose} />}
+          {paneType === 'reschedule' && <StandaloneReschedule view={view} onClose={onClose} />}
+        </div>
+      </div>
+
+      {paneType !== 'resolve' && paneType !== 'reschedule' && (
+        <div className="shrink-0 border-t border-border px-4 py-3">
+          <div className="flex gap-2">
+            {paneType === 'details' && appointment.status === 'APPROVED' && !showCheckInForm && (
+              <button onClick={() => setShowCheckInForm(true)} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl">
+                Check In
+              </button>
+            )}
+            {paneType === 'details' && appointment.status === 'APPROVED' && showCheckInForm && (
+              <div className="w-full flex flex-col gap-3">
+                <div className="flex flex-col gap-0.5">
+                  <h3 className="text-base font-medium text-foreground">Confirm Patient Check-In</h3>
+                  <p className="text-xs text-muted-foreground">
+                    Mark patient as arrived and ready for their appointment.
+                  </p>
+                </div>
+                <div className="p-3 border bg-amber-500/5 border-amber-500/20">
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-amber-600">Check-In Notice</span>
+                  <div className="text-[11px] text-muted-foreground mt-1 leading-relaxed">
+                    Clicking Confirm Check-In will check in the patient and change their status to Checked In. Are you sure you want to proceed? This will immediately move their card to the "In Treatment" queue.
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <button onClick={() => setShowCheckInForm(false)} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent transition-colors rounded-xl">
+                    Cancel
+                  </button>
+                  <button onClick={() => { view.handleCheckIn(appointment.id); setShowCheckInForm(false); }} disabled={view.isPending} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl disabled:opacity-40">
+                    {view.isPending ? 'Checking In...' : 'Confirm Check-In'}
+                  </button>
+                </div>
+              </div>
+            )}
+            {paneType === 'details' && appointment.status === 'NO_SHOW' && !showResolveForm && !showRescheduleForm && (
+              <>
+                <button onClick={() => { const toHHMM = (t?: string) => { if (!t) return ''; if (t.includes('T')) { const p = t.split('T')[1]; if (p) return p.slice(0, 5); } const m = t.match(/^(\d{2}):(\d{2})/); return m ? `${m[1]}:${m[2]}` : ''; }; view.setRescheduleAppt(appointment); view.setRescheduleDate(appointment.date || ''); view.setRescheduleTime(toHHMM(appointment.startTime)); view.setRescheduleEndTime(toHHMM(appointment.endTime)); view.setRescheduleJustification(''); setShowRescheduleForm(true); }} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent transition-colors rounded-xl">
+                  Reschedule
+                </button>
+                <button onClick={() => { setShowResolveForm(true); setResolveMode('CONFIRMED_NO_SHOW'); setResolveReason(''); setShowCustomReason(false); setSelectedPreset(''); }} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl">
+                  Resolve
+                </button>
+              </>
+            )}
+            {paneType === 'details' && appointment.status === 'NO_SHOW' && showResolveForm && (
+              <div className="w-full flex flex-col gap-3">
+                <div className="flex flex-col gap-0.5">
+                  <h3 className="text-base font-medium text-foreground">No-Show Resolution</h3>
+                  <p className="text-xs text-muted-foreground">
+                    Choose how to handle this no-show. Unresolved stays marked as No-Show.
+                  </p>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <button onClick={() => { setResolveMode('CONFIRMED_NO_SHOW'); setSelectedPreset(''); setResolveReason(''); setShowCustomReason(false); }}
+                    className={`p-2 border text-[10px] font-medium transition-all ${resolveMode === 'CONFIRMED_NO_SHOW' ? 'border-red-500 bg-red-500/10 text-red-500' : 'border-card-border bg-card text-muted-foreground hover:border-foreground/30'}`}>
+                    Keep No-Show
+                  </button>
+                  <button onClick={() => { setResolveMode('COMPLETED'); setSelectedPreset(''); setResolveReason(''); setShowCustomReason(false); }}
+                    className={`p-2 border text-[10px] font-medium transition-all ${resolveMode === 'COMPLETED' ? 'border-emerald-500 bg-emerald-500/10 text-emerald-600' : 'border-card-border bg-card text-muted-foreground hover:border-foreground/30'}`}>
+                    Mark Completed
+                  </button>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <span className="text-xs text-muted-foreground">Reason for Resolution</span>
+                  <select value={selectedPreset} onChange={(e) => { const v = e.target.value; if (v === '__custom__') { setShowCustomReason(true); setResolveReason(''); } else { setShowCustomReason(false); setSelectedPreset(v); setResolveReason(v); } }} className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border">
+                    <option value="" disabled>Select reason...</option>
+                    {resolveReasonOptions[resolveMode].map((opt) => (<option key={opt} value={opt}>{opt}</option>))}
+                    <option value="__custom__">Custom</option>
+                  </select>
+                  {showCustomReason && (
+                    <textarea value={resolveReason} onChange={(e) => setResolveReason(e.target.value)} rows={2} placeholder="Type custom reason..." className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border resize-none" />
+                  )}
+                </div>
+                <div className="p-3 border bg-amber-500/5 border-amber-500/20">
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-amber-600">Resolution Notice</span>
+                  <div className="text-[11px] text-muted-foreground mt-1 leading-relaxed">
+                    Clicking Submit Resolution will apply the selected action. Are you sure you want to proceed? This decision can be changed later.
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <button onClick={() => { setShowResolveForm(false); setResolveMode('CONFIRMED_NO_SHOW'); setResolveReason(''); setShowCustomReason(false); setSelectedPreset(''); }} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent transition-colors rounded-xl">
+                    Cancel
+                  </button>
+                  <button onClick={() => { view.handleResolveNoShowSubmit({ appointmentId: appointment.id, resolution: resolveMode, reason: resolveReason }); setShowResolveForm(false); }} disabled={view.isPending || !resolveReason.trim()} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl disabled:opacity-40">
+                    {view.isPending ? 'Submitting...' : 'Submit Resolution'}
+                  </button>
+                </div>
+              </div>
+            )}
+            {paneType === 'details' && appointment.status === 'NO_SHOW' && showRescheduleForm && (
+              <div className="[&_form]:!border-t-0 [&_form]:!pt-0 w-full">
+                <AppointmentRescheduleForm
+                  appointment={appointment}
+                  services={view.servicesList || []}
+                  serviceId={appointment.serviceId}
+                  doctorId={view.rescheduleDoctor || appointment.doctorId}
+                  doctors={(view.doctorsList || []).map((d: any) => ({ doctorId: d.id, doctorName: `${d.prefix || 'Dr.'} ${d.firstName} ${d.lastName}` }))}
+                  date={view.rescheduleDate || ''}
+                  activeServiceId={appointment.serviceId}
+                  activeDoctorId={appointment.doctorId}
+                  startTime={view.rescheduleTime || ''}
+                  endTime={view.rescheduleEndTime || ''}
+                  justification={view.rescheduleJustification || ''}
+                  isSubmitting={view.isPending}
+                  onServiceSelect={() => {}}
+                  onDoctorSelect={(docId) => view.setRescheduleDoctor(docId)}
+                  onDateSelect={(d) => view.setRescheduleDate(d)}
+                  onStartTimeChange={(t) => view.setRescheduleTime(t)}
+                  onEndTimeChange={(t) => view.setRescheduleEndTime?.(t)}
+                  onJustificationChange={(j) => view.setRescheduleJustification(j)}
+                  onSubmit={() => { view.handleRescheduleSubmit(); setShowRescheduleForm(false); }}
+                  onBack={() => { view.setRescheduleAppt(null); setShowRescheduleForm(false); }}
+                />
+              </div>
+            )}
+            {paneType === 'details' && appointment.status === 'CHECKED_IN' && !showUndoForm && !showCheckoutForm && (
+              <>
+                <button onClick={() => setShowUndoForm(true)} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent transition-colors rounded-xl">
+                  Undo Check-In
+                </button>
+                <button onClick={() => setShowCheckoutForm(true)} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl">
+                  Checkout
+                </button>
+              </>
+            )}
+            {paneType === 'details' && appointment.status === 'CHECKED_IN' && showUndoForm && (
+              <div className="w-full flex flex-col gap-3">
+                <div className="flex flex-col gap-0.5">
+                  <h3 className="text-base font-medium text-foreground">Undo Check-In</h3>
+                  <p className="text-xs text-muted-foreground">
+                    Revert patient back to <span className="font-medium text-amber-600">Upcoming Today</span> status.
+                  </p>
+                </div>
+                <div className="p-3 border bg-amber-500/5 border-amber-500/20">
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-amber-600">Status Change</span>
+                  <div className="text-[11px] text-muted-foreground mt-1 leading-relaxed">
+                    Clicking Undo Check-In will revert the check-in and move the patient back to the "Upcoming Today" queue. Are you sure you want to proceed?
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <button onClick={() => setShowUndoForm(false)} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent transition-colors rounded-xl">
+                    Cancel
+                  </button>
+                  <button onClick={() => { view.handleUndoCheckIn(appointment.id); setShowUndoForm(false); }} disabled={view.isPending} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl disabled:opacity-40">
+                    {view.isPending ? 'Reverting...' : 'Undo Check-In'}
+                  </button>
+                </div>
+              </div>
+            )}
+            {paneType === 'details' && appointment.status === 'CHECKED_IN' && showCheckoutForm && (
+              <div className="w-full flex flex-col gap-3">
+                <div className="flex flex-col gap-0.5">
+                  <h3 className="text-base font-medium text-foreground">Checkout Patient</h3>
+                  <p className="text-xs text-muted-foreground">
+                    Complete visit & send post-care messages.
+                  </p>
+                </div>
+                <div className="p-3 border bg-amber-500/5 border-amber-500/20">
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-amber-600">Automated Communication</span>
+                  <div className="text-[11px] text-muted-foreground mt-1 leading-relaxed">
+                    Clicking Confirm & Send will complete the visit and send a Thank You and Post-Care Review Request to the patient. Are you sure you want to proceed?
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <button onClick={() => setShowCheckoutForm(false)} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent transition-colors rounded-xl">
+                    Cancel
+                  </button>
+                  <button onClick={() => { view.handleCheckoutComplete(appointment.id); setShowCheckoutForm(false); }} disabled={view.isPending} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl disabled:opacity-40">
+{view.isPending ? 'Sending...' : 'Confirm & Send'}
+                  </button>
+                </div>
+              </div>
+            )}
+            {paneType === 'checkout' && (
+              <>
+                <button onClick={onClose} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent transition-colors rounded-xl">
+                  Cancel
+                </button>
+                <button onClick={() => view.handleCheckoutComplete(appointment.id)} disabled={view.isPending} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-40">
+                  {view.isPending ? 'Sending...' : 'Confirm & Send'}
+                </button>
+              </>
+            )}
+            {paneType === 'details' && appointment.status === 'COMPLETED' && !showMessageLog && (
+              <button onClick={() => setShowMessageLog(true)} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent transition-colors rounded-xl">
+                View Message Log
+              </button>
+            )}
+            {paneType === 'details' && appointment.status === 'COMPLETED' && showMessageLog && (
+              <div className="w-full flex flex-col gap-3">
+                <div className="flex flex-col gap-0.5">
+                  <h3 className="text-base font-medium text-foreground">Message Log</h3>
+                  <p className="text-xs text-muted-foreground">
+                    View communication history for this appointment.
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <button onClick={() => setShowMessageLog(false)} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent transition-colors rounded-xl">
+                    Back
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -77,92 +339,74 @@ function InfoBox({ variant, title, children }: { variant: 'cyan' | 'amber' | 'em
 
 function DetailsContent({ appointment }: { appointment: any }) {
   return (
-    <>
-      <div className="flex flex-col gap-3 text-xs bg-muted/30 p-4 border border-card-border/40">
-        <Row label="Patient" value={`${appointment.patient?.firstName || ''} ${appointment.patient?.lastName || ''}`} />
-        <Row label="Doctor" value={`Dr. ${appointment.doctor?.firstName || ''} ${appointment.doctor?.lastName || ''}`} />
-        <Row label="Service" value={appointment.service?.name || 'Procedure'} />
-        <Row label="Date" value={appointment.date} />
-        <Row label="Time" value={`${formatClinicTime(appointment.startTime)} - ${formatClinicTime(appointment.endTime)}`} />
-        {appointment.statusReason && (
-          <>
-            <div className="border-t border-card-border/30 pt-2" />
-            <div className="flex flex-col gap-1">
-              <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Completion Log</span>
-              <span className="text-[11px] text-muted-foreground italic">{appointment.statusReason}</span>
-            </div>
-          </>
-        )}
+    <div className="flex flex-col gap-4">
+      <div>
+        <span className="text-sm font-medium text-foreground block mb-3">Guest Information</span>
+        <div className="flex flex-col gap-2">
+          <Field label="First Name" value={appointment.patient?.firstName || '-'} />
+          <Field label="Last Name" value={appointment.patient?.lastName || '-'} />
+          <div className="grid grid-cols-2 gap-2">
+            <Field label="Middle Name" value={appointment.patient?.middleName || '-'} />
+            <Field label="Suffix" value={appointment.patient?.suffix || '-'} />
+          </div>
+        </div>
       </div>
-    </>
+
+      <hr className="border-card-border/40" />
+
+      <div>
+        <span className="text-sm font-medium text-foreground block mb-3">Guest Contact</span>
+        <div className="flex flex-col gap-2">
+          <Field label="Email" value={appointment.patient?.email || '-'} />
+          <Field label="Phone" value={appointment.patient?.phoneNumber || '-'} />
+        </div>
+      </div>
+
+      <hr className="border-card-border/40" />
+
+      <div>
+        <span className="text-sm font-medium text-foreground block mb-3">Service & Schedule</span>
+        <div className="flex flex-col gap-2">
+          <Field label="Service" value={appointment.service?.name || 'Procedure'} />
+          <Field label="Date" value={appointment.date ? formatShortDate(appointment.date) : '-'} />
+          <div className="grid grid-cols-2 gap-2">
+            <Field label="Start Time" value={appointment.startTime ? formatClinicTime(appointment.startTime) : '-'} />
+            <Field label="End Time" value={appointment.endTime ? formatClinicTime(appointment.endTime) : '-'} />
+          </div>
+          <Field label="Assign Dentist" value={`Dr. ${appointment.doctor?.firstName || ''} ${appointment.doctor?.lastName || ''}`} />
+        </div>
+      </div>
+
+      <hr className="border-card-border/40" />
+      <AppointmentStatusHistory appointment={appointment as any} activeTab="upcoming" compact />
+    </div>
   );
 }
 
-function CheckInContent({ appointment, view, onClose }: { appointment: any; view: any; onClose: () => void }) {
+function Field({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-1">
-        <h3 className="text-sm font-medium text-foreground">Check In Patient</h3>
-        <p className="text-xs text-muted-foreground">
-          Confirm arrival for {appointment.service?.name} with Dr. {appointment.doctor?.firstName} {appointment.doctor?.lastName}.
-        </p>
-      </div>
-
-      <InfoBox variant="cyan" title="Check-In Notice">
-        Patient will be marked as present in clinic and moved to Checked In status.
-      </InfoBox>
-
-      <div className="flex flex-col gap-2 pt-2">
-        <button
-          onClick={() => {
-            view.handleCheckIn(appointment.id);
-            view.setCheckInAppt(null);
-          }}
-          disabled={view.isPending}
-          className="w-full h-10 text-sm font-medium bg-cyan-500/10 text-cyan-600 hover:bg-cyan-500/20 border border-cyan-500/20 disabled:opacity-40 transition-colors"
-        >
-          {view.isPending ? 'Checking In...' : 'Confirm Check-In'}
-        </button>
-        <button
-          onClick={onClose}
-          className="w-full h-10 text-sm font-medium border border-card-border text-foreground bg-transparent hover:bg-muted transition-colors"
-        >
-          Cancel
-        </button>
+    <div className="flex flex-col gap-0.5">
+      <span className="text-xs text-muted-foreground">{label}</span>
+      <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">
+        {value}
       </div>
     </div>
   );
 }
 
-function CheckoutContent({ appointment, view, onClose }: { appointment: any; view: any; onClose: () => void }) {
+function CheckoutContent({ appointment }: { appointment: any }) {
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-1">
-        <h3 className="text-sm font-medium text-foreground">Checkout Patient</h3>
+      <div className="flex flex-col gap-0.5">
+        <h3 className="text-base font-medium text-foreground">Checkout Patient</h3>
         <p className="text-xs text-muted-foreground">
-          Complete visit for {appointment.patient?.firstName} {appointment.patient?.lastName}. Treatment ({appointment.service?.name}) has been rendered.
+          Finalize the visit and automatically send a Thank You and Post-Care Review Request to the patient.
         </p>
       </div>
 
       <InfoBox variant="amber" title="Automated Communication">
         Confirming checkout will finalize the visit and automatically send a Thank You and Post-Care Review Request message to the patient.
       </InfoBox>
-
-      <div className="flex flex-col gap-2 pt-2">
-        <button
-          onClick={() => view.handleCheckoutComplete(appointment.id)}
-          disabled={view.isPending}
-          className="w-full h-10 text-sm font-medium bg-amber-500/10 text-amber-600 hover:bg-amber-500/20 border border-amber-500/20 disabled:opacity-40 transition-colors"
-        >
-          {view.isPending ? 'Processing...' : 'Confirm Checkout & Send'}
-        </button>
-        <button
-          onClick={onClose}
-          className="w-full h-10 text-sm font-medium border border-card-border text-foreground bg-transparent hover:bg-muted transition-colors"
-        >
-          Cancel
-        </button>
-      </div>
     </div>
   );
 }
@@ -324,7 +568,7 @@ function StandaloneReschedule({ view, onClose }: { view: any; onClose: () => voi
         activeDoctorId={appointment.doctorId}
         startTime={view.rescheduleTime}
         endTime={view.rescheduleEndTime || ''}
-        justification={view.rescheduleJustification || 'Patient requested reschedule'}
+        justification={view.rescheduleJustification || ''}
         isSubmitting={view.isPending}
         onServiceSelect={(sId) => view.setRescheduleService?.(sId)}
         onDoctorSelect={(docId) => view.setRescheduleDoctor(docId)}
