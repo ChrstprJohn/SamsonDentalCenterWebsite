@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Clock, XCircle, UserCheck, CheckCircle2 } from 'lucide-react';
 import { formatClinicTime, formatShortDate } from '@/shared/utils/date.util';
 import type { AppointmentDto } from '@/modules/appointments/dtos/exports';
 
@@ -65,7 +65,13 @@ function VisitColumn({ col, appointments, view }: { col: typeof COLUMNS[0]; appo
             <VisitCard key={appointment.id} appointment={appointment} columnKey={col.key} view={view} />
           ))}
         {appointments.length === 0 && (
-          <div className="text-center py-8 px-1.5 text-[10px] text-muted-foreground">{col.empty}</div>
+          <div className="flex flex-col items-center justify-center py-12 px-4">
+            {col.key === 'approved' && <Clock className="size-7 text-muted-foreground/30 mb-2" />}
+            {col.key === 'noShow' && <XCircle className="size-7 text-muted-foreground/30 mb-2" />}
+            {col.key === 'checkedIn' && <UserCheck className="size-7 text-muted-foreground/30 mb-2" />}
+            {col.key === 'completed' && <CheckCircle2 className="size-7 text-muted-foreground/30 mb-2" />}
+            <p className="text-xs text-muted-foreground">{col.empty}</p>
+          </div>
         )}
       </div>
     </div>
