@@ -60,7 +60,11 @@ function VisitColumn({ col, appointments, view }: { col: typeof COLUMNS[0]; appo
         <span className="text-xs xl:text-sm font-medium text-foreground truncate">{col.title}</span>
         <span className="text-[10px] font-medium px-1.5 py-0.5 bg-muted/50 text-muted-foreground shrink-0">{appointments.length}</span>
       </div>
-      <div className="flex flex-col flex-1 min-h-0 overflow-y-auto [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent" style={{ scrollbarWidth: 'thin' }}>
+      <div 
+        data-lenis-prevent
+        className="flex flex-col flex-1 min-h-0 overflow-y-auto !overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent" 
+        style={{ scrollbarWidth: 'thin' }}
+      >
           {appointments.map((appointment) => (
             <VisitCard key={appointment.id} appointment={appointment} columnKey={col.key} view={view} />
           ))}
@@ -114,7 +118,7 @@ function VisitCard({ appointment, columnKey, view }: { appointment: AppointmentD
 
   return (
     <div
-      className={`flex flex-row items-stretch text-left transition-all cursor-pointer select-none overflow-hidden border-b border-border ${
+      className={`flex flex-row items-stretch text-left transition-all cursor-pointer select-none overflow-hidden border-b border-border shrink-0 ${
         isSelected ? `${doctorColor.bg} ${doctorColor.selected}` : doctorColor.bg
       } ${doctorColor.text}`}
       onClick={() => view.handleViewApptDetails(appointment)}

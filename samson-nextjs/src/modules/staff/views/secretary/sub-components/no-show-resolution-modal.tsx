@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { AlertCircle, CheckCircle2, Clock, Calendar, RefreshCw, X, Pencil, Check } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Clock, Calendar, RefreshCw, X, Pencil, Check, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select } from '@/components/ui/select';
 import { AppointmentRescheduleForm } from './appointment-reschedule-form';

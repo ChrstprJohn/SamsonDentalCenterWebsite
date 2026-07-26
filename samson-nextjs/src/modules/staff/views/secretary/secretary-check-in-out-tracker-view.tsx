@@ -78,8 +78,8 @@ export function SecretaryCheckInOutTrackerView() {
           )}
         </div>
 
-        <div className={`flex-1 min-h-0 w-full overflow-hidden ${hasSelection ? 'lg:pr-0' : ''}`}>
-          <div className={`h-full w-full overflow-x-auto ${hasSelection ? 'hidden lg:block' : 'block'}`}>
+        <div className={`flex-1 min-h-0 h-full w-full overflow-hidden ${hasSelection ? 'lg:pr-0' : ''}`}>
+          <div className={`h-full min-h-0 w-full overflow-x-auto ${hasSelection ? 'hidden lg:block' : 'block'}`}>
             <CheckInBoard view={{ ...view, handleViewApptDetails: handleCardClick }} columns={filteredColumns} />
           </div>
         </div>
