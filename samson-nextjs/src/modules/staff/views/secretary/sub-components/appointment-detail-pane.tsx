@@ -269,32 +269,42 @@ function AppointmentDetails({ appointment, view, activeTab, compact }: { appoint
               <p className="text-xs text-muted-foreground italic">No events yet.</p>
             ) : (
               <div className="flex flex-col gap-1.5 max-h-[240px] overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
-                {outboxLogs.map((log) => {
-                  const logStatus = log.status;
-                  const isFailed = logStatus === 'FAILED';
-                  const isProcessed = logStatus === 'PROCESSED';
-                  return (
-                    <div key={log.id} className="flex items-center gap-2 p-2 rounded-lg bg-secondary-bg/20 border border-card-border/40 text-xs">
-                      <div className="shrink-0">
-                        {isFailed ? <AlertCircle className="size-3.5 text-rose-500" /> : isProcessed ? <CheckCircle2 className="size-3.5 text-emerald-500" /> : <Clock className="size-3.5 text-amber-500" />}
+                {(() => {
+                  // Latest PROCESSED event id per event type — only show "New" on latest
+                  const latestProcessed: Record<string, string> = {};
+                  for (const log of outboxLogs) {
+                    if (log.status === 'PROCESSED') {
+                      if (!latestProcessed[log.eventType]) latestProcessed[log.eventType] = log.id;
+                    }
+                  }
+                  return outboxLogs.map((log) => {
+                    const logStatus = log.status;
+                    const isFailed = logStatus === 'FAILED';
+                    const isProcessed = logStatus === 'PROCESSED';
+                    const isLatestProcessed = isProcessed && latestProcessed[log.eventType] === log.id;
+                    return (
+                      <div key={log.id} className="flex items-center gap-2 p-2 rounded-lg bg-secondary-bg/20 border border-card-border/40 text-xs">
+                        <div className="shrink-0">
+                          {isFailed ? <AlertCircle className="size-3.5 text-rose-500" /> : isProcessed ? <CheckCircle2 className="size-3.5 text-emerald-500" /> : <Clock className="size-3.5 text-amber-500" />}
+                        </div>
+                        <span className="text-foreground font-medium truncate min-w-0 flex-1">
+                          {EVENT_LABELS[log.eventType] || log.eventType}
+                        </span>
+                        <Badge variant={isFailed ? 'error' : isProcessed ? 'success' : 'warning'} className="text-[9px] px-1 py-0 shrink-0">
+                          {logStatus}
+                        </Badge>
+                        <span className="text-muted-foreground shrink-0">{new Date(log.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                        <button
+                          onClick={() => handleDetailResend(log.id)}
+                          className="text-[10px] font-semibold text-rose-600 hover:text-rose-700 shrink-0 disabled:opacity-50"
+                          disabled={detailResendingId === log.id}
+                        >
+                          {detailResendingId === log.id ? '...' : isLatestProcessed ? 'New' : isFailed || logStatus === 'PENDING' ? 'Resend' : ''}
+                        </button>
                       </div>
-                      <span className="text-foreground font-medium truncate min-w-0 flex-1">
-                        {EVENT_LABELS[log.eventType] || log.eventType}
-                      </span>
-                      <Badge variant={isFailed ? 'error' : isProcessed ? 'success' : 'warning'} className="text-[9px] px-1 py-0 shrink-0">
-                        {logStatus}
-                      </Badge>
-                      <span className="text-muted-foreground shrink-0">{new Date(log.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                      <button
-                        onClick={() => handleDetailResend(log.id)}
-                        className="text-[10px] font-semibold text-rose-600 hover:text-rose-700 shrink-0 disabled:opacity-50"
-                        disabled={detailResendingId === log.id}
-                      >
-                        {detailResendingId === log.id ? '...' : isProcessed ? 'New' : 'Resend'}
-                      </button>
-                    </div>
-                  );
-                })}
+                    );
+                  });
+                })()}
               </div>
             )}
           </div>
