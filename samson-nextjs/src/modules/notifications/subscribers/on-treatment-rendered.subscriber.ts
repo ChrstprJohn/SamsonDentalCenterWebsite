@@ -13,7 +13,7 @@ export const onTreatmentRenderedSubscriber = {
       priority: 'HIGH',
       title: 'Ready for Checkout',
       message: `${doctorName || 'Doctor'} finished treatment for ${patientName || 'Patient'}. Invoice draft is ready.`,
-      linkUrl: `/secretary/check-in?openCheckout=${appointmentId}`,
+      linkUrl: `/secretary-v2/check-in?openCheckout=${appointmentId}`,
       entityId: appointmentId,
     });
   },

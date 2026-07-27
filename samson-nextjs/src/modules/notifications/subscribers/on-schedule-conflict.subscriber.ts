@@ -13,7 +13,7 @@ export const onScheduleConflictSubscriber = {
       priority: 'HIGH',
       title: 'Doctor Schedule Conflict',
       message: `${doctorName || 'Doctor'} scheduled leave on ${date}. ${conflictCount || 0} appointment(s) require displacement.`,
-      linkUrl: `/secretary/appointments?status=APPROVED&date=${date}&doctorId=${doctorId}`,
+      linkUrl: `/secretary-v2/appointments?status=APPROVED&date=${date}&doctorId=${doctorId}`,
       entityId: doctorId,
     });
   },

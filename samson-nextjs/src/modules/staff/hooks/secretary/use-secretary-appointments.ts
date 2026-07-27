@@ -1,7 +1,6 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
 import { updateAppointmentStatusAction } from '@/modules/appointments/actions/status/update-appointment-status.action';
 import type { AppointmentDto } from '@/modules/appointments/dtos/shared/appointment.dto';
 import type { AvailableSlotDto } from '@/modules/appointments/dtos/availability/get-available-time-slots.dto';
@@ -71,23 +70,6 @@ export function useSecretaryAppointments() {
   }, []);
 
   useEffect(() => { fetchData(); }, [fetchData]);
-
-  useEffect(() => {
-    if (appointments.length > 0 && !selectedAppointmentId) {
-      const urlId = searchParams.get('id') || searchParams.get('appointmentId');
-      if (urlId) {
-        const found = appointments.find((a) => a.id === urlId);
-        if (found) {
-          setSelectedAppointmentId(urlId);
-          if (['CANCELLED', 'COMPLETED', 'REJECTED', 'NO_SHOW'].includes(found.status)) {
-            setActiveTab('history');
-          } else {
-            setActiveTab('upcoming');
-          }
-        }
-      }
-    }
-  }, [appointments, searchParams, selectedAppointmentId]);
 
   const openRescheduleForm = useCallback(() => {
     if (selectedAppointment) {
