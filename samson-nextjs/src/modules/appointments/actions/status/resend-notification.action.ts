@@ -87,6 +87,28 @@ export async function resendNotificationAction(input: ResendNotificationInput) {
     const outbox = outboxCommands(supabaseAdmin);
     let dispatchedEvents: string[] = [];
 
+    // Helper: find existing FAILED event for this appointment+eventType and reuse it
+    const reuseOrEmit = async (eventType: string, payload: Record<string, any>) => {
+      const { data: existing } = await supabaseAdmin
+        .from('outbox')
+        .select('id')
+        .eq('event_type', eventType)
+        .contains('payload', { appointmentId: input.appointmentId })
+        .eq('status', 'FAILED')
+        .order('created_at', { ascending: false })
+        .limit(1);
+
+      if (existing && existing.length > 0) {
+        await supabaseAdmin
+          .from('outbox')
+          .update({ status: 'PENDING', retry_count: 0, error_logs: null })
+          .eq('id', existing[0].id);
+        return existing[0].id;
+      }
+      const emitted = await outbox.emitEvent(eventType, payload);
+      return emitted.id;
+    };
+
     // Build atomic update payload based on event type and target channel
     const updatePayload: Record<string, boolean> = {};
 
@@ -166,10 +188,10 @@ export async function resendNotificationAction(input: ResendNotificationInput) {
         }
       }
 
-      const emittedEmailEvent = await outbox.emitEvent(eventType, payload);
+      const emailEventId = await reuseOrEmit(eventType, payload);
       dispatchedEvents.push(`Email (${eventType})`);
       bootstrapEventSubscribers();
-      await globalOutboxDispatcher(supabaseAdmin, true, emittedEmailEvent.id)();
+      await globalOutboxDispatcher(supabaseAdmin, true, emailEventId)();
     }
 
     // Dispatch SMS Event
@@ -182,10 +204,10 @@ export async function resendNotificationAction(input: ResendNotificationInput) {
         appointmentId: appointment.id,
       };
 
-      const emittedSmsEvent = await outbox.emitEvent(smsEventType, smsPayload);
+      const smsEventId = await reuseOrEmit(smsEventType, smsPayload);
       dispatchedEvents.push(`SMS (${recipientPhone})`);
       bootstrapEventSubscribers();
-      await globalOutboxDispatcher(supabaseAdmin, true, emittedSmsEvent.id)();
+      await globalOutboxDispatcher(supabaseAdmin, true, smsEventId)();
     }
 
     return {

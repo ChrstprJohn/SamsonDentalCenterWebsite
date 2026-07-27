@@ -31,13 +31,46 @@ export async function resendEmailAction(data: { id: string }) {
       return { error: 'Email log not found.' };
     }
 
-    // Force reset retry_count and set status to PENDING
+    // Refresh payload with current email from appointment
+    const eventPayload = (event as any).payload || {};
+    const apptId = eventPayload.appointmentId;
+    if (apptId) {
+      const { data: gc } = await supabase
+        .from('guest_contacts')
+        .select('email')
+        .eq('appointment_id', apptId)
+        .maybeSingle();
+
+      const { data: appt } = await supabase
+        .from('appointments')
+        .select('patient_id')
+        .eq('id', apptId)
+        .single();
+
+      let freshEmail = gc?.email?.trim();
+      if (!freshEmail && appt?.patient_id) {
+        const { data: user } = await supabase
+          .from('users')
+          .select('email')
+          .eq('id', appt.patient_id)
+          .single();
+        freshEmail = user?.email?.trim();
+      }
+
+      if (freshEmail) {
+        eventPayload.email = freshEmail;
+        eventPayload.guestEmail = freshEmail;
+      }
+    }
+
+    // Force reset retry_count, set status to PENDING, and update payload with fresh email
     const { error: updateError } = await supabase
       .from('outbox')
       .update({
         status: 'PENDING',
         retry_count: 0,
         error_logs: null,
+        payload: eventPayload,
       })
       .eq('id', id);
 
