@@ -2,6 +2,7 @@
 
 import { z } from 'zod';
 import { createAdminClient } from '@/shared/database/server';
+import { outboxCommands } from '@/shared/outbox/outbox.commands';
 import { globalOutboxDispatcher } from '@/shared/outbox/outbox.dispatcher';
 import { authorizeRole } from '@/shared/auth/auth.util';
 import { bootstrapEventSubscribers } from '@/orchestrators/event-subscribers';
@@ -34,6 +35,7 @@ export async function resendEmailAction(data: { id: string }) {
     // Refresh payload with current email from appointment
     const eventPayload = (event as any).payload || {};
     const apptId = eventPayload.appointmentId;
+    const eventType = (event as any).event_type || '';
     if (apptId) {
       const { data: gc } = await supabase
         .from('guest_contacts')
@@ -63,18 +65,29 @@ export async function resendEmailAction(data: { id: string }) {
       }
     }
 
-    // Set status to PENDING — retry_count handled by dispatcher auto-retry
-    const { error: updateError } = await supabase
-      .from('outbox')
-      .update({
-        status: 'PENDING',
-        error_logs: null,
-        payload: eventPayload,
-      })
-      .eq('id', id);
+    const eventStatus = (event as any).status || '';
+    const outbox = outboxCommands(supabase);
+    let eventId = id;
 
-    if (updateError) {
-      return { error: `Failed to queue email resend: ${updateError.message}` };
+    if (eventStatus === 'PROCESSED') {
+      // Already sent — create new record for fresh attempt
+      const emitted = await outbox.emitEvent(eventType, eventPayload);
+      eventId = emitted.id;
+    } else {
+      // FAILED or PENDING — reuse same record, reset retry counter
+      const { error: updateError } = await supabase
+        .from('outbox')
+        .update({
+          status: 'PENDING',
+          retry_count: 0,
+          error_logs: null,
+          payload: eventPayload,
+        })
+        .eq('id', id);
+
+      if (updateError) {
+        return { error: `Failed to queue email resend: ${updateError.message}` };
+      }
     }
 
     // Trigger dispatcher

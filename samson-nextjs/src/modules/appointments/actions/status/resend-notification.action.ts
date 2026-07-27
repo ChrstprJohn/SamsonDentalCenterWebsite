@@ -101,7 +101,7 @@ export async function resendNotificationAction(input: ResendNotificationInput) {
       if (existing && existing.length > 0) {
         await supabaseAdmin
           .from('outbox')
-          .update({ status: 'PENDING', error_logs: null, payload })
+          .update({ status: 'PENDING', retry_count: 0, error_logs: null, payload })
           .eq('id', existing[0].id);
         return existing[0].id;
       }
