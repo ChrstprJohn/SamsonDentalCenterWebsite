@@ -184,7 +184,11 @@ function TimelineEntryCard({ entry, onResend, resendingId }: { entry: TimelineEn
             disabled={resendingId === entry.id}
             className="mt-2 text-xs font-semibold text-rose-600 hover:text-rose-700 disabled:opacity-50"
           >
-            {resendingId === entry.id ? 'Resending...' : 'Resend'}
+            {resendingId === entry.id
+              ? 'Sending...'
+              : entry.rawStatus === 'PROCESSED'
+                ? 'Send New'
+                : 'Resend'}
           </button>
         )}
 
