@@ -16,7 +16,7 @@ export const outboxLogResponseSchema = outboxDbRecordSchema.transform((data) => 
   payload: data.payload,
   status: data.status,
   errorLogs: data.error_logs ?? null,
-  retryCount: data.retry_count,
+  retryCount: Math.min(data.retry_count, 3),
   createdAt: data.created_at ?? new Date().toISOString(),
 }));
 

@@ -115,9 +115,9 @@ describe('outboxCommands', () => {
       expect(mockUpdateEq).toHaveBeenCalledWith('id', 'event-uuid');
     });
 
-    it('marks event status as FAILED if retry_count >= 3', async () => {
-      // 1. Mock select retry_count
-      const mockSingle = vi.fn().mockResolvedValue({ data: { retry_count: 3 }, error: null });
+    it('marks event status as FAILED if next retry_count >= 3', async () => {
+      // 1. Mock select retry_count (2 previous failures)
+      const mockSingle = vi.fn().mockResolvedValue({ data: { retry_count: 2 }, error: null });
       const mockSelectEq = vi.fn().mockReturnValue({ single: mockSingle });
       const mockSelect = vi.fn().mockReturnValue({ eq: mockSelectEq });
 
@@ -140,7 +140,7 @@ describe('outboxCommands', () => {
       expect(mockUpdate).toHaveBeenCalledWith({
         status: 'FAILED',
         error_logs: 'Max retries exceeded',
-        retry_count: 4,
+        retry_count: 3,
       });
     });
 

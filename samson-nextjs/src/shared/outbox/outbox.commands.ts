@@ -65,13 +65,14 @@ export const outboxCommands = (supabase: SupabaseClient) => {
         .single();
         
       const currentRetryCount = data?.retry_count || 0;
+      const nextRetryCount = currentRetryCount + 1;
       
       const { error } = await supabase
         .from('outbox')
         .update({ 
-          status: currentRetryCount >= 3 ? 'FAILED' : 'PENDING', // Re-queue if < 3 retries
+          status: nextRetryCount >= 3 ? 'FAILED' : 'PENDING', // Re-queue if next retry count < 3
           error_logs: errorLogs, 
-          retry_count: currentRetryCount + 1 
+          retry_count: nextRetryCount 
         })
         .eq('id', id);
 
