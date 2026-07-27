@@ -63,12 +63,13 @@ export async function resendEmailAction(data: { id: string }) {
       }
     }
 
-    // Force reset retry_count, set status to PENDING, and update payload with fresh email
+    // Increment retry_count and set status to PENDING
+    const currentRetries = ((event as any).retry_count || 0);
     const { error: updateError } = await supabase
       .from('outbox')
       .update({
         status: 'PENDING',
-        retry_count: 0,
+        retry_count: currentRetries + 1,
         error_logs: null,
         payload: eventPayload,
       })
@@ -78,29 +79,10 @@ export async function resendEmailAction(data: { id: string }) {
       return { error: `Failed to queue email resend: ${updateError.message}` };
     }
 
-    // Trigger dispatcher synchronously for quick feedback
+    // Trigger dispatcher
     bootstrapEventSubscribers();
     const dispatch = globalOutboxDispatcher(supabase);
     await dispatch();
-
-    // Verify it changed to PROCESSED
-    const { data: updatedEvent } = await supabase
-      .from('outbox')
-      .select('status, error_logs')
-      .eq('id', id)
-      .single();
-
-    if (updatedEvent?.status !== 'PROCESSED') {
-      await supabase
-        .from('outbox')
-        .update({
-          status: 'FAILED',
-          retry_count: 3,
-        })
-        .eq('id', id);
-
-      return { error: `Email sending failed again: ${updatedEvent?.error_logs || 'Unknown error'}` };
-    }
 
     return { data: { success: true } };
   } catch (err: any) {
