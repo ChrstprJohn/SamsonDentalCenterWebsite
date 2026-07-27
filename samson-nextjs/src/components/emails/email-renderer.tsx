@@ -20,11 +20,12 @@ export function RenderedEmailFrame({ eventType, payload }: RenderedEmailFramePro
 
   const isConfirmed = eventType === 'APPOINTMENT_BOOKED' || eventType === 'APPOINTMENT_MANUALLY_BOOKED_PATIENT' || eventType === 'APPOINTMENT_MANUALLY_BOOKED_GUEST' || eventType === 'APPOINTMENT_CONVERTED_FROM_INQUIRY';
   const isReminder = eventType.startsWith('APPOINTMENT_REMINDER');
-  const isRescheduled = eventType === 'RESCHEDULE_BOOKING';
-  const isCancelled = eventType === 'CANCEL_BOOKING';
+  const isRescheduled = eventType === 'RESCHEDULE_BOOKING' || eventType === 'RESCHEDULE_BOOKING_SMS';
+  const isCancelled = eventType === 'CANCEL_BOOKING' || eventType === 'CANCEL_BOOKING_SMS';
   const isOtp = eventType === 'PATIENT_REGISTERED' || eventType === 'PASSWORD_RESET_REQUESTED';
   const isStaffReply = eventType === 'STAFF_REPLIED_TO_CHAT';
   const isRequestReceived = eventType.includes('REQUEST_RECEIVED');
+  const isSms = eventType.endsWith('_SMS');
 
   const topBorderColor = isCancelled ? '#ef4444' : isRescheduled ? '#3b82f6' : isConfirmed ? '#16a34a' : '#3b82f6';
   const subTitle = isConfirmed
@@ -32,9 +33,9 @@ export function RenderedEmailFrame({ eventType, payload }: RenderedEmailFramePro
     : isReminder
       ? (eventType.includes('24H') ? '24-Hour Reminder' : '48-Hour Reminder')
       : isRescheduled
-        ? 'Appointment Rescheduled'
+        ? (isSms ? 'Appointment Rescheduled (SMS)' : 'Appointment Rescheduled')
         : isCancelled
-          ? 'Appointment Cancelled'
+          ? (isSms ? 'Appointment Cancelled (SMS)' : 'Appointment Cancelled')
           : isOtp
             ? (eventType === 'PATIENT_REGISTERED' ? 'Welcome & Verification' : 'Password Reset')
             : isStaffReply
