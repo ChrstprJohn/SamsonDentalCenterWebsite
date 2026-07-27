@@ -5,16 +5,19 @@ import { Button } from '@/components/ui/button';
 import { Select } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
 import type { AppointmentDto } from '@/modules/appointments/dtos/shared/appointment.dto';
 import type { AppointmentDirectoryTab } from '@/modules/staff/hooks/secretary/use-secretary-appointments';
 import { SharedAppointmentDetail } from '@/modules/appointments/components/sub-components/shared-appointment-detail';
 import { AppointmentCancelForm } from './appointment-cancel-form';
 import { AppointmentRescheduleForm } from './appointment-reschedule-form';
 import { AppointmentStatusHistory } from './appointment-status-history';
-import { Send, Calendar, RotateCw, Pencil, X, Check, Mail, MessageSquare } from 'lucide-react';
+import { Send, Calendar, RotateCw, Pencil, X, Check, Mail, MessageSquare, AlertCircle, Clock, CheckCircle2 } from 'lucide-react';
 import { updateConfirmationChannelAction } from '@/modules/appointments/actions/status/update-confirmation-channel.action';
 import { resendNotificationAction } from '@/modules/appointments/actions/status/resend-notification.action';
+import { getEmailLogsByAppointmentAction } from '@/modules/emails/actions/logs/get-email-logs-by-appointment.action';
 import { computeNotificationStatus } from '@/modules/notifications/utils/notification-status.util';
+import type { OutboxLogResponseDto } from '@/modules/emails/dtos/logs/outbox-log-response.dto';
 
 interface AppointmentDetailPaneProps {
   view: any;
@@ -41,6 +44,17 @@ export function AppointmentDetailPane({ view, compact }: AppointmentDetailPanePr
 
 function AppointmentDetails({ appointment, view, activeTab, compact }: { appointment: AppointmentDto; view: any; activeTab: AppointmentDirectoryTab; compact?: boolean }) {
   const [resending, setResending] = useState<string | null>(null);
+  const [detailResendingId, setDetailResendingId] = useState<string | null>(null);
+  const [outboxLogs, setOutboxLogs] = useState<OutboxLogResponseDto[]>([]);
+  const [loadingLogs, setLoadingLogs] = useState(false);
+
+  useEffect(() => {
+    setLoadingLogs(true);
+    getEmailLogsByAppointmentAction(appointment.id).then((res) => {
+      if (res.success && res.data) setOutboxLogs(res.data);
+      setLoadingLogs(false);
+    });
+  }, [appointment.id]);
   const [allowOverrideResend, setAllowOverrideResend] = useState(false);
   const [channel, setChannel] = useState<'EMAIL' | 'SMS' | 'BOTH' | 'NONE'>(
     (appointment.confirmationChannel as any) || 'EMAIL'
@@ -139,6 +153,9 @@ function AppointmentDetails({ appointment, view, activeTab, compact }: { appoint
         return { ...prev, ...updates };
       });
 
+      getEmailLogsByAppointmentAction(appointment.id).then((r) => {
+        if (r.success && r.data) setOutboxLogs(r.data);
+      });
       if (view?.fetchData) {
         view.fetchData();
       }
@@ -146,6 +163,37 @@ function AppointmentDetails({ appointment, view, activeTab, compact }: { appoint
       alert(res.error || 'Failed to resend notification.');
     }
     setResending(null);
+  };
+
+  const handleDetailResend = async (logId: string) => {
+    setDetailResendingId(logId);
+    const res = await import('@/modules/emails/actions/logs/resend-email.action').then(m => m.resendEmailAction({ id: logId }));
+    if (!res?.error) {
+      getEmailLogsByAppointmentAction(appointment.id).then((r) => {
+        if (r.success && r.data) setOutboxLogs(r.data);
+      });
+    }
+    setDetailResendingId(null);
+  };
+
+  const EVENT_LABELS: Record<string, string> = {
+    'APPOINTMENT_BOOKED': 'Booking Confirmation',
+    'APPOINTMENT_CONVERTED_FROM_INQUIRY': 'Inquiry Approved',
+    'APPOINTMENT_CONVERTED_FROM_INQUIRY_SMS': 'Inquiry Approved SMS',
+    'APPOINTMENT_MANUALLY_BOOKED_PATIENT': 'Manual Booking',
+    'APPOINTMENT_MANUALLY_BOOKED_GUEST': 'Manual Booking',
+    'APPOINTMENT_REMINDER_24H': '24-Hour Reminder',
+    'APPOINTMENT_REMINDER_48H': '48-Hour Reminder',
+    'RESCHEDULE_BOOKING': 'Rescheduled',
+    'CANCEL_BOOKING': 'Cancelled',
+    'APPOINTMENT_MANUALLY_BOOKED_SMS': 'Manual Booking SMS',
+    'APPOINTMENT_REMINDER_48H_SMS': '48-Hour Reminder SMS',
+    'APPOINTMENT_REMINDER_24H_SMS': '24-Hour Reminder SMS',
+    'APPOINTMENT_COMPLETED_POST_CARE_SMS': 'Post-Care SMS',
+    'APPOINTMENT_COMPLETED_POST_CARE': 'Post-Care',
+    'STAFF_REPLIED_TO_CHAT': 'Staff Reply',
+    'PATIENT_REGISTERED': 'Registration OTP',
+    'PASSWORD_RESET_REQUESTED': 'Password Reset OTP',
   };
 
   const handleSaveChannel = async () => {
@@ -323,6 +371,47 @@ function AppointmentDetails({ appointment, view, activeTab, compact }: { appoint
                 <p className="text-xs text-muted-foreground italic">No notification channel selected.</p>
               )}
             </div>
+          </div>
+          <hr className={`border-card-border/40 ${compact ? 'mx-4' : 'mx-5'}`} />
+          {/* Email/SMS Event Log */}
+          <div className={`${compact ? 'py-3 px-4 space-y-2' : 'py-4 px-5 space-y-3'}`}>
+            <span className={`${compact ? 'text-sm' : 'text-base'} font-medium text-foreground`}>Delivery Log</span>
+            {loadingLogs ? (
+              <div className="space-y-2">
+                {[1,2,3].map(i => <div key={i} className="h-8 bg-muted/30 animate-pulse rounded-lg" />)}
+              </div>
+            ) : outboxLogs.length === 0 ? (
+              <p className="text-xs text-muted-foreground italic">No events yet.</p>
+            ) : (
+              <div className="flex flex-col gap-1.5 max-h-[240px] overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+                {outboxLogs.map((log) => {
+                  const logStatus = log.status;
+                  const isFailed = logStatus === 'FAILED';
+                  const isProcessed = logStatus === 'PROCESSED';
+                  return (
+                    <div key={log.id} className="flex items-center gap-2 p-2 rounded-lg bg-secondary-bg/20 border border-card-border/40 text-xs">
+                      <div className="shrink-0">
+                        {isFailed ? <AlertCircle className="size-3.5 text-rose-500" /> : isProcessed ? <CheckCircle2 className="size-3.5 text-emerald-500" /> : <Clock className="size-3.5 text-amber-500" />}
+                      </div>
+                      <span className="text-foreground font-medium truncate min-w-0 flex-1">
+                        {EVENT_LABELS[log.eventType] || log.eventType}
+                      </span>
+                      <Badge variant={isFailed ? 'error' : isProcessed ? 'success' : 'warning'} className="text-[9px] px-1 py-0 shrink-0">
+                        {logStatus}
+                      </Badge>
+                      <span className="text-muted-foreground shrink-0">{new Date(log.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                      <button
+                        onClick={() => handleDetailResend(log.id)}
+                        className="text-[10px] font-semibold text-rose-600 hover:text-rose-700 shrink-0 disabled:opacity-50"
+                        disabled={detailResendingId === log.id}
+                      >
+                        {detailResendingId === log.id ? '...' : isProcessed ? 'New' : 'Resend'}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
           <hr className={`border-card-border/40 ${compact ? 'mx-4' : 'mx-5'}`} />
           <div className={`${compact ? 'px-4 pb-4 pt-1' : 'px-5 pb-6 pt-2'}`}>
