@@ -124,19 +124,21 @@ export function useAppointmentEmailTimeline() {
   };
 
   const EVENT_LABELS: Record<string, string> = {
-    'APPOINTMENT_BOOKED': 'Booking Confirmation',
-    'APPOINTMENT_CONVERTED_FROM_INQUIRY': 'Inquiry Approved',
-    'APPOINTMENT_CONVERTED_FROM_INQUIRY_SMS': 'Inquiry Approved SMS',
-    'APPOINTMENT_MANUALLY_BOOKED_PATIENT': 'Manual Booking',
-    'APPOINTMENT_MANUALLY_BOOKED_GUEST': 'Manual Booking',
-    'APPOINTMENT_REMINDER_24H': '24-Hour Reminder',
-    'APPOINTMENT_REMINDER_48H': '48-Hour Reminder',
-    'RESCHEDULE_BOOKING': 'Rescheduled',
-    'CANCEL_BOOKING': 'Cancelled',
-    'APPOINTMENT_MANUALLY_BOOKED_SMS': 'Manual Booking SMS',
-    'APPOINTMENT_REMINDER_48H_SMS': '48-Hour Reminder SMS',
-    'APPOINTMENT_REMINDER_24H_SMS': '24-Hour Reminder SMS',
-    'APPOINTMENT_COMPLETED_POST_CARE_SMS': 'Post-Care SMS',
+    'APPOINTMENT_BOOKED': 'Booking Confirmation (Email)',
+    'APPOINTMENT_CONVERTED_FROM_INQUIRY': 'Inquiry Approved (Guest Email)',
+    'APPOINTMENT_CONVERTED_FROM_INQUIRY_PATIENT': 'Inquiry Approved (Patient Email)',
+    'APPOINTMENT_CONVERTED_FROM_INQUIRY_SMS': 'Inquiry Approved (SMS)',
+    'APPOINTMENT_MANUALLY_BOOKED_PATIENT': 'Manual Booking (Patient Email)',
+    'APPOINTMENT_MANUALLY_BOOKED_GUEST': 'Manual Booking (Guest Email)',
+    'APPOINTMENT_MANUALLY_BOOKED_SMS': 'Manual Booking (SMS)',
+    'APPOINTMENT_REMINDER_24H': '24-Hour Reminder (Email)',
+    'APPOINTMENT_REMINDER_48H': '48-Hour Reminder (Email)',
+    'APPOINTMENT_REMINDER_24H_SMS': '24-Hour Reminder (SMS)',
+    'APPOINTMENT_REMINDER_48H_SMS': '48-Hour Reminder (SMS)',
+    'RESCHEDULE_BOOKING': 'Rescheduled (Email)',
+    'CANCEL_BOOKING': 'Cancelled (Email)',
+    'APPOINTMENT_COMPLETED_POST_CARE': 'Post-Care Review (Email)',
+    'APPOINTMENT_COMPLETED_POST_CARE_SMS': 'Post-Care (SMS)',
   };
 
   const allCards: AppointmentCardData[] = useMemo(() => {

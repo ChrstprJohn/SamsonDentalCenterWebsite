@@ -177,23 +177,24 @@ function AppointmentDetails({ appointment, view, activeTab, compact }: { appoint
   };
 
   const EVENT_LABELS: Record<string, string> = {
-    'APPOINTMENT_BOOKED': 'Booking Confirmation',
-    'APPOINTMENT_CONVERTED_FROM_INQUIRY': 'Inquiry Approved',
-    'APPOINTMENT_CONVERTED_FROM_INQUIRY_SMS': 'Inquiry Approved SMS',
-    'APPOINTMENT_MANUALLY_BOOKED_PATIENT': 'Manual Booking',
-    'APPOINTMENT_MANUALLY_BOOKED_GUEST': 'Manual Booking',
-    'APPOINTMENT_REMINDER_24H': '24-Hour Reminder',
-    'APPOINTMENT_REMINDER_48H': '48-Hour Reminder',
-    'RESCHEDULE_BOOKING': 'Rescheduled',
-    'CANCEL_BOOKING': 'Cancelled',
-    'APPOINTMENT_MANUALLY_BOOKED_SMS': 'Manual Booking SMS',
-    'APPOINTMENT_REMINDER_48H_SMS': '48-Hour Reminder SMS',
-    'APPOINTMENT_REMINDER_24H_SMS': '24-Hour Reminder SMS',
-    'APPOINTMENT_COMPLETED_POST_CARE_SMS': 'Post-Care SMS',
-    'APPOINTMENT_COMPLETED_POST_CARE': 'Post-Care',
-    'STAFF_REPLIED_TO_CHAT': 'Staff Reply',
-    'PATIENT_REGISTERED': 'Registration OTP',
-    'PASSWORD_RESET_REQUESTED': 'Password Reset OTP',
+    'APPOINTMENT_BOOKED': 'Booking Confirmation (Email)',
+    'APPOINTMENT_CONVERTED_FROM_INQUIRY': 'Inquiry Approved (Email)', // Guest inquiry conversion email
+    'APPOINTMENT_CONVERTED_FROM_INQUIRY_PATIENT': 'Inquiry Approved (Email)', // Patient inquiry conversion email
+    'APPOINTMENT_CONVERTED_FROM_INQUIRY_SMS': 'Inquiry Approved (SMS)',
+    'APPOINTMENT_MANUALLY_BOOKED_PATIENT': 'Manual Booking (Email)', // Patient manual booking email
+    'APPOINTMENT_MANUALLY_BOOKED_GUEST': 'Manual Booking (Email)', // Guest manual booking email
+    'APPOINTMENT_MANUALLY_BOOKED_SMS': 'Manual Booking (SMS)',
+    'APPOINTMENT_REMINDER_24H': '24-Hour Reminder (Email)',
+    'APPOINTMENT_REMINDER_48H': '48-Hour Reminder (Email)',
+    'APPOINTMENT_REMINDER_24H_SMS': '24-Hour Reminder (SMS)',
+    'APPOINTMENT_REMINDER_48H_SMS': '48-Hour Reminder (SMS)',
+    'RESCHEDULE_BOOKING': 'Rescheduled (Email)',
+    'CANCEL_BOOKING': 'Cancelled (Email)',
+    'APPOINTMENT_COMPLETED_POST_CARE': 'Post-Care Review (Email)',
+    'APPOINTMENT_COMPLETED_POST_CARE_SMS': 'Post-Care (SMS)',
+    'STAFF_REPLIED_TO_CHAT': 'Staff Reply (Email)',
+    'PATIENT_REGISTERED': 'Registration OTP (Email)',
+    'PASSWORD_RESET_REQUESTED': 'Password Reset OTP (Email)',
   };
 
   const handleSaveChannel = async () => {

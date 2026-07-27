@@ -7,24 +7,28 @@ import type { AppointmentCardData, TimelineEntry } from '@/modules/staff/hooks/s
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, Mail, RotateCw, ChevronRight, UserRound } from 'lucide-react';
+import { RenderedEmailFrame } from '@/components/emails/email-renderer';
 
+// UI Label Mappings for Event Types (Guest vs Patient distinction noted in code comments)
 const EVENT_NAME_MAP: Record<string, string> = {
-  'APPOINTMENT_BOOKED': 'Booking Confirmation',
-  'APPOINTMENT_CONVERTED_FROM_INQUIRY': 'Inquiry Approved',
-  'APPOINTMENT_CONVERTED_FROM_INQUIRY_SMS': 'Inquiry Approved SMS',
-  'APPOINTMENT_MANUALLY_BOOKED_PATIENT': 'Manual Booking (Patient)',
-  'APPOINTMENT_MANUALLY_BOOKED_GUEST': 'Manual Booking (Guest)',
-  'APPOINTMENT_REMINDER_24H': '24-Hour Reminder',
-  'APPOINTMENT_REMINDER_48H': '48-Hour Reminder',
-  'RESCHEDULE_BOOKING': 'Rescheduled',
-  'CANCEL_BOOKING': 'Cancelled',
-  'STAFF_REPLIED_TO_CHAT': 'Staff Reply',
-  'APPOINTMENT_MANUALLY_BOOKED_SMS': 'Manual Booking SMS',
-  'APPOINTMENT_REMINDER_48H_SMS': '48-Hour Reminder SMS',
-  'APPOINTMENT_REMINDER_24H_SMS': '24-Hour Reminder SMS',
-  'APPOINTMENT_COMPLETED_POST_CARE_SMS': 'Post-Care SMS',
-  'PATIENT_REGISTERED': 'Registration OTP',
-  'PASSWORD_RESET_REQUESTED': 'Password Reset OTP',
+  'APPOINTMENT_BOOKED': 'Booking Confirmation (Email)',
+  'APPOINTMENT_CONVERTED_FROM_INQUIRY': 'Inquiry Approved (Email)', // Guest inquiry conversion email
+  'APPOINTMENT_CONVERTED_FROM_INQUIRY_PATIENT': 'Inquiry Approved (Email)', // Patient inquiry conversion email
+  'APPOINTMENT_CONVERTED_FROM_INQUIRY_SMS': 'Inquiry Approved (SMS)',
+  'APPOINTMENT_MANUALLY_BOOKED_PATIENT': 'Manual Booking (Email)', // Registered patient manual booking email
+  'APPOINTMENT_MANUALLY_BOOKED_GUEST': 'Manual Booking (Email)', // Guest patient manual booking email
+  'APPOINTMENT_MANUALLY_BOOKED_SMS': 'Manual Booking (SMS)',
+  'APPOINTMENT_REMINDER_24H': '24-Hour Reminder (Email)',
+  'APPOINTMENT_REMINDER_48H': '48-Hour Reminder (Email)',
+  'APPOINTMENT_REMINDER_24H_SMS': '24-Hour Reminder (SMS)',
+  'APPOINTMENT_REMINDER_48H_SMS': '48-Hour Reminder (SMS)',
+  'RESCHEDULE_BOOKING': 'Rescheduled (Email)',
+  'CANCEL_BOOKING': 'Cancelled (Email)',
+  'STAFF_REPLIED_TO_CHAT': 'Staff Reply (Email)',
+  'APPOINTMENT_COMPLETED_POST_CARE': 'Post-Care Review (Email)',
+  'APPOINTMENT_COMPLETED_POST_CARE_SMS': 'Post-Care (SMS)',
+  'PATIENT_REGISTERED': 'Registration OTP (Email)',
+  'PASSWORD_RESET_REQUESTED': 'Password Reset OTP (Email)',
 };
 
 function formatMessageTime(dateStr: string): string {
@@ -152,8 +156,13 @@ function recipientLabel(recipient: string): string {
   return recipient;
 }
 
+function renderActualEmailComponent(eventType: string, payload: Record<string, any>) {
+  return <RenderedEmailFrame eventType={eventType} payload={payload} />;
+}
+
 function TimelineEntryCard({ entry, onResend, resendingId }: { entry: TimelineEntry; onResend?: (id: string) => void; resendingId?: string | null }) {
   const [showPayload, setShowPayload] = useState(false);
+  const [activeDetailTab, setActiveDetailTab] = useState<'preview' | 'payload'>('preview');
 
   const statusColor =
     entry.rawStatus === 'FAILED'
@@ -169,11 +178,16 @@ function TimelineEntryCard({ entry, onResend, resendingId }: { entry: TimelineEn
         ? 'bg-emerald-100 text-emerald-700'
         : 'bg-amber-100 text-amber-700';
 
+  const isEmail = entry.channel === 'EMAIL';
+
+  // Helper to extract clean email summary fields from payload
+  const payload = entry.payload || {};
+
   return (
     <div className="relative flex gap-3 pb-5 last:pb-0">
       <div className="flex flex-col items-center shrink-0">
         <div className={`size-7 rounded-full flex items-center justify-center border-2 text-[10px] font-bold ${statusColor}`}>
-          {entry.channel === 'EMAIL' ? 'E' : 'S'}
+          {isEmail ? 'E' : 'S'}
         </div>
         <div className="w-px flex-1 bg-border/60 mt-1" />
       </div>
@@ -202,7 +216,7 @@ function TimelineEntryCard({ entry, onResend, resendingId }: { entry: TimelineEn
           </div>
 
           <div className="flex items-center gap-1 mt-1.5 text-[11px] text-muted-foreground/70">
-            <span>{showPayload ? 'Hide' : 'View'} Message Details</span>
+            <span>{showPayload ? 'Hide' : 'View'} Details & Preview</span>
             <ChevronRight className={`size-3 transition-transform ${showPayload ? 'rotate-90' : ''}`} />
           </div>
 
@@ -230,15 +244,46 @@ function TimelineEntryCard({ entry, onResend, resendingId }: { entry: TimelineEn
         )}
 
         {showPayload && (
-          <div className="mt-2 space-y-2">
+          <div className="mt-3 space-y-2.5">
             {entry.errorLogs && (
               <div className="bg-rose-950/10 border border-rose-500/20 rounded-lg p-2.5 text-[11px] font-mono text-rose-600 whitespace-pre-wrap leading-relaxed">
                 {entry.errorLogs}
               </div>
             )}
-            <div className="bg-secondary-bg/30 border border-card-border/40 rounded-lg p-2.5 text-[11px] font-mono text-text-secondary leading-relaxed whitespace-pre-wrap max-h-48 overflow-y-auto">
-              {JSON.stringify(entry.payload, null, 2)}
+
+            {/* Sub-tabs for Preview vs Payload */}
+            <div className="flex gap-1 border-b border-card-border/40 pb-1 text-xs">
+              <button
+                onClick={() => setActiveDetailTab('preview')}
+                className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors ${
+                  activeDetailTab === 'preview'
+                    ? 'bg-primary/10 text-primary font-semibold'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                {isEmail ? '📧 Email Preview' : '💬 Message Preview'}
+              </button>
+              <button
+                onClick={() => setActiveDetailTab('payload')}
+                className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors ${
+                  activeDetailTab === 'payload'
+                    ? 'bg-primary/10 text-primary font-semibold'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                {'{ }'} Technical Payload
+              </button>
             </div>
+
+            {activeDetailTab === 'preview' ? (
+              <div className="rounded-xl border border-card-border/60 overflow-hidden shadow-2xs bg-white text-black max-h-[500px] overflow-y-auto">
+                {renderActualEmailComponent(entry.eventType, payload)}
+              </div>
+            ) : (
+              <div className="bg-secondary-bg/30 border border-card-border/40 rounded-lg p-2.5 text-[11px] font-mono text-text-secondary leading-relaxed whitespace-pre-wrap max-h-48 overflow-y-auto">
+                {JSON.stringify(entry.payload, null, 2)}
+              </div>
+            )}
           </div>
         )}
       </div>
