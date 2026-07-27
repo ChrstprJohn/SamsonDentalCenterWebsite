@@ -287,7 +287,7 @@ export function AppointmentEmailTimelineView() {
       >
         <div className="p-3.5 border-b shrink-0 space-y-2">
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-medium text-foreground">Appointments</h2>
+            <h2 className="text-base font-medium text-foreground">Communication List</h2>
             <Button
               size="sm"
               variant="ghost"

@@ -25,7 +25,8 @@ import {
   DollarSign,
   Briefcase,
   MessageSquare,
-  UserCheck
+  UserCheck,
+  Mail
 } from "lucide-react"
 
 const data = {
@@ -46,6 +47,11 @@ const data = {
       title: "Chat Inbox",
       url: "/secretary-v2/chat",
       icon: <MessageSquare className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
+    },
+    {
+      title: "Communication History",
+      url: "/secretary-v2/communication-logs",
+      icon: <Mail className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
     },
 
     {
@@ -93,12 +99,12 @@ const data = {
           url: "/secretary-v2/notifications",
         },
         {
-          title: "Email Logs",
+          title: "Email Log List",
           url: "/secretary-v2/emails",
         },
         {
-          title: "Communication Logs",
-          url: "/secretary-v2/communication-logs",
+          title: "SMS Logs List",
+          url: "/secretary-v2/sms-logs",
         },
         {
           title: "Audit Logs",
