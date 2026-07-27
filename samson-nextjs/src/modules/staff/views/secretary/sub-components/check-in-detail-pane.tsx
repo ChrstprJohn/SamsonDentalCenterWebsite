@@ -590,7 +590,9 @@ function DetailsContent({ appointment, view }: { appointment: any; view?: any })
           </Label>
         </div>
         <div className="flex flex-col gap-2">
-          {commEntries.map((entry) => {
+          {channel === 'NONE' ? (
+            <p className="text-xs text-muted-foreground italic">No notification channel selected.</p>
+          ) : commEntries.map((entry) => {
             const createdAt = (appointment as any).createdAt || (appointment as any).created_at;
             const startTime = (appointment as any).startTime || (appointment as any).start_time || (appointment as any).date;
 
@@ -1192,7 +1194,9 @@ function MessageLogContent({ appointment, view }: { appointment: any; view: any 
       <div className="space-y-3">
         <span className="text-sm font-medium text-foreground block">Notification History</span>
         <div className="flex flex-col gap-2">
-          {commEntries.map((entry) => {
+          {channel === 'NONE' ? (
+            <p className="text-xs text-muted-foreground italic">No notification channel selected.</p>
+          ) : commEntries.map((entry) => {
             const hasEmail = channel === 'EMAIL' || channel === 'BOTH';
             const hasSms = channel === 'SMS' || channel === 'BOTH';
 
@@ -1244,11 +1248,6 @@ function MessageLogContent({ appointment, view }: { appointment: any; view: any 
                         <RotateCw className={`size-3 ${resending === `${entry.eventType}_EMAIL` ? 'animate-spin' : ''}`} />
                         {resending === `${entry.eventType}_EMAIL` ? 'Sending...' : 'Resend'}
                       </Button>
-                    </div>
-                  )}
-                  {!hasEmail && !hasSms && (
-                    <div className="p-2.5 bg-secondary-bg/20 border border-card-border/60 rounded-xl text-xs text-muted-foreground">
-                      Notifications opted out (Channel set to None)
                     </div>
                   )}
                 </div>

@@ -296,7 +296,9 @@ function AppointmentDetails({ appointment, view, activeTab, compact }: { appoint
               </Label>
             </div>
             <div className={`flex flex-col ${compact ? 'gap-2' : 'gap-3'}`}>
-              {commEntries.map((entry) => {
+              {channel === 'NONE' ? (
+                <p className="text-xs text-muted-foreground italic">No notification channel selected.</p>
+              ) : commEntries.map((entry) => {
                 const createdAt = (appointment as any).createdAt || (appointment as any).created_at;
                 const startTime = (appointment as any).startTime || (appointment as any).start_time || (appointment as any).date;
 
@@ -368,9 +370,6 @@ function AppointmentDetails({ appointment, view, activeTab, compact }: { appoint
                   </div>
                 );
               })}
-              {channel === 'NONE' && (
-                <p className="text-xs text-muted-foreground italic">No notification channel selected.</p>
-              )}
             </div>
           </div>
           <hr className={`border-card-border/40 ${compact ? 'mx-4' : 'mx-5'}`} />

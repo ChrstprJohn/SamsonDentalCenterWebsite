@@ -33,7 +33,7 @@ export function computeNotificationStatus({
   if (createdAt && startTime) {
     const createdMs = new Date(createdAt).getTime();
     startMs = new Date(startTime).getTime();
-    if (!isNaN(createdMs) && !isNaN(startMs) && startMs > createdMs) {
+    if (!isNaN(createdMs) && !isNaN(startMs)) {
       leadTimeHours = (startMs - createdMs) / (1000 * 3600);
     }
   } else if (startTime) {
