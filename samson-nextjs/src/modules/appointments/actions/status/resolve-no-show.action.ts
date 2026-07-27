@@ -44,11 +44,24 @@ export async function resolveNoShowAction(formData: ResolveNoShowDto) {
         const { outboxCommands } = await import('@/shared/outbox/outbox.commands');
         const { createAdminClient } = await import('@/shared/database/server');
         const adminDb = await createAdminClient();
+        const { data: appointment } = await adminDb
+          .from('appointments')
+          .select('patient_id, guest_contacts(email, phone_number)')
+          .eq('id', validData.appointmentId)
+          .single();
+        const aptData = appointment as any;
+        const patientId = aptData?.patient_id || null;
+        const guestEmail = aptData?.guest_contacts?.[0]?.email || null;
+        const guestPhone = aptData?.guest_contacts?.[0]?.phone_number || null;
         await outboxCommands(adminDb).emitEvent('APPOINTMENT_COMPLETED_POST_CARE', {
           appointmentId: validData.appointmentId,
+          patientId,
+          email: guestEmail,
         });
         await outboxCommands(adminDb).emitEvent('APPOINTMENT_COMPLETED_POST_CARE_SMS', {
           appointmentId: validData.appointmentId,
+          patientId,
+          phoneNumber: guestPhone,
         });
       } catch (err) {
         console.warn('Failed to emit post-care resolution events:', err);

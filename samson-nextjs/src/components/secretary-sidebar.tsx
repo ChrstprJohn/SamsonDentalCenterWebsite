@@ -97,6 +97,10 @@ const data = {
           url: "/secretary-v2/emails",
         },
         {
+          title: "Communication Logs",
+          url: "/secretary-v2/communication-logs",
+        },
+        {
           title: "Audit Logs",
           url: "/secretary-v2/audits",
         },
