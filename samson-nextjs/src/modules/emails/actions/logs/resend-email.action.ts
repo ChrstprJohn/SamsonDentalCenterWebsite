@@ -63,13 +63,11 @@ export async function resendEmailAction(data: { id: string }) {
       }
     }
 
-    // Increment retry_count and set status to PENDING
-    const currentRetries = ((event as any).retry_count || 0);
+    // Set status to PENDING — retry_count handled by dispatcher auto-retry
     const { error: updateError } = await supabase
       .from('outbox')
       .update({
         status: 'PENDING',
-        retry_count: currentRetries + 1,
         error_logs: null,
         payload: eventPayload,
       })
