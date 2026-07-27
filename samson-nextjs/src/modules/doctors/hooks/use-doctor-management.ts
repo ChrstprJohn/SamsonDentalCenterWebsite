@@ -21,6 +21,7 @@ export interface Doctor {
   email: string;
   phoneNumber: string;
   specialization: string;
+  avatarUrl?: string | null;
   status: 'ACTIVE' | 'FORCE_PASSWORD_CHANGE' | 'HIDDEN' | 'ARCHIVED';
   isActive: boolean;
   services: string[];
@@ -37,7 +38,7 @@ export function useDoctorManagement({ initialDoctors }: UseDoctorManagementProps
     initialDoctors.length > 0 ? initialDoctors[0].id : null
   );
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('ALL');
+  const [statusFilter, setStatusFilter] = useState<string>('ACTIVE');
   const [isEditing, setIsEditing] = useState(false);
   const [isAddingNew, setIsAddingNew] = useState(false);
 

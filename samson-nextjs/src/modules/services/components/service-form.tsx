@@ -70,23 +70,25 @@ export function ServiceForm({
           </div>
         )}
 
-        {/* Service Information Section */}
-        <div className="py-4 px-5">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-base font-medium text-foreground">Service Information</span>
-            <div className="flex items-center gap-2">
-              <Button type="button" variant="outline" size="sm" onClick={onCancel} disabled={isSubmitting} className="h-7 px-2.5 text-xs gap-1">
-                <X className="size-3.5" /> Cancel
-              </Button>
-              <Button type="submit" size="sm" disabled={isSubmitting} className="h-7 px-2.5 text-xs gap-1 bg-slate-900 text-white rounded-md disabled:cursor-not-allowed">
-                <Check className="size-3.5" /> {isSubmitting ? 'Saving...' : 'Save'}
-              </Button>
-            </div>
-          </div>
+        {/* Current Status Section */}
+        <div className="py-4 px-5 border-b border-card-border/40">
+          <span className="text-base font-medium text-foreground block mb-3">Current Status</span>
+          <select
+            {...register('status')}
+            className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border font-medium"
+          >
+            <option value="ACTIVE">🟢 Active (Available for online booking & internal system)</option>
+            <option value="HIDDEN">🟡 Hidden Online (Hidden from online booking portal, internal staff only)</option>
+            <option value="ARCHIVED">🔴 Archived (Disabled across all platforms and clinic catalog)</option>
+          </select>
+        </div>
 
+        {/* Service Information Section */}
+        <div className="py-4 px-5 border-b border-card-border/40">
+          <span className="text-base font-medium text-foreground block mb-3">Service Information</span>
           <div className="flex flex-col gap-3">
             <div className="flex flex-col gap-0.5">
-              <span className="text-xs text-muted-foreground">Service Title</span>
+              <span className="text-xs text-muted-foreground">Service Title <span className="text-red-500 font-bold ml-0.5">*</span></span>
               <input
                 type="text"
                 required
@@ -94,19 +96,6 @@ export function ServiceForm({
                 className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
               />
               {errors.name && <span className="text-[10px] text-red-600 font-semibold">{errors.name.message}</span>}
-            </div>
-
-            {/* Service Status Select */}
-            <div className="flex flex-col gap-0.5">
-              <span className="text-xs text-muted-foreground font-medium">Current Status</span>
-              <select
-                {...register('status')}
-                className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border font-medium"
-              >
-                <option value="ACTIVE">🟢 Active (Available for online booking & internal system)</option>
-                <option value="HIDDEN">🟡 Hidden Online (Hidden from online booking portal, internal staff only)</option>
-                <option value="ARCHIVED">🔴 Archived (Disabled across all platforms and clinic catalog)</option>
-              </select>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
@@ -122,7 +111,7 @@ export function ServiceForm({
               </div>
 
               <div className="flex flex-col gap-0.5">
-                <span className="text-xs text-muted-foreground">Duration (Minutes)</span>
+                <span className="text-xs text-muted-foreground">Duration (Minutes) <span className="text-red-500 font-bold ml-0.5">*</span></span>
                 <input
                   type="number"
                   required
@@ -134,7 +123,7 @@ export function ServiceForm({
             </div>
 
             <div className="flex flex-col gap-0.5">
-              <span className="text-xs text-muted-foreground">Base Price ($)</span>
+              <span className="text-xs text-muted-foreground">Base Price ($) <span className="text-red-500 font-bold ml-0.5">*</span></span>
               <input
                 type="number"
                 step="0.01"
@@ -153,31 +142,59 @@ export function ServiceForm({
                 className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground leading-relaxed focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
               />
             </div>
-
-            <div className="flex flex-col gap-1.5 pt-1">
-              <span className="text-xs text-muted-foreground">Service Cover Image</span>
-              {form.watch('imageUrl') && (
-                <div className="flex items-center gap-3 p-2 border border-card-border rounded-xl bg-card-border/5 mb-1">
-                  <img
-                    src={form.watch('imageUrl') || undefined}
-                    alt="Current service image"
-                    className="w-10 h-10 rounded-lg object-cover border border-card-border"
-                  />
-                  <div className="flex flex-col">
-                    <span className="text-xs font-medium text-foreground">Current Image</span>
-                    <span className="text-[10px] text-muted-foreground">Will be replaced if a new file is uploaded.</span>
-                  </div>
-                </div>
-              )}
-              <input
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                {...register('imageFile')}
-                className="w-full px-3 py-2 rounded-xl border bg-card text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border file:mr-3 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-[10px] file:font-semibold file:bg-primary/10 file:text-primary"
-              />
-            </div>
           </div>
         </div>
+
+        {/* Service Photo Section */}
+        <div className="py-4 px-5">
+          <span className="text-base font-medium text-foreground block mb-3">Service Photo</span>
+          <div className="flex flex-col gap-2">
+            {form.watch('imageUrl') && (
+              <div className="flex items-center gap-3 p-3 border border-card-border rounded-xl bg-card-border/5 mb-1">
+                <img
+                  src={form.watch('imageUrl') || undefined}
+                  alt="Current service image"
+                  className="w-12 h-12 rounded-lg object-cover border border-card-border"
+                />
+                <div className="flex flex-col">
+                  <span className="text-xs font-semibold text-foreground">Current Photo</span>
+                  <span className="text-[11px] text-muted-foreground">Will be replaced if a new file is uploaded.</span>
+                </div>
+              </div>
+            )}
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              {...register('imageFile')}
+              className="w-full px-3 py-2 rounded-xl border bg-card text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border file:mr-3 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-[10px] file:font-semibold file:bg-primary/10 file:text-primary"
+            />
+            <span className="text-[11px] text-muted-foreground">
+              Supports JPEG, PNG, WebP • Maximum file size: 5MB • Recommended resolution: 1200×800 (16:9)
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Sticky Bottom Actions Bar */}
+      <div className="sticky bottom-0 left-0 right-0 p-4 border-t border-card-border/40 bg-background/95 backdrop-blur-sm flex items-center justify-end gap-3 z-10 shrink-0 shadow-lg">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={onCancel}
+          disabled={isSubmitting}
+          className="h-9 px-4 text-xs font-semibold rounded-xl gap-1.5"
+        >
+          <X className="size-4" /> Cancel
+        </Button>
+        <Button
+          type="submit"
+          size="sm"
+          disabled={isSubmitting}
+          className="h-9 px-4 text-xs font-semibold rounded-xl gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm disabled:cursor-not-allowed"
+        >
+          <Check className="size-4" /> {isSubmitting ? (isEditMode ? 'Saving Changes...' : 'Creating Service...') : (isEditMode ? 'Save Changes' : 'Create Service')}
+        </Button>
       </div>
     </form>
   );

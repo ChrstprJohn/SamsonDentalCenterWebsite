@@ -49,13 +49,11 @@ export function DoctorManagementView({ initialDoctors, allServices }: DoctorMana
     setMobileView('detail');
   };
 
-  const activeCount = useMemo(() => initialDoctors.filter((d) => d.status === 'ACTIVE').length, [initialDoctors]);
-  const hiddenCount = useMemo(() => initialDoctors.filter((d) => d.status === 'HIDDEN').length, [initialDoctors]);
+  const activeCount = useMemo(() => initialDoctors.filter((d) => d.status === 'ACTIVE' || d.status === 'FORCE_PASSWORD_CHANGE').length, [initialDoctors]);
   const archivedCount = useMemo(() => initialDoctors.filter((d) => d.status === 'ARCHIVED').length, [initialDoctors]);
 
   const TABS = [
     { key: 'ACTIVE', label: 'Active', count: activeCount },
-    { key: 'HIDDEN', label: 'Hidden', count: hiddenCount },
     { key: 'ARCHIVED', label: 'Archived', count: archivedCount },
   ];
 
@@ -63,14 +61,9 @@ export function DoctorManagementView({ initialDoctors, allServices }: DoctorMana
     <div className="flex flex-1 min-h-0 w-full overflow-hidden">
       {/* Left Roster Sidebar Pane */}
       <div className={`lg:w-[350px] flex-1 lg:flex-none flex-col border-r border-card-border/40 bg-sidebar min-h-0 overflow-hidden ${colMobile('list')} lg:flex`}>
-        <SidebarHeader className="gap-3.5 border-b border-card-border/40 p-4 shrink-0">
+        <div className="flex flex-col gap-3.5 border-b border-card-border/40 p-4 shrink-0">
           <div className="flex w-full items-center justify-between">
-            <div className="flex items-center gap-2 text-base font-medium text-foreground">
-              <div className="lg:hidden">
-                <SidebarTrigger />
-              </div>
-              <span>Doctors Directory</span>
-            </div>
+            <span className="text-base font-medium text-foreground">Dentists List</span>
             <button
               onClick={handleAdd}
               disabled={isAddingNew}
@@ -105,7 +98,7 @@ export function DoctorManagementView({ initialDoctors, allServices }: DoctorMana
               </button>
             ))}
           </div>
-        </SidebarHeader>
+        </div>
 
         <DoctorList
           doctors={filteredDoctors}
@@ -126,28 +119,24 @@ export function DoctorManagementView({ initialDoctors, allServices }: DoctorMana
               <div className="flex-1 flex flex-col text-left min-w-0">
                 <span className="text-base font-medium text-foreground truncate">
                   {isAddingNew
-                    ? 'New Doctor Onboarding'
-                    : selectedDoctor
-                    ? `Dr. ${selectedDoctor.firstName} ${selectedDoctor.lastName}`
+                    ? 'Add New Doctor'
                     : 'Doctor Details'}
                 </span>
                 <span className="text-[11px] text-muted-foreground truncate">
-                  {selectedDoctor ? selectedDoctor.specialization || 'General Dentist' : 'Onboard & configure clinician profile'}
+                  {selectedDoctor ? 'Dentist Profile Details' : 'Account creation & clinician profile setup'}
                 </span>
               </div>
             </div>
           </div>
-          <div className="flex-1 min-h-0 overflow-y-auto p-6">
-            <DoctorDetailsPane
-              doctor={selectedDoctor}
-              allServices={allServices}
-              isEditing={isEditing}
-              setIsEditing={setIsEditing}
-              isAddingNew={isAddingNew}
-              onCancel={handleCancel}
-              onSuccess={handleCancel}
-            />
-          </div>
+          <DoctorDetailsPane
+            doctor={selectedDoctor}
+            allServices={allServices}
+            isEditing={isEditing}
+            setIsEditing={setIsEditing}
+            isAddingNew={isAddingNew}
+            onCancel={handleCancel}
+            onSuccess={handleCancel}
+          />
         </div>
       ) : (
         <div className="flex-1 flex-col items-center justify-center text-muted-foreground bg-muted/10 max-lg:hidden flex p-6 text-center">
@@ -161,3 +150,4 @@ export function DoctorManagementView({ initialDoctors, allServices }: DoctorMana
     </div>
   );
 }
+

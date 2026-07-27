@@ -69,57 +69,23 @@ export function DoctorDetailsPane({
   };
 
   return (
-    <div className="flex flex-col gap-4">
-      {/* Top Actions Header */}
-      {doctor && (
-        <div className="flex items-center justify-between gap-4 p-4 bg-card border border-card-border rounded-2xl">
-          <div className="flex items-center gap-2">
-            <label className="text-xs font-bold text-text-secondary uppercase">Quick Status:</label>
-            <select
-              value={doctor.status === 'FORCE_PASSWORD_CHANGE' ? 'ACTIVE' : doctor.status}
-              onChange={(e) => handleStatusToggle(e.target.value)}
-              className="px-2 py-1 text-xs border border-slate-200 dark:border-white/10 rounded-lg bg-white dark:bg-slate-900 focus:outline-none focus:ring-1 focus:ring-blue-500 font-semibold"
-            >
-              <option value="ACTIVE">ACTIVE</option>
-              <option value="HIDDEN">HIDDEN</option>
-              <option value="ARCHIVED">ARCHIVED</option>
-            </select>
-          </div>
-
-          <Button
-            size="sm"
-            onClick={() => setIsEditing(true)}
-            disabled={isEditing}
-            className="text-[11px] h-8 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold"
-          >
-            ✏️ Edit Profile
-          </Button>
-        </div>
+    <div className="flex flex-col flex-1 min-h-0 h-full">
+      {isEditing || isAddingNew ? (
+        <DoctorEditForm
+          doctor={doctor}
+          allServices={allServices}
+          onSuccess={onSuccess}
+          onCancel={onCancel}
+        />
+      ) : (
+        <DoctorReadPane
+          doctor={doctor}
+          allServices={allServices}
+          onEdit={() => setIsEditing(true)}
+          onStatusToggle={handleStatusToggle}
+        />
       )}
-
-      {/* Details Pane Layout Split */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Left Sub-Pane: Read-only details */}
-        <div className="h-full">
-          <DoctorReadPane doctor={doctor} />
-        </div>
-
-        {/* Right Sub-Pane: Form / Interactive edit */}
-        <div className="h-full">
-          {isEditing || isAddingNew ? (
-            <DoctorEditForm
-              doctor={doctor}
-              allServices={allServices}
-              onSuccess={onSuccess}
-              onCancel={onCancel}
-            />
-          ) : (
-            <div className="flex flex-col items-center justify-center p-6 text-center text-xs text-text-muted border border-dashed border-card-border rounded-2xl h-full bg-slate-50/20 dark:bg-slate-900/10 min-h-[300px]">
-              Click &quot;Edit Profile&quot; to toggle editor interactive form state.
-            </div>
-          )}
-        </div>
-      </div>
     </div>
   );
 }
+

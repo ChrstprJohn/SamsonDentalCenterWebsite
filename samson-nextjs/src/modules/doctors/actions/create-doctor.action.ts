@@ -26,6 +26,8 @@ export async function createDoctorAction(
         suffix: validatedData.suffix || null,
         phone: validatedData.phoneNumber,
         specialization: validatedData.specialization,
+        avatar_url: validatedData.avatarUrl || null,
+        avatarUrl: validatedData.avatarUrl || null,
         // Trigger compatibility keys:
         firstName: validatedData.firstName,
         lastName: validatedData.lastName,
@@ -43,7 +45,7 @@ export async function createDoctorAction(
 
     const doctorId = authData.user.id;
 
-    // 1.5 Update database profile role to DOCTOR and name/phone fields
+    // 1.5 Update database profile role to DOCTOR and name/phone/avatar fields
     const { error: dbUpdateError } = await supabaseAdmin
       .from('users')
       .update({
@@ -53,13 +55,15 @@ export async function createDoctorAction(
         middle_name: validatedData.middleName || null,
         suffix: validatedData.suffix || null,
         phone_number: validatedData.phoneNumber,
+        avatar_url: validatedData.avatarUrl || null,
         status: validatedData.status,
         is_active: validatedData.status !== 'ARCHIVED',
       })
       .eq('id', doctorId);
 
     if (dbUpdateError) {
-      console.error('Failed to update doctor role in database:', dbUpdateError);
+      console.error('Failed to update doctor role in database, rolling back auth account:', dbUpdateError);
+      await supabaseAdmin.auth.admin.deleteUser(doctorId);
       return {
         success: false,
         error: dbUpdateError.message || 'Failed to update database profile role',

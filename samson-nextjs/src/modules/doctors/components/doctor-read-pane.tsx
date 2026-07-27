@@ -5,110 +5,152 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Doctor } from '../hooks/use-doctor-management';
 import { formatTimeString } from '@/shared/utils/date.util';
+import { UserRound, Pencil } from 'lucide-react';
+
+
+interface Service {
+  id: string;
+  name: string;
+}
 
 interface DoctorReadPaneProps {
   doctor: Doctor | null;
+  allServices?: Service[];
+  onEdit: () => void;
+  onStatusToggle: (status: string) => void;
 }
 
-export function DoctorReadPane({ doctor }: DoctorReadPaneProps) {
+export function DoctorReadPane({ doctor, allServices = [], onEdit, onStatusToggle }: DoctorReadPaneProps) {
   if (!doctor) {
     return (
-      <div className="flex flex-col items-center justify-center p-6 text-center text-xs text-text-muted h-full">
-        Select a doctor to view their schedules and details.
+      <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center text-muted-foreground">
+        <div className="size-12 rounded-full bg-muted/40 flex items-center justify-center mb-3">
+          <UserRound className="size-6 text-muted-foreground/60" />
+        </div>
+        <p className="text-xs font-medium text-foreground">No doctor selected</p>
+        <p className="text-[11px] text-muted-foreground mt-1 max-w-[220px]">
+          Select a doctor from the roster to view details.
+        </p>
       </div>
     );
   }
 
-  const initials = `${doctor.firstName[0] || ''}${doctor.lastName[0] || ''}`.toUpperCase();
+  const fullName = `Dr. ${doctor.firstName} ${doctor.lastName}${doctor.suffix ? ` ${doctor.suffix}` : ''}`;
+  const assignedServices = allServices.filter((s) => doctor.services?.includes(s.id));
 
   return (
-    <div className="flex flex-col gap-5 p-5 bg-slate-50/50 dark:bg-slate-900/30 rounded-2xl border border-card-border/50 h-full">
-      <div className="flex items-center gap-3">
-        <div className="w-12 h-12 rounded-full bg-blue-500/10 text-blue-500 flex items-center justify-center font-bold text-lg border border-blue-500/20">
-          {initials}
+    <div className="flex flex-col flex-1 min-h-0 h-full">
+      <div
+        className="flex-1 min-h-0 overflow-y-auto [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
+        style={{ scrollbarWidth: 'thin' }}
+        data-lenis-prevent
+      >
+        {/* Header Profile Section */}
+        <div className="w-full py-8 px-5 border-b border-card-border/40 bg-muted/20 flex flex-col items-center justify-center text-center">
+          {doctor.avatarUrl ? (
+            <div className="size-20 shrink-0 rounded-full border-2 border-primary/20 overflow-hidden bg-card shadow-sm mb-3">
+              <img src={doctor.avatarUrl} alt={fullName} className="w-full h-full object-cover" />
+            </div>
+          ) : (
+            <div className="size-20 shrink-0 rounded-full bg-muted-foreground/10 flex items-center justify-center border border-border/60 overflow-hidden mb-3">
+              <UserRound className="size-12 text-muted-foreground/70 translate-y-0.5" />
+            </div>
+          )}
+          <h2 className="text-2xl font-bold text-foreground">{fullName}</h2>
         </div>
-        <div>
-          <h3 className="font-bold text-sm text-text-primary">
-            Dr. {doctor.firstName} {doctor.lastName}
-          </h3>
-          <p className="text-[10px] font-semibold text-blue-500 uppercase tracking-wider">
-            {doctor.specialization || 'General Dentist'}
-          </p>
-        </div>
-      </div>
 
-      <div className="flex flex-col gap-2.5 text-xs">
-        <div>
-          <span className="font-bold text-text-secondary block mb-0.5">Email</span>
-          <span className="text-text-primary block break-all">{doctor.email}</span>
+        {/* Current Status Section */}
+        <div className="py-4 px-5 border-b border-card-border/40">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-base font-medium text-foreground">Current Status</span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onEdit}
+              className="h-7 px-2.5 text-xs gap-1"
+            >
+              <Pencil className="size-3.5" /> Edit
+            </Button>
+          </div>
+          <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">
+            {doctor.status === 'ARCHIVED'
+              ? '🔴 Archived (Disabled across all platforms and clinic roster)'
+              : '🟢 Active (Available for schedule & internal roster)'}
+          </div>
         </div>
-        <div>
-          <span className="font-bold text-text-secondary block mb-0.5">Phone Number</span>
-          <span className="text-text-primary block">{doctor.phoneNumber || 'N/A'}</span>
+
+        {/* Doctor Information Section */}
+        <div className="py-4 px-5 border-b border-card-border/40">
+          <span className="text-base font-medium text-foreground block mb-3">Doctor Information</span>
+          <div className="flex flex-col gap-3">
+            <div className="grid grid-cols-2 gap-3">
+              <DoctorField label="First Name" value={doctor.firstName} />
+              <DoctorField label="Last Name" value={doctor.lastName} />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <DoctorField label="Middle Name" value={doctor.middleName || 'N/A'} />
+              <DoctorField label="Suffix" value={doctor.suffix || 'N/A'} />
+            </div>
+          </div>
         </div>
-        <div>
-          <span className="font-bold text-text-secondary block mb-0.5">Operational Status</span>
-          <span className="text-text-primary block font-medium">
-            {doctor.isActive ? '🟢 Active clear' : '🔴 Inactive'}
-          </span>
+
+        {/* Doctor Contact Section */}
+        <div className="py-4 px-5 border-b border-card-border/40">
+          <span className="text-base font-medium text-foreground block mb-3">Doctor Contact</span>
+          <div className="flex flex-col gap-3">
+            <DoctorField label="Phone Number" value={doctor.phoneNumber || 'N/A'} />
+            <DoctorField label="Email Address" value={doctor.email} />
+          </div>
         </div>
-      </div>
 
-      <div className="border-t border-card-border/50 pt-4 flex flex-col gap-3">
-        <h4 className="font-bold text-xs text-text-secondary uppercase tracking-wider">
-          Clinician Shifts <span className="text-[10px] font-normal text-text-muted lowercase italic">(informational only)</span>
-        </h4>
-        <div className="flex flex-col gap-1.5 text-[11px] text-text-muted">
-          {(() => {
-            const formatTime = formatTimeString;
-
-            const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-
-            // If doctor has dynamic schedules defined, render them
-            if (doctor.schedules && doctor.schedules.length > 0) {
-              // Sort by dayOfWeek
-              const sortedSchedules = [...doctor.schedules].sort((a, b) => a.dayOfWeek - b.dayOfWeek);
-              return (
-                <>
-                  {sortedSchedules.map((sched) => (
-                    <div key={sched.dayOfWeek} className="flex justify-between py-1 border-b border-card-border/20 last:border-b-0">
-                      <span className="font-medium text-text-secondary">{dayNames[sched.dayOfWeek]}</span>
-                      {sched.isOpen ? (
-                        <span>
-                          {formatTime(sched.startTime)} - {formatTime(sched.endTime)}
-                        </span>
-                      ) : (
-                        <span className="text-red-500/75 font-medium">Off-Duty</span>
-                      )}
-                    </div>
-                  ))}
-                </>
-              );
-            }
-
-            // Fallback default schedules (Mon-Fri 9:00 AM - 5:00 PM)
-            return (
-              <>
-                {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map((day) => (
-                  <div key={day} className="flex justify-between py-1 border-b border-card-border/20 last:border-b-0">
-                    <span className="font-medium text-text-secondary">{day}</span>
-                    <span>9:00 AM - 5:00 PM</span>
-                  </div>
-                ))}
-                <div className="flex justify-between py-1 text-red-500/75">
-                  <span className="font-medium">Saturday & Sunday</span>
-                  <span>Off-Duty</span>
-                </div>
-              </>
-            );
-          })()}
+        {/* Account Credentials Section */}
+        <div className="py-4 px-5 border-b border-card-border/40">
+          <span className="text-base font-medium text-foreground block mb-3">Account Credentials</span>
+          <div className="flex flex-col gap-0.5">
+            <span className="text-xs text-muted-foreground font-medium">Password Status</span>
+            <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">
+              {doctor.status === 'FORCE_PASSWORD_CHANGE'
+                ? '🟡 Password Reset Required (First Login Pending)'
+                : '🟢 Password Configured (Active Account)'}
+            </div>
+          </div>
         </div>
-        <Link href="/secretary" className="mt-2">
-          <Button variant="secondary" className="w-full text-[10px] h-8 rounded-xl font-bold">
-            Edit Doctor Schedule
-          </Button>
-        </Link>
+
+        {/* Doctor Photo Section */}
+        <div className="py-4 px-5">
+          <span className="text-base font-medium text-foreground block mb-3">Doctor Photo / Avatar</span>
+          {doctor.avatarUrl ? (
+            <div className="flex items-center gap-3 p-3 border border-card-border rounded-xl bg-muted/50">
+              <img
+                src={doctor.avatarUrl}
+                alt="Current doctor photo"
+                className="w-12 h-12 rounded-full object-cover border border-card-border"
+              />
+              <div className="flex flex-col">
+                <span className="text-xs font-semibold text-foreground">Current Doctor Photo</span>
+                <span className="text-[11px] text-muted-foreground">Active profile avatar displayed across clinic portals.</span>
+              </div>
+            </div>
+          ) : (
+            <div className="w-full px-4 py-3 rounded-xl border bg-muted/50 text-xs text-muted-foreground border-card-border cursor-default italic">
+              No photo uploaded yet. Click &quot;Edit&quot; to upload a doctor photo.
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
 }
+
+function DoctorField({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex flex-col gap-0.5">
+      <span className="text-xs text-muted-foreground">{label}</span>
+      <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground leading-5 border-card-border cursor-default truncate">
+        {value}
+      </div>
+    </div>
+  );
+}
+

@@ -8,6 +8,7 @@ import { createDoctorAction } from '../actions/create-doctor.action';
 import { updateDoctorAction } from '../actions/update-doctor.action';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/components/feedback/toast-container';
+import { uploadDoctorAvatar } from '../utils/upload-doctor-avatar';
 
 interface UseDoctorFormProps {
   doctor?: any | null; // Passed when editing
@@ -32,6 +33,7 @@ export function useDoctorForm({ doctor, onSuccess }: UseDoctorFormProps = {}) {
       specialization: '',
       defaultPassword: 'Welcome@Samson2026',
       serviceIds: [],
+      avatarUrl: null,
       status: 'ACTIVE',
     },
   });
@@ -55,6 +57,7 @@ export function useDoctorForm({ doctor, onSuccess }: UseDoctorFormProps = {}) {
           specialization: doctor.specialization || '',
           defaultPassword: '',
           serviceIds: doctor.services || [],
+          avatarUrl: doctor.avatarUrl || null,
           status: doctor.status === 'FORCE_PASSWORD_CHANGE' ? 'ACTIVE' : (doctor.status || 'ACTIVE'),
         });
       }
@@ -74,6 +77,7 @@ export function useDoctorForm({ doctor, onSuccess }: UseDoctorFormProps = {}) {
           specialization: doctor.specialization || '',
           defaultPassword: '',
           serviceIds: doctor.services || [],
+          avatarUrl: doctor.avatarUrl || null,
           status: doctor.status === 'FORCE_PASSWORD_CHANGE' ? 'ACTIVE' : (doctor.status || 'ACTIVE'),
         });
       } else {
@@ -87,6 +91,7 @@ export function useDoctorForm({ doctor, onSuccess }: UseDoctorFormProps = {}) {
           specialization: '',
           defaultPassword: 'Welcome@Samson2026',
           serviceIds: [],
+          avatarUrl: null,
           status: 'ACTIVE',
         });
       }
@@ -98,14 +103,30 @@ export function useDoctorForm({ doctor, onSuccess }: UseDoctorFormProps = {}) {
     setServerError(null);
 
     try {
+      let avatarUrl = doctor?.avatarUrl || values.avatarUrl || null;
+      if (values.imageFile && values.imageFile[0]) {
+        try {
+          avatarUrl = await uploadDoctorAvatar(values.imageFile[0]);
+        } catch (err: any) {
+          setServerError(`Avatar upload failed: ${err.message}`);
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
+      const payload = {
+        ...values,
+        avatarUrl,
+      };
+
       let result;
       if (doctor?.id) {
         result = await updateDoctorAction({
           id: doctor.id,
-          ...values,
+          ...payload,
         });
       } else {
-        result = await createDoctorAction(values);
+        result = await createDoctorAction(payload);
       }
 
       if (!result.success) {

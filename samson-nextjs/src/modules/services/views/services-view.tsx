@@ -106,12 +106,7 @@ export function ServicesView({ initialServices }: ServicesViewProps) {
       <div className={`lg:w-[350px] flex-1 lg:flex-none flex-col border-r border-card-border/40 bg-sidebar min-h-0 overflow-hidden ${colMobile('list')} lg:flex`}>
         <SidebarHeader className="gap-3.5 border-b border-card-border/40 p-4 shrink-0">
           <div className="flex w-full items-center justify-between">
-            <div className="flex items-center gap-2 text-base font-medium text-foreground">
-              <div className="lg:hidden">
-                <SidebarTrigger />
-              </div>
-              <span>Service Catalog</span>
-            </div>
+            <span className="text-base font-medium text-foreground">Services List</span>
             <button
               onClick={handleAdd}
               className="h-8 px-2.5 text-xs rounded-xl font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 outline-none select-none active:scale-[0.98] flex items-center gap-1 shadow-sm"
@@ -166,7 +161,7 @@ export function ServicesView({ initialServices }: ServicesViewProps) {
                 <span className="text-base font-medium text-foreground truncate">
                   {isAddingNew
                     ? 'New Treatment Service'
-                    : selectedService?.name}
+                    : 'Service Details'}
                 </span>
                 <span className="text-[11px] text-muted-foreground truncate">
                   {selectedService ? (selectedService.serviceType === 'SPECIALIZED' ? 'Specialized Service' : 'General Service') : 'Create practice catalog treatment item'}

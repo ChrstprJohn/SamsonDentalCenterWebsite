@@ -19,6 +19,7 @@ describe("createServiceUseCase (Unit Test)", () => {
       durationMinutes: 30,
       price: 100,
       serviceType: "GENERAL" as const,
+      status: "ACTIVE" as const,
       isActive: true,
     };
     

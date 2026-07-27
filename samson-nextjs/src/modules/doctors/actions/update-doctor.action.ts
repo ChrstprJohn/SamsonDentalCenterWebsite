@@ -30,6 +30,8 @@ export async function updateDoctorAction(
           suffix: validatedData.suffix || null,
           phone: validatedData.phoneNumber,
           specialization: validatedData.specialization,
+          avatar_url: validatedData.avatarUrl || null,
+          avatarUrl: validatedData.avatarUrl || null,
           status: validatedData.status,
           is_active: validatedData.status !== 'ARCHIVED',
           // Trigger compatibility keys:
@@ -58,6 +60,7 @@ export async function updateDoctorAction(
         middle_name: validatedData.middleName || null,
         suffix: validatedData.suffix || null,
         phone_number: validatedData.phoneNumber,
+        avatar_url: validatedData.avatarUrl || null,
         status: validatedData.status,
         is_active: validatedData.status !== 'ARCHIVED',
       })

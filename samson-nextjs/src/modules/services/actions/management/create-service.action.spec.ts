@@ -29,6 +29,7 @@ describe("createServiceAction (Unit Test)", () => {
       durationMinutes: 30,
       price: 100,
       serviceType: "GENERAL",
+      status: "ACTIVE",
       isActive: true,
     });
     

@@ -18,9 +18,6 @@ export function DoctorCard({ doctor, isSelected, onClick }: DoctorCardProps) {
     if (status === 'HIDDEN') {
       return { label: 'HIDDEN', className: 'text-amber-600 bg-amber-500/10 dark:text-amber-400' };
     }
-    if (status === 'FORCE_PASSWORD_CHANGE') {
-      return { label: 'RESET REQ', className: 'text-orange-600 bg-orange-500/10 dark:text-orange-400' };
-    }
     return { label: 'ACTIVE', className: 'text-emerald-600 bg-emerald-500/10 dark:text-emerald-400' };
   };
 
@@ -35,9 +32,15 @@ export function DoctorCard({ doctor, isSelected, onClick }: DoctorCardProps) {
           : 'text-foreground'
       }`}
     >
-      <div className="size-10 shrink-0 rounded-full bg-muted-foreground/10 flex items-center justify-center border-2 border-border/60 overflow-hidden">
-        <UserRound className="size-8 text-muted-foreground/70 translate-y-0.5" />
-      </div>
+      {doctor.avatarUrl ? (
+        <div className="size-10 shrink-0 rounded-full border-2 border-border/60 overflow-hidden bg-muted">
+          <img src={doctor.avatarUrl} alt={doctor.firstName} className="w-full h-full object-cover" />
+        </div>
+      ) : (
+        <div className="size-10 shrink-0 rounded-full bg-muted-foreground/10 flex items-center justify-center border-2 border-border/60 overflow-hidden">
+          <UserRound className="size-8 text-muted-foreground/70 translate-y-0.5" />
+        </div>
+      )}
       <div className="flex flex-col min-w-0 flex-1 gap-1.5">
         <div className="flex w-full items-center justify-between gap-2">
           <span className="font-semibold truncate">

@@ -69,16 +69,16 @@ const data = {
       icon: <UserCheck className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
     },
     {
-      title: "Clinic Catalogs",
+      title: "Clinic Management",
       url: "#",
       icon: <Users className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
       items: [
         {
-          title: "Doctors Directory",
+          title: "Dentists",
           url: "/secretary-v2/doctors",
         },
         {
-          title: "Services Catalog",
+          title: "Services",
           url: "/secretary-v2/services",
         },
       ],

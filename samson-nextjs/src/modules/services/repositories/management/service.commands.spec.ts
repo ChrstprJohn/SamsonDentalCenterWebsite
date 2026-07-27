@@ -48,6 +48,7 @@ describe("service command closures (Unit Test)", () => {
         durationMinutes: 30,
         price: 100,
         serviceType: "GENERAL",
+        status: "ACTIVE",
         isActive: true,
       });
 
@@ -60,7 +61,7 @@ describe("service command closures (Unit Test)", () => {
 
       const createService = createServiceCommand(mockSupabase);
       await expect(
-        createService({ name: "X", durationMinutes: 10, serviceType: "GENERAL", isActive: true })
+        createService({ name: "X", durationMinutes: 10, serviceType: "GENERAL", status: "ACTIVE", isActive: true })
       ).rejects.toThrow("Failed to create service: DB error");
     });
   });

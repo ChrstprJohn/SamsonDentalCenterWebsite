@@ -81,10 +81,10 @@ export function ServiceDetailPanel({
           </div>
         )}
 
-        {/* Service Details Section */}
-        <div className="py-4 px-5">
+        {/* Current Status Section */}
+        <div className="py-4 px-5 border-b border-card-border/40">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-base font-medium text-foreground">Service Information</span>
+            <span className="text-base font-medium text-foreground">Current Status</span>
             <Button
               variant="outline"
               size="sm"
@@ -95,20 +95,20 @@ export function ServiceDetailPanel({
               <Pencil className="size-3.5" /> Edit
             </Button>
           </div>
+          <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">
+            {service.status === 'ACTIVE'
+              ? '🟢 Active (Available for online booking & internal system)'
+              : service.status === 'HIDDEN'
+              ? '🟡 Hidden Online (Hidden from online booking portal, internal staff only)'
+              : '🔴 Archived (Disabled across all platforms and clinic catalog)'}
+          </div>
+        </div>
 
+        {/* Service Information Section */}
+        <div className="py-4 px-5 border-b border-card-border/40">
+          <span className="text-base font-medium text-foreground block mb-3">Service Information</span>
           <div className="flex flex-col gap-3">
             <ServiceField label="Service Title" value={service.name} />
-
-            <div className="flex flex-col gap-0.5">
-              <span className="text-xs text-muted-foreground font-medium">Current Status</span>
-              <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">
-                {service.status === 'ACTIVE'
-                  ? '🟢 Active (Available for online booking & internal system)'
-                  : service.status === 'HIDDEN'
-                  ? '🟡 Hidden Online (Hidden from online booking portal, internal staff only)'
-                  : '🔴 Archived (Disabled across all platforms and clinic catalog)'}
-              </div>
-            </div>
 
             <div className="grid grid-cols-2 gap-3">
               <ServiceField label="Category Type" value={service.serviceType || 'GENERAL'} />
@@ -124,6 +124,28 @@ export function ServiceDetailPanel({
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Service Photo Section */}
+        <div className="py-4 px-5">
+          <span className="text-base font-medium text-foreground block mb-3">Service Photo</span>
+          {imgUrl ? (
+            <div className="flex items-center gap-3 p-3 border border-card-border rounded-xl bg-muted/50">
+              <img
+                src={imgUrl}
+                alt={service.name}
+                className="w-12 h-12 rounded-lg object-cover border border-card-border"
+              />
+              <div className="flex flex-col">
+                <span className="text-xs font-semibold text-foreground">Current Service Photo</span>
+                <span className="text-[11px] text-muted-foreground">Displayed on online booking portal & clinic catalog.</span>
+              </div>
+            </div>
+          ) : (
+            <div className="w-full px-4 py-3 rounded-xl border bg-muted/50 text-xs text-muted-foreground border-card-border cursor-default italic">
+              No cover image uploaded yet. Click &quot;Edit&quot; to upload an image.
+            </div>
+          )}
         </div>
 
       </div>

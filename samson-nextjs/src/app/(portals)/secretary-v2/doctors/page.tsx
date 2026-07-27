@@ -76,6 +76,7 @@ export default async function SecretaryDoctorsPage() {
     const dbStatus = doc.status || 'ACTIVE';
     const status = authStatus === 'FORCE_PASSWORD_CHANGE' ? 'FORCE_PASSWORD_CHANGE' : dbStatus;
     const specialization = authUser?.user_metadata?.specialization || 'General Dentist';
+    const avatarUrl = doc.avatar_url || authUser?.user_metadata?.avatar_url || authUser?.user_metadata?.avatarUrl || null;
 
     const doctorServiceIds = (dbDoctorServices || [])
       .filter((ds: any) => ds.doctor_id === doc.id)
@@ -120,6 +121,7 @@ export default async function SecretaryDoctorsPage() {
       email: doc.email,
       phoneNumber: doc.phone_number || '',
       specialization,
+      avatarUrl,
       status,
       isActive: doc.is_active,
       services: doctorServiceIds,
