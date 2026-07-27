@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { getClinicAppointmentsAction } from '@/modules/appointments/actions/clinic/get-clinic-appointments.action';
 import { getEmailLogsByAppointmentAction } from '@/modules/emails/actions/logs/get-email-logs-by-appointment.action';
 import { resendEmailAction } from '@/modules/emails/actions/logs/resend-email.action';
@@ -43,6 +44,7 @@ export interface AppointmentCardData {
 }
 
 export function useAppointmentEmailTimeline() {
+  const searchParams = useSearchParams();
   const [appointments, setAppointments] = useState<AppointmentDto[]>([]);
   const [activityMap, setActivityMap] = useState<CommunicationActivityMap>({});
   const [selectedAppointmentId, setSelectedAppointmentId] = useState<string | null>(null);
@@ -70,6 +72,18 @@ export function useAppointmentEmailTimeline() {
   useEffect(() => {
     fetchAppointments();
   }, [fetchAppointments]);
+
+  useEffect(() => {
+    if (appointments.length > 0 && !selectedAppointmentId) {
+      const urlId = searchParams.get('id') || searchParams.get('appointmentId');
+      if (urlId) {
+        const found = appointments.find((a) => a.id === urlId);
+        if (found) {
+          setSelectedAppointmentId(urlId);
+        }
+      }
+    }
+  }, [appointments, searchParams, selectedAppointmentId]);
 
   const fetchEmailLogs = useCallback(async (appointmentId: string) => {
     setIsLoadingLogs(true);

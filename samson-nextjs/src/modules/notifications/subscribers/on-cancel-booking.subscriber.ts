@@ -13,7 +13,7 @@ export const onCancelBookingSubscriber = {
       priority: 'HIGH',
       title: 'Appointment Cancelled',
       message: `Patient ${patientName || 'Patient'} cancelled their ${serviceName || 'Service'} appointment scheduled for ${date || ''}.`,
-      linkUrl: `/secretary/appointments?status=CANCELLED&id=${appointmentId}`,
+      linkUrl: `/secretary-v2/appointments?status=CANCELLED&id=${appointmentId}`,
       entityId: appointmentId,
     });
   },

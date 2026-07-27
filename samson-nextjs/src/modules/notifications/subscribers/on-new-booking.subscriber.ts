@@ -16,7 +16,7 @@ export const onNewBookingSubscriber = {
       priority: 'HIGH',
       title: 'New Booking Request',
       message: `Patient ${patientName || 'Patient'} requested ${serviceName || 'Service'} for ${date || ''} at ${formattedTime}.`,
-      linkUrl: `/secretary/pending?id=${appointmentId}`,
+      linkUrl: `/secretary-v2/pending?id=${appointmentId}`,
       entityId: appointmentId,
     });
   },

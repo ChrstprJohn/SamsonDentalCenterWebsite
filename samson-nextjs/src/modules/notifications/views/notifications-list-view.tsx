@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { NotificationResponseDto } from '../dtos/management/notification-response.dto';
 import { markAllReadAction } from '../actions/management/mark-all-read.action';
 import { markReadAction } from '../actions/management/mark-read.action';
@@ -85,6 +85,16 @@ export function NotificationsListView({ initialNotifications }: NotificationsLis
 
   const { addToast } = useToast();
   const router = useRouter();
+  const pathname = usePathname();
+  const isV2 = pathname?.startsWith('/secretary-v2');
+
+  const getTargetUrl = (url?: string | null) => {
+    if (!url) return '#';
+    if (isV2 && url.startsWith('/secretary') && !url.startsWith('/secretary-v2')) {
+      return url.replace(/^\/secretary(\/|$)/, '/secretary-v2$1');
+    }
+    return url;
+  };
 
   const handleMarkRead = async (id: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
@@ -329,7 +339,7 @@ export function NotificationsListView({ initialNotifications }: NotificationsLis
               {selectedNotif.linkUrl && (
                 <div className="pt-2">
                   <Button asChild className="w-full gap-2 text-sm font-semibold">
-                    <Link href={selectedNotif.linkUrl}>
+                    <Link href={getTargetUrl(selectedNotif.linkUrl)}>
                       <ExternalLink className="size-4" />
                       Open Linked Item / Action
                     </Link>

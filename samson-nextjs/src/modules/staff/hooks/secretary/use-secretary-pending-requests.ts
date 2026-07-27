@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { getAvailableDaysAction } from '@/modules/appointments/actions/availability/get-available-days.action';
 import { getAvailableTimeSlotsAction } from '@/modules/appointments/actions/availability/get-available-time-slots.action';
 import { getDoctorScheduleAction } from '@/modules/appointments/actions/availability/get-doctor-schedule.action';
@@ -19,6 +20,7 @@ export const PENDING_CLINIC_HOURS = [
 ] as const;
 
 export function useSecretaryPendingRequests() {
+  const searchParams = useSearchParams();
   const [appointments, setAppointments] = useState<any[]>([]);
   const [selectedAppointmentId, setSelectedAppointmentId] = useState<string | null>(null);
   const [patientDetails, setPatientDetails] = useState<any>(null);
@@ -52,6 +54,18 @@ export function useSecretaryPendingRequests() {
   }, []);
 
   useEffect(() => { fetchPending(); }, [fetchPending]);
+
+  useEffect(() => {
+    if (appointments.length > 0 && !selectedAppointmentId) {
+      const urlId = searchParams.get('id') || searchParams.get('appointmentId');
+      if (urlId) {
+        const found = appointments.find((a) => a.id === urlId);
+        if (found) {
+          setSelectedAppointmentId(urlId);
+        }
+      }
+    }
+  }, [appointments, searchParams, selectedAppointmentId]);
 
   const selectedAppointment = useMemo(
     () => appointments.find((appointment) => appointment.id === selectedAppointmentId),

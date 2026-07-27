@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Calendar, MailWarning, AlertTriangle, CircleAlert, Check, FileText } from 'lucide-react';
 import { NotificationResponseDto } from '../dtos/management/notification-response.dto';
 
@@ -8,6 +9,13 @@ interface NotificationItemProps {
 }
 
 export function NotificationItem({ notification, onMarkRead }: NotificationItemProps) {
+  const pathname = usePathname();
+  const isV2 = pathname?.startsWith('/secretary-v2');
+
+  const targetUrl = (notification.linkUrl && isV2 && notification.linkUrl.startsWith('/secretary') && !notification.linkUrl.startsWith('/secretary-v2'))
+    ? notification.linkUrl.replace(/^\/secretary(\/|$)/, '/secretary-v2$1')
+    : (notification.linkUrl || '#');
+
   const getIcon = (type: string) => {
     switch (type) {
       case 'NEW_APPOINTMENT_REQUEST':
@@ -44,7 +52,7 @@ export function NotificationItem({ notification, onMarkRead }: NotificationItemP
         ? 'bg-slate-800/10 border border-slate-800/30 opacity-55'
         : 'bg-slate-800/40 hover:bg-slate-800/80 border border-slate-700/30 hover:border-slate-700/70'
     }`}>
-      <Link href={notification.linkUrl} className="flex-1 min-w-0 flex gap-3">
+      <Link href={targetUrl} className="flex-1 min-w-0 flex gap-3">
         <div className="flex-shrink-0 mt-0.5 p-2 rounded-lg bg-slate-900/60 border border-slate-700/20">
           {getIcon(notification.type)}
         </div>
