@@ -23,7 +23,7 @@ export function SecretaryAppointmentsView() {
   };
 
   const upcomingCount = useMemo(() =>
-    view.appointments.filter((a) => a.status === 'APPROVED').length,
+    view.appointments.filter((a) => ['APPROVED', 'CHECKED_IN'].includes(a.status)).length,
     [view.appointments]
   );
   const historyCount = useMemo(() =>
@@ -32,7 +32,7 @@ export function SecretaryAppointmentsView() {
   );
 
   const TABS = [
-    { key: 'upcoming' as const, label: 'Upcoming', icon: CalendarClock, count: upcomingCount },
+    { key: 'upcoming' as const, label: 'Active', icon: CalendarClock, count: upcomingCount },
     { key: 'history' as const, label: 'History', icon: History, count: historyCount },
   ];
 

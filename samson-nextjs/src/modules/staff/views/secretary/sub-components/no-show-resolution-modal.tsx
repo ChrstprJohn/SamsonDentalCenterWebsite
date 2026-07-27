@@ -234,6 +234,11 @@ export function NoShowResolutionModal({ view }: { view: any }) {
               startTime={newTime}
               endTime={newEndTime}
               justification={reason}
+              confirmationChannel={appointment.confirmationChannel || (appointment as any).confirmation_channel || 'EMAIL'}
+              onConfirmationChannelChange={(channel) => {
+                appointment.confirmationChannel = channel;
+                (appointment as any).confirmation_channel = channel;
+              }}
               isSubmitting={view.isPending}
               onServiceSelect={() => {}}
               onDoctorSelect={(docId) => setNewDoctorId(docId)}

@@ -1,0 +1,62 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { Check, Pencil } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Select } from '@/components/ui/select';
+import { updateConfirmationChannelAction } from '@/modules/appointments/actions/status/update-confirmation-channel.action';
+
+export type NotificationChannel = 'EMAIL' | 'SMS' | 'BOTH' | 'NONE';
+
+export function NotificationChannelField({
+  appointmentId,
+  value,
+  onChange,
+}: {
+  appointmentId: string;
+  value?: NotificationChannel;
+  onChange?: (value: NotificationChannel) => void;
+}) {
+  const current = value || 'EMAIL';
+  const [channel, setChannel] = useState<NotificationChannel>(current);
+  const [draft, setDraft] = useState<NotificationChannel>(current);
+  const [editing, setEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => { setChannel(current); setDraft(current); setEditing(false); }, [current, appointmentId]);
+
+  const save = async () => {
+    if (draft === channel) { setEditing(false); return; }
+    setSaving(true);
+    const result = await updateConfirmationChannelAction({ appointmentId, confirmationChannel: draft });
+    if (result.success) { setChannel(draft); onChange?.(draft); setEditing(false); }
+    setSaving(false);
+  };
+
+  return (
+    <div className="flex flex-col gap-1.5 p-3 rounded-xl bg-muted/40 border border-card-border">
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-bold text-text-secondary">Notification Channel</span>
+        {!editing ? (
+          <Button type="button" variant="outline" size="sm" onClick={() => setEditing(true)} className="h-7 px-2.5 text-xs gap-1">
+            <Pencil className="size-3.5" /> Edit
+          </Button>
+        ) : (
+          <div className="flex gap-1.5">
+            <Button type="button" variant="outline" size="sm" onClick={() => { setDraft(channel); setEditing(false); }} className="h-7 px-2.5 text-xs">Cancel</Button>
+            <Button type="button" size="sm" onClick={save} disabled={saving || draft === channel} className="h-7 px-2.5 text-xs gap-1"><Check className="size-3.5" /> Save</Button>
+          </div>
+        )}
+      </div>
+      {editing ? (
+        <Select value={draft} onChange={(e) => setDraft(e.target.value as NotificationChannel)} className="text-sm w-full" options={[
+          { value: 'EMAIL', label: 'Email' }, { value: 'SMS', label: 'SMS' }, { value: 'BOTH', label: 'Email & SMS' }, { value: 'NONE', label: 'None' },
+        ]} />
+      ) : (
+        <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-text-muted border-card-border cursor-default">
+          {channel === 'EMAIL' ? 'Email' : channel === 'SMS' ? 'SMS' : channel === 'BOTH' ? 'Email & SMS' : 'None'}
+        </div>
+      )}
+    </div>
+  );
+}

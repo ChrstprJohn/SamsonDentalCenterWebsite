@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import type { AppointmentDto } from '@/modules/appointments/dtos/shared/appointment.dto';
 import type { AvailableDoctorItem } from '@/modules/staff/hooks/secretary/use-secretary-appointments';
 import type { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
+import { NotificationChannelField } from './notification-channel-field';
 
 interface AppointmentRescheduleFormProps {
   appointment: AppointmentDto;
@@ -135,27 +136,7 @@ export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps)
         <p className="text-xs text-muted-foreground">Update date, time, dentist, or service details.</p>
       </div>
 
-      {props.onConfirmationChannelChange && (
-        <div className="flex flex-col gap-1.5 p-3 rounded-xl bg-muted/40 border border-card-border">
-          <span className="text-xs font-bold text-text-secondary">Notification Channel</span>
-          <div className="grid grid-cols-4 gap-1.5">
-            {(['EMAIL', 'SMS', 'BOTH', 'NONE'] as const).map((ch) => (
-              <button
-                type="button"
-                key={ch}
-                onClick={() => props.onConfirmationChannelChange?.(ch)}
-                className={`py-1.5 text-xs font-semibold rounded-lg transition-colors border ${
-                  (props.confirmationChannel || 'EMAIL') === ch
-                    ? 'bg-primary text-primary-foreground border-primary shadow-sm'
-                    : 'bg-card text-text-muted hover:text-text-primary border-card-border'
-                }`}
-              >
-                {ch}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+      {props.onConfirmationChannelChange && <NotificationChannelField appointmentId={props.appointment.id} value={props.confirmationChannel} onChange={props.onConfirmationChannelChange} />}
 
       {/* 1. Service Selection */}
       <div className="flex flex-col gap-0.5">

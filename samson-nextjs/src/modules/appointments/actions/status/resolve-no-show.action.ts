@@ -39,6 +39,24 @@ export async function resolveNoShowAction(formData: ResolveNoShowDto) {
       rescheduleMetadata
     );
 
+    // `NO_SHOW` is intentionally retained when the secretary confirms it.
+    // Persist the decision separately so only no-shows that still need follow-up
+    // appear in the Past Appointment Follow-ups queue.
+    if (validData.resolution === 'CONFIRMED_NO_SHOW') {
+      const { error: resolutionError } = await supabase
+        .from('appointments')
+        .update({
+          no_show_resolved_at: new Date().toISOString(),
+          no_show_resolution: 'CONFIRMED_NO_SHOW',
+        })
+        .eq('id', validData.appointmentId)
+        .eq('status', 'NO_SHOW');
+
+      if (resolutionError) {
+        throw new DomainError(`Failed to record no-show resolution: ${resolutionError.message}`, 'DATABASE_ERROR');
+      }
+    }
+
     if (validData.resolution === 'COMPLETED') {
       try {
         const { outboxCommands } = await import('@/shared/outbox/outbox.commands');

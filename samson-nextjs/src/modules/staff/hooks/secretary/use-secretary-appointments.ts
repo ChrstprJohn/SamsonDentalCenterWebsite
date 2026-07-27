@@ -153,7 +153,9 @@ export function useSecretaryAppointments() {
   };
 
   const filteredAppointments = useMemo(() => appointments.filter((appointment) => {
-    const isUpcoming = appointment.status === 'APPROVED';
+    // A checked-in visit is still active and must remain discoverable in the
+    // directory even after the today-only Kanban has moved on.
+    const isUpcoming = ['APPROVED', 'CHECKED_IN'].includes(appointment.status);
     const isHistory = ['COMPLETED', 'CANCELLED', 'REJECTED', 'DISPLACED', 'NO_SHOW'].includes(appointment.status);
     if (activeTab === 'upcoming' && !isUpcoming) return false;
     if (activeTab === 'history' && !isHistory) return false;

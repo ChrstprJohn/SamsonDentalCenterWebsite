@@ -539,6 +539,7 @@ function AppointmentDetails({ appointment, view, activeTab, compact }: { appoint
             {view.showCancelForm && (canModify || canCancelOnly) && (
               <AppointmentCancelForm
                 reasonPreset={view.cancelReasonPreset}
+                appointmentId={appointment.id}
                 setReasonPreset={view.setCancelReasonPreset}
                 reasonCustom={view.cancelReasonCustom}
                 setReasonCustom={view.setCancelReasonCustom}

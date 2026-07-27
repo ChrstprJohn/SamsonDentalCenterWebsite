@@ -26,6 +26,7 @@ import {
   Briefcase,
   MessageSquare,
   UserCheck,
+  ClipboardCheck,
   Mail
 } from "lucide-react"
 
@@ -73,6 +74,11 @@ const data = {
       title: "Check-In / Out",
       url: "/secretary-v2/check-in",
       icon: <UserCheck className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
+    },
+    {
+      title: "Past Follow-ups",
+      url: "/secretary-v2/past-follow-ups",
+      icon: <ClipboardCheck className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
     },
     {
       title: "Clinic Management",

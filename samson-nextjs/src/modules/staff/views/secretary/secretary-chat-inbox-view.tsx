@@ -664,6 +664,12 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
         if (!appointmentAdapter) return null;
         return {
             selectedAppointment: appointmentAdapter,
+            confirmationChannel: appointmentAdapter.confirmationChannel,
+            setConfirmationChannel: (channel: 'EMAIL' | 'SMS' | 'BOTH' | 'NONE') => {
+                setThreads(prev => prev.map(t => t.appointmentId === selectedThreadId
+                    ? { ...t, confirmationChannel: channel, confirmation_channel: channel }
+                    : t));
+            },
             activeTab: 'upcoming',
             fetchData: () => fetchThreads(),
             showRescheduleForm: activeAction === 'RESCHEDULE',

@@ -39,6 +39,11 @@ export function CheckInRescheduleModal({ view }: { view: any }) {
             startTime={view.rescheduleTime}
             endTime={view.rescheduleEndTime || ''}
             justification={view.rescheduleJustification || 'Patient requested reschedule'}
+            confirmationChannel={appointment.confirmationChannel || (appointment as any).confirmation_channel || 'EMAIL'}
+            onConfirmationChannelChange={(channel) => {
+              appointment.confirmationChannel = channel;
+              (appointment as any).confirmation_channel = channel;
+            }}
             isSubmitting={view.isPending}
             onServiceSelect={(sId) => view.setRescheduleService?.(sId)}
             onDoctorSelect={(docId) => view.setRescheduleDoctor(docId)}

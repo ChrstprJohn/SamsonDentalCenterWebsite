@@ -421,6 +421,13 @@ export function SecretaryBookAppointmentView() {
                 compact
                 view={{
                   selectedAppointment: view.selectedAppointmentDetails,
+                  confirmationChannel: (view.selectedAppointmentDetails.confirmationChannel || (view.selectedAppointmentDetails as any).confirmation_channel || 'EMAIL'),
+                  setConfirmationChannel: (channel: 'EMAIL' | 'SMS' | 'BOTH' | 'NONE') => {
+                    if (view.selectedAppointmentDetails) {
+                      view.selectedAppointmentDetails.confirmationChannel = channel;
+                      (view.selectedAppointmentDetails as any).confirmation_channel = channel;
+                    }
+                  },
                   activeTab: 'upcoming',
                   showRescheduleForm: isRescheduleOpen,
                   setShowRescheduleForm: (show: boolean) => {

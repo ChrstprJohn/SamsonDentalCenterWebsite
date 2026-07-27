@@ -351,6 +351,11 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
                   startTime={view.rescheduleTime || ''}
                   endTime={view.rescheduleEndTime || ''}
                   justification={view.rescheduleJustification || ''}
+                  confirmationChannel={appointment.confirmationChannel || (appointment as any).confirmation_channel || 'EMAIL'}
+                  onConfirmationChannelChange={(channel) => {
+                    appointment.confirmationChannel = channel;
+                    (appointment as any).confirmation_channel = channel;
+                  }}
                   isSubmitting={view.isPending}
                   onServiceSelect={() => {}}
                   onDoctorSelect={(docId) => view.setRescheduleDoctor(docId)}
@@ -917,6 +922,11 @@ function ResolveContent({ view, onClose }: { view: any; onClose: () => void }) {
           startTime={view.rescheduleTime || ''}
           endTime={view.rescheduleEndTime || ''}
           justification={reason}
+          confirmationChannel={appointment.confirmationChannel || (appointment as any).confirmation_channel || 'EMAIL'}
+          onConfirmationChannelChange={(channel) => {
+            appointment.confirmationChannel = channel;
+            (appointment as any).confirmation_channel = channel;
+          }}
           isSubmitting={view.isPending}
           onServiceSelect={() => {}}
           onDoctorSelect={(docId) => view.setRescheduleDoctor(docId)}
@@ -1014,6 +1024,11 @@ function StandaloneReschedule({ view, onClose }: { view: any; onClose: () => voi
         startTime={view.rescheduleTime}
         endTime={view.rescheduleEndTime || ''}
         justification={view.rescheduleJustification || ''}
+        confirmationChannel={appointment.confirmationChannel || (appointment as any).confirmation_channel || 'EMAIL'}
+        onConfirmationChannelChange={(channel) => {
+          appointment.confirmationChannel = channel;
+          (appointment as any).confirmation_channel = channel;
+        }}
         isSubmitting={view.isPending}
         onServiceSelect={(sId) => view.setRescheduleService?.(sId)}
         onDoctorSelect={(docId) => view.setRescheduleDoctor(docId)}
