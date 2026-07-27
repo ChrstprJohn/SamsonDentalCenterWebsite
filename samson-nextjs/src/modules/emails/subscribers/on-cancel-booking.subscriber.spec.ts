@@ -11,11 +11,12 @@ describe('onCancelBookingSubscriber', () => {
   const mockSingle = vi.fn();
   const mockEq = vi.fn(() => ({ single: mockSingle }));
   const mockSelect = vi.fn(() => ({ eq: mockEq }));
+  const mockUpdate = vi.fn(() => ({ eq: vi.fn().mockResolvedValue({ error: null }) }));
 
   const mockSupabase = {
     from: vi.fn((table: string) => {
       if (table === 'appointments') {
-        return { select: mockSelect };
+        return { select: mockSelect, update: mockUpdate };
       }
       if (table === 'users') {
         return { select: vi.fn(() => ({ eq: vi.fn(() => ({ single: vi.fn().mockResolvedValue({ data: { email: 'patient@example.com' } }) })) })) };

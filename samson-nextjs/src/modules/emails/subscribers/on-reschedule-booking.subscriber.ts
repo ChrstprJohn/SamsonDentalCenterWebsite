@@ -75,5 +75,7 @@ export const onRescheduleBookingSubscriber = {
         baseUrl,
       } as any
     );
+
+    await supabaseAdmin.from('appointments').update({ email_reschedule_sent: true }).eq('id', appointmentId);
   },
 };

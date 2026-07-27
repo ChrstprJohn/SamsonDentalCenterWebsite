@@ -43,5 +43,6 @@ export const onCancelBookingSmsSubscriber = {
 
     const message = `Hi ${name}, your appointment at Samson Dental Center scheduled for ${date || ''} has been cancelled.`;
     console.info(`[Cancel SMS Dispatched] To: ${phone} | Message: "${message}"`);
+    await supabaseAdmin.from('appointments').update({ sms_cancel_sent: true }).eq('id', appointmentId);
   },
 };

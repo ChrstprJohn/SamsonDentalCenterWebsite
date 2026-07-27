@@ -43,5 +43,6 @@ export const onRescheduleBookingSmsSubscriber = {
 
     const message = `Hi ${name}, your appointment at Samson Dental Center has been rescheduled to ${date || ''} at ${startTime || ''}.`;
     console.info(`[Reschedule SMS Dispatched] To: ${phone} | Message: "${message}"`);
+    await supabaseAdmin.from('appointments').update({ sms_reschedule_sent: true }).eq('id', appointmentId);
   },
 };

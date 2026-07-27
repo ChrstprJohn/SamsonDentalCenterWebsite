@@ -49,12 +49,28 @@ function AppointmentDetails({ appointment, view, activeTab, compact }: { appoint
   const [loadingLogs, setLoadingLogs] = useState(false);
 
   useEffect(() => {
+    let cancelled = false;
     setLoadingLogs(true);
     getEmailLogsByAppointmentAction(appointment.id).then((res) => {
+      if (cancelled) return;
       if (res.success && res.data) setOutboxLogs(res.data);
       setLoadingLogs(false);
     });
-  }, [appointment.id]);
+
+    // Status changes enqueue notification delivery in a post-request task.
+    // Refresh once after that task has had time to create/process the outbox
+    // row so this pane stays in sync with Communication Details.
+    const refreshTimers = [750, 1750, 3000].map((delay) => window.setTimeout(() => {
+      getEmailLogsByAppointmentAction(appointment.id).then((res) => {
+        if (!cancelled && res.success && res.data) setOutboxLogs(res.data);
+      });
+    }, delay));
+
+    return () => {
+      cancelled = true;
+      refreshTimers.forEach((timer) => window.clearTimeout(timer));
+    };
+  }, [appointment.id, appointment.status, appointment.date, appointment.startTime]);
   const [allowOverrideResend, setAllowOverrideResend] = useState(false);
   const [channel, setChannel] = useState<'EMAIL' | 'SMS' | 'BOTH' | 'NONE'>(
     (appointment.confirmationChannel as any) || 'EMAIL'
@@ -75,6 +91,10 @@ function AppointmentDetails({ appointment, view, activeTab, compact }: { appoint
     smsReminder24hSent: Boolean((appointment as any).smsReminder24hSent || (appointment as any).sms_reminder_24h_sent),
     emailCheckoutSent: Boolean((appointment as any).emailCheckoutSent || (appointment as any).email_checkout_sent),
     smsCheckoutSent: Boolean((appointment as any).smsCheckoutSent || (appointment as any).sms_checkout_sent),
+    emailCancelSent: Boolean((appointment as any).emailCancelSent || (appointment as any).email_cancel_sent),
+    smsCancelSent: Boolean((appointment as any).smsCancelSent || (appointment as any).sms_cancel_sent),
+    emailRescheduleSent: Boolean((appointment as any).emailRescheduleSent || (appointment as any).email_reschedule_sent),
+    smsRescheduleSent: Boolean((appointment as any).smsRescheduleSent || (appointment as any).sms_reschedule_sent),
   });
 
   useEffect(() => {
@@ -89,6 +109,10 @@ function AppointmentDetails({ appointment, view, activeTab, compact }: { appoint
       smsReminder24hSent: Boolean((appointment as any).smsReminder24hSent || (appointment as any).sms_reminder_24h_sent),
       emailCheckoutSent: Boolean((appointment as any).emailCheckoutSent || (appointment as any).email_checkout_sent),
       smsCheckoutSent: Boolean((appointment as any).smsCheckoutSent || (appointment as any).sms_checkout_sent),
+      emailCancelSent: Boolean((appointment as any).emailCancelSent || (appointment as any).email_cancel_sent),
+      smsCancelSent: Boolean((appointment as any).smsCancelSent || (appointment as any).sms_cancel_sent),
+      emailRescheduleSent: Boolean((appointment as any).emailRescheduleSent || (appointment as any).email_reschedule_sent),
+      smsRescheduleSent: Boolean((appointment as any).smsRescheduleSent || (appointment as any).sms_reschedule_sent),
     });
   }, [appointment]);
 
@@ -175,6 +199,19 @@ function AppointmentDetails({ appointment, view, activeTab, compact }: { appoint
     }
     setDetailResendingId(null);
   };
+
+  // Keep one actionable row per notification event. The outbox can contain
+  // several attempts for the same event, but staff only need the latest state
+  // and one action for that event.
+  const groupedOutboxLogs = Array.from(
+    outboxLogs.reduce((groups, log) => {
+      const existing = groups.get(log.eventType);
+      if (!existing || new Date(log.createdAt).getTime() > new Date(existing.createdAt).getTime()) {
+        groups.set(log.eventType, log);
+      }
+      return groups;
+    }, new Map<string, OutboxLogResponseDto>()).values()
+  ).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   const EVENT_LABELS: Record<string, string> = {
     'APPOINTMENT_BOOKED': 'Booking Confirmation (Email)',
@@ -296,9 +333,8 @@ function AppointmentDetails({ appointment, view, activeTab, compact }: { appoint
               </Label>
             </div>
             <div className={`flex flex-col ${compact ? 'gap-2' : 'gap-3'}`}>
-              {channel === 'NONE' ? (
-                <p className="text-xs text-muted-foreground italic">No notification channel selected.</p>
-              ) : commEntries.map((entry) => {
+              <>
+                {commEntries.map((entry) => {
                 const createdAt = (appointment as any).createdAt || (appointment as any).created_at;
                 const startTime = (appointment as any).startTime || (appointment as any).start_time || (appointment as any).date;
 
@@ -320,8 +356,11 @@ function AppointmentDetails({ appointment, view, activeTab, compact }: { appoint
                   startTime,
                 });
 
-                const isSmsResendAllowed = allowOverrideResend || (entry.smsSent ? false : smsStatus.variant === 'pending');
-                const isEmailResendAllowed = allowOverrideResend || (entry.emailSent ? false : emailStatus.variant === 'pending');
+                const isCheckoutApplicable = entry.eventType !== 'APPOINTMENT_CHECKOUT' || appointment.status === 'COMPLETED';
+                const displaySmsStatus = isCheckoutApplicable ? smsStatus : { ...smsStatus, label: 'NOT APPLICABLE', badgeClass: 'bg-slate-500/10 text-slate-500 dark:text-slate-400' };
+                const displayEmailStatus = isCheckoutApplicable ? emailStatus : { ...emailStatus, label: 'NOT APPLICABLE', badgeClass: 'bg-slate-500/10 text-slate-500 dark:text-slate-400' };
+                const isSmsResendAllowed = isCheckoutApplicable && (allowOverrideResend || (entry.smsSent ? false : smsStatus.variant === 'pending'));
+                const isEmailResendAllowed = isCheckoutApplicable && (allowOverrideResend || (entry.emailSent ? false : emailStatus.variant === 'pending'));
 
                 return (
                   <div key={entry.key} className={compact ? 'space-y-1' : 'space-y-2'}>
@@ -332,7 +371,7 @@ function AppointmentDetails({ appointment, view, activeTab, compact }: { appoint
                           <MessageSquare className={`${compact ? 'size-3' : 'size-3.5'} text-muted-foreground shrink-0`} />
                           <span className="text-sm text-foreground">SMS</span>
                           <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${smsStatus.badgeClass}`}>
-                            {smsStatus.label}
+                            {displaySmsStatus.label}
                           </span>
                         </div>
                         <Button
@@ -352,7 +391,7 @@ function AppointmentDetails({ appointment, view, activeTab, compact }: { appoint
                           <Mail className={`${compact ? 'size-3' : 'size-3.5'} text-muted-foreground shrink-0`} />
                           <span className="text-sm text-foreground">Email</span>
                           <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${emailStatus.badgeClass}`}>
-                            {emailStatus.label}
+                            {displayEmailStatus.label}
                           </span>
                         </div>
                         <Button
@@ -370,6 +409,58 @@ function AppointmentDetails({ appointment, view, activeTab, compact }: { appoint
                   </div>
                 );
               })}
+                {(['CANCEL_BOOKING', 'RESCHEDULE_BOOKING'] as const).map((eventType) => {
+                  const label = eventType === 'CANCEL_BOOKING' ? 'Cancellation' : 'Reschedule';
+                  return (
+                    <div key={eventType} className={compact ? 'space-y-1' : 'space-y-2'}>
+                      <span className="text-xs text-muted-foreground">{label}</span>
+                      <div className={!compact ? 'grid grid-cols-2 gap-2' : 'flex flex-col gap-2'}>
+                        {(['EMAIL', 'SMS'] as const).map((channelType) => {
+                          const logEventType = channelType === 'SMS' ? `${eventType}_SMS` : eventType;
+                          const latestLog = groupedOutboxLogs.find((log) => log.eventType === logEventType);
+                          const sentFlag = eventType === 'CANCEL_BOOKING'
+                            ? channelType === 'SMS' ? commState.smsCancelSent : commState.emailCancelSent
+                            : channelType === 'SMS' ? commState.smsRescheduleSent : commState.emailRescheduleSent;
+                          const eventOccurred = eventType === 'CANCEL_BOOKING'
+                            ? appointment.status === 'CANCELLED'
+                            : Boolean((appointment as any).rescheduleCount || (appointment as any).reschedule_count);
+                          const displayStatus = sentFlag ? 'SENT' : latestLog ? latestLog.status === 'FAILED' ? 'FAILED' : latestLog.status === 'PROCESSED' ? 'SENT' : 'PENDING' : eventOccurred ? 'NOT SENT' : 'NOT APPLICABLE';
+                          const statusBadgeClass = displayStatus === 'SENT'
+                            ? 'bg-green-500/10 text-green-500'
+                            : displayStatus === 'FAILED'
+                              ? 'bg-rose-500/10 text-rose-600'
+                              : displayStatus === 'PENDING'
+                                ? 'bg-muted text-muted-foreground/60'
+                                : 'bg-slate-500/10 text-slate-500 dark:text-slate-400';
+                          const Icon = channelType === 'SMS' ? MessageSquare : Mail;
+                          return (
+                            <div key={logEventType} className="flex items-center justify-between p-3 bg-secondary-bg/20 border border-card-border/60 rounded-xl">
+                              <div className="flex items-center gap-2 min-w-0">
+                                <Icon className="size-3.5 text-muted-foreground shrink-0" />
+                                <span className="text-sm text-foreground">{channelType === 'SMS' ? 'SMS' : 'Email'}</span>
+                                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${statusBadgeClass}`}>
+                                  {displayStatus}
+                                </span>
+                              </div>
+                              {latestLog && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  disabled={detailResendingId === latestLog.id}
+                                  onClick={() => handleDetailResend(latestLog.id)}
+                                  className="text-xs h-7 px-2.5 shrink-0 disabled:opacity-40"
+                                >
+                                  {detailResendingId === latestLog.id ? 'Sending...' : latestLog.status === 'PROCESSED' ? 'Send New' : 'Resend'}
+                                </Button>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </>
             </div>
           </div>
           <hr className={`border-card-border/40 ${compact ? 'mx-4' : 'mx-5'}`} />
@@ -383,29 +474,29 @@ function AppointmentDetails({ appointment, view, activeTab, compact }: { appoint
             ) : outboxLogs.length === 0 ? (
               <p className="text-xs text-muted-foreground italic">No events yet.</p>
             ) : (
-              <div className="flex flex-col gap-1.5 max-h-[240px] overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
-                {outboxLogs.map((log) => {
+              <div className="flex flex-col gap-2 max-h-[240px] overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+                {groupedOutboxLogs.map((log) => {
                   const logStatus = log.status;
                   const isFailed = logStatus === 'FAILED';
                   const isProcessed = logStatus === 'PROCESSED';
                   return (
-                    <div key={log.id} className="flex items-center gap-2 p-2 rounded-lg bg-secondary-bg/20 border border-card-border/40 text-xs">
+                    <div key={log.eventType} className="flex items-center gap-2.5 p-2.5 rounded-xl bg-secondary-bg/20 border border-card-border/40 text-sm">
                       <div className="shrink-0">
                         {isFailed ? <AlertCircle className="size-3.5 text-rose-500" /> : isProcessed ? <CheckCircle2 className="size-3.5 text-emerald-500" /> : <Clock className="size-3.5 text-amber-500" />}
                       </div>
                       <span className="text-foreground font-medium truncate min-w-0 flex-1">
                         {EVENT_LABELS[log.eventType] || log.eventType}
                       </span>
-                      <Badge variant={isFailed ? 'error' : isProcessed ? 'success' : 'warning'} className="text-[9px] px-1 py-0 shrink-0">
+                      <Badge variant={isFailed ? 'error' : isProcessed ? 'success' : 'warning'} className="text-[10px] px-1.5 py-0.5 shrink-0">
                         {logStatus}
                       </Badge>
-                      <span className="text-muted-foreground shrink-0">{new Date(log.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                      <span className="text-xs text-muted-foreground shrink-0">{new Date(log.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                       <button
                         onClick={() => handleDetailResend(log.id)}
-                        className="text-[10px] font-semibold text-rose-600 hover:text-rose-700 shrink-0 disabled:opacity-50"
+                        className="text-xs font-semibold text-rose-600 hover:text-rose-700 shrink-0 disabled:opacity-50"
                         disabled={detailResendingId === log.id}
                       >
-                        {detailResendingId === log.id ? '...' : isProcessed ? 'New' : 'Resend'}
+                        {detailResendingId === log.id ? 'Sending...' : isProcessed ? 'Send New' : 'Resend'}
                       </button>
                     </div>
                   );

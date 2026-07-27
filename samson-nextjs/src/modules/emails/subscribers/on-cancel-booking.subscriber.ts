@@ -65,5 +65,7 @@ export const onCancelBookingSubscriber = {
         dateStr,
       } as any
     );
+
+    await supabaseAdmin.from('appointments').update({ email_cancel_sent: true }).eq('id', appointmentId);
   },
 };

@@ -29,6 +29,21 @@ export async function updateAppointmentStatusAction(formData: StaffUpdateAppoint
       updateAppointmentStatusTransaction: updateAppointmentStatusTransactionCommand(supabase),
     });
 
+    // The appointment status trigger creates cancellation/reschedule
+    // notifications. Persist the selected channel first so the trigger sees
+    // the channel chosen for this status transition (including NONE).
+    if (validData.confirmationChannel) {
+      const { createAdminClient } = await import('@/shared/database/server');
+      const adminDb = await createAdminClient();
+      const { error: channelError } = await adminDb
+        .from('appointments')
+        .update({ confirmation_channel: validData.confirmationChannel })
+        .eq('id', validData.appointmentId);
+      if (channelError) {
+        throw new Error(`Failed to update confirmation channel: ${channelError.message}`);
+      }
+    }
+
     const rescheduleMetadata =
       validData.newDate && validData.newStartTime && validData.newEndTime && validData.newDoctorId
         ? {
@@ -49,19 +64,6 @@ export async function updateAppointmentStatusAction(formData: StaffUpdateAppoint
       validData.statusReason || undefined,
       rescheduleMetadata
     );
-
-    if (validData.confirmationChannel) {
-      try {
-        const { createAdminClient } = await import('@/shared/database/server');
-        const adminDb = await createAdminClient();
-        await adminDb
-          .from('appointments')
-          .update({ confirmation_channel: validData.confirmationChannel })
-          .eq('id', validData.appointmentId);
-      } catch (err) {
-        console.warn('Failed to update confirmation channel on status change:', err);
-      }
-    }
 
     // Emit outbox events for COMPLETED status only.
     //
@@ -85,16 +87,21 @@ export async function updateAppointmentStatusAction(formData: StaffUpdateAppoint
         const guestEmail = aptData?.guest_contacts?.[0]?.email || null;
         const guestPhone = aptData?.guest_contacts?.[0]?.phone_number || null;
 
-        await outboxCommands(adminDb).emitEvent('APPOINTMENT_COMPLETED_POST_CARE', {
-          appointmentId: validData.appointmentId,
-          patientId,
-          email: guestEmail,
-        });
-        await outboxCommands(adminDb).emitEvent('APPOINTMENT_COMPLETED_POST_CARE_SMS', {
-          appointmentId: validData.appointmentId,
-          patientId,
-          phoneNumber: guestPhone,
-        });
+        const completionChannel = aptData?.confirmation_channel || 'EMAIL';
+        if (completionChannel === 'EMAIL' || completionChannel === 'BOTH') {
+          await outboxCommands(adminDb).emitEvent('APPOINTMENT_COMPLETED_POST_CARE', {
+            appointmentId: validData.appointmentId,
+            patientId,
+            email: guestEmail,
+          });
+        }
+        if (completionChannel === 'SMS' || completionChannel === 'BOTH') {
+          await outboxCommands(adminDb).emitEvent('APPOINTMENT_COMPLETED_POST_CARE_SMS', {
+            appointmentId: validData.appointmentId,
+            patientId,
+            phoneNumber: guestPhone,
+          });
+        }
       } catch (err) {
         console.warn('Failed to emit post-care outbox events:', err);
       }
