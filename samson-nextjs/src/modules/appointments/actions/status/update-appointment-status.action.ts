@@ -63,13 +63,17 @@ export async function updateAppointmentStatusAction(formData: StaffUpdateAppoint
       }
     }
 
-    // Emit outbox events for status side effects
-    try {
-      const { outboxCommands } = await import('@/shared/outbox/outbox.commands');
-      const { createAdminClient } = await import('@/shared/database/server');
-      const adminDb = await createAdminClient();
+    // Emit outbox events for COMPLETED status only.
+    //
+    // CANCEL_BOOKING + CANCEL_BOOKING_SMS    → emitted by DB trigger trg_appointment_status_change_outbox
+    // RESCHEDULE_BOOKING + RESCHEDULE_BOOKING_SMS → emitted by DB trigger trg_appointment_status_change_outbox
+    // APPOINTMENT_COMPLETED_POST_CARE (email + SMS) → no DB trigger exists; emitted here.
+    if (validData.status === 'COMPLETED') {
+      try {
+        const { outboxCommands } = await import('@/shared/outbox/outbox.commands');
+        const { createAdminClient } = await import('@/shared/database/server');
+        const adminDb = await createAdminClient();
 
-      if (validData.status === 'COMPLETED') {
         const appointment = await adminDb
           .from('appointments')
           .select('patient_id, guest_contacts(email, phone_number), confirmation_channel')
@@ -91,29 +95,9 @@ export async function updateAppointmentStatusAction(formData: StaffUpdateAppoint
           patientId,
           phoneNumber: guestPhone,
         });
-      } else if (validData.status === 'CANCELLED') {
-        await outboxCommands(adminDb).emitEvent('CANCEL_BOOKING', {
-          appointmentId: validData.appointmentId,
-          date: validData.newDate || undefined,
-        });
-        await outboxCommands(adminDb).emitEvent('CANCEL_BOOKING_SMS', {
-          appointmentId: validData.appointmentId,
-          date: validData.newDate || undefined,
-        });
-      } else if (validData.status === 'APPROVED' && rescheduleMetadata) {
-        await outboxCommands(adminDb).emitEvent('RESCHEDULE_BOOKING', {
-          appointmentId: validData.appointmentId,
-          date: rescheduleMetadata.date,
-          startTime: rescheduleMetadata.startTime,
-        });
-        await outboxCommands(adminDb).emitEvent('RESCHEDULE_BOOKING_SMS', {
-          appointmentId: validData.appointmentId,
-          date: rescheduleMetadata.date,
-          startTime: rescheduleMetadata.startTime,
-        });
+      } catch (err) {
+        console.warn('Failed to emit post-care outbox events:', err);
       }
-    } catch (err) {
-      console.warn('Failed to emit outbox events for appointment status update:', err);
     }
 
     // Non-blocking outbox processing for side effects (e.g. reschedule email, post-care review email)
