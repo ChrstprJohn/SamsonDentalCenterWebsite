@@ -6,6 +6,7 @@ import { authorizeRole } from '@/shared/auth/auth.util';
 export interface CommunicationActivity {
   lastActivity: string;
   hasFailed: boolean;
+  failureCount: number;
   latestEventType?: string;
   latestRecipient?: string;
 }
@@ -41,10 +42,11 @@ export async function getCommunicationActivityAction(): Promise<{
 
       if (!activityMap[appId]) {
         const recipient = payload.email || payload.guestEmail || payload.phoneNumber || '';
-        activityMap[appId] = { lastActivity: r.created_at, hasFailed: false, latestEventType: r.event_type, latestRecipient: recipient };
+        activityMap[appId] = { lastActivity: r.created_at, hasFailed: false, failureCount: 0, latestEventType: r.event_type, latestRecipient: recipient };
       }
       if (r.status === 'FAILED') {
         activityMap[appId].hasFailed = true;
+        activityMap[appId].failureCount += 1;
       }
     }
 

@@ -38,6 +38,7 @@ export interface AppointmentCardData {
   };
   lastActivity: string | null;
   hasFailed: boolean;
+  failureCount: number;
   latestEventPreview?: string;
 }
 
@@ -156,6 +157,7 @@ export function useAppointmentEmailTimeline() {
         },
         lastActivity: act?.lastActivity ?? null,
         hasFailed: act?.hasFailed ?? false,
+        failureCount: act?.failureCount ?? 0,
         latestEventPreview: act?.latestEventType ? `${latestLabel} → ${act.latestRecipient || 'system'}` : undefined,
       };
     });

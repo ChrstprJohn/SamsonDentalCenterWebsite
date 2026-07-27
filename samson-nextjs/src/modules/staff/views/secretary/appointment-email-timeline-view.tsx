@@ -5,7 +5,7 @@ import { useAppointmentEmailTimeline, LeftTab } from '@/modules/staff/hooks/secr
 import type { AppointmentCardData, TimelineEntry } from '@/modules/staff/hooks/secretary/use-appointment-email-timeline';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, Mail, RotateCw, ChevronRight } from 'lucide-react';
+import { Search, Mail, RotateCw, ChevronRight, UserRound } from 'lucide-react';
 
 const EVENT_NAME_MAP: Record<string, string> = {
   'APPOINTMENT_BOOKED': 'Booking Confirmation',
@@ -25,6 +25,26 @@ const EVENT_NAME_MAP: Record<string, string> = {
   'PATIENT_REGISTERED': 'Registration OTP',
   'PASSWORD_RESET_REQUESTED': 'Password Reset OTP',
 };
+
+function formatMessageTime(dateStr: string): string {
+  try {
+    const d = new Date(dateStr).getTime();
+    if (isNaN(d)) return '';
+    const date = new Date(d);
+    const today = new Date();
+    if (date.toDateString() === today.toDateString()) {
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+    const yesterday = new Date();
+    yesterday.setDate(today.getDate() - 1);
+    if (date.toDateString() === yesterday.toDateString()) {
+      return 'Yesterday';
+    }
+    return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+  } catch {
+    return '';
+  }
+}
 
 function timeAgo(dateStr: string): string {
   try {
@@ -72,37 +92,61 @@ function AppointmentCard({
   onClick: () => void;
 }) {
   const range = formatTimeRange(app.startTime, app.endTime);
+  const hasActivity = !!app.lastActivity;
 
   return (
     <button
       onClick={onClick}
-      className={`flex flex-col w-full gap-1 border-b p-3 text-left transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${
+      className={`flex items-start w-full gap-3 border-b p-4 text-sm leading-tight text-left transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${
         isSelected
-          ? 'bg-sidebar-accent text-sidebar-accent-foreground [&_*]:text-sidebar-accent-foreground [&_.e-badge]:bg-sidebar-accent-foreground/20 [&_.s-badge]:bg-sidebar-accent-foreground/20 [&_.fail-badge]:bg-sidebar-accent-foreground/20'
+          ? 'bg-sidebar-accent text-sidebar-accent-foreground'
           : 'text-foreground'
       }`}
     >
-      <div className="flex items-center justify-between gap-2">
-        <span className="text-[13px] font-semibold truncate">{app.patientName}</span>
+      <div className="size-10 shrink-0 rounded-full bg-muted-foreground/10 flex items-center justify-center border-2 border-border/60 overflow-hidden">
+        <UserRound className="size-8 text-muted-foreground/70 translate-y-0.5" />
+      </div>
+      <div className="flex flex-col min-w-0 flex-1 gap-1.5">
+        <div className="flex w-full items-center justify-between gap-2">
+          <span className={hasActivity ? 'font-semibold truncate' : 'truncate'}>
+            {app.patientName}
+          </span>
+          {app.lastActivity && (
+            <span className="text-[10px] text-muted-foreground font-medium whitespace-nowrap shrink-0">
+              {formatMessageTime(app.lastActivity)}
+            </span>
+          )}
+        </div>
+        <span className="font-medium text-xs text-text-secondary">
+          {app.treatmentName}{range ? ` \u00b7 ${range}` : ''}
+        </span>
         <div className="flex items-center gap-1.5 shrink-0">
-          {app.channelsUsed.email && <span className="e-badge size-3.5 rounded-full bg-emerald-500/10 text-emerald-600 text-[8px] font-bold flex items-center justify-center">E</span>}
-          {app.channelsUsed.sms && <span className="s-badge size-3.5 rounded-full bg-blue-500/10 text-blue-600 text-[8px] font-bold flex items-center justify-center">S</span>}
-          {app.hasFailed && <span className="fail-badge size-3.5 rounded-full bg-rose-500/10 text-rose-600 text-[8px] font-bold flex items-center justify-center">!</span>}
+          {app.channelsUsed.email && app.channelsUsed.sms ? (
+            <span className="text-[10px] font-medium text-text-secondary">Email, SMS</span>
+          ) : app.channelsUsed.email ? (
+            <span className="text-[10px] font-medium text-text-secondary">Email</span>
+          ) : app.channelsUsed.sms ? (
+            <span className="text-[10px] font-medium text-text-secondary">SMS</span>
+          ) : null}
+        </div>
+        <div className="flex w-full items-end justify-between gap-4 min-w-0">
+          {app.latestEventPreview ? (
+            <span className="truncate text-xs text-muted-foreground">
+              {app.latestEventPreview}
+            </span>
+          ) : (
+            <span className="text-xs text-muted-foreground italic flex-1">
+              No recent activity
+            </span>
+          )}
+          {app.hasFailed && (
+            <span className="text-[10px] font-semibold text-rose-600 flex items-center gap-1 shrink-0">
+              <span className="size-3.5 rounded-full bg-rose-500/15 flex items-center justify-center text-[8px] font-bold">!</span>
+              {app.failureCount} Failed
+            </span>
+          )}
         </div>
       </div>
-      <div className="text-[11px] text-text-secondary truncate">
-        {app.treatmentName}{range ? ` \u00b7 ${range}` : ''}
-      </div>
-      {app.latestEventPreview && (
-        <div className="text-[10px] text-muted-foreground truncate">
-          {app.latestEventPreview}
-        </div>
-      )}
-      {app.lastActivity && (
-        <div className="text-[10px] text-muted-foreground text-right -mt-0.5">
-          {timeAgo(app.lastActivity)}
-        </div>
-      )}
     </button>
   );
 }
@@ -130,7 +174,7 @@ function TimelineEntryCard({ entry, onResend, resendingId }: { entry: TimelineEn
         : 'bg-amber-100 text-amber-700';
 
   return (
-    <div className="relative flex gap-4 pb-5 last:pb-0">
+    <div className="relative flex gap-3 pb-5 last:pb-0">
       <div className="flex flex-col items-center shrink-0">
         <div className={`size-7 rounded-full flex items-center justify-center border-2 text-[10px] font-bold ${statusColor}`}>
           {entry.channel === 'EMAIL' ? 'E' : 'S'}
@@ -143,13 +187,12 @@ function TimelineEntryCard({ entry, onResend, resendingId }: { entry: TimelineEn
           onClick={() => setShowPayload(!showPayload)}
           className="w-full text-left"
         >
-          {/* Top Row */}
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-center gap-2 min-w-0">
               <span className="text-sm font-semibold text-foreground truncate">
                 {EVENT_NAME_MAP[entry.eventType] || entry.eventType}
               </span>
-              <span className="text-[9px] text-text-secondary font-mono leading-none pt-0.5 shrink-0">
+              <span className="text-[9px] text-muted-foreground font-mono leading-none shrink-0">
                 {entry.eventType}
               </span>
             </div>
@@ -158,17 +201,15 @@ function TimelineEntryCard({ entry, onResend, resendingId }: { entry: TimelineEn
             </span>
           </div>
 
-          {/* Middle Block */}
-          <div className="text-[12px] text-muted-foreground mt-1 truncate">
+          <div className="text-xs text-muted-foreground mt-1 truncate">
             To: {recipientLabel(entry.recipient)}
           </div>
 
-          <div className="flex items-center gap-1.5 mt-1.5 text-[11px] text-muted-foreground/70">
+          <div className="flex items-center gap-1 mt-1.5 text-[11px] text-muted-foreground/70">
             <span>{showPayload ? 'Hide' : 'View'} Message Details</span>
             <ChevronRight className={`size-3 transition-transform ${showPayload ? 'rotate-90' : ''}`} />
           </div>
 
-          {/* Bottom Row */}
           <div className="flex items-center gap-2 mt-1.5 text-[10px] text-muted-foreground">
             <span>{formatTimeFull(entry.timestamp)}</span>
             <span>&middot;</span>
@@ -192,11 +233,10 @@ function TimelineEntryCard({ entry, onResend, resendingId }: { entry: TimelineEn
           </button>
         )}
 
-        {/* Collapsible Content */}
         {showPayload && (
-          <div className="mt-2 pl-0">
+          <div className="mt-2 space-y-2">
             {entry.errorLogs && (
-              <div className="mb-2 bg-rose-950/10 border border-rose-500/20 rounded-lg p-2.5 text-[11px] font-mono text-rose-600 whitespace-pre-wrap leading-relaxed">
+              <div className="bg-rose-950/10 border border-rose-500/20 rounded-lg p-2.5 text-[11px] font-mono text-rose-600 whitespace-pre-wrap leading-relaxed">
                 {entry.errorLogs}
               </div>
             )}
