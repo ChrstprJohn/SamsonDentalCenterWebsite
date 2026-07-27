@@ -50,9 +50,6 @@ export function DoctorCard({ doctor, isSelected, onClick }: DoctorCardProps) {
             {statusInfo.label}
           </span>
         </div>
-        <span className="font-medium text-xs text-text-secondary truncate">
-          {doctor.specialization || 'General Dentist'}
-        </span>
         <div className="flex w-full items-center justify-between gap-2 min-w-0">
           <span className="truncate text-xs text-muted-foreground">
             {doctor.email}
