@@ -97,7 +97,6 @@ function AppointmentCard({
   isSelected: boolean;
   onClick: () => void;
 }) {
-  const range = formatTimeRange(app.startTime, app.endTime);
   const hasActivity = !!app.lastActivity;
 
   return (
@@ -123,8 +122,8 @@ function AppointmentCard({
             </span>
           )}
         </div>
-        <span className="font-medium text-xs text-text-secondary">
-          {app.treatmentName}{range ? ` \u00b7 ${range}` : ''}
+        <span className="font-medium text-xs text-text-secondary truncate">
+          {app.treatmentName}
         </span>
         <div className="flex w-full items-end justify-between gap-4 min-w-0">
           {app.latestEventPreview ? (
