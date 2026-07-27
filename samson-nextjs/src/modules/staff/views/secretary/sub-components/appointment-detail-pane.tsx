@@ -452,6 +452,8 @@ function AppointmentDetails({ appointment, view, activeTab, compact }: { appoint
                 setReasonPreset={view.setCancelReasonPreset}
                 reasonCustom={view.cancelReasonCustom}
                 setReasonCustom={view.setCancelReasonCustom}
+                confirmationChannel={view.confirmationChannel}
+                onConfirmationChannelChange={view.setConfirmationChannel}
                 isSubmitting={view.isSubmitting}
                 onSubmit={view.submitCancel}
                 onBack={() => view.setShowCancelForm(false)}
@@ -484,6 +486,8 @@ function getRescheduleProps(view: any) {
     isLoadingSlots: view.isLoadingSlots,
     startTime: view.rescheduleStartTime,
     endTime: view.rescheduleEndTime,
+    confirmationChannel: view.confirmationChannel,
+    onConfirmationChannelChange: view.setConfirmationChannel,
     justification: view.rescheduleJustification,
     isSubmitting: view.isSubmitting,
     onToggleTreatment: view.toggleChangeTreatment,

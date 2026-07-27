@@ -73,6 +73,7 @@ describe('useSecretaryAppointments', () => {
       appointmentId: 'appt-1',
       status: 'CANCELLED',
       statusReason: 'Patient requested reschedule / cancellation',
+      confirmationChannel: 'EMAIL',
     });
   });
 });

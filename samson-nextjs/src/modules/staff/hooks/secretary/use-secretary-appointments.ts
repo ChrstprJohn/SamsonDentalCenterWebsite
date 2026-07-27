@@ -42,6 +42,7 @@ export function useSecretaryAppointments() {
   const [cancelReasonPreset, setCancelReasonPreset] = useState('');
   const [cancelReasonCustom, setCancelReasonCustom] = useState('');
   const [showCancelForm, setShowCancelForm] = useState(false);
+  const [confirmationChannel, setConfirmationChannel] = useState<'EMAIL' | 'SMS' | 'BOTH' | 'NONE'>('EMAIL');
 
   const selectedAppointment = appointments.find((appointment) => appointment.id === selectedAppointmentId);
   const activeServiceId = changeTreatment ? rescheduleServiceId : (selectedAppointment?.serviceId ?? '');
@@ -215,6 +216,7 @@ export function useSecretaryAppointments() {
         newEndTime: formatIso(rescheduleDate, rescheduleEndTime),
         newDoctorId: activeDoctorId,
         newServiceId: rescheduleServiceId || selectedAppointment.serviceId || undefined,
+        confirmationChannel,
       });
       if (res.success) {
         alert('Appointment rescheduled successfully.');
@@ -240,6 +242,7 @@ export function useSecretaryAppointments() {
         appointmentId: selectedAppointment.id,
         status: 'CANCELLED',
         statusReason: finalReason.trim(),
+        confirmationChannel,
       });
       if (res.success) {
         alert('Appointment cancelled successfully.');
@@ -264,7 +267,7 @@ export function useSecretaryAppointments() {
     isLoadingRescheduleDoctors: scheduler.loadingKey === 'doctors', rescheduleMonth, setRescheduleMonth, availableDates,
     isLoadingDays: scheduler.loadingKey === 'dates', rescheduleDate, timeslots, isLoadingSlots: scheduler.loadingKey === 'slots',
     rescheduleStartTime, setRescheduleStartTime, rescheduleEndTime, setRescheduleEndTime, cancelReasonPreset, setCancelReasonPreset, cancelReasonCustom, setCancelReasonCustom,
-    showCancelForm, setShowCancelForm, activeServiceId, activeDoctorId, formatPatientName, toggleChangeTreatment,
+    showCancelForm, setShowCancelForm, confirmationChannel, setConfirmationChannel, activeServiceId, activeDoctorId, formatPatientName, toggleChangeTreatment,
     toggleChangeDoctor, selectRescheduleService, selectRescheduleDate, selectRescheduleSlot, submitReschedule, submitCancel, fetchData,
   };
 }

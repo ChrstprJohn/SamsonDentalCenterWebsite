@@ -9,6 +9,8 @@ interface AppointmentCancelFormProps {
   setReasonPreset: (value: string) => void;
   reasonCustom: string;
   setReasonCustom: (value: string) => void;
+  confirmationChannel?: 'EMAIL' | 'SMS' | 'BOTH' | 'NONE';
+  onConfirmationChannelChange?: (channel: 'EMAIL' | 'SMS' | 'BOTH' | 'NONE') => void;
   isSubmitting: boolean;
   onSubmit: () => void;
   onBack: () => void;
@@ -60,6 +62,28 @@ export function AppointmentCancelForm(props: AppointmentCancelFormProps) {
         <h3 className="text-base font-medium text-destructive">Cancel Slot</h3>
         <p className="text-xs text-muted-foreground">Select a cancellation reason to confirm.</p>
       </div>
+
+      {props.onConfirmationChannelChange && (
+        <div className="flex flex-col gap-1.5 p-3 rounded-xl bg-muted/40 border border-card-border">
+          <span className="text-xs font-bold text-text-secondary">Notification Channel</span>
+          <div className="grid grid-cols-4 gap-1.5">
+            {(['EMAIL', 'SMS', 'BOTH', 'NONE'] as const).map((ch) => (
+              <button
+                type="button"
+                key={ch}
+                onClick={() => props.onConfirmationChannelChange?.(ch)}
+                className={`py-1.5 text-xs font-semibold rounded-lg transition-colors border ${
+                  (props.confirmationChannel || 'EMAIL') === ch
+                    ? 'bg-primary text-primary-foreground border-primary shadow-sm'
+                    : 'bg-card text-text-muted hover:text-text-primary border-card-border'
+                }`}
+              >
+                {ch}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="flex flex-col gap-1.5">
         <label className="text-xs text-muted-foreground">Reason <span className="text-destructive">*</span></label>

@@ -21,6 +21,9 @@ import { onAppointmentReminder48hSmsSubscriber } from '@/modules/emails/subscrib
 import { onPostCareReviewSubscriber } from '@/modules/emails/subscribers/on-post-care-review.subscriber';
 import { onPostCareReviewSmsSubscriber } from '@/modules/emails/subscribers/on-post-care-review-sms.subscriber';
 
+import { onCancelBookingSmsSubscriber } from '@/modules/notifications/subscribers/on-cancel-booking-sms.subscriber';
+import { onRescheduleBookingSmsSubscriber } from '@/modules/notifications/subscribers/on-reschedule-booking-sms.subscriber';
+
 export const bootstrapEventSubscribers = () => {
   registerSubscriber('PATIENT_REGISTERED', onPatientRegisteredSubscriber.handle);
   registerSubscriber('PASSWORD_RESET_REQUESTED', onPasswordResetRequestedSubscriber.handle);
@@ -39,9 +42,11 @@ export const bootstrapEventSubscribers = () => {
   // Cancel subscribers
   registerSubscriber('CANCEL_BOOKING', onCancelBookingNotificationSubscriber.handle);
   registerSubscriber('CANCEL_BOOKING', onCancelBookingEmailSubscriber.handle);
+  registerSubscriber('CANCEL_BOOKING_SMS', onCancelBookingSmsSubscriber.handle);
   
   // Reschedule & reply & SMS confirmation subscribers
   registerSubscriber('RESCHEDULE_BOOKING', onRescheduleBookingSubscriber.handle);
+  registerSubscriber('RESCHEDULE_BOOKING_SMS', onRescheduleBookingSmsSubscriber.handle);
   registerSubscriber('STAFF_REPLIED_TO_CHAT', onStaffReplySubscriber.handle);
   registerSubscriber('APPOINTMENT_MANUALLY_BOOKED_SMS', onManualBookingSmsSubscriber.handle);
   registerSubscriber('APPOINTMENT_CONVERTED_FROM_INQUIRY_SMS', onManualBookingSmsSubscriber.handle);

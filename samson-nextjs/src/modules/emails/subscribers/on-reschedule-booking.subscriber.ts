@@ -14,12 +14,17 @@ export const onRescheduleBookingSubscriber = {
     // 1. Fetch appointment token
     const { data: appt, error: apptError } = await supabaseAdmin
       .from('appointments')
-      .select('chat_token, patient_id')
+      .select('chat_token, patient_id, confirmation_channel')
       .eq('id', appointmentId)
       .single();
 
     if (apptError || !appt) {
       throw new Error(`Failed to fetch appointment for reschedule: ${apptError?.message || 'Not found'}`);
+    }
+
+    const channel = (appt as any).confirmation_channel || 'EMAIL';
+    if (channel === 'NONE' || channel === 'SMS') {
+      return;
     }
 
     let recipientEmail = '';

@@ -57,6 +57,7 @@ export const staffUpdateAppointmentStatusSchema = z
             .uuid('Invalid Service ID format')
             .or(emptyStringToUndefined)
             .optional(),
+        confirmationChannel: z.enum(['EMAIL', 'SMS', 'BOTH', 'NONE']).optional(),
     })
     .superRefine((data, ctx) => {
         // 1. Audit Trail Reasoning Guard - always required, handled by validation schema above.

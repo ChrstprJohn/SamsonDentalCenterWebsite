@@ -13,12 +13,17 @@ export const onCancelBookingSubscriber = {
     // 1. Fetch appointment details to resolve email
     const { data: appt, error: apptError } = await supabaseAdmin
       .from('appointments')
-      .select('patient_id')
+      .select('patient_id, confirmation_channel')
       .eq('id', appointmentId)
       .single();
 
     if (apptError || !appt) {
       throw new Error(`Failed to fetch appointment for cancellation: ${apptError?.message || 'Not found'}`);
+    }
+
+    const channel = (appt as any).confirmation_channel || 'EMAIL';
+    if (channel === 'NONE' || channel === 'SMS') {
+      return;
     }
 
     let recipientEmail = '';
