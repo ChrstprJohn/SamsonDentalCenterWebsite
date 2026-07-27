@@ -44,6 +44,7 @@ export const bootstrapEventSubscribers = () => {
   registerSubscriber('RESCHEDULE_BOOKING', onRescheduleBookingSubscriber.handle);
   registerSubscriber('STAFF_REPLIED_TO_CHAT', onStaffReplySubscriber.handle);
   registerSubscriber('APPOINTMENT_MANUALLY_BOOKED_SMS', onManualBookingSmsSubscriber.handle);
+  registerSubscriber('APPOINTMENT_CONVERTED_FROM_INQUIRY_SMS', onManualBookingSmsSubscriber.handle);
   
   // 24h & 48h Reminders
   registerSubscriber('APPOINTMENT_REMINDER_24H', onAppointmentReminder24hSubscriber.handle);

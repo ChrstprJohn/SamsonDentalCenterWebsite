@@ -10,6 +10,7 @@ import { Search, Mail, RotateCw, ChevronRight } from 'lucide-react';
 const EVENT_NAME_MAP: Record<string, string> = {
   'APPOINTMENT_BOOKED': 'Booking Confirmation',
   'APPOINTMENT_CONVERTED_FROM_INQUIRY': 'Inquiry Approved',
+  'APPOINTMENT_CONVERTED_FROM_INQUIRY_SMS': 'Inquiry Approved SMS',
   'APPOINTMENT_MANUALLY_BOOKED_PATIENT': 'Manual Booking (Patient)',
   'APPOINTMENT_MANUALLY_BOOKED_GUEST': 'Manual Booking (Guest)',
   'APPOINTMENT_REMINDER_24H': '24-Hour Reminder',

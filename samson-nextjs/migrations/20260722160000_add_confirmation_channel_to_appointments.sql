@@ -336,7 +336,7 @@ BEGIN
             'startTime', p_start_time
         );
         INSERT INTO outbox (event_type, payload, status)
-        VALUES ('APPOINTMENT_MANUALLY_BOOKED_SMS', v_outbox_payload, 'PENDING');
+        VALUES ('APPOINTMENT_CONVERTED_FROM_INQUIRY_SMS', v_outbox_payload, 'PENDING');
     END IF;
 
     IF v_effective_channel IN ('EMAIL', 'BOTH') THEN

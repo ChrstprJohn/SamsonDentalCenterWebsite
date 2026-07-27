@@ -125,6 +125,7 @@ export function useAppointmentEmailTimeline() {
   const EVENT_LABELS: Record<string, string> = {
     'APPOINTMENT_BOOKED': 'Booking Confirmation',
     'APPOINTMENT_CONVERTED_FROM_INQUIRY': 'Inquiry Approved',
+    'APPOINTMENT_CONVERTED_FROM_INQUIRY_SMS': 'Inquiry Approved SMS',
     'APPOINTMENT_MANUALLY_BOOKED_PATIENT': 'Manual Booking',
     'APPOINTMENT_MANUALLY_BOOKED_GUEST': 'Manual Booking',
     'APPOINTMENT_REMINDER_24H': '24-Hour Reminder',
