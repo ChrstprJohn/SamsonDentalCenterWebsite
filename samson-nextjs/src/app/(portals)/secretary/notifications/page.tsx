@@ -24,15 +24,5 @@ export default async function NotificationsPage() {
   const supabase = await createClient();
   const initialNotifications = await getUnreadNotifications(supabase)(userId, 'SECRETARY', 50);
 
-  return (
-    <div className="flex flex-col gap-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-xl font-bold text-text-primary">In-App Notifications Log</h1>
-          <p className="text-xs text-text-muted font-medium">View all operational notifications and alerts</p>
-        </div>
-      </div>
-      <NotificationsListView initialNotifications={initialNotifications} />
-    </div>
-  );
+  return <NotificationsListView initialNotifications={initialNotifications} />;
 }
