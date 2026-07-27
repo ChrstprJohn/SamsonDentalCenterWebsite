@@ -10,8 +10,9 @@ import { SharedAppointmentDetail } from '@/modules/appointments/components/sub-c
 import { AppointmentCancelForm } from './appointment-cancel-form';
 import { AppointmentRescheduleForm } from './appointment-reschedule-form';
 import { AppointmentStatusHistory } from './appointment-status-history';
-import { Calendar, Pencil, X, Check, Mail, MessageSquare, AlertCircle, Clock, CheckCircle2 } from 'lucide-react';
+import { Calendar, Pencil, X, Check, Mail, MessageSquare, AlertCircle, Clock, CheckCircle2, RotateCw } from 'lucide-react';
 import { updateConfirmationChannelAction } from '@/modules/appointments/actions/status/update-confirmation-channel.action';
+import { resendNotificationAction } from '@/modules/appointments/actions/status/resend-notification.action';
 import { getEmailLogsByAppointmentAction } from '@/modules/emails/actions/logs/get-email-logs-by-appointment.action';
 import { computeNotificationStatus } from '@/modules/notifications/utils/notification-status.util';
 import type { OutboxLogResponseDto } from '@/modules/emails/dtos/logs/outbox-log-response.dto';
@@ -87,6 +88,19 @@ function AppointmentDetails({ appointment, view, activeTab, compact }: { appoint
       smsCheckoutSent: Boolean((appointment as any).smsCheckoutSent || (appointment as any).sms_checkout_sent),
     });
   }, [appointment]);
+
+  const handleResend = async (eventType: 'APPOINTMENT_BOOKED' | 'APPOINTMENT_REMINDER_48H' | 'APPOINTMENT_REMINDER_24H' | 'APPOINTMENT_CHECKOUT', targetChannel: 'EMAIL' | 'SMS') => {
+    const key = `${eventType}_${targetChannel}`;
+    setResending(key);
+    const res = await resendNotificationAction({ appointmentId: appointment.id, eventType, targetChannel });
+    if (res.success) {
+      getEmailLogsByAppointmentAction(appointment.id).then((r) => {
+        if (r.success && r.data) setOutboxLogs(r.data);
+      });
+      if (view?.fetchData) view.fetchData();
+    }
+    setResending(null);
+  };
 
   const handleDetailResend = async (logId: string) => {
     setDetailResendingId(logId);
@@ -234,19 +248,43 @@ function AppointmentDetails({ appointment, view, activeTab, compact }: { appoint
                   <div key={entry.key} className={compact ? 'space-y-1' : 'space-y-2'}>
                     <span className="text-xs text-muted-foreground">{entry.label}</span>
                     <div className={!compact ? 'grid grid-cols-2 gap-2' : 'flex flex-col gap-2'}>
-                      <div className="flex items-center gap-2 p-2.5 bg-secondary-bg/20 border border-card-border/60 rounded-xl">
-                        <MessageSquare className={`${compact ? 'size-3' : 'size-3.5'} text-muted-foreground shrink-0`} />
-                        <span className="text-sm text-foreground">SMS</span>
-                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${smsStatus.badgeClass}`}>
-                          {smsStatus.label}
-                        </span>
+                      <div className="flex items-center justify-between p-2.5 bg-secondary-bg/20 border border-card-border/60 rounded-xl">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <MessageSquare className={`${compact ? 'size-3' : 'size-3.5'} text-muted-foreground shrink-0`} />
+                          <span className="text-sm text-foreground">SMS</span>
+                          <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${smsStatus.badgeClass}`}>
+                            {smsStatus.label}
+                          </span>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={resending === `${entry.eventType}_SMS`}
+                          onClick={() => handleResend(entry.eventType, 'SMS')}
+                          className={`${compact ? 'text-[9px] h-6 px-2 gap-0.5' : 'text-[10px] h-7 px-2.5 gap-1'} shrink-0 disabled:opacity-40`}
+                        >
+                          <RotateCw className={`size-3 ${resending === `${entry.eventType}_SMS` ? 'animate-spin' : ''}`} />
+                          {resending === `${entry.eventType}_SMS` ? 'Sending...' : 'Send'}
+                        </Button>
                       </div>
-                      <div className="flex items-center gap-2 p-2.5 bg-secondary-bg/20 border border-card-border/60 rounded-xl">
-                        <Mail className={`${compact ? 'size-3' : 'size-3.5'} text-muted-foreground shrink-0`} />
-                        <span className="text-sm text-foreground">Email</span>
-                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${emailStatus.badgeClass}`}>
-                          {emailStatus.label}
-                        </span>
+                      <div className="flex items-center justify-between p-2.5 bg-secondary-bg/20 border border-card-border/60 rounded-xl">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <Mail className={`${compact ? 'size-3' : 'size-3.5'} text-muted-foreground shrink-0`} />
+                          <span className="text-sm text-foreground">Email</span>
+                          <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${emailStatus.badgeClass}`}>
+                            {emailStatus.label}
+                          </span>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={resending === `${entry.eventType}_EMAIL`}
+                          onClick={() => handleResend(entry.eventType, 'EMAIL')}
+                          className={`${compact ? 'text-[9px] h-6 px-2 gap-0.5' : 'text-[10px] h-7 px-2.5 gap-1'} shrink-0 disabled:opacity-40`}
+                        >
+                          <RotateCw className={`size-3 ${resending === `${entry.eventType}_EMAIL` ? 'animate-spin' : ''}`} />
+                          {resending === `${entry.eventType}_EMAIL` ? 'Sending...' : 'Send'}
+                        </Button>
                       </div>
                     </div>
                   </div>
