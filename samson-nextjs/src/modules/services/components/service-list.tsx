@@ -3,6 +3,7 @@
 import React from 'react';
 import { ServiceCard } from './service-card';
 import type { Service } from '../types';
+import { Layers } from 'lucide-react';
 
 interface ServiceListProps {
   services: Service[];
@@ -13,26 +14,32 @@ interface ServiceListProps {
 export function ServiceList({ services, selectedId, onSelect }: ServiceListProps) {
   if (services.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center p-8 text-center border border-dashed border-card-border rounded-3xl bg-card">
-        <span className="text-3xl mb-2">🔍</span>
-        <h4 className="text-sm font-bold text-text-primary">No treatments found</h4>
-        <p className="text-xs text-text-muted mt-1">Try adjusting your filters or add a new treatment.</p>
+      <div className="flex-1 flex flex-col items-center justify-center py-12 px-4 text-center">
+        <div className="size-10 rounded-full bg-muted/30 flex items-center justify-center mb-2.5">
+          <Layers className="size-5 text-muted-foreground/60" />
+        </div>
+        <span className="text-xs font-medium text-foreground">No services found</span>
+        <p className="text-[11px] text-muted-foreground mt-0.5 max-w-[220px]">Try adjusting your search query or tab filter.</p>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-4 overflow-y-auto max-h-[70vh] pr-2">
-      {services.map((svc) => (
-        <div
-          key={svc.id}
-          className={`${
-            selectedId === svc.id ? 'ring-2 ring-accent-blue-text' : ''
-          } rounded-3xl`}
-        >
-          <ServiceCard service={svc as any} onSelect={onSelect as any} />
-        </div>
-      ))}
+    <div
+      className="flex-1 min-h-0 overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
+      style={{ scrollbarWidth: 'thin' }}
+      data-lenis-prevent
+    >
+      <div className="flex flex-col">
+        {services.map((svc) => (
+          <ServiceCard
+            key={svc.id}
+            service={svc as any}
+            isSelected={selectedId === svc.id}
+            onSelect={onSelect as any}
+          />
+        ))}
+      </div>
     </div>
   );
 }

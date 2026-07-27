@@ -6,6 +6,7 @@ export const createServiceFormSchema = z.object({
   durationMinutes: z.coerce.number().int().positive("Duration must be positive"),
   price: z.coerce.number().nonnegative("Price cannot be negative").optional().nullable(),
   serviceType: z.enum(["GENERAL", "SPECIALIZED"]).default("GENERAL"),
+  status: z.enum(["ACTIVE", "HIDDEN", "ARCHIVED"]).default("ACTIVE"),
   isActive: z.boolean().default(true),
   imageUrl: z.string().optional().nullable(),
   imageFile: z.any().optional(),

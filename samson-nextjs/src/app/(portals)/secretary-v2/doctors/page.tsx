@@ -128,22 +128,11 @@ export default async function SecretaryDoctorsPage() {
   });
 
   return (
-    <div className="flex flex-col gap-6 w-full">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-bold tracking-tight text-text-primary">
-          Doctor Management
-        </h1>
-        <p className="text-xs text-text-muted">
-          Configure clinic dentist details, specialization, active status, and treatment services offered.
-        </p>
-      </div>
-
-      <div className="border-t border-card-border/50 pt-6">
-        <DoctorManagementView
-          initialDoctors={mappedDoctors}
-          allServices={dbServices || []}
-        />
-      </div>
+    <div className="flex flex-1 min-h-0 w-full overflow-hidden">
+      <DoctorManagementView
+        initialDoctors={mappedDoctors}
+        allServices={dbServices || []}
+      />
     </div>
   );
 }

@@ -22,7 +22,7 @@ export function useServiceDetail({ service, onSuccess }: UseServiceDetailProps) 
     if (!service) return;
     setServerError(null);
     startTransition(async () => {
-      const result = await archiveServiceAction(service.id);
+      const result = await archiveServiceAction(service.id, service.status);
       if (result.error) {
         setServerError(result.error);
       } else {

@@ -13,9 +13,5 @@ export default async function SecretaryServicesPage() {
   const getServices = getServicesQuery(supabase);
   const initialServices = await getServices(true); // get both active and inactive for management
 
-  return (
-    <div className="py-8 px-6">
-      <ServicesView initialServices={initialServices as any} />
-    </div>
-  );
+  return <ServicesView initialServices={initialServices as any} />;
 }

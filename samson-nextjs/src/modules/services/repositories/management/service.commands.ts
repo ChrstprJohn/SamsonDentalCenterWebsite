@@ -5,15 +5,16 @@ import { ServiceResponseDto, serviceResponseSchema } from '../../dtos/management
 
 export const createServiceCommand = (supabase: SupabaseClient) => {
   return async (data: CreateServiceDto): Promise<ServiceResponseDto> => {
+    const status = data.status || (data.isActive ? 'ACTIVE' : 'HIDDEN');
     const dbPayload = {
       name: data.name,
       description: data.description,
       duration_minutes: data.durationMinutes,
       price: data.price,
       service_type: data.serviceType,
-      is_active: data.isActive,
+      is_active: status === 'ACTIVE',
       image_url: data.imageUrl,
-      status: data.isActive ? 'ACTIVE' : 'HIDDEN',
+      status: status,
     };
     const { data: result, error } = await supabase
       .from("services")
@@ -35,7 +36,10 @@ export const updateServiceCommand = (supabase: SupabaseClient) => {
     if (updates.durationMinutes !== undefined) dbPayload.duration_minutes = updates.durationMinutes;
     if (updates.price !== undefined) dbPayload.price = updates.price;
     if (updates.serviceType !== undefined) dbPayload.service_type = updates.serviceType;
-    if (updates.isActive !== undefined) {
+    if (updates.status !== undefined) {
+      dbPayload.status = updates.status;
+      dbPayload.is_active = updates.status === 'ACTIVE';
+    } else if (updates.isActive !== undefined) {
       dbPayload.is_active = updates.isActive;
       dbPayload.status = updates.isActive ? 'ACTIVE' : 'HIDDEN';
     }
@@ -65,15 +69,19 @@ export const deleteServiceCommand = (supabase: SupabaseClient) => {
 };
 
 export const archiveServiceCommand = (supabase: SupabaseClient) => {
-  return async (id: string): Promise<ServiceResponseDto> => {
+  return async (id: string, currentStatus?: string): Promise<ServiceResponseDto> => {
+    const isArchived = currentStatus === 'ARCHIVED';
+    const nextStatus = isArchived ? 'HIDDEN' : 'ARCHIVED';
+    const nextIsActive = false; // Restored service goes to HIDDEN by default until toggled ACTIVE
+
     const { data: result, error } = await supabase
       .from("services")
-      .update({ is_active: false, status: 'ARCHIVED' })
+      .update({ is_active: nextIsActive, status: nextStatus })
       .eq("id", id)
       .select()
       .single();
 
-    if (error) throw new Error(`Failed to archive service: ${error.message}`);
+    if (error) throw new Error(`Failed to archive/restore service: ${error.message}`);
     return serviceResponseSchema.parse(result);
   };
 };

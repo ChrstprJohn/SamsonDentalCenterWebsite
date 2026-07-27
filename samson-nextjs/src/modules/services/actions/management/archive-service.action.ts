@@ -6,7 +6,7 @@ import { authorizeRole } from '@/shared/auth/auth.util';
 import { archiveServiceUseCase } from '../../use-cases/management/archive-service.use-case';
 import { archiveServiceCommand } from '../../repositories/management/service.commands';
 
-export async function archiveServiceAction(id: string) {
+export async function archiveServiceAction(id: string, currentStatus?: string) {
   try {
     // 1. Session verification
     await authorizeRole('SECRETARY');
@@ -17,7 +17,7 @@ export async function archiveServiceAction(id: string) {
     const useCase = archiveServiceUseCase(command);
 
     // 3. Execution
-    const result = await useCase(id);
+    const result = await useCase(id, currentStatus);
 
     // 4. Revalidate cache
     revalidatePath('/secretary/services');

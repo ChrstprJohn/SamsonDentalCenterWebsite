@@ -1,8 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import type { Service } from '../types';
+import { Stethoscope, Pencil, X, Check, Trash2 } from 'lucide-react';
 
 interface ServiceDetailPanelProps {
   service: Service | null;
@@ -21,10 +23,14 @@ export function ServiceDetailPanel({
 }: ServiceDetailPanelProps) {
   if (!service) {
     return (
-      <div className="flex flex-col items-center justify-center p-12 text-center border border-dashed border-card-border rounded-3xl bg-card h-full min-h-[400px]">
-        <span className="text-4xl mb-4">🦷</span>
-        <h4 className="text-sm font-bold text-text-primary">No Service Selected</h4>
-        <p className="text-xs text-text-muted mt-1">Select a service from the left list to view or edit details.</p>
+      <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center text-muted-foreground">
+        <div className="size-12 rounded-full bg-muted/40 flex items-center justify-center mb-3">
+          <Stethoscope className="size-6 text-muted-foreground/60" />
+        </div>
+        <p className="text-xs font-medium text-foreground">No service selected</p>
+        <p className="text-[11px] text-muted-foreground mt-1 max-w-[220px]">
+          Select a service from the list to view details.
+        </p>
       </div>
     );
   }
@@ -37,86 +43,100 @@ export function ServiceDetailPanel({
     }).format(price);
   };
 
+  const getBadgeVariant = (status: string) => {
+    if (status === 'ACTIVE') return 'success';
+    if (status === 'HIDDEN') return 'warning';
+    return 'error';
+  };
+
+  const imgUrl = service.imageUrl || (service as any).image_url;
+
   return (
-    <div className="bg-card border border-card-border p-6 rounded-3xl shadow-sm flex flex-col gap-6">
-      {service.imageUrl && (
-        <div className="w-full h-48 sm:h-64 rounded-2xl overflow-hidden border border-card-border shadow-inner">
-          <img src={service.imageUrl} alt={service.name} className="w-full h-full object-cover" />
-        </div>
-      )}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-card-border">
-        <div className="flex items-center gap-3">
-          <span className="text-2xl">🦷</span>
-          <div>
-            <h3 className="text-lg font-bold text-text-primary">{service.name}</h3>
-            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide mt-1 ${
-              service.serviceType === 'SPECIALIZED'
-                ? 'bg-purple-100 text-purple-700'
-                : 'bg-accent-blue-bg text-accent-blue-text'
-            }`}>
-              {service.serviceType}
-            </span>
+    <div className="flex flex-col flex-1 min-h-0 h-full">
+      <div
+        className="flex-1 min-h-0 overflow-y-auto [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
+        style={{ scrollbarWidth: 'thin' }}
+        data-lenis-prevent
+      >
+        {/* Header Profile Section */}
+        {imgUrl ? (
+          <div className="w-full h-48 sm:h-56 overflow-hidden relative border-b border-card-border/40 bg-muted/20">
+            <img src={imgUrl} alt={service.name} className="w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent flex flex-col items-center justify-end p-5 text-center">
+              <h2 className="text-2xl font-bold text-foreground">{service.name}</h2>
+              <p className="text-xs text-muted-foreground font-medium mt-0.5">
+                {service.serviceType === 'SPECIALIZED' ? 'Specialized Service' : 'General Service'}
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="w-full h-48 sm:h-56 overflow-hidden relative border-b border-card-border/40 bg-muted/20 flex flex-col items-center justify-end p-5 text-center">
+            <div className="size-14 shrink-0 rounded-full bg-muted-foreground/10 flex items-center justify-center border border-border/60 overflow-hidden mb-3">
+              <Stethoscope className="size-8 text-muted-foreground/70" />
+            </div>
+            <h2 className="text-2xl font-bold text-foreground">{service.name}</h2>
+            <p className="text-xs text-muted-foreground font-medium mt-0.5">
+              {service.serviceType === 'SPECIALIZED' ? 'Specialized Service' : 'General Service'}
+            </p>
+          </div>
+        )}
+
+        {/* Service Details Section */}
+        <div className="py-4 px-5">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-base font-medium text-foreground">Service Information</span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onEdit}
+              disabled={isPending}
+              className="h-7 px-2.5 text-xs gap-1"
+            >
+              <Pencil className="size-3.5" /> Edit
+            </Button>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <ServiceField label="Service Title" value={service.name} />
+
+            <div className="flex flex-col gap-0.5">
+              <span className="text-xs text-muted-foreground font-medium">Current Status</span>
+              <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">
+                {service.status === 'ACTIVE'
+                  ? '🟢 Active (Available for online booking & internal system)'
+                  : service.status === 'HIDDEN'
+                  ? '🟡 Hidden Online (Hidden from online booking portal, internal staff only)'
+                  : '🔴 Archived (Disabled across all platforms and clinic catalog)'}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <ServiceField label="Category Type" value={service.serviceType || 'GENERAL'} />
+              <ServiceField label="Duration" value={`${service.durationMinutes} minutes`} />
+            </div>
+
+            <ServiceField label="Base Price" value={formatPrice(service.price)} />
+
+            <div className="flex flex-col gap-0.5">
+              <span className="text-xs text-muted-foreground">Description</span>
+              <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground leading-relaxed border-card-border cursor-default min-h-[80px]">
+                {service.description || 'No detailed description provided.'}
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
-          <Button onClick={onEdit} variant="outline" size="sm" disabled={isPending || service.status === 'ARCHIVED'}>
-            Edit
-          </Button>
-          <Button onClick={onArchive} variant="destructive" size="sm" disabled={isPending || service.status === 'ARCHIVED'}>
-            Archive
-          </Button>
-        </div>
       </div>
+    </div>
+  );
+}
 
-      <div className="flex flex-col gap-4 text-xs">
-        <div className="flex justify-between items-center bg-card-border/10 p-3 rounded-xl">
-          <span className="text-text-muted font-medium">Online Booking Status</span>
-          <div className="flex items-center gap-2">
-            <span className={`font-semibold ${
-              service.status === 'ACTIVE' 
-                ? 'text-green-600' 
-                : service.status === 'HIDDEN' 
-                ? 'text-amber-600' 
-                : 'text-red-600'
-            }`}>
-              {service.status === 'ACTIVE' ? 'Active' : service.status === 'HIDDEN' ? 'Hidden' : 'Archived'}
-            </span>
-            {service.status !== 'ARCHIVED' && (
-              <button
-                onClick={onToggleVisibility}
-                disabled={isPending}
-                className={`w-9 h-5 flex items-center rounded-full p-1 cursor-pointer transition-colors ${
-                  service.status === 'ACTIVE' ? 'bg-green-600' : 'bg-slate-300'
-                }`}
-              >
-                <div
-                  className={`bg-white w-3.5 h-3.5 rounded-full shadow-md transform transition-transform ${
-                    service.status === 'ACTIVE' ? 'translate-x-4' : 'translate-x-0'
-                  }`}
-                />
-              </button>
-            )}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-card-border/10 p-4 rounded-xl flex flex-col gap-1">
-            <span className="text-[10px] text-text-muted uppercase font-bold tracking-wider">Duration</span>
-            <span className="text-sm font-bold text-text-primary">⏳ {service.durationMinutes} mins</span>
-          </div>
-          <div className="bg-card-border/10 p-4 rounded-xl flex flex-col gap-1">
-            <span className="text-[10px] text-text-muted uppercase font-bold tracking-wider">Base Price</span>
-            <span className="text-sm font-bold text-accent-blue-text">{formatPrice(service.price)}</span>
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <span className="text-[10px] text-text-muted uppercase font-bold tracking-wider">Description</span>
-          <p className="text-xs text-text-secondary leading-relaxed bg-card-border/10 p-4 rounded-xl min-h-[80px]">
-            {service.description || 'No description provided.'}
-          </p>
-        </div>
+function ServiceField({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex flex-col gap-0.5">
+      <span className="text-xs text-muted-foreground">{label}</span>
+      <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground leading-5 border-card-border cursor-default">
+        {value}
       </div>
     </div>
   );

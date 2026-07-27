@@ -29,6 +29,7 @@ export function useServiceForm({ service, onSuccess }: UseServiceFormProps = {})
       durationMinutes: service?.durationMinutes || 30,
       price: service?.price || 0,
       serviceType: service?.serviceType || 'GENERAL',
+      status: (service?.status as any) || 'ACTIVE',
       isActive: service?.isActive ?? true,
       imageUrl: service?.imageUrl || null,
     },
@@ -42,6 +43,7 @@ export function useServiceForm({ service, onSuccess }: UseServiceFormProps = {})
         durationMinutes: service.durationMinutes,
         price: service.price || 0,
         serviceType: service.serviceType,
+        status: (service.status as any) || 'ACTIVE',
         isActive: service.isActive,
         imageUrl: service.imageUrl || null,
       });
@@ -52,6 +54,7 @@ export function useServiceForm({ service, onSuccess }: UseServiceFormProps = {})
         durationMinutes: 30,
         price: 0,
         serviceType: 'GENERAL',
+        status: 'ACTIVE',
         isActive: true,
         imageUrl: null,
       });
@@ -81,7 +84,8 @@ export function useServiceForm({ service, onSuccess }: UseServiceFormProps = {})
         durationMinutes: values.durationMinutes,
         price: values.price,
         serviceType: values.serviceType,
-        isActive: values.isActive,
+        status: values.status,
+        isActive: values.status === 'ACTIVE',
         imageUrl,
       };
 
