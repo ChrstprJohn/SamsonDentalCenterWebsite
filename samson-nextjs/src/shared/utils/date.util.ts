@@ -47,6 +47,9 @@ export function formatClinicTime(date: Date | string | null): string {
   const d = typeof date === 'string' ? new Date(date) : date;
 
   if (Number.isNaN(d.getTime())) {
+    if (typeof date === 'string' && date.toLowerCase().includes('invalid')) {
+      return '';
+    }
     return typeof date === 'string' ? date : '';
   }
 

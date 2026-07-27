@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { formatClinicTime } from '@/shared/utils/date.util';
 import { useAppointmentEmailTimeline, LeftTab } from '@/modules/staff/hooks/secretary/use-appointment-email-timeline';
 import type { AppointmentCardData, TimelineEntry } from '@/modules/staff/hooks/secretary/use-appointment-email-timeline';
 import { Input } from '@/components/ui/input';
@@ -71,9 +72,14 @@ function formatTimeFull(dateStr: string) {
 }
 
 function formatTimeRange(start: string | null, end: string | null) {
-  const fmt = (t: string) => new Date(`2000-01-01T${t}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  if (start && end) return `${fmt(start)} - ${fmt(end)}`;
-  if (start) return fmt(start);
+  if (start && end) {
+    const s = formatClinicTime(start);
+    const e = formatClinicTime(end);
+    if (s && e) return `${s} - ${e}`;
+    if (s) return s;
+    return '';
+  }
+  if (start) return formatClinicTime(start);
   return '';
 }
 
@@ -120,15 +126,6 @@ function AppointmentCard({
         <span className="font-medium text-xs text-text-secondary">
           {app.treatmentName}{range ? ` \u00b7 ${range}` : ''}
         </span>
-        <div className="flex items-center gap-1.5 shrink-0">
-          {app.channelsUsed.email && app.channelsUsed.sms ? (
-            <span className="text-[10px] font-medium text-text-secondary">Email, SMS</span>
-          ) : app.channelsUsed.email ? (
-            <span className="text-[10px] font-medium text-text-secondary">Email</span>
-          ) : app.channelsUsed.sms ? (
-            <span className="text-[10px] font-medium text-text-secondary">SMS</span>
-          ) : null}
-        </div>
         <div className="flex w-full items-end justify-between gap-4 min-w-0">
           {app.latestEventPreview ? (
             <span className="truncate text-xs text-muted-foreground">
@@ -278,9 +275,8 @@ export function AppointmentEmailTimelineView() {
     setMobileView('timeline');
   };
 
-  const patientName = selectedAppointment
-    ? appointmentCards.find((a) => a.id === selectedAppointmentId)?.patientName ?? ''
-    : '';
+  const selectedCard = appointmentCards.find((a) => a.id === selectedAppointmentId);
+  const patientName = selectedCard?.patientName ?? '';
   const treatmentName = selectedAppointment?.service?.name ?? '';
 
   return (
@@ -387,6 +383,16 @@ export function AppointmentEmailTimelineView() {
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   {isLoadingLogs && <RotateCw className="size-3.5 text-muted-foreground animate-spin" />}
+                  {selectedCard?.channelsUsed.email && (
+                    <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-blue-500/10 text-blue-600 border border-blue-500/20 shadow-2xs">
+                      Email
+                    </span>
+                  )}
+                  {selectedCard?.channelsUsed.sms && (
+                    <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-purple-500/10 text-purple-600 border border-purple-500/20 shadow-2xs">
+                      SMS
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
