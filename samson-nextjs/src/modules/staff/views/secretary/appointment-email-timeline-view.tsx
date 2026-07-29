@@ -4,9 +4,17 @@ import React, { useState } from 'react';
 import { formatClinicTime } from '@/shared/utils/date.util';
 import { useAppointmentEmailTimeline, LeftTab } from '@/modules/staff/hooks/secretary/use-appointment-email-timeline';
 import type { AppointmentCardData, TimelineEntry } from '@/modules/staff/hooks/secretary/use-appointment-email-timeline';
-import { Input } from '@/components/ui/input';
+import {
+  Sidebar,
+  SidebarHeader,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarInput,
+  SidebarTrigger,
+} from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
-import { Search, Mail, RotateCw, ChevronRight, UserRound } from 'lucide-react';
+import { Mail, RotateCw, ChevronRight, UserRound } from 'lucide-react';
 import { RenderedEmailFrame } from '@/components/emails/email-renderer';
 
 // UI Label Mappings for Event Types (Guest vs Patient distinction noted in code comments)
@@ -327,32 +335,38 @@ export function AppointmentEmailTimelineView() {
 
   return (
     <div className="flex h-full w-full overflow-hidden">
-      <div
-        className={`w-[400px] lg:flex flex-col border-r border-card-border/40 bg-sidebar h-full overflow-hidden ${
+      <Sidebar
+        collapsible="none"
+        className={`flex-col lg:w-[350px] flex-1 lg:flex-none border-r border-card-border/40 bg-sidebar h-full overflow-hidden ${
           mobileView === 'list' ? 'flex' : 'hidden'
-        }`}
+        } lg:flex`}
       >
-        <div className="p-3.5 border-b shrink-0 space-y-2">
-          <div className="flex items-center justify-between">
-            <h2 className="text-base font-medium text-foreground">Communication List</h2>
+        <SidebarHeader className="gap-3.5 border-b p-4 shrink-0">
+          <div className="flex w-full h-8 items-center justify-between">
+            <div className="flex items-center gap-2">
+              <SidebarTrigger className="lg:hidden -ml-1 text-muted-foreground hover:text-foreground" />
+              <div className="text-base font-medium text-foreground">
+                Communication List
+              </div>
+            </div>
             <Button
               size="sm"
               variant="ghost"
               onClick={refresh}
               disabled={isLoadingApps}
-              className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
+              className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
+              title="Refresh logs"
             >
               <RotateCw className={`size-3.5 ${isLoadingApps ? 'animate-spin' : ''}`} />
             </Button>
           </div>
 
-          <div className="relative">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
-            <Input
-              placeholder="Search patient..."
+          <div className="px-1">
+            <SidebarInput
+              placeholder="Type to search..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-8 text-xs rounded-md h-8"
+              className="rounded-md"
             />
           </div>
 
@@ -363,7 +377,7 @@ export function AppointmentEmailTimelineView() {
                 onClick={() => setLeftTab(tab.key)}
                 variant="ghost"
                 size="sm"
-                className={`flex-1 h-8 text-xs transition-all ${
+                className={`flex-1 h-8 text-xs font-semibold rounded-xl transition-all ${
                   leftTab === tab.key
                     ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground shadow-sm'
                     : 'text-muted-foreground hover:text-foreground'
@@ -373,38 +387,52 @@ export function AppointmentEmailTimelineView() {
               </Button>
             ))}
           </div>
-        </div>
+        </SidebarHeader>
 
-        <div className="flex-1 overflow-y-auto" data-lenis-prevent style={{ scrollbarWidth: 'thin' }}>
-          {isLoadingApps ? (
-            <div className="flex flex-col">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className="flex flex-col gap-2 border-b p-3.5 animate-pulse">
-                  <div className="h-3.5 w-36 rounded bg-muted/40" />
-                  <div className="h-3 w-24 rounded bg-muted/30" />
-                  <div className="h-3 w-16 rounded bg-muted/20" />
+        <SidebarContent
+          data-lenis-prevent
+          style={{ scrollbarWidth: 'thin' }}
+          className="!overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
+        >
+          <SidebarGroup className="px-0">
+            <SidebarGroupContent className="flex flex-col">
+              {isLoadingApps ? (
+                <div className="flex flex-col w-full">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <div key={i} className="flex items-start w-full gap-3 border-b p-4 animate-pulse">
+                      <div className="size-9 rounded-full bg-muted/40 shrink-0" />
+                      <div className="flex flex-col flex-1 gap-2">
+                        <div className="flex justify-between gap-2">
+                          <div className="h-3.5 w-32 rounded bg-muted/40" />
+                          <div className="h-2.5 w-10 rounded bg-muted/30" />
+                        </div>
+                        <div className="h-3 w-44 rounded bg-muted/30" />
+                        <div className="h-3 w-20 rounded bg-muted/20" />
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          ) : filteredCards.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center px-4">
-              <Mail className="size-8 text-muted-foreground/40 mb-2" />
-              <p className="text-xs font-medium text-foreground">
-                {leftTab === 'failed' ? 'No failed deliveries' : 'No appointments with logs'}
-              </p>
-            </div>
-          ) : (
-            filteredCards.map((app) => (
-              <AppointmentCard
-                key={app.id}
-                app={app}
-                isSelected={app.id === selectedAppointmentId}
-                onClick={() => handleSelect(app.id)}
-              />
-            ))
-          )}
-        </div>
-      </div>
+              ) : filteredCards.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12 text-center px-4">
+                  <Mail className="size-8 text-muted-foreground/40 mb-2" />
+                  <p className="text-xs font-medium text-foreground">
+                    {leftTab === 'failed' ? 'No failed deliveries' : 'No appointments with logs'}
+                  </p>
+                </div>
+              ) : (
+                filteredCards.map((app) => (
+                  <AppointmentCard
+                    key={app.id}
+                    app={app}
+                    isSelected={app.id === selectedAppointmentId}
+                    onClick={() => handleSelect(app.id)}
+                  />
+                ))
+              )}
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </SidebarContent>
+      </Sidebar>
 
       <div
         className={`flex-1 flex flex-col h-full overflow-hidden ${

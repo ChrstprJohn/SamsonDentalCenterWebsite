@@ -10,7 +10,8 @@ import { ServiceDetailPanel } from '../components/service-detail-panel';
 import { ServiceForm } from '../components/service-form';
 import { ArchiveConfirmModal } from '../components/archive-confirm-modal';
 import { ArrowLeft, Stethoscope, Plus, Layers } from 'lucide-react';
-import { SidebarHeader, SidebarInput, SidebarTrigger } from '@/components/ui/sidebar';
+import { Button } from '@/components/ui/button';
+import { Sidebar, SidebarHeader, SidebarInput, SidebarTrigger } from '@/components/ui/sidebar';
 
 interface ServicesViewProps {
   initialServices: Service[];
@@ -103,10 +104,18 @@ export function ServicesView({ initialServices }: ServicesViewProps) {
   return (
     <div className="flex flex-1 min-h-0 w-full overflow-hidden">
       {/* Left Roster Sidebar Pane */}
-      <div className={`lg:w-[350px] flex-1 lg:flex-none flex-col border-r border-card-border/40 bg-sidebar min-h-0 overflow-hidden ${colMobile('list')} lg:flex`}>
-        <SidebarHeader className="gap-3.5 border-b border-card-border/40 p-4 shrink-0">
-          <div className="flex w-full items-center justify-between">
-            <span className="text-base font-medium text-foreground">Services List</span>
+      <Sidebar
+        collapsible="none"
+        className={`flex-col lg:w-[350px] flex-1 lg:flex-none border-r border-card-border/40 bg-sidebar h-full overflow-hidden ${colMobile('list')} lg:flex`}
+      >
+        <SidebarHeader className="gap-3.5 border-b p-4 shrink-0">
+          <div className="flex w-full h-8 items-center justify-between">
+            <div className="flex items-center gap-2">
+              <SidebarTrigger className="lg:hidden -ml-1 text-muted-foreground hover:text-foreground" />
+              <div className="text-base font-medium text-foreground">
+                Services List
+              </div>
+            </div>
             <button
               onClick={handleAdd}
               className="h-8 px-2.5 text-xs rounded-xl font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 outline-none select-none active:scale-[0.98] flex items-center gap-1 shadow-sm"
@@ -127,17 +136,19 @@ export function ServicesView({ initialServices }: ServicesViewProps) {
 
           <div className="flex gap-1 bg-muted/20 p-1 rounded-lg">
             {TABS.map((tab) => (
-              <button
+              <Button
                 key={tab.key}
                 onClick={() => setStatusFilter(tab.key)}
-                className={`flex-1 h-8 text-xs rounded-xl font-semibold transition-all duration-300 outline-none select-none active:scale-[0.98] flex items-center justify-center gap-1.5 ${
+                variant="ghost"
+                size="sm"
+                className={`flex-1 h-8 text-xs font-semibold rounded-xl transition-all ${
                   statusFilter === tab.key
                     ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground shadow-sm'
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 {tab.label} ({tab.count})
-              </button>
+              </Button>
             ))}
           </div>
         </SidebarHeader>
@@ -147,7 +158,7 @@ export function ServicesView({ initialServices }: ServicesViewProps) {
           selectedId={selectedServiceId}
           onSelect={handleSelectService}
         />
-      </div>
+      </Sidebar>
 
       {/* Right Detail Pane */}
       {hasSelection ? (

@@ -1,10 +1,12 @@
 'use client';
+'use client';
 
 import { useMemo, useState } from 'react';
 import { useSecretaryAppointments } from '../../hooks/secretary/use-secretary-appointments';
 import { AppointmentDetailPane } from './sub-components/appointment-detail-pane';
 import { AppointmentsTable } from './sub-components/appointments-table';
-import { ArrowLeft, CalendarClock, CalendarDays, History } from 'lucide-react';
+import { ArrowLeft, CalendarDays } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { SidebarHeader, SidebarInput, SidebarTrigger } from '@/components/ui/sidebar';
 
 export function SecretaryAppointmentsView() {
@@ -32,20 +34,20 @@ export function SecretaryAppointmentsView() {
   );
 
   const TABS = [
-    { key: 'upcoming' as const, label: 'Active', icon: CalendarClock, count: upcomingCount },
-    { key: 'history' as const, label: 'History', icon: History, count: historyCount },
+    { key: 'upcoming' as const, label: 'Active', count: upcomingCount },
+    { key: 'history' as const, label: 'History', count: historyCount },
   ];
 
   return (
     <div className="flex flex-1 min-h-0 w-full overflow-hidden">
       <div className={`lg:w-[350px] flex-1 lg:flex-none flex-col border-r border-card-border/40 bg-sidebar min-h-0 overflow-hidden ${colMobile('list')} lg:flex`}>
-        <SidebarHeader className="gap-3.5 border-b border-card-border/40 p-4 shrink-0">
-          <div className="flex w-full items-center justify-between">
-            <div className="flex items-center gap-2 text-base font-medium text-foreground">
-              <div className="lg:hidden">
-                <SidebarTrigger />
+        <SidebarHeader className="gap-3.5 border-b p-4 shrink-0">
+          <div className="flex w-full h-8 items-center justify-between">
+            <div className="flex items-center gap-2">
+              <SidebarTrigger className="lg:hidden -ml-1 text-muted-foreground hover:text-foreground" />
+              <div className="text-base font-medium text-foreground">
+                Appointments Directory
               </div>
-              <span>Appointments Directory</span>
             </div>
           </div>
           <div className="px-1">
@@ -57,23 +59,21 @@ export function SecretaryAppointmentsView() {
             />
           </div>
           <div className="flex gap-1 bg-muted/20 p-1 rounded-lg">
-            {TABS.map((tab) => {
-              const Icon = tab.icon;
-              return (
-                <button
-                  key={tab.key}
-                  onClick={() => view.selectTab(tab.key)}
-                  className={`flex-1 h-8 text-xs rounded-xl font-semibold transition-all duration-300 outline-none select-none active:scale-[0.98] flex items-center justify-center gap-1.5 ${
-                    view.activeTab === tab.key
-                      ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground shadow-sm'
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  <Icon className="size-3.5" />
-                  {tab.label} ({tab.count})
-                </button>
-              );
-            })}
+            {TABS.map((tab) => (
+              <Button
+                key={tab.key}
+                onClick={() => view.selectTab(tab.key)}
+                variant="ghost"
+                size="sm"
+                className={`flex-1 h-8 text-xs font-semibold rounded-xl transition-all ${
+                  view.activeTab === tab.key
+                    ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                {tab.label} ({tab.count})
+              </Button>
+            ))}
           </div>
         </SidebarHeader>
         <AppointmentsTable

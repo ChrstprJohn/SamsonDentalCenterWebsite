@@ -13,6 +13,8 @@ import {
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarInput,
+  SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { Mail, AlertCircle, Clock, CheckCircle2, RefreshCw, Search, MessageSquare, ArrowLeft } from 'lucide-react';
 
@@ -111,17 +113,21 @@ export function SecretaryEmailLogView() {
   };
 
   return (
-    <SidebarProvider className="h-full w-full min-h-0 bg-transparent flex flex-row overflow-hidden">
-      <div className="flex h-full w-full overflow-hidden">
+    <div className="flex h-full w-full overflow-hidden">
         {/* -- Left Sidebar: Card List -- */}
         <Sidebar
           collapsible="none"
-          className={`flex-col lg:w-[360px] flex-1 lg:flex-none border-r border-card-border/40 bg-sidebar h-full overflow-hidden ${mobileView === 'list' ? 'flex' : 'hidden'} lg:flex`}
+          className={`flex-col lg:w-[350px] flex-1 lg:flex-none border-r border-card-border/40 bg-sidebar h-full overflow-hidden ${mobileView === 'list' ? 'flex' : 'hidden'} lg:flex`}
         >
           {/* Header */}
           <SidebarHeader className="gap-3.5 border-b p-4 shrink-0">
-            <div className="flex w-full items-center justify-between">
-              <span className="text-base font-medium text-foreground">Email Log List</span>
+            <div className="flex w-full h-8 items-center justify-between">
+              <div className="flex items-center gap-2">
+                <SidebarTrigger className="lg:hidden -ml-1 text-muted-foreground hover:text-foreground" />
+                <div className="text-base font-medium text-foreground">
+                  Email Log List
+                </div>
+              </div>
               <Button
                 size="sm"
                 variant="ghost"
@@ -135,14 +141,12 @@ export function SecretaryEmailLogView() {
             </div>
 
             {/* Search */}
-            <div className="relative px-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
-              <Input
-                type="text"
-                placeholder="Search recipient or event type..."
+            <div className="px-1">
+              <SidebarInput
+                placeholder="Type to search..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-8 text-xs rounded-md h-9"
+                className="rounded-md"
               />
             </div>
 
@@ -154,7 +158,7 @@ export function SecretaryEmailLogView() {
                   onClick={() => setStatusFilter(tab)}
                   variant="ghost"
                   size="sm"
-                  className={`flex-1 h-8 text-xs transition-all ${
+                  className={`flex-1 h-8 text-xs font-semibold rounded-xl transition-all ${
                     statusFilter === tab
                       ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground shadow-sm'
                       : 'text-muted-foreground hover:text-foreground'
@@ -347,6 +351,5 @@ export function SecretaryEmailLogView() {
           </div>
         )}
       </div>
-    </SidebarProvider>
   );
 }

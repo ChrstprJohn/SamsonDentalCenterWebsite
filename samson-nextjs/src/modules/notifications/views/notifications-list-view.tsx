@@ -17,6 +17,8 @@ import {
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarInput,
+  SidebarTrigger,
 } from '@/components/ui/sidebar';
 import {
   Bell,
@@ -151,20 +153,22 @@ export function NotificationsListView({ initialNotifications }: NotificationsLis
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   return (
-    <SidebarProvider className="h-full w-full min-h-0 bg-transparent flex flex-row overflow-hidden">
-      <div className="flex h-full w-full overflow-hidden">
+    <div className="flex h-full w-full overflow-hidden">
         {/* -- Left Sidebar: Card List -- */}
         <Sidebar
           collapsible="none"
-          className={`flex-col lg:w-[360px] flex-1 lg:flex-none border-r border-card-border/40 bg-sidebar h-full overflow-hidden ${
+          className={`flex-col lg:w-[350px] flex-1 lg:flex-none border-r border-card-border/40 bg-sidebar h-full overflow-hidden ${
             mobileView === 'list' ? 'flex' : 'hidden'
           } lg:flex`}
         >
           {/* Header */}
           <SidebarHeader className="gap-3.5 border-b p-4 shrink-0">
-            <div className="flex w-full items-center justify-between">
+            <div className="flex w-full h-8 items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="text-base font-medium text-foreground">In-App Notifications Log</span>
+                <SidebarTrigger className="lg:hidden -ml-1 text-muted-foreground hover:text-foreground" />
+                <div className="text-base font-medium text-foreground">
+                  Notifications Log
+                </div>
                 {unreadCount > 0 && (
                   <Badge variant="default" className="text-[10px] px-1.5 py-0 bg-primary">
                     {unreadCount} new
@@ -174,14 +178,12 @@ export function NotificationsListView({ initialNotifications }: NotificationsLis
             </div>
 
             {/* Search */}
-            <div className="relative px-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
-              <Input
-                type="text"
-                placeholder="Search notifications..."
+            <div className="px-1">
+              <SidebarInput
+                placeholder="Type to search..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-8 text-xs rounded-md h-9"
+                className="rounded-md"
               />
             </div>
 
@@ -193,7 +195,7 @@ export function NotificationsListView({ initialNotifications }: NotificationsLis
                   onClick={() => setActiveTab(tab)}
                   variant="ghost"
                   size="sm"
-                  className={`flex-1 h-8 text-xs transition-all ${
+                  className={`flex-1 h-8 text-xs font-semibold rounded-xl transition-all ${
                     activeTab === tab
                       ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground shadow-sm'
                       : 'text-muted-foreground hover:text-foreground'
@@ -360,6 +362,5 @@ export function NotificationsListView({ initialNotifications }: NotificationsLis
           </div>
         )}
       </div>
-    </SidebarProvider>
   );
 }

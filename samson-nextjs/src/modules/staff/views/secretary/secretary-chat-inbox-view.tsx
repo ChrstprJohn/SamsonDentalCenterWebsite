@@ -792,7 +792,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                 className={`flex-col lg:w-[350px] flex-1 lg:flex-none border-r border-card-border/40 bg-sidebar h-full overflow-hidden ${colMobile('list')} lg:flex`}
             >
                 <SidebarHeader className="gap-3.5 border-b p-4 shrink-0">
-                    <div className="flex w-full items-center justify-between">
+                    <div className="flex w-full h-8 items-center justify-between">
                         <div className="flex items-center gap-2">
                             <SidebarTrigger className="lg:hidden -ml-1 text-muted-foreground hover:text-foreground" />
                             <div className="text-base font-medium text-foreground">
@@ -823,26 +823,24 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                             onClick={() => setActiveTab('ACTIVE')}
                             variant="ghost"
                             size="sm"
-                            className={`flex-1 h-8 text-xs transition-all ${
+                            className={`flex-1 h-8 text-xs font-semibold rounded-xl transition-all ${
                                 activeTab === 'ACTIVE'
                                     ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground shadow-sm'
                                     : 'text-muted-foreground hover:text-foreground'
                             }`}
                         >
-                            <Mail className="size-3.5 mr-1.5" />
                             Active ({threads.filter(t => t.status !== 'PENDING' && activeStates.includes(t.status)).length})
                         </Button>
                         <Button
                             onClick={() => setActiveTab('ARCHIVE')}
                             variant="ghost"
                             size="sm"
-                            className={`flex-1 h-8 text-xs transition-all ${
+                            className={`flex-1 h-8 text-xs font-semibold rounded-xl transition-all ${
                                 activeTab === 'ARCHIVE'
                                     ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground shadow-sm'
                                     : 'text-muted-foreground hover:text-foreground'
                             }`}
                         >
-                            <Archive className="size-3.5 mr-1.5" />
                             Archive ({threads.filter(t => t.status !== 'PENDING' && !activeStates.includes(t.status)).length})
                         </Button>
                     </div>

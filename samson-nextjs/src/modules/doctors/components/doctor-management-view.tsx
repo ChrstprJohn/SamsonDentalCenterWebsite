@@ -5,7 +5,8 @@ import { useDoctorManagement, Doctor } from '../hooks/use-doctor-management';
 import { DoctorList } from './doctor-list';
 import { DoctorDetailsPane } from './doctor-details-pane';
 import { ArrowLeft, UserCheck, Plus, Users, UserPlus } from 'lucide-react';
-import { SidebarHeader, SidebarInput, SidebarTrigger } from '@/components/ui/sidebar';
+import { Button } from '@/components/ui/button';
+import { Sidebar, SidebarHeader, SidebarInput, SidebarTrigger } from '@/components/ui/sidebar';
 
 interface Service {
   id: string;
@@ -60,10 +61,18 @@ export function DoctorManagementView({ initialDoctors, allServices }: DoctorMana
   return (
     <div className="flex flex-1 min-h-0 w-full overflow-hidden">
       {/* Left Roster Sidebar Pane */}
-      <div className={`lg:w-[350px] flex-1 lg:flex-none flex-col border-r border-card-border/40 bg-sidebar min-h-0 overflow-hidden ${colMobile('list')} lg:flex`}>
-        <div className="flex flex-col gap-3.5 border-b border-card-border/40 p-4 shrink-0">
-          <div className="flex w-full items-center justify-between">
-            <span className="text-base font-medium text-foreground">Dentists List</span>
+      <Sidebar
+        collapsible="none"
+        className={`flex-col lg:w-[350px] flex-1 lg:flex-none border-r border-card-border/40 bg-sidebar h-full overflow-hidden ${colMobile('list')} lg:flex`}
+      >
+        <SidebarHeader className="gap-3.5 border-b p-4 shrink-0">
+          <div className="flex w-full h-8 items-center justify-between">
+            <div className="flex items-center gap-2">
+              <SidebarTrigger className="lg:hidden -ml-1 text-muted-foreground hover:text-foreground" />
+              <div className="text-base font-medium text-foreground">
+                Dentists List
+              </div>
+            </div>
             <button
               onClick={handleAdd}
               disabled={isAddingNew}
@@ -85,20 +94,22 @@ export function DoctorManagementView({ initialDoctors, allServices }: DoctorMana
 
           <div className="flex gap-1 bg-muted/20 p-1 rounded-lg">
             {TABS.map((tab) => (
-              <button
+              <Button
                 key={tab.key}
                 onClick={() => setStatusFilter(tab.key)}
-                className={`flex-1 h-8 text-xs rounded-xl font-semibold transition-all duration-300 outline-none select-none active:scale-[0.98] flex items-center justify-center gap-1.5 ${
+                variant="ghost"
+                size="sm"
+                className={`flex-1 h-8 text-xs font-semibold rounded-xl transition-all ${
                   statusFilter === tab.key
                     ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground shadow-sm'
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 {tab.label} ({tab.count})
-              </button>
+              </Button>
             ))}
           </div>
-        </div>
+        </SidebarHeader>
 
         <DoctorList
           doctors={filteredDoctors}
@@ -106,7 +117,7 @@ export function DoctorManagementView({ initialDoctors, allServices }: DoctorMana
           onSelectDoctor={handleSelect}
           isAddingNew={isAddingNew}
         />
-      </div>
+      </Sidebar>
 
       {/* Right Detail Pane */}
       {hasSelection ? (

@@ -43,19 +43,48 @@ export function SecretaryPastAppointmentFollowUpsView() {
   return (
     <div className="flex flex-1 min-h-0 w-full overflow-hidden">
       <section className={`lg:w-[350px] flex-1 lg:flex-none flex-col border-r border-card-border/40 bg-sidebar min-h-0 overflow-hidden ${colMobile('list')} lg:flex`}>
-        <SidebarHeader className="gap-3.5 border-b border-card-border/40 p-4 shrink-0">
-          <div className="flex items-center gap-2 text-base font-medium text-foreground">
-            <div className="lg:hidden"><SidebarTrigger /></div>
-            <span>Past Follow-ups</span>
+        <SidebarHeader className="gap-3.5 border-b p-4 shrink-0">
+          <div className="flex w-full h-8 items-center justify-between">
+            <div className="flex items-center gap-2">
+              <SidebarTrigger className="lg:hidden -ml-1 text-muted-foreground hover:text-foreground" />
+              <div className="text-base font-medium text-foreground">
+                Past Follow-ups
+              </div>
+            </div>
           </div>
-          <SidebarInput placeholder="Search patient or service..." value={search} onChange={(event) => setSearch(event.target.value)} className="rounded-md" />
+          <div className="px-1">
+            <SidebarInput
+              placeholder="Type to search..."
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              className="rounded-md"
+            />
+          </div>
           <div className="flex gap-1 bg-muted/20 p-1 rounded-lg">
-            <button onClick={() => view.selectTab('missed-checkouts')} className={`flex-1 h-8 text-xs rounded-xl font-semibold transition-all duration-300 outline-none select-none active:scale-[0.98] flex items-center justify-center gap-1.5 ${view.activeTab === 'missed-checkouts' ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}>
+            <Button
+              onClick={() => view.selectTab('missed-checkouts')}
+              variant="ghost"
+              size="sm"
+              className={`flex-1 h-8 text-xs font-semibold rounded-xl transition-all ${
+                view.activeTab === 'missed-checkouts'
+                  ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
               Checkouts ({view.missedCheckouts.length})
-            </button>
-            <button onClick={() => view.selectTab('no-show-follow-ups')} className={`flex-1 h-8 text-xs rounded-xl font-semibold transition-all duration-300 outline-none select-none active:scale-[0.98] flex items-center justify-center gap-1.5 ${view.activeTab === 'no-show-follow-ups' ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}>
+            </Button>
+            <Button
+              onClick={() => view.selectTab('no-show-follow-ups')}
+              variant="ghost"
+              size="sm"
+              className={`flex-1 h-8 text-xs font-semibold rounded-xl transition-all ${
+                view.activeTab === 'no-show-follow-ups'
+                  ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
               No-shows ({view.unresolvedNoShows.length})
-            </button>
+            </Button>
           </div>
         </SidebarHeader>
 
