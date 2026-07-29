@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Check, Pencil } from 'lucide-react';
+import { Check, Pencil, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select } from '@/components/ui/select';
 import { updateConfirmationChannelAction } from '@/modules/appointments/actions/status/update-confirmation-channel.action';
@@ -34,17 +34,21 @@ export function NotificationChannelField({
   };
 
   return (
-    <div className="flex flex-col gap-1.5 p-3 rounded-xl bg-muted/40 border border-card-border">
+    <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
-        <span className="text-xs font-bold text-text-secondary">Notification Channel</span>
+        <span className="text-base font-medium text-foreground">Notification Channel</span>
         {!editing ? (
           <Button type="button" variant="outline" size="sm" onClick={() => setEditing(true)} className="h-7 px-2.5 text-xs gap-1">
             <Pencil className="size-3.5" /> Edit
           </Button>
         ) : (
-          <div className="flex gap-1.5">
-            <Button type="button" variant="outline" size="sm" onClick={() => { setDraft(channel); setEditing(false); }} className="h-7 px-2.5 text-xs">Cancel</Button>
-            <Button type="button" size="sm" onClick={save} disabled={saving || draft === channel} className="h-7 px-2.5 text-xs gap-1"><Check className="size-3.5" /> Save</Button>
+          <div className="flex items-center gap-2">
+            <Button type="button" variant="outline" size="sm" onClick={() => { setDraft(channel); setEditing(false); }} className="h-7 px-2.5 text-xs gap-1">
+              <X className="size-3.5" /> Cancel
+            </Button>
+            <Button type="button" size="sm" onClick={save} disabled={saving || draft === channel} className="h-7 px-2.5 text-xs gap-1 bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50">
+              <Check className="size-3.5" /> {saving ? 'Saving...' : 'Save'}
+            </Button>
           </div>
         )}
       </div>
@@ -53,7 +57,7 @@ export function NotificationChannelField({
           { value: 'EMAIL', label: 'Email' }, { value: 'SMS', label: 'SMS' }, { value: 'BOTH', label: 'Email & SMS' }, { value: 'NONE', label: 'None' },
         ]} />
       ) : (
-        <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-text-muted border-card-border cursor-default">
+        <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">
           {channel === 'EMAIL' ? 'Email' : channel === 'SMS' ? 'SMS' : channel === 'BOTH' ? 'Email & SMS' : 'None'}
         </div>
       )}

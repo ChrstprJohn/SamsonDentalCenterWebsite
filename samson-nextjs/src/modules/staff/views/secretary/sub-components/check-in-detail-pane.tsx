@@ -140,12 +140,12 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
 
   const paneType = view.checkInAppt ? 'checkin' : view.checkoutAppt ? 'checkout' : view.viewAppt ? 'details' : view.resolveAppt ? 'resolve' : view.rescheduleAppt ? 'reschedule' : null;
 
-  const paneTitle = paneType === 'details' ? 'Appointment Details' : paneType === 'checkin' ? 'Check In' : paneType === 'checkout' ? 'Checkout' : paneType === 'resolve' ? 'No-Show Resolution' : paneType === 'reschedule' ? 'Reschedule' : '';
+  const paneTitle = paneType === 'details' && showRescheduleForm ? 'Reschedule' : paneType === 'details' ? 'Appointment Details' : paneType === 'checkin' ? 'Check In' : paneType === 'checkout' ? 'Checkout' : paneType === 'resolve' ? 'No-Show Resolution' : paneType === 'reschedule' ? 'Reschedule' : '';
 
   return (
     <div className="w-full h-full flex flex-col min-h-0">
       <div className="flex items-center gap-2 p-4 border-b border-border shrink-0">
-        <button onClick={onClose} className="lg:hidden p-1 -ml-1 text-muted-foreground hover:text-foreground">
+        <button onClick={paneType === 'details' && showRescheduleForm ? () => setShowRescheduleForm(false) : onClose} className="p-1 -ml-1 text-muted-foreground hover:text-foreground shrink-0">
           <ArrowLeft className="size-4" />
         </button>
         <div className="flex-1 min-w-0 flex flex-col gap-0.5">
@@ -153,16 +153,13 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
             {paneTitle}
           </span>
           <span className="text-xs text-muted-foreground truncate">
-            {paneType === 'details' ? `Ref #${appointment.id?.slice(0, 8) || ''}` : `${getPatientDisplayName(appointment)} &mdash; ${appointment.service?.name}`}
+            {paneType === 'details' && showRescheduleForm ? 'Update date, time, dentist, or service details.' : paneType === 'details' ? `Ref #${appointment.id?.slice(0, 8) || ''}` : `${getPatientDisplayName(appointment)} &mdash; ${appointment.service?.name}`}
           </span>
         </div>
-        <button onClick={onClose} className="p-1 text-muted-foreground hover:text-foreground shrink-0 max-lg:hidden">
-          <X className="size-4" />
-        </button>
       </div>
 
       <div className="flex-1 min-h-0 overflow-y-auto [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent" style={{ scrollbarWidth: 'thin' }} data-lenis-prevent>
-        {paneType === 'details' && (
+        {paneType === 'details' && !showRescheduleForm && (
           <div className="flex flex-col items-center pt-4 pb-3 px-4">
             <div className="size-12 shrink-0 rounded-full bg-muted-foreground/10 flex items-center justify-center border-2 border-border/60 overflow-hidden mb-3">
               <UserRound className="size-10 text-muted-foreground/70 translate-y-0.5" />
@@ -173,8 +170,8 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
             <p className="text-sm text-muted-foreground mt-0.5">{appointment.guestContact ? 'Guest' : 'Patient'}</p>
           </div>
         )}
-        {paneType === 'details' && <hr className="border-card-border/40 mx-4" />}
-        {paneType === 'details' && (
+        {paneType === 'details' && !showRescheduleForm && <hr className="border-card-border/40 mx-4" />}
+        {paneType === 'details' && !showRescheduleForm && (
           <div className="flex items-center justify-between py-3 px-4">
             <span className="text-sm font-medium text-foreground">Current Status</span>
             <span className={`text-xs font-medium px-3 py-1 rounded-full ${STATUS_BADGE[appointment.status] || 'bg-muted/50 text-muted-foreground'}`}>
@@ -182,20 +179,61 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
             </span>
           </div>
         )}
-        {paneType === 'details' && <hr className="border-card-border/40 mx-4" />}
+        {paneType === 'details' && !showRescheduleForm && <hr className="border-card-border/40 mx-4" />}
         <div className="px-4 py-4 space-y-4">
-          {paneType === 'details' && <DetailsContent appointment={appointment} view={view} />}
+          {paneType === 'details' && !showRescheduleForm && <DetailsContent appointment={appointment} view={view} />}
 
           {paneType === 'checkout' && <CheckoutContent appointment={appointment} view={view} />}
           {paneType === 'resolve' && <ResolveContent view={view} onClose={onClose} />}
           {paneType === 'reschedule' && <StandaloneReschedule view={view} onClose={onClose} />}
+          {paneType === 'details' && appointment.status === 'NO_SHOW' && showRescheduleForm && (
+            <div className="[&_form]:!border-t-0 [&_form]:!pt-0">
+              <AppointmentRescheduleForm
+                appointment={appointment}
+                services={view.servicesList || []}
+                serviceId={appointment.serviceId}
+                doctorId={view.rescheduleDoctor || appointment.doctorId}
+                doctors={(view.doctorsList || []).map((d: any) => ({ doctorId: d.id, doctorName: `${d.prefix || 'Dr.'} ${d.firstName} ${d.lastName}` }))}
+                date={view.rescheduleDate || ''}
+                activeServiceId={appointment.serviceId}
+                activeDoctorId={appointment.doctorId}
+                startTime={view.rescheduleTime || ''}
+                endTime={view.rescheduleEndTime || ''}
+                justification={view.rescheduleJustification || ''}
+                confirmationChannel={appointment.confirmationChannel || (appointment as any).confirmation_channel || 'EMAIL'}
+                onConfirmationChannelChange={(channel) => {
+                  appointment.confirmationChannel = channel;
+                  (appointment as any).confirmation_channel = channel;
+                }}
+                isSubmitting={view.isPending}
+                noFooter
+                onServiceSelect={() => {}}
+                onDoctorSelect={(docId) => view.setRescheduleDoctor(docId)}
+                onDateSelect={(d) => view.setRescheduleDate(d)}
+                onStartTimeChange={(t) => view.setRescheduleTime(t)}
+                onEndTimeChange={(t) => view.setRescheduleEndTime?.(t)}
+                onJustificationChange={(j) => view.setRescheduleJustification(j)}
+                onSubmit={() => { view.handleRescheduleSubmit(); setShowRescheduleForm(false); }}
+                onBack={() => { view.setRescheduleAppt(null); setShowRescheduleForm(false); }}
+              />
+            </div>
+          )}
         </div>
       </div>
 
       {paneType !== 'resolve' && paneType !== 'reschedule' && (
         <div className="shrink-0 border-t border-border px-4 py-3">
           <div className="flex gap-2">
-            {paneType === 'details' && appointment.status === 'APPROVED' && !showCheckInForm && (
+            {paneType === 'details' && appointment.status === 'NO_SHOW' && showRescheduleForm ? (
+              <>
+                <button onClick={() => { view.handleRescheduleSubmit(); setShowRescheduleForm(false); }} disabled={view.isPending} className="flex-1 h-[42px] text-sm font-medium bg-primary text-white hover:bg-primary/90 rounded-xl disabled:opacity-50">
+                  {view.isPending ? 'Saving...' : 'Confirm'}
+                </button>
+                <button onClick={() => { view.setRescheduleAppt(null); setShowRescheduleForm(false); }} className="flex-1 h-[42px] text-sm font-medium border border-card-border text-foreground bg-transparent hover:bg-muted rounded-xl">
+                  Cancel
+                </button>
+              </>
+            ) : paneType === 'details' && appointment.status === 'APPROVED' && !showCheckInForm && (
               <button onClick={() => setShowCheckInForm(true)} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl">
                 Check In
               </button>
@@ -335,37 +373,6 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
                     {view.isPending ? 'Submitting...' : 'Submit Resolution'}
                   </button>
                 </div>
-              </div>
-            )}
-            {paneType === 'details' && appointment.status === 'NO_SHOW' && showRescheduleForm && (
-              <div className="[&_form]:!border-t-0 [&_form]:!pt-0 w-full">
-                <AppointmentRescheduleForm
-                  appointment={appointment}
-                  services={view.servicesList || []}
-                  serviceId={appointment.serviceId}
-                  doctorId={view.rescheduleDoctor || appointment.doctorId}
-                  doctors={(view.doctorsList || []).map((d: any) => ({ doctorId: d.id, doctorName: `${d.prefix || 'Dr.'} ${d.firstName} ${d.lastName}` }))}
-                  date={view.rescheduleDate || ''}
-                  activeServiceId={appointment.serviceId}
-                  activeDoctorId={appointment.doctorId}
-                  startTime={view.rescheduleTime || ''}
-                  endTime={view.rescheduleEndTime || ''}
-                  justification={view.rescheduleJustification || ''}
-                  confirmationChannel={appointment.confirmationChannel || (appointment as any).confirmation_channel || 'EMAIL'}
-                  onConfirmationChannelChange={(channel) => {
-                    appointment.confirmationChannel = channel;
-                    (appointment as any).confirmation_channel = channel;
-                  }}
-                  isSubmitting={view.isPending}
-                  onServiceSelect={() => {}}
-                  onDoctorSelect={(docId) => view.setRescheduleDoctor(docId)}
-                  onDateSelect={(d) => view.setRescheduleDate(d)}
-                  onStartTimeChange={(t) => view.setRescheduleTime(t)}
-                  onEndTimeChange={(t) => view.setRescheduleEndTime?.(t)}
-                  onJustificationChange={(j) => view.setRescheduleJustification(j)}
-                  onSubmit={() => { view.handleRescheduleSubmit(); setShowRescheduleForm(false); }}
-                  onBack={() => { view.setRescheduleAppt(null); setShowRescheduleForm(false); }}
-                />
               </div>
             )}
             {paneType === 'details' && appointment.status === 'CHECKED_IN' && !showUndoForm && !showCheckoutForm && (
@@ -828,6 +835,8 @@ function ResolveContent({ view, onClose }: { view: any; onClose: () => void }) {
 
   return (
     <div className="flex flex-col gap-4">
+      {resolution !== 'RESCHEDULE' && (
+        <>
       <div className="flex flex-col gap-1">
         <h3 className="text-sm font-medium text-foreground">No-Show Resolution</h3>
         <p className="text-xs text-muted-foreground">
@@ -857,7 +866,7 @@ function ResolveContent({ view, onClose }: { view: any; onClose: () => void }) {
           <button
             onClick={() => selectResolution('RESCHEDULE', 'Patient arrived late; rescheduling to new slot')}
             className={`p-2.5 border text-[10px] font-medium transition-all ${
-              resolution === 'RESCHEDULE' ? 'border-cyan-500 bg-cyan-500/10 text-cyan-600' : 'border-card-border bg-card text-muted-foreground hover:border-foreground/30'
+              (resolution as string) === 'RESCHEDULE' ? 'border-cyan-500 bg-cyan-500/10 text-cyan-600' : 'border-card-border bg-card text-muted-foreground hover:border-foreground/30'
             }`}
           >
             Reschedule
@@ -905,38 +914,58 @@ function ResolveContent({ view, onClose }: { view: any; onClose: () => void }) {
           )}
         </div>
       )}
+      </>
+      )}
 
       {resolution === 'RESCHEDULE' ? (
-        <AppointmentRescheduleForm
-          appointment={appointment}
-          services={view.servicesList || []}
-          serviceId={appointment.serviceId}
-          doctorId={view.rescheduleDoctor || appointment.doctorId}
-          doctors={(view.doctorsList || []).map((d: any) => ({
-            doctorId: d.id,
-            doctorName: `${d.prefix || 'Dr.'} ${d.firstName} ${d.lastName}`,
-          }))}
-          date={view.rescheduleDate || ''}
-          activeServiceId={appointment.serviceId}
-          activeDoctorId={appointment.doctorId}
-          startTime={view.rescheduleTime || ''}
-          endTime={view.rescheduleEndTime || ''}
-          justification={reason}
-          confirmationChannel={appointment.confirmationChannel || (appointment as any).confirmation_channel || 'EMAIL'}
-          onConfirmationChannelChange={(channel) => {
-            appointment.confirmationChannel = channel;
-            (appointment as any).confirmation_channel = channel;
-          }}
-          isSubmitting={view.isPending}
-          onServiceSelect={() => {}}
-          onDoctorSelect={(docId) => view.setRescheduleDoctor(docId)}
-          onDateSelect={(d) => view.setRescheduleDate(d)}
-          onStartTimeChange={(t) => view.setRescheduleTime(t)}
-          onEndTimeChange={(t) => view.setRescheduleEndTime?.(t)}
-          onJustificationChange={(j) => setReason(j)}
-          onSubmit={handleSubmit}
-          onBack={onClose}
-        />
+        <>
+          <AppointmentRescheduleForm
+            appointment={appointment}
+            services={view.servicesList || []}
+            serviceId={appointment.serviceId}
+            doctorId={view.rescheduleDoctor || appointment.doctorId}
+            doctors={(view.doctorsList || []).map((d: any) => ({
+              doctorId: d.id,
+              doctorName: `${d.prefix || 'Dr.'} ${d.firstName} ${d.lastName}`,
+            }))}
+            date={view.rescheduleDate || ''}
+            activeServiceId={appointment.serviceId}
+            activeDoctorId={appointment.doctorId}
+            startTime={view.rescheduleTime || ''}
+            endTime={view.rescheduleEndTime || ''}
+            justification={reason}
+            confirmationChannel={appointment.confirmationChannel || (appointment as any).confirmation_channel || 'EMAIL'}
+            onConfirmationChannelChange={(channel) => {
+              appointment.confirmationChannel = channel;
+              (appointment as any).confirmation_channel = channel;
+            }}
+            isSubmitting={view.isPending}
+            noFooter
+            onServiceSelect={() => {}}
+            onDoctorSelect={(docId) => view.setRescheduleDoctor(docId)}
+            onDateSelect={(d) => view.setRescheduleDate(d)}
+            onStartTimeChange={(t) => view.setRescheduleTime(t)}
+            onEndTimeChange={(t) => view.setRescheduleEndTime?.(t)}
+            onJustificationChange={(j) => setReason(j)}
+            onSubmit={handleSubmit}
+            onBack={onClose}
+          />
+          <div className="flex flex-col gap-2">
+            <button
+              onClick={handleSubmit}
+              disabled={view.isPending}
+              className="w-full h-10 text-sm font-medium bg-primary text-primary-foreground rounded-xl disabled:opacity-40 transition-colors"
+            >
+              {view.isPending ? 'Saving...' : 'Confirm'}
+            </button>
+            <button
+              onClick={onClose}
+              className="w-full h-10 text-sm font-medium border border-card-border text-foreground bg-transparent hover:bg-muted transition-colors rounded-xl"
+            >
+              Cancel
+            </button>
+          </div>
+        </>
       ) : (
         <>
           <div className="flex flex-col gap-1.5">
@@ -1002,13 +1031,6 @@ function StandaloneReschedule({ view, onClose }: { view: any; onClose: () => voi
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-1">
-        <h3 className="text-sm font-medium text-foreground">Reschedule Appointment</h3>
-        <p className="text-xs text-muted-foreground">
-          {getPatientDisplayName(appointment)} - {appointment.service?.name}
-        </p>
-      </div>
-
       <AppointmentRescheduleForm
         appointment={appointment}
         services={view.servicesList || []}
@@ -1030,6 +1052,7 @@ function StandaloneReschedule({ view, onClose }: { view: any; onClose: () => voi
           (appointment as any).confirmation_channel = channel;
         }}
         isSubmitting={view.isPending}
+        noFooter
         onServiceSelect={(sId) => view.setRescheduleService?.(sId)}
         onDoctorSelect={(docId) => view.setRescheduleDoctor(docId)}
         onDateSelect={(d) => view.setRescheduleDate(d)}
@@ -1039,6 +1062,14 @@ function StandaloneReschedule({ view, onClose }: { view: any; onClose: () => voi
         onSubmit={view.handleRescheduleSubmit}
         onBack={onClose}
       />
+      <div className="flex gap-2 pt-3 border-t border-card-border/60">
+        <Button onClick={view.handleRescheduleSubmit} disabled={view.isPending} className="flex-1 h-[42px] text-sm font-medium bg-primary text-white hover:bg-primary/90 rounded-xl disabled:opacity-50">
+          {view.isPending ? 'Saving...' : 'Confirm'}
+        </Button>
+        <Button variant="outline" onClick={onClose} className="flex-1 h-[42px] text-sm font-medium">
+          Cancel
+        </Button>
+      </div>
     </div>
   );
 }

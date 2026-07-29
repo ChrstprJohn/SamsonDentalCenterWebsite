@@ -58,6 +58,27 @@ export function NoShowResolutionModal({ view }: { view: any }) {
     setIsSavingChannel(false);
   };
 
+  const handleRescheduleFormSubmit = () => {
+    const formatIso = (dateStr: string, timeStr: string) => {
+      if (!dateStr || !timeStr) return undefined;
+      const timeFormatted = timeStr.length === 5 ? `${timeStr}:00` : timeStr;
+      return `${dateStr}T${timeFormatted}Z`;
+    };
+    const startIso = formatIso(newDate, newTime);
+    const endIso = newEndTime
+      ? formatIso(newDate, newEndTime)
+      : new Date(new Date(startIso!).getTime() + 30 * 60 * 1000).toISOString();
+    view.handleResolveNoShowSubmit({
+      appointmentId: appointment.id,
+      resolution: 'RESCHEDULE',
+      reason: reason.trim(),
+      newDate,
+      newStartTime: startIso,
+      newEndTime: endIso,
+      newDoctorId,
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!reason.trim()) {
@@ -99,6 +120,7 @@ export function NoShowResolutionModal({ view }: { view: any }) {
           <X className="h-4 w-4" />
         </button>
 
+        {resolution !== 'RESCHEDULE' && (
         <div className="flex flex-col gap-1">
           <span className="text-xs font-black text-amber-500 uppercase tracking-wider">No-Show Resolution</span>
           <h3 className="text-lg font-extrabold text-text-primary">
@@ -108,8 +130,10 @@ export function NoShowResolutionModal({ view }: { view: any }) {
             Original Slot: {appointment.date} ({appointment.startTime?.substring(0, 5)} - {appointment.endTime?.substring(0, 5)})
           </p>
         </div>
+        )}
 
         <div className="flex flex-col gap-4">
+          {resolution !== 'RESCHEDULE' && (
           <div className="flex flex-col gap-2">
             <label className="text-xs font-bold text-text-primary">Select Resolution Action</label>
             <div className="grid grid-cols-3 gap-2">
@@ -152,7 +176,7 @@ export function NoShowResolutionModal({ view }: { view: any }) {
                   setReason('Patient arrived late; rescheduling to new slot');
                 }}
                 className={`p-3 rounded-2xl border text-xs font-bold flex flex-col items-center gap-1.5 transition-all ${
-                  resolution === 'RESCHEDULE'
+                  (resolution as string) === 'RESCHEDULE'
                     ? 'border-cyan-500 bg-cyan-500/10 text-cyan-500'
                     : 'border-card-border bg-card/50 text-text-secondary hover:border-text-muted'
                 }`}
@@ -162,6 +186,7 @@ export function NoShowResolutionModal({ view }: { view: any }) {
               </button>
             </div>
           </div>
+          )}
 
           {/* Notification Channel Block - Only visible on Mark Completed */}
           {resolution === 'COMPLETED' && (
@@ -240,34 +265,37 @@ export function NoShowResolutionModal({ view }: { view: any }) {
                 (appointment as any).confirmation_channel = channel;
               }}
               isSubmitting={view.isPending}
+              noFooter
               onServiceSelect={() => {}}
               onDoctorSelect={(docId) => setNewDoctorId(docId)}
               onDateSelect={(d) => setNewDate(d)}
               onStartTimeChange={(t) => setNewTime(t)}
               onEndTimeChange={(t) => setNewEndTime(t)}
               onJustificationChange={(j) => setReason(j)}
-              onSubmit={() => {
-                const formatIso = (dateStr: string, timeStr: string) => {
-                  if (!dateStr || !timeStr) return undefined;
-                  const timeFormatted = timeStr.length === 5 ? `${timeStr}:00` : timeStr;
-                  return `${dateStr}T${timeFormatted}Z`;
-                };
-                const startIso = formatIso(newDate, newTime);
-                const endIso = newEndTime
-                  ? formatIso(newDate, newEndTime)
-                  : new Date(new Date(startIso!).getTime() + 30 * 60 * 1000).toISOString();
-                view.handleResolveNoShowSubmit({
-                  appointmentId: appointment.id,
-                  resolution: 'RESCHEDULE',
-                  reason: reason.trim(),
-                  newDate,
-                  newStartTime: startIso,
-                  newEndTime: endIso,
-                  newDoctorId,
-                });
-              }}
+              onSubmit={handleRescheduleFormSubmit}
               onBack={() => view.setResolveAppt(null)}
             />
+          )}
+
+          {resolution === 'RESCHEDULE' && (
+            <div className="flex justify-end gap-2 mt-2">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => view.setResolveAppt(null)}
+                className="text-xs h-9 px-4 rounded-xl"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                onClick={handleRescheduleFormSubmit}
+                disabled={view.isPending}
+                className="text-xs h-9 px-5 font-bold rounded-xl border-none bg-primary text-primary-foreground"
+              >
+                {view.isPending ? 'Saving...' : 'Confirm'}
+              </Button>
+            </div>
           )}
 
           {resolution === 'COMPLETED' && (

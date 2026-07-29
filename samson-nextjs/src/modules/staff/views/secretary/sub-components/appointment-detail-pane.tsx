@@ -266,6 +266,28 @@ function AppointmentDetails({ appointment, view, activeTab, compact }: { appoint
     { key: 'checkout', label: 'Checkout / Thank You', eventType: 'APPOINTMENT_CHECKOUT', emailSent: commState.emailCheckoutSent, smsSent: commState.smsCheckoutSent },
   ];
 
+  const canModify = ['APPROVED', 'PENDING', 'RESCHEDULE_REQUESTED', 'DISPLACED'].includes(appointment.status);
+  const canRescheduleOnly = appointment.status === 'NO_SHOW';
+  if (view.showRescheduleForm && (canModify || canRescheduleOnly)) {
+    return (
+      <div className="flex flex-col flex-1 min-h-0 h-full">
+        <div className="flex-1 min-h-0 overflow-y-auto p-4" style={{ scrollbarWidth: 'thin' }} data-lenis-prevent>
+          <AppointmentRescheduleForm appointment={appointment} {...getRescheduleProps(view)} noFooter />
+        </div>
+        <div className="shrink-0 border-t border-border px-4 py-3">
+          <div className="flex gap-2">
+            <Button onClick={view.submitReschedule} disabled={view.isSubmitting} className="flex-1 h-[42px] text-sm font-medium bg-primary text-white hover:bg-primary/90 rounded-xl disabled:opacity-50">
+              {view.isSubmitting ? 'Saving...' : 'Confirm'}
+            </Button>
+            <Button variant="outline" onClick={() => view.setShowRescheduleForm(false)} className="flex-1 h-[42px] text-sm font-medium">
+              Cancel
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <SharedAppointmentDetail
       appointment={appointment}
@@ -511,8 +533,6 @@ function AppointmentDetails({ appointment, view, activeTab, compact }: { appoint
         </>
       }
       actionsBar={(() => {
-        const canModify = ['APPROVED', 'PENDING', 'RESCHEDULE_REQUESTED', 'DISPLACED'].includes(appointment.status);
-        const canRescheduleOnly = appointment.status === 'NO_SHOW';
         const canCancelOnly = appointment.status === 'CHECKED_IN';
         if (!canModify && !canRescheduleOnly && !canCancelOnly) return undefined;
 
@@ -535,7 +555,19 @@ function AppointmentDetails({ appointment, view, activeTab, compact }: { appoint
 
         return (
           <div className="space-y-3">
-            {view.showRescheduleForm && (canModify || canRescheduleOnly) && <AppointmentRescheduleForm appointment={appointment} {...getRescheduleProps(view)} />}
+            {view.showRescheduleForm && (canModify || canRescheduleOnly) && (
+              <>
+                <AppointmentRescheduleForm appointment={appointment} {...getRescheduleProps(view)} noFooter />
+                <div className="flex gap-2">
+                  <Button onClick={view.handleRescheduleSubmit} disabled={view.isPending} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl disabled:opacity-40">
+                    {view.isPending ? 'Saving...' : 'Confirm'}
+                  </Button>
+                  <Button variant="outline" onClick={() => view.setShowRescheduleForm(false)} className="flex-1 h-[42px] text-sm font-medium rounded-xl">
+                    Cancel
+                  </Button>
+                </div>
+              </>
+            )}
             {view.showCancelForm && (canModify || canCancelOnly) && (
               <AppointmentCancelForm
                 reasonPreset={view.cancelReasonPreset}

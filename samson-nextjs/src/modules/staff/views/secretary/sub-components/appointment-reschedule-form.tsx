@@ -37,6 +37,7 @@ interface AppointmentRescheduleFormProps {
   onJustificationChange: (value: string) => void;
   onSubmit: () => void;
   onBack: () => void;
+  noFooter?: boolean;
 }
 
 const COMMON_REASONS = [
@@ -129,16 +130,14 @@ export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps)
         event.preventDefault();
         props.onSubmit();
       }}
-      className="flex flex-col gap-4 border-t border-card-border/60 pt-4"
+      className="flex flex-col gap-4"
     >
-      <div className="flex flex-col gap-0.5">
-        <h3 className="text-base font-medium text-foreground">Reschedule Form</h3>
-        <p className="text-xs text-muted-foreground">Update date, time, dentist, or service details.</p>
-      </div>
-
       {props.onConfirmationChannelChange && <NotificationChannelField appointmentId={props.appointment.id} value={props.confirmationChannel} onChange={props.onConfirmationChannelChange} />}
 
-      {/* 1. Service Selection */}
+      {/* 1. Service & Schedule */}
+      <span className="text-base font-medium text-foreground">Service &amp; Schedule</span>
+
+      {/* Service Selection */}
       <div className="flex flex-col gap-0.5">
         <label className="text-xs text-muted-foreground">Service <span className="text-destructive">*</span></label>
         <select
@@ -275,8 +274,8 @@ export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps)
         )}
       </div>
 
-      {/* 6. Buttons: Confirm and Cancel (no icons, same size as Reschedule button) */}
-      <div className="flex gap-2 pt-1">
+      {!props.noFooter && (
+      <div className="flex gap-2 pt-3 border-t border-card-border/60">
         <Button
           type="submit"
           disabled={props.isSubmitting || !props.date || !selectedDoctor || !props.startTime || !props.endTime || !props.justification.trim()}
@@ -292,6 +291,7 @@ export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps)
           Cancel
         </Button>
       </div>
+      )}
     </form>
   );
 }

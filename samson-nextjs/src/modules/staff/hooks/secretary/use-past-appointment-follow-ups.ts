@@ -4,6 +4,8 @@ import { useCallback, useEffect, useMemo, useState, useTransition } from 'react'
 import { getClinicAppointmentsAction } from '@/modules/appointments/actions/clinic/get-clinic-appointments.action';
 import { updateAppointmentStatusAction } from '@/modules/appointments/actions/status/update-appointment-status.action';
 import { resolveNoShowAction } from '@/modules/appointments/actions/status/resolve-no-show.action';
+import { getDoctorsAction } from '@/modules/staff/actions/management/get-doctors.action';
+import { getServicesAction } from '@/modules/services/actions/management/get-services.action';
 import type { AppointmentDto } from '@/modules/appointments/dtos/exports';
 import { getTodayLocalDateStr } from '@/shared/utils/date.util';
 
@@ -18,15 +20,28 @@ export function usePastAppointmentFollowUps() {
   const [resolveAppt, setResolveAppt] = useState<AppointmentDto | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [doctorsList, setDoctorsList] = useState<any[]>([]);
+  const [servicesList, setServicesList] = useState<any[]>([]);
+  const [rescheduleDoctor, setRescheduleDoctor] = useState('');
+  const [rescheduleDate, setRescheduleDate] = useState('');
+  const [rescheduleTime, setRescheduleTime] = useState('');
+  const [rescheduleEndTime, setRescheduleEndTime] = useState('');
+  const [rescheduleJustification, setRescheduleJustification] = useState('');
   const today = getTodayLocalDateStr();
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const result = await getClinicAppointmentsAction({});
-      if (!result.success) throw new Error(result.error || 'Could not load past appointment follow-ups.');
-      setAppointments((result.data || []) as AppointmentDto[]);
+      const [apptRes, docRes, svcRes] = await Promise.all([
+        getClinicAppointmentsAction({}),
+        getDoctorsAction({ includeHidden: true }),
+        getServicesAction('BOOKABLE'),
+      ]);
+      if (!apptRes.success) throw new Error(apptRes.error || 'Could not load past appointment follow-ups.');
+      setAppointments((apptRes.data || []) as AppointmentDto[]);
+      if (docRes.success) setDoctorsList(docRes.data || []);
+      if ((svcRes as any).data) setServicesList((svcRes as any).data || []);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Could not load past appointment follow-ups.');
     } finally {
@@ -58,13 +73,13 @@ export function usePastAppointmentFollowUps() {
     setSelectedAppointmentId(null);
   };
 
-  const completeMissedCheckout = (appointment: AppointmentDto, reason: string) => {
+  const completeMissedCheckout = (appointmentId: string) => {
     setActionError(null);
     startTransition(async () => {
       const result = await updateAppointmentStatusAction({
-        appointmentId: appointment.id,
+        appointmentId,
         status: 'COMPLETED',
-        statusReason: reason,
+        statusReason: 'Late checkout — past appointment follow-up',
       });
       if (!result.success) {
         setActionError(result.error || 'Could not complete the missed checkout.');
@@ -100,8 +115,9 @@ export function usePastAppointmentFollowUps() {
     activeTab, selectTab, missedCheckouts, unresolvedNoShows, list, selectedAppointment, actionError, setActionError,
     selectedAppointmentId, setSelectedAppointmentId, isLoading, error, isPending, fetchData,
     resolveAppt, setResolveAppt, completeMissedCheckout, handleResolveNoShowSubmit,
-    // The existing no-show modal expects these values. The follow-up page only
-    // uses its confirmed-no-show action, so it does not need today's Kanban data.
-    todayStr: today, doctorsList: [], servicesList: [],
+    todayStr: today, doctorsList, servicesList,
+    rescheduleDoctor, setRescheduleDoctor, rescheduleDate, setRescheduleDate,
+    rescheduleTime, setRescheduleTime, rescheduleEndTime, setRescheduleEndTime,
+    rescheduleJustification, setRescheduleJustification,
   };
 }
