@@ -38,15 +38,15 @@ export function AppointmentsTable(props: AppointmentsTableProps) {
         <SecretaryListSkeletonTheme>
           <div className="flex flex-col">
             {Array.from({ length: 7 }, (_, index) => (
-              <div key={index} className="flex flex-col items-start w-full gap-2 border-b p-4">
+              <div key={index} className="flex flex-col items-start w-full gap-2 border-b p-4 last:border-b-0 text-sm leading-tight">
                 <div className="flex w-full items-center justify-between gap-2">
-                  <SecretaryListSkeleton width={128} height={14} />
+                  <SecretaryListSkeleton width={128} height={20} />
                   <SecretaryListSkeleton width={64} height={16} borderRadius="9999px" />
                 </div>
-                <SecretaryListSkeleton width={160} height={12} />
+                <SecretaryListSkeleton width={160} height={20} />
                 <div className="w-full flex items-center justify-between gap-2">
-                  <SecretaryListSkeleton width={144} height={10} />
-                  <SecretaryListSkeleton width={80} height={10} />
+                  <SecretaryListSkeleton width={144} height={16} />
+                  <SecretaryListSkeleton width={80} height={12} />
                 </div>
               </div>
             ))}
@@ -159,12 +159,12 @@ function AppointmentRow({ appointment, isSelected, formatPatientName, onSelect }
       }`}
     >
       <div className="flex w-full items-center gap-2">
-        <span>{formatPatientName(appointment)}</span>
+      <span className="min-w-0 truncate">{formatPatientName(appointment)}</span>
         <span className={`ml-auto text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded shrink-0 ${BADGE_STYLES[status] || 'text-muted-foreground bg-muted/20'}`}>
           {status}
         </span>
       </div>
-      <span className="font-medium">
+      <span className="font-medium truncate">
         {appointment.service?.name || 'Treatment'}
       </span>
       <div className="w-full flex items-center justify-between gap-2 text-xs">

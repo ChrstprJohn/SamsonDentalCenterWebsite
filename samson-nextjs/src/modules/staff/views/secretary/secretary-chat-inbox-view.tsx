@@ -22,10 +22,9 @@ import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
-import SkeletonLib, { SkeletonTheme } from 'react-loading-skeleton';
-import 'react-loading-skeleton/dist/skeleton.css';
 import { InquiryToast } from './sub-components/inquiry-toast';
 import { AppointmentDetailPane } from './sub-components/appointment-detail-pane';
+import { SecretaryListSkeleton, SecretaryListSkeletonTheme } from './sub-components/secretary-list-skeleton';
 import type { AppointmentDto } from '@/modules/appointments/dtos/shared/appointment.dto';
 import { formatClinicTime } from '@/shared/utils/date.util';
 import { Search, Mail, Archive, MessageSquare, Calendar, XCircle, CheckCircle, AlertCircle, ArrowLeft, UserRound, Pencil, Check, X, ChevronDown } from 'lucide-react';
@@ -175,31 +174,27 @@ function DetailSkeleton() {
 
 function SidebarThreadSkeleton() {
     return (
-        <SkeletonTheme
-            baseColor="#e2e8f0"
-            highlightColor="#f1f5f9"
-            borderRadius="0.5rem"
-        >
+        <SecretaryListSkeletonTheme>
             <div className="flex flex-col w-full">
                 {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
-                    <div key={i} className="flex items-start w-full gap-3 border-b p-4">
+                    <div key={i} className="flex items-start w-full gap-3 border-b p-4 last:border-b-0">
                         {/* Avatar circle */}
-                        <SkeletonLib circle width={40} height={40} />
-                        <div className="flex flex-col min-w-0 flex-1 gap-2">
+                        <SecretaryListSkeleton circle width={40} height={40} />
+                        <div className="flex flex-col min-w-0 flex-1 gap-1.5">
                             {/* Name + timestamp row */}
                             <div className="flex w-full items-center justify-between gap-2">
-                                <SkeletonLib width={132} height={14} />
-                                <SkeletonLib width={40} height={10} />
+                                <SecretaryListSkeleton width={132} height={20} />
+                                <SecretaryListSkeleton width={40} height={12} />
                             </div>
                             {/* Service name */}
-                            <SkeletonLib width={88} height={11} />
+                            <SecretaryListSkeleton width={88} height={16} />
                             {/* Message preview full width */}
-                            <SkeletonLib width="100%" height={11} />
+                            <SecretaryListSkeleton width="100%" height={16} />
                         </div>
                     </div>
                 ))}
             </div>
-        </SkeletonTheme>
+        </SecretaryListSkeletonTheme>
     );
 }
 
@@ -926,15 +921,15 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                 collapsible="none"
                 className={`flex-col lg:w-[350px] flex-1 lg:flex-none border-r border-card-border/40 bg-sidebar h-full overflow-hidden ${colMobile('list')} lg:flex`}
             >
-                <SidebarHeader className="border-b border-card-border/40 p-4 space-y-3 shrink-0">
-                    <div className="flex items-center justify-between">
+                <SidebarHeader className="gap-3.5 border-b p-4 shrink-0">
+                    <div className="flex w-full h-8 items-center justify-between">
                         <div className="flex items-center gap-2">
                             <SidebarTrigger className="lg:hidden -ml-1 text-muted-foreground hover:text-foreground" />
                             <div className="text-base font-medium text-foreground">
                                 Chat Inbox
                             </div>
                         </div>
-                        <Label className="flex items-center gap-2 text-sm">
+                        <Label className="flex items-center gap-2 text-xs text-muted-foreground shrink-0">
                             <span>Unreads</span>
                             <Switch 
                                 checked={showOnlyUnreads} 
@@ -1038,7 +1033,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                                                         {t.latestMessage ? formatMessageTime(t.latestMessage.createdAt) : ''}
                                                     </span>
                                                 </div>
-                                                <span className="font-medium text-xs text-text-secondary">
+                                                <span className="font-medium text-xs text-text-secondary truncate">
                                                     {t.serviceName || 'Treatment'}
                                                 </span>
                                                 <div className="flex w-full items-end justify-between gap-4 min-w-0">

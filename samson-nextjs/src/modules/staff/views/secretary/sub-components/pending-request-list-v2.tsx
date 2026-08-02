@@ -92,14 +92,16 @@ export function PendingRequestListV2(props: PendingRequestListV2Props) {
               Appointment Requests
             </div>
           </div>
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => setSortOrder(sortOrder === 'newest' ? 'oldest' : 'newest')}
-            className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors shrink-0"
+            className="h-8 gap-1 px-2 text-xs text-muted-foreground hover:text-foreground transition-colors shrink-0"
             title={`Sort by ${sortOrder === 'newest' ? 'oldest' : 'newest'} first`}
           >
             <ArrowUpDown className="size-3" />
             {sortOrder === 'newest' ? 'Newest' : 'Oldest'}
-          </button>
+          </Button>
         </div>
         <div className="px-1">
           <SidebarInput
@@ -141,18 +143,18 @@ export function PendingRequestListV2(props: PendingRequestListV2Props) {
               <SecretaryListSkeletonTheme>
                 <div className="flex flex-col w-full">
                 {[0, 1, 2, 3, 4, 5].map((i) => (
-                  <div key={i} className="flex flex-col items-start w-full gap-2 border-b p-4">
+                  <div key={i} className="flex flex-col items-start w-full gap-2 border-b p-4 last:border-b-0 text-sm leading-tight">
                     {/* Name + status badge */}
                     <div className="flex w-full items-center justify-between gap-2">
-                      <SecretaryListSkeleton width={112} height={14} />
+                      <SecretaryListSkeleton width={112} height={20} />
                       <SecretaryListSkeleton width={64} height={16} borderRadius="9999px" />
                     </div>
                     {/* Service name */}
-                    <SecretaryListSkeleton width={160} height={12} />
+                    <SecretaryListSkeleton width={160} height={20} />
                     {/* Date • Time + Submitted */}
                     <div className="w-full flex items-center justify-between gap-2">
-                      <SecretaryListSkeleton width={144} height={10} />
-                      <SecretaryListSkeleton width={96} height={10} />
+                      <SecretaryListSkeleton width={144} height={16} />
+                      <SecretaryListSkeleton width={96} height={12} />
                     </div>
                   </div>
                 ))}
@@ -216,12 +218,12 @@ export function PendingRequestListV2(props: PendingRequestListV2Props) {
                     }`}
                   >
                     <div className="flex w-full items-center gap-2">
-                      <span>{name}</span>
+                      <span className="min-w-0 truncate">{name}</span>
                       <span className={`ml-auto text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded shrink-0 ${BADGE_STYLES[status]}`}>
                         {BADGE_LABELS[status]}
                       </span>
                     </div>
-                    <span className="font-medium">
+                    <span className="font-medium truncate">
                       {inq.preferredServiceName || 'Treatment'}
                     </span>
                     <div className="w-full flex items-center justify-between gap-2 text-xs">

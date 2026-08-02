@@ -117,7 +117,7 @@ function AppointmentCard({
   return (
     <button
       onClick={onClick}
-      className={`flex items-start w-full gap-3 border-b p-4 text-sm leading-tight text-left transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${
+      className={`flex items-start w-full gap-3 border-b p-4 text-sm leading-tight text-left transition-colors last:border-b-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${
         isSelected
           ? 'bg-sidebar-accent text-sidebar-accent-foreground'
           : 'text-foreground'
@@ -419,15 +419,15 @@ export function AppointmentEmailTimelineView() {
                 <SecretaryListSkeletonTheme>
                   <div className="flex flex-col w-full">
                     {[1, 2, 3, 4, 5].map((i) => (
-                      <div key={i} className="flex items-start w-full gap-3 border-b p-4">
+                      <div key={i} className="flex items-start w-full gap-3 border-b p-4 last:border-b-0">
                         <SecretaryListSkeleton circle width={40} height={40} />
-                        <div className="flex flex-col min-w-0 flex-1 gap-2">
+                        <div className="flex flex-col min-w-0 flex-1 gap-1.5">
                           <div className="flex w-full items-center justify-between gap-2">
-                            <SecretaryListSkeleton width={132} height={14} />
-                            <SecretaryListSkeleton width={40} height={10} />
+                            <SecretaryListSkeleton width={132} height={20} />
+                            <SecretaryListSkeleton width={40} height={12} />
                           </div>
-                          <SecretaryListSkeleton width={88} height={11} />
-                          <SecretaryListSkeleton width="100%" height={11} />
+                          <SecretaryListSkeleton width={88} height={16} />
+                          <SecretaryListSkeleton width="100%" height={16} />
                         </div>
                       </div>
                     ))}
