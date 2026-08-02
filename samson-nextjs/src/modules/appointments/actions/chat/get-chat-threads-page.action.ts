@@ -1,22 +1,15 @@
 'use server';
 
 import { z } from 'zod';
-import { createClient, createAdminClient } from '@/shared/database/server';
+import { createClient } from '@/shared/database/server';
+import { authorizeRole } from '@/shared/auth/auth.util';
 import { getChatThreadsPageSchema, type GetChatThreadsPageDto } from '../../dtos/chat/get-chat-threads-page.dto';
 import { getChatThreadsPageQuery } from '../../repositories/chat/chat.queries';
 
-export async function getChatThreadsPageAction(params: GetChatThreadsPageDto, options?: { skipAuth?: boolean }) {
+export async function getChatThreadsPageAction(params: GetChatThreadsPageDto) {
     try {
-        let supabase;
-        if (options?.skipAuth) {
-            supabase = await createAdminClient();
-        } else {
-            supabase = await createClient();
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) return { success: false as const, error: 'Unauthorized user session' };
-            const role = user.user_metadata?.role as string;
-            if (role !== 'SECRETARY' && role !== 'ADMIN') return { success: false as const, error: 'Unauthorized role' };
-        }
+        await authorizeRole('SECRETARY');
+        const supabase = await createClient();
         const validated = getChatThreadsPageSchema.parse(params);
         const result = await getChatThreadsPageQuery(supabase)(validated);
         return { success: true as const, data: result };

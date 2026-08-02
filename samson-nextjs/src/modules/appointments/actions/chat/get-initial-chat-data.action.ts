@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient, createAdminClient } from '@/shared/database/server';
+import { getTrustedUserProfile } from '@/shared/auth/auth.util';
 import { validateChatTokenQuery, getMessagesByAppointmentIdQuery } from '../../repositories/chat/chat.queries';
 
 interface InitialDataResult {
@@ -24,11 +25,11 @@ export async function getChatInitialDataAction(
 ): Promise<{ data: InitialDataResult } | { error: string }> {
     try {
         const supabase = await createClient();
-        const { data: { session } } = await supabase.auth.getSession();
-        const user = session?.user ?? null;
+        const { data: { user } } = await supabase.auth.getUser();
 
         if (user) {
-            const role = user.user_metadata?.role as string;
+            const profile = await getTrustedUserProfile(user.id);
+            const role = profile.role;
             const userId = user.id;
             const systemDb = await createAdminClient();
 
@@ -87,8 +88,8 @@ export async function getChatInitialDataAction(
                             initialHasMore: messagesResult?.hasMore ?? false,
                             currentUserRole,
                             currentUserName: isStaff
-                                ? 'Secretary'
-                                : (user.user_metadata?.first_name || 'Patient'),
+                                ? `${profile.firstName} ${profile.lastName}`.trim()
+                                : `${profile.firstName} ${profile.lastName}`.trim(),
                         }
                     };
                 }

@@ -1,7 +1,7 @@
 import React from 'react';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { createClient } from '@/shared/database/server';
+import { getAuthenticatedUser, getTrustedUserProfile, type TrustedUserProfile } from '@/shared/auth/auth.util';
 import { Button } from '@/components/ui/button';
 import type { AuthHeaderUser } from '@/modules/patients/hooks/auth/header/use-auth-header';
 import { RealtimeListener } from '@/modules/notifications/exports';
@@ -18,13 +18,13 @@ export default async function SecretaryPortalV2Layout({
   let headerUser: AuthHeaderUser | null = null;
   let isAuthorized = false;
   let userId: string | null = null;
-  let user: any = null;
+  let user: Awaited<ReturnType<typeof getAuthenticatedUser>> | null = null;
+  let profile: TrustedUserProfile | null = null;
   
   // Secure route access and authorize roles
   try {
-    const supabase = await createClient();
-    const { data } = await supabase.auth.getUser();
-    user = data.user;
+    user = await getAuthenticatedUser();
+    profile = await getTrustedUserProfile(user.id);
   } catch (err) {
     console.error('Secretary portal V2 auth check failed:', err);
   }
@@ -34,14 +34,14 @@ export default async function SecretaryPortalV2Layout({
   }
 
   userId = user.id;
-  const role = user.user_metadata?.role as string;
+  const role = profile?.role;
   isAuthorized = role === 'SECRETARY' || role === 'ADMIN';
 
   headerUser = {
-    firstName: user.user_metadata?.first_name || user.user_metadata?.firstName || 'Staff',
-    lastName: user.user_metadata?.last_name || user.user_metadata?.lastName || '',
-    email: user.email || '',
-    avatarUrl: user.user_metadata?.avatar_url || user.user_metadata?.avatarUrl || null,
+    firstName: profile?.firstName || 'Staff',
+    lastName: profile?.lastName || '',
+    email: profile?.email || user.email || '',
+    avatarUrl: profile?.avatarUrl || null,
   };
 
   if (!isAuthorized) {

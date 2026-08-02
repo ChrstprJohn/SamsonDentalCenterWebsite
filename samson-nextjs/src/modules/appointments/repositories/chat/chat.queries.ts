@@ -104,7 +104,7 @@ export const getMessagesByAppointmentIdQuery = (supabase: SupabaseClient) => {
 
         let query = supabase
             .from('appointment_messages')
-            .select('*')
+            .select('id, appointment_id, sender_role, sender_name, message, created_at, is_read')
             .eq('appointment_id', appointmentId);
 
         if (options?.beforeCreatedAt) {
@@ -162,7 +162,7 @@ export const getChatThreadsPageQuery = (supabase: SupabaseClient) => {
     return async (params: GetChatThreadsPageDto): Promise<PageResult<ChatThreadDto>> => {
         const cursor = decodeCursor(params.cursor);
         if (params.cursor && !cursor) throw new DomainError('Invalid chat threads cursor.', 'VALIDATION_ERROR');
-        const { data, error } = await supabase.rpc('get_secretary_chat_threads_page', {
+        const { data, error } = await supabase.rpc('get_secretary_chat_threads_page_staff', {
             p_limit: params.limit ?? 20,
             p_cursor_latest_message_created_at: cursor?.sortValue ?? null,
             p_cursor_appointment_id: cursor?.id ?? null,

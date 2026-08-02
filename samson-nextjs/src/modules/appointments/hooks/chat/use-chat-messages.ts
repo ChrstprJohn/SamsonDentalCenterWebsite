@@ -167,7 +167,7 @@ export function useChatMessages({
         let pollInterval: any = null;
         if (chatToken) {
             pollInterval = setInterval(async () => {
-                const res = await getMessagesAction(appointmentId, chatToken, { limit: 5, skipAuth: true });
+                const res = await getMessagesAction(appointmentId, chatToken, { limit: 5 });
                 if (res && res.data && res.data.length > 0) {
                     setMessages((prev) => {
                         const existingIds = new Set(prev.map((m) => m.id));

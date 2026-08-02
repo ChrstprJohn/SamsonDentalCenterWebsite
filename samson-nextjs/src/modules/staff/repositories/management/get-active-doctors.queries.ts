@@ -1,12 +1,11 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { UserProfileResponseDto } from '../../dtos/exports';
-import { unstable_cache } from 'next/cache';
 
 export const getActiveDoctorsQuery = (supabase: SupabaseClient) => {
   const fetchActiveDoctors = async (serviceId?: string, includeHidden = false): Promise<UserProfileResponseDto[]> => {
     let query = supabase
       .from('users')
-      .select('*')
+      .select('id, email, first_name, last_name, role, is_active, status')
       .eq('role', 'DOCTOR');
 
     if (includeHidden) {
@@ -45,12 +44,7 @@ export const getActiveDoctorsQuery = (supabase: SupabaseClient) => {
     }));
   };
 
-  // Server-side caching for active doctors (5 minutes)
-  const cachedDoctors = unstable_cache(
-    async (srvId?: string) => fetchActiveDoctors(srvId),
-    ['active-doctors'],
-    { revalidate: 300, tags: ['doctors', 'active-doctors'] }
-  );
-
-  return cachedDoctors;
+  // This read intentionally remains uncached. Doctor visibility and status are
+  // operational data, and callers may request hidden doctors for staff flows.
+  return fetchActiveDoctors;
 };

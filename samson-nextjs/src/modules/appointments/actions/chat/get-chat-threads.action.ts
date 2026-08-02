@@ -1,24 +1,13 @@
 "use server";
 
-import { createClient, createAdminClient } from '@/shared/database/server';
+import { createAdminClient } from '@/shared/database/server';
+import { authorizeRole } from '@/shared/auth/auth.util';
 import { getChatThreadsForSecretaryQuery } from '../../repositories/chat/chat.queries';
 
-export async function getChatThreadsAction(options?: { limit?: number; offset?: number; skipAuth?: boolean }) {
+export async function getChatThreadsAction(options?: { limit?: number; offset?: number }) {
     try {
-        let supabase;
-        if (options?.skipAuth) {
-            supabase = await createAdminClient();
-        } else {
-            supabase = await createClient();
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) {
-                return { error: 'Unauthorized user session' };
-            }
-            const role = user.user_metadata?.role as string;
-            if (role !== 'SECRETARY' && role !== 'ADMIN') {
-                return { error: 'Unauthorized role' };
-            }
-        }
+        await authorizeRole('SECRETARY');
+        const supabase = await createAdminClient();
 
         const query = getChatThreadsForSecretaryQuery(supabase);
         const result = await query(options);

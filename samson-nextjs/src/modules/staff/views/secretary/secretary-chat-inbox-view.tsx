@@ -201,6 +201,7 @@ function SidebarThreadSkeleton() {
 interface SecretaryChatInboxViewProps {
     initialThreads: ChatThreadDto[];
     initialHasMore?: boolean;
+    initialTabCounts?: { active: number; archive: number };
 }
 
 function getBadgeVariant(status: string) {
@@ -211,7 +212,7 @@ function getBadgeVariant(status: string) {
   return 'default';
 }
 
-export function SecretaryChatInboxView({ initialThreads, initialHasMore = false }: SecretaryChatInboxViewProps) {
+export function SecretaryChatInboxView({ initialThreads, initialHasMore = false, initialTabCounts = { active: 0, archive: 0 } }: SecretaryChatInboxViewProps) {
     const [threads, setThreads] = useState<ChatThreadDto[]>(initialThreads);
     const [searchQuery, setSearchQuery] = useState('');
     const [activeTab, setActiveTab] = useState<'ACTIVE' | 'ARCHIVE'>('ACTIVE');
@@ -228,13 +229,13 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
     const [selectedThreadHasMore, setSelectedThreadHasMore] = useState(false);
     const [loadingMessages, setLoadingMessages] = useState(false);
     const [fetchingThreads, setFetchingThreads] = useState(false);
-    const [isInitialLoad, setIsInitialLoad] = useState(true);
+    const [isInitialLoad, setIsInitialLoad] = useState(false);
     const [messagesLoadKey, setMessagesLoadKey] = useState(0);
     const [hasMoreThreads, setHasMoreThreads] = useState(initialHasMore);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const [loadMoreError, setLoadMoreError] = useState<string | null>(null);
     const [threadError, setThreadError] = useState<string | null>(null);
-    const [tabCounts, setTabCounts] = useState({ active: 0, archive: 0 });
+    const [tabCounts, setTabCounts] = useState(initialTabCounts);
     const nextThreadCursorRef = useRef<string | null>(null);
     const loadingMoreThreadsRef = useRef(false);
     const threadRequestId = useRef(0);
@@ -342,13 +343,6 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                     const existingIds = new Set(prev.map((thread) => thread.appointmentId));
                     return [...prev, ...result.data.items.filter((thread) => !existingIds.has(thread.appointmentId))];
                 }
-                if (options?.preserveExisting) {
-                    const incomingById = new Map(result.data.items.map((thread) => [thread.appointmentId, thread]));
-                    const existingIds = new Set(prev.map((thread) => thread.appointmentId));
-                    const updated = prev.map((thread) => incomingById.get(thread.appointmentId) || thread);
-                    const additions = result.data.items.filter((thread) => !existingIds.has(thread.appointmentId));
-                    return [...updated, ...additions];
-                }
                 return result.data.items;
             });
             nextThreadCursorRef.current = result.data.nextCursor;
@@ -376,15 +370,6 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
         void fetchThreads({ append: true });
     }, [fetchThreads]);
 
-    // Refresh threads on mount to fix stale data from Next.js cached SSR pages
-    // during client-side transitions.
-    useEffect(() => {
-        const timer = window.setTimeout(() => {
-            void fetchThreads().finally(() => setIsInitialLoad(false));
-        }, 250);
-        return () => window.clearTimeout(timer);
-    }, [fetchThreads]);
-
     useEffect(() => {
         const refreshOnVisible = () => {
             if (document.visibilityState === 'visible') void fetchThreads({ preserveExisting: true });
@@ -393,17 +378,29 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
         return () => document.removeEventListener('visibilitychange', refreshOnVisible);
     }, [fetchThreads]);
 
-    useEffect(() => {
-        getDoctorsAction().then((res) => {
-            if (res.success && res.data) setDoctors(res.data);
-        });
-        getServicesAction('BOOKABLE').then((res) => {
-            if (res.data) setServices(res.data as ServiceResponseDto[]);
-        });
+    const actionResourcesLoaded = useRef(false);
+    const loadActionResources = useCallback(async () => {
+        if (actionResourcesLoaded.current) return;
+        const [doctorsResult, servicesResult] = await Promise.all([
+            getDoctorsAction(),
+            getServicesAction('BOOKABLE'),
+        ]);
+        if (doctorsResult.success && doctorsResult.data) setDoctors(doctorsResult.data);
+        if (servicesResult.data) setServices(servicesResult.data as ServiceResponseDto[]);
+        actionResourcesLoaded.current = true;
     }, []);
 
     const selectedThreadIdRef = useRef(selectedThreadId);
     selectedThreadIdRef.current = selectedThreadId;
+
+    const realtimeRefreshTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const scheduleThreadRefresh = useCallback(() => {
+        if (realtimeRefreshTimer.current) return;
+        realtimeRefreshTimer.current = setTimeout(() => {
+            realtimeRefreshTimer.current = null;
+            void fetchThreads({ preserveExisting: true });
+        }, 250);
+    }, [fetchThreads]);
 
     useEffect(() => {
         const supabase = createClient();
@@ -418,10 +415,12 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
 
                     const affectedAppointmentId = newMsg.appointment_id;
 
+                    let foundThread = false;
                     setThreads((prevThreads) => {
                         const threadIndex = prevThreads.findIndex(t => t.appointmentId === affectedAppointmentId);
 
                         if (threadIndex !== -1) {
+                            foundThread = true;
                             const updatedThreads = [...prevThreads];
                             const thread = updatedThreads[threadIndex];
 
@@ -449,25 +448,27 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                             // Move updated thread to the top
                             const [movedThread] = updatedThreads.splice(threadIndex, 1);
                             return [movedThread, ...updatedThreads];
-                        } else {
-                            // Thread not currently in memory list (e.g. paginated out), fetch fresh threads
-                            void fetchThreads({ preserveExisting: true });
-                            return prevThreads;
                         }
+                        return prevThreads;
                     });
+                    if (!foundThread) scheduleThreadRefresh();
                 }
             )
             .on(
                 'postgres_changes',
                 { event: 'UPDATE', schema: 'public', table: 'appointments' },
-                () => { void fetchThreads({ preserveExisting: true }); }
+                () => { scheduleThreadRefresh(); }
             )
             .subscribe();
 
         return () => {
             supabase.removeChannel(channel);
+            if (realtimeRefreshTimer.current) {
+                clearTimeout(realtimeRefreshTimer.current);
+                realtimeRefreshTimer.current = null;
+            }
         };
-    }, [fetchThreads]);
+    }, [scheduleThreadRefresh]);
 
     useEffect(() => {
         if (!selectedThreadId) return;
@@ -476,7 +477,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
         const loadMessages = async () => {
             setLoadingMessages(true);
             try {
-                const res = await getMessagesAction(selectedThreadId, undefined, { limit: 20, skipAuth: true });
+                const res = await getMessagesAction(selectedThreadId, undefined, { limit: 20 });
                 if (active && res && res.data) {
                     setSelectedThreadMessages(res.data);
                     setSelectedThreadHasMore(res.hasMore ?? false);
@@ -554,8 +555,6 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                     ? { ...t, unreadCount: 0 }
                     : t
             ));
-            markMessagesAsReadAction(thread.appointmentId, 'STAFF')
-                .catch(console.error);
         }
     };
 
@@ -799,6 +798,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
             showRescheduleForm: activeAction === 'RESCHEDULE',
             setShowRescheduleForm: (show: boolean) => {
                 if (show) {
+                    void loadActionResources();
                     setActiveAction('RESCHEDULE');
                     setRescheduleServiceId(selectedThread?.serviceId || '');
                     setRescheduleDate(selectedThread?.date || '');
