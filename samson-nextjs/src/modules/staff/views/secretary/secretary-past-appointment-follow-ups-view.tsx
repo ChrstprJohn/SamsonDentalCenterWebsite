@@ -6,8 +6,8 @@ import { Select } from '@/components/ui/select';
 import { updateConfirmationChannelAction } from '@/modules/appointments/actions/status/update-confirmation-channel.action';
 import { SidebarHeader, SidebarInput, SidebarTrigger } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
 import { formatClinicTime, formatShortDate } from '@/shared/utils/date.util';
+import { SecretaryListSkeleton, SecretaryListSkeletonTheme } from './sub-components/secretary-list-skeleton';
 import type { AppointmentDto } from '@/modules/appointments/dtos/exports';
 import { usePastAppointmentFollowUps } from '../../hooks/secretary/use-past-appointment-follow-ups';
 import { AppointmentRescheduleForm, isRescheduleFormComplete } from './sub-components/appointment-reschedule-form';
@@ -102,21 +102,23 @@ export function SecretaryPastAppointmentFollowUpsView() {
           className="flex-1 min-h-0 !overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
         >
           {view.isLoading && view.list.length === 0 ? (
-            <div className="flex flex-col w-full">
-              {Array.from({ length: 5 }, (_, index) => (
-                <div key={index} className="flex flex-col items-start w-full gap-2 border-b border-card-border/40 p-4">
-                  <div className="flex w-full items-center justify-between gap-2">
-                    <Skeleton className="h-3.5 w-32 rounded-md" />
-                    <Skeleton className="h-4 w-20 rounded-full" />
+            <SecretaryListSkeletonTheme>
+              <div className="flex flex-col w-full">
+                {Array.from({ length: 5 }, (_, index) => (
+                  <div key={index} className="flex flex-col items-start w-full gap-2 border-b p-4">
+                    <div className="flex w-full items-center justify-between gap-2">
+                      <SecretaryListSkeleton width={128} height={14} />
+                      <SecretaryListSkeleton width={80} height={16} borderRadius="9999px" />
+                    </div>
+                    <SecretaryListSkeleton width={160} height={12} />
+                    <div className="w-full flex items-center justify-between gap-2">
+                      <SecretaryListSkeleton width={112} height={10} />
+                      <SecretaryListSkeleton width={96} height={10} />
+                    </div>
                   </div>
-                  <Skeleton className="h-3 w-40 rounded-md" />
-                  <div className="w-full flex items-center justify-between gap-2">
-                    <Skeleton className="h-2.5 w-28 rounded-md" />
-                    <Skeleton className="h-2.5 w-24 rounded-md" />
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            </SecretaryListSkeletonTheme>
           ) : null}
           {view.isRefreshing && (
             <div className="h-0.5 w-full overflow-hidden rounded-full bg-primary/15"><div className="h-full w-1/3 animate-pulse bg-primary" /></div>

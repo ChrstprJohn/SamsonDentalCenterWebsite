@@ -14,9 +14,9 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Mail, RotateCw, ChevronRight, UserRound } from 'lucide-react';
 import { RenderedEmailFrame } from '@/components/emails/email-renderer';
+import { SecretaryListSkeleton, SecretaryListSkeletonTheme } from './sub-components/secretary-list-skeleton';
 
 // UI Label Mappings for Event Types (Guest vs Patient distinction noted in code comments)
 const EVENT_NAME_MAP: Record<string, string> = {
@@ -416,21 +416,23 @@ export function AppointmentEmailTimelineView() {
           <SidebarGroup className="px-0">
             <SidebarGroupContent className="flex flex-col">
               {isLoadingApps ? (
-                <div className="flex flex-col w-full">
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <div key={i} className="flex items-start w-full gap-3 border-b p-4">
-                      <Skeleton className="size-9 shrink-0 rounded-full" />
-                      <div className="flex flex-col flex-1 gap-2">
-                        <div className="flex justify-between gap-2">
-                          <Skeleton className="h-3.5 w-32 rounded-md" />
-                          <Skeleton className="h-2.5 w-10 rounded-md" />
+                <SecretaryListSkeletonTheme>
+                  <div className="flex flex-col w-full">
+                    {[1, 2, 3, 4, 5].map((i) => (
+                      <div key={i} className="flex items-start w-full gap-3 border-b p-4">
+                        <SecretaryListSkeleton circle width={40} height={40} />
+                        <div className="flex flex-col min-w-0 flex-1 gap-2">
+                          <div className="flex w-full items-center justify-between gap-2">
+                            <SecretaryListSkeleton width={132} height={14} />
+                            <SecretaryListSkeleton width={40} height={10} />
+                          </div>
+                          <SecretaryListSkeleton width={88} height={11} />
+                          <SecretaryListSkeleton width="100%" height={11} />
                         </div>
-                        <Skeleton className="h-3 w-44 rounded-md" />
-                        <Skeleton className="h-3 w-20 rounded-md" />
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                </SecretaryListSkeletonTheme>
               ) : appsError && filteredCards.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12 text-center px-4">
                   <Mail className="size-8 text-destructive/60 mb-2" />
