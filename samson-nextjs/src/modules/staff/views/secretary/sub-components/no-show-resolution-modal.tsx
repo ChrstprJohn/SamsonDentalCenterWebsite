@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { AlertCircle, CheckCircle2, Clock, Calendar, RefreshCw, X, Pencil, Check, MessageSquare, UserCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select } from '@/components/ui/select';
-import { AppointmentRescheduleForm } from './appointment-reschedule-form';
+import { AppointmentRescheduleForm, isRescheduleFormComplete } from './appointment-reschedule-form';
 import { updateConfirmationChannelAction } from '@/modules/appointments/actions/status/update-confirmation-channel.action';
 
 function getPatientDisplayName(app: any): string {
@@ -369,26 +369,36 @@ export function NoShowResolutionModal({ view }: { view: any }) {
             />
           )}
 
-          {resolution === 'RESCHEDULE' && (
-            <div className="flex justify-end gap-2 mt-2">
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={() => view.setResolveAppt(null)}
-                className="text-xs h-9 px-4 rounded-xl"
-              >
-                Cancel
-              </Button>
-              <Button
-                type="button"
-                onClick={handleRescheduleFormSubmit}
-                disabled={view.isPending}
-                className="text-xs h-9 px-5 font-bold rounded-xl border-none bg-primary text-primary-foreground"
-              >
-                {view.isPending ? 'Saving...' : 'Confirm'}
-              </Button>
-            </div>
-          )}
+          {resolution === 'RESCHEDULE' && (() => {
+            const isFormComplete = isRescheduleFormComplete({
+              serviceId: appointment.serviceId,
+              doctorId: newDoctorId || appointment.doctorId,
+              date: newDate,
+              startTime: newTime,
+              endTime: newEndTime,
+              justification: reason,
+            });
+            return (
+              <div className="flex justify-end gap-2 mt-2">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => view.setResolveAppt(null)}
+                  className="text-xs h-9 px-4 rounded-xl"
+                >
+                  Back
+                </Button>
+                <Button
+                  type="button"
+                  onClick={handleRescheduleFormSubmit}
+                  disabled={view.isPending || !isFormComplete}
+                  className="text-xs h-9 px-5 font-bold rounded-xl border-none bg-primary text-primary-foreground disabled:opacity-50"
+                >
+                  {view.isPending ? 'Saving...' : 'Confirm'}
+                </Button>
+              </div>
+            );
+          })()}
 
 
 
@@ -400,7 +410,7 @@ export function NoShowResolutionModal({ view }: { view: any }) {
                 onClick={() => view.setResolveAppt(null)}
                 className="text-xs h-9 px-4 rounded-xl"
               >
-                Cancel
+                Back
               </Button>
               <Button
                 type="button"

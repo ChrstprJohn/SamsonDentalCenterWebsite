@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { formatClinicTime, formatShortDate } from '@/shared/utils/date.util';
 import type { AppointmentDto } from '@/modules/appointments/dtos/exports';
 import { usePastAppointmentFollowUps } from '../../hooks/secretary/use-past-appointment-follow-ups';
-import { AppointmentRescheduleForm } from './sub-components/appointment-reschedule-form';
+import { AppointmentRescheduleForm, isRescheduleFormComplete } from './sub-components/appointment-reschedule-form';
 
 function patientName(appointment: AppointmentDto) {
   if (appointment.dependent) return `${appointment.dependent.firstName} ${appointment.dependent.lastName}`;
@@ -297,16 +297,26 @@ function FollowUpDetail({ appointment, view, onBack, className }: { appointment:
       </div>
 
       <div className="shrink-0 border-t border-border px-4 py-3">
-        {showRescheduleForm ? (
-          <div className="flex gap-2">
-            <button onClick={handleRescheduleSubmit} disabled={view.isPending} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl disabled:opacity-40">
-              {view.isPending ? 'Saving...' : 'Confirm'}
-            </button>
-            <button onClick={() => setShowRescheduleForm(false)} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent transition-colors rounded-xl">
-              Cancel
-            </button>
-          </div>
-        ) : isMissedCheckout && showLateCheckout ? (
+        {showRescheduleForm ? (() => {
+          const isFormComplete = isRescheduleFormComplete({
+            serviceId: appointment.serviceId,
+            doctorId: view.rescheduleDoctor || appointment.doctorId || '',
+            date: view.rescheduleDate || appointment.date,
+            startTime: view.rescheduleTime || '',
+            endTime: view.rescheduleEndTime || '',
+            justification: view.rescheduleJustification || '',
+          });
+          return (
+            <div className="flex gap-2">
+              <button onClick={handleRescheduleSubmit} disabled={view.isPending || !isFormComplete} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl disabled:opacity-40">
+                {view.isPending ? 'Saving...' : 'Confirm'}
+              </button>
+              <button onClick={() => setShowRescheduleForm(false)} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent transition-colors rounded-xl">
+                Back
+              </button>
+            </div>
+          );
+        })() : isMissedCheckout && showLateCheckout ? (
           <div className="flex flex-col gap-3">
             <div className="p-3 border bg-amber-500/5 border-amber-500/20 rounded-2xl">
               <span className="text-[10px] font-semibold uppercase tracking-wider text-amber-600">Completion Notice</span>

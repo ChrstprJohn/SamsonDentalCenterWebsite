@@ -28,6 +28,15 @@ const CANCEL_REASONS = [
   { value: 'CUSTOM', label: 'Other / Custom Reason...' },
 ];
 
+export function isCancelFormComplete(props: { reasonPreset?: string; reasonCustom?: string }): boolean {
+  const preset = props.reasonPreset?.trim();
+  if (!preset) return false;
+  if (preset === 'CUSTOM') {
+    return Boolean(props.reasonCustom && props.reasonCustom.trim());
+  }
+  return true;
+}
+
 export function AppointmentCancelForm(props: AppointmentCancelFormProps) {
   const [preset, setPreset] = useState<string>(props.reasonPreset || '');
   const [customText, setCustomText] = useState<string>(props.reasonCustom || '');
@@ -53,7 +62,10 @@ export function AppointmentCancelForm(props: AppointmentCancelFormProps) {
     props.setReasonCustom(val);
   };
 
-  const activeReason = preset === 'CUSTOM' ? customText : preset;
+  const isFormComplete = isCancelFormComplete({
+    reasonPreset: preset,
+    reasonCustom: customText,
+  });
 
   return (
     <form
@@ -63,6 +75,14 @@ export function AppointmentCancelForm(props: AppointmentCancelFormProps) {
       }}
       className="flex flex-col gap-4 pt-1"
     >
+      {/* Cancellation Warning Notice */}
+      <div className="p-3 border bg-red-500/5 border-red-500/20 rounded-2xl text-left">
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-red-500">Cancellation Notice</span>
+        <div className="text-[11px] text-muted-foreground mt-1 leading-relaxed">
+          Canceling this appointment will remove it from the schedule and notify the patient.
+        </div>
+      </div>
+
       {props.onConfirmationChannelChange && <NotificationChannelField appointmentId={props.appointmentId} value={props.confirmationChannel} onChange={props.onConfirmationChannelChange} />}
 
       <div className="flex flex-col gap-1.5">
@@ -102,17 +122,17 @@ export function AppointmentCancelForm(props: AppointmentCancelFormProps) {
         <div className="flex gap-2 pt-1">
           <Button
             type="submit"
-            disabled={props.isSubmitting || !activeReason.trim()}
+            disabled={props.isSubmitting || !isFormComplete}
             className="flex-1 h-[42px] text-sm font-semibold bg-destructive text-white hover:bg-destructive/90 rounded-xl disabled:opacity-50 transition-colors"
           >
-            {props.isSubmitting ? 'Canceling...' : 'Confirm'}
+            {props.isSubmitting ? 'Canceling...' : 'Confirm Cancellation'}
           </Button>
           <Button
             type="button"
             onClick={props.onBack}
             className="flex-1 h-[42px] text-sm font-medium border border-card-border text-foreground bg-transparent hover:bg-muted rounded-xl"
           >
-            Cancel
+            Back
           </Button>
         </div>
       )}

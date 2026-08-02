@@ -59,6 +59,14 @@ export function CancelAppointmentModal({
       size="sm"
     >
       <form onSubmit={onSubmit} className="flex flex-col gap-4 text-sm text-slate-700 dark:text-slate-300 py-1">
+        {/* Cancellation Warning Notice */}
+        <div className="p-3 border bg-red-500/5 border-red-500/20 rounded-2xl text-left">
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-red-500">Cancellation Notice</span>
+          <div className="text-[11px] text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">
+            Canceling this appointment will release your reserved slot and update your appointment history.
+          </div>
+        </div>
+
         {warnExcessiveCancellations && (
           <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-xs leading-relaxed flex gap-2">
             <span>⚠️</span>
@@ -107,10 +115,10 @@ export function CancelAppointmentModal({
             variant="secondary"
             onClick={onClose}
           >
-            Close
+            Back
           </Button>
-          <Button type="submit" variant="danger" disabled={isCancelling}>
-            {isCancelling ? 'Cancelling...' : 'Confirm Cancel'}
+          <Button type="submit" variant="danger" disabled={isCancelling || !cancelReason || !cancelReason.trim()}>
+            {isCancelling ? 'Canceling...' : 'Confirm Cancellation'}
           </Button>
         </div>
       </form>

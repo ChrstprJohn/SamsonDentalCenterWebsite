@@ -131,7 +131,7 @@ export function CheckInCheckoutModal({ view }: { view: any }) {
             onClick={() => view.setCheckoutAppt(null)}
             className="text-xs h-9 px-4 rounded-xl"
           >
-            Cancel
+            Back
           </Button>
           <Button
             type="button"

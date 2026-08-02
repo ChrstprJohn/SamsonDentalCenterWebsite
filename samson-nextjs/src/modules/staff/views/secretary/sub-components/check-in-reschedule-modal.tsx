@@ -3,11 +3,20 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { AppointmentRescheduleForm } from './appointment-reschedule-form';
+import { AppointmentRescheduleForm, isRescheduleFormComplete } from './appointment-reschedule-form';
 
 export function CheckInRescheduleModal({ view }: { view: any }) {
   if (!view.rescheduleAppt) return null;
   const appointment = view.rescheduleAppt;
+
+  const isFormComplete = isRescheduleFormComplete({
+    serviceId: view.rescheduleService || appointment.serviceId,
+    doctorId: view.rescheduleDoctor || appointment.doctorId,
+    date: view.rescheduleDate,
+    startTime: view.rescheduleTime,
+    endTime: view.rescheduleEndTime || '',
+    justification: view.rescheduleJustification || '',
+  });
 
   return (
     <AnimatePresence>
@@ -66,7 +75,7 @@ export function CheckInRescheduleModal({ view }: { view: any }) {
           <div className="shrink-0 border-t border-border flex gap-2 p-4">
             <Button
               onClick={view.handleRescheduleSubmit}
-              disabled={view.isPending}
+              disabled={view.isPending || !isFormComplete}
               className="flex-1 h-[42px] text-sm font-medium bg-primary text-white hover:bg-primary/90 rounded-xl disabled:opacity-50"
             >
               {view.isPending ? 'Saving...' : 'Confirm'}
@@ -76,7 +85,7 @@ export function CheckInRescheduleModal({ view }: { view: any }) {
               onClick={() => view.clearSelection()}
               className="flex-1 h-[42px] text-sm font-medium"
             >
-              Cancel
+              Back
             </Button>
           </div>
         </motion.div>

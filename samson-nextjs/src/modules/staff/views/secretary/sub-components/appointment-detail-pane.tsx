@@ -6,8 +6,8 @@ import { Calendar, User, Bell, History } from 'lucide-react';
 import type { AppointmentDto } from '@/modules/appointments/dtos/shared/appointment.dto';
 import type { AppointmentDirectoryTab } from '@/modules/staff/hooks/secretary/use-secretary-appointments';
 import { SharedAppointmentDetail } from '@/modules/appointments/components/sub-components/shared-appointment-detail';
-import { AppointmentCancelForm } from './appointment-cancel-form';
-import { AppointmentRescheduleForm } from './appointment-reschedule-form';
+import { AppointmentCancelForm, isCancelFormComplete } from './appointment-cancel-form';
+import { AppointmentRescheduleForm, isRescheduleFormComplete } from './appointment-reschedule-form';
 import { AppointmentStatusHistory } from './appointment-status-history';
 import { AppointmentNotificationsTab } from './appointment-notifications-tab';
 
@@ -73,6 +73,14 @@ function AppointmentDetails({ appointment, view, activeTab, compact, hideActions
   }, [activeIndex, tabRefs]);
 
   if (view.showRescheduleForm && (canModify || canRescheduleOnly)) {
+    const isFormComplete = isRescheduleFormComplete({
+      serviceId: view.rescheduleServiceId || appointment.serviceId,
+      doctorId: view.rescheduleDoctorId || appointment.doctorId,
+      date: view.rescheduleDate,
+      startTime: view.rescheduleStartTime,
+      endTime: view.rescheduleEndTime,
+      justification: view.rescheduleJustification,
+    });
     return (
       <div className="flex flex-col flex-1 min-h-0 h-full">
         <div className="flex-1 min-h-0 overflow-y-auto p-4" style={{ scrollbarWidth: 'thin' }} data-lenis-prevent>
@@ -80,11 +88,11 @@ function AppointmentDetails({ appointment, view, activeTab, compact, hideActions
         </div>
         <div className={`shrink-0 border-t border-border px-4 py-3 ${compact ? 'bg-sidebar' : 'bg-card'}`}>
           <div className="flex gap-2">
-            <Button onClick={view.submitReschedule} disabled={view.isSubmitting} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl disabled:opacity-50">
+            <Button onClick={view.submitReschedule} disabled={view.isSubmitting || !isFormComplete} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl disabled:opacity-50">
               {view.isSubmitting ? 'Saving...' : 'Confirm'}
             </Button>
             <Button variant="outline" onClick={() => view.setShowRescheduleForm(false)} className="flex-1 h-[42px] text-sm font-medium rounded-xl">
-              Cancel
+              Back
             </Button>
           </div>
         </div>
@@ -93,7 +101,10 @@ function AppointmentDetails({ appointment, view, activeTab, compact, hideActions
   }
 
   if (view.showCancelForm && (canModify || appointment.status === 'CHECKED_IN')) {
-    const activeReason = view.cancelReasonPreset === 'CUSTOM' ? view.cancelReasonCustom : view.cancelReasonPreset;
+    const isCancelValid = isCancelFormComplete({
+      reasonPreset: view.cancelReasonPreset,
+      reasonCustom: view.cancelReasonCustom,
+    });
     return (
       <div className="flex flex-col flex-1 min-h-0 h-full">
         <div className="flex-1 min-h-0 overflow-y-auto p-4" style={{ scrollbarWidth: 'thin' }} data-lenis-prevent>
@@ -115,17 +126,17 @@ function AppointmentDetails({ appointment, view, activeTab, compact, hideActions
           <div className="flex gap-2">
             <Button
               onClick={view.submitCancel}
-              disabled={view.isSubmitting || !activeReason?.trim()}
+              disabled={view.isSubmitting || !isCancelValid}
               className="flex-1 h-[42px] text-sm font-semibold bg-destructive text-white hover:bg-destructive/90 transition-colors rounded-xl disabled:opacity-50"
             >
-              {view.isSubmitting ? 'Canceling...' : 'Confirm'}
+              {view.isSubmitting ? 'Canceling...' : 'Confirm Cancellation'}
             </Button>
             <Button
               variant="outline"
               onClick={() => view.setShowCancelForm(false)}
               className="flex-1 h-[42px] text-sm font-medium rounded-xl"
             >
-              Cancel
+              Back
             </Button>
           </div>
         </div>

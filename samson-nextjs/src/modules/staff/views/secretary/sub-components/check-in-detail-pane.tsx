@@ -5,7 +5,7 @@ import { X, ArrowLeft, UserRound, MessageSquare, Mail, RotateCw, Pencil, Check, 
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select } from '@/components/ui/select';
-import { AppointmentRescheduleForm } from './appointment-reschedule-form';
+import { AppointmentRescheduleForm, isRescheduleFormComplete } from './appointment-reschedule-form';
 import { AppointmentDetailPane } from './appointment-detail-pane';
 import { updateConfirmationChannelAction } from '@/modules/appointments/actions/status/update-confirmation-channel.action';
 import { resendNotificationAction } from '@/modules/appointments/actions/status/resend-notification.action';
@@ -291,16 +291,26 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
       {paneType !== 'reschedule' && (
         <div className="shrink-0 border-t border-border px-4 py-3">
           <div className="flex gap-2">
-            {paneType === 'details' && appointment.status === 'NO_SHOW' && showRescheduleForm ? (
-              <>
-                <button onClick={() => { view.handleRescheduleSubmit(); }} disabled={view.isPending} className="flex-1 h-[42px] text-sm font-medium bg-primary text-white hover:bg-primary/90 rounded-xl disabled:opacity-50">
-                  {view.isPending ? 'Saving...' : 'Confirm'}
-                </button>
-                <button onClick={returnToDetails} className="flex-1 h-[42px] text-sm font-medium border border-card-border text-foreground bg-transparent hover:bg-muted rounded-xl">
-                  Cancel
-                </button>
-              </>
-            ) : paneType === 'details' && appointment.status === 'APPROVED' && !showCheckInForm && (
+            {paneType === 'details' && appointment.status === 'NO_SHOW' && showRescheduleForm ? (() => {
+              const isFormValid = isRescheduleFormComplete({
+                serviceId: appointment.serviceId,
+                doctorId: view.rescheduleDoctor || appointment.doctorId,
+                date: view.rescheduleDate,
+                startTime: view.rescheduleTime,
+                endTime: view.rescheduleEndTime,
+                justification: view.rescheduleJustification,
+              });
+              return (
+                <>
+                  <button onClick={() => { view.handleRescheduleSubmit(); }} disabled={view.isPending || !isFormValid} className="flex-1 h-[42px] text-sm font-medium bg-primary text-white hover:bg-primary/90 rounded-xl disabled:opacity-50">
+                    {view.isPending ? 'Saving...' : 'Confirm'}
+                  </button>
+                  <button onClick={returnToDetails} className="flex-1 h-[42px] text-sm font-medium border border-card-border text-foreground bg-transparent hover:bg-muted rounded-xl">
+                    Back
+                  </button>
+                </>
+              );
+            })() : paneType === 'details' && appointment.status === 'APPROVED' && !showCheckInForm && (
                 <button onClick={() => { resetActionDrafts(); view.openCheckIn(appointment); }} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl">
                 Check In
               </button>
@@ -432,7 +442,7 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
 
                 <div className="flex gap-2">
                   <button onClick={returnToDetails} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent transition-colors rounded-xl">
-                    Cancel
+                    Back
                   </button>
                   <button onClick={async () => {
                     if (draftInlineChannel !== inlineChannel) {
@@ -458,25 +468,25 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
 
             {paneType === 'checkin' && (
               <>
-                <button onClick={returnToDetails} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent rounded-xl">Cancel</button>
+                <button onClick={returnToDetails} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent rounded-xl">Back</button>
                 <button onClick={() => view.handleCheckIn(appointment.id, checkInReason)} disabled={view.isPending || !checkInReason.trim()} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl disabled:opacity-40">{view.isPending ? 'Checking In...' : 'Confirm Check-In'}</button>
               </>
             )}
             {paneType === 'checkout' && (
               <>
-                <button onClick={returnToDetails} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent rounded-xl">Cancel</button>
+                <button onClick={returnToDetails} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent rounded-xl">Back</button>
                 <button onClick={() => view.handleCheckoutComplete(appointment.id, checkoutReason)} disabled={view.isPending || !checkoutReason.trim()} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl disabled:opacity-40">{view.isPending ? 'Sending...' : 'Confirm & Send'}</button>
               </>
             )}
             {paneType === 'details' && showUndoForm && (
               <>
-                <button onClick={returnToDetails} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent rounded-xl">Cancel</button>
+                <button onClick={returnToDetails} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent rounded-xl">Back</button>
                 <button onClick={() => view.handleUndoCheckIn(appointment.id, undoReason)} disabled={view.isPending || !undoReason.trim()} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground rounded-xl disabled:opacity-40">{view.isPending ? 'Reverting...' : 'Undo Check-In'}</button>
               </>
             )}
             {paneType === 'resolve' && (
               <>
-                <button onClick={returnToDetails} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent rounded-xl">Cancel</button>
+                <button onClick={returnToDetails} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent rounded-xl">Back</button>
                 <button onClick={() => (document.getElementById('resolve-form') as HTMLFormElement | null)?.requestSubmit()} disabled={view.isPending} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground rounded-xl disabled:opacity-40">{view.isPending ? 'Submitting...' : 'Submit Resolution'}</button>
               </>
             )}
@@ -1004,6 +1014,15 @@ function StandaloneReschedule({ view, onClose }: { view: any; onClose: () => voi
   const appointment = view.rescheduleAppt;
   if (!appointment) return null;
 
+  const isFormComplete = isRescheduleFormComplete({
+    serviceId: view.rescheduleService || appointment.serviceId,
+    doctorId: view.rescheduleDoctor || appointment.doctorId,
+    date: view.rescheduleDate,
+    startTime: view.rescheduleTime,
+    endTime: view.rescheduleEndTime || '',
+    justification: view.rescheduleJustification || '',
+  });
+
   return (
     <div className="flex flex-col gap-4">
       <AppointmentRescheduleForm
@@ -1038,11 +1057,11 @@ function StandaloneReschedule({ view, onClose }: { view: any; onClose: () => voi
         onBack={onClose}
       />
       <div className="flex gap-2 pt-3 border-t border-card-border/60">
-        <Button onClick={view.handleRescheduleSubmit} disabled={view.isPending} className="flex-1 h-[42px] text-sm font-medium bg-primary text-white hover:bg-primary/90 rounded-xl disabled:opacity-50">
+        <Button onClick={view.handleRescheduleSubmit} disabled={view.isPending || !isFormComplete} className="flex-1 h-[42px] text-sm font-medium bg-primary text-white hover:bg-primary/90 rounded-xl disabled:opacity-50">
           {view.isPending ? 'Saving...' : 'Confirm'}
         </Button>
         <Button variant="outline" onClick={onClose} className="flex-1 h-[42px] text-sm font-medium">
-          Cancel
+          Back
         </Button>
       </div>
     </div>

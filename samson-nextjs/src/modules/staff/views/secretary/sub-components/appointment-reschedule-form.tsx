@@ -71,6 +71,35 @@ const DAYS = Array.from({ length: 31 }, (_, i) => (i + 1).toString().padStart(2,
 const CURRENT_YEAR = new Date().getFullYear();
 const YEARS = Array.from({ length: 5 }, (_, i) => (CURRENT_YEAR + i).toString());
 
+export function isRescheduleFormComplete(props: {
+  serviceId?: string;
+  doctorId?: string;
+  date?: string;
+  startTime?: string;
+  endTime?: string;
+  justification?: string;
+}): boolean {
+  const serviceId = props.serviceId?.trim();
+  const doctorId = props.doctorId?.trim();
+  const date = props.date?.trim();
+  const startTime = props.startTime?.trim();
+  const endTime = props.endTime?.trim();
+  const justification = props.justification?.trim();
+
+  if (!serviceId) return false;
+  if (!doctorId) return false;
+  if (!date) return false;
+
+  const parts = date.split('-');
+  if (parts.length !== 3 || !parts[0] || !parts[1] || !parts[2]) return false;
+
+  if (!startTime) return false;
+  if (!endTime) return false;
+  if (!justification) return false;
+
+  return true;
+}
+
 export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps) {
   const FormWrapper = props.noForm ? 'div' : 'form';
   const selectedService = props.serviceId || props.activeServiceId || props.appointment.serviceId || '';
@@ -134,6 +163,15 @@ export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps)
     }
   };
 
+  const isFormComplete = isRescheduleFormComplete({
+    serviceId: selectedService,
+    doctorId: selectedDoctor,
+    date: props.date,
+    startTime: props.startTime,
+    endTime: props.endTime,
+    justification: props.justification,
+  });
+
   return (
     <FormWrapper
       onSubmit={props.noForm ? undefined : (event) => {
@@ -142,6 +180,14 @@ export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps)
       }}
       className="flex flex-col gap-4"
     >
+      {/* Reschedule Warning Notice */}
+      <div className="p-3 border bg-amber-500/5 border-amber-500/20 rounded-2xl text-left">
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-amber-500">Reschedule Notice</span>
+        <div className="text-[11px] text-muted-foreground mt-1 leading-relaxed">
+          Rescheduling will update the appointment date and time, notify the patient, and update doctor availability.
+        </div>
+      </div>
+
       {/* 1. Service & Schedule */}
       <span className="text-sm font-medium text-foreground">Service &amp; Schedule</span>
 
@@ -310,7 +356,7 @@ export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps)
         <div className="flex gap-2 pt-3 border-t border-card-border/60">
           <Button
             type="submit"
-            disabled={props.isSubmitting || !props.date || !selectedDoctor || !props.startTime || !props.endTime || !props.justification.trim()}
+            disabled={props.isSubmitting || !isFormComplete}
             className="flex-1 h-[42px] text-sm font-medium bg-primary text-white hover:bg-primary/90 rounded-xl disabled:opacity-50"
           >
             {props.isSubmitting ? 'Saving...' : 'Confirm'}
@@ -320,7 +366,7 @@ export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps)
             onClick={props.onBack}
             className="flex-1 h-[42px] text-sm font-medium border border-card-border text-foreground bg-transparent hover:bg-muted rounded-xl"
           >
-            Cancel
+            Back
           </Button>
         </div>
       )}
