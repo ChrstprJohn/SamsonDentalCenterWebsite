@@ -1,7 +1,7 @@
 'use client';
 
-import { useMemo, useState, useEffect } from 'react';
-import { getOutboxLogsAction } from '@/modules/emails/actions/logs/get-outbox-logs.action';
+import { useCallback, useMemo, useState, useEffect, useRef } from 'react';
+import { getOutboxLogsPageAction } from '@/modules/emails/actions/logs/get-outbox-logs-page.action';
 import { resendEmailAction } from '@/modules/emails/actions/logs/resend-email.action';
 
 export interface SmsLog {
@@ -25,46 +25,102 @@ export function useSecretarySmsLog() {
   const [selectedSmsId, setSelectedSmsId] = useState<string | null>(null);
   const [resendingId, setResendingId] = useState<string | null>(null);
   const [isRetryingAll, setIsRetryingAll] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [loadMoreError, setLoadMoreError] = useState<string | null>(null);
+  const latestRequestId = useRef(0);
+  const nextCursorRef = useRef<string | null>(null);
+  const loadingMoreRef = useRef(false);
 
-  const fetchLogs = async () => {
-    setIsLoading(true);
-    const res = await getOutboxLogsAction();
-    if (res.success && res.data) {
-      // Filter for SMS events
-      const smsEvents = res.data.filter((log: any) => 
-        log.eventType?.endsWith('_SMS') || 
-        !!(log.payload as any)?.phone || 
-        !!(log.payload as any)?.mobileNumber
-      );
+  const statusForQuery = () => statusFilter === 'SENT' ? 'PROCESSED' as const : statusFilter === 'FAILED' ? 'FAILED' as const : statusFilter === 'PENDING' ? 'PENDING' as const : undefined;
 
-      const mapped: SmsLog[] = smsEvents.map((log: any) => {
-        const payload = (log.payload as any) || {};
-        const recipientPhone = payload.phone || payload.mobileNumber || payload.recipientPhone || payload.email || 'system';
+  const fetchLogs = useCallback(async (options?: { append?: boolean }) => {
+    const append = options?.append === true;
+    if (append) {
+      if (loadingMoreRef.current || !nextCursorRef.current) return;
+      loadingMoreRef.current = true;
+      setIsLoadingMore(true);
+      setLoadMoreError(null);
+    } else {
+      setIsLoading(true);
+      setError(null);
+      setLoadMoreError(null);
+      nextCursorRef.current = null;
+      setNextCursor(null);
+    }
+
+    const requestId = ++latestRequestId.current;
+    try {
+      const res = await getOutboxLogsPageAction({
+        limit: 25,
+        cursor: append ? nextCursorRef.current : null,
+        status: statusForQuery(),
+        search: searchTerm || undefined,
+        channel: 'SMS',
+        onlyAppointments: false,
+      });
+      if (requestId !== latestRequestId.current) return;
+      if (!res.success || !res.data) throw new Error(res.error || 'Could not load SMS logs.');
+
+      const mapped: SmsLog[] = res.data.items.map((log) => {
+        const payload = (log.payload as Record<string, unknown>) || {};
+        const recipientPhone = payload.phone || payload.mobileNumber || payload.recipientPhone || payload.phoneNumber || payload.email || 'system';
 
         return {
           id: log.id,
-          recipient: recipientPhone,
+          recipient: String(recipientPhone),
           subject: log.eventType,
           type: log.eventType,
           timestamp: log.createdAt,
           status: log.status === 'PROCESSED' ? 'Sent' : log.status === 'FAILED' ? 'Failed' : 'Pending',
           rawStatus: log.status,
           content: JSON.stringify(log.payload, null, 2),
-          errorLogs: log.errorLogs || null,
-          retryCount: log.retryCount || 0,
+          errorLogs: log.errorLogs,
+          retryCount: log.retryCount,
         };
       });
 
-      setLiveSmsLogs(mapped);
-    } else {
-      setLiveSmsLogs([]);
+      setLiveSmsLogs((previous) => append
+        ? [...previous, ...mapped.filter((item) => !previous.some((existing) => existing.id === item.id))]
+        : mapped);
+      nextCursorRef.current = res.data.nextCursor;
+      setNextCursor(res.data.nextCursor);
+      setHasMore(res.data.hasMore);
+    } catch (cause) {
+      if (requestId === latestRequestId.current) {
+        if (append) setLoadMoreError(cause instanceof Error ? cause.message : 'Could not load more SMS logs.');
+        else setError(cause instanceof Error ? cause.message : 'Could not load SMS logs.');
+      }
+    } finally {
+      if (requestId === latestRequestId.current) {
+        setIsLoading(false);
+        setIsLoadingMore(false);
+        loadingMoreRef.current = false;
+      }
     }
-    setIsLoading(false);
-  };
+  }, [searchTerm, statusFilter]);
 
   useEffect(() => {
-    fetchLogs();
-  }, []);
+    const timer = window.setTimeout(() => { void fetchLogs(); }, 250);
+    return () => window.clearTimeout(timer);
+  }, [fetchLogs]);
+
+  useEffect(() => {
+    const refreshOnVisible = () => {
+      if (document.visibilityState === 'visible') void fetchLogs();
+    };
+    document.addEventListener('visibilitychange', refreshOnVisible);
+    return () => document.removeEventListener('visibilitychange', refreshOnVisible);
+  }, [fetchLogs]);
+
+  useEffect(() => {
+    if (!toast) return;
+    const timer = window.setTimeout(() => setToast(null), 3000);
+    return () => window.clearTimeout(timer);
+  }, [toast]);
 
   const selectedSms = useMemo(
     () => liveSmsLogs.find((sms) => sms.id === selectedSmsId) ?? null,
@@ -88,21 +144,25 @@ export function useSecretarySmsLog() {
 
   const handleResend = async (id: string) => {
     setResendingId(id);
-    const res = await resendEmailAction({ id });
-    if (res.error) {
-      alert(res.error);
+    try {
+      const res = await resendEmailAction({ id });
+      if (res.error) {
+        setToast({ message: res.error, type: 'error' });
+      } else {
+        setToast({ message: 'SMS dispatch triggered successfully!', type: 'success' });
+      }
       await fetchLogs();
-    } else {
-      alert('SMS dispatch triggered successfully!');
-      await fetchLogs();
+    } catch (cause) {
+      setToast({ message: cause instanceof Error ? cause.message : 'Could not resend SMS.', type: 'error' });
+    } finally {
+      setResendingId(null);
     }
-    setResendingId(null);
   };
 
   const handleRetryAllFailed = async () => {
     const failedSms = filteredSmsLogs.filter((e) => e.status === 'Failed');
     if (failedSms.length === 0) {
-      alert('No failed SMS dispatches to retry.');
+      setToast({ message: 'No failed SMS dispatches to retry.', type: 'error' });
       return;
     }
 
@@ -112,10 +172,12 @@ export function useSecretarySmsLog() {
       const res = await resendEmailAction({ id: sms.id });
       if (!res.error) successCount++;
     }
-    alert(`Batch retry complete. ${successCount}/${failedSms.length} dispatched successfully.`);
+    setToast({ message: `Batch retry complete. ${successCount}/${failedSms.length} dispatched successfully.`, type: successCount === failedSms.length ? 'success' : 'error' });
     await fetchLogs();
     setIsRetryingAll(false);
   };
+
+  const loadMore = useCallback(() => { void fetchLogs({ append: true }); }, [fetchLogs]);
 
   return {
     searchTerm,
@@ -128,9 +190,15 @@ export function useSecretarySmsLog() {
     filteredSmsLogs,
     handleResend,
     handleRetryAllFailed,
-    refreshLogs: fetchLogs,
+    refreshLogs: () => fetchLogs(),
     resendingId,
     isRetryingAll,
     isLoading,
+    error,
+    toast,
+    hasMore,
+    isLoadingMore,
+    loadMoreError,
+    loadMore,
   };
 }

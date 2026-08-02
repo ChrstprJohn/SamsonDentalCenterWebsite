@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { convertInquiryAction } from '@/modules/appointments/actions/booking/convert-inquiry.action';
 import { dropInquiryAction } from '@/modules/appointments/actions/booking/drop-inquiry.action';
-import { getInquiriesAction } from '@/modules/appointments/actions/booking/get-inquiries.action';
+import { getInquiriesPageAction } from '@/modules/appointments/actions/booking/get-inquiries-page.action';
 import { updateInquiryAction } from '@/modules/appointments/actions/booking/update-inquiry.action';
 import { useBookingScheduler } from '@/modules/appointments/hooks/shared/use-booking-scheduler';
 import { searchPatientsAction } from '@/modules/patients/actions/profile/search-patients.action';
@@ -20,7 +20,8 @@ export function useSecretaryInquiriesQueue() {
   const { loadAvailableDates, loadDoctorsForDate, loadAvailableSlots } = scheduler;
   const [allInquiries, setAllInquiries] = useState<any[]>([]);
   const [selectedInquiryId, setSelectedInquiryId] = useState<string | null>(null);
-  const [isLoadingInquiries, setIsLoadingInquiries] = useState(false);
+  const [isLoadingInquiries, setIsLoadingInquiries] = useState(true);
+  const [isRefreshingInquiries, setIsRefreshingInquiries] = useState(false);
   const [inquiriesError, setInquiriesError] = useState('');
   const [stagedInquiryAction, setStagedInquiryAction] = useState<InquiryDecision>('');
   const [stagedInquiryService, setStagedInquiryService] = useState('');
@@ -52,18 +53,21 @@ export function useSecretaryInquiriesQueue() {
   const [inlineError, setInlineError] = useState('');
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [activeTab, setActiveTab] = useState<InquiryTab>('NEW');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [loadMoreError, setLoadMoreError] = useState<string | null>(null);
+  const [tabCounts, setTabCounts] = useState<Record<InquiryTab, number>>({ NEW: 0, CONVERTED: 0, DROPPED: 0 });
+  const latestInquiriesRequest = useRef(0);
+  const nextCursorRef = useRef<string | null>(null);
+  const loadingMoreRef = useRef(false);
+  const hasLoadedRef = useRef(false);
+  const queryRef = useRef({ activeTab, searchTerm });
+  queryRef.current = { activeTab, searchTerm };
 
   const inquiries = useMemo(
-    () => allInquiries.filter((i) => i.status === activeTab),
-    [allInquiries, activeTab]
-  );
-
-  const tabCounts = useMemo(
-    () => ({
-      NEW: allInquiries.filter((i) => i.status === 'NEW').length,
-      CONVERTED: allInquiries.filter((i) => i.status === 'CONVERTED').length,
-      DROPPED: allInquiries.filter((i) => i.status === 'DROPPED').length,
-    }),
+    () => allInquiries,
     [allInquiries]
   );
 
@@ -110,16 +114,85 @@ export function useSecretaryInquiriesQueue() {
     }
   }, [patientMode, selectedPatient, stagedInquiryAction, isNotesManual]);
 
-  const loadInquiries = async () => {
-    setIsLoadingInquiries(true);
-    setInquiriesError('');
-    const res = await getInquiriesAction();
-    setIsLoadingInquiries(false);
-    if (res.success && res.data) setAllInquiries(res.data);
-    else setInquiriesError(res.error || 'Failed to load inquiries queue.');
-  };
+  const loadInquiries = useCallback(async (options?: { append?: boolean }) => {
+    const append = options?.append === true;
+    if (append) {
+      if (loadingMoreRef.current || !nextCursorRef.current) return;
+      loadingMoreRef.current = true;
+      setIsLoadingMore(true);
+      setLoadMoreError(null);
+    } else {
+      if (hasLoadedRef.current) setIsRefreshingInquiries(true);
+      else setIsLoadingInquiries(true);
+      setInquiriesError('');
+      setLoadMoreError(null);
+      nextCursorRef.current = null;
+      setNextCursor(null);
+    }
 
-  useEffect(() => { loadInquiries(); }, []);
+    const requestId = ++latestInquiriesRequest.current;
+    const currentTab = queryRef.current.activeTab;
+    const search = queryRef.current.searchTerm || undefined;
+    try {
+      const activeRequest = getInquiriesPageAction({
+        limit: 25,
+        cursor: append ? nextCursorRef.current : null,
+        status: currentTab,
+        search,
+        sortDirection: 'desc',
+      });
+      const otherTabs: InquiryTab[] = ['NEW', 'CONVERTED', 'DROPPED'].filter((tab) => tab !== currentTab) as InquiryTab[];
+      const otherRequests = append
+        ? Promise.resolve([])
+        : Promise.all(otherTabs.map((status) => getInquiriesPageAction({ limit: 1, cursor: null, status, search, sortDirection: 'desc' })));
+      const [activeResult, otherResults] = await Promise.all([activeRequest, otherRequests]);
+      if (requestId !== latestInquiriesRequest.current) return;
+      if (!activeResult.success || !activeResult.data) throw new Error(activeResult.error || 'Failed to load inquiries queue.');
+
+      const page = activeResult.data;
+      setAllInquiries((previous) => append
+        ? [...previous, ...page.items.filter((item) => !previous.some((existing) => existing.id === item.id))]
+        : page.items);
+      nextCursorRef.current = page.nextCursor;
+      setNextCursor(page.nextCursor);
+      setHasMore(page.hasMore);
+      setTabCounts((previous) => ({ ...previous, [currentTab]: page.total ?? page.items.length }));
+      if (!append) {
+        for (let index = 0; index < otherTabs.length; index += 1) {
+          const result = otherResults[index];
+          if (result?.success && result.data) {
+            setTabCounts((previous) => ({ ...previous, [otherTabs[index]]: result.data.total ?? result.data.items.length }));
+          }
+        }
+      }
+      hasLoadedRef.current = true;
+    } catch (cause) {
+      if (requestId === latestInquiriesRequest.current) {
+        if (append) setLoadMoreError(cause instanceof Error ? cause.message : 'Could not load more inquiries.');
+        else setInquiriesError(cause instanceof Error ? cause.message : 'Failed to load inquiries queue.');
+      }
+    } finally {
+      if (requestId === latestInquiriesRequest.current) {
+        setIsLoadingInquiries(false);
+        setIsRefreshingInquiries(false);
+        setIsLoadingMore(false);
+        loadingMoreRef.current = false;
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => { void loadInquiries(); }, 300);
+    return () => window.clearTimeout(timeout);
+  }, [activeTab, searchTerm, loadInquiries]);
+
+  useEffect(() => {
+    const refreshOnVisible = () => {
+      if (document.visibilityState === 'visible') void loadInquiries();
+    };
+    document.addEventListener('visibilitychange', refreshOnVisible);
+    return () => document.removeEventListener('visibilitychange', refreshOnVisible);
+  }, [loadInquiries]);
 
   useEffect(() => {
     async function loadServices() {
@@ -202,6 +275,14 @@ export function useSecretaryInquiriesQueue() {
       if (!Number.isNaN(parsedDate.getTime())) setCurrentMonth(new Date(parsedDate.getFullYear(), parsedDate.getMonth(), 1));
     }
   };
+
+  const selectTab = (tab: InquiryTab) => {
+    setActiveTab(tab);
+    setSelectedInquiryId(null);
+    setStagedInquiryAction('');
+  };
+
+  const loadMore = useCallback(() => { void loadInquiries({ append: true }); }, [loadInquiries]);
 
   const setDecision = (decision: InquiryDecision) => {
     setStagedInquiryAction(decision);
@@ -364,7 +445,7 @@ export function useSecretaryInquiriesQueue() {
       : !!(stagedInquiryService && stagedInquiryDate && stagedInquiryDoctor && stagedInquiryTime && stagedInquiryEndTime));
 
   return {
-    inquiries, selectedInquiry, selectedInquiryId, selectInquiry, isLoadingInquiries, inquiriesError, loadInquiries,
+    inquiries, selectedInquiry, selectedInquiryId, selectInquiry, isLoadingInquiries, isRefreshingInquiries, inquiriesError, loadInquiries,
     stagedInquiryAction, setDecision, stagedInquiryService, selectService, stagedInquiryDoctor, selectDoctor,
     stagedInquiryDate, selectDate, stagedInquiryTime, setStagedInquiryTime, stagedInquiryEndTime, setStagedInquiryEndTime,
     selectSlot, stagedInquiryNote, setStagedInquiryNote,
@@ -376,6 +457,7 @@ export function useSecretaryInquiriesQueue() {
     availableDoctors, timeslots, isLoadingServices, isLoadingDays: scheduler.loadingKey === 'dates',
     isLoadingDoctors: scheduler.loadingKey === 'doctors', isLoadingSlots: scheduler.loadingKey === 'slots',
     isSubmitting, inlineError, toast, isAvailabilityLoading, canSubmit, submitReview, saveInquiryChanges,
-    activeTab, setActiveTab, tabCounts,
+    activeTab, setActiveTab: selectTab, tabCounts, searchTerm, setSearchTerm,
+    hasMore, isLoadingMore, loadMoreError, loadMore,
   };
 }

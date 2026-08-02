@@ -5,6 +5,7 @@ import { useSecretarySmsLog } from '@/modules/staff/hooks/secretary/use-secretar
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   SidebarProvider,
   Sidebar,
@@ -16,6 +17,7 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { AlertCircle, Clock, CheckCircle2, RefreshCw, Search, MessageSquare, ArrowLeft, Smartphone, Send } from 'lucide-react';
+import { InquiryToast } from './sub-components/inquiry-toast';
 
 const SMS_EVENT_NAME_MAP: Record<string, string> = {
   'APPOINTMENT_MANUALLY_BOOKED_SMS': 'Manual Booking SMS',
@@ -99,6 +101,12 @@ export function SecretarySmsLogView() {
     refreshLogs,
     resendingId,
     isLoading,
+    error,
+    toast,
+    hasMore,
+    isLoadingMore,
+    loadMoreError,
+    loadMore,
   } = useSecretarySmsLog();
 
   const [mobileView, setMobileView] = useState<'list' | 'detail'>('list');
@@ -145,7 +153,7 @@ export function SecretarySmsLogView() {
               <SidebarInput
                 placeholder="Type to search..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => { setSearchTerm(e.target.value); setSelectedSmsId(null); setMobileView('list'); }}
                 className="rounded-md"
               />
             </div>
@@ -155,7 +163,7 @@ export function SecretarySmsLogView() {
               {STATUS_TABS.map((tab) => (
                 <Button
                   key={tab}
-                  onClick={() => setStatusFilter(tab)}
+                  onClick={() => { setStatusFilter(tab); setSelectedSmsId(null); setMobileView('list'); }}
                   variant="ghost"
                   size="sm"
                   className={`flex-1 h-8 text-xs font-semibold rounded-xl transition-all ${
@@ -181,18 +189,27 @@ export function SecretarySmsLogView() {
                 {isLoading ? (
                   <div className="flex flex-col w-full">
                     {[0, 1, 2, 3, 4, 5].map((i) => (
-                      <div key={i} className="flex items-start w-full gap-3 border-b p-4 animate-pulse">
-                        <div className="size-9 rounded-full bg-muted/40 shrink-0" />
+                      <div key={i} className="flex items-start w-full gap-3 border-b p-4">
+                        <Skeleton className="size-9 shrink-0 rounded-full" />
                         <div className="flex flex-col flex-1 gap-2">
                           <div className="flex justify-between gap-2">
-                            <div className="h-3.5 w-32 rounded bg-muted/40" />
-                            <div className="h-2.5 w-10 rounded bg-muted/30" />
+                            <Skeleton className="h-3.5 w-32 rounded-md" />
+                            <Skeleton className="h-2.5 w-10 rounded-md" />
                           </div>
-                          <div className="h-3 w-44 rounded bg-muted/30" />
-                          <div className="h-3 w-20 rounded bg-muted/20" />
+                          <Skeleton className="h-3 w-44 rounded-md" />
+                          <Skeleton className="h-3 w-20 rounded-md" />
                         </div>
                       </div>
                     ))}
+                  </div>
+                ) : error && filteredSmsLogs.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+                    <div className="size-10 rounded-full bg-destructive/10 flex items-center justify-center mb-2.5">
+                      <Smartphone className="size-5 text-destructive/70" />
+                    </div>
+                    <span className="text-xs font-medium text-foreground">Could not load SMS logs</span>
+                    <p className="text-[11px] text-muted-foreground mt-0.5 max-w-[220px]">{error}</p>
+                    <Button variant="outline" size="sm" onClick={() => void refreshLogs()} className="mt-3 h-8 text-xs">Retry</Button>
                   </div>
                 ) : filteredSmsLogs.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
@@ -203,7 +220,16 @@ export function SecretarySmsLogView() {
                     <p className="text-[11px] text-muted-foreground mt-0.5">Try adjusting your search filters.</p>
                   </div>
                 ) : (
-                  filteredSmsLogs.map((sms) => {
+                  <>
+                  {error && (
+                    <div className="m-3 rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-xs text-destructive">
+                      <div className="flex items-center justify-between gap-3">
+                        <span>Could not refresh SMS logs. {error}</span>
+                        <Button variant="outline" size="sm" onClick={() => void refreshLogs()} className="h-7 shrink-0 text-xs">Retry</Button>
+                      </div>
+                    </div>
+                  )}
+                  {filteredSmsLogs.map((sms) => {
                     const isSelected = selectedSmsId === sms.id;
                     const isFailed = sms.status.toUpperCase() === 'FAILED';
                     return (
@@ -249,7 +275,22 @@ export function SecretarySmsLogView() {
                         </div>
                       </button>
                     );
-                  })
+                  })}
+                  {loadMoreError && (
+                    <div className="m-3 rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-xs text-destructive">
+                      <div className="flex items-center justify-between gap-3">
+                        <span>Could not load more SMS logs. {loadMoreError}</span>
+                        <Button variant="outline" size="sm" onClick={loadMore} className="h-7 shrink-0 text-xs">Retry</Button>
+                      </div>
+                    </div>
+                  )}
+                  {hasMore && (
+                    <Button variant="ghost" size="sm" onClick={loadMore} disabled={isLoadingMore} className="m-3 text-xs">
+                      {isLoadingMore ? <RefreshCw className="mr-2 size-3.5 animate-spin" /> : null}
+                      {isLoadingMore ? 'Loading…' : 'Show More'}
+                    </Button>
+                  )}
+                  </>
                 )}
               </SidebarGroupContent>
             </SidebarGroup>
@@ -350,6 +391,7 @@ export function SecretarySmsLogView() {
             </p>
           </div>
         )}
+      <InquiryToast toast={toast} />
       </div>
   );
 }

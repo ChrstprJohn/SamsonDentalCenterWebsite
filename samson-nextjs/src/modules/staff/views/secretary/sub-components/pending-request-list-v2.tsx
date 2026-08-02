@@ -2,8 +2,8 @@
 
 import * as React from 'react';
 import { ArrowUpDown, ClipboardList } from 'lucide-react';
-import { Skeleton } from '@/components/ui/skeleton';
 import { formatShortDate, formatTimeString } from '@/shared/utils/date.util';
+import { SecretaryListSkeleton, SecretaryListSkeletonTheme } from './secretary-list-skeleton';
 import type { InquiryTab } from '../../../hooks/secretary/use-secretary-inquiries-queue';
 import { Button } from '@/components/ui/button';
 import {
@@ -20,6 +20,15 @@ interface PendingRequestListV2Props {
   inquiries: any[];
   selectedInquiryId: string | null;
   isLoadingInquiries: boolean;
+  isRefreshingInquiries: boolean;
+  inquiriesError: string;
+  onRetry: () => void;
+  searchTerm: string;
+  onSearchChange: (value: string) => void;
+  hasMore: boolean;
+  isLoadingMore: boolean;
+  loadMoreError: string | null;
+  onLoadMore: () => void;
   onSelectInquiry: (inquiry: any) => void;
   activeTab: InquiryTab;
   setActiveTab: (tab: InquiryTab) => void;
@@ -58,29 +67,17 @@ function formatCreatedAt(iso: string): string {
 }
 
 export function PendingRequestListV2(props: PendingRequestListV2Props) {
-  const [search, setSearch] = React.useState('');
   const [sortOrder, setSortOrder] = React.useState<'newest' | 'oldest'>('newest');
 
   const filteredInquiries = React.useMemo(() => {
-    const filtered = props.inquiries.filter((inq) => {
-      const name = `${inq.firstName || ''} ${inq.middleName ? inq.middleName + ' ' : ''}${inq.lastName || ''} ${inq.suffix || ''}`.trim() || 'Guest';
-      const serviceName = inq.preferredServiceName || '';
-
-      return (
-        name.toLowerCase().includes(search.toLowerCase()) ||
-        serviceName.toLowerCase().includes(search.toLowerCase())
-      );
-    });
-
-    return [...filtered].sort((a, b) => {
+    return [...props.inquiries].sort((a, b) => {
       const dateA = new Date(a.createdAt || a.preferredDate || 0).getTime();
       const dateB = new Date(b.createdAt || b.preferredDate || 0).getTime();
       return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
     });
-  }, [props.inquiries, search, sortOrder]);
+  }, [props.inquiries, sortOrder]);
 
-  const currentCount = filteredInquiries.length;
-  const isLoading = props.isLoadingInquiries;
+  const isLoading = props.isLoadingInquiries && props.inquiries.length === 0;
 
   return (
     <Sidebar
@@ -107,8 +104,8 @@ export function PendingRequestListV2(props: PendingRequestListV2Props) {
         <div className="px-1">
           <SidebarInput
             placeholder="Type to search..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => { props.onSearchChange(e.target.value); props.onSelectInquiry(null); }}
+            value={props.searchTerm}
             className="rounded-md"
           />
         </div>
@@ -116,7 +113,7 @@ export function PendingRequestListV2(props: PendingRequestListV2Props) {
           {TABS.map((tab) => (
             <Button
               key={tab.key}
-              onClick={() => props.setActiveTab(tab.key)}
+              onClick={() => { props.setActiveTab(tab.key); props.onSelectInquiry(null); }}
               variant="ghost"
               size="sm"
               className={`flex-1 h-8 text-xs font-semibold rounded-xl transition-all ${
@@ -130,6 +127,9 @@ export function PendingRequestListV2(props: PendingRequestListV2Props) {
           ))}
         </div>
       </SidebarHeader>
+      {props.isRefreshingInquiries && (
+        <div className="h-0.5 w-full overflow-hidden bg-primary/15"><div className="h-full w-1/3 animate-pulse bg-primary" /></div>
+      )}
       <SidebarContent 
         data-lenis-prevent 
         style={{ scrollbarWidth: 'thin' }}
@@ -138,24 +138,37 @@ export function PendingRequestListV2(props: PendingRequestListV2Props) {
         <SidebarGroup className="px-0">
           <SidebarGroupContent className="flex flex-col">
             {isLoading ? (
-              <div className="flex flex-col w-full">
+              <SecretaryListSkeletonTheme>
+                <div className="flex flex-col w-full">
                 {[0, 1, 2, 3, 4, 5].map((i) => (
                   <div key={i} className="flex flex-col items-start w-full gap-2 border-b p-4">
                     {/* Name + status badge */}
                     <div className="flex w-full items-center justify-between gap-2">
-                      <Skeleton className="h-3.5 w-28 rounded-md !bg-slate-200" />
-                      <Skeleton className="h-4 w-16 rounded-full !bg-slate-200" />
+                      <SecretaryListSkeleton width={112} height={14} />
+                      <SecretaryListSkeleton width={64} height={16} borderRadius="9999px" />
                     </div>
                     {/* Service name */}
-                    <Skeleton className="h-3 w-40 rounded-md !bg-slate-200" />
+                    <SecretaryListSkeleton width={160} height={12} />
                     {/* Date • Time + Submitted */}
                     <div className="w-full flex items-center justify-between gap-2">
-                      <Skeleton className="h-2.5 w-36 rounded-md !bg-slate-200" />
-                      <Skeleton className="h-2.5 w-24 rounded-md !bg-slate-200" />
+                      <SecretaryListSkeleton width={144} height={10} />
+                      <SecretaryListSkeleton width={96} height={10} />
                     </div>
                   </div>
                 ))}
               </div>
+            ) : props.inquiriesError && filteredInquiries.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+                <div className="size-10 rounded-full bg-destructive/10 flex items-center justify-center mb-2.5">
+                  <ClipboardList className="size-5 text-destructive/70" />
+                </div>
+                <span className="text-xs font-medium text-foreground">Could not load requests</span>
+                <p className="text-[11px] text-muted-foreground mt-0.5 max-w-[220px]">{props.inquiriesError}</p>
+                <Button variant="outline" size="sm" onClick={props.onRetry} className="mt-3 h-8 text-xs">
+                  Retry
+                </Button>
+                </div>
+              </SecretaryListSkeletonTheme>
             ) : filteredInquiries.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
                 <div className="size-10 rounded-full bg-muted/30 flex items-center justify-center mb-2.5">
@@ -167,7 +180,18 @@ export function PendingRequestListV2(props: PendingRequestListV2Props) {
                 </p>
               </div>
             ) : (
-              filteredInquiries.map((inq) => {
+              <>
+                {props.inquiriesError && (
+                  <div className="m-3 rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-xs text-destructive">
+                    <div className="flex items-center justify-between gap-3">
+                      <span>Could not refresh requests. {props.inquiriesError}</span>
+                      <Button variant="outline" size="sm" onClick={props.onRetry} className="h-7 shrink-0 text-xs">
+                        Retry
+                      </Button>
+                    </div>
+                  </div>
+                )}
+                {filteredInquiries.map((inq) => {
                 const isSelected = props.selectedInquiryId === inq.id;
                 const initial = inq.middleName ? ` ${inq.middleName.charAt(0).toUpperCase()}.` : '';
                 const name = `${inq.firstName || ''}${initial} ${inq.lastName || ''}`.trim() + (inq.suffix ? `, ${inq.suffix}` : '') || 'Guest';
@@ -206,7 +230,27 @@ export function PendingRequestListV2(props: PendingRequestListV2Props) {
                     </div>
                   </button>
                 );
-              })
+                })}
+                {props.loadMoreError && (
+                  <div className="m-3 rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-xs text-destructive">
+                    <div className="flex items-center justify-between gap-3">
+                      <span>Could not load more requests. {props.loadMoreError}</span>
+                      <Button variant="outline" size="sm" onClick={props.onLoadMore} className="h-7 shrink-0 text-xs">Retry</Button>
+                    </div>
+                  </div>
+                )}
+                {props.hasMore && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    disabled={props.isLoadingMore}
+                    onClick={props.onLoadMore}
+                    className="w-full h-10 rounded-none border-t text-xs text-muted-foreground hover:text-foreground"
+                  >
+                    {props.isLoadingMore ? 'Loading…' : 'Show more'}
+                  </Button>
+                )}
+              </>
             )}
           </SidebarGroupContent>
         </SidebarGroup>

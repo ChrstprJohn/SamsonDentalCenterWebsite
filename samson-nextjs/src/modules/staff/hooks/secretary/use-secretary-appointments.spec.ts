@@ -3,7 +3,7 @@
  */
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import { getClinicAppointmentsAction } from '@/modules/appointments/actions/clinic/get-clinic-appointments.action';
+import { getClinicAppointmentsPageAction } from '@/modules/appointments/actions/clinic/get-clinic-appointments-page.action';
 import { updateAppointmentStatusAction } from '@/modules/appointments/actions/status/update-appointment-status.action';
 import { getDoctorsAction } from '@/modules/staff/actions/management/get-doctors.action';
 import { useSecretaryAppointments } from './use-secretary-appointments';
@@ -24,8 +24,8 @@ const scheduler = {
 vi.mock('@/modules/appointments/hooks/shared/use-booking-scheduler', () => ({
   useBookingScheduler: () => scheduler,
 }));
-vi.mock('@/modules/appointments/actions/clinic/get-clinic-appointments.action', () => ({
-  getClinicAppointmentsAction: vi.fn(),
+vi.mock('@/modules/appointments/actions/clinic/get-clinic-appointments-page.action', () => ({
+  getClinicAppointmentsPageAction: vi.fn(),
 }));
 vi.mock('@/modules/staff/actions/management/get-doctors.action', () => ({
   getDoctorsAction: vi.fn(),
@@ -53,7 +53,7 @@ const appointment = {
 
 describe('useSecretaryAppointments', () => {
   it('loads appointments and submits the cancellation payload', async () => {
-    vi.mocked(getClinicAppointmentsAction).mockResolvedValue({ success: true, data: [appointment] } as any);
+    vi.mocked(getClinicAppointmentsPageAction).mockResolvedValue({ success: true, data: { items: [appointment], nextCursor: null, hasMore: false, total: 1 } } as any);
     vi.mocked(getDoctorsAction).mockResolvedValue({ success: true, data: [] } as any);
     vi.mocked(updateAppointmentStatusAction).mockResolvedValue({ success: true } as any);
     vi.spyOn(window, 'alert').mockImplementation(() => undefined);

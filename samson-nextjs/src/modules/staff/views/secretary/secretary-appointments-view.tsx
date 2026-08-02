@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useSecretaryAppointments } from '../../hooks/secretary/use-secretary-appointments';
 import { AppointmentDetailPane } from './sub-components/appointment-detail-pane';
 import { AppointmentsTable } from './sub-components/appointments-table';
@@ -24,18 +24,9 @@ export function SecretaryAppointmentsView() {
     view.setSearchTerm(val);
   };
 
-  const upcomingCount = useMemo(() =>
-    view.appointments.filter((a) => ['APPROVED', 'CHECKED_IN'].includes(a.status)).length,
-    [view.appointments]
-  );
-  const historyCount = useMemo(() =>
-    view.appointments.filter((a) => ['COMPLETED', 'CANCELLED', 'REJECTED', 'DISPLACED', 'NO_SHOW'].includes(a.status)).length,
-    [view.appointments]
-  );
-
   const TABS = [
-    { key: 'upcoming' as const, label: 'Active', count: upcomingCount },
-    { key: 'history' as const, label: 'History', count: historyCount },
+    { key: 'upcoming' as const, label: 'Active', count: view.tabTotals.upcoming },
+    { key: 'history' as const, label: 'History', count: view.tabTotals.history },
   ];
 
   return (
@@ -78,9 +69,16 @@ export function SecretaryAppointmentsView() {
           </div>
         </SidebarHeader>
         <AppointmentsTable
-          appointments={view.filteredAppointments}
+          appointments={view.visibleAppointments}
           selectedAppointmentId={view.selectedAppointmentId}
           isLoading={view.isLoading}
+          isRefreshing={view.isRefreshing}
+          error={view.error}
+          hasMore={view.hasMore}
+          isLoadingMore={view.isLoadingMore}
+          loadMoreError={view.loadMoreError}
+          onRetry={view.fetchData}
+          onLoadMore={view.loadMore}
           formatPatientName={view.formatPatientName}
           onSelect={(id) => { view.setSelectedAppointmentId(id); setMobileView('detail'); }}
         />
@@ -144,4 +142,3 @@ export function SecretaryAppointmentsView() {
     </div>
   );
 }
-

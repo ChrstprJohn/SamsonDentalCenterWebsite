@@ -116,7 +116,16 @@ export function SecretaryPendingRequestsViewV2() {
           inquiries={inquiriesView.inquiries}
           selectedInquiryId={inquiriesView.selectedInquiryId}
           isLoadingInquiries={inquiriesView.isLoadingInquiries}
-          onSelectInquiry={(inq) => { inquiriesView.selectInquiry(inq); setIsEditingPatient(false); setIsEditingSchedule(false); setAssignedDoctorName(''); setMobileView('detail'); }}
+          isRefreshingInquiries={inquiriesView.isRefreshingInquiries}
+          inquiriesError={inquiriesView.inquiriesError}
+          onRetry={() => void inquiriesView.loadInquiries()}
+          searchTerm={inquiriesView.searchTerm}
+          onSearchChange={inquiriesView.setSearchTerm}
+          hasMore={inquiriesView.hasMore}
+          isLoadingMore={inquiriesView.isLoadingMore}
+          loadMoreError={inquiriesView.loadMoreError}
+          onLoadMore={inquiriesView.loadMore}
+          onSelectInquiry={(inq) => { inquiriesView.selectInquiry(inq); setIsEditingPatient(false); setIsEditingSchedule(false); setAssignedDoctorName(''); setMobileView(inq ? 'detail' : 'list'); }}
           activeTab={inquiriesView.activeTab}
           setActiveTab={inquiriesView.setActiveTab}
           tabCounts={inquiriesView.tabCounts}

@@ -5,6 +5,7 @@ export * from './availability/doctor-schedule-response.dto';
 export * from './availability/appointment-response.dto';
 export * from './booking/submit-booking.dto';
 export * from './booking/create-manual-booking.dto';
+export * from './booking/get-inquiries-page.dto';
 export * from './shared/appointment.dto';
 export * from './status/cancel-appointment.dto';
 export * from './status/request-reschedule.dto';

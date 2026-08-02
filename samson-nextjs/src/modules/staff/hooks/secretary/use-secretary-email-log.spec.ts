@@ -5,10 +5,10 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import type { EmailLog } from '../../types/secretary.types';
 
-vi.mock('@/modules/emails/actions/logs/get-outbox-logs.action', () => ({
-  getOutboxLogsAction: vi.fn().mockResolvedValue({
+vi.mock('@/modules/emails/actions/logs/get-outbox-logs-page.action', () => ({
+  getOutboxLogsPageAction: vi.fn().mockResolvedValue({
     success: true,
-    data: [
+    data: { items: [
       {
         id: 'eml-1',
         eventType: 'Confirmation',
@@ -16,7 +16,7 @@ vi.mock('@/modules/emails/actions/logs/get-outbox-logs.action', () => ({
         status: 'PROCESSED',
         createdAt: '2026-06-22T08:00:00Z',
       }
-    ]
+    ], nextCursor: null, hasMore: false, total: 1 }
   })
 }));
 vi.mock('@/modules/emails/actions/logs/resend-email.action', () => ({

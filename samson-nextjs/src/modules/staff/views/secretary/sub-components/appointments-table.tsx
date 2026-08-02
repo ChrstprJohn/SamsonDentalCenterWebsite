@@ -1,8 +1,10 @@
 'use client';
 
 import { CalendarDays } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import type { AppointmentDto } from '@/modules/appointments/dtos/shared/appointment.dto';
 import { formatClinicTime, formatShortDate, formatTimeString } from '@/shared/utils/date.util';
+import { SecretaryListSkeleton, SecretaryListSkeletonTheme } from './secretary-list-skeleton';
 
 const BADGE_STYLES: Record<string, string> = {
   APPROVED: 'text-blue-600 bg-blue-500/10 dark:text-blue-400',
@@ -18,6 +20,13 @@ interface AppointmentsTableProps {
   appointments: AppointmentDto[];
   selectedAppointmentId: string | null;
   isLoading: boolean;
+  isRefreshing?: boolean;
+  error: string | null;
+  hasMore: boolean;
+  isLoadingMore: boolean;
+  loadMoreError: string | null;
+  onRetry: () => void;
+  onLoadMore: () => void;
   formatPatientName: (appointment: AppointmentDto) => string;
   onSelect: (appointmentId: string) => void;
 }
@@ -25,11 +34,44 @@ interface AppointmentsTableProps {
 export function AppointmentsTable(props: AppointmentsTableProps) {
   if (props.isLoading) {
     return (
-      <div className="flex-1 flex items-center justify-center text-xs text-text-muted p-4">Loading appointments...</div>
+      <div className="flex-1 min-h-0 overflow-hidden" data-lenis-prevent>
+        <SecretaryListSkeletonTheme>
+          <div className="flex flex-col">
+            {Array.from({ length: 7 }, (_, index) => (
+              <div key={index} className="flex flex-col items-start w-full gap-2 border-b p-4">
+                <div className="flex w-full items-center justify-between gap-2">
+                  <SecretaryListSkeleton width={128} height={14} />
+                  <SecretaryListSkeleton width={64} height={16} borderRadius="9999px" />
+                </div>
+                <SecretaryListSkeleton width={160} height={12} />
+                <div className="w-full flex items-center justify-between gap-2">
+                  <SecretaryListSkeleton width={144} height={10} />
+                  <SecretaryListSkeleton width={80} height={10} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </SecretaryListSkeletonTheme>
+      </div>
     );
   }
 
-  if (props.appointments.length === 0) {
+  if (props.error && props.appointments.length === 0) {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center py-12 px-4 text-center">
+        <div className="size-10 rounded-full bg-destructive/10 flex items-center justify-center mb-2.5">
+          <CalendarDays className="size-5 text-destructive/70" />
+        </div>
+        <span className="text-xs font-medium text-foreground">Could not load appointments</span>
+        <p className="text-[11px] text-muted-foreground mt-0.5 max-w-[240px]">{props.error}</p>
+        <Button variant="outline" size="sm" onClick={props.onRetry} className="mt-3 h-8 text-xs">
+          Retry
+        </Button>
+      </div>
+    );
+  }
+
+  if (!props.error && props.appointments.length === 0) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center py-12 px-4 text-center">
         <div className="size-10 rounded-full bg-muted/30 flex items-center justify-center mb-2.5">
@@ -46,7 +88,22 @@ export function AppointmentsTable(props: AppointmentsTableProps) {
       style={{ scrollbarWidth: 'thin' }}
       data-lenis-prevent
     >
+      {props.isRefreshing && (
+        <div className="h-0.5 w-full overflow-hidden rounded-full bg-primary/15">
+          <div className="h-full w-1/3 animate-pulse bg-primary" />
+        </div>
+      )}
       <div className="flex flex-col">
+        {props.error && (
+          <div className="m-3 rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-xs text-destructive">
+            <div className="flex items-center justify-between gap-3">
+              <span>Could not refresh appointments. {props.error}</span>
+              <Button variant="outline" size="sm" onClick={props.onRetry} className="h-7 shrink-0 text-xs">
+                Retry
+              </Button>
+            </div>
+          </div>
+        )}
         {props.appointments.map((appointment) => (
           <AppointmentRow
             key={appointment.id}
@@ -56,6 +113,27 @@ export function AppointmentsTable(props: AppointmentsTableProps) {
             onSelect={props.onSelect}
           />
         ))}
+        {props.loadMoreError && (
+          <div className="m-3 rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-xs text-destructive">
+            <div className="flex items-center justify-between gap-3">
+              <span>Could not load more appointments. {props.loadMoreError}</span>
+              <Button variant="outline" size="sm" onClick={props.onLoadMore} className="h-7 shrink-0 text-xs">
+                Retry
+              </Button>
+            </div>
+          </div>
+        )}
+        {props.hasMore && (
+          <Button
+            variant="ghost"
+            size="sm"
+            disabled={props.isLoadingMore}
+            onClick={props.onLoadMore}
+            className="w-full h-10 rounded-none border-t text-xs text-muted-foreground hover:text-foreground"
+          >
+            {props.isLoadingMore ? 'Loading…' : 'Show more'}
+          </Button>
+        )}
       </div>
     </div>
   );

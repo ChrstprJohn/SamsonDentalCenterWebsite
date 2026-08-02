@@ -4,7 +4,7 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { convertInquiryAction } from '@/modules/appointments/actions/booking/convert-inquiry.action';
-import { getInquiriesAction } from '@/modules/appointments/actions/booking/get-inquiries.action';
+import { getInquiriesPageAction } from '@/modules/appointments/actions/booking/get-inquiries-page.action';
 import { getServicesAction } from '@/modules/services/actions/management/get-services.action';
 import { getDoctorsAction } from '@/modules/staff/actions/management/get-doctors.action';
 import { useSecretaryInquiriesQueue } from './use-secretary-inquiries-queue';
@@ -28,8 +28,8 @@ const scheduler = {
 vi.mock('@/modules/appointments/hooks/shared/use-booking-scheduler', () => ({
   useBookingScheduler: () => scheduler,
 }));
-vi.mock('@/modules/appointments/actions/booking/get-inquiries.action', () => ({
-  getInquiriesAction: vi.fn(),
+vi.mock('@/modules/appointments/actions/booking/get-inquiries-page.action', () => ({
+  getInquiriesPageAction: vi.fn(),
 }));
 vi.mock('@/modules/appointments/actions/booking/convert-inquiry.action', () => ({
   convertInquiryAction: vi.fn(),
@@ -66,8 +66,8 @@ const inquiry = {
 
 describe('useSecretaryInquiriesQueue', () => {
   it('converts an inquiry with the expected payload', async () => {
-    vi.mocked(getInquiriesAction).mockResolvedValueOnce({ success: true, data: [inquiry] } as any)
-      .mockResolvedValue({ success: true, data: [] } as any);
+    vi.mocked(getInquiriesPageAction).mockResolvedValueOnce({ success: true, data: { items: [inquiry], nextCursor: null, hasMore: false, total: 1 } } as any)
+      .mockResolvedValue({ success: true, data: { items: [], nextCursor: null, hasMore: false, total: 0 } } as any);
     vi.mocked(getServicesAction).mockResolvedValue({ success: true, data: [{ id: 'service-1', name: 'Cleaning' }] } as any);
     vi.mocked(getDoctorsAction).mockResolvedValue({ success: true, data: [{ id: 'doctor-1', firstName: 'Santos', lastName: '' }] } as any);
     vi.mocked(convertInquiryAction).mockResolvedValue({ success: true } as any);

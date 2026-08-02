@@ -1,12 +1,9 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { getClinicAppointmentsAction } from '@/modules/appointments/actions/clinic/get-clinic-appointments.action';
-import { getEmailLogsByAppointmentAction } from '@/modules/emails/actions/logs/get-email-logs-by-appointment.action';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { getCommunicationSummaryPageAction } from '@/modules/emails/actions/logs/get-communication-summary-page.action';
+import { getAppointmentCommunicationPageAction } from '@/modules/emails/actions/logs/get-appointment-communication-page.action';
 import { resendEmailAction } from '@/modules/emails/actions/logs/resend-email.action';
-import { getCommunicationActivityAction } from '@/modules/emails/actions/logs/get-communication-activity.action';
-import type { CommunicationActivityMap } from '@/modules/emails/actions/logs/get-communication-activity.action';
-import type { AppointmentDto } from '@/modules/appointments/dtos/shared/appointment.dto';
 import type { OutboxLogResponseDto } from '@/modules/emails/dtos/logs/outbox-log-response.dto';
 
 export type LeftTab = 'all' | 'failed';
@@ -32,10 +29,7 @@ export interface AppointmentCardData {
   startTime: string | null;
   endTime: string | null;
   doctorName: string;
-  channelsUsed: {
-    email: boolean;
-    sms: boolean;
-  };
+  channelsUsed: { email: boolean; sms: boolean };
   lastActivity: string | null;
   hasFailed: boolean;
   failureCount: number;
@@ -43,159 +37,199 @@ export interface AppointmentCardData {
 }
 
 export function useAppointmentEmailTimeline() {
-  const [appointments, setAppointments] = useState<AppointmentDto[]>([]);
-  const [activityMap, setActivityMap] = useState<CommunicationActivityMap>({});
+  const [appointmentCards, setAppointmentCards] = useState<AppointmentCardData[]>([]);
   const [selectedAppointmentId, setSelectedAppointmentId] = useState<string | null>(null);
   const [emailLogs, setEmailLogs] = useState<OutboxLogResponseDto[]>([]);
   const [isLoadingApps, setIsLoadingApps] = useState(true);
+  const [isRefreshingApps, setIsRefreshingApps] = useState(false);
   const [isLoadingLogs, setIsLoadingLogs] = useState(false);
+  const [appsError, setAppsError] = useState<string | null>(null);
+  const [logsError, setLogsError] = useState<string | null>(null);
   const [resendingId, setResendingId] = useState<string | null>(null);
   const [leftTab, setLeftTab] = useState<LeftTab>('all');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [tabCounts, setTabCounts] = useState({ all: 0, failed: 0 });
+  const [summaryHasMore, setSummaryHasMore] = useState(false);
+  const [summaryIsLoadingMore, setSummaryIsLoadingMore] = useState(false);
+  const [summaryLoadMoreError, setSummaryLoadMoreError] = useState<string | null>(null);
+  const summaryCursorRef = useRef<string | null>(null);
+  const summaryLoadingMoreRef = useRef(false);
+  const summaryRequestId = useRef(0);
+  const hasLoadedSummary = useRef(false);
+  const timelineRequestId = useRef(0);
+  const timelineCursorRef = useRef<string | null>(null);
+  const timelineLoadingMoreRef = useRef(false);
+  const [timelineHasMore, setTimelineHasMore] = useState(false);
+  const [timelineIsLoadingMore, setTimelineIsLoadingMore] = useState(false);
+  const [timelineLoadMoreError, setTimelineLoadMoreError] = useState<string | null>(null);
 
-  const fetchAppointments = useCallback(async () => {
-    setIsLoadingApps(true);
-    const [appRes, actRes] = await Promise.all([
-      getClinicAppointmentsAction({}),
-      getCommunicationActivityAction(),
-    ]);
-    if (appRes.success && appRes.data) {
-      setAppointments(appRes.data as AppointmentDto[]);
+  const fetchAppointments = useCallback(async (options?: { append?: boolean }) => {
+    const append = options?.append === true;
+    if (append) {
+      if (summaryLoadingMoreRef.current || !summaryCursorRef.current) return;
+      summaryLoadingMoreRef.current = true;
+      setSummaryIsLoadingMore(true);
+      setSummaryLoadMoreError(null);
+    } else {
+      if (hasLoadedSummary.current) setIsRefreshingApps(true);
+      else setIsLoadingApps(true);
+      setAppsError(null);
+      setSummaryLoadMoreError(null);
+      summaryCursorRef.current = null;
     }
-    if (actRes.success && actRes.data) {
-      setActivityMap(actRes.data);
+
+    const requestId = ++summaryRequestId.current;
+    try {
+      const activeParams = {
+        limit: 25,
+        cursor: append ? summaryCursorRef.current : null,
+        tab: leftTab,
+        search: searchTerm || undefined,
+      } as const;
+      const [activeResult, countResult] = append
+        ? [await getCommunicationSummaryPageAction(activeParams), null]
+        : await Promise.all([
+          getCommunicationSummaryPageAction(activeParams),
+          getCommunicationSummaryPageAction({ limit: 1, cursor: null, tab: leftTab === 'all' ? 'failed' : 'all', search: searchTerm || undefined }),
+        ]);
+
+      if (requestId !== summaryRequestId.current) return;
+      if (!activeResult.success || !activeResult.data) throw new Error(activeResult.error || 'Could not load communication history.');
+      if (!append && countResult && (!countResult.success || !countResult.data)) {
+        throw new Error(countResult.error || 'Could not load communication totals.');
+      }
+
+      setAppointmentCards((previous) => append
+        ? [...previous, ...activeResult.data.items.filter((item) => !previous.some((existing) => existing.id === item.id))]
+        : activeResult.data.items);
+      summaryCursorRef.current = activeResult.data.nextCursor;
+      setSummaryHasMore(activeResult.data.hasMore);
+      if (!append) {
+        const activeTotal = activeResult.data.total ?? 0;
+        const otherTotal = countResult?.data?.total ?? 0;
+        setTabCounts(leftTab === 'all'
+          ? { all: activeTotal, failed: otherTotal }
+          : { all: otherTotal, failed: activeTotal });
+      }
+      hasLoadedSummary.current = true;
+    } catch (cause) {
+      if (requestId === summaryRequestId.current) {
+        if (append) setSummaryLoadMoreError(cause instanceof Error ? cause.message : 'Could not load more communication history.');
+        else setAppsError(cause instanceof Error ? cause.message : 'Could not load communication history.');
+      }
+    } finally {
+      if (requestId === summaryRequestId.current) {
+        setIsLoadingApps(false);
+        setIsRefreshingApps(false);
+        setSummaryIsLoadingMore(false);
+        summaryLoadingMoreRef.current = false;
+      }
     }
-    setIsLoadingApps(false);
-  }, []);
+  }, [leftTab, searchTerm]);
 
   useEffect(() => {
-    fetchAppointments();
+    const timer = window.setTimeout(() => { void fetchAppointments(); }, 250);
+    return () => window.clearTimeout(timer);
   }, [fetchAppointments]);
 
-  const fetchEmailLogs = useCallback(async (appointmentId: string) => {
-    setIsLoadingLogs(true);
-    const res = await getEmailLogsByAppointmentAction(appointmentId);
-    if (res.success && res.data) {
-      setEmailLogs(res.data);
+  useEffect(() => {
+    const refreshOnVisible = () => {
+      if (document.visibilityState === 'visible') void fetchAppointments();
+    };
+    document.addEventListener('visibilitychange', refreshOnVisible);
+    return () => document.removeEventListener('visibilitychange', refreshOnVisible);
+  }, [fetchAppointments]);
+
+  const fetchEmailLogs = useCallback(async (appointmentId: string, options?: { append?: boolean }) => {
+    const append = options?.append === true;
+    if (append) {
+      if (timelineLoadingMoreRef.current || !timelineCursorRef.current) return;
+      timelineLoadingMoreRef.current = true;
+      setTimelineIsLoadingMore(true);
+      setTimelineLoadMoreError(null);
     } else {
-      setEmailLogs([]);
+      timelineCursorRef.current = null;
+      setIsLoadingLogs(true);
+      setLogsError(null);
+      setTimelineLoadMoreError(null);
     }
-    setIsLoadingLogs(false);
+
+    const requestId = ++timelineRequestId.current;
+    try {
+      const res = await getAppointmentCommunicationPageAction({
+        appointmentId,
+        limit: 25,
+        cursor: append ? timelineCursorRef.current : null,
+      });
+      if (requestId !== timelineRequestId.current) return;
+      if (!res.success || !res.data) throw new Error(res.error || 'Could not load communication timeline.');
+      setEmailLogs((previous) => append
+        ? [...previous, ...res.data.items.filter((item) => !previous.some((existing) => existing.id === item.id))]
+        : res.data.items);
+      timelineCursorRef.current = res.data.nextCursor;
+      setTimelineHasMore(res.data.hasMore);
+    } catch (cause) {
+      if (requestId === timelineRequestId.current) {
+        if (append) setTimelineLoadMoreError(cause instanceof Error ? cause.message : 'Could not load more timeline entries.');
+        else setLogsError(cause instanceof Error ? cause.message : 'Could not load communication timeline.');
+      }
+    } finally {
+      if (requestId === timelineRequestId.current) {
+        setIsLoadingLogs(false);
+        setTimelineIsLoadingMore(false);
+        timelineLoadingMoreRef.current = false;
+      }
+    }
   }, []);
 
-  const resendEmail = useCallback(async (id: string) => {
-    setResendingId(id);
-    const res = await resendEmailAction({ id });
-    if (res?.error) {
-      console.error('Resend failed:', res.error);
-    }
-    setResendingId(null);
-    if (selectedAppointmentId) fetchEmailLogs(selectedAppointmentId);
-  }, [fetchEmailLogs, selectedAppointmentId]);
+  const selectedAppointment = useMemo(
+    () => appointmentCards.find((appointment) => appointment.id === selectedAppointmentId) ?? null,
+    [appointmentCards, selectedAppointmentId]
+  );
 
   useEffect(() => {
     if (selectedAppointmentId) {
-      fetchEmailLogs(selectedAppointmentId);
-    } else {
       setEmailLogs([]);
+      timelineCursorRef.current = null;
+      setTimelineHasMore(false);
+      void fetchEmailLogs(selectedAppointmentId);
+    } else {
+      timelineRequestId.current += 1;
+      setEmailLogs([]);
+      setLogsError(null);
+      setIsLoadingLogs(false);
+      timelineCursorRef.current = null;
+      setTimelineHasMore(false);
     }
   }, [selectedAppointmentId, fetchEmailLogs]);
 
-  const selectedAppointment = useMemo(
-    () => appointments.find((a) => a.id === selectedAppointmentId) ?? null,
-    [appointments, selectedAppointmentId]
-  );
+  useEffect(() => {
+    if (selectedAppointmentId && !selectedAppointment) setSelectedAppointmentId(null);
+  }, [selectedAppointment, selectedAppointmentId]);
 
-  const formatPatientName = (app: AppointmentDto): string => {
-    if (app.dependent) {
-      const holder = app.patient ? `${app.patient.firstName} ${app.patient.lastName}` : 'Unknown';
-      return `${app.dependent.firstName} ${app.dependent.lastName} (${holder})`;
+  const resendEmail = useCallback(async (id: string) => {
+    setResendingId(id);
+    try {
+      const res = await resendEmailAction({ id });
+      if (res?.error) setLogsError(res.error);
+      if (selectedAppointmentId) await fetchEmailLogs(selectedAppointmentId);
+    } finally {
+      setResendingId(null);
     }
-    if (app.source === 'STAFF_CREATED' && !app.patientId) {
-      if (app.guestContact) {
-        return `${app.guestContact.firstName ?? ''} ${app.guestContact.lastName ?? ''}`.trim() || 'Guest';
-      }
-      return 'Guest';
-    }
-    return app.patient
-      ? `${app.patient.firstName} ${app.patient.lastName}`
-      : app.guestContact
-        ? `${app.guestContact.firstName ?? ''} ${app.guestContact.lastName ?? ''}`.trim() || 'Guest'
-        : 'Patient';
-  };
+  }, [fetchEmailLogs, selectedAppointmentId]);
 
-  const EVENT_LABELS: Record<string, string> = {
-    'APPOINTMENT_BOOKED': 'Booking Confirmation (Email)',
-    'APPOINTMENT_CONVERTED_FROM_INQUIRY': 'Inquiry Approved (Guest Email)',
-    'APPOINTMENT_CONVERTED_FROM_INQUIRY_PATIENT': 'Inquiry Approved (Patient Email)',
-    'APPOINTMENT_CONVERTED_FROM_INQUIRY_SMS': 'Inquiry Approved (SMS)',
-    'APPOINTMENT_MANUALLY_BOOKED_PATIENT': 'Manual Booking (Patient Email)',
-    'APPOINTMENT_MANUALLY_BOOKED_GUEST': 'Manual Booking (Guest Email)',
-    'APPOINTMENT_MANUALLY_BOOKED_SMS': 'Manual Booking (SMS)',
-    'APPOINTMENT_REMINDER_24H': '24-Hour Reminder (Email)',
-    'APPOINTMENT_REMINDER_48H': '48-Hour Reminder (Email)',
-    'APPOINTMENT_REMINDER_24H_SMS': '24-Hour Reminder (SMS)',
-    'APPOINTMENT_REMINDER_48H_SMS': '48-Hour Reminder (SMS)',
-    'RESCHEDULE_BOOKING': 'Rescheduled (Email)',
-    'CANCEL_BOOKING': 'Cancelled (Email)',
-    'APPOINTMENT_COMPLETED_POST_CARE': 'Post-Care Review (Email)',
-    'APPOINTMENT_COMPLETED_POST_CARE_SMS': 'Post-Care (SMS)',
-  };
-
-  const allCards: AppointmentCardData[] = useMemo(() => {
-    return appointments.map((app) => {
-      const act = activityMap[app.id];
-      const latestLabel = act?.latestEventType ? (EVENT_LABELS[act.latestEventType] || act.latestEventType) : undefined;
-      return {
-        id: app.id,
-        patientName: formatPatientName(app),
-        treatmentName: app.service?.name ?? 'Unknown',
-        date: app.date,
-        startTime: app.startTime,
-        endTime: app.endTime,
-        doctorName: app.doctor ? `Dr. ${app.doctor.firstName} ${app.doctor.lastName}` : '',
-        channelsUsed: {
-          email: !!(app.emailConfirmationSent || app.emailReminder48hSent || app.emailReminder24hSent || app.emailCheckoutSent),
-          sms: !!(app.smsConfirmationSent || app.smsReminder48hSent || app.smsReminder24hSent || app.smsCheckoutSent),
-        },
-        lastActivity: act?.lastActivity ?? null,
-        hasFailed: act?.hasFailed ?? false,
-        failureCount: act?.failureCount ?? 0,
-        latestEventPreview: act?.latestEventType ? `${latestLabel} → ${act.latestRecipient || 'system'}` : undefined,
-      };
-    });
-  }, [appointments, activityMap]);
-
-  const appointmentCards = useMemo(() => {
-    let filtered = allCards;
-
-    if (leftTab === 'all') {
-      filtered = filtered.filter((c) => c.lastActivity !== null);
-    } else if (leftTab === 'failed') {
-      filtered = filtered.filter((c) => c.hasFailed);
-    }
-
-    return filtered.sort((a, b) => {
-      if (!a.lastActivity && !b.lastActivity) return 0;
-      if (!a.lastActivity) return 1;
-      if (!b.lastActivity) return -1;
-      return b.lastActivity.localeCompare(a.lastActivity);
-    });
-  }, [allCards, leftTab]);
-
-  const timelineEntries: TimelineEntry[] = useMemo(() => {
-    return emailLogs.map((log) => ({
-      id: log.id,
-      channel: log.eventType.endsWith('_SMS') ? 'SMS' as const : 'EMAIL' as const,
-      eventType: log.eventType,
-      status: log.status === 'PROCESSED' ? 'Sent' : log.status === 'FAILED' ? 'Failed' : 'Pending',
-      rawStatus: log.status,
-      recipient: (log.payload as any)?.email || (log.payload as any)?.guestEmail || (log.payload as any)?.phoneNumber || 'system',
-      timestamp: log.createdAt,
-      retryCount: log.retryCount,
-      errorLogs: log.errorLogs || null,
-      payload: log.payload,
-    }));
-  }, [emailLogs]);
+  const timelineEntries: TimelineEntry[] = useMemo(() => emailLogs.map((log) => ({
+    id: log.id,
+    channel: log.eventType.endsWith('_SMS') || Boolean((log.payload as any)?.phoneNumber || (log.payload as any)?.phone) ? 'SMS' as const : 'EMAIL' as const,
+    eventType: log.eventType,
+    status: log.status === 'PROCESSED' ? 'Sent' : log.status === 'FAILED' ? 'Failed' : 'Pending',
+    rawStatus: log.status,
+    recipient: (log.payload as any)?.email || (log.payload as any)?.guestEmail || (log.payload as any)?.phoneNumber || (log.payload as any)?.phone || 'system',
+    timestamp: log.createdAt,
+    retryCount: log.retryCount,
+    errorLogs: log.errorLogs || null,
+    payload: log.payload,
+  })), [emailLogs]);
 
   return {
     appointmentCards,
@@ -204,11 +238,26 @@ export function useAppointmentEmailTimeline() {
     selectedAppointmentId,
     setSelectedAppointmentId,
     isLoadingApps,
+    isRefreshingApps,
     isLoadingLogs,
+    appsError,
+    logsError,
     resendEmail,
     resendingId,
     leftTab,
     setLeftTab,
-    refresh: fetchAppointments,
+    searchTerm,
+    setSearchTerm,
+    tabCounts,
+    hasMore: summaryHasMore,
+    isLoadingMore: summaryIsLoadingMore,
+    loadMoreError: summaryLoadMoreError,
+    loadMore: () => { void fetchAppointments({ append: true }); },
+    timelineHasMore,
+    timelineIsLoadingMore,
+    timelineLoadMoreError,
+    loadMoreTimeline: () => selectedAppointmentId && void fetchEmailLogs(selectedAppointmentId, { append: true }),
+    refresh: () => fetchAppointments(),
+    refreshTimeline: selectedAppointmentId ? () => fetchEmailLogs(selectedAppointmentId) : undefined,
   };
 }

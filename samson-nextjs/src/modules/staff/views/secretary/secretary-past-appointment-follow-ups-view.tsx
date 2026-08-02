@@ -1,11 +1,12 @@
 'use client';
 
-import { useMemo, useState, useEffect, useRef } from 'react';
-import { AlertCircle, ArrowLeft, ClipboardCheck, UserRound, X, Pencil, Check } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { AlertCircle, ArrowLeft, ClipboardCheck, UserRound, X, Pencil, Check, RefreshCw } from 'lucide-react';
 import { Select } from '@/components/ui/select';
 import { updateConfirmationChannelAction } from '@/modules/appointments/actions/status/update-confirmation-channel.action';
 import { SidebarHeader, SidebarInput, SidebarTrigger } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { formatClinicTime, formatShortDate } from '@/shared/utils/date.util';
 import type { AppointmentDto } from '@/modules/appointments/dtos/exports';
 import { usePastAppointmentFollowUps } from '../../hooks/secretary/use-past-appointment-follow-ups';
@@ -27,18 +28,16 @@ function daysWaiting(date: string) {
 
 export function SecretaryPastAppointmentFollowUpsView() {
   const view = usePastAppointmentFollowUps();
-  const [search, setSearch] = useState('');
   const [mobileView, setMobileView] = useState<'list' | 'detail'>('list');
-  const visibleAppointments = useMemo(() => {
-    const query = search.trim().toLowerCase();
-    if (!query) return view.list;
-    return view.list.filter((appointment) =>
-      [patientName(appointment), appointment.service?.name, appointment.doctor ? `${appointment.doctor.firstName} ${appointment.doctor.lastName}` : '']
-        .some((value) => value?.toLowerCase().includes(query))
-    );
-  }, [search, view.list]);
+  const visibleAppointments = view.list;
 
   const colMobile = (mode: 'list' | 'detail') => mobileView === mode ? 'flex' : 'hidden';
+
+  const handleSearch = (value: string) => {
+    view.setSearchTerm(value);
+    view.setSelectedAppointmentId(null);
+    setMobileView('list');
+  };
 
   return (
     <div className="flex flex-1 min-h-0 w-full overflow-hidden">
@@ -47,22 +46,31 @@ export function SecretaryPastAppointmentFollowUpsView() {
           <div className="flex w-full h-8 items-center justify-between">
             <div className="flex items-center gap-2">
               <SidebarTrigger className="lg:hidden -ml-1 text-muted-foreground hover:text-foreground" />
-              <div className="text-base font-medium text-foreground">
-                Unresolved Appointments
-              </div>
+              <div className="text-base font-medium text-foreground">Unresolved Appointments</div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => void view.fetchData()}
+                disabled={view.isLoading || view.isRefreshing}
+                className="size-8 text-muted-foreground hover:text-foreground"
+                aria-label="Refresh unresolved appointments"
+                title="Refresh unresolved appointments"
+              >
+                <RefreshCw className={`size-3.5 ${view.isLoading || view.isRefreshing ? 'animate-spin' : ''}`} />
+              </Button>
             </div>
           </div>
           <div className="px-1">
             <SidebarInput
               placeholder="Type to search..."
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
+              value={view.searchTerm}
+              onChange={(event) => handleSearch(event.target.value)}
               className="rounded-md"
             />
           </div>
           <div className="flex gap-1 bg-muted/20 p-1 rounded-lg">
             <Button
-              onClick={() => view.selectTab('missed-checkouts')}
+              onClick={() => { view.selectTab('missed-checkouts'); setMobileView('list'); }}
               variant="ghost"
               size="sm"
               className={`flex-1 h-8 text-xs font-semibold rounded-xl transition-all ${
@@ -71,10 +79,10 @@ export function SecretaryPastAppointmentFollowUpsView() {
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
-              Checkouts ({view.missedCheckouts.length})
+              Checkouts ({view.tabCounts['missed-checkouts']})
             </Button>
             <Button
-              onClick={() => view.selectTab('no-show-follow-ups')}
+              onClick={() => { view.selectTab('no-show-follow-ups'); setMobileView('list'); }}
               variant="ghost"
               size="sm"
               className={`flex-1 h-8 text-xs font-semibold rounded-xl transition-all ${
@@ -83,7 +91,7 @@ export function SecretaryPastAppointmentFollowUpsView() {
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
-              No-shows ({view.unresolvedNoShows.length})
+              No-shows ({view.tabCounts['no-show-follow-ups']})
             </Button>
           </div>
         </SidebarHeader>
@@ -93,8 +101,41 @@ export function SecretaryPastAppointmentFollowUpsView() {
           style={{ scrollbarWidth: 'thin' }}
           className="flex-1 min-h-0 !overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
         >
-          {view.isLoading ? <div className="p-6 text-center text-sm text-muted-foreground">Loading follow-ups…</div> : null}
-          {view.error ? <div className="m-4 rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-xs text-destructive">{view.error}</div> : null}
+          {view.isLoading && view.list.length === 0 ? (
+            <div className="flex flex-col w-full">
+              {Array.from({ length: 5 }, (_, index) => (
+                <div key={index} className="flex flex-col items-start w-full gap-2 border-b border-card-border/40 p-4">
+                  <div className="flex w-full items-center justify-between gap-2">
+                    <Skeleton className="h-3.5 w-32 rounded-md" />
+                    <Skeleton className="h-4 w-20 rounded-full" />
+                  </div>
+                  <Skeleton className="h-3 w-40 rounded-md" />
+                  <div className="w-full flex items-center justify-between gap-2">
+                    <Skeleton className="h-2.5 w-28 rounded-md" />
+                    <Skeleton className="h-2.5 w-24 rounded-md" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : null}
+          {view.isRefreshing && (
+            <div className="h-0.5 w-full overflow-hidden rounded-full bg-primary/15"><div className="h-full w-1/3 animate-pulse bg-primary" /></div>
+          )}
+          {view.error ? (
+            <div className="m-4 rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-xs text-destructive">
+              <div className="flex items-center justify-between gap-3">
+                <span>{view.error}</span>
+                <Button variant="outline" size="sm" onClick={() => void view.fetchData()} className="h-7 shrink-0 text-xs">
+                  Retry
+                </Button>
+              </div>
+            </div>
+          ) : null}
+          {!view.isLoading && view.lastRefreshedAt ? (
+            <div className="px-4 py-2 text-[10px] text-muted-foreground border-b border-card-border/20">
+              Updated {view.lastRefreshedAt.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
+            </div>
+          ) : null}
           {!view.isLoading && !view.error && visibleAppointments.length === 0 ? (
             <div className="p-8 text-center text-sm text-muted-foreground">Nothing needs follow-up in this section.</div>
           ) : visibleAppointments.map((appointment) => (
@@ -104,6 +145,19 @@ export function SecretaryPastAppointmentFollowUpsView() {
               <div className="flex justify-between gap-2 text-[11px] text-muted-foreground"><span>{formatShortDate(appointment.date)}</span><span>{daysWaiting(appointment.date)}</span></div>
             </button>
           ))}
+          {!view.isLoading && view.loadMoreError && (
+            <div className="m-4 rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-xs text-destructive">
+              <div className="flex items-center justify-between gap-3">
+                <span>Could not load more follow-ups. {view.loadMoreError}</span>
+                <Button variant="outline" size="sm" onClick={() => view.loadMore()} className="h-7 shrink-0 text-xs">Retry</Button>
+              </div>
+            </div>
+          )}
+          {!view.isLoading && visibleAppointments.length > 0 && view.hasMore && (
+            <Button variant="ghost" size="sm" disabled={view.isLoadingMore} onClick={() => view.loadMore()} className="w-full h-10 rounded-none border-t text-xs text-muted-foreground">
+              {view.isLoadingMore ? 'Loading…' : 'Show more'}
+            </Button>
+          )}
         </div>
       </section>
 

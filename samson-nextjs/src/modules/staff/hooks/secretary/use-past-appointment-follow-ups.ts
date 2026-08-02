@@ -1,7 +1,7 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
-import { getClinicAppointmentsAction } from '@/modules/appointments/actions/clinic/get-clinic-appointments.action';
+import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react';
+import { getClinicAppointmentsPageAction } from '@/modules/appointments/actions/clinic/get-clinic-appointments-page.action';
 import { updateAppointmentStatusAction } from '@/modules/appointments/actions/status/update-appointment-status.action';
 import { resolveNoShowAction } from '@/modules/appointments/actions/status/resolve-no-show.action';
 import { getDoctorsAction } from '@/modules/staff/actions/management/get-doctors.action';
@@ -14,9 +14,17 @@ export type PastFollowUpTab = 'missed-checkouts' | 'no-show-follow-ups';
 export function usePastAppointmentFollowUps() {
   const [appointments, setAppointments] = useState<AppointmentDto[]>([]);
   const [activeTab, setActiveTab] = useState<PastFollowUpTab>('missed-checkouts');
+  const [tabCounts, setTabCounts] = useState<Record<PastFollowUpTab, number>>({ 'missed-checkouts': 0, 'no-show-follow-ups': 0 });
   const [selectedAppointmentId, setSelectedAppointmentId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [lastRefreshedAt, setLastRefreshedAt] = useState<Date | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(false);
+  const [loadMoreError, setLoadMoreError] = useState<string | null>(null);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [resolveAppt, setResolveAppt] = useState<AppointmentDto | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -28,30 +36,84 @@ export function usePastAppointmentFollowUps() {
   const [rescheduleEndTime, setRescheduleEndTime] = useState('');
   const [rescheduleJustification, setRescheduleJustification] = useState('');
   const today = getTodayLocalDateStr();
+  const latestRequestId = useRef(0);
+  const nextCursorRef = useRef<string | null>(null);
+  const loadingMoreRef = useRef(false);
+  const hasLoadedRef = useRef(false);
+  const queryRef = useRef({ activeTab, searchTerm });
+  queryRef.current = { activeTab, searchTerm };
 
-  const fetchData = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
+  const buildPageParams = (tab: PastFollowUpTab, cursor: string | null) => ({
+    limit: 25,
+    cursor,
+    statuses: [tab === 'missed-checkouts' ? 'CHECKED_IN' : 'NO_SHOW'],
+    dateBefore: today,
+    noShowUnresolvedOnly: tab === 'no-show-follow-ups',
+    search: queryRef.current.searchTerm || undefined,
+  });
+
+  const fetchData = useCallback(async (options?: { append?: boolean }) => {
+    const append = options?.append === true;
+    if (append) {
+      if (loadingMoreRef.current || !nextCursorRef.current) return;
+      loadingMoreRef.current = true;
+      setIsLoadingMore(true);
+      setLoadMoreError(null);
+    } else {
+      if (hasLoadedRef.current) setIsRefreshing(true);
+      else setIsLoading(true);
+      setError(null);
+      setLoadMoreError(null);
+      nextCursorRef.current = null;
+      setNextCursor(null);
+    }
+
+    const requestId = ++latestRequestId.current;
+    const currentTab = queryRef.current.activeTab;
+    const otherTab: PastFollowUpTab = currentTab === 'missed-checkouts' ? 'no-show-follow-ups' : 'missed-checkouts';
     try {
-      const [apptRes, docRes, svcRes] = await Promise.all([
-        getClinicAppointmentsAction({}),
-        getDoctorsAction({ includeHidden: true }),
-        getServicesAction('BOOKABLE'),
-      ]);
-      if (!apptRes.success) throw new Error(apptRes.error || 'Could not load past appointment follow-ups.');
-      setAppointments((apptRes.data || []) as AppointmentDto[]);
-      if (docRes.success) setDoctorsList(docRes.data || []);
-      if ((svcRes as any).data) setServicesList((svcRes as any).data || []);
+      const activeRequest = getClinicAppointmentsPageAction(buildPageParams(currentTab, append ? nextCursorRef.current : null));
+      const otherRequest = append ? Promise.resolve(null) : getClinicAppointmentsPageAction(buildPageParams(otherTab, null));
+      const [apptRes, otherRes] = await Promise.all([activeRequest, otherRequest]);
+      if (requestId !== latestRequestId.current) return;
+      if (!apptRes.success || !apptRes.data) throw new Error(apptRes.error || 'Could not load past appointment follow-ups.');
+      const page = apptRes.data;
+      setAppointments((previous) => append
+        ? [...previous, ...page.items.filter((item) => !previous.some((existing) => existing.id === item.id))]
+        : page.items);
+      nextCursorRef.current = page.nextCursor;
+      setNextCursor(page.nextCursor);
+      setHasMore(page.hasMore);
+      setLastRefreshedAt(new Date());
+      setTabCounts((previous) => ({ ...previous, [currentTab]: page.total ?? page.items.length }));
+      if (otherRes?.success && otherRes.data) setTabCounts((previous) => ({ ...previous, [otherTab]: otherRes.data.total ?? otherRes.data.items.length }));
+      hasLoadedRef.current = true;
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'Could not load past appointment follow-ups.');
+      if (requestId === latestRequestId.current) {
+        if (append) setLoadMoreError(cause instanceof Error ? cause.message : 'Could not load more follow-ups.');
+        else setError(cause instanceof Error ? cause.message : 'Could not load past appointment follow-ups.');
+      }
     } finally {
-      setIsLoading(false);
+      if (requestId === latestRequestId.current) {
+        setIsLoading(false);
+        setIsRefreshing(false);
+        setIsLoadingMore(false);
+        loadingMoreRef.current = false;
+      }
     }
   }, []);
 
   useEffect(() => {
-    const timeout = window.setTimeout(() => { void fetchData(); }, 0);
+    const timeout = window.setTimeout(() => { void fetchData(); }, 300);
     return () => window.clearTimeout(timeout);
+  }, [activeTab, searchTerm, fetchData]);
+
+  useEffect(() => {
+    const refreshOnVisible = () => {
+      if (document.visibilityState === 'visible') void fetchData();
+    };
+    document.addEventListener('visibilitychange', refreshOnVisible);
+    return () => document.removeEventListener('visibilitychange', refreshOnVisible);
   }, [fetchData]);
 
   const missedCheckouts = useMemo(
@@ -68,10 +130,19 @@ export function usePastAppointmentFollowUps() {
   const list = activeTab === 'missed-checkouts' ? missedCheckouts : unresolvedNoShows;
   const selectedAppointment = list.find((appointment) => appointment.id === selectedAppointmentId) || null;
 
+  useEffect(() => {
+    if (selectedAppointmentId && !list.some((appointment) => appointment.id === selectedAppointmentId)) {
+      const timeout = window.setTimeout(() => setSelectedAppointmentId(null), 0);
+      return () => window.clearTimeout(timeout);
+    }
+  }, [list, selectedAppointmentId]);
+
   const selectTab = (tab: PastFollowUpTab) => {
     setActiveTab(tab);
     setSelectedAppointmentId(null);
   };
+
+  const loadMore = useCallback(() => { void fetchData({ append: true }); }, [fetchData]);
 
   const completeMissedCheckout = (appointmentId: string, reason?: string) => {
     setActionError(null);
@@ -112,12 +183,13 @@ export function usePastAppointmentFollowUps() {
   };
 
   return {
-    activeTab, selectTab, missedCheckouts, unresolvedNoShows, list, selectedAppointment, actionError, setActionError,
-    selectedAppointmentId, setSelectedAppointmentId, isLoading, error, isPending, fetchData,
+    activeTab, selectTab, tabCounts, missedCheckouts, unresolvedNoShows, list, selectedAppointment, actionError, setActionError,
+    selectedAppointmentId, setSelectedAppointmentId, isLoading, isRefreshing, error, lastRefreshedAt, isPending, fetchData,
     resolveAppt, setResolveAppt, completeMissedCheckout, handleResolveNoShowSubmit,
     todayStr: today, doctorsList, servicesList,
     rescheduleDoctor, setRescheduleDoctor, rescheduleDate, setRescheduleDate,
     rescheduleTime, setRescheduleTime, rescheduleEndTime, setRescheduleEndTime,
     rescheduleJustification, setRescheduleJustification,
+    searchTerm, setSearchTerm, hasMore, isLoadingMore, loadMoreError, loadMore,
   };
 }

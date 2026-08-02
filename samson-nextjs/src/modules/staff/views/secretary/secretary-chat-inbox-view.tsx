@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { createClient } from '@/shared/database/client';
-import { getChatThreadsAction } from '@/modules/appointments/actions/chat/get-chat-threads.action';
+import { getChatThreadsPageAction } from '@/modules/appointments/actions/chat/get-chat-threads-page.action';
 import { getStaffAppointmentByIdAction } from '@/modules/appointments/actions/clinic/get-staff-appointment-by-id.action';
 import { getMessagesAction } from '@/modules/appointments/actions/chat/get-messages.action';
 import { markMessagesAsReadAction } from '@/modules/appointments/actions/chat/mark-read.action';
@@ -236,6 +236,13 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
     const [isInitialLoad, setIsInitialLoad] = useState(true);
     const [messagesLoadKey, setMessagesLoadKey] = useState(0);
     const [hasMoreThreads, setHasMoreThreads] = useState(initialHasMore);
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
+    const [loadMoreError, setLoadMoreError] = useState<string | null>(null);
+    const [threadError, setThreadError] = useState<string | null>(null);
+    const [tabCounts, setTabCounts] = useState({ active: 0, archive: 0 });
+    const nextThreadCursorRef = useRef<string | null>(null);
+    const loadingMoreThreadsRef = useRef(false);
+    const threadRequestId = useRef(0);
 
     const [doctors, setDoctors] = useState<{ id: string; firstName: string; lastName: string }[]>([]);
     const [services, setServices] = useState<ServiceResponseDto[]>([]);
@@ -290,31 +297,106 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
         setTimeout(() => setToast(null), 3000);
     }, []);
 
-    const fetchThreads = useCallback(async () => {
-        setFetchingThreads(true);
-        const res = await getChatThreadsAction({ limit: 20, offset: 0 });
-        if (res && res.data) {
-            setThreads(res.data);
-            setHasMoreThreads(res.hasMore ?? false);
-        }
-        setFetchingThreads(false);
-    }, []);
-
-    const loadMoreThreads = useCallback(async () => {
-        const res = await getChatThreadsAction({ limit: 20, offset: threads.length });
-        if (res && res.data && res.data.length > 0) {
-            setThreads((prev) => [...prev, ...res.data]);
-            setHasMoreThreads(res.hasMore ?? false);
+    const fetchThreads = useCallback(async (options?: { preserveExisting?: boolean; append?: boolean }) => {
+        const append = options?.append === true;
+        if (append) {
+            if (loadingMoreThreadsRef.current || !nextThreadCursorRef.current) return;
+            loadingMoreThreadsRef.current = true;
+            setIsLoadingMore(true);
+            setLoadMoreError(null);
         } else {
-            setHasMoreThreads(false);
+            setFetchingThreads(true);
+            setThreadError(null);
+            setLoadMoreError(null);
+            if (!options?.preserveExisting) nextThreadCursorRef.current = null;
         }
-    }, [threads.length]);
+
+        const requestId = ++threadRequestId.current;
+        try {
+            const params = {
+                limit: 20,
+                cursor: append ? nextThreadCursorRef.current : null,
+                tab: activeTab,
+                search: searchQuery || undefined,
+                unreadOnly: showOnlyUnreads,
+            } as const;
+            const [result, otherResult] = append
+                ? [await getChatThreadsPageAction(params), null]
+                : await Promise.all([
+                    getChatThreadsPageAction(params),
+                    getChatThreadsPageAction({
+                        limit: 1,
+                        cursor: null,
+                        tab: activeTab === 'ACTIVE' ? 'ARCHIVE' : 'ACTIVE',
+                        search: searchQuery || undefined,
+                        unreadOnly: showOnlyUnreads,
+                    }),
+                ]);
+            if (requestId !== threadRequestId.current) return;
+            if (!result.success || !result.data) {
+                if (append) setLoadMoreError(result.error || 'Could not load more conversations.');
+                else setThreadError(result.error || 'Could not refresh conversations.');
+                return;
+            }
+            if (!append && otherResult && (!otherResult.success || !otherResult.data)) {
+                throw new Error(otherResult.error || 'Could not load conversation totals.');
+            }
+
+            setThreads((prev) => {
+                if (append) {
+                    const existingIds = new Set(prev.map((thread) => thread.appointmentId));
+                    return [...prev, ...result.data.items.filter((thread) => !existingIds.has(thread.appointmentId))];
+                }
+                if (options?.preserveExisting) {
+                    const incomingById = new Map(result.data.items.map((thread) => [thread.appointmentId, thread]));
+                    const existingIds = new Set(prev.map((thread) => thread.appointmentId));
+                    const updated = prev.map((thread) => incomingById.get(thread.appointmentId) || thread);
+                    const additions = result.data.items.filter((thread) => !existingIds.has(thread.appointmentId));
+                    return [...updated, ...additions];
+                }
+                return result.data.items;
+            });
+            nextThreadCursorRef.current = result.data.nextCursor;
+            setHasMoreThreads(result.data.hasMore);
+            if (!append) {
+                const activeTotal = activeTab === 'ACTIVE' ? result.data.total ?? 0 : otherResult?.data?.total ?? 0;
+                const archiveTotal = activeTab === 'ARCHIVE' ? result.data.total ?? 0 : otherResult?.data?.total ?? 0;
+                setTabCounts({ active: activeTotal, archive: archiveTotal });
+            }
+        } catch (error) {
+            if (requestId === threadRequestId.current) {
+                if (append) setLoadMoreError(error instanceof Error ? error.message : 'Could not load more conversations.');
+                else setThreadError(error instanceof Error ? error.message : 'Could not refresh conversations.');
+            }
+        } finally {
+            if (requestId === threadRequestId.current) {
+                setFetchingThreads(false);
+                setIsLoadingMore(false);
+                loadingMoreThreadsRef.current = false;
+            }
+        }
+    }, [activeTab, searchQuery, showOnlyUnreads]);
+
+    const loadMoreThreads = useCallback(() => {
+        void fetchThreads({ append: true });
+    }, [fetchThreads]);
 
     // Refresh threads on mount to fix stale data from Next.js cached SSR pages
     // during client-side transitions.
     useEffect(() => {
-        fetchThreads().finally(() => setIsInitialLoad(false));
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+        const timer = window.setTimeout(() => {
+            void fetchThreads().finally(() => setIsInitialLoad(false));
+        }, 250);
+        return () => window.clearTimeout(timer);
+    }, [fetchThreads]);
+
+    useEffect(() => {
+        const refreshOnVisible = () => {
+            if (document.visibilityState === 'visible') void fetchThreads({ preserveExisting: true });
+        };
+        document.addEventListener('visibilitychange', refreshOnVisible);
+        return () => document.removeEventListener('visibilitychange', refreshOnVisible);
+    }, [fetchThreads]);
 
     useEffect(() => {
         getDoctorsAction().then((res) => {
@@ -374,11 +456,16 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                             return [movedThread, ...updatedThreads];
                         } else {
                             // Thread not currently in memory list (e.g. paginated out), fetch fresh threads
-                            fetchThreads();
+                            void fetchThreads({ preserveExisting: true });
                             return prevThreads;
                         }
                     });
                 }
+            )
+            .on(
+                'postgres_changes',
+                { event: 'UPDATE', schema: 'public', table: 'appointments' },
+                () => { void fetchThreads({ preserveExisting: true }); }
             )
             .subscribe();
 
@@ -417,21 +504,14 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
         };
     }, [selectedThreadId, messagesLoadKey]);
 
-    const filteredThreads = useMemo(() => threads
-        .filter((t) => {
-            if (t.status === 'PENDING') return false;
-            const nameMatch = t.patientName.toLowerCase().includes(searchQuery.toLowerCase());
-            const isTabMatch = activeTab === 'ACTIVE' 
-                ? activeStates.includes(t.status)
-                : !activeStates.includes(t.status);
-            const isUnreadMatch = showOnlyUnreads ? t.unreadCount > 0 : true;
-            return nameMatch && isTabMatch && isUnreadMatch;
-        })
-        .sort((a, b) => {
-            const timeA = a.latestMessage ? new Date(a.latestMessage.createdAt).getTime() : 0;
-            const timeB = b.latestMessage ? new Date(b.latestMessage.createdAt).getTime() : 0;
-            return timeB - timeA;
-        }), [threads, searchQuery, activeTab, showOnlyUnreads]);
+    const filteredThreads = useMemo(() => threads, [threads]);
+
+    useEffect(() => {
+        if (selectedThreadId && !filteredThreads.some((thread) => thread.appointmentId === selectedThreadId)) {
+            const timeout = window.setTimeout(() => setSelectedThreadId(null), 0);
+            return () => window.clearTimeout(timeout);
+        }
+    }, [filteredThreads, selectedThreadId]);
 
     const selectedThread = threads.find((t) => t.appointmentId === selectedThreadId);
     const hasGuestInfoChanges = isEditingGuestInfo && (
@@ -556,7 +636,14 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
 
             if (res && res.success) {
                 setActionSuccess('Action executed successfully!');
-                await fetchThreads();
+                const nextStatus = activeAction === 'RESCHEDULE'
+                    ? 'APPROVED'
+                    : activeAction === 'CANCEL'
+                        ? 'CANCELLED'
+                        : 'COMPLETED';
+                setThreads((prev) => prev.map((thread) => thread.appointmentId === selectedThreadId
+                    ? { ...thread, status: nextStatus }
+                    : thread));
                 if (selectedThreadId) {
                     await refreshFullAppointment(selectedThreadId);
                 }
@@ -711,7 +798,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
             },
             activeTab: 'upcoming',
             fetchData: () => {
-                fetchThreads();
+                void fetchThreads({ preserveExisting: true });
                 if (selectedThreadId) refreshFullAppointment(selectedThreadId);
             },
             showRescheduleForm: activeAction === 'RESCHEDULE',
@@ -860,7 +947,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                         <SidebarInput
                             placeholder="Type to search..."
                             value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
+                            onChange={(e) => { setSearchQuery(e.target.value); setSelectedThreadId(null); }}
                             className="rounded-md"
                         />
                     </div>
@@ -868,7 +955,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                     {/* Tabs */}
                     <div className="flex gap-1 bg-muted/20 p-1 rounded-lg">
                         <Button
-                            onClick={() => setActiveTab('ACTIVE')}
+                            onClick={() => { setActiveTab('ACTIVE'); setSelectedThreadId(null); }}
                             variant="ghost"
                             size="sm"
                             className={`flex-1 h-8 text-xs font-semibold rounded-xl transition-all ${
@@ -877,10 +964,10 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                                     : 'text-muted-foreground hover:text-foreground'
                             }`}
                         >
-                            Active ({threads.filter(t => t.status !== 'PENDING' && activeStates.includes(t.status)).length})
+                            Active ({tabCounts.active})
                         </Button>
                         <Button
-                            onClick={() => setActiveTab('ARCHIVE')}
+                            onClick={() => { setActiveTab('ARCHIVE'); setSelectedThreadId(null); }}
                             variant="ghost"
                             size="sm"
                             className={`flex-1 h-8 text-xs font-semibold rounded-xl transition-all ${
@@ -889,9 +976,14 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                                     : 'text-muted-foreground hover:text-foreground'
                             }`}
                         >
-                            Archive ({threads.filter(t => t.status !== 'PENDING' && !activeStates.includes(t.status)).length})
+                            Archive ({tabCounts.archive})
                         </Button>
                     </div>
+                    {fetchingThreads && !isInitialLoad && (
+                        <div className="h-0.5 w-full overflow-hidden rounded-full bg-primary/15">
+                            <div className="h-full w-1/3 animate-pulse bg-primary" />
+                        </div>
+                    )}
                 </SidebarHeader>
 
                 <SidebarContent 
@@ -905,14 +997,24 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                                 <SidebarThreadSkeleton />
                             ) : filteredThreads.length === 0 ? (
                                 <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-                                    <div className="size-10 rounded-full bg-muted/30 flex items-center justify-center mb-2.5">
-                                        <MessageSquare className="size-5 text-muted-foreground/60" />
+                                    <div className={`size-10 rounded-full flex items-center justify-center mb-2.5 ${threadError ? 'bg-destructive/10' : 'bg-muted/30'}`}>
+                                        <MessageSquare className={`size-5 ${threadError ? 'text-destructive/70' : 'text-muted-foreground/60'}`} />
                                     </div>
-                                    <span className="text-xs font-medium text-foreground">No conversations found</span>
-                                    <p className="text-[11px] text-muted-foreground mt-0.5">Inquiries and patient chats will appear here.</p>
+                                    <span className="text-xs font-medium text-foreground">{threadError ? 'Could not load conversations' : 'No conversations found'}</span>
+                                    <p className="text-[11px] text-muted-foreground mt-0.5 max-w-[240px]">{threadError || 'Inquiries and patient chats will appear here.'}</p>
+                                    {threadError && <Button variant="outline" size="sm" onClick={() => void fetchThreads()} className="mt-3 h-8 text-xs">Retry</Button>}
                                 </div>
                             ) : (
-                                filteredThreads.map((t) => {
+                                <>
+                                {threadError && (
+                                    <div className="m-3 rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-xs text-destructive">
+                                        <div className="flex items-center justify-between gap-3">
+                                            <span>Could not refresh conversations. {threadError}</span>
+                                            <Button variant="outline" size="sm" onClick={() => void fetchThreads()} className="h-7 shrink-0 text-xs">Retry</Button>
+                                        </div>
+                                    </div>
+                                )}
+                                {filteredThreads.map((t) => {
                                     const isSelected = t.appointmentId === selectedThreadId;
                                     return (
                                         <button
@@ -958,17 +1060,27 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                                             </div>
                                         </button>
                                     );
-                                })
+                                })}
+                                </>
                             )}
-                            {hasMoreThreads && (
+                            {filteredThreads.length > 0 && hasMoreThreads && (
                                 <Button
                                     onClick={loadMoreThreads}
+                                    disabled={isLoadingMore}
                                     variant="ghost"
                                     size="sm"
                                     className="w-full h-10 text-xs text-muted-foreground hover:text-foreground rounded-none border-t"
                                 >
-                                    Show more
+                                    {isLoadingMore ? 'Loading…' : 'Show more'}
                                 </Button>
+                            )}
+                            {filteredThreads.length > 0 && loadMoreError && (
+                                <div className="m-3 rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-xs text-destructive">
+                                    <div className="flex items-center justify-between gap-3">
+                                        <span>Could not load more conversations. {loadMoreError}</span>
+                                        <Button variant="outline" size="sm" onClick={() => void loadMoreThreads()} className="h-7 shrink-0 text-xs">Retry</Button>
+                                    </div>
+                                </div>
                             )}
                         </SidebarGroupContent>
                     </SidebarGroup>
