@@ -864,7 +864,7 @@ function ResolveContent({ view, onClose }: { view: any; onClose: () => void }) {
             Keep No-Show
           </button>
           <button
-            onClick={() => selectResolution('RESCHEDULE', 'Patient arrived late; rescheduling to new slot')}
+            onClick={() => selectResolution('RESCHEDULE', '')}
             className={`p-2.5 border text-[10px] font-medium transition-all ${
               (resolution as string) === 'RESCHEDULE' ? 'border-cyan-500 bg-cyan-500/10 text-cyan-600' : 'border-card-border bg-card text-muted-foreground hover:border-foreground/30'
             }`}

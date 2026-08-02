@@ -173,7 +173,7 @@ export function NoShowResolutionModal({ view }: { view: any }) {
                 type="button"
                 onClick={() => {
                   setResolution('RESCHEDULE');
-                  setReason('Patient arrived late; rescheduling to new slot');
+                  setReason('');
                 }}
                 className={`p-3 rounded-2xl border text-xs font-bold flex flex-col items-center gap-1.5 transition-all ${
                   (resolution as string) === 'RESCHEDULE'

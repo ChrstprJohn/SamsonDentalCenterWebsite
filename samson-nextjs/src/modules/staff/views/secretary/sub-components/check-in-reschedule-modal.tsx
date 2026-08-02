@@ -45,7 +45,7 @@ export function CheckInRescheduleModal({ view }: { view: any }) {
               activeDoctorId={appointment.doctorId}
               startTime={view.rescheduleTime}
               endTime={view.rescheduleEndTime || ''}
-              justification={view.rescheduleJustification || 'Patient requested reschedule'}
+              justification={view.rescheduleJustification || ''}
               confirmationChannel={appointment.confirmationChannel || (appointment as any).confirmation_channel || 'EMAIL'}
               onConfirmationChannelChange={(channel) => {
                 appointment.confirmationChannel = channel;
