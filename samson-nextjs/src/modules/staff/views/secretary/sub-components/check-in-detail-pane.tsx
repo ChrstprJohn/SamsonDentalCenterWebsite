@@ -140,7 +140,7 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
 
   const paneType = view.checkInAppt ? 'checkin' : view.checkoutAppt ? 'checkout' : view.viewAppt ? 'details' : view.resolveAppt ? 'resolve' : view.rescheduleAppt ? 'reschedule' : null;
 
-  const paneTitle = paneType === 'details' && showRescheduleForm ? 'Reschedule' : paneType === 'details' ? 'Appointment Details' : paneType === 'checkin' ? 'Check In' : paneType === 'checkout' ? 'Checkout' : paneType === 'resolve' ? 'No-Show Resolution' : paneType === 'reschedule' ? 'Reschedule' : '';
+  const paneTitle = paneType === 'details' && showRescheduleForm ? 'Reschedule Appointment' : paneType === 'details' ? 'Appointment Details' : paneType === 'checkin' ? 'Check In' : paneType === 'checkout' ? 'Checkout' : paneType === 'resolve' ? 'No-Show Resolution' : paneType === 'reschedule' ? 'Reschedule Appointment' : '';
 
   return (
     <div className="w-full h-full flex flex-col min-h-0">

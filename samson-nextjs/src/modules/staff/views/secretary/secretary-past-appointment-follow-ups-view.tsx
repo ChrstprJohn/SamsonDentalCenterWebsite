@@ -197,7 +197,7 @@ function FollowUpDetail({ appointment, view, onBack, className }: { appointment:
   };
 
   const displayName = patientName(appointment);
-  const pTitle = showRescheduleForm ? 'Reschedule' : (isMissedCheckout ? 'Late Checkout' : 'No-Show Follow-up');
+  const pTitle = showRescheduleForm ? 'Reschedule Appointment' : (isMissedCheckout ? 'Late Checkout' : 'No-Show Follow-up');
   const pSub = showRescheduleForm ? 'Update date, time, dentist, or service details.' : `${displayName} — ${appointment.service?.name || 'Treatment'}`;
   const statusStr = isMissedCheckout ? 'CHECKED IN' : 'NO SHOW';
   const statusColor = isMissedCheckout ? 'text-cyan-600 bg-cyan-500/10' : 'text-amber-600 bg-amber-500/10';

@@ -107,7 +107,7 @@ export function SecretaryAppointmentsView() {
                 <ArrowLeft className="size-5" />
               </button>
               <div className="text-base font-medium text-foreground text-left">
-                {view.showRescheduleForm ? 'Reschedule' : view.showCancelForm ? 'Cancel Appointment' : 'Appointment Details'}
+                {view.showRescheduleForm ? 'Reschedule Appointment' : view.showCancelForm ? 'Cancel Appointment' : 'Appointment Details'}
               </div>
             </div>
             <Button

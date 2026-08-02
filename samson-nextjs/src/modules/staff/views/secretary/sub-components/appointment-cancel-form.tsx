@@ -28,7 +28,7 @@ const CANCEL_REASONS = [
 ];
 
 export function AppointmentCancelForm(props: AppointmentCancelFormProps) {
-  const [preset, setPreset] = useState<string>(props.reasonPreset || CANCEL_REASONS[0].value);
+  const [preset, setPreset] = useState<string>(props.reasonPreset || '');
   const [customText, setCustomText] = useState<string>(props.reasonCustom || '');
 
   useEffect(() => {
@@ -75,6 +75,7 @@ export function AppointmentCancelForm(props: AppointmentCancelFormProps) {
           className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
           required
         >
+          <option value="" disabled>Select reason...</option>
           {CANCEL_REASONS.map((r) => (
             <option key={r.value} value={r.value}>
               {r.label}

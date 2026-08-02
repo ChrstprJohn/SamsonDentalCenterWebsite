@@ -132,8 +132,6 @@ export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps)
       }}
       className="flex flex-col gap-4"
     >
-      {props.onConfirmationChannelChange && <NotificationChannelField appointmentId={props.appointment.id} value={props.confirmationChannel} onChange={props.onConfirmationChannelChange} />}
-
       {/* 1. Service & Schedule */}
       <span className="text-base font-medium text-foreground">Service &amp; Schedule</span>
 
@@ -248,6 +246,8 @@ export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps)
         </div>
       </div>
 
+      {props.onConfirmationChannelChange && <NotificationChannelField appointmentId={props.appointment.id} value={props.confirmationChannel} onChange={props.onConfirmationChannelChange} />}
+
       {/* 5. Justification / Reschedule Reason Dropdown + Custom Input */}
       <div className="flex flex-col gap-1.5">
         <div className="flex flex-col gap-0.5">
@@ -258,6 +258,7 @@ export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps)
           value={reasonMode}
           onChange={(e) => handleReasonSelect(e.target.value)}
           className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
+          required
         >
           <option value="" disabled>Select reason...</option>
           {COMMON_REASONS.map((reason) => (

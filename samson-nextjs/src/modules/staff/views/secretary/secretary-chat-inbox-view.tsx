@@ -769,7 +769,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                     </button>
                     <div className="flex-1 flex flex-col min-w-0">
                         <span className="text-base font-medium text-foreground truncate">
-                            {detailPaneView?.showRescheduleForm ? 'Reschedule' : 'Appointment Details'}
+                            {detailPaneView?.showRescheduleForm ? 'Reschedule Appointment' : 'Appointment Details'}
                         </span>
                         <span className="text-[11px] text-muted-foreground truncate">{detailPaneView?.showRescheduleForm ? 'Update date, time, dentist, or service details.' : `Ref #${selectedThread.appointmentId.slice(0, 8)}`}</span>
                     </div>

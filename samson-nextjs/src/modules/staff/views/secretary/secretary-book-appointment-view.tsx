@@ -73,8 +73,8 @@ export function SecretaryBookAppointmentView() {
   const [rescheduleDoctorId, setRescheduleDoctorId] = React.useState('');
   const [rescheduleStartTime, setRescheduleStartTime] = React.useState('');
   const [rescheduleEndTime, setRescheduleEndTime] = React.useState('');
-  const [rescheduleJustification, setRescheduleJustification] = React.useState('Patient requested reschedule');
-  const [cancelReasonPreset, setCancelReasonPreset] = React.useState('Patient requested reschedule');
+  const [rescheduleJustification, setRescheduleJustification] = React.useState('');
+  const [cancelReasonPreset, setCancelReasonPreset] = React.useState('');
   const [cancelReasonCustom, setCancelReasonCustom] = React.useState('');
   const [isActionSubmitting, setIsActionSubmitting] = React.useState(false);
   const [doctors, setDoctors] = React.useState<{ id: string; firstName: string; lastName: string }[]>([]);
@@ -398,7 +398,7 @@ export function SecretaryBookAppointmentView() {
               </button>
               <div className="flex-1 flex flex-col min-w-0">
                 <span className="text-base font-medium text-foreground truncate">
-                  {isRescheduleOpen ? 'Reschedule' : 'Appointment Details'}
+                  {isRescheduleOpen ? 'Reschedule Appointment' : 'Appointment Details'}
                 </span>
                 <span className="text-[11px] text-muted-foreground truncate">
                   {isRescheduleOpen ? 'Update date, time, dentist, or service details.' : `Ref #${view.selectedAppointmentDetails.id.slice(0, 8)}`}
@@ -438,7 +438,7 @@ export function SecretaryBookAppointmentView() {
                       };
                       setRescheduleStartTime(parseTimeToHHMM(view.selectedAppointmentDetails?.startTime));
                       setRescheduleEndTime(parseTimeToHHMM(view.selectedAppointmentDetails?.endTime));
-                      setRescheduleJustification('Patient requested reschedule');
+                      setRescheduleJustification('');
                     } else {
                       setIsRescheduleOpen(false);
                     }
@@ -448,6 +448,8 @@ export function SecretaryBookAppointmentView() {
                     if (show) {
                       setIsCancelOpen(true);
                       setIsRescheduleOpen(false);
+                      setCancelReasonPreset('');
+                      setCancelReasonCustom('');
                     } else {
                       setIsCancelOpen(false);
                     }
