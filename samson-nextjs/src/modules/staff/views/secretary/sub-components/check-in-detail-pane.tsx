@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { X, ArrowLeft, UserRound, MessageSquare, Mail, RotateCw, Pencil, Check, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -35,6 +35,9 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
   const [showRescheduleForm, setShowRescheduleForm] = useState(false);
   const [showUndoForm, setShowUndoForm] = useState(false);
   const [showCheckoutForm, setShowCheckoutForm] = useState(false);
+  const [checkInReason, setCheckInReason] = useState('');
+  const [checkInReasonMode, setCheckInReasonMode] = useState('');
+  const [checkInCustomReason, setCheckInCustomReason] = useState('');
   const [undoReason, setUndoReason] = useState('');
   const [undoReasonMode, setUndoReasonMode] = useState('');
   const [undoCustomReason, setUndoCustomReason] = useState('');
@@ -54,6 +57,28 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
   const [draftInlineChannel, setDraftInlineChannel] = useState(ch);
   const [isEditingInlineChannel, setIsEditingInlineChannel] = useState(false);
   const [isSavingInlineChannel, setIsSavingInlineChannel] = useState(false);
+  const selectionMode = view.checkInAppt ? 'checkin' : view.checkoutAppt ? 'checkout' : view.viewAppt ? 'details' : view.resolveAppt ? 'resolve' : view.rescheduleAppt ? 'reschedule' : null;
+
+  const resetActionDrafts = useCallback((channel = ch) => {
+    setShowCheckInForm(false);
+    setShowResolveForm(false);
+    setShowRescheduleForm(false);
+    setShowUndoForm(false);
+    setShowCheckoutForm(false);
+    setCheckInReason('');
+    setCheckInReasonMode('');
+    setCheckInCustomReason('');
+    setUndoReason('');
+    setUndoReasonMode('');
+    setUndoCustomReason('');
+    setResolveMode('COMPLETED');
+    setResolveReason('');
+    setShowCustomReason(false);
+    setSelectedPreset('');
+    setInlineChannel(channel);
+    setDraftInlineChannel(channel);
+    setIsEditingInlineChannel(false);
+  }, [ch]);
 
   const handleSaveInlineChannel = async () => {
     if (!appointment) return;
@@ -73,26 +98,20 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
   };
 
   const prevApptId = useRef(appointment?.id);
+  const prevSelectionMode = useRef(selectionMode);
+  const prevSelectionVersion = useRef(view.selectionVersion);
   useEffect(() => {
-    if (appointment?.id !== prevApptId.current) {
+    if (
+      appointment?.id !== prevApptId.current ||
+      selectionMode !== prevSelectionMode.current ||
+      view.selectionVersion !== prevSelectionVersion.current
+    ) {
       prevApptId.current = appointment?.id;
-      setShowCheckInForm(false);
-      setShowResolveForm(false);
-      setShowRescheduleForm(false);
-      setShowUndoForm(false);
-      setShowCheckoutForm(false);
-      setUndoReason('');
-      setUndoReasonMode('');
-      setUndoCustomReason('');
-      setResolveMode('COMPLETED');
-      setResolveReason('');
-      setShowCustomReason(false);
-      setSelectedPreset('');
-      setInlineChannel(ch);
-      setDraftInlineChannel(ch);
-      setIsEditingInlineChannel(false);
+      prevSelectionMode.current = selectionMode;
+      prevSelectionVersion.current = view.selectionVersion;
+      resetActionDrafts();
     }
-  }, [appointment?.id, ch]);
+  }, [appointment?.id, resetActionDrafts, selectionMode, view.selectionVersion]);
 
   if (!appointment) {
     return (
@@ -108,14 +127,36 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
     );
   }
 
-  const paneType = view.checkInAppt ? 'checkin' : view.checkoutAppt ? 'checkout' : view.viewAppt ? 'details' : view.resolveAppt ? 'resolve' : view.rescheduleAppt ? 'reschedule' : null;
+  const paneType = selectionMode;
 
   const paneTitle = paneType === 'details' && showRescheduleForm ? 'Reschedule Appointment' : paneType === 'details' && showUndoForm ? 'Undo Check-In' : paneType === 'details' ? 'Appointment Details' : paneType === 'checkin' ? 'Check In Patient' : paneType === 'checkout' ? 'Checkout Patient' : paneType === 'resolve' ? 'Resolve No-Show' : paneType === 'reschedule' ? 'Reschedule Appointment' : '';
+
+  const returnToDetails = () => {
+    resetActionDrafts();
+    view.clearSelection();
+    view.setViewAppt(appointment);
+  };
+
+  const handleHeaderBack = () => {
+    if (paneType === 'details' && showRescheduleForm) {
+      returnToDetails();
+      return;
+    }
+    if (paneType === 'details' && showUndoForm) {
+      returnToDetails();
+      return;
+    }
+    if (paneType === 'checkin' || paneType === 'checkout' || paneType === 'resolve' || paneType === 'reschedule') {
+      returnToDetails();
+      return;
+    }
+    onClose();
+  };
 
   return (
     <div className="w-full h-full flex flex-col min-h-0">
       <div className="flex items-center gap-2 p-4 border-b border-border shrink-0">
-        <button onClick={paneType === 'details' && showRescheduleForm ? () => setShowRescheduleForm(false) : onClose} className="p-1 -ml-1 text-muted-foreground hover:text-foreground shrink-0">
+        <button onClick={handleHeaderBack} className="p-1 -ml-1 text-muted-foreground hover:text-foreground shrink-0">
           <ArrowLeft className="size-4" />
         </button>
         <div className="flex-1 min-w-0 flex flex-col gap-0.5">
@@ -134,7 +175,7 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
                     : paneType === 'details' && showUndoForm
                       ? 'Return the patient to the upcoming queue.'
                       : paneType === 'details'
-                        ? 'Review appointment details and available actions.'
+                        ? `Ref #${appointment.id.slice(0, 8)}`
                         : 'Review the warning and confirm this visit action.'}
           </span>
         </div>
@@ -142,6 +183,7 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
 
       {paneType === 'details' && !showRescheduleForm && !showUndoForm ? (
         <AppointmentDetailPane
+          key={`${appointment.id}-${view.selectionVersion ?? 0}`}
           view={view}
           appointment={appointment}
           activeTab="upcoming"
@@ -151,7 +193,23 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
       ) : (
         <div className="flex-1 min-h-0 overflow-y-auto [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent" style={{ scrollbarWidth: 'thin' }} data-lenis-prevent>
           <div className="px-4 py-4 space-y-4">
-            {paneType === 'checkin' && <CheckInContent appointment={appointment} view={view} onClose={onClose} />}
+            {paneType === 'checkin' && (
+              <CheckInContent
+                appointment={appointment}
+                view={view}
+                onClose={onClose}
+                reasonMode={checkInReasonMode}
+                customReason={checkInCustomReason}
+                onReasonSelect={(value) => {
+                  setCheckInReasonMode(value);
+                  setCheckInReason(value === 'CUSTOM' ? checkInCustomReason : value);
+                }}
+                onCustomReasonChange={(value) => {
+                  setCheckInCustomReason(value);
+                  if (checkInReasonMode === 'CUSTOM') setCheckInReason(value);
+                }}
+              />
+            )}
             {paneType === 'checkout' && <CheckoutContent appointment={appointment} view={view} />}
             {paneType === 'resolve' && <ResolveContent view={view} onClose={onClose} />}
             {paneType === 'details' && appointment.status === 'CHECKED_IN' && showUndoForm && (
@@ -171,7 +229,7 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
                 }}
               />
             )}
-            {paneType === 'reschedule' && <StandaloneReschedule view={view} onClose={onClose} />}
+            {paneType === 'reschedule' && <StandaloneReschedule view={view} onClose={returnToDetails} />}
             {paneType === 'details' && appointment.status === 'NO_SHOW' && showRescheduleForm && (
               <div className="[&_form]:!border-t-0 [&_form]:!pt-0">
                 <AppointmentRescheduleForm
@@ -199,8 +257,8 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
                   onStartTimeChange={(t) => view.setRescheduleTime(t)}
                   onEndTimeChange={(t) => view.setRescheduleEndTime?.(t)}
                   onJustificationChange={(j) => view.setRescheduleJustification(j)}
-                  onSubmit={() => { view.handleRescheduleSubmit(); setShowRescheduleForm(false); }}
-                  onBack={() => { view.setRescheduleAppt(null); setShowRescheduleForm(false); }}
+                  onSubmit={() => { view.handleRescheduleSubmit(); }}
+                  onBack={returnToDetails}
                 />
               </div>
             )}
@@ -213,22 +271,22 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
           <div className="flex gap-2">
             {paneType === 'details' && appointment.status === 'NO_SHOW' && showRescheduleForm ? (
               <>
-                <button onClick={() => { view.handleRescheduleSubmit(); setShowRescheduleForm(false); }} disabled={view.isPending} className="flex-1 h-[42px] text-sm font-medium bg-primary text-white hover:bg-primary/90 rounded-xl disabled:opacity-50">
+                <button onClick={() => { view.handleRescheduleSubmit(); }} disabled={view.isPending} className="flex-1 h-[42px] text-sm font-medium bg-primary text-white hover:bg-primary/90 rounded-xl disabled:opacity-50">
                   {view.isPending ? 'Saving...' : 'Confirm'}
                 </button>
-                <button onClick={() => { view.setRescheduleAppt(null); setShowRescheduleForm(false); }} className="flex-1 h-[42px] text-sm font-medium border border-card-border text-foreground bg-transparent hover:bg-muted rounded-xl">
+                <button onClick={returnToDetails} className="flex-1 h-[42px] text-sm font-medium border border-card-border text-foreground bg-transparent hover:bg-muted rounded-xl">
                   Cancel
                 </button>
               </>
             ) : paneType === 'details' && appointment.status === 'APPROVED' && !showCheckInForm && (
-                <button onClick={() => { view.setViewAppt(null); view.setCheckInAppt(appointment); }} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl">
+                <button onClick={() => { resetActionDrafts(); view.openCheckIn(appointment); }} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl">
                 Check In
               </button>
             )}
             {paneType === 'details' && appointment.status === 'APPROVED' && showCheckInForm && null}
             {paneType === 'details' && appointment.status === 'NO_SHOW' && !showResolveForm && (
               <>
-                <button onClick={() => { view.setViewAppt(null); view.setResolveAppt(appointment); }} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl">
+                <button onClick={() => { resetActionDrafts(); view.openResolve(appointment); }} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl">
                   Resolve
                 </button>
               </>
@@ -321,7 +379,7 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
                   </div>
                 )}
                 <div className="flex gap-2">
-                  <button onClick={() => { setShowResolveForm(false); setResolveMode('CONFIRMED_NO_SHOW'); setResolveReason(''); setShowCustomReason(false); setSelectedPreset(''); }} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent transition-colors rounded-xl">
+                  <button onClick={returnToDetails} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent transition-colors rounded-xl">
                     Cancel
                   </button>
                   <button onClick={async () => {
@@ -329,7 +387,6 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
                       await handleSaveInlineChannel();
                     }
                     view.handleResolveNoShowSubmit({ appointmentId: appointment.id, resolution: resolveMode, reason: resolveReason });
-                    setShowResolveForm(false);
                   }} disabled={view.isPending || !resolveReason.trim()} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl disabled:opacity-40">
                     {view.isPending ? 'Submitting...' : 'Submit Resolution'}
                   </button>
@@ -338,10 +395,10 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
             )}
             {paneType === 'details' && appointment.status === 'CHECKED_IN' && !showUndoForm && !showCheckoutForm && (
               <>
-                <button onClick={() => setShowUndoForm(true)} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent transition-colors rounded-xl">
+                <button onClick={() => { resetActionDrafts(); setShowUndoForm(true); }} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent transition-colors rounded-xl">
                   Undo Check-In
                 </button>
-                <button onClick={() => { view.setViewAppt(null); view.setCheckoutAppt(appointment); }} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl">
+                <button onClick={() => { resetActionDrafts(); view.openCheckout(appointment); }} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl">
                   Checkout
                 </button>
               </>
@@ -349,25 +406,25 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
 
             {paneType === 'checkin' && (
               <>
-                <button onClick={() => { view.setCheckInAppt(null); view.setViewAppt(appointment); }} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent rounded-xl">Cancel</button>
-                <button onClick={() => { view.handleCheckIn(appointment.id); view.setCheckInAppt(null); }} disabled={view.isPending} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl disabled:opacity-40">{view.isPending ? 'Checking In...' : 'Confirm Check-In'}</button>
+                <button onClick={returnToDetails} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent rounded-xl">Cancel</button>
+                <button onClick={() => view.handleCheckIn(appointment.id, checkInReason)} disabled={view.isPending || !checkInReason.trim()} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl disabled:opacity-40">{view.isPending ? 'Checking In...' : 'Confirm Check-In'}</button>
               </>
             )}
             {paneType === 'checkout' && (
               <>
-                <button onClick={() => { view.setCheckoutAppt(null); view.setViewAppt(appointment); }} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent rounded-xl">Cancel</button>
+                <button onClick={returnToDetails} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent rounded-xl">Cancel</button>
                 <button onClick={() => view.handleCheckoutComplete(appointment.id)} disabled={view.isPending} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl disabled:opacity-40">{view.isPending ? 'Sending...' : 'Confirm & Send'}</button>
               </>
             )}
             {paneType === 'details' && showUndoForm && (
               <>
-                <button onClick={() => setShowUndoForm(false)} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent rounded-xl">Cancel</button>
-                <button onClick={() => { view.handleUndoCheckIn(appointment.id, undoReason); setShowUndoForm(false); }} disabled={view.isPending || !undoReason.trim()} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground rounded-xl disabled:opacity-40">{view.isPending ? 'Reverting...' : 'Undo Check-In'}</button>
+                <button onClick={returnToDetails} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent rounded-xl">Cancel</button>
+                <button onClick={() => view.handleUndoCheckIn(appointment.id, undoReason)} disabled={view.isPending || !undoReason.trim()} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground rounded-xl disabled:opacity-40">{view.isPending ? 'Reverting...' : 'Undo Check-In'}</button>
               </>
             )}
             {paneType === 'resolve' && (
               <>
-                <button onClick={() => { view.setResolveAppt(null); view.setViewAppt(appointment); }} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent rounded-xl">Cancel</button>
+                <button onClick={returnToDetails} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent rounded-xl">Cancel</button>
                 <button onClick={() => (document.getElementById('resolve-form') as HTMLFormElement | null)?.requestSubmit()} disabled={view.isPending} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground rounded-xl disabled:opacity-40">{view.isPending ? 'Submitting...' : 'Submit Resolution'}</button>
               </>
             )}
@@ -378,22 +435,52 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
   );
 }
 
-function CheckInContent({ appointment, view, onClose }: { appointment: any; view: any; onClose: () => void }) {
-  const startTime = appointment.startTime?.includes('T') ? appointment.startTime.split('T')[1]?.slice(0, 5) : appointment.startTime?.slice(0, 5);
-  const endTime = appointment.endTime?.includes('T') ? appointment.endTime.split('T')[1]?.slice(0, 5) : appointment.endTime?.slice(0, 5);
-  const dentist = `${appointment.doctor?.firstName || ''} ${appointment.doctor?.lastName || ''}`.trim();
+function CheckInContent({
+  appointment,
+  reasonMode,
+  customReason,
+  onReasonSelect,
+  onCustomReasonChange,
+}: {
+  appointment: any;
+  view: any;
+  onClose: () => void;
+  reasonMode: string;
+  customReason: string;
+  onReasonSelect: (value: string) => void;
+  onCustomReasonChange: (value: string) => void;
+}) {
+  const reasonOptions = ['Patient arrived for appointment', 'Patient identity confirmed', 'Check-in completed by secretary'];
 
   return (
     <div className="flex flex-col gap-4">
       <InfoBox variant="cyan" title="Check-In Notice">
         Confirming will mark the patient as present and move the appointment to the Checked In queue.
       </InfoBox>
-      <div className="rounded-xl border border-card-border/60 bg-muted/30 px-3.5 py-3 text-xs text-muted-foreground">
-        <span className="font-medium text-foreground">{appointment.date || 'Appointment date'}</span>
-        <span className="mx-1.5">&middot;</span>
-        <span>{startTime || '--:--'} - {endTime || '--:--'}</span>
-        <span className="mx-1.5">&middot;</span>
-        <span>{dentist ? `Dr. ${dentist}` : 'Assigned dentist unavailable'}</span>
+      <div className="flex flex-col gap-1.5">
+        <span className="text-xs text-muted-foreground">Reason for Check-In</span>
+        <div className="relative flex items-center">
+          <select
+            value={reasonMode}
+            onChange={(event) => onReasonSelect(event.target.value)}
+            className="w-full px-4 pr-10 py-2.5 appearance-none rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
+            required
+          >
+            <option value="" disabled>Select a Reason</option>
+            {reasonOptions.map((option) => <option key={option} value={option}>{option}</option>)}
+            <option value="CUSTOM">Other / Custom Reason...</option>
+          </select>
+          <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+        </div>
+        {reasonMode === 'CUSTOM' && (
+          <Textarea
+            value={customReason}
+            onChange={(event) => onCustomReasonChange(event.target.value)}
+            placeholder="Enter check-in reason..."
+            className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border min-h-[60px] resize-none"
+            required
+          />
+        )}
       </div>
     </div>
   );
@@ -1132,7 +1219,7 @@ function InlineCheckoutForm({ appointment, view, onCancel }: { appointment: any;
           Cancel
         </button>
         <button
-          onClick={() => { view.handleCheckoutComplete(appointment.id); onCancel(); }}
+          onClick={() => view.handleCheckoutComplete(appointment.id)}
           disabled={view.isPending || isEditingChannel}
           className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl disabled:opacity-40"
         >

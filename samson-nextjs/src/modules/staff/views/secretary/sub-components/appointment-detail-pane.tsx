@@ -136,7 +136,7 @@ function AppointmentDetails({ appointment, view, activeTab, compact, hideActions
   return (
     <div className="flex flex-col flex-1 min-h-0 h-full">
       {/* Sub-Header Tabs */}
-      <div className={`shrink-0 border-b border-card-border/40 ${compact ? 'px-4 bg-sidebar' : 'px-5 bg-card'}`}>
+      <div className={`shrink-0 border-b border-card-border/40 ${compact ? 'px-2.5 xl:px-4 bg-sidebar' : 'px-5 bg-card'}`}>
         <div className="relative flex gap-6">
           {TABS.map((tab, idx) => {
             const isActive = detailTab === tab.key;
@@ -145,7 +145,7 @@ function AppointmentDetails({ appointment, view, activeTab, compact, hideActions
                 key={tab.key}
                 ref={(el) => { tabRefs[idx].current = el; }}
                 onClick={() => setDetailTab(tab.key)}
-                className={`py-3 text-sm font-semibold transition-colors ${
+                className={`py-2 xl:py-2.5 text-xs xl:text-sm font-medium transition-colors ${
                   isActive
                     ? 'text-primary'
                     : 'text-muted-foreground hover:text-foreground'

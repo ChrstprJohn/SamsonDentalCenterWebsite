@@ -21,6 +21,7 @@ export function useSecretaryCheckInOutTracker() {
   const [viewAppt, setViewAppt] = useState<AppointmentDto | null>(null);
   const [resolveAppt, setResolveAppt] = useState<AppointmentDto | null>(null);
   const [rescheduleAppt, setRescheduleAppt] = useState<AppointmentDto | null>(null);
+  const [selectionVersion, setSelectionVersion] = useState(0);
   const [rescheduleDate, setRescheduleDate] = useState('');
   const [rescheduleTime, setRescheduleTime] = useState('');
   const [rescheduleEndTime, setRescheduleEndTime] = useState('');
@@ -63,6 +64,24 @@ export function useSecretaryCheckInOutTracker() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const resetRescheduleDraft = () => {
+    setRescheduleDate('');
+    setRescheduleTime('');
+    setRescheduleEndTime('');
+    setRescheduleDoctor('');
+    setRescheduleService('');
+    setRescheduleJustification('');
+  };
+
+  const clearSelection = () => {
+    setCheckInAppt(null);
+    setCheckoutAppt(null);
+    setViewAppt(null);
+    setResolveAppt(null);
+    setRescheduleAppt(null);
+    resetRescheduleDraft();
   };
 
   useEffect(() => {
@@ -119,12 +138,15 @@ export function useSecretaryCheckInOutTracker() {
     startTransition(async () => {
       const res = await action();
       if (!res.success) alert(res.error || fallback);
-      else fetchData();
+      else {
+        clearSelection();
+        fetchData();
+      }
     });
   };
 
-  const handleCheckIn = (appointmentId: string) =>
-    runStatusAction(() => checkInAction({ appointmentId }), 'Failed to check in');
+  const handleCheckIn = (appointmentId: string, reason?: string) =>
+    runStatusAction(() => reason ? checkInAction({ appointmentId, reason }) : checkInAction({ appointmentId }), 'Failed to check in');
 
   const handleUndoCheckIn = (appointmentId: string, reason?: string) => {
     runStatusAction(() => undoCheckInAction({ appointmentId, reason }), 'Failed to undo check-in');
@@ -139,7 +161,7 @@ export function useSecretaryCheckInOutTracker() {
       });
       if (!res.success) alert(res.error || 'Failed to complete checkout');
       else {
-        setCheckoutAppt(null);
+        clearSelection();
         fetchData();
       }
     });
@@ -158,7 +180,7 @@ export function useSecretaryCheckInOutTracker() {
       const res = await resolveNoShowAction(payload);
       if (!res.success) alert(res.error || 'Failed to resolve no-show');
       else {
-        setResolveAppt(null);
+        clearSelection();
         fetchData();
       }
     });
@@ -189,14 +211,36 @@ export function useSecretaryCheckInOutTracker() {
       });
       if (!res.success) alert(res.error || 'Failed to reschedule');
       else {
-        setRescheduleAppt(null);
+        clearSelection();
         fetchData();
       }
     });
   };
 
   const handleViewApptDetails = (appointment: AppointmentDto) => {
+    clearSelection();
     setViewAppt(appointment);
+    setSelectionVersion((version) => version + 1);
+  };
+
+  const openCheckIn = (appointment: AppointmentDto) => {
+    clearSelection();
+    setCheckInAppt(appointment);
+  };
+
+  const openCheckout = (appointment: AppointmentDto) => {
+    clearSelection();
+    setCheckoutAppt(appointment);
+  };
+
+  const openResolve = (appointment: AppointmentDto) => {
+    clearSelection();
+    setResolveAppt(appointment);
+  };
+
+  const openReschedule = (appointment: AppointmentDto) => {
+    clearSelection();
+    setRescheduleAppt(appointment);
   };
 
   const columns = useMemo(() => {
@@ -226,6 +270,9 @@ export function useSecretaryCheckInOutTracker() {
     isPending,
     bypassWindow,
     setBypassWindow,
+    clearSelection,
+    selectionVersion,
+    resetRescheduleDraft,
     checkInAppt,
     setCheckInAppt,
     checkoutAppt,
@@ -256,6 +303,10 @@ export function useSecretaryCheckInOutTracker() {
     handleResolveNoShowSubmit,
     handleRescheduleSubmit,
     handleViewApptDetails,
+    openCheckIn,
+    openCheckout,
+    openResolve,
+    openReschedule,
     isPastEndTime,
   };
 }

@@ -21,11 +21,7 @@ export function SecretaryCheckInOutTrackerView() {
 
   const openDetail = () => setMobileView('detail');
   const closeDetail = () => {
-    view.setCheckInAppt(null);
-    view.setCheckoutAppt(null);
-    view.setViewAppt(null);
-    view.setResolveAppt(null);
-    view.setRescheduleAppt(null);
+    view.clearSelection();
     setMobileView('board');
   };
 
@@ -54,6 +50,7 @@ export function SecretaryCheckInOutTrackerView() {
   if (view.isLoading) return <CheckInLoading />;
 
   const handleCardClick = (appointment: any) => {
+    if (view.isPending) return;
     view.handleViewApptDetails(appointment);
     openDetail();
   };

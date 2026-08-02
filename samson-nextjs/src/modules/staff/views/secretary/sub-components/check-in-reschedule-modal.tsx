@@ -24,7 +24,7 @@ export function CheckInRescheduleModal({ view }: { view: any }) {
               <p className="text-xs text-muted-foreground">Update date, time, dentist, or service details.</p>
             </div>
             <button
-              onClick={() => view.setRescheduleAppt(null)}
+              onClick={() => view.clearSelection()}
               className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded-md hover:bg-muted"
             >
               <X className="size-4" />
@@ -60,7 +60,7 @@ export function CheckInRescheduleModal({ view }: { view: any }) {
               onEndTimeChange={(t) => view.setRescheduleEndTime?.(t)}
               onJustificationChange={(j) => view.setRescheduleJustification?.(j)}
               onSubmit={view.handleRescheduleSubmit}
-              onBack={() => view.setRescheduleAppt(null)}
+              onBack={() => view.clearSelection()}
             />
           </div>
           <div className="shrink-0 border-t border-border flex gap-2 p-4">
@@ -73,7 +73,7 @@ export function CheckInRescheduleModal({ view }: { view: any }) {
             </Button>
             <Button
               variant="outline"
-              onClick={() => view.setRescheduleAppt(null)}
+              onClick={() => view.clearSelection()}
               className="flex-1 h-[42px] text-sm font-medium"
             >
               Cancel
