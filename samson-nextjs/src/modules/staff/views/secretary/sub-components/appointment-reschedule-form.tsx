@@ -248,18 +248,18 @@ export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps)
         </div>
       </div>
 
-      {/* 5. Justification / Approval Note Dropdown + Custom Input */}
+      {/* 5. Justification / Reschedule Reason Dropdown + Custom Input */}
       <div className="flex flex-col gap-1.5">
         <div className="flex flex-col gap-0.5">
-          <label className="text-xs text-muted-foreground font-medium">Approval Note <span className="text-destructive">*</span></label>
-          <span className="text-xs text-muted-foreground">Add a note for this approval before confirming.</span>
+          <span className="text-base font-medium text-foreground">Reschedule Reason <span className="text-destructive">*</span></span>
+          <span className="text-xs text-muted-foreground">Add a reason for this reschedule before confirming.</span>
         </div>
         <select
           value={reasonMode}
           onChange={(e) => handleReasonSelect(e.target.value)}
           className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
         >
-          <option value="" disabled>Select note/reason...</option>
+          <option value="" disabled>Select reason...</option>
           {COMMON_REASONS.map((reason) => (
             <option key={reason} value={reason}>
               {reason === 'CUSTOM' ? 'Other / Custom Reason...' : reason}
@@ -268,7 +268,7 @@ export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps)
         </select>
         {reasonMode === 'CUSTOM' && (
           <Textarea
-            placeholder="Enter approval note..."
+            placeholder="Enter reschedule reason..."
             value={customReasonText}
             onChange={(event) => handleCustomReasonChange(event.target.value)}
             className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border min-h-[60px] resize-none"
