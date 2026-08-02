@@ -691,8 +691,8 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                     };
                     setRescheduleStartTime(parseTimeToHHMM(selectedThread?.startTime));
                     setRescheduleEndTime(parseTimeToHHMM(selectedThread?.endTime));
-                    setActionReasonPreset('Patient requested reschedule');
-                    setActionReason('Patient requested reschedule');
+                    setActionReasonPreset('');
+                    setActionReason('');
                     setActionError(null);
                     setActionSuccess(null);
                 } else {

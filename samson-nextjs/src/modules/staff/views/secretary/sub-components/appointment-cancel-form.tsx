@@ -2,6 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { NotificationChannelField } from './notification-channel-field';
@@ -69,19 +70,22 @@ export function AppointmentCancelForm(props: AppointmentCancelFormProps) {
           <span className="text-base font-medium text-foreground">Cancellation Reason <span className="text-destructive">*</span></span>
           <span className="text-xs text-muted-foreground">Add a reason for this cancellation before confirming.</span>
         </div>
-        <select
-          value={preset}
-          onChange={(e) => handleSelectChange(e.target.value)}
-          className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
-          required
-        >
-          <option value="" disabled>Select reason...</option>
-          {CANCEL_REASONS.map((r) => (
-            <option key={r.value} value={r.value}>
-              {r.label}
-            </option>
-          ))}
-        </select>
+        <div className="relative flex items-center">
+          <select
+            value={preset}
+            onChange={(e) => handleSelectChange(e.target.value)}
+            className="w-full px-4 pr-10 py-2.5 appearance-none rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
+            required
+          >
+            <option value="" disabled>Select reason...</option>
+            {CANCEL_REASONS.map((r) => (
+              <option key={r.value} value={r.value}>
+                {r.label}
+              </option>
+            ))}
+          </select>
+          <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+        </div>
 
         {preset === 'CUSTOM' && (
           <Textarea

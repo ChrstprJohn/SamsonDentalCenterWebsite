@@ -34,6 +34,7 @@ import {
 import {
   Plus,
   ChevronRight,
+  ChevronDown,
   Check,
   Calendar as CalendarIcon,
   Users,
@@ -515,30 +516,36 @@ export function SecretaryBookAppointmentView() {
                   {/* Service */}
                   <div className="flex flex-col gap-0.5">
                     <span className="text-xs text-muted-foreground">Service <span className="text-destructive">*</span></span>
-                    <select
-                      value={view.selectedService}
-                      onChange={(e) => view.selectService(e.target.value)}
-                      className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
-                    >
-                      <option value="">Select Service...</option>
-                      {view.services.map((svc) => (
-                        <option key={svc.id} value={svc.id}>{svc.name}</option>
-                      ))}
-                    </select>
+                    <div className="relative flex items-center">
+                      <select
+                        value={view.selectedService}
+                        onChange={(e) => view.selectService(e.target.value)}
+                        className="w-full px-4 pr-10 py-2.5 appearance-none rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
+                      >
+                        <option value="">Select Service...</option>
+                        {view.services.map((svc) => (
+                          <option key={svc.id} value={svc.id}>{svc.name}</option>
+                        ))}
+                      </select>
+                      <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+                    </div>
                   </div>
                   {/* Dentist */}
                   <div className="flex flex-col gap-0.5">
                     <span className="text-xs text-muted-foreground">Dentist <span className="text-destructive">*</span></span>
-                    <select
-                      value={view.selectedDoctor}
-                      onChange={(e) => view.selectDoctor(e.target.value)}
-                      className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
-                    >
-                      <option value="">Select Dentist...</option>
-                      {view.doctorsList.map((doc) => (
-                        <option key={doc.id} value={doc.id}>Dr. {doc.firstName} {doc.lastName}</option>
-                      ))}
-                    </select>
+                    <div className="relative flex items-center">
+                      <select
+                        value={view.selectedDoctor}
+                        onChange={(e) => view.selectDoctor(e.target.value)}
+                        className="w-full px-4 pr-10 py-2.5 appearance-none rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
+                      >
+                        <option value="">Select Dentist...</option>
+                        {view.doctorsList.map((doc) => (
+                          <option key={doc.id} value={doc.id}>Dr. {doc.firstName} {doc.lastName}</option>
+                        ))}
+                      </select>
+                      <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+                    </div>
                   </div>
                   {/* Date */}
                   <div className="flex flex-col gap-0.5">

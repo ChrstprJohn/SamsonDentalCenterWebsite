@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import type { AppointmentDto } from '@/modules/appointments/dtos/shared/appointment.dto';
@@ -108,6 +109,13 @@ export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps)
     }
   }, [reasonMode, customReasonText]);
 
+  useEffect(() => {
+    if (!props.justification) {
+      setReasonMode('');
+      setCustomReasonText('');
+    }
+  }, [props.justification]);
+
   const handleReasonSelect = (value: string) => {
     setReasonMode(value);
     if (value !== 'CUSTOM') {
@@ -138,87 +146,102 @@ export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps)
       {/* Service Selection */}
       <div className="flex flex-col gap-0.5">
         <label className="text-xs text-muted-foreground">Service <span className="text-destructive">*</span></label>
-        <select
-          value={selectedService}
-          onChange={(e) => props.onServiceSelect(e.target.value)}
-          className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
-          required
-        >
-          <option value="">Select Service...</option>
-          {props.services.map((service) => (
-            <option key={service.id} value={service.id}>
-              {service.name}
-            </option>
-          ))}
-          {props.services.length === 0 && props.appointment.service?.name && (
-            <option value={props.appointment.serviceId}>{props.appointment.service.name}</option>
-          )}
-        </select>
+        <div className="relative flex items-center">
+          <select
+            value={selectedService}
+            onChange={(e) => props.onServiceSelect(e.target.value)}
+            className="w-full px-4 pr-10 py-2.5 appearance-none rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
+            required
+          >
+            <option value="">Select Service...</option>
+            {props.services.map((service) => (
+              <option key={service.id} value={service.id}>
+                {service.name}
+              </option>
+            ))}
+            {props.services.length === 0 && props.appointment.service?.name && (
+              <option value={props.appointment.serviceId}>{props.appointment.service.name}</option>
+            )}
+          </select>
+          <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+        </div>
       </div>
 
       {/* 2. Dentist Selection */}
       <div className="flex flex-col gap-0.5">
         <label className="text-xs text-muted-foreground">Assigned Dentist <span className="text-destructive">*</span></label>
-        <select
-          value={selectedDoctor}
-          onChange={(e) => props.onDoctorSelect(e.target.value)}
-          className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
-          required
-        >
-          <option value="">Select Dentist...</option>
-          {props.doctors.map((d) => (
-            <option key={d.doctorId} value={d.doctorId}>
-              {d.doctorName}
-            </option>
-          ))}
-        </select>
+        <div className="relative flex items-center">
+          <select
+            value={selectedDoctor}
+            onChange={(e) => props.onDoctorSelect(e.target.value)}
+            className="w-full px-4 pr-10 py-2.5 appearance-none rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
+            required
+          >
+            <option value="">Select Dentist...</option>
+            {props.doctors.map((d) => (
+              <option key={d.doctorId} value={d.doctorId}>
+                {d.doctorName}
+              </option>
+            ))}
+          </select>
+          <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+        </div>
       </div>
 
       {/* 3. Date Selection (Month, Day, Year Dropdowns) */}
       <div className="flex flex-col gap-0.5">
         <label className="text-xs text-muted-foreground">New Date <span className="text-destructive">*</span></label>
         <div className="grid grid-cols-3 gap-2">
-          <select
-            value={selectedMonth}
-            onChange={(e) => handleDatePartChange(e.target.value, selectedDay, selectedYear)}
-            className="w-full px-3 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
-            required
-          >
-            <option value="">Month</option>
-            {MONTHS.map((m) => (
-              <option key={m.value} value={m.value}>
-                {m.label}
-              </option>
-            ))}
-          </select>
+          <div className="relative flex items-center">
+            <select
+              value={selectedMonth}
+              onChange={(e) => handleDatePartChange(e.target.value, selectedDay, selectedYear)}
+              className="w-full pl-3 pr-8 py-2.5 appearance-none rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
+              required
+            >
+              <option value="">Month</option>
+              {MONTHS.map((m) => (
+                <option key={m.value} value={m.value}>
+                  {m.label}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
+          </div>
 
-          <select
-            value={selectedDay}
-            onChange={(e) => handleDatePartChange(selectedMonth, e.target.value, selectedYear)}
-            className="w-full px-3 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
-            required
-          >
-            <option value="">Day</option>
-            {DAYS.map((d) => (
-              <option key={d} value={d}>
-                {d}
-              </option>
-            ))}
-          </select>
+          <div className="relative flex items-center">
+            <select
+              value={selectedDay}
+              onChange={(e) => handleDatePartChange(selectedMonth, e.target.value, selectedYear)}
+              className="w-full pl-3 pr-8 py-2.5 appearance-none rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
+              required
+            >
+              <option value="">Day</option>
+              {DAYS.map((d) => (
+                <option key={d} value={d}>
+                  {d}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
+          </div>
 
-          <select
-            value={selectedYear}
-            onChange={(e) => handleDatePartChange(selectedMonth, selectedDay, e.target.value)}
-            className="w-full px-3 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
-            required
-          >
-            <option value="">Year</option>
-            {YEARS.map((y) => (
-              <option key={y} value={y}>
-                {y}
-              </option>
-            ))}
-          </select>
+          <div className="relative flex items-center">
+            <select
+              value={selectedYear}
+              onChange={(e) => handleDatePartChange(selectedMonth, selectedDay, e.target.value)}
+              className="w-full pl-3 pr-8 py-2.5 appearance-none rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
+              required
+            >
+              <option value="">Year</option>
+              {YEARS.map((y) => (
+                <option key={y} value={y}>
+                  {y}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
+          </div>
         </div>
       </div>
 
@@ -254,19 +277,22 @@ export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps)
           <span className="text-base font-medium text-foreground">Reschedule Reason <span className="text-destructive">*</span></span>
           <span className="text-xs text-muted-foreground">Add a reason for this reschedule before confirming.</span>
         </div>
-        <select
-          value={reasonMode}
-          onChange={(e) => handleReasonSelect(e.target.value)}
-          className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
-          required
-        >
-          <option value="" disabled>Select reason...</option>
-          {COMMON_REASONS.map((reason) => (
-            <option key={reason} value={reason}>
-              {reason === 'CUSTOM' ? 'Other / Custom Reason...' : reason}
-            </option>
-          ))}
-        </select>
+        <div className="relative flex items-center">
+          <select
+            value={reasonMode}
+            onChange={(e) => handleReasonSelect(e.target.value)}
+            className="w-full px-4 pr-10 py-2.5 appearance-none rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
+            required
+          >
+            <option value="" disabled>Select reason...</option>
+            {COMMON_REASONS.map((reason) => (
+              <option key={reason} value={reason}>
+                {reason === 'CUSTOM' ? 'Other / Custom Reason...' : reason}
+              </option>
+            ))}
+          </select>
+          <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+        </div>
         {reasonMode === 'CUSTOM' && (
           <Textarea
             placeholder="Enter reschedule reason..."

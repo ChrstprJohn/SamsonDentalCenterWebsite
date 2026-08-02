@@ -89,7 +89,7 @@ export function useSecretaryAppointments() {
       };
       setRescheduleStartTime(parseTimeToHHMM(selectedAppointment.startTime));
       setRescheduleEndTime(parseTimeToHHMM(selectedAppointment.endTime));
-      setRescheduleJustification('Patient requested reschedule');
+      setRescheduleJustification('');
     }
     setShowRescheduleForm(true);
     setShowCancelForm(false);
