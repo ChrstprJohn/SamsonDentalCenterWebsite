@@ -133,15 +133,15 @@ function Field({ label, value }: { label: string; value: string }) {
 
 function FollowUpDetail({ appointment, view, onBack, className }: { appointment: AppointmentDto; view: ReturnType<typeof usePastAppointmentFollowUps>; onBack: () => void; className: string }) {
   const isMissedCheckout = appointment.status === 'CHECKED_IN';
-  const [showLateCheckout, setShowLateCheckout] = useState(false);
   const [showResolveForm, setShowResolveForm] = useState(false);
   const [showRescheduleForm, setShowRescheduleForm] = useState(false);
-  const [resolveMode, setResolveMode] = useState<'COMPLETED' | 'CONFIRMED_NO_SHOW'>('COMPLETED');
+  const [resolveMode, setResolveMode] = useState<'COMPLETED' | 'CONFIRMED_NO_SHOW' | 'RESCHEDULE'>('COMPLETED');
   const [resolveReason, setResolveReason] = useState('');
   const [showCustomReason, setShowCustomReason] = useState(false);
   const resolveReasonOptions: Record<string, string[]> = {
     COMPLETED: ['Secretary forgot to click check-in', 'Patient was seen but not checked in', 'Administrative oversight'],
     CONFIRMED_NO_SHOW: ['Patient failed to arrive for appointment', 'Patient arrived after closing', 'Patient refused treatment'],
+    RESCHEDULE: ['Patient requested new date', 'Doctor requested reschedule', 'Administrative reschedule'],
   };
   const [selectedPreset, setSelectedPreset] = useState('');
 
@@ -164,7 +164,6 @@ function FollowUpDetail({ appointment, view, onBack, className }: { appointment:
   useEffect(() => {
     if (appointment.id !== prevId.current) {
       prevId.current = appointment.id;
-      setShowLateCheckout(false);
       resetResolveState();
       const ch = (appointment.confirmationChannel || 'EMAIL') as 'EMAIL' | 'SMS' | 'BOTH' | 'NONE';
       setChannel(ch);
@@ -181,9 +180,13 @@ function FollowUpDetail({ appointment, view, onBack, className }: { appointment:
   };
 
   const handleResolveSubmit = async () => {
-    if (!resolveReason.trim()) return;
     if (draftChannel !== channel) await handleSaveChannel();
-    view.handleResolveNoShowSubmit({ appointmentId: appointment.id, resolution: resolveMode, reason: resolveReason.trim() });
+    if (isMissedCheckout) {
+      view.completeMissedCheckout(appointment.id, resolveReason.trim() || 'Late checkout — past appointment follow-up');
+    } else {
+      if (!resolveReason.trim()) return;
+      view.handleResolveNoShowSubmit({ appointmentId: appointment.id, resolution: resolveMode, reason: resolveReason.trim() });
+    }
     resetResolveState();
   };
 
@@ -201,17 +204,36 @@ function FollowUpDetail({ appointment, view, onBack, className }: { appointment:
   };
 
   const displayName = patientName(appointment);
-  const pTitle = showRescheduleForm ? 'Reschedule Appointment' : 'Appointment Details';
-  const pSub = showRescheduleForm ? 'Update date, time, dentist, or service details.' : `Ref #${appointment.id.slice(0, 8)}`;
+  const isFormActive = showRescheduleForm || showResolveForm;
+  const pTitle = showRescheduleForm
+    ? 'Reschedule Appointment'
+    : showResolveForm
+      ? isMissedCheckout
+        ? 'Resolve Missed Checkout'
+        : 'Resolve No-Show'
+      : 'Appointment Details';
+  const pSub = showRescheduleForm
+    ? 'Update date, time, dentist, or service details.'
+    : showResolveForm
+      ? isMissedCheckout
+        ? 'Review the visit and finalize checkout.'
+        : 'Review the no-show and choose a resolution.'
+      : `Ref #${appointment.id.slice(0, 8)}`;
   const statusStr = isMissedCheckout ? 'CHECKED IN' : 'NO SHOW';
   const statusColor = isMissedCheckout ? 'text-cyan-600 bg-cyan-500/10' : 'text-amber-600 bg-amber-500/10';
 
-  const showingBodyForm = isMissedCheckout ? showLateCheckout : (showResolveForm || showRescheduleForm);
+  const handleHeaderBack = () => {
+    if (isFormActive) {
+      resetResolveState();
+      return;
+    }
+    onBack();
+  };
 
   return (
     <section className={`flex flex-1 min-w-0 flex-col min-h-0 ${className}`}>
       <div className="flex items-center gap-2 p-4 border-b border-border shrink-0 min-h-[61px]">
-        <button onClick={showRescheduleForm ? () => setShowRescheduleForm(false) : onBack} className="p-1 -ml-1 text-muted-foreground hover:text-foreground shrink-0"><ArrowLeft className="size-5" /></button>
+        <button onClick={handleHeaderBack} className="p-1 -ml-1 text-muted-foreground hover:text-foreground shrink-0"><ArrowLeft className="size-5" /></button>
         <div className="flex-1 min-w-0 flex flex-col">
           <span className="text-base font-medium text-foreground truncate">{pTitle}</span>
           <span className="text-[11px] text-muted-foreground truncate">{pSub}</span>
@@ -219,7 +241,141 @@ function FollowUpDetail({ appointment, view, onBack, className }: { appointment:
       </div>
 
       <div className="flex-1 min-h-0 !overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent" style={{ scrollbarWidth: 'thin' }} data-lenis-prevent>
-        {!showRescheduleForm ? (
+        {showRescheduleForm ? (
+          <div className="p-4">
+            <AppointmentRescheduleForm
+              appointment={appointment as any}
+              services={view.servicesList}
+              serviceId={appointment.serviceId}
+              doctorId={view.rescheduleDoctor || appointment.doctorId || ''}
+              doctors={view.doctorsList.map((d: any) => ({ doctorId: d.id, doctorName: `${d.prefix || 'Dr.'} ${d.firstName} ${d.lastName}` }))}
+              date={view.rescheduleDate || appointment.date}
+              activeServiceId={appointment.serviceId}
+              activeDoctorId={appointment.doctorId || ''}
+              startTime={view.rescheduleTime || ''}
+              endTime={view.rescheduleEndTime || ''}
+              justification={view.rescheduleJustification || ''}
+              confirmationChannel={appointment.confirmationChannel || 'EMAIL'}
+              onConfirmationChannelChange={() => {}}
+              isSubmitting={view.isPending}
+              noFooter
+              onServiceSelect={() => {}}
+              onDoctorSelect={(docId: string) => view.setRescheduleDoctor(docId)}
+              onDateSelect={(d: string) => view.setRescheduleDate(d)}
+              onStartTimeChange={(t: string) => view.setRescheduleTime(t)}
+              onEndTimeChange={(t: string) => view.setRescheduleEndTime(t)}
+              onJustificationChange={(j: string) => view.setRescheduleJustification(j)}
+              onSubmit={handleRescheduleSubmit}
+              onBack={() => setShowRescheduleForm(false)}
+            />
+          </div>
+        ) : showResolveForm ? (
+          <div className="px-4 py-4 space-y-4">
+            <div className="flex flex-col gap-0.5">
+              <span className="text-sm font-medium text-foreground">Resolution Action <span className="text-destructive">*</span></span>
+              <span className="text-xs text-muted-foreground">{isMissedCheckout ? 'Finalize checkout to complete this visit.' : 'Select an action for resolving this no-show appointment.'}</span>
+            </div>
+            <div className="flex flex-col gap-2">
+              {!isMissedCheckout && (
+                <button
+                  type="button"
+                  onClick={() => { setResolveMode('CONFIRMED_NO_SHOW'); setSelectedPreset(''); setResolveReason(''); setShowCustomReason(false); }}
+                  className={`w-full p-2.5 rounded-xl border text-left flex items-center gap-2.5 transition-all cursor-pointer ${
+                    resolveMode === 'CONFIRMED_NO_SHOW' ? 'border-red-500 bg-red-500/10 ring-1 ring-red-500/50' : 'border-card-border bg-card text-muted-foreground hover:border-foreground/30'
+                  }`}
+                >
+                  <div className={`size-3.5 rounded-full border-2 flex items-center justify-center shrink-0 ${resolveMode === 'CONFIRMED_NO_SHOW' ? 'border-red-500 bg-red-500' : 'border-muted-foreground/40'}`}>
+                    {resolveMode === 'CONFIRMED_NO_SHOW' && <div className="size-1 rounded-full bg-white" />}
+                  </div>
+                  <span className={`text-xs font-semibold ${resolveMode === 'CONFIRMED_NO_SHOW' ? 'text-red-500' : 'text-foreground'}`}>Keep No-Show</span>
+                </button>
+              )}
+
+              {/* Checkout (Mark Completed) */}
+              <button
+                type="button"
+                onClick={() => { setResolveMode('COMPLETED'); setSelectedPreset(''); setResolveReason(''); setShowCustomReason(false); }}
+                className={`w-full p-2.5 rounded-xl border text-left flex items-center gap-2.5 transition-all cursor-pointer ${
+                  resolveMode === 'COMPLETED' ? 'border-emerald-500 bg-emerald-500/10 ring-1 ring-emerald-500/50' : 'border-card-border bg-card text-muted-foreground hover:border-foreground/30'
+                }`}
+              >
+                <div className={`size-3.5 rounded-full border-2 flex items-center justify-center shrink-0 ${resolveMode === 'COMPLETED' ? 'border-emerald-500 bg-emerald-500' : 'border-muted-foreground/40'}`}>
+                  {resolveMode === 'COMPLETED' && <div className="size-1 rounded-full bg-white" />}
+                </div>
+                <span className={`text-xs font-semibold ${resolveMode === 'COMPLETED' ? 'text-emerald-600' : 'text-foreground'}`}>Checkout (Mark Completed)</span>
+              </button>
+
+              {!isMissedCheckout && (
+                <button
+                  type="button"
+                  onClick={() => { setResolveMode('RESCHEDULE'); setSelectedPreset(''); setResolveReason(''); setShowCustomReason(false); }}
+                  className={`w-full p-2.5 rounded-xl border text-left flex items-center gap-2.5 transition-all cursor-pointer ${
+                    resolveMode === 'RESCHEDULE' ? 'border-cyan-500 bg-cyan-500/10 ring-1 ring-cyan-500/50' : 'border-card-border bg-card text-muted-foreground hover:border-foreground/30'
+                  }`}
+                >
+                  <div className={`size-3.5 rounded-full border-2 flex items-center justify-center shrink-0 ${resolveMode === 'RESCHEDULE' ? 'border-cyan-500 bg-cyan-500' : 'border-muted-foreground/40'}`}>
+                    {resolveMode === 'RESCHEDULE' && <div className="size-1 rounded-full bg-white" />}
+                  </div>
+                  <span className={`text-xs font-semibold ${resolveMode === 'RESCHEDULE' ? 'text-cyan-600' : 'text-foreground'}`}>Reschedule</span>
+                </button>
+              )}
+            </div>
+
+            {resolveMode === 'COMPLETED' && (
+              <div className="p-3 border bg-amber-500/5 border-amber-500/20 rounded-2xl">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-amber-600">Completion Notice</span>
+                <div className="text-[11px] text-muted-foreground mt-1 leading-relaxed">This will complete the visit and send the selected post-care message.</div>
+              </div>
+            )}
+            {resolveMode === 'CONFIRMED_NO_SHOW' && (
+              <div className="p-3 border bg-red-500/5 border-red-500/20 rounded-2xl">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-red-500">No-Show Notice</span>
+                <div className="text-[11px] text-muted-foreground mt-1 leading-relaxed">Clicking Submit Resolution will keep this appointment marked as <strong>Confirmed No-Show</strong> in system audit logs.</div>
+              </div>
+            )}
+            {resolveMode === 'RESCHEDULE' && (
+              <div className="p-3 border bg-cyan-500/5 border-cyan-500/20 rounded-2xl">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-cyan-600">Reschedule Notice</span>
+                <div className="text-[11px] text-muted-foreground mt-1 leading-relaxed">Clicking Continue to Reschedule will open slot selection to pick a new date, time, dentist, or service.</div>
+              </div>
+            )}
+
+            {resolveMode === 'COMPLETED' && (
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-foreground">Notification Channel</span>
+                  {!isEditingChannel ? (
+                    <button onClick={() => setIsEditingChannel(true)} className="h-7 px-2.5 text-xs gap-1 inline-flex items-center justify-center rounded-md border border-input bg-background text-foreground hover:bg-accent"><Pencil className="size-3.5" /> Edit</button>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <button onClick={() => { setDraftChannel(channel); setIsEditingChannel(false); }} className="h-7 px-2.5 text-xs gap-1 inline-flex items-center justify-center rounded-md border border-input bg-background text-foreground hover:bg-accent"><X className="size-3.5" /> Cancel</button>
+                      <button onClick={handleSaveChannel} disabled={isSavingChannel || draftChannel === channel} className="h-7 px-2.5 text-xs gap-1 inline-flex items-center justify-center rounded-md bg-slate-900 text-white disabled:opacity-40"><Check className="size-3.5" /> {isSavingChannel ? 'Saving...' : 'Save'}</button>
+                    </div>
+                  )}
+                </div>
+                {isEditingChannel ? (
+                  <Select value={draftChannel} onChange={(e) => setDraftChannel(e.target.value as any)} className="text-sm w-full" options={[{ value: 'EMAIL', label: 'Email' }, { value: 'SMS', label: 'SMS' }, { value: 'BOTH', label: 'Email & SMS' }, { value: 'NONE', label: 'None' }]} />
+                ) : (
+                  <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{channel === 'EMAIL' ? 'Email' : channel === 'SMS' ? 'SMS' : channel === 'BOTH' ? 'Email & SMS' : 'None'}</div>
+                )}
+              </div>
+            )}
+
+            {resolveMode !== 'RESCHEDULE' && (
+              <div className="flex flex-col gap-1.5">
+                <span className="text-xs text-muted-foreground">Reason for Resolution</span>
+                <select value={selectedPreset} onChange={(e) => { const v = e.target.value; if (v === '__custom__') { setShowCustomReason(true); setResolveReason(''); } else { setShowCustomReason(false); setSelectedPreset(v); setResolveReason(v); } }} className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border">
+                  <option value="" disabled>Select reason...</option>
+                  {resolveReasonOptions[resolveMode]?.map((opt) => (<option key={opt} value={opt}>{opt}</option>))}
+                  <option value="__custom__">Custom</option>
+                </select>
+                {showCustomReason && (
+                  <textarea value={resolveReason} onChange={(e) => setResolveReason(e.target.value)} rows={2} placeholder="Type custom reason..." className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border resize-none" />
+                )}
+              </div>
+            )}
+          </div>
+        ) : (
           <>
             <div className="flex flex-col items-center pt-4 pb-3 px-4">
               <div className="size-12 shrink-0 rounded-full bg-muted-foreground/10 flex items-center justify-center border-2 border-border/60 overflow-hidden mb-3">
@@ -265,34 +421,6 @@ function FollowUpDetail({ appointment, view, onBack, className }: { appointment:
               </div>
             </div>
           </>
-        ) : (
-          <div className="p-4">
-            <AppointmentRescheduleForm
-              appointment={appointment as any}
-              services={view.servicesList}
-              serviceId={appointment.serviceId}
-              doctorId={view.rescheduleDoctor || appointment.doctorId || ''}
-              doctors={view.doctorsList.map((d: any) => ({ doctorId: d.id, doctorName: `${d.prefix || 'Dr.'} ${d.firstName} ${d.lastName}` }))}
-              date={view.rescheduleDate || appointment.date}
-              activeServiceId={appointment.serviceId}
-              activeDoctorId={appointment.doctorId || ''}
-              startTime={view.rescheduleTime || ''}
-              endTime={view.rescheduleEndTime || ''}
-              justification={view.rescheduleJustification || ''}
-              confirmationChannel={appointment.confirmationChannel || 'EMAIL'}
-              onConfirmationChannelChange={() => {}}
-              isSubmitting={view.isPending}
-              noFooter
-              onServiceSelect={() => {}}
-              onDoctorSelect={(docId: string) => view.setRescheduleDoctor(docId)}
-              onDateSelect={(d: string) => view.setRescheduleDate(d)}
-              onStartTimeChange={(t: string) => view.setRescheduleTime(t)}
-              onEndTimeChange={(t: string) => view.setRescheduleEndTime(t)}
-              onJustificationChange={(j: string) => view.setRescheduleJustification(j)}
-              onSubmit={handleRescheduleSubmit}
-              onBack={() => setShowRescheduleForm(false)}
-            />
-          </div>
         )}
       </div>
 
@@ -316,110 +444,32 @@ function FollowUpDetail({ appointment, view, onBack, className }: { appointment:
               </button>
             </div>
           );
-        })() : isMissedCheckout && showLateCheckout ? (
-          <div className="flex flex-col gap-3">
-            <div className="p-3 border bg-amber-500/5 border-amber-500/20 rounded-2xl">
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-amber-600">Completion Notice</span>
-              <div className="text-[11px] text-muted-foreground mt-1 leading-relaxed">This will complete the visit and send the selected post-care message.</div>
-            </div>
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-foreground">Notification Channel</span>
-                {!isEditingChannel ? (
-                  <button onClick={() => setIsEditingChannel(true)} className="h-7 px-2.5 text-xs gap-1 inline-flex items-center justify-center rounded-md border border-input bg-background text-foreground hover:bg-accent"><Pencil className="size-3.5" /> Edit</button>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <button onClick={() => { setDraftChannel(channel); setIsEditingChannel(false); }} className="h-7 px-2.5 text-xs gap-1 inline-flex items-center justify-center rounded-md border border-input bg-background text-foreground hover:bg-accent"><X className="size-3.5" /> Cancel</button>
-                    <button onClick={handleSaveChannel} disabled={isSavingChannel || draftChannel === channel} className="h-7 px-2.5 text-xs gap-1 inline-flex items-center justify-center rounded-md bg-slate-900 text-white disabled:opacity-40"><Check className="size-3.5" /> {isSavingChannel ? 'Saving...' : 'Save'}</button>
-                  </div>
-                )}
-              </div>
-              {isEditingChannel ? (
-                <Select value={draftChannel} onChange={(e) => setDraftChannel(e.target.value as any)} className="text-sm w-full" options={[{ value: 'EMAIL', label: 'Email' }, { value: 'SMS', label: 'SMS' }, { value: 'BOTH', label: 'Email & SMS' }, { value: 'NONE', label: 'None' }]} />
-              ) : (
-                <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{channel === 'EMAIL' ? 'Email' : channel === 'SMS' ? 'SMS' : channel === 'BOTH' ? 'Email & SMS' : 'None'}</div>
-              )}
-            </div>
-            <div className="flex gap-2">
-              <button onClick={() => setShowLateCheckout(false)} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent transition-colors rounded-xl">Cancel</button>
-              <button onClick={() => { void view.completeMissedCheckout(appointment.id); }} disabled={view.isPending} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl disabled:opacity-40">{view.isPending ? 'Checking out...' : 'Confirm Late Checkout'}</button>
-            </div>
-          </div>
-        ) : isMissedCheckout ? (
-          <button onClick={() => setShowLateCheckout(true)} className="w-full h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl">Late Checkout</button>
-        ) : showResolveForm ? (
-          <div className="flex flex-col gap-3">
-            <div className="flex flex-col gap-0.5">
-              <span className="text-sm font-medium text-foreground">Resolution Action <span className="text-destructive">*</span></span>
-              <span className="text-xs text-muted-foreground">Select an action for resolving this no-show appointment.</span>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              <button onClick={() => { setResolveMode('CONFIRMED_NO_SHOW'); setSelectedPreset(''); setResolveReason(''); setShowCustomReason(false); }}
-                className={`p-2 border text-[10px] font-medium transition-all ${resolveMode === 'CONFIRMED_NO_SHOW' ? 'border-red-500 bg-red-500/10 text-red-500' : 'border-card-border bg-card text-muted-foreground hover:border-foreground/30'}`}>Keep No-Show</button>
-              <button onClick={() => { setResolveMode('COMPLETED'); setSelectedPreset(''); setResolveReason(''); setShowCustomReason(false); }}
-                className={`p-2 border text-[10px] font-medium transition-all ${resolveMode === 'COMPLETED' ? 'border-emerald-500 bg-emerald-500/10 text-emerald-600' : 'border-card-border bg-card text-muted-foreground hover:border-foreground/30'}`}>Mark Completed</button>
-            </div>
-            {resolveMode === 'COMPLETED' && (
-              <div className="p-3 border bg-amber-500/5 border-amber-500/20 rounded-2xl">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-amber-600">Completion Notice</span>
-                <div className="text-[11px] text-muted-foreground mt-1 leading-relaxed">This will complete the visit and send the selected post-care message.</div>
-              </div>
+        })() : showResolveForm ? (
+          <div className="flex gap-2">
+            <button onClick={resetResolveState} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent transition-colors rounded-xl">Cancel</button>
+            {resolveMode === 'RESCHEDULE' ? (
+              <button
+                type="button"
+                onClick={() => {
+                  const toHHMM = (t?: string) => { if (!t) return ''; if (t.includes('T')) { const p = t.split('T')[1]; if (p) return p.slice(0, 5); } const m = t.match(/^(\d{2}):(\d{2})/); return m ? `${m[1]}:${m[2]}` : ''; };
+                  view.setRescheduleDoctor(appointment.doctorId || '');
+                  view.setRescheduleDate(appointment.date || '');
+                  view.setRescheduleTime(toHHMM(appointment.startTime ?? undefined));
+                  view.setRescheduleEndTime(toHHMM(appointment.endTime ?? undefined));
+                  view.setRescheduleJustification('');
+                  setShowRescheduleForm(true);
+                  setShowResolveForm(false);
+                }}
+                className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl"
+              >
+                Continue to Reschedule
+              </button>
+            ) : (
+              <button onClick={handleResolveSubmit} disabled={view.isPending || (!isMissedCheckout && !resolveReason.trim())} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl disabled:opacity-40">{view.isPending ? 'Submitting...' : 'Submit Resolution'}</button>
             )}
-            {resolveMode === 'CONFIRMED_NO_SHOW' && (
-              <div className="p-3 border bg-red-500/5 border-red-500/20 rounded-2xl">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-red-500">No-Show Notice</span>
-                <div className="text-[11px] text-muted-foreground mt-1 leading-relaxed">Clicking Submit Resolution will keep this appointment marked as <strong>Confirmed No-Show</strong> in system audit logs.</div>
-              </div>
-            )}
-            {resolveMode === 'COMPLETED' && (
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-foreground">Notification Channel</span>
-                  {!isEditingChannel ? (
-                    <button onClick={() => setIsEditingChannel(true)} className="h-7 px-2.5 text-xs gap-1 inline-flex items-center justify-center rounded-md border border-input bg-background text-foreground hover:bg-accent"><Pencil className="size-3.5" /> Edit</button>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <button onClick={() => { setDraftChannel(channel); setIsEditingChannel(false); }} className="h-7 px-2.5 text-xs gap-1 inline-flex items-center justify-center rounded-md border border-input bg-background text-foreground hover:bg-accent"><X className="size-3.5" /> Cancel</button>
-                      <button onClick={handleSaveChannel} disabled={isSavingChannel || draftChannel === channel} className="h-7 px-2.5 text-xs gap-1 inline-flex items-center justify-center rounded-md bg-slate-900 text-white disabled:opacity-40"><Check className="size-3.5" /> {isSavingChannel ? 'Saving...' : 'Save'}</button>
-                    </div>
-                  )}
-                </div>
-                {isEditingChannel ? (
-                  <Select value={draftChannel} onChange={(e) => setDraftChannel(e.target.value as any)} className="text-sm w-full" options={[{ value: 'EMAIL', label: 'Email' }, { value: 'SMS', label: 'SMS' }, { value: 'BOTH', label: 'Email & SMS' }, { value: 'NONE', label: 'None' }]} />
-                ) : (
-                  <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{channel === 'EMAIL' ? 'Email' : channel === 'SMS' ? 'SMS' : channel === 'BOTH' ? 'Email & SMS' : 'None'}</div>
-                )}
-              </div>
-            )}
-            <div className="flex flex-col gap-1.5">
-              <span className="text-xs text-muted-foreground">Reason for Resolution</span>
-              <select value={selectedPreset} onChange={(e) => { const v = e.target.value; if (v === '__custom__') { setShowCustomReason(true); setResolveReason(''); } else { setShowCustomReason(false); setSelectedPreset(v); setResolveReason(v); } }} className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border">
-                <option value="" disabled>Select reason...</option>
-                {resolveReasonOptions[resolveMode].map((opt) => (<option key={opt} value={opt}>{opt}</option>))}
-                <option value="__custom__">Custom</option>
-              </select>
-              {showCustomReason && (
-                <textarea value={resolveReason} onChange={(e) => setResolveReason(e.target.value)} rows={2} placeholder="Type custom reason..." className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border resize-none" />
-              )}
-            </div>
-            <div className="flex gap-2">
-              <button onClick={resetResolveState} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent transition-colors rounded-xl">Cancel</button>
-              <button onClick={handleResolveSubmit} disabled={view.isPending || !resolveReason.trim()} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl disabled:opacity-40">{view.isPending ? 'Submitting...' : 'Submit Resolution'}</button>
-            </div>
           </div>
         ) : (
-          <div className="flex gap-2">
-            <button onClick={() => {
-              const toHHMM = (t?: string) => { if (!t) return ''; if (t.includes('T')) { const p = t.split('T')[1]; if (p) return p.slice(0, 5); } const m = t.match(/^(\d{2}):(\d{2})/); return m ? `${m[1]}:${m[2]}` : ''; };
-              view.setRescheduleDoctor(appointment.doctorId || '');
-              view.setRescheduleDate(appointment.date || '');
-              view.setRescheduleTime(toHHMM(appointment.startTime ?? undefined));
-              view.setRescheduleEndTime(toHHMM(appointment.endTime ?? undefined));
-              view.setRescheduleJustification('');
-              setShowRescheduleForm(true);
-            }} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent transition-colors rounded-xl">Reschedule</button>
-            <button onClick={() => { setShowResolveForm(true); setResolveMode('CONFIRMED_NO_SHOW'); setResolveReason(''); setShowCustomReason(false); setSelectedPreset(''); }} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl">Resolve</button>
-          </div>
+          <button onClick={() => { setShowResolveForm(true); setResolveMode('COMPLETED'); setResolveReason(''); setShowCustomReason(false); setSelectedPreset(''); }} className="w-full h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl">Resolve</button>
         )}
       </div>
     </section>

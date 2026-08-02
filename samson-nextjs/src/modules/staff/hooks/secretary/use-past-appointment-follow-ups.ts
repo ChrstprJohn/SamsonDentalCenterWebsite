@@ -73,13 +73,13 @@ export function usePastAppointmentFollowUps() {
     setSelectedAppointmentId(null);
   };
 
-  const completeMissedCheckout = (appointmentId: string) => {
+  const completeMissedCheckout = (appointmentId: string, reason?: string) => {
     setActionError(null);
     startTransition(async () => {
       const result = await updateAppointmentStatusAction({
         appointmentId,
         status: 'COMPLETED',
-        statusReason: 'Late checkout — past appointment follow-up',
+        statusReason: reason || 'Late checkout — past appointment follow-up',
       });
       if (!result.success) {
         setActionError(result.error || 'Could not complete the missed checkout.');
