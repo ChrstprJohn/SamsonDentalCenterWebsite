@@ -398,13 +398,8 @@ export function SecretaryBookAppointmentView() {
                 >
                   <ArrowLeft className="size-5" />
                 </button>
-                <div className="flex-1 flex flex-col min-w-0 justify-center">
-                  <span className="text-base font-medium text-foreground truncate leading-tight">
-                    {isRescheduleOpen ? 'Reschedule Appointment' : 'Appointment Details'}
-                  </span>
-                  <span className="text-[11px] text-muted-foreground truncate leading-none mt-0.5">
-                    {isRescheduleOpen ? 'Update date, time, dentist, or service details.' : `Ref #${view.selectedAppointmentDetails.id.slice(0, 8)}`}
-                  </span>
+                <div className="text-base font-medium text-foreground truncate">
+                  {isRescheduleOpen ? 'Reschedule Appointment' : 'Appointment Details'}
                 </div>
               </div>
             </div>

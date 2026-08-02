@@ -767,11 +767,8 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                     <button onClick={detailPaneView?.showRescheduleForm ? () => detailPaneView.setShowRescheduleForm(false) : handleBackToChat} className="p-1 -ml-1 text-muted-foreground hover:text-foreground shrink-0">
                         <ArrowLeft className="size-5" />
                     </button>
-                    <div className="flex-1 flex flex-col min-w-0 justify-center">
-                        <span className="text-base font-medium text-foreground truncate leading-tight">
-                            {detailPaneView?.showRescheduleForm ? 'Reschedule Appointment' : 'Appointment Details'}
-                        </span>
-                        <span className="text-[11px] text-muted-foreground truncate leading-none mt-0.5">{detailPaneView?.showRescheduleForm ? 'Update date, time, dentist, or service details.' : `Ref #${selectedThread.appointmentId.slice(0, 8)}`}</span>
+                    <div className="text-base font-medium text-foreground truncate">
+                        {detailPaneView?.showRescheduleForm ? 'Reschedule Appointment' : 'Appointment Details'}
                     </div>
                 </div>
             )}
