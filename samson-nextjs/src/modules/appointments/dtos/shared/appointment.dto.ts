@@ -86,7 +86,7 @@ const appointmentDbSchema = z.object({
   sms_reschedule_sent: z.boolean().optional().default(false),
   payment_receipt_sent: z.boolean().optional().default(false),
   no_show_resolved_at: z.string().nullable().optional(),
-  no_show_resolution: z.enum(['COMPLETED', 'CONFIRMED_NO_SHOW', 'RESCHEDULE']).nullable().optional(),
+  no_show_resolution: z.enum(['COMPLETED', 'CONFIRMED_NO_SHOW', 'RESCHEDULE', 'CHECKED_IN']).nullable().optional(),
   created_at: z.string().optional(),
   updated_at: z.string().optional(),
   doctor: appointmentDoctorDbSchema.nullable().optional(),
