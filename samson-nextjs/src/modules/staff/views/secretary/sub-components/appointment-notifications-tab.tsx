@@ -241,9 +241,9 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
   return (
     <div className="space-y-4">
       {/* Section 1: Notification Channel */}
-      <div className={`${compact ? 'py-3 px-4' : 'py-4 px-5'}`}>
-        <div className={`flex items-center justify-between ${compact ? 'mb-2' : 'mb-3'}`}>
-          <span className={`${compact ? 'text-sm' : 'text-base'} font-medium text-foreground`}>Notification Channel</span>
+      <div className="py-3 px-4">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-sm font-medium text-foreground">Notification Channel</span>
           {!isEditingChannel && !['COMPLETED', 'CANCELLED', 'REJECTED', 'NO_SHOW'].includes(appointment.status) && (
             <Button
               variant="outline"
@@ -285,12 +285,12 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
         )}
       </div>
 
-      <hr className={`border-card-border/40 ${compact ? 'mx-4' : 'mx-5'}`} />
+      <hr className="border-card-border/40 mx-4" />
 
       {/* Section 2: Notification History */}
-      <div className={`${compact ? 'py-3 px-4 space-y-2' : 'py-4 px-5 space-y-3'}`}>
+      <div className="py-3 px-4 space-y-2">
         <div className="flex items-center justify-between">
-          <span className={`${compact ? 'text-sm' : 'text-base'} font-medium text-foreground block`}>Notification History</span>
+          <span className="text-sm font-medium text-foreground block">Notification History</span>
           <Label className="flex items-center gap-1.5 text-[11px] text-muted-foreground cursor-pointer select-none">
             <span>Manual Resend</span>
             <Switch
@@ -432,11 +432,11 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
         </div>
       </div>
 
-      <hr className={`border-card-border/40 ${compact ? 'mx-4' : 'mx-5'}`} />
+      <hr className="border-card-border/40 mx-4" />
 
       {/* Section 3: Delivery Log */}
-      <div className={`${compact ? 'py-3 px-4 space-y-2' : 'py-4 px-5 space-y-3'}`}>
-        <span className={`${compact ? 'text-sm' : 'text-base'} font-medium text-foreground block`}>Delivery Log</span>
+      <div className="py-3 px-4 space-y-2">
+        <span className="text-sm font-medium text-foreground block">Delivery Log</span>
         {loadingLogs ? (
           <div className="space-y-2">
             {[1, 2, 3].map((i) => <div key={i} className="h-8 bg-muted/30 animate-pulse rounded-lg" />)}
@@ -450,24 +450,51 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
               const isFailed = logStatus === 'FAILED';
               const isProcessed = logStatus === 'PROCESSED';
               return (
-                <div key={log.eventType} className={`flex items-center gap-2.5 ${compact ? 'p-2' : 'p-3'} rounded-xl bg-secondary-bg/20 border border-card-border/60 text-sm`}>
+                <div key={log.eventType} className={`flex items-center gap-2 ${compact ? 'p-2 text-xs' : 'p-3 text-sm'} rounded-xl bg-secondary-bg/20 border border-card-border/60`}>
                   <div className="shrink-0">
                     {isFailed ? <AlertCircle className="size-3.5 text-rose-500" /> : isProcessed ? <CheckCircle2 className="size-3.5 text-emerald-500" /> : <Clock className="size-3.5 text-amber-500" />}
                   </div>
                   <span className="text-foreground font-medium truncate min-w-0 flex-1">
                     {EVENT_LABELS[log.eventType] || log.eventType}
                   </span>
-                  <Badge variant={isFailed ? 'error' : isProcessed ? 'success' : 'warning'} className="text-[10px] px-1.5 py-0.5 shrink-0">
-                    {logStatus}
-                  </Badge>
-                  <span className="text-xs text-muted-foreground shrink-0">{new Date(log.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                  <button
-                    onClick={() => handleDetailResend(log.id)}
-                    className="text-xs font-semibold text-rose-600 hover:text-rose-700 shrink-0 disabled:opacity-50"
-                    disabled={detailResendingId === log.id}
-                  >
-                    {detailResendingId === log.id ? 'Sending...' : isProcessed ? 'Send New' : 'Resend'}
-                  </button>
+                  {compact ? (
+                    isProcessed ? (
+                      <span title="PROCESSED" className="inline-flex items-center justify-center p-0.5 rounded bg-emerald-500/10 text-emerald-600 shrink-0">
+                        <Check className="size-3" />
+                      </span>
+                    ) : (
+                      <Badge variant={isFailed ? 'error' : 'warning'} className="text-[9px] px-1.5 py-0.5 shrink-0">
+                        {logStatus}
+                      </Badge>
+                    )
+                  ) : (
+                    <Badge variant={isFailed ? 'error' : isProcessed ? 'success' : 'warning'} className="text-[10px] px-1.5 py-0.5 shrink-0">
+                      {logStatus}
+                    </Badge>
+                  )}
+                  <span className={`${compact ? 'text-[10px]' : 'text-xs'} text-muted-foreground shrink-0`}>
+                    {new Date(log.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                  {compact ? (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDetailResend(log.id)}
+                      className="h-6 w-6 p-0 text-rose-600 hover:text-rose-700 hover:bg-rose-500/10 shrink-0 disabled:opacity-50"
+                      disabled={detailResendingId === log.id}
+                      title={detailResendingId === log.id ? 'Sending...' : isProcessed ? 'Send New' : 'Resend'}
+                    >
+                      <RotateCw className={`size-3 ${detailResendingId === log.id ? 'animate-spin' : ''}`} />
+                    </Button>
+                  ) : (
+                    <button
+                      onClick={() => handleDetailResend(log.id)}
+                      className="text-xs font-semibold text-rose-600 hover:text-rose-700 shrink-0 disabled:opacity-50"
+                      disabled={detailResendingId === log.id}
+                    >
+                      {detailResendingId === log.id ? 'Sending...' : isProcessed ? 'Send New' : 'Resend'}
+                    </button>
+                  )}
                 </div>
               );
             })}

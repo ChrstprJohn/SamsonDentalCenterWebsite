@@ -67,7 +67,7 @@ export function AppointmentCancelForm(props: AppointmentCancelFormProps) {
 
       <div className="flex flex-col gap-1.5">
         <div className="flex flex-col gap-0.5">
-          <span className="text-base font-medium text-foreground">Cancellation Reason <span className="text-destructive">*</span></span>
+          <span className="text-sm font-medium text-foreground">Cancellation Reason <span className="text-destructive">*</span></span>
           <span className="text-xs text-muted-foreground">Add a reason for this cancellation before confirming.</span>
         </div>
         <div className="relative flex items-center">

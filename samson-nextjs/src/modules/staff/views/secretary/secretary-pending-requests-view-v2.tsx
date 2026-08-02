@@ -131,15 +131,15 @@ export function SecretaryPendingRequestsViewV2() {
         {inquiriesView.stagedInquiryAction ? (
           <>
             {/* Header */}
-            <div className="p-4 border-b border-card-border/40 shrink-0">
-              <div className="flex items-center gap-2">
+            <div className="p-4 border-b border-card-border/40 shrink-0 h-14 flex items-center">
+              <div className="flex items-center gap-2 min-w-0 flex-1">
                 <button
                   onClick={() => { inquiriesView.setDecision(''); setApprovalReason(''); }}
                   className="p-1 -ml-1 text-muted-foreground hover:text-foreground shrink-0"
                 >
                   <ArrowLeft className="size-5" />
                 </button>
-                <div className={`flex-1 text-base font-medium ${
+                <div className={`flex-1 text-base font-medium truncate ${
                   inquiriesView.stagedInquiryAction === 'CONVERT' ? 'text-foreground' : 'text-destructive'
                 }`}>
                   {inquiriesView.stagedInquiryAction === 'CONVERT' ? 'Approve & Convert' : 'Reject / Drop'}
@@ -159,7 +159,7 @@ export function SecretaryPendingRequestsViewV2() {
                   ? 'bg-muted/30 border-card-border/60'
                   : 'bg-destructive/5 border-destructive/20'
               }`}>
-                <span className="text-base font-medium text-foreground">Request Summary</span>
+                <span className="text-sm font-medium text-foreground">Request Summary</span>
                 <hr className="border-card-border/40 -mx-4" />
                 <div className="flex items-center gap-3">
                   <div className="size-10 shrink-0 rounded-full bg-muted-foreground/10 flex items-center justify-center border border-border/60 overflow-hidden">
@@ -214,7 +214,7 @@ export function SecretaryPendingRequestsViewV2() {
               >
                 {inquiriesView.stagedInquiryAction === 'CONVERT' && (
                   <div className="flex flex-col gap-1">
-                    <span className="text-base font-medium text-foreground">Notification Channel <span className="text-destructive">*</span></span>
+                    <span className="text-sm font-medium text-foreground">Notification Channel <span className="text-destructive">*</span></span>
                     <span className="text-xs text-muted-foreground">Which channel should be used to notify the patient?</span>
                     <div className="relative mt-1">
                       <select
@@ -235,7 +235,7 @@ export function SecretaryPendingRequestsViewV2() {
                 )}
 
                 <div className="flex flex-col gap-1">
-                  <span className="text-base font-medium text-foreground">
+                  <span className="text-sm font-medium text-foreground">
                     {inquiriesView.stagedInquiryAction === 'CONVERT' ? 'Approval Note' : 'Drop Reason'}
                     {' '}<span className="text-destructive">*</span>
                   </span>
@@ -308,8 +308,8 @@ export function SecretaryPendingRequestsViewV2() {
         ) : (
           /* ── NORMAL VIEW: Request Details ── */
           <>
-            <div className="p-4 border-b border-card-border/40 shrink-0">
-              <div className="flex items-center gap-2">
+            <div className="p-4 border-b border-card-border/40 shrink-0 h-14 flex items-center justify-between">
+              <div className="flex items-center gap-2 min-w-0 flex-1">
                 <button
                   onClick={() => {
                     inquiriesView.selectInquiry(null);
@@ -319,24 +319,24 @@ export function SecretaryPendingRequestsViewV2() {
                 >
                   <ArrowLeft className="size-5" />
                 </button>
-                <div className="flex-1 text-base font-medium text-foreground text-left">
+                <div className="flex-1 text-base font-medium text-foreground text-left truncate">
                   Request Details
                 </div>
-                <button onClick={() => setMobileView('quickLogs')} className="xl:hidden p-1 -mr-1 text-muted-foreground hover:text-foreground shrink-0 flex flex-col items-center gap-0.5">
-                  <ClipboardList className="size-5" />
-                  <span className="text-[10px] leading-none">Notes</span>
-                </button>
               </div>
+              <button onClick={() => setMobileView('quickLogs')} className="xl:hidden p-1 -mr-1 text-muted-foreground hover:text-foreground shrink-0 flex flex-col items-center gap-0.5">
+                <ClipboardList className="size-5" />
+                <span className="text-[10px] leading-none">Notes</span>
+              </button>
             </div>
             <div className="flex-1 !overflow-y-auto max-md:px-5 px-5 space-y-0 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
               style={{ scrollbarWidth: 'thin' }}
               data-lenis-prevent
             >
-                  <div className="flex flex-col items-center pt-6 pb-4">
-                    <div className="size-16 shrink-0 rounded-full bg-muted-foreground/10 flex items-center justify-center border-2 border-border/60 overflow-hidden mb-3">
-                      <UserRound className="size-14 text-muted-foreground/70 translate-y-0.5" />
+                  <div className="flex flex-col items-center pt-4 pb-3">
+                    <div className="size-12 shrink-0 rounded-full bg-muted-foreground/10 flex items-center justify-center border-2 border-border/60 overflow-hidden mb-3">
+                      <UserRound className="size-10 text-muted-foreground/70 translate-y-0.5" />
                     </div>
-                    <h2 className="text-lg font-semibold text-foreground">
+                    <h2 className="text-base font-semibold text-foreground">
                       {isEditingPatient
                         ? formatPatientName(patientSnapshot.firstName, patientSnapshot.middleName, patientSnapshot.lastName, patientSnapshot.suffix)
                         : formatPatientName(inquiriesView.guestFirstName, inquiriesView.guestMiddleName, inquiriesView.guestLastName, inquiriesView.guestSuffix)
@@ -355,7 +355,7 @@ export function SecretaryPendingRequestsViewV2() {
 
                   {/* Section: Current Status */}
                   <div className="flex items-center justify-between py-4">
-                    <span className="text-base font-medium text-foreground">Current Status</span>
+                    <span className="text-sm font-medium text-foreground">Current Status</span>
                     <Badge variant={inquiriesView.selectedInquiry?.status === 'NEW' ? 'warning' : inquiriesView.selectedInquiry?.status === 'CONVERTED' ? 'success' : 'error'} className="text-xs px-3 py-1">
                       {inquiriesView.selectedInquiry?.status === 'NEW' ? 'NEW / PENDING' : inquiriesView.selectedInquiry?.status === 'CONVERTED' ? 'CONVERTED / APPROVED' : 'DROPPED / REJECTED'}
                     </Badge>
@@ -366,7 +366,7 @@ export function SecretaryPendingRequestsViewV2() {
                   {/* Section 1: Patient Information */}
                   <div className="py-4">
                     <div className="flex items-center justify-between mb-3">
-                      <span className="text-base font-medium text-foreground">
+                      <span className="text-sm font-medium text-foreground">
                         Guest Information
                       </span>
                       {inquiriesView.selectedInquiry?.status === 'NEW' && (!isEditingPatient ? (
@@ -439,7 +439,7 @@ export function SecretaryPendingRequestsViewV2() {
 
                   {/* Section 1b: Guest Contact */}
                   <div className="py-4 space-y-3">
-                    <span className="text-base font-medium text-foreground block">Guest Contact</span>
+                    <span className="text-sm font-medium text-foreground block">Guest Contact</span>
 
                     {!isEditingPatient ? (
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
@@ -481,8 +481,8 @@ export function SecretaryPendingRequestsViewV2() {
                   {/* Section 2: Appointment Details */}
                   <div className="py-4">
                     <div className="flex items-center justify-between mb-3">
-                      <span className="text-base font-medium text-foreground">
-                        Service & Schedule
+                      <span className="text-sm font-medium text-foreground">
+                        Service &amp; Schedule
                       </span>
                       {inquiriesView.selectedInquiry?.status === 'NEW' && (isEditingSchedule ? (
                         <div className="flex items-center gap-2">

@@ -390,20 +390,22 @@ export function SecretaryBookAppointmentView() {
       <Sidebar collapsible="none" side="right" className={`flex-1 lg:flex-none lg:w-80 border-l border-border shrink-0 flex-col h-full bg-sidebar ${mobileView === 'timeline' ? 'max-lg:hidden' : ''}`}>
         {view.selectedAppointmentDetails ? (
           <div className="flex flex-col h-full overflow-hidden">
-            <div className="p-4 border-b border-border flex items-center gap-2 shrink-0">
-              <button
-                onClick={isRescheduleOpen ? () => setIsRescheduleOpen(false) : () => { view.setSelectedAppointmentDetails(null); setMobileView('timeline'); }}
-                className="p-1 -ml-1 text-muted-foreground hover:text-foreground shrink-0"
-              >
-                <ArrowLeft className="size-5" />
-              </button>
-              <div className="flex-1 flex flex-col min-w-0">
-                <span className="text-base font-medium text-foreground truncate">
-                  {isRescheduleOpen ? 'Reschedule Appointment' : 'Appointment Details'}
-                </span>
-                <span className="text-[11px] text-muted-foreground truncate">
-                  {isRescheduleOpen ? 'Update date, time, dentist, or service details.' : `Ref #${view.selectedAppointmentDetails.id.slice(0, 8)}`}
-                </span>
+            <div className="p-4 border-b border-card-border/40 shrink-0 flex items-center justify-between h-14">
+              <div className="flex items-center gap-2 min-w-0 flex-1">
+                <button
+                  onClick={isRescheduleOpen ? () => setIsRescheduleOpen(false) : () => { view.setSelectedAppointmentDetails(null); setMobileView('timeline'); }}
+                  className="p-1 -ml-1 text-muted-foreground hover:text-foreground shrink-0"
+                >
+                  <ArrowLeft className="size-5" />
+                </button>
+                <div className="flex-1 flex flex-col min-w-0 justify-center">
+                  <span className="text-base font-medium text-foreground truncate leading-tight">
+                    {isRescheduleOpen ? 'Reschedule Appointment' : 'Appointment Details'}
+                  </span>
+                  <span className="text-[11px] text-muted-foreground truncate leading-none mt-0.5">
+                    {isRescheduleOpen ? 'Update date, time, dentist, or service details.' : `Ref #${view.selectedAppointmentDetails.id.slice(0, 8)}`}
+                  </span>
+                </div>
               </div>
             </div>
             <div className="flex-1 overflow-y-auto min-h-0">

@@ -89,8 +89,8 @@ export function SecretaryAppointmentsView() {
       {/* Column 2: Appointment Details */}
       {hasSelection ? (
         <div className={`flex flex-1 flex-col min-w-0 min-h-0 h-full ${colMobile('detail')} lg:flex`}>
-          <div className="p-4 border-b border-card-border/40 shrink-0 flex items-center justify-between">
-            <div className="flex items-center gap-2">
+          <div className="p-4 border-b border-card-border/40 shrink-0 flex items-center justify-between h-14">
+            <div className="flex items-center gap-2 min-w-0 flex-1">
               <button
                 onClick={() => {
                   if (view.showRescheduleForm) {
@@ -106,7 +106,7 @@ export function SecretaryAppointmentsView() {
               >
                 <ArrowLeft className="size-5" />
               </button>
-              <div className="text-base font-medium text-foreground text-left">
+              <div className="text-base font-medium text-foreground text-left truncate">
                 {view.showRescheduleForm ? 'Reschedule Appointment' : view.showCancelForm ? 'Cancel Appointment' : 'Appointment Details'}
               </div>
             </div>

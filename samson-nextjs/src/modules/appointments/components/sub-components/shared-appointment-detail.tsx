@@ -111,26 +111,26 @@ export function SharedAppointmentDetail({ appointment, extraSections, actionsBar
         style={{ scrollbarWidth: 'thin' }}
         data-lenis-prevent
       >
-        <div className={`flex flex-col items-center ${compact ? 'pt-4 pb-3 px-4' : 'pt-6 pb-4 px-5'}`}>
-          <div className={`${compact ? 'size-12' : 'size-16'} shrink-0 rounded-full bg-muted-foreground/10 flex items-center justify-center border-2 border-border/60 overflow-hidden mb-3`}>
-            <UserRound className={`${compact ? 'size-10' : 'size-14'} text-muted-foreground/70 translate-y-0.5`} />
+        <div className="flex flex-col items-center pt-4 pb-3 px-4">
+          <div className="size-12 shrink-0 rounded-full bg-muted-foreground/10 flex items-center justify-center border-2 border-border/60 overflow-hidden mb-3">
+            <UserRound className="size-10 text-muted-foreground/70 translate-y-0.5" />
           </div>
-          <h2 className={`${compact ? 'text-base' : 'text-lg'} font-semibold text-foreground`}>{formatName()}</h2>
+          <h2 className="text-base font-semibold text-foreground">{formatName()}</h2>
           <p className="text-sm text-muted-foreground mt-0.5">{isGuest ? 'Guest' : 'Patient'}</p>
         </div>
 
-        <hr className={`border-card-border/40 ${compact ? 'mx-4' : 'mx-5'}`} />
+        <hr className="border-card-border/40 mx-4" />
 
-        <div className={`flex items-center justify-between ${compact ? 'py-3 px-4' : 'py-4 px-5'}`}>
-          <span className={`${compact ? 'text-sm' : 'text-base'} font-medium text-foreground`}>Current Status</span>
+        <div className="flex items-center justify-between py-3 px-4">
+          <span className="text-sm font-medium text-foreground">Current Status</span>
           <Badge variant={getBadgeVariant(appointment.status)} className="text-xs px-3 py-1">{appointment.status}</Badge>
         </div>
 
-        <hr className={`border-card-border/40 ${compact ? 'mx-4' : 'mx-5'}`} />
+        <hr className="border-card-border/40 mx-4" />
 
-        <div className={`${compact ? 'py-3 px-4' : 'py-4 px-5'}`}>
-          <div className={`flex items-center justify-between ${compact ? 'mb-2' : 'mb-3'}`}>
-            <span className={`${compact ? 'text-sm' : 'text-base'} font-medium text-foreground`}>Guest Information</span>
+        <div className="py-3 px-4">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-medium text-foreground">Guest Information</span>
             {hasGuestInfo && !isEditingGuestInfo && !['COMPLETED', 'CANCELLED', 'REJECTED', 'NO_SHOW'].includes(appointment.status) && (
               <Button variant="outline" size="sm" onClick={startEditGuestInfo} className="h-7 px-2.5 text-xs gap-1">
                 <Pencil className="size-3.5" /> Edit
@@ -157,21 +157,21 @@ export function SharedAppointmentDetail({ appointment, extraSections, actionsBar
           </div>
         </div>
 
-        <hr className={`border-card-border/40 ${compact ? 'mx-4' : 'mx-5'}`} />
+        <hr className="border-card-border/40 mx-4" />
 
-        <div className={`${compact ? 'py-3 px-4' : 'py-4 px-5'}`}>
-          <span className={`${compact ? 'text-sm' : 'text-base'} font-medium text-foreground block ${compact ? 'mb-2' : 'mb-3'}`}>Guest Contact</span>
-          <div className={`flex flex-col ${compact ? 'gap-2' : 'gap-3'}`}>
+        <div className="py-3 px-4">
+          <span className="text-sm font-medium text-foreground block mb-2">Guest Contact</span>
+          <div className="flex flex-col gap-2">
             <GuestField label="Email" value={getEmail()} editValue={guestInfoDraft.email} onChange={(v) => setGuestInfoDraft(p => ({ ...p, email: v }))} isEditing={isEditingGuestInfo} />
             <GuestField label="Phone" value={getPhone()} editValue={guestInfoDraft.phone} onChange={(v) => setGuestInfoDraft(p => ({ ...p, phone: v }))} isEditing={isEditingGuestInfo} />
           </div>
         </div>
 
-        <hr className={`border-card-border/40 ${compact ? 'mx-4' : 'mx-5'}`} />
+        <hr className="border-card-border/40 mx-4" />
 
-        <div className={`${compact ? 'py-3 px-4' : 'py-4 px-5'}`}>
-          <span className={`${compact ? 'text-sm' : 'text-base'} font-medium text-foreground block ${compact ? 'mb-2' : 'mb-3'}`}>Service & Schedule</span>
-          <div className={`flex flex-col ${compact ? 'gap-2' : 'gap-3'}`}>
+        <div className="py-3 px-4">
+          <span className="text-sm font-medium text-foreground block mb-2">Service &amp; Schedule</span>
+          <div className="flex flex-col gap-2">
             <div className="flex flex-col gap-0.5">
               <span className="text-xs text-muted-foreground">Service</span>
               <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{appointment.service?.name || 'Selected Treatment'}</div>
@@ -201,10 +201,10 @@ export function SharedAppointmentDetail({ appointment, extraSections, actionsBar
           </div>
         </div>
 
-        <hr className={`border-card-border/40 ${compact ? 'mx-4' : 'mx-5'}`} />
+        <hr className="border-card-border/40 mx-4" />
 
-        <div className={`${compact ? 'py-3 px-4' : 'py-4 px-5'}`}>
-          <span className={`${compact ? 'text-sm' : 'text-base'} font-medium text-foreground block ${compact ? 'mb-2' : 'mb-3'}`}>Patient Notes</span>
+        <div className="py-3 px-4">
+          <span className="text-sm font-medium text-foreground block mb-2">Patient Notes</span>
           <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground leading-relaxed border-card-border cursor-default min-h-[42px] whitespace-pre-wrap">
             {appointment.userNote || (appointment as any).user_note || appointment.statusReason || (appointment as any).status_reason || 'No notes provided.'}
           </div>

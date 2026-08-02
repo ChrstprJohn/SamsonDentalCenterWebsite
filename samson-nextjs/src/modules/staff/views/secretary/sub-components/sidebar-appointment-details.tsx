@@ -266,19 +266,19 @@ export function SidebarAppointmentDetails({
 
       <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent" style={{ scrollbarWidth: 'thin' }} data-lenis-prevent>
         {/* Profile */}
-        <div className="flex flex-col items-center pt-4 pb-4">
-          <div className="size-16 shrink-0 rounded-full bg-muted-foreground/10 flex items-center justify-center border-2 border-border/60 overflow-hidden mb-3">
-            <UserRound className="size-14 text-muted-foreground/70 translate-y-0.5" />
+        <div className="flex flex-col items-center pt-4 pb-3">
+          <div className="size-12 shrink-0 rounded-full bg-muted-foreground/10 flex items-center justify-center border-2 border-border/60 overflow-hidden mb-3">
+            <UserRound className="size-10 text-muted-foreground/70 translate-y-0.5" />
           </div>
-          <h2 className="text-lg font-semibold text-foreground">{patientName}</h2>
+          <h2 className="text-base font-semibold text-foreground">{patientName}</h2>
           <p className="text-sm text-muted-foreground mt-0.5">{hasGuestInfo ? 'Guest' : 'Patient'}</p>
         </div>
 
         <hr className="border-card-border/40 mx-5" />
 
         {/* Current Status */}
-        <div className="flex items-center justify-between py-4 px-5">
-          <span className="text-base font-medium text-foreground">Current Status</span>
+        <div className="flex items-center justify-between py-3 px-4">
+          <span className="text-sm font-medium text-foreground">Current Status</span>
           <Badge variant={isActiveStatus ? 'success' : 'error'} className="text-xs px-3 py-1">
             {appointment.status}
           </Badge>
@@ -287,9 +287,9 @@ export function SidebarAppointmentDetails({
         <hr className="border-card-border/40 mx-5" />
 
         {/* Guest Information */}
-        <div className="py-4 px-5">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-base font-medium text-foreground">Guest Information</span>
+        <div className="py-3 px-4">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-medium text-foreground">Guest Information</span>
             {hasGuestInfo && !isEditingGuestInfo && (
               <Button variant="outline" size="sm" onClick={startEditGuestInfo} className="h-7 px-2.5 text-xs gap-1">
                 <Pencil className="size-3.5" /> Edit
@@ -319,8 +319,8 @@ export function SidebarAppointmentDetails({
         <hr className="border-card-border/40 mx-5" />
 
         {/* Guest Contact */}
-        <div className="py-4 px-5">
-          <span className="text-base font-medium text-foreground block mb-3">Guest Contact</span>
+        <div className="py-3 px-4">
+          <span className="text-sm font-medium text-foreground block mb-2">Guest Contact</span>
           <div className="flex flex-col gap-3">
             <GuestField label="Email" value={getPatientEmail()} editValue={guestInfoDraft.email} onChange={(v) => setGuestInfoDraft(p => ({ ...p, email: v }))} />
             <GuestField label="Phone" value={getPatientPhone()} editValue={guestInfoDraft.phone} onChange={(v) => setGuestInfoDraft(p => ({ ...p, phone: v }))} />
@@ -330,8 +330,8 @@ export function SidebarAppointmentDetails({
         <hr className="border-card-border/40 mx-5" />
 
         {/* Service & Schedule */}
-        <div className="py-4 px-5">
-          <span className="text-base font-medium text-foreground block mb-3">Service & Schedule</span>
+        <div className="py-3 px-4">
+          <span className="text-sm font-medium text-foreground block mb-2">Service &amp; Schedule</span>
           <div className="flex flex-col gap-3">
             <div className="flex flex-col gap-0.5">
               <span className="text-xs text-muted-foreground">Service <span className="text-destructive">*</span></span>
@@ -359,8 +359,8 @@ export function SidebarAppointmentDetails({
         <hr className="border-card-border/40 mx-5" />
 
         {/* Reminders & Notifications Hub */}
-        <div className="py-4 px-5">
-          <span className="text-base font-medium text-foreground block mb-3">Notification Reminders</span>
+        <div className="py-3 px-4">
+          <span className="text-sm font-medium text-foreground block mb-2">Notification Reminders</span>
           <div className="flex flex-col gap-3">
             {/* 48H Reminder Status */}
             <div className="flex items-center justify-between p-3 rounded-xl border border-card-border bg-muted/30">

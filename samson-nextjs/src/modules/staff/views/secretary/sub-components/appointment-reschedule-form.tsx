@@ -141,7 +141,7 @@ export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps)
       className="flex flex-col gap-4"
     >
       {/* 1. Service & Schedule */}
-      <span className="text-base font-medium text-foreground">Service &amp; Schedule</span>
+      <span className="text-sm font-medium text-foreground">Service &amp; Schedule</span>
 
       {/* Service Selection */}
       <div className="flex flex-col gap-0.5">
@@ -274,7 +274,7 @@ export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps)
       {/* 5. Justification / Reschedule Reason Dropdown + Custom Input */}
       <div className="flex flex-col gap-1.5">
         <div className="flex flex-col gap-0.5">
-          <span className="text-base font-medium text-foreground">Reschedule Reason <span className="text-destructive">*</span></span>
+          <span className="text-sm font-medium text-foreground">Reschedule Reason <span className="text-destructive">*</span></span>
           <span className="text-xs text-muted-foreground">Add a reason for this reschedule before confirming.</span>
         </div>
         <div className="relative flex items-center">

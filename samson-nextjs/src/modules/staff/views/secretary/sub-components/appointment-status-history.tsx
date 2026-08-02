@@ -51,8 +51,8 @@ export function AppointmentStatusHistory({ appointment, activeTab, compact }: { 
   const entries = buildTimelineEntries(appointment);
 
   return (
-    <div className={`${compact ? 'py-3 px-4 space-y-2' : 'py-4 px-5 space-y-3'}`}>
-      <span className={`${compact ? 'text-sm' : 'text-base'} font-medium text-foreground block`}>Appointment Timeline</span>
+    <div className="py-3 px-4 space-y-2">
+      <span className="text-sm font-medium text-foreground block">Appointment Timeline</span>
       {entries.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-6 px-4 text-center">
           <div className="size-8 rounded-full bg-muted/30 flex items-center justify-center mb-2">

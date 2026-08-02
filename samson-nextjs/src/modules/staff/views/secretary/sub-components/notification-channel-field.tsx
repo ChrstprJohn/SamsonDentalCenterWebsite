@@ -37,7 +37,7 @@ export function NotificationChannelField({
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
         <div className="flex flex-col gap-0.5">
-          <span className="text-base font-medium text-foreground">Notification Channel <span className="text-destructive">*</span></span>
+          <span className="text-sm font-medium text-foreground">Notification Channel <span className="text-destructive">*</span></span>
           <span className="text-xs text-muted-foreground">Which channel should be used to notify the patient?</span>
         </div>
         {!editing ? (

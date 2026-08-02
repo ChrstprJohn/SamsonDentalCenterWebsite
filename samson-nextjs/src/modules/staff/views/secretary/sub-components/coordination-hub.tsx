@@ -57,15 +57,15 @@ export function CoordinationHub({ inquiryId, hideHeader, hideActions, onBack }: 
   return (
     <div className="flex flex-col h-full overflow-hidden border-r border-card-border/40 bg-sidebar">
       {!hideHeader && (
-        <div className="p-4 border-b border-card-border/40 shrink-0">
-          <div className="flex items-center gap-2">
+        <div className="p-4 border-b border-card-border/40 shrink-0 h-14 flex items-center">
+          <div className="flex items-center gap-2 min-w-0 flex-1">
             {onBack && (
               <button onClick={onBack} className="xl:hidden p-1 -ml-1 text-muted-foreground hover:text-foreground shrink-0">
                 <ArrowLeft className="size-5" />
               </button>
             )}
-            <div className="text-base font-medium text-foreground">
-              Staff Notes & Logs
+            <div className="text-base font-medium text-foreground truncate">
+              Staff Notes &amp; Logs
             </div>
           </div>
         </div>
