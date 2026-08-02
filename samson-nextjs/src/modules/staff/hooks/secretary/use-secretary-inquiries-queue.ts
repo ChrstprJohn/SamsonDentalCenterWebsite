@@ -161,6 +161,11 @@ export function useSecretaryInquiriesQueue() {
   }, [patientSearchQuery]);
 
   const selectInquiry = (inquiry: any) => {
+    if (!inquiry) {
+      setSelectedInquiryId(null);
+      setStagedInquiryAction('');
+      return;
+    }
     setSelectedInquiryId(inquiry.id);
     setStagedInquiryAction('');
     setStagedInquiryService(inquiry.preferredServiceId);

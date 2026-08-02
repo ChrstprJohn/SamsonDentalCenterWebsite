@@ -194,6 +194,15 @@ export function SharedAppointmentDetail({ appointment, extraSections, actionsBar
           </div>
         </div>
 
+        <hr className={`border-card-border/40 ${compact ? 'mx-4' : 'mx-5'}`} />
+
+        <div className={`${compact ? 'py-3 px-4' : 'py-4 px-5'}`}>
+          <span className={`${compact ? 'text-sm' : 'text-base'} font-medium text-foreground block ${compact ? 'mb-2' : 'mb-3'}`}>Patient Notes</span>
+          <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground leading-relaxed border-card-border cursor-default min-h-[42px] whitespace-pre-wrap">
+            {appointment.userNote || (appointment as any).user_note || appointment.statusReason || (appointment as any).status_reason || 'No notes provided.'}
+          </div>
+        </div>
+
         {extraSections}
       </div>
 

@@ -51,46 +51,45 @@ export function AppointmentStatusHistory({ appointment, activeTab, compact }: { 
   const entries = buildTimelineEntries(appointment);
 
   return (
-    <>
-      <div className="pt-4 flex flex-col gap-4">
-        <span className={`${compact ? 'text-sm' : 'text-base'} font-medium text-foreground`}>Appointment Timeline</span>
-        {entries.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-6 px-4 text-center">
-            <div className="size-8 rounded-full bg-muted/30 flex items-center justify-center mb-2">
-              <History className="size-4 text-muted-foreground/60" />
-            </div>
-            <span className="text-xs font-medium text-foreground">No timeline records</span>
-            <p className="text-[10px] text-muted-foreground mt-0.5">Status change history will appear here.</p>
+    <div className={`${compact ? 'py-3 px-4 space-y-2' : 'py-4 px-5 space-y-3'}`}>
+      <span className={`${compact ? 'text-sm' : 'text-base'} font-medium text-foreground block`}>Appointment Timeline</span>
+      {entries.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-6 px-4 text-center">
+          <div className="size-8 rounded-full bg-muted/30 flex items-center justify-center mb-2">
+            <History className="size-4 text-muted-foreground/60" />
           </div>
-        ) : (
-          <div className="relative">
-            <div className="absolute left-[11px] top-2 bottom-2 w-px bg-border/60" />
-            <div className="flex flex-col">
-              {entries.map((entry, i) => {
-                const style = getStatusStyle(entry.status);
-                return (
-                  <div key={entry.id} className="relative pl-8 pb-5 last:pb-0">
-                    <div
-                      className="absolute left-[5px] top-[5px] size-3 rounded-full border-2 z-10"
-                      style={{ borderColor: style.dot, backgroundColor: style.bg }}
-                    />
-                    <div className="flex flex-col gap-0.5">
-                      <div className="flex items-baseline gap-2 flex-wrap">
-                        <span className="text-xs font-semibold" style={{ color: style.dot }}>{statusLabels[entry.status] || entry.status}</span>
-                        <span className="text-xs text-text-muted">{formatTime(entry.time)}</span>
-                      </div>
-                      {entry.reason && (
-                        <p className="text-xs text-text-secondary leading-relaxed">&ldquo;{entry.reason}&rdquo;</p>
-                      )}
-                      <span className="text-[10px] text-text-muted">- {entry.actor}</span>
+          <span className="text-xs font-medium text-foreground">No timeline records</span>
+          <p className="text-[10px] text-muted-foreground mt-0.5">Status change history will appear here.</p>
+        </div>
+      ) : (
+        <div className="relative">
+          <div className="absolute left-[11px] top-2 bottom-2 w-px bg-border/60" />
+          <div className="flex flex-col">
+            {entries.map((entry) => {
+              const style = getStatusStyle(entry.status);
+              return (
+                <div key={entry.id} className="relative pl-8 pb-5 last:pb-0">
+                  <div
+                    className="absolute left-[5px] top-[5px] size-3 rounded-full border-2 z-10"
+                    style={{ borderColor: style.dot, backgroundColor: style.bg }}
+                  />
+                  <div className="flex flex-col gap-0.5">
+                    <div className="flex items-baseline gap-2 flex-wrap">
+                      <span className="text-xs font-semibold" style={{ color: style.dot }}>{statusLabels[entry.status] || entry.status}</span>
+                      <span className="text-xs text-text-muted">{formatTime(entry.time)}</span>
                     </div>
+                    {entry.reason && (
+                      <p className="text-xs text-text-secondary leading-relaxed">&ldquo;{entry.reason}&rdquo;</p>
+                    )}
+                    <span className="text-[10px] text-text-muted">- {entry.actor}</span>
                   </div>
-                );
-              })}
-            </div>
+                </div>
+              );
+            })}
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
       {activeTab === 'history' && appointment.status === 'COMPLETED' && (
         <div className="border-t border-card-border/80 pt-4 flex flex-col gap-2">
           <span className="text-xs font-bold text-text-secondary">Invoice Receipt</span>
@@ -100,7 +99,7 @@ export function AppointmentStatusHistory({ appointment, activeTab, compact }: { 
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }
 

@@ -45,16 +45,10 @@ const data = {
       icon: <LayoutDashboard className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
     },
     {
-      title: "Chat Inbox",
-      url: "/secretary-v2/chat",
-      icon: <MessageSquare className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
+      title: "Check-In / Out",
+      url: "/secretary-v2/check-in",
+      icon: <UserCheck className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
     },
-    {
-      title: "Communication History",
-      url: "/secretary-v2/communication-logs",
-      icon: <Mail className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
-    },
-
     {
       title: "Appointment Requests",
       url: "/secretary-v2/pending",
@@ -66,19 +60,24 @@ const data = {
       icon: <CalendarDays className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
     },
     {
+      title: "Chat Inbox",
+      url: "/secretary-v2/chat",
+      icon: <MessageSquare className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
+    },
+    {
       title: "Appointments Directory",
       url: "/secretary-v2/appointments",
       icon: <CalendarRange className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
     },
     {
-      title: "Check-In / Out",
-      url: "/secretary-v2/check-in",
-      icon: <UserCheck className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
-    },
-    {
       title: "Past Follow-ups",
       url: "/secretary-v2/past-follow-ups",
       icon: <ClipboardCheck className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
+    },
+    {
+      title: "Communication History",
+      url: "/secretary-v2/communication-logs",
+      icon: <Mail className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
     },
     {
       title: "Clinic Management",
@@ -188,4 +187,3 @@ export function SecretarySidebar({ userProfile, ...props }: SecretarySidebarProp
     </Sidebar>
   )
 }
-

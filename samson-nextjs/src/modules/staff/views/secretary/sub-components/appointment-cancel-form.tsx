@@ -1,4 +1,5 @@
 'use client';
+'use client';
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
@@ -16,6 +17,7 @@ interface AppointmentCancelFormProps {
   isSubmitting: boolean;
   onSubmit: () => void;
   onBack: () => void;
+  noFooter?: boolean;
 }
 
 const CANCEL_REASONS = [
@@ -60,15 +62,13 @@ export function AppointmentCancelForm(props: AppointmentCancelFormProps) {
       }}
       className="flex flex-col gap-4 pt-1"
     >
-      <div className="flex flex-col gap-0.5">
-        <h3 className="text-base font-medium text-destructive">Cancel Slot</h3>
-        <p className="text-xs text-muted-foreground">Select a cancellation reason to confirm.</p>
-      </div>
-
       {props.onConfirmationChannelChange && <NotificationChannelField appointmentId={props.appointmentId} value={props.confirmationChannel} onChange={props.onConfirmationChannelChange} />}
 
       <div className="flex flex-col gap-1.5">
-        <label className="text-xs text-muted-foreground">Reason <span className="text-destructive">*</span></label>
+        <div className="flex flex-col gap-0.5">
+          <label className="text-xs text-muted-foreground font-medium">Approval Note <span className="text-destructive">*</span></label>
+          <span className="text-xs text-muted-foreground">Add a note for this approval before confirming.</span>
+        </div>
         <select
           value={preset}
           onChange={(e) => handleSelectChange(e.target.value)}
@@ -93,23 +93,24 @@ export function AppointmentCancelForm(props: AppointmentCancelFormProps) {
         )}
       </div>
 
-      <div className="flex gap-2 pt-1">
-        <Button
-          type="submit"
-          disabled={props.isSubmitting || !activeReason.trim()}
-          className="flex-1 h-[42px] text-sm font-medium bg-destructive text-white hover:bg-destructive/90 rounded-xl disabled:opacity-50"
-        >
-          {props.isSubmitting ? 'Canceling...' : 'Confirm'}
-        </Button>
-        <Button
-          type="button"
-          onClick={props.onBack}
-          className="flex-1 h-[42px] text-sm font-medium border border-card-border text-foreground bg-transparent hover:bg-muted rounded-xl"
-        >
-          Cancel
-        </Button>
-      </div>
+      {!props.noFooter && (
+        <div className="flex gap-2 pt-1">
+          <Button
+            type="submit"
+            disabled={props.isSubmitting || !activeReason.trim()}
+            className="flex-1 h-[42px] text-sm font-semibold bg-destructive text-white hover:bg-destructive/90 rounded-xl disabled:opacity-50 transition-colors"
+          >
+            {props.isSubmitting ? 'Canceling...' : 'Confirm'}
+          </Button>
+          <Button
+            type="button"
+            onClick={props.onBack}
+            className="flex-1 h-[42px] text-sm font-medium border border-card-border text-foreground bg-transparent hover:bg-muted rounded-xl"
+          >
+            Cancel
+          </Button>
+        </div>
+      )}
     </form>
   );
 }
-

@@ -71,12 +71,7 @@ export function CoordinationHub({ inquiryId, hideHeader, hideActions, onBack }: 
         </div>
       )}
 
-      {!inquiryId ? (
-        <div className="flex-1 flex-col items-center justify-center text-muted-foreground bg-muted/10 space-y-2 max-lg:hidden flex">
-          <ClipboardList className="size-12 text-muted-foreground/40" />
-          <p className="text-sm font-medium">Select an inquiry to start logging coordination actions.</p>
-        </div>
-      ) : (
+      {!inquiryId ? null : (
         <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
           <div className="overflow-y-auto flex-1 p-4 space-y-4 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent" style={{ scrollbarWidth: 'thin' }} data-lenis-prevent>
 
@@ -140,7 +135,7 @@ export function CoordinationHub({ inquiryId, hideHeader, hideActions, onBack }: 
               </div>
             )}
 
-            <div className={`border-t border-card-border/40 pt-4 ${hideActions ? 'mt-0' : ''}`}>
+            <div className={!hideActions ? 'border-t border-card-border/40 pt-4' : ''}>
               <div className="text-xs text-muted-foreground mb-2">Notes History</div>
               {isLoading ? (
                 <div className="py-6 text-center text-xs text-muted-foreground">Loading timeline...</div>

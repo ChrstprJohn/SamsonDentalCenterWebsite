@@ -197,7 +197,8 @@ export function useSecretaryAppointments() {
 
   const submitReschedule = async () => {
     if (!selectedAppointment) return;
-    if (!rescheduleDate || !activeDoctorId || !rescheduleStartTime || !rescheduleEndTime) return alert('Please complete all scheduling fields (date, doctor, timeslot).');
+    const targetDoctorId = rescheduleDoctorId || selectedAppointment.doctorId || activeDoctorId;
+    if (!rescheduleDate || !targetDoctorId || !rescheduleStartTime || !rescheduleEndTime) return alert('Please complete all scheduling fields (date, doctor, timeslot).');
     if (changeTreatment && !rescheduleServiceId) return alert('Please select a treatment service.');
     if (!rescheduleJustification.trim()) return alert('Justification note is required.');
     setIsSubmitting(true);
@@ -216,7 +217,7 @@ export function useSecretaryAppointments() {
         newDate: rescheduleDate,
         newStartTime: formatIso(rescheduleDate, rescheduleStartTime),
         newEndTime: formatIso(rescheduleDate, rescheduleEndTime),
-        newDoctorId: activeDoctorId,
+        newDoctorId: targetDoctorId,
         newServiceId: rescheduleServiceId || selectedAppointment.serviceId || undefined,
         confirmationChannel,
       });

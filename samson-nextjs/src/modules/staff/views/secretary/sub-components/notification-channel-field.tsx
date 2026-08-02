@@ -36,9 +36,12 @@ export function NotificationChannelField({
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
-        <span className="text-base font-medium text-foreground">Notification Channel</span>
+        <div className="flex flex-col gap-0.5">
+          <span className="text-base font-medium text-foreground">Notification Channel <span className="text-destructive">*</span></span>
+          <span className="text-xs text-muted-foreground">Which channel should be used to notify the patient?</span>
+        </div>
         {!editing ? (
-          <Button type="button" variant="outline" size="sm" onClick={() => setEditing(true)} className="h-7 px-2.5 text-xs gap-1">
+          <Button type="button" variant="outline" size="sm" onClick={() => setEditing(true)} className="h-7 px-2.5 text-xs gap-1 shrink-0">
             <Pencil className="size-3.5" /> Edit
           </Button>
         ) : (

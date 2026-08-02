@@ -248,15 +248,18 @@ export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps)
         </div>
       </div>
 
-      {/* 5. Justification Reason Dropdown + Custom Input */}
+      {/* 5. Justification / Approval Note Dropdown + Custom Input */}
       <div className="flex flex-col gap-1.5">
-        <label className="text-xs text-muted-foreground">Reschedule Reason <span className="text-destructive">*</span></label>
+        <div className="flex flex-col gap-0.5">
+          <label className="text-xs text-muted-foreground font-medium">Approval Note <span className="text-destructive">*</span></label>
+          <span className="text-xs text-muted-foreground">Add a note for this approval before confirming.</span>
+        </div>
         <select
           value={reasonMode}
           onChange={(e) => handleReasonSelect(e.target.value)}
           className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
         >
-          <option value="" disabled>Select reason...</option>
+          <option value="" disabled>Select note/reason...</option>
           {COMMON_REASONS.map((reason) => (
             <option key={reason} value={reason}>
               {reason === 'CUSTOM' ? 'Other / Custom Reason...' : reason}
@@ -265,7 +268,7 @@ export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps)
         </select>
         {reasonMode === 'CUSTOM' && (
           <Textarea
-            placeholder="Enter custom justification reason..."
+            placeholder="Enter approval note..."
             value={customReasonText}
             onChange={(event) => handleCustomReasonChange(event.target.value)}
             className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border min-h-[60px] resize-none"
@@ -275,26 +278,23 @@ export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps)
       </div>
 
       {!props.noFooter && (
-      <div className="flex gap-2 pt-3 border-t border-card-border/60">
-        <Button
-          type="submit"
-          disabled={props.isSubmitting || !props.date || !selectedDoctor || !props.startTime || !props.endTime || !props.justification.trim()}
-          className="flex-1 h-[42px] text-sm font-medium bg-primary text-white hover:bg-primary/90 rounded-xl disabled:opacity-50"
-        >
-          {props.isSubmitting ? 'Saving...' : 'Confirm'}
-        </Button>
-        <Button
-          type="button"
-          onClick={props.onBack}
-          className="flex-1 h-[42px] text-sm font-medium border border-card-border text-foreground bg-transparent hover:bg-muted rounded-xl"
-        >
-          Cancel
-        </Button>
-      </div>
+        <div className="flex gap-2 pt-3 border-t border-card-border/60">
+          <Button
+            type="submit"
+            disabled={props.isSubmitting || !props.date || !selectedDoctor || !props.startTime || !props.endTime || !props.justification.trim()}
+            className="flex-1 h-[42px] text-sm font-medium bg-primary text-white hover:bg-primary/90 rounded-xl disabled:opacity-50"
+          >
+            {props.isSubmitting ? 'Saving...' : 'Confirm'}
+          </Button>
+          <Button
+            type="button"
+            onClick={props.onBack}
+            className="flex-1 h-[42px] text-sm font-medium border border-card-border text-foreground bg-transparent hover:bg-muted rounded-xl"
+          >
+            Cancel
+          </Button>
+        </div>
       )}
     </form>
   );
 }
-
-
-

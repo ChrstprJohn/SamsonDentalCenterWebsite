@@ -1,20 +1,20 @@
 'use client';
-'use client';
 
 import { useMemo, useState } from 'react';
 import { useSecretaryAppointments } from '../../hooks/secretary/use-secretary-appointments';
 import { AppointmentDetailPane } from './sub-components/appointment-detail-pane';
 import { AppointmentsTable } from './sub-components/appointments-table';
-import { ArrowLeft, CalendarDays } from 'lucide-react';
+import { CoordinationHub } from './sub-components/coordination-hub';
+import { ArrowLeft, CalendarDays, ClipboardList } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SidebarHeader, SidebarInput, SidebarTrigger } from '@/components/ui/sidebar';
 
 export function SecretaryAppointmentsView() {
   const view = useSecretaryAppointments();
-  const [mobileView, setMobileView] = useState<'list' | 'detail'>('list');
+  const [mobileView, setMobileView] = useState<'list' | 'detail' | 'quickLogs'>('list');
   const [search, setSearch] = useState('');
 
-  const colMobile = (v: 'list' | 'detail') =>
+  const colMobile = (v: 'list' | 'detail' | 'quickLogs') =>
     mobileView === v ? 'flex' : 'hidden';
 
   const hasSelection = !!view.selectedAppointment;
@@ -40,7 +40,8 @@ export function SecretaryAppointmentsView() {
 
   return (
     <div className="flex flex-1 min-h-0 w-full overflow-hidden">
-      <div className={`lg:w-[350px] flex-1 lg:flex-none flex-col border-r border-card-border/40 bg-sidebar min-h-0 overflow-hidden ${colMobile('list')} lg:flex`}>
+      {/* Column 1: Appointments List */}
+      <div className={`xl:w-[350px] lg:w-[320px] flex-1 lg:flex-none flex-col border-r border-card-border/40 bg-sidebar min-h-0 overflow-hidden ${colMobile('list')} lg:flex`}>
         <SidebarHeader className="gap-3.5 border-b p-4 shrink-0">
           <div className="flex w-full h-8 items-center justify-between">
             <div className="flex items-center gap-2">
@@ -85,22 +86,39 @@ export function SecretaryAppointmentsView() {
         />
       </div>
 
+      {/* Column 2: Appointment Details */}
       {hasSelection ? (
         <div className={`flex flex-1 flex-col min-w-0 min-h-0 h-full ${colMobile('detail')} lg:flex`}>
-          <div className="p-4 border-b border-card-border/40 shrink-0">
+          <div className="p-4 border-b border-card-border/40 shrink-0 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <button onClick={view.showRescheduleForm ? () => view.setShowRescheduleForm(false) : () => setMobileView('list')} className="p-1 -ml-1 text-muted-foreground hover:text-foreground shrink-0">
+              <button
+                onClick={() => {
+                  if (view.showRescheduleForm) {
+                    view.setShowRescheduleForm(false);
+                  } else if (view.showCancelForm) {
+                    view.setShowCancelForm(false);
+                  } else {
+                    view.setSelectedAppointmentId(null);
+                    setMobileView('list');
+                  }
+                }}
+                className="p-1 -ml-1 text-muted-foreground hover:text-foreground shrink-0"
+              >
                 <ArrowLeft className="size-5" />
               </button>
-              <div className="flex-1 flex flex-col text-left min-w-0">
-                <span className="text-base font-medium text-foreground truncate">
-                  {view.showRescheduleForm ? 'Reschedule' : 'Appointment Details'}
-                </span>
-                <span className="text-[11px] text-muted-foreground truncate">
-                  {view.showRescheduleForm ? 'Update date, time, dentist, or service details.' : (view.selectedAppointment?.id ? `Ref #${view.selectedAppointment.id.slice(0, 8)}` : '')}
-                </span>
+              <div className="text-base font-medium text-foreground text-left">
+                {view.showRescheduleForm ? 'Reschedule' : view.showCancelForm ? 'Cancel Appointment' : 'Appointment Details'}
               </div>
             </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setMobileView('quickLogs')}
+              className="xl:hidden gap-1.5 text-xs h-8"
+            >
+              <ClipboardList className="size-3.5" />
+              <span>Notes & Logs</span>
+            </Button>
           </div>
           <AppointmentDetailPane view={view} />
         </div>
@@ -113,6 +131,17 @@ export function SecretaryAppointmentsView() {
           <p className="text-xs text-muted-foreground max-w-xs mt-1">Select an appointment from the list to view patient details and status.</p>
         </div>
       )}
+
+      {/* Column 3: Staff Notes & Logs */}
+      {hasSelection && (
+        <div className={`xl:w-[350px] lg:w-[320px] flex-col border-l border-card-border/40 min-h-0 overflow-hidden ${colMobile('quickLogs')} xl:flex`}>
+          <CoordinationHub
+            inquiryId={view.selectedAppointmentId}
+            onBack={() => setMobileView('detail')}
+          />
+        </div>
+      )}
     </div>
   );
 }
+
