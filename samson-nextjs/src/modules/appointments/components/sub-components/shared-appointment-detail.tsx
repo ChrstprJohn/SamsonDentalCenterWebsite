@@ -238,6 +238,7 @@ function GuestField({ label, value, editValue, onChange, isEditing }: { label: s
 function getBadgeVariant(status: string) {
   if (status === 'COMPLETED') return 'success';
   if (status === 'APPROVED') return 'info';
+  if (status === 'CHECKED_IN') return 'cyan';
   if (status === 'NO_SHOW' || status === 'DISPLACED') return 'warning';
   if (status === 'CANCELLED' || status === 'REJECTED') return 'error';
   return 'default';

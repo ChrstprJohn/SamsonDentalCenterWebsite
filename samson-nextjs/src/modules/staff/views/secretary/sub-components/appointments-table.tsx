@@ -6,6 +6,7 @@ import { formatClinicTime, formatShortDate, formatTimeString } from '@/shared/ut
 
 const BADGE_STYLES: Record<string, string> = {
   APPROVED: 'text-blue-600 bg-blue-500/10 dark:text-blue-400',
+  CHECKED_IN: 'text-cyan-600 bg-cyan-500/10 dark:text-cyan-400',
   COMPLETED: 'text-emerald-600 bg-emerald-500/10 dark:text-emerald-400',
   CANCELLED: 'text-rose-600 bg-rose-500/10 dark:text-rose-400',
   REJECTED: 'text-rose-600 bg-rose-500/10 dark:text-rose-400',
