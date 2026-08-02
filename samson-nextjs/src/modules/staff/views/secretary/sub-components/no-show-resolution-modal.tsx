@@ -190,9 +190,12 @@ export function NoShowResolutionModal({ view }: { view: any }) {
 
           {/* Notification Channel Block - Only visible on Mark Completed */}
           {resolution === 'COMPLETED' && (
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-text-primary">Notification Channel</span>
+            <div className="flex flex-col gap-1.5">
+              <div className="flex items-center justify-between mb-1">
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-sm font-medium text-text-primary">Notification Channel <span className="text-destructive">*</span></span>
+                  <span className="text-xs text-text-secondary">Which channel should be used to notify the patient?</span>
+                </div>
                 {!isEditingChannel ? (
                   <Button variant="outline" size="sm" onClick={() => setIsEditingChannel(true)} className="h-7 px-2.5 text-xs gap-1">
                     <Pencil className="size-3.5" /> Edit
@@ -231,7 +234,10 @@ export function NoShowResolutionModal({ view }: { view: any }) {
 
           {resolution !== 'RESCHEDULE' && (
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-bold text-text-primary">Reason for Resolution</label>
+              <div className="flex flex-col gap-0.5">
+                <span className="text-sm font-medium text-text-primary">Reason for Resolution <span className="text-destructive">*</span></span>
+                <span className="text-xs text-text-secondary">Add a reason for resolving this no-show before confirming.</span>
+              </div>
               <textarea
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}

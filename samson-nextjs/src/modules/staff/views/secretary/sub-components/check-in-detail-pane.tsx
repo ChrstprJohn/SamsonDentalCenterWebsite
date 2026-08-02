@@ -332,9 +332,12 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
                 </div>
 
                 {resolveMode === 'COMPLETED' && (
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-foreground">Notification Channel</span>
+                  <div className="flex flex-col gap-1.5">
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-sm font-medium text-foreground">Notification Channel <span className="text-destructive">*</span></span>
+                        <span className="text-xs text-muted-foreground">Which channel should be used to notify the patient?</span>
+                      </div>
                       {!isEditingInlineChannel ? (
                         <Button variant="outline" size="sm" onClick={() => setIsEditingInlineChannel(true)} className="h-7 px-2.5 text-xs gap-1">
                           <Pencil className="size-3.5" /> Edit
@@ -371,7 +374,10 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
                   </div>
                 )}
                 <div className="flex flex-col gap-1.5">
-                  <span className="text-xs text-muted-foreground">Reason for Resolution</span>
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-sm font-medium text-foreground">Reason for Resolution <span className="text-destructive">*</span></span>
+                    <span className="text-xs text-muted-foreground">Add a reason for resolving this no-show before confirming.</span>
+                  </div>
                   <select value={selectedPreset} onChange={(e) => { const v = e.target.value; if (v === '__custom__') { setShowCustomReason(true); setResolveReason(''); } else { setShowCustomReason(false); setSelectedPreset(v); setResolveReason(v); } }} className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border">
                     <option value="" disabled>Select a Reason</option>
                     {resolveReasonOptions[resolveMode].map((opt) => (<option key={opt} value={opt}>{opt}</option>))}
@@ -479,7 +485,10 @@ function CheckInContent({
         Confirming will mark the patient as present and move the appointment to the Checked In queue.
       </InfoBox>
       <div className="flex flex-col gap-1.5">
-        <span className="text-xs text-muted-foreground">Reason for Check-In</span>
+        <div className="flex flex-col gap-0.5">
+          <span className="text-sm font-medium text-foreground">Reason for Check-In <span className="text-destructive">*</span></span>
+          <span className="text-xs text-muted-foreground">Add a reason for this check-in before confirming.</span>
+        </div>
         <div className="relative flex items-center">
           <select
             value={reasonMode}
@@ -529,7 +538,10 @@ function UndoCheckInContent({
         This will remove the Checked In status and return the patient to the Upcoming queue.
       </InfoBox>
       <div className="flex flex-col gap-1.5">
-        <span className="text-xs text-muted-foreground">Reason for Undo</span>
+        <div className="flex flex-col gap-0.5">
+          <span className="text-sm font-medium text-foreground">Reason for Undo <span className="text-destructive">*</span></span>
+          <span className="text-xs text-muted-foreground">Add a reason for reverting this check-in before confirming.</span>
+        </div>
         <div className="relative flex items-center">
           <select
             value={reasonMode}
@@ -624,7 +636,10 @@ function CheckoutContent({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-1.5">
-        <span className="text-xs text-muted-foreground">Checkout Reason <span className="text-destructive">*</span></span>
+        <div className="flex flex-col gap-0.5">
+          <span className="text-sm font-medium text-foreground">Checkout Reason <span className="text-destructive">*</span></span>
+          <span className="text-xs text-muted-foreground">Add a reason for this checkout before confirming.</span>
+        </div>
         <div className="relative flex items-center">
           <select
             value={reasonMode}
@@ -649,9 +664,12 @@ function CheckoutContent({
         )}
       </div>
 
-      <div>
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-foreground">Notification Channel</span>
+      <div className="flex flex-col gap-1.5">
+        <div className="flex items-center justify-between mb-1">
+          <div className="flex flex-col gap-0.5">
+            <span className="text-sm font-medium text-foreground">Notification Channel <span className="text-destructive">*</span></span>
+            <span className="text-xs text-muted-foreground">Which channel should be used to notify the patient?</span>
+          </div>
           {!isEditingChannel ? (
             <Button variant="outline" size="sm" onClick={() => setIsEditingChannel(true)} className="h-7 px-2.5 text-xs gap-1">
               <Pencil className="size-3.5" /> Edit
@@ -810,9 +828,12 @@ function ResolveContent({ view, onClose }: { view: any; onClose: () => void }) {
 
       {/* Notification Channel Block - Only visible on Checkout */}
       {resolution === 'COMPLETED' && (
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-foreground">Notification Channel</span>
+        <div className="flex flex-col gap-1.5">
+          <div className="flex items-center justify-between mb-1">
+            <div className="flex flex-col gap-0.5">
+              <span className="text-sm font-medium text-foreground">Notification Channel <span className="text-destructive">*</span></span>
+              <span className="text-xs text-muted-foreground">Which channel should be used to notify the patient?</span>
+            </div>
             {!isEditingChannel ? (
               <Button variant="outline" size="sm" onClick={() => setIsEditingChannel(true)} className="h-7 px-2.5 text-xs gap-1">
                 <Pencil className="size-3.5" /> Edit
@@ -883,7 +904,10 @@ function ResolveContent({ view, onClose }: { view: any; onClose: () => void }) {
         />
       ) : (
         <div className="flex flex-col gap-1.5">
-            <span className="text-xs text-muted-foreground">Reason for Resolution</span>
+            <div className="flex flex-col gap-0.5">
+              <span className="text-sm font-medium text-foreground">Reason for Resolution <span className="text-destructive">*</span></span>
+              <span className="text-xs text-muted-foreground">Add a reason for resolving this no-show before confirming.</span>
+            </div>
             <div className="relative flex items-center">
               <select
                 value={reasonMode}
@@ -1236,9 +1260,12 @@ function InlineCheckoutForm({ appointment, view, onCancel }: { appointment: any;
 
       <hr className="border-card-border/40" />
 
-      <div>
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-foreground">Notification Channel</span>
+      <div className="flex flex-col gap-1.5">
+        <div className="flex items-center justify-between mb-1">
+          <div className="flex flex-col gap-0.5">
+            <span className="text-sm font-medium text-foreground">Notification Channel <span className="text-destructive">*</span></span>
+            <span className="text-xs text-muted-foreground">Which channel should be used to notify the patient?</span>
+          </div>
           {!isEditingChannel ? (
             <Button variant="outline" size="sm" onClick={() => setIsEditingChannel(true)} className="h-7 px-2.5 text-xs gap-1">
               <Pencil className="size-3.5" /> Edit

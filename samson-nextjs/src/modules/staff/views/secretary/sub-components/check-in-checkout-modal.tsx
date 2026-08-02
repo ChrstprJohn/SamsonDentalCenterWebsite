@@ -75,9 +75,12 @@ export function CheckInCheckoutModal({ view }: { view: any }) {
         </div>
 
         {/* Notification Channel Block */}
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-text-primary">Notification Channel</span>
+        <div className="flex flex-col gap-1.5">
+          <div className="flex items-center justify-between mb-1">
+            <div className="flex flex-col gap-0.5">
+              <span className="text-sm font-medium text-text-primary">Notification Channel <span className="text-destructive">*</span></span>
+              <span className="text-xs text-text-secondary">Which channel should be used to notify the patient?</span>
+            </div>
             {!isEditingChannel ? (
               <Button variant="outline" size="sm" onClick={() => setIsEditingChannel(true)} className="h-7 px-2.5 text-xs gap-1">
                 <Pencil className="size-3.5" /> Edit
