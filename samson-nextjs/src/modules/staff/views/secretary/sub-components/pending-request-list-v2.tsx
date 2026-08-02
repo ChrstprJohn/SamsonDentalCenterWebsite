@@ -169,7 +169,6 @@ export function PendingRequestListV2(props: PendingRequestListV2Props) {
                   Retry
                 </Button>
                 </div>
-              </SecretaryListSkeletonTheme>
             ) : filteredInquiries.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
                 <div className="size-10 rounded-full bg-muted/30 flex items-center justify-center mb-2.5">
