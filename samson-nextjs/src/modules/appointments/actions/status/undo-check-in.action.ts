@@ -43,11 +43,9 @@ export async function undoCheckInAction(formData: UndoCheckInDto) {
         ),
     });
 
-    const result = await useCase(
-      validData.appointmentId,
-      user.id,
-      'STAFF'
-    );
+    const result = validData.reason
+      ? await useCase(validData.appointmentId, user.id, 'STAFF', validData.reason)
+      : await useCase(validData.appointmentId, user.id, 'STAFF');
 
     return { success: true, data: result };
   } catch (error) {

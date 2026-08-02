@@ -284,7 +284,7 @@ export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps)
             className="w-full px-4 pr-10 py-2.5 appearance-none rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
             required
           >
-            <option value="" disabled>Select reason...</option>
+            <option value="" disabled>Select a Reason</option>
             {COMMON_REASONS.map((reason) => (
               <option key={reason} value={reason}>
                 {reason === 'CUSTOM' ? 'Other / Custom Reason...' : reason}

@@ -48,7 +48,7 @@ export function SecretaryPastAppointmentFollowUpsView() {
             <div className="flex items-center gap-2">
               <SidebarTrigger className="lg:hidden -ml-1 text-muted-foreground hover:text-foreground" />
               <div className="text-base font-medium text-foreground">
-                Past Follow-ups
+                Unresolved Appointments
               </div>
             </div>
           </div>

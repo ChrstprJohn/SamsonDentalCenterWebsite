@@ -70,7 +70,7 @@ const data = {
       icon: <CalendarRange className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
     },
     {
-      title: "Past Follow-ups",
+      title: "Unresolved Appointments",
       url: "/secretary-v2/past-follow-ups",
       icon: <ClipboardCheck className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
     },

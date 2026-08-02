@@ -126,9 +126,8 @@ export function useSecretaryCheckInOutTracker() {
   const handleCheckIn = (appointmentId: string) =>
     runStatusAction(() => checkInAction({ appointmentId }), 'Failed to check in');
 
-  const handleUndoCheckIn = (appointmentId: string) => {
-    if (!confirm('Are you sure you want to undo this check-in?')) return;
-    runStatusAction(() => undoCheckInAction({ appointmentId }), 'Failed to undo check-in');
+  const handleUndoCheckIn = (appointmentId: string, reason?: string) => {
+    runStatusAction(() => undoCheckInAction({ appointmentId, reason }), 'Failed to undo check-in');
   };
 
   const handleCheckoutComplete = (appointmentId: string) => {

@@ -21,10 +21,13 @@ import { AppointmentNotificationsTab } from './appointment-notifications-tab';
 interface AppointmentDetailPaneProps {
   view: any;
   compact?: boolean;
+  appointment?: AppointmentDto;
+  activeTab?: AppointmentDirectoryTab;
+  hideActions?: boolean;
 }
 
-export function AppointmentDetailPane({ view, compact }: AppointmentDetailPaneProps) {
-  const appointment = view.selectedAppointment as AppointmentDto | undefined;
+export function AppointmentDetailPane({ view, compact, appointment: appointmentOverride, activeTab: activeTabOverride, hideActions }: AppointmentDetailPaneProps) {
+  const appointment = appointmentOverride || (view.selectedAppointment as AppointmentDto | undefined);
   if (!appointment) {
     return (
       <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center text-muted-foreground">
@@ -38,10 +41,10 @@ export function AppointmentDetailPane({ view, compact }: AppointmentDetailPanePr
       </div>
     );
   }
-  return <AppointmentDetails appointment={appointment} view={view} activeTab={view.activeTab} compact={compact} />;
+  return <AppointmentDetails appointment={appointment} view={view} activeTab={activeTabOverride || view.activeTab || 'upcoming'} compact={compact} hideActions={hideActions} />;
 }
 
-function AppointmentDetails({ appointment, view, activeTab, compact }: { appointment: AppointmentDto; view: any; activeTab: AppointmentDirectoryTab; compact?: boolean }) {
+function AppointmentDetails({ appointment, view, activeTab, compact, hideActions }: { appointment: AppointmentDto; view: any; activeTab: AppointmentDirectoryTab; compact?: boolean; hideActions?: boolean }) {
   const [detailTab, setDetailTab] = useState<'overview' | 'notifications' | 'timeline'>('overview');
 
   const canModify = ['APPROVED', 'PENDING', 'RESCHEDULE_REQUESTED', 'DISPLACED'].includes(appointment.status);
@@ -186,7 +189,7 @@ function AppointmentDetails({ appointment, view, activeTab, compact }: { appoint
       </div>
 
       {/* Sticky Bottom Actions Bar */}
-      {(() => {
+      {!hideActions && (() => {
         const canCancelOnly = appointment.status === 'CHECKED_IN';
         if (!canModify && !canRescheduleOnly && !canCancelOnly) return null;
 
