@@ -11,6 +11,13 @@ import { AppointmentRescheduleForm } from './appointment-reschedule-form';
 import { AppointmentStatusHistory } from './appointment-status-history';
 import { AppointmentNotificationsTab } from './appointment-notifications-tab';
 
+/**
+ * AppointmentDetailPane - Shared appointment details panel.
+ * 
+ * Layout & Background Styling Rules:
+ * - Calendar & Chat views pass `compact={true}`: Tabs sub-header and sticky bottom action containers use `bg-sidebar` to seamlessly blend into sidebar containers.
+ * - Appointment Directory view passes `compact={false}` (default): Tabs sub-header and sticky bottom action containers use `bg-card` (white) for standard main panel styling.
+ */
 interface AppointmentDetailPaneProps {
   view: any;
   compact?: boolean;
@@ -68,7 +75,7 @@ function AppointmentDetails({ appointment, view, activeTab, compact }: { appoint
         <div className="flex-1 min-h-0 overflow-y-auto p-4" style={{ scrollbarWidth: 'thin' }} data-lenis-prevent>
           <AppointmentRescheduleForm appointment={appointment} {...getRescheduleProps(view)} noFooter />
         </div>
-        <div className="shrink-0 border-t border-border px-4 py-3 bg-sidebar">
+        <div className={`shrink-0 border-t border-border px-4 py-3 ${compact ? 'bg-sidebar' : 'bg-card'}`}>
           <div className="flex gap-2">
             <Button onClick={view.submitReschedule} disabled={view.isSubmitting} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl disabled:opacity-50">
               {view.isSubmitting ? 'Saving...' : 'Confirm'}
@@ -101,7 +108,7 @@ function AppointmentDetails({ appointment, view, activeTab, compact }: { appoint
             noFooter
           />
         </div>
-        <div className="shrink-0 border-t border-border px-4 py-3 bg-sidebar">
+        <div className={`shrink-0 border-t border-border px-4 py-3 ${compact ? 'bg-sidebar' : 'bg-card'}`}>
           <div className="flex gap-2">
             <Button
               onClick={view.submitCancel}
@@ -126,7 +133,7 @@ function AppointmentDetails({ appointment, view, activeTab, compact }: { appoint
   return (
     <div className="flex flex-col flex-1 min-h-0 h-full">
       {/* Sub-Header Tabs */}
-      <div className="shrink-0 border-b border-card-border/40 px-5 bg-card/50">
+      <div className={`shrink-0 border-b border-card-border/40 ${compact ? 'px-4 bg-sidebar' : 'px-5 bg-card'}`}>
         <div className="relative flex gap-6">
           {TABS.map((tab, idx) => {
             const isActive = detailTab === tab.key;
@@ -185,7 +192,7 @@ function AppointmentDetails({ appointment, view, activeTab, compact }: { appoint
 
         if (!view.showRescheduleForm && !view.showCancelForm) {
           return (
-            <div className={`shrink-0 border-t border-border bg-sidebar ${compact ? 'p-3' : 'p-4'}`}>
+            <div className={`shrink-0 border-t border-border ${compact ? 'p-3 bg-sidebar' : 'p-4 bg-card'}`}>
               <div className="flex gap-2">
                 {(canModify || canRescheduleOnly) && (
                   <Button variant="outline" className={`${canModify ? 'flex-1' : 'w-full'} h-[42px]`} onClick={() => view.setShowRescheduleForm(true)}>
@@ -203,7 +210,7 @@ function AppointmentDetails({ appointment, view, activeTab, compact }: { appoint
         }
 
         return (
-          <div className={`shrink-0 border-t border-border bg-sidebar ${compact ? 'p-3' : 'p-4'}`}>
+          <div className={`shrink-0 border-t border-border ${compact ? 'p-3 bg-sidebar' : 'p-4 bg-card'}`}>
             <div className="space-y-3">
               {view.showRescheduleForm && (canModify || canRescheduleOnly) && (
                 <>

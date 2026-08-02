@@ -9,6 +9,13 @@ import { getPatientDetailsForStaffAction } from '@/modules/patients/actions/prof
 import { updateGuestContactAction } from '@/modules/appointments/actions/booking/update-guest-contact.action';
 import { UserRound, Pencil, X, Check } from 'lucide-react';
 
+/**
+ * SharedAppointmentDetail - Core appointment details overview content.
+ * 
+ * Layout & Background Styling Rules:
+ * - `compact={true}` (Calendar & Chat): Action bar uses `bg-sidebar` to match sidebar layout.
+ * - `compact={false}` (Appointment Directory): Action bar uses `bg-card` (white) for main panel styling.
+ */
 interface SharedAppointmentDetailProps {
   appointment: AppointmentDto;
   extraSections?: ReactNode;
@@ -207,7 +214,7 @@ export function SharedAppointmentDetail({ appointment, extraSections, actionsBar
       </div>
 
       {actionsBar && (
-        <div className={`shrink-0 border-t border-border bg-sidebar ${compact ? 'p-3' : 'p-4'}`}>
+        <div className={`shrink-0 border-t border-border ${compact ? 'p-3 bg-sidebar' : 'p-4 bg-card'}`}>
           {actionsBar}
         </div>
       )}
