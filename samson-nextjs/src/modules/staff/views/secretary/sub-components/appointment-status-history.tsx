@@ -107,10 +107,8 @@ function buildTimelineEntries(appointment: AppointmentDto): TimelineEntry[] {
   const history = appointment.statusHistory || [];
   const entries: TimelineEntry[] = [];
 
-  const needsPendingPrepend = history.length === 0 ||
-    !(history[0].previousStatus === 'PENDING' || history[0].newStatus === 'PENDING');
-
-  if (needsPendingPrepend) {
+  const hasPendingEntry = history.some((h) => h.newStatus === 'PENDING');
+  if (!hasPendingEntry) {
     const isStaffCreated = appointment.source === 'STAFF_CREATED';
     entries.push({
       id: 'initial',

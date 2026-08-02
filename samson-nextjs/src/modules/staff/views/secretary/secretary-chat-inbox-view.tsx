@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { createClient } from '@/shared/database/client';
 import { getChatThreadsAction } from '@/modules/appointments/actions/chat/get-chat-threads.action';
+import { getStaffAppointmentByIdAction } from '@/modules/appointments/actions/clinic/get-staff-appointment-by-id.action';
 import { getMessagesAction } from '@/modules/appointments/actions/chat/get-messages.action';
 import { markMessagesAsReadAction } from '@/modules/appointments/actions/chat/mark-read.action';
 import { ChatThreadDto } from '@/modules/appointments/repositories/chat/chat.queries';
@@ -258,6 +259,31 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
     const [isEditingGuestInfo, setIsEditingGuestInfo] = useState(false);
     const [guestInfoDraft, setGuestInfoDraft] = useState({ firstName: '', middleName: '', lastName: '', suffix: '', email: '', phone: '' });
     const [savingGuestInfo, setSavingGuestInfo] = useState(false);
+    const [fullAppointment, setFullAppointment] = useState<AppointmentDto | null>(null);
+
+    const refreshFullAppointment = useCallback(async (appointmentId: string) => {
+        const res = await getStaffAppointmentByIdAction(appointmentId);
+        if (res.success && res.data) {
+            setFullAppointment(res.data);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (!selectedThreadId) {
+            setFullAppointment(null);
+            return;
+        }
+        let isCancelled = false;
+        getStaffAppointmentByIdAction(selectedThreadId).then((res) => {
+            if (!isCancelled && res.success && res.data) {
+                setFullAppointment(res.data);
+            }
+        });
+        return () => {
+            isCancelled = true;
+        };
+    }, [selectedThreadId]);
+
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
     const showToast = React.useCallback((message: string, type: 'success' | 'error') => {
         setToast({ message, type });
@@ -531,6 +557,9 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
             if (res && res.success) {
                 setActionSuccess('Action executed successfully!');
                 await fetchThreads();
+                if (selectedThreadId) {
+                    await refreshFullAppointment(selectedThreadId);
+                }
                 const msgRes = await getMessagesAction(selectedThreadId);
                 if (msgRes && msgRes.data) {
                     setSelectedThreadMessages(msgRes.data);
@@ -592,6 +621,9 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                     : t
             ));
             setIsEditingGuestInfo(false);
+            if (selectedThreadId) {
+                refreshFullAppointment(selectedThreadId);
+            }
             showToast('Guest info updated successfully', 'success');
         } else {
             showToast(res.error || 'Failed to update guest info', 'error');
@@ -601,6 +633,9 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
 
     const appointmentAdapter: AppointmentDto | null = useMemo(() => {
         if (!selectedThread) return null;
+        if (fullAppointment && fullAppointment.id === selectedThread.appointmentId) {
+            return fullAppointment;
+        }
         const ch = (selectedThread as any).confirmationChannel || (selectedThread as any).confirmation_channel || 'EMAIL';
         const st = selectedThread as any;
         const patientIdVal = st?.patientId || null;
@@ -662,7 +697,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
             proposedEndTime: null,
             proposedDoctorId: null,
         } as unknown as AppointmentDto;
-    }, [selectedThread]);
+    }, [selectedThread, fullAppointment]);
 
     const detailPaneView = useMemo(() => {
         if (!appointmentAdapter) return null;
@@ -675,7 +710,10 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                     : t));
             },
             activeTab: 'upcoming',
-            fetchData: () => fetchThreads(),
+            fetchData: () => {
+                fetchThreads();
+                if (selectedThreadId) refreshFullAppointment(selectedThreadId);
+            },
             showRescheduleForm: activeAction === 'RESCHEDULE',
             setShowRescheduleForm: (show: boolean) => {
                 if (show) {
