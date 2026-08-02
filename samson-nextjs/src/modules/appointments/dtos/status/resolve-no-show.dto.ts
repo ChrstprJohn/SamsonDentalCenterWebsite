@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const resolveNoShowSchema = z.object({
   appointmentId: z.string().uuid('Invalid Appointment ID format'),
-  resolution: z.enum(['COMPLETED', 'CONFIRMED_NO_SHOW', 'RESCHEDULE']),
+  resolution: z.enum(['COMPLETED', 'CONFIRMED_NO_SHOW', 'RESCHEDULE', 'CHECKED_IN']),
   reason: z.string().min(3, 'Reason must be at least 3 characters long'),
   newDate: z.string().optional(),
   newStartTime: z.string().optional(),

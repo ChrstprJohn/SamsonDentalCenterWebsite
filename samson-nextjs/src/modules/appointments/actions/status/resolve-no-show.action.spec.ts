@@ -47,4 +47,32 @@ describe('resolveNoShowAction', () => {
       undefined
     );
   });
+
+  it('successfully resolves no-show with CHECKED_IN resolution', async () => {
+    vi.mocked(authorizeRole).mockResolvedValue({ id: 'staff_1' } as any);
+    vi.mocked(getAuthenticatedUser).mockResolvedValue({ id: 'staff_1' } as any);
+    const mockUpdate = vi.fn().mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) });
+    vi.mocked(createClient).mockResolvedValue({
+      from: vi.fn().mockReturnValue({ update: mockUpdate }),
+    } as any);
+    mockResolveNoShow.mockResolvedValue({ id: 'appt_123', status: 'CHECKED_IN' });
+
+    const payload = {
+      appointmentId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd2',
+      resolution: 'CHECKED_IN' as const,
+      reason: 'Late check-in for active patient',
+    };
+
+    const result = await resolveNoShowAction(payload);
+
+    expect(result).toEqual({ success: true, data: { id: 'appt_123', status: 'CHECKED_IN' } });
+    expect(mockResolveNoShow).toHaveBeenCalledWith(
+      'da95a63c-333e-4b68-98e3-82bdf1a07bd2',
+      'staff_1',
+      'STAFF',
+      'CHECKED_IN',
+      'Late check-in for active patient',
+      undefined
+    );
+  });
 });

@@ -92,7 +92,7 @@ export function usePastAppointmentFollowUps() {
 
   const handleResolveNoShowSubmit = (payload: {
     appointmentId: string;
-    resolution: 'COMPLETED' | 'CONFIRMED_NO_SHOW' | 'RESCHEDULE';
+    resolution: 'COMPLETED' | 'CONFIRMED_NO_SHOW' | 'RESCHEDULE' | 'CHECKED_IN';
     reason: string;
     newDate?: string;
     newStartTime?: string;

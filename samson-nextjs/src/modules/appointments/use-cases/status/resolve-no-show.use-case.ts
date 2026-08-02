@@ -25,7 +25,7 @@ export const resolveNoShowUseCase = (deps: {
     appointmentId: string,
     actorId: string | null,
     actorRole: string,
-    resolution: 'COMPLETED' | 'CONFIRMED_NO_SHOW' | 'RESCHEDULE',
+    resolution: 'COMPLETED' | 'CONFIRMED_NO_SHOW' | 'RESCHEDULE' | 'CHECKED_IN',
     reason: string,
     rescheduleMetadata?: {
       date: string;
@@ -35,6 +35,16 @@ export const resolveNoShowUseCase = (deps: {
     }
   ) => {
     const appointment = await deps.getAppointmentById(appointmentId);
+
+    if (resolution === 'CHECKED_IN') {
+      return await deps.updateAppointmentStatusTransaction(
+        appointmentId,
+        actorId,
+        actorRole,
+        'CHECKED_IN',
+        `Resolved No-Show (Late Check-in): ${reason}`
+      );
+    }
 
     if (resolution === 'COMPLETED') {
       return await deps.updateAppointmentStatusTransaction(

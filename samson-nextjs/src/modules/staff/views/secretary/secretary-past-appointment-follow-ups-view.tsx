@@ -308,6 +308,10 @@ function FollowUpDetail({ appointment, view, onBack, className }: { appointment:
           </div>
         ) : isMissedCheckout && showLateCheckout ? (
           <div className="flex flex-col gap-3">
+            <div className="p-3 border bg-amber-500/5 border-amber-500/20 rounded-2xl">
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-amber-600">Completion Notice</span>
+              <div className="text-[11px] text-muted-foreground mt-1 leading-relaxed">This will complete the visit and send the selected post-care message.</div>
+            </div>
             <div>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium text-foreground">Notification Channel</span>
@@ -326,10 +330,6 @@ function FollowUpDetail({ appointment, view, onBack, className }: { appointment:
                 <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{channel === 'EMAIL' ? 'Email' : channel === 'SMS' ? 'SMS' : channel === 'BOTH' ? 'Email & SMS' : 'None'}</div>
               )}
             </div>
-            <div className="p-4 border bg-amber-500/5 border-amber-500/20 rounded-2xl">
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-amber-600">Automated Communication</span>
-              <div className="text-[11px] text-muted-foreground mt-1 leading-relaxed">Confirming will complete the visit and send a Thank You & Review Request message via the selected channel.</div>
-            </div>
             <div className="flex gap-2">
               <button onClick={() => setShowLateCheckout(false)} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent transition-colors rounded-xl">Cancel</button>
               <button onClick={() => { void view.completeMissedCheckout(appointment.id); }} disabled={view.isPending} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl disabled:opacity-40">{view.isPending ? 'Checking out...' : 'Confirm Late Checkout'}</button>
@@ -339,12 +339,28 @@ function FollowUpDetail({ appointment, view, onBack, className }: { appointment:
           <button onClick={() => setShowLateCheckout(true)} className="w-full h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl">Late Checkout</button>
         ) : showResolveForm ? (
           <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-0.5">
+              <span className="text-sm font-medium text-foreground">Resolution Action <span className="text-destructive">*</span></span>
+              <span className="text-xs text-muted-foreground">Select an action for resolving this no-show appointment.</span>
+            </div>
             <div className="grid grid-cols-2 gap-2">
               <button onClick={() => { setResolveMode('CONFIRMED_NO_SHOW'); setSelectedPreset(''); setResolveReason(''); setShowCustomReason(false); }}
                 className={`p-2 border text-[10px] font-medium transition-all ${resolveMode === 'CONFIRMED_NO_SHOW' ? 'border-red-500 bg-red-500/10 text-red-500' : 'border-card-border bg-card text-muted-foreground hover:border-foreground/30'}`}>Keep No-Show</button>
               <button onClick={() => { setResolveMode('COMPLETED'); setSelectedPreset(''); setResolveReason(''); setShowCustomReason(false); }}
                 className={`p-2 border text-[10px] font-medium transition-all ${resolveMode === 'COMPLETED' ? 'border-emerald-500 bg-emerald-500/10 text-emerald-600' : 'border-card-border bg-card text-muted-foreground hover:border-foreground/30'}`}>Mark Completed</button>
             </div>
+            {resolveMode === 'COMPLETED' && (
+              <div className="p-3 border bg-amber-500/5 border-amber-500/20 rounded-2xl">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-amber-600">Completion Notice</span>
+                <div className="text-[11px] text-muted-foreground mt-1 leading-relaxed">This will complete the visit and send the selected post-care message.</div>
+              </div>
+            )}
+            {resolveMode === 'CONFIRMED_NO_SHOW' && (
+              <div className="p-3 border bg-red-500/5 border-red-500/20 rounded-2xl">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-red-500">No-Show Notice</span>
+                <div className="text-[11px] text-muted-foreground mt-1 leading-relaxed">Clicking Submit Resolution will keep this appointment marked as <strong>Confirmed No-Show</strong> in system audit logs.</div>
+              </div>
+            )}
             {resolveMode === 'COMPLETED' && (
               <div>
                 <div className="flex items-center justify-between mb-2">
@@ -376,18 +392,6 @@ function FollowUpDetail({ appointment, view, onBack, className }: { appointment:
                 <textarea value={resolveReason} onChange={(e) => setResolveReason(e.target.value)} rows={2} placeholder="Type custom reason..." className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border resize-none" />
               )}
             </div>
-            {resolveMode === 'COMPLETED' && (
-              <div className="p-4 border bg-amber-500/5 border-amber-500/20 rounded-2xl">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-amber-600">Automated Patient Communication</span>
-                <div className="text-[11px] text-muted-foreground mt-1 leading-relaxed">Clicking <strong>Submit Resolution</strong> will finalize this visit and automatically send a <strong>Thank You & Post-Care Review Request</strong> message to the patient.</div>
-              </div>
-            )}
-            {resolveMode === 'CONFIRMED_NO_SHOW' && (
-              <div className="p-3 border bg-red-500/5 border-red-500/20 rounded-2xl">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-red-500">No-Show Notice</span>
-                <div className="text-[11px] text-muted-foreground mt-1 leading-relaxed">Clicking Submit Resolution will keep this appointment marked as <strong>Confirmed No-Show</strong> in system audit logs.</div>
-              </div>
-            )}
             <div className="flex gap-2">
               <button onClick={resetResolveState} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent transition-colors rounded-xl">Cancel</button>
               <button onClick={handleResolveSubmit} disabled={view.isPending || !resolveReason.trim()} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl disabled:opacity-40">{view.isPending ? 'Submitting...' : 'Submit Resolution'}</button>

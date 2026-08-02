@@ -42,15 +42,14 @@ export async function resolveNoShowAction(formData: ResolveNoShowDto) {
     // `NO_SHOW` is intentionally retained when the secretary confirms it.
     // Persist the decision separately so only no-shows that still need follow-up
     // appear in the Past Appointment Follow-ups queue.
-    if (validData.resolution === 'CONFIRMED_NO_SHOW') {
+    if (validData.resolution === 'CONFIRMED_NO_SHOW' || validData.resolution === 'CHECKED_IN') {
       const { error: resolutionError } = await supabase
         .from('appointments')
         .update({
           no_show_resolved_at: new Date().toISOString(),
-          no_show_resolution: 'CONFIRMED_NO_SHOW',
+          no_show_resolution: validData.resolution,
         })
-        .eq('id', validData.appointmentId)
-        .eq('status', 'NO_SHOW');
+        .eq('id', validData.appointmentId);
 
       if (resolutionError) {
         throw new DomainError(`Failed to record no-show resolution: ${resolutionError.message}`, 'DATABASE_ERROR');

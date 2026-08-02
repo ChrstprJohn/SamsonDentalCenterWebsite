@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { AlertCircle, CheckCircle2, Clock, Calendar, RefreshCw, X, Pencil, Check, MessageSquare } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Clock, Calendar, RefreshCw, X, Pencil, Check, MessageSquare, UserCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select } from '@/components/ui/select';
 import { AppointmentRescheduleForm } from './appointment-reschedule-form';
@@ -19,8 +19,8 @@ export function NoShowResolutionModal({ view }: { view: any }) {
   const appointment = view.resolveAppt;
   const ch = (appointment?.confirmationChannel || appointment?.confirmation_channel) as 'EMAIL' | 'SMS' | 'BOTH' | 'NONE' || 'EMAIL';
 
-  const [resolution, setResolution] = useState<'COMPLETED' | 'CONFIRMED_NO_SHOW' | 'RESCHEDULE'>('COMPLETED');
-  const [reason, setReason] = useState('Secretary forgot to click check-in');
+  const [resolution, setResolution] = useState<'COMPLETED' | 'CONFIRMED_NO_SHOW' | 'RESCHEDULE' | 'CHECKED_IN'>('CONFIRMED_NO_SHOW');
+  const [reason, setReason] = useState('Patient failed to arrive for appointment');
   const [newDate, setNewDate] = useState(view.todayStr || '');
   const [newTime, setNewTime] = useState('10:00');
   const [newEndTime, setNewEndTime] = useState('10:30');
@@ -134,56 +134,142 @@ export function NoShowResolutionModal({ view }: { view: any }) {
 
         <div className="flex flex-col gap-4">
           {resolution !== 'RESCHEDULE' && (
-          <div className="flex flex-col gap-2">
-            <label className="text-xs font-bold text-text-primary">Select Resolution Action</label>
-            <div className="grid grid-cols-3 gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  setResolution('COMPLETED');
-                  setReason('Secretary forgot to click check-in');
-                }}
-                className={`p-3 rounded-2xl border text-xs font-bold flex flex-col items-center gap-1.5 transition-all ${
-                  resolution === 'COMPLETED'
-                    ? 'border-emerald-500 bg-emerald-500/10 text-emerald-500'
-                    : 'border-card-border bg-card/50 text-text-secondary hover:border-text-muted'
-                }`}
-              >
-                <CheckCircle2 className="h-4 w-4" />
-                <span>Mark Completed</span>
-              </button>
-
+          <div className="flex flex-col gap-2.5">
+            <div className="flex flex-col gap-0.5">
+              <span className="text-sm font-medium text-text-primary">Resolution Action <span className="text-destructive">*</span></span>
+              <span className="text-xs text-text-secondary">Select an action for resolving this no-show appointment.</span>
+            </div>
+            <div className="flex flex-col gap-2">
+              {/* Keep No-Show */}
               <button
                 type="button"
                 onClick={() => {
                   setResolution('CONFIRMED_NO_SHOW');
                   setReason('Patient failed to arrive for appointment');
                 }}
-                className={`p-3 rounded-2xl border text-xs font-bold flex flex-col items-center gap-1.5 transition-all ${
+                className={`w-full p-2.5 rounded-2xl border text-left flex items-center gap-3 transition-all cursor-pointer ${
                   resolution === 'CONFIRMED_NO_SHOW'
-                    ? 'border-red-500 bg-red-500/10 text-red-500'
-                    : 'border-card-border bg-card/50 text-text-secondary hover:border-text-muted'
+                    ? 'border-red-500 bg-red-500/10 ring-1 ring-red-500/50'
+                    : 'border-card-border bg-card/50 hover:border-text-muted hover:bg-card'
                 }`}
               >
-                <AlertCircle className="h-4 w-4" />
-                <span>Keep No-Show</span>
+                <div className={`size-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                  resolution === 'CONFIRMED_NO_SHOW' ? 'border-red-500 bg-red-500' : 'border-text-muted'
+                }`}>
+                  {resolution === 'CONFIRMED_NO_SHOW' && <div className="size-1.5 rounded-full bg-white" />}
+                </div>
+                <div className="flex items-center gap-2 min-w-0 flex-1">
+                  <AlertCircle className={`size-4 ${resolution === 'CONFIRMED_NO_SHOW' ? 'text-red-500' : 'text-text-secondary'}`} />
+                  <span className={`text-xs font-bold ${resolution === 'CONFIRMED_NO_SHOW' ? 'text-red-500' : 'text-text-primary'}`}>
+                    Keep No-Show
+                  </span>
+                </div>
               </button>
 
+              {/* Check In */}
+              <button
+                type="button"
+                onClick={() => {
+                  setResolution('CHECKED_IN');
+                  setReason('Secretary forgot to check-in patient during active window');
+                }}
+                className={`w-full p-2.5 rounded-2xl border text-left flex items-center gap-3 transition-all cursor-pointer ${
+                  resolution === 'CHECKED_IN'
+                    ? 'border-blue-500 bg-blue-500/10 ring-1 ring-blue-500/50'
+                    : 'border-card-border bg-card/50 hover:border-text-muted hover:bg-card'
+                }`}
+              >
+                <div className={`size-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                  resolution === 'CHECKED_IN' ? 'border-blue-500 bg-blue-500' : 'border-text-muted'
+                }`}>
+                  {resolution === 'CHECKED_IN' && <div className="size-1.5 rounded-full bg-white" />}
+                </div>
+                <div className="flex items-center gap-2 min-w-0 flex-1">
+                  <UserCheck className={`size-4 ${resolution === 'CHECKED_IN' ? 'text-blue-500' : 'text-text-secondary'}`} />
+                  <span className={`text-xs font-bold ${resolution === 'CHECKED_IN' ? 'text-blue-500' : 'text-text-primary'}`}>
+                    Check In
+                  </span>
+                </div>
+              </button>
+
+              {/* Checkout */}
+              <button
+                type="button"
+                onClick={() => {
+                  setResolution('COMPLETED');
+                  setReason('Secretary forgot to click check-in during visit');
+                }}
+                className={`w-full p-2.5 rounded-2xl border text-left flex items-center gap-3 transition-all cursor-pointer ${
+                  resolution === 'COMPLETED'
+                    ? 'border-emerald-500 bg-emerald-500/10 ring-1 ring-emerald-500/50'
+                    : 'border-card-border bg-card/50 hover:border-text-muted hover:bg-card'
+                }`}
+              >
+                <div className={`size-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                  resolution === 'COMPLETED' ? 'border-emerald-500 bg-emerald-500' : 'border-text-muted'
+                }`}>
+                  {resolution === 'COMPLETED' && <div className="size-1.5 rounded-full bg-white" />}
+                </div>
+                <div className="flex items-center gap-2 min-w-0 flex-1">
+                  <CheckCircle2 className={`size-4 ${resolution === 'COMPLETED' ? 'text-emerald-500' : 'text-text-secondary'}`} />
+                  <span className={`text-xs font-bold ${resolution === 'COMPLETED' ? 'text-emerald-500' : 'text-text-primary'}`}>
+                    Checkout (Mark Completed)
+                  </span>
+                </div>
+              </button>
+
+              {/* Reschedule */}
               <button
                 type="button"
                 onClick={() => {
                   setResolution('RESCHEDULE');
                   setReason('');
                 }}
-                className={`p-3 rounded-2xl border text-xs font-bold flex flex-col items-center gap-1.5 transition-all ${
+                className={`w-full p-2.5 rounded-2xl border text-left flex items-center gap-3 transition-all cursor-pointer ${
                   (resolution as string) === 'RESCHEDULE'
-                    ? 'border-cyan-500 bg-cyan-500/10 text-cyan-500'
-                    : 'border-card-border bg-card/50 text-text-secondary hover:border-text-muted'
+                    ? 'border-cyan-500 bg-cyan-500/10 ring-1 ring-cyan-500/50'
+                    : 'border-card-border bg-card/50 hover:border-text-muted hover:bg-card'
                 }`}
               >
-                <RefreshCw className="h-4 w-4" />
-                <span>Reschedule</span>
+                <div className={`size-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                  (resolution as string) === 'RESCHEDULE' ? 'border-cyan-500 bg-cyan-500' : 'border-text-muted'
+                }`}>
+                  {(resolution as string) === 'RESCHEDULE' && <div className="size-1.5 rounded-full bg-white" />}
+                </div>
+                <div className="flex items-center gap-2 min-w-0 flex-1">
+                  <RefreshCw className={`size-4 ${(resolution as string) === 'RESCHEDULE' ? 'text-cyan-500' : 'text-text-secondary'}`} />
+                  <span className={`text-xs font-bold ${(resolution as string) === 'RESCHEDULE' ? 'text-cyan-500' : 'text-text-primary'}`}>
+                    Reschedule
+                  </span>
+                </div>
               </button>
+              {/* Dynamic Notice Box right after Resolution Action choice */}
+              {resolution === 'CHECKED_IN' && (
+                <div className="p-3 border bg-blue-500/5 border-blue-500/20 rounded-2xl">
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-blue-500">Late Check-In Notice</span>
+                  <div className="text-[11px] text-muted-foreground mt-1 leading-relaxed">
+                    Clicking <strong>Submit Resolution</strong> will mark this patient as <strong>Checked In</strong> so staff and doctors know they are currently in the clinic.
+                  </div>
+                </div>
+              )}
+
+              {resolution === 'COMPLETED' && (
+                <div className="p-3 border bg-amber-500/5 border-amber-500/20 rounded-2xl">
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-amber-500">Completion Notice</span>
+                  <div className="text-[11px] text-text-secondary mt-1 leading-relaxed">
+                    This will complete the visit and send the selected post-care message.
+                  </div>
+                </div>
+              )}
+
+              {resolution === 'CONFIRMED_NO_SHOW' && (
+                <div className="p-3 border bg-red-500/5 border-red-500/20 rounded-2xl">
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-red-500">No-Show Notice</span>
+                  <div className="text-[11px] text-muted-foreground mt-1 leading-relaxed">
+                    Clicking <strong>Submit Resolution</strong> will keep this appointment marked as <strong>Confirmed No-Show</strong> in system audit logs.
+                  </div>
+                </div>
+              )}
             </div>
           </div>
           )}
@@ -304,26 +390,7 @@ export function NoShowResolutionModal({ view }: { view: any }) {
             </div>
           )}
 
-          {resolution === 'COMPLETED' && (
-            <div className="p-4 bg-amber-500/5 border border-amber-500/20 rounded-2xl flex flex-col gap-2">
-              <div className="flex items-center gap-2 text-amber-500 text-xs font-bold">
-                <MessageSquare className="h-4 w-4" />
-                <span>Automated Patient Communication</span>
-              </div>
-              <p className="text-[11px] text-text-secondary leading-relaxed">
-                Clicking <strong>Submit Resolution</strong> will finalize this visit and automatically send a <strong>Thank You & Post-Care Review Request</strong> message to the patient.
-              </p>
-            </div>
-          )}
 
-          {resolution === 'CONFIRMED_NO_SHOW' && (
-            <div className="p-3 border bg-red-500/5 border-red-500/20 rounded-2xl">
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-red-500">No-Show Notice</span>
-              <div className="text-[11px] text-muted-foreground mt-1 leading-relaxed">
-                Clicking Submit Resolution will keep this appointment marked as <strong>Confirmed No-Show</strong> in system audit logs.
-              </div>
-            </div>
-          )}
 
           {resolution !== 'RESCHEDULE' && (
             <div className="flex justify-end gap-2 mt-2">
@@ -340,9 +407,11 @@ export function NoShowResolutionModal({ view }: { view: any }) {
                 onClick={(e) => handleSubmit(e as any)}
                 disabled={view.isPending}
                 className={`text-xs h-9 px-5 font-bold rounded-xl border-none ${
-                  resolution === 'COMPLETED'
-                    ? 'bg-emerald-500 text-white'
-                    : 'bg-red-500 text-white'
+                  resolution === 'CHECKED_IN'
+                    ? 'bg-blue-500 hover:bg-blue-600 text-white'
+                    : resolution === 'COMPLETED'
+                    ? 'bg-emerald-500 hover:bg-emerald-600 text-white'
+                    : 'bg-red-500 hover:bg-red-600 text-white'
                 }`}
               >
                 Submit Resolution

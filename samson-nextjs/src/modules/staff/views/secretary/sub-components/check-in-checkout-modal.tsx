@@ -74,6 +74,13 @@ export function CheckInCheckoutModal({ view }: { view: any }) {
           </p>
         </div>
 
+        <div className="p-3 border bg-amber-500/5 border-amber-500/20 rounded-2xl text-left">
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-amber-500">Completion Notice</span>
+          <div className="text-[11px] text-text-secondary mt-1 leading-relaxed">
+            This will complete the visit and send the selected post-care message.
+          </div>
+        </div>
+
         {/* Notification Channel Block */}
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center justify-between mb-1">
@@ -116,15 +123,6 @@ export function CheckInCheckoutModal({ view }: { view: any }) {
           )}
         </div>
 
-        <div className="p-4 bg-amber-500/5 border border-amber-500/20 rounded-2xl flex flex-col gap-2">
-          <div className="flex items-center gap-2 text-amber-500 text-xs font-bold">
-            <MessageSquare className="h-4 w-4" />
-            <span>Automated Patient Communication</span>
-          </div>
-          <p className="text-[11px] text-text-secondary leading-relaxed">
-            Clicking <strong>Confirm Checkout</strong> will finalize this visit and automatically send a <strong>Thank You & Post-Care Review Request</strong> message to the patient.
-          </p>
-        </div>
 
         <div className="flex justify-end gap-2 mt-2">
           <Button
