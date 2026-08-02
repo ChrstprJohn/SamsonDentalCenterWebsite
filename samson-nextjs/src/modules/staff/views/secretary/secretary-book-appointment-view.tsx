@@ -390,7 +390,7 @@ export function SecretaryBookAppointmentView() {
       <Sidebar collapsible="none" side="right" className={`flex-1 lg:flex-none lg:w-80 border-l border-border shrink-0 flex-col h-full bg-sidebar ${mobileView === 'timeline' ? 'max-lg:hidden' : ''}`}>
         {view.selectedAppointmentDetails ? (
           <div className="flex flex-col h-full overflow-hidden">
-            <div className="p-4 border-b border-card-border/40 shrink-0 flex items-center justify-between h-14">
+            <div className="p-4 border-b border-card-border/40 shrink-0 flex items-center justify-between min-h-[61px]">
               <div className="flex items-center gap-2 min-w-0 flex-1">
                 <button
                   onClick={isRescheduleOpen ? () => setIsRescheduleOpen(false) : () => { view.setSelectedAppointmentDetails(null); setMobileView('timeline'); }}
@@ -398,12 +398,21 @@ export function SecretaryBookAppointmentView() {
                 >
                   <ArrowLeft className="size-5" />
                 </button>
-                <div className="text-base font-medium text-foreground truncate">
-                  {isRescheduleOpen ? 'Reschedule Appointment' : 'Appointment Details'}
+                <div className="flex flex-col min-w-0">
+                  <div className="text-base font-medium text-foreground truncate">
+                    {isRescheduleOpen ? 'Reschedule Appointment' : 'Appointment Details'}
+                  </div>
+                  <span className="text-[11px] text-muted-foreground truncate">
+                    {isRescheduleOpen
+                      ? 'Update date, time, dentist, or service details.'
+                      : view.selectedAppointmentDetails?.id
+                          ? `Ref #${view.selectedAppointmentDetails.id.slice(0, 8)}`
+                          : ''}
+                  </span>
                 </div>
               </div>
             </div>
-            <div className="flex-1 overflow-y-auto min-h-0">
+            <div className="flex-1 min-h-0 !overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent" style={{ scrollbarWidth: 'thin' }} data-lenis-prevent>
               <AppointmentDetailPane
                 compact
                 view={{
@@ -842,6 +851,21 @@ function DatePicker({
       </SidebarGroupContent>
     </SidebarGroup>
   );
+}
+
+function getPatientDisplayName(app: any): string {
+  if (!app) return 'Guest Patient';
+  if (app.dependent) {
+    return `${app.dependent.firstName} ${app.dependent.lastName}`;
+  }
+  if (app.guestContact) {
+    const initial = app.guestContact.middleName ? ` ${app.guestContact.middleName.charAt(0).toUpperCase()}.` : '';
+    return `${app.guestContact.firstName || ''}${initial} ${app.guestContact.lastName || ''}`.trim() + (app.guestContact.suffix ? `, ${app.guestContact.suffix}` : '');
+  }
+  if (app.patient) {
+    return `${app.patient.firstName} ${app.patient.lastName}`;
+  }
+  return 'Guest Patient';
 }
 
 

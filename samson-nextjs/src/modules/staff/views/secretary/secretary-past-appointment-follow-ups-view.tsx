@@ -88,7 +88,11 @@ export function SecretaryPastAppointmentFollowUpsView() {
           </div>
         </SidebarHeader>
 
-        <div className="flex-1 min-h-0 overflow-y-auto">
+        <div
+          data-lenis-prevent
+          style={{ scrollbarWidth: 'thin' }}
+          className="flex-1 min-h-0 !overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
+        >
           {view.isLoading ? <div className="p-6 text-center text-sm text-muted-foreground">Loading follow-ups…</div> : null}
           {view.error ? <div className="m-4 rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-xs text-destructive">{view.error}</div> : null}
           {!view.isLoading && !view.error && visibleAppointments.length === 0 ? (
@@ -103,7 +107,7 @@ export function SecretaryPastAppointmentFollowUpsView() {
         </div>
       </section>
 
-      {view.selectedAppointment ? <FollowUpDetail appointment={view.selectedAppointment} view={view} onBack={() => setMobileView('list')} className={`${colMobile('detail')} lg:flex`} /> : (
+      {view.selectedAppointment ? <FollowUpDetail appointment={view.selectedAppointment} view={view} onBack={() => { view.setSelectedAppointmentId(null); setMobileView('list'); }} className={`${colMobile('detail')} lg:flex`} /> : (
         <div className="flex flex-1 flex-col items-center justify-center bg-muted/10 text-center max-lg:hidden"><ClipboardCheck className="size-8 text-muted-foreground/50 mb-3" /><p className="font-medium">No appointment selected</p><p className="mt-1 text-sm text-muted-foreground">Select a past appointment to finish its follow-up.</p></div>
       )}
       
@@ -197,8 +201,8 @@ function FollowUpDetail({ appointment, view, onBack, className }: { appointment:
   };
 
   const displayName = patientName(appointment);
-  const pTitle = showRescheduleForm ? 'Reschedule Appointment' : (isMissedCheckout ? 'Late Checkout' : 'No-Show Follow-up');
-  const pSub = showRescheduleForm ? 'Update date, time, dentist, or service details.' : `${displayName} — ${appointment.service?.name || 'Treatment'}`;
+  const pTitle = showRescheduleForm ? 'Reschedule Appointment' : 'Appointment Details';
+  const pSub = showRescheduleForm ? 'Update date, time, dentist, or service details.' : `Ref #${appointment.id.slice(0, 8)}`;
   const statusStr = isMissedCheckout ? 'CHECKED IN' : 'NO SHOW';
   const statusColor = isMissedCheckout ? 'text-cyan-600 bg-cyan-500/10' : 'text-amber-600 bg-amber-500/10';
 
@@ -206,15 +210,15 @@ function FollowUpDetail({ appointment, view, onBack, className }: { appointment:
 
   return (
     <section className={`flex flex-1 min-w-0 flex-col min-h-0 ${className}`}>
-      <div className="flex items-center gap-2 p-4 border-b border-border shrink-0">
-        <button onClick={showRescheduleForm ? () => setShowRescheduleForm(false) : onBack} className="p-1 -ml-1 text-muted-foreground hover:text-foreground shrink-0"><ArrowLeft className="size-4" /></button>
-        <div className="flex-1 min-w-0 flex flex-col gap-0.5">
+      <div className="flex items-center gap-2 p-4 border-b border-border shrink-0 min-h-[61px]">
+        <button onClick={showRescheduleForm ? () => setShowRescheduleForm(false) : onBack} className="p-1 -ml-1 text-muted-foreground hover:text-foreground shrink-0"><ArrowLeft className="size-5" /></button>
+        <div className="flex-1 min-w-0 flex flex-col">
           <span className="text-base font-medium text-foreground truncate">{pTitle}</span>
-          <span className="text-xs text-muted-foreground truncate">{pSub}</span>
+          <span className="text-[11px] text-muted-foreground truncate">{pSub}</span>
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 overflow-y-auto [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent" style={{ scrollbarWidth: 'thin' }} data-lenis-prevent>
+      <div className="flex-1 min-h-0 !overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent" style={{ scrollbarWidth: 'thin' }} data-lenis-prevent>
         {!showRescheduleForm ? (
           <>
             <div className="flex flex-col items-center pt-4 pb-3 px-4">

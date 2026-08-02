@@ -64,7 +64,7 @@ export function ChatHeader({
           </Link>
         )}
         {currentUserRole === 'STAFF' && onShowDetail && (
-          <button onClick={onShowDetail} className="xl:hidden p-1 text-muted-foreground hover:text-foreground flex flex-col items-center gap-0.5">
+          <button onClick={onShowDetail} className="p-1 text-muted-foreground hover:text-foreground flex flex-col items-center gap-0.5" title="Toggle Appointment Details">
             <Info className="size-5" />
             <span className="text-[10px] leading-none">Detail</span>
           </button>

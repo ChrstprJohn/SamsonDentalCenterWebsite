@@ -222,6 +222,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
     const [showOnlyUnreads, setShowOnlyUnreads] = useState(false);
 
     const [mobileView, setMobileView] = useState<'list' | 'chat' | 'detail'>('list');
+    const [isDetailPaneOpen, setIsDetailPaneOpen] = useState(true);
     
     const activeStates = ['APPROVED', 'CHECKED_IN', 'RESCHEDULE_REQUESTED'];
     const initialActive = initialThreads.filter(t => t.status !== 'PENDING' && activeStates.includes(t.status));
@@ -445,6 +446,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
         setLoadingMessages(true);
         setMessagesLoadKey((k) => k + 1);
         setMobileView('chat');
+        setIsDetailPaneOpen(true);
         if (thread.unreadCount > 0) {
             setThreads(prev => prev.map(t =>
                 t.appointmentId === thread.appointmentId
@@ -464,10 +466,12 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
 
     const handleBackToChat = useCallback(() => {
         setMobileView('chat');
+        setIsDetailPaneOpen(false);
     }, []);
 
     const handleShowDetail = useCallback(() => {
         setMobileView('detail');
+        setIsDetailPaneOpen((prev) => !prev);
     }, []);
 
     const handleActionSubmit = async (e: React.FormEvent) => {
@@ -756,19 +760,28 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
     const detailPanelContent = selectedThreadId && selectedThread && detailPaneView ? (
         <div className="flex flex-col h-full overflow-hidden">
             {loadingMessages ? (
-                <div className="p-4 border-b border-border flex items-center justify-between shrink-0">
+                <div className="p-4 border-b border-border flex items-center gap-2 shrink-0 min-h-[61px]">
                     <div className="flex flex-col min-w-0">
                         <Skeleton className="h-5 w-36 rounded-md !bg-slate-200" />
                         <Skeleton className="h-3 w-24 rounded-md !bg-slate-200 mt-1" />
                     </div>
                 </div>
             ) : (
-                <div className="p-4 border-b border-border shrink-0 flex items-center gap-2 h-14">
+                <div className="p-4 border-b border-border shrink-0 flex items-center gap-2 min-h-[61px]">
                     <button onClick={detailPaneView?.showRescheduleForm ? () => detailPaneView.setShowRescheduleForm(false) : handleBackToChat} className="p-1 -ml-1 text-muted-foreground hover:text-foreground shrink-0">
                         <ArrowLeft className="size-5" />
                     </button>
-                    <div className="text-base font-medium text-foreground truncate">
-                        {detailPaneView?.showRescheduleForm ? 'Reschedule Appointment' : 'Appointment Details'}
+                    <div className="flex flex-col min-w-0">
+                        <div className="text-base font-medium text-foreground truncate">
+                            {detailPaneView?.showRescheduleForm ? 'Reschedule Appointment' : 'Appointment Details'}
+                        </div>
+                        <span className="text-[11px] text-muted-foreground truncate">
+                            {detailPaneView?.showRescheduleForm
+                                ? 'Update date, time, dentist, or service details.'
+                                : detailPaneView?.selectedAppointment?.id
+                                    ? `Ref #${detailPaneView.selectedAppointment.id.slice(0, 8)}`
+                                    : ''}
+                        </span>
                     </div>
                 </div>
             )}
@@ -788,8 +801,8 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                 collapsible="none"
                 className={`flex-col lg:w-[350px] flex-1 lg:flex-none border-r border-card-border/40 bg-sidebar h-full overflow-hidden ${colMobile('list')} lg:flex`}
             >
-                <SidebarHeader className="gap-3.5 border-b p-4 shrink-0">
-                    <div className="flex w-full h-8 items-center justify-between">
+                <SidebarHeader className="border-b border-card-border/40 p-4 space-y-3 shrink-0">
+                    <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                             <SidebarTrigger className="lg:hidden -ml-1 text-muted-foreground hover:text-foreground" />
                             <div className="text-base font-medium text-foreground">
@@ -952,13 +965,13 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false 
                                 currentUserName="Secretary"
                                 className="border-0 rounded-none shadow-none h-full max-w-none w-full"
                                 onBack={handleBackToList}
-                                onShowDetail={handleShowDetail}
+                                onShowDetail={isDetailPaneOpen ? undefined : handleShowDetail}
                             />
                         )}
                     </div>
 
                     {/* Column 3: Context & Action Control Dock */}
-                    <div className={`${colMobile('detail')} flex-1 xl:flex-none xl:w-80 flex-col border-l border-border bg-sidebar h-full overflow-hidden xl:flex`}>
+                    <div className={`${colMobile('detail')} flex-1 xl:flex-none xl:w-80 flex-col border-l border-border bg-sidebar h-full overflow-hidden ${isDetailPaneOpen ? 'xl:flex' : 'xl:hidden'}`}>
                         {detailPanelContent}
                     </div>
                 </>

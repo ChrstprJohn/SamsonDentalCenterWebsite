@@ -153,7 +153,7 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
             {paneTitle}
           </span>
           <span className="text-xs text-muted-foreground truncate">
-            {paneType === 'details' && showRescheduleForm ? 'Update date, time, dentist, or service details.' : paneType === 'details' ? `Ref #${appointment.id?.slice(0, 8) || ''}` : `${getPatientDisplayName(appointment)} &mdash; ${appointment.service?.name}`}
+            {paneType === 'details' && showRescheduleForm ? 'Update date, time, dentist, or service details.' : `${getPatientDisplayName(appointment)} &mdash; ${appointment.service?.name || 'Treatment'}`}
           </span>
         </div>
       </div>
