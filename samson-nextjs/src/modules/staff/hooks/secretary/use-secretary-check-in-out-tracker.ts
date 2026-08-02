@@ -152,12 +152,12 @@ export function useSecretaryCheckInOutTracker() {
     runStatusAction(() => undoCheckInAction({ appointmentId, reason }), 'Failed to undo check-in');
   };
 
-  const handleCheckoutComplete = (appointmentId: string) => {
+  const handleCheckoutComplete = (appointmentId: string, reason?: string) => {
     startTransition(async () => {
       const res = await updateAppointmentStatusAction({
         appointmentId,
         status: 'COMPLETED',
-        statusReason: 'Checked out patient and dispatched Thank You & Post-Care Review Request message.',
+        statusReason: reason || 'Checked out patient and dispatched Thank You & Post-Care Review Request message.',
       });
       if (!res.success) alert(res.error || 'Failed to complete checkout');
       else {

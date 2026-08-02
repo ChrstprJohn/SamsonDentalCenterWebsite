@@ -39,6 +39,7 @@ interface AppointmentRescheduleFormProps {
   onSubmit: () => void;
   onBack: () => void;
   noFooter?: boolean;
+  noForm?: boolean;
 }
 
 const COMMON_REASONS = [
@@ -71,6 +72,7 @@ const CURRENT_YEAR = new Date().getFullYear();
 const YEARS = Array.from({ length: 5 }, (_, i) => (CURRENT_YEAR + i).toString());
 
 export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps) {
+  const FormWrapper = props.noForm ? 'div' : 'form';
   const selectedService = props.serviceId || props.activeServiceId || props.appointment.serviceId || '';
   const selectedDoctor = props.doctorId || props.activeDoctorId || props.appointment.doctorId || '';
 
@@ -133,8 +135,8 @@ export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps)
   };
 
   return (
-    <form
-      onSubmit={(event) => {
+    <FormWrapper
+      onSubmit={props.noForm ? undefined : (event) => {
         event.preventDefault();
         props.onSubmit();
       }}
@@ -322,6 +324,6 @@ export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps)
           </Button>
         </div>
       )}
-    </form>
+    </FormWrapper>
   );
 }

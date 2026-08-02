@@ -38,6 +38,9 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
   const [checkInReason, setCheckInReason] = useState('');
   const [checkInReasonMode, setCheckInReasonMode] = useState('');
   const [checkInCustomReason, setCheckInCustomReason] = useState('');
+  const [checkoutReason, setCheckoutReason] = useState('');
+  const [checkoutReasonMode, setCheckoutReasonMode] = useState('');
+  const [checkoutCustomReason, setCheckoutCustomReason] = useState('');
   const [undoReason, setUndoReason] = useState('');
   const [undoReasonMode, setUndoReasonMode] = useState('');
   const [undoCustomReason, setUndoCustomReason] = useState('');
@@ -68,6 +71,9 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
     setCheckInReason('');
     setCheckInReasonMode('');
     setCheckInCustomReason('');
+    setCheckoutReason('');
+    setCheckoutReasonMode('');
+    setCheckoutCustomReason('');
     setUndoReason('');
     setUndoReasonMode('');
     setUndoCustomReason('');
@@ -210,7 +216,22 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
                 }}
               />
             )}
-            {paneType === 'checkout' && <CheckoutContent appointment={appointment} view={view} />}
+            {paneType === 'checkout' && (
+              <CheckoutContent
+                appointment={appointment}
+                view={view}
+                reasonMode={checkoutReasonMode}
+                customReason={checkoutCustomReason}
+                onReasonSelect={(value) => {
+                  setCheckoutReasonMode(value);
+                  setCheckoutReason(value === 'CUSTOM' ? checkoutCustomReason : value);
+                }}
+                onCustomReasonChange={(value) => {
+                  setCheckoutCustomReason(value);
+                  if (checkoutReasonMode === 'CUSTOM') setCheckoutReason(value);
+                }}
+              />
+            )}
             {paneType === 'resolve' && <ResolveContent view={view} onClose={onClose} />}
             {paneType === 'details' && appointment.status === 'CHECKED_IN' && showUndoForm && (
               <UndoCheckInContent
@@ -306,7 +327,7 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
                   </button>
                   <button onClick={() => { setResolveMode('COMPLETED'); setSelectedPreset(''); setResolveReason(''); setShowCustomReason(false); }}
                     className={`p-2 border text-[10px] font-medium transition-all ${resolveMode === 'COMPLETED' ? 'border-emerald-500 bg-emerald-500/10 text-emerald-600' : 'border-card-border bg-card text-muted-foreground hover:border-foreground/30'}`}>
-                    Mark Completed
+                    Checkout
                   </button>
                 </div>
 
@@ -413,7 +434,7 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
             {paneType === 'checkout' && (
               <>
                 <button onClick={returnToDetails} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent rounded-xl">Cancel</button>
-                <button onClick={() => view.handleCheckoutComplete(appointment.id)} disabled={view.isPending} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl disabled:opacity-40">{view.isPending ? 'Sending...' : 'Confirm & Send'}</button>
+                <button onClick={() => view.handleCheckoutComplete(appointment.id, checkoutReason)} disabled={view.isPending || !checkoutReason.trim()} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl disabled:opacity-40">{view.isPending ? 'Sending...' : 'Confirm & Send'}</button>
               </>
             )}
             {paneType === 'details' && showUndoForm && (
@@ -551,8 +572,27 @@ function InfoBox({ variant, title, children }: { variant: 'cyan' | 'amber' | 'em
   );
 }
 
-function CheckoutContent({ appointment, view }: { appointment: any; view?: any }) {
+function CheckoutContent({
+  appointment,
+  view,
+  reasonMode,
+  customReason,
+  onReasonSelect,
+  onCustomReasonChange,
+}: {
+  appointment: any;
+  view?: any;
+  reasonMode: string;
+  customReason: string;
+  onReasonSelect: (value: string) => void;
+  onCustomReasonChange: (value: string) => void;
+}) {
   const ch = (appointment?.confirmationChannel || appointment?.confirmation_channel) as 'EMAIL' | 'SMS' | 'BOTH' | 'NONE' || 'EMAIL';
+  const reasonOptions = [
+    'Treatment completed and reviewed with patient',
+    'Payment and visit details confirmed',
+    'Checkout completed by secretary',
+  ];
 
   const [channel, setChannel] = useState(ch);
   const [draftChannel, setDraftChannel] = useState(ch);
@@ -583,6 +623,32 @@ function CheckoutContent({ appointment, view }: { appointment: any; view?: any }
 
   return (
     <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-1.5">
+        <span className="text-xs text-muted-foreground">Checkout Reason <span className="text-destructive">*</span></span>
+        <div className="relative flex items-center">
+          <select
+            value={reasonMode}
+            onChange={(event) => onReasonSelect(event.target.value)}
+            className="w-full px-4 pr-10 py-2.5 appearance-none rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
+            required
+          >
+            <option value="" disabled>Select a Reason</option>
+            {reasonOptions.map((option) => <option key={option} value={option}>{option}</option>)}
+            <option value="CUSTOM">Other / Custom Reason...</option>
+          </select>
+          <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+        </div>
+        {reasonMode === 'CUSTOM' && (
+          <Textarea
+            value={customReason}
+            onChange={(event) => onCustomReasonChange(event.target.value)}
+            placeholder="Enter checkout reason..."
+            className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border min-h-[60px] resize-none"
+            required
+          />
+        )}
+      </div>
+
       <div>
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm font-medium text-foreground">Notification Channel</span>
@@ -621,7 +687,7 @@ function CheckoutContent({ appointment, view }: { appointment: any; view?: any }
         )}
       </div>
 
-      <InfoBox variant="amber" title="Automated Communication">
+      <InfoBox variant="amber" title="Completion Notice">
         This will complete the visit and send the selected post-care message.
       </InfoBox>
     </div>
@@ -715,7 +781,7 @@ function ResolveContent({ view, onClose }: { view: any; onClose: () => void }) {
               resolution === 'COMPLETED' ? 'border-emerald-500 bg-emerald-500/10 text-emerald-600' : 'border-card-border bg-card text-muted-foreground hover:border-foreground/30'
             }`}
           >
-            Mark Completed
+            Checkout
           </button>
           <button
             type="button"
@@ -742,7 +808,7 @@ function ResolveContent({ view, onClose }: { view: any; onClose: () => void }) {
         {resolutionWarning.text}
       </InfoBox>
 
-      {/* Notification Channel Block - Only visible on Mark Completed */}
+      {/* Notification Channel Block - Only visible on Checkout */}
       {resolution === 'COMPLETED' && (
         <div>
           <div className="flex items-center justify-between mb-2">
@@ -805,6 +871,7 @@ function ResolveContent({ view, onClose }: { view: any; onClose: () => void }) {
           }}
           isSubmitting={view.isPending}
           noFooter
+          noForm
           onServiceSelect={() => {}}
           onDoctorSelect={(doctorId) => view.setRescheduleDoctor(doctorId)}
           onDateSelect={(date) => view.setRescheduleDate(date)}
@@ -1208,7 +1275,7 @@ function InlineCheckoutForm({ appointment, view, onCancel }: { appointment: any;
       </div>
 
       <div className="p-4 border bg-amber-500/5 border-amber-500/20 rounded-2xl">
-        <span className="text-[10px] font-semibold uppercase tracking-wider text-amber-600">Automated Communication</span>
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-amber-600">Completion Notice</span>
         <div className="text-[11px] text-muted-foreground mt-1 leading-relaxed">
           Confirming will complete the visit and send a Thank You & Review Request message via the selected channel.
         </div>
