@@ -156,7 +156,8 @@ export function PendingRequestListV2(props: PendingRequestListV2Props) {
                     </div>
                   </div>
                 ))}
-              </div>
+                </div>
+              </SecretaryListSkeletonTheme>
             ) : props.inquiriesError && filteredInquiries.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
                 <div className="size-10 rounded-full bg-destructive/10 flex items-center justify-center mb-2.5">
