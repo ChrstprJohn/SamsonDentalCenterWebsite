@@ -5,15 +5,16 @@ import { outboxCommands } from '@/shared/outbox/outbox.commands';
 import { globalOutboxDispatcher } from '@/shared/outbox/outbox.dispatcher';
 import { bootstrapEventSubscribers } from '@/orchestrators/event-subscribers';
 
-export interface ResendReminderInput {
-  appointmentId: string;
-  reminderType: '24H' | '48H';
-}
+import { resendReminderSchema, ResendReminderDto } from '../../dtos/status/resend-reminder.dto';
+
+export type ResendReminderInput = ResendReminderDto;
 
 export async function resendReminderAction(input: ResendReminderInput) {
   try {
+    const parsed = resendReminderSchema.parse(input);
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
+
 
     if (authError || !user) {
       return { success: false, error: 'Unauthorized user.' };
@@ -41,7 +42,7 @@ export async function resendReminderAction(input: ResendReminderInput) {
         confirmation_channel,
         patient:users!appointments_patient_id_fkey(email)
       `)
-      .eq('id', input.appointmentId)
+      .eq('id', parsed.appointmentId)
       .single();
 
     if (appError || !appointment) {
@@ -57,7 +58,7 @@ export async function resendReminderAction(input: ResendReminderInput) {
     const { data: gc } = await supabaseAdmin
       .from('guest_contacts')
       .select('email')
-      .eq('appointment_id', input.appointmentId)
+      .eq('appointment_id', parsed.appointmentId)
       .single();
 
     let recipientEmail = gc?.email?.trim() || appointment.patient?.email?.trim();
@@ -66,19 +67,19 @@ export async function resendReminderAction(input: ResendReminderInput) {
       return { success: false, error: 'No contact email found for this appointment.' };
     }
 
-    const eventType = input.reminderType === '48H' ? 'APPOINTMENT_REMINDER_48H' : 'APPOINTMENT_REMINDER_24H';
+    const eventType = parsed.reminderType === '48H' ? 'APPOINTMENT_REMINDER_48H' : 'APPOINTMENT_REMINDER_24H';
     const outbox = outboxCommands(supabaseAdmin);
 
     const emittedEvent = await outbox.emitEvent(eventType, {
-      appointmentId: input.appointmentId,
+      appointmentId: parsed.appointmentId,
       email: recipientEmail,
     });
 
     // Update sent flags on appointments table
-    if (input.reminderType === '48H') {
-      await supabaseAdmin.from('appointments').update({ email_reminder_48h_sent: true }).eq('id', input.appointmentId);
+    if (parsed.reminderType === '48H') {
+      await supabaseAdmin.from('appointments').update({ email_reminder_48h_sent: true }).eq('id', parsed.appointmentId);
     } else {
-      await supabaseAdmin.from('appointments').update({ email_reminder_24h_sent: true }).eq('id', input.appointmentId);
+      await supabaseAdmin.from('appointments').update({ email_reminder_24h_sent: true }).eq('id', parsed.appointmentId);
     }
 
     // Trigger immediate outbox processing ONLY for this specific event
@@ -87,7 +88,7 @@ export async function resendReminderAction(input: ResendReminderInput) {
 
     return {
       success: true,
-      message: `Manual ${input.reminderType} reminder dispatched successfully to ${recipientEmail}.`,
+      message: `Manual ${parsed.reminderType} reminder dispatched successfully to ${recipientEmail}.`,
     };
   } catch (error: any) {
     console.error('[resendReminderAction] Error:', error);
