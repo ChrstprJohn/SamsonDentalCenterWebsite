@@ -56,7 +56,7 @@ export const getAppointmentCommunicationPageQuery = (supabase: SupabaseClient) =
       : `appointment_id.eq.${params.appointmentId},payload->>appointmentId.eq.${params.appointmentId}`;
 
     let query = supabase.from('outbox')
-      .select('id, event_type, status, error_logs, retry_count, created_at, patient_id:payload->>patientId, email:payload->>email, guest_email:payload->>guestEmail, phone:payload->>phone, phone_number:payload->>phoneNumber, mobile_number:payload->>mobileNumber', { count: 'exact' })
+      .select('id, event_type, status, error_logs, retry_count, created_at, payload, patient_id:payload->>patientId, email:payload->>email, guest_email:payload->>guestEmail, phone:payload->>phone, phone_number:payload->>phoneNumber, mobile_number:payload->>mobileNumber', { count: 'exact' })
       .or(matchFilter)
       .order('created_at', { ascending: false })
       .order('id', { ascending: false });
@@ -87,9 +87,7 @@ export const getAppointmentCommunicationPageQuery = (supabase: SupabaseClient) =
       const payload = (record.payload || {}) as Record<string, unknown>;
       const eventType = String(record.event_type || '');
       const recipient = String(record.email || record.guest_email || record.phone_number || record.phone || record.mobile_number || payload.email || payload.guestEmail || payload.phoneNumber || payload.phone || payload.mobileNumber || '');
-      const channel = eventType.endsWith('_SMS') || Boolean(record.phone || record.phone_number || record.mobile_number || payload.phone || payload.phoneNumber || payload.mobileNumber)
-        ? 'SMS' as const
-        : 'EMAIL' as const;
+      const channel = eventType.endsWith('_SMS') ? 'SMS' as const : 'EMAIL' as const;
       return {
         id: String(record.id),
         eventType,
