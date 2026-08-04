@@ -21,7 +21,9 @@ import { SecretaryListSkeleton, SecretaryListSkeletonTheme } from './sub-compone
 
 // UI Label Mappings for Event Types (Guest vs Patient distinction noted in code comments)
 const EVENT_NAME_MAP: Record<string, string> = {
-  'APPOINTMENT_BOOKED': 'Booking Confirmation (Email)',
+  'APPOINTMENT_BOOKED': 'Booking Request Received (Email)',
+  'REJECT_INQUIRY': 'Inquiry Rejected (Email)',
+  'BOOKING_REJECTED': 'Inquiry Rejected (Email)',
   'APPOINTMENT_CONVERTED_FROM_INQUIRY': 'Inquiry Approved (Email)', // Guest inquiry conversion email
   'APPOINTMENT_CONVERTED_FROM_INQUIRY_PATIENT': 'Inquiry Approved (Email)', // Patient inquiry conversion email
   'APPOINTMENT_CONVERTED_FROM_INQUIRY_SMS': 'Inquiry Approved (SMS)',

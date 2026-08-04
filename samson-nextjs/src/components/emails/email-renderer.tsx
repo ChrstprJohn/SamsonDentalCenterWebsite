@@ -1,3 +1,4 @@
+'use server';
 'use client';
 
 import React from 'react';
@@ -13,21 +14,24 @@ export function RenderedEmailFrame({ eventType, payload }: RenderedEmailFramePro
   const doctorName = payload.doctorName || 'Dr. Assigned Dentist';
   const dateStr = payload.dateStr || payload.appointmentDate || 'Jun 4, 2026';
   const timeRangeStr = payload.timeRangeStr || '09:00 AM - 09:30 AM';
-  const appointmentId = payload.appointmentId || 'f616dc57-4194-428c-901b-2e30205c97e4';
+  const appointmentId = payload.appointmentId || payload.id || '';
   const otpCode = payload.otpCode || '123456';
   const chatToken = payload.chatToken || '';
   const baseUrl = payload.baseUrl || 'http://localhost:3000';
+  const rejectionReason = payload.rejectionReason || payload.statusReason || 'Unfortunately, we are unable to accommodate your request at this time.';
 
-  const isConfirmed = eventType === 'APPOINTMENT_BOOKED' || eventType === 'APPOINTMENT_MANUALLY_BOOKED_PATIENT' || eventType === 'APPOINTMENT_MANUALLY_BOOKED_GUEST' || eventType === 'APPOINTMENT_CONVERTED_FROM_INQUIRY';
+  const isConfirmed = eventType === 'APPOINTMENT_CONVERTED_FROM_INQUIRY' || eventType === 'APPOINTMENT_MANUALLY_BOOKED_PATIENT' || eventType === 'APPOINTMENT_MANUALLY_BOOKED_GUEST';
   const isReminder = eventType.startsWith('APPOINTMENT_REMINDER');
   const isRescheduled = eventType === 'RESCHEDULE_BOOKING' || eventType === 'RESCHEDULE_BOOKING_SMS';
   const isCancelled = eventType === 'CANCEL_BOOKING' || eventType === 'CANCEL_BOOKING_SMS';
+  const isRejected = eventType === 'REJECT_INQUIRY' || eventType === 'BOOKING_REJECTED';
+  const isRequestReceived = eventType === 'APPOINTMENT_BOOKED' || eventType.includes('REQUEST_RECEIVED');
+  const isPostCare = eventType === 'APPOINTMENT_COMPLETED_POST_CARE' || eventType === 'APPOINTMENT_COMPLETED_POST_CARE_SMS';
   const isOtp = eventType === 'PATIENT_REGISTERED' || eventType === 'PASSWORD_RESET_REQUESTED';
   const isStaffReply = eventType === 'STAFF_REPLIED_TO_CHAT';
-  const isRequestReceived = eventType.includes('REQUEST_RECEIVED');
   const isSms = eventType.endsWith('_SMS');
 
-  const topBorderColor = isCancelled ? '#ef4444' : isRescheduled ? '#3b82f6' : isConfirmed ? '#16a34a' : '#3b82f6';
+  const topBorderColor = isRejected ? '#e11d48' : isCancelled ? '#ef4444' : isRescheduled ? '#3b82f6' : isConfirmed ? '#16a34a' : isRequestReceived ? '#0284c7' : '#3b82f6';
   const subTitle = isConfirmed
     ? 'Appointment Confirmed'
     : isReminder
@@ -36,13 +40,17 @@ export function RenderedEmailFrame({ eventType, payload }: RenderedEmailFramePro
         ? (isSms ? 'Appointment Rescheduled (SMS)' : 'Appointment Rescheduled')
         : isCancelled
           ? (isSms ? 'Appointment Cancelled (SMS)' : 'Appointment Cancelled')
-          : isOtp
-            ? (eventType === 'PATIENT_REGISTERED' ? 'Welcome & Verification' : 'Password Reset')
-            : isStaffReply
-              ? 'New Message Received'
-              : isRequestReceived
-                ? 'Appointment Request Received'
-                : 'Notification Dispatch';
+          : isRejected
+            ? 'Booking Request Declined'
+            : isRequestReceived
+              ? 'Booking Request Received'
+              : isPostCare
+                ? 'Post-Care Feedback'
+                : isOtp
+                  ? (eventType === 'PATIENT_REGISTERED' ? 'Welcome & Verification' : 'Password Reset')
+                  : isStaffReply
+                    ? 'New Message Received'
+                    : 'Notification Dispatch';
 
   return (
     <div style={{ backgroundColor: '#f8fafc', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', padding: '24px 12px', margin: '0' }}>
@@ -77,6 +85,20 @@ export function RenderedEmailFrame({ eventType, payload }: RenderedEmailFramePro
                 </span>
               </div>
             </>
+          ) : isRejected ? (
+            <>
+              <p style={{ fontSize: '14px', color: '#374151', lineHeight: '22px', margin: '0 0 16px' }}>
+                Thank you for reaching out to Samson Dental Center. We have reviewed your appointment request. Unfortunately, we are unable to accommodate your booking at this time.
+              </p>
+              <div style={{ backgroundColor: '#fff1f2', border: '1px solid #fecdd3', borderRadius: '8px', padding: '16px', margin: '16px 0 24px' }}>
+                <p style={{ margin: '0 0 4px', fontSize: '11px', fontWeight: '700', color: '#be123c', textTransform: 'uppercase' }}>Reason</p>
+                <p style={{ margin: '0', fontSize: '13px', color: '#9f1239', lineHeight: '20px' }}>{rejectionReason}</p>
+              </div>
+            </>
+          ) : isRequestReceived ? (
+            <p style={{ fontSize: '14px', color: '#374151', lineHeight: '22px', margin: '0 0 24px' }}>
+              We have received your booking request for <strong>{serviceName}</strong>. Our clinic staff is reviewing your requested date and time and will confirm your appointment shortly.
+            </p>
           ) : isCancelled ? (
             <p style={{ fontSize: '14px', color: '#374151', lineHeight: '22px', margin: '0 0 24px' }}>
               As requested, your appointment scheduled for <strong>{dateStr}</strong> has been successfully cancelled. We hope you feel better!
@@ -89,6 +111,10 @@ export function RenderedEmailFrame({ eventType, payload }: RenderedEmailFramePro
             <p style={{ fontSize: '14px', color: '#374151', lineHeight: '22px', margin: '0 0 24px' }}>
               Our clinic staff has sent a new message regarding your appointment. You can view the message and reply directly in the secure chat thread:
             </p>
+          ) : isPostCare ? (
+            <p style={{ fontSize: '14px', color: '#374151', lineHeight: '22px', margin: '0 0 24px' }}>
+              Thank you for visiting Samson Dental Center! We hope you had a great experience with <strong>{doctorName}</strong>. Please take a moment to share your feedback.
+            </p>
           ) : (
             <p style={{ fontSize: '14px', color: '#374151', lineHeight: '22px', margin: '0 0 28px' }}>
               {isConfirmed
@@ -98,7 +124,7 @@ export function RenderedEmailFrame({ eventType, payload }: RenderedEmailFramePro
           )}
 
           {/* Appointment Details Box */}
-          {!isOtp && !isCancelled && (
+          {!isOtp && !isCancelled && !isRejected && (
             <div style={{ backgroundColor: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '8px', padding: '20px 24px', marginBottom: '28px' }}>
               <p style={{ margin: '0 0 12px', fontSize: '11px', fontWeight: '700', color: '#6b7280', letterSpacing: '0.6px', textTransform: 'uppercase' }}>
                 Appointment Summary
