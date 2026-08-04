@@ -2,7 +2,7 @@
 
 import { z } from 'zod';
 import { createClient } from '@/shared/database/server';
-import { authorizeRole, getAuthenticatedUser } from '@/shared/auth/auth.util';
+import { authorizeRole } from '@/shared/auth/auth.util';
 import { DomainError } from '@/shared/errors';
 import { resolveNoShowSchema, ResolveNoShowDto } from '../../dtos/status/resolve-no-show.dto';
 import { getAppointmentByIdQuery, updateAppointmentStatusTransactionCommand } from '../../repositories/exports';
@@ -10,8 +10,7 @@ import { resolveNoShowUseCase } from '../../use-cases/status/resolve-no-show.use
 
 export async function resolveNoShowAction(formData: ResolveNoShowDto) {
   try {
-    await authorizeRole('SECRETARY');
-    const user = await getAuthenticatedUser();
+    const user = await authorizeRole('SECRETARY');
 
     const validData = resolveNoShowSchema.parse(formData);
     const supabase = await createClient();
@@ -90,26 +89,8 @@ export async function resolveNoShowAction(formData: ResolveNoShowDto) {
       }
     }
 
-    try {
-      const { after } = await import('next/server');
-      after(async () => {
-        const { bootstrapEventSubscribers } = await import('@/orchestrators/event-subscribers');
-        const { globalOutboxDispatcher } = await import('@/shared/outbox/outbox.dispatcher');
-        const { createAdminClient } = await import('@/shared/database/server');
-        bootstrapEventSubscribers();
-        await globalOutboxDispatcher(await createAdminClient())();
-      });
-    } catch {
-      try {
-        const { bootstrapEventSubscribers } = await import('@/orchestrators/event-subscribers');
-        const { globalOutboxDispatcher } = await import('@/shared/outbox/outbox.dispatcher');
-        const { createAdminClient } = await import('@/shared/database/server');
-        bootstrapEventSubscribers();
-        await globalOutboxDispatcher(await createAdminClient())();
-      } catch (err) {
-        console.warn('Could not run outbox dispatcher in background:', err);
-      }
-    }
+    const { scheduleAppointmentOutboxDispatch } = await import('@/shared/outbox/dispatch-appointment-outbox');
+    await scheduleAppointmentOutboxDispatch(validData.appointmentId);
 
     return { success: true, data: result };
   } catch (error) {

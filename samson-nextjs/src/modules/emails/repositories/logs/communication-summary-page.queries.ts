@@ -45,6 +45,10 @@ const EVENT_LABELS: Record<string, string> = {
   APPOINTMENT_COMPLETED_POST_CARE_SMS: 'Post-Care (SMS)',
 };
 
+function isMissingStaffRpc(error: { code?: string } | null): boolean {
+  return error?.code === 'PGRST202';
+}
+
 function displayName(firstName: string | null, lastName: string | null, fallback: string): string {
   return `${firstName || ''} ${lastName || ''}`.trim() || fallback;
 }
@@ -81,13 +85,20 @@ export const getCommunicationSummaryPageQuery = (supabase: SupabaseClient) => {
     const cursor = decodeCursor(params.cursor);
     if (params.cursor && !cursor) throw new Error('Invalid communication summary cursor.');
 
-    const { data, error } = await supabase.rpc('get_secretary_communication_summary_page', {
+    const rpcParams = {
       p_limit: params.limit ?? 25,
       p_cursor_last_activity: cursor?.sortValue ?? null,
       p_cursor_appointment_id: cursor?.id ?? null,
       p_tab: params.tab ?? 'all',
       p_search: params.search || null,
-    });
+    };
+    let { data, error } = await supabase.rpc('get_secretary_communication_summary_page_staff', rpcParams);
+    // The staff wrapper is introduced by the Secretary V2 migration. Keep the
+    // fresh read usable during a rolling deploy where the older secured RPC is
+    // still present, after the action has independently authorized the caller.
+    if (isMissingStaffRpc(error)) {
+      ({ data, error } = await supabase.rpc('get_secretary_communication_summary_page', rpcParams));
+    }
     if (error) throw new Error(`Failed to fetch communication summary: ${error.message}`);
 
     const rows = (data || []) as SummaryRow[];
@@ -105,6 +116,45 @@ export const getCommunicationSummaryPageQuery = (supabase: SupabaseClient) => {
       nextCursor,
       hasMore,
       total: rows.length > 0 ? Number(rows[0].total_count || 0) : 0,
+    };
+  };
+};
+
+export const getCommunicationSummaryCountsQuery = (supabase: SupabaseClient) => {
+  return async (search?: string): Promise<{ all: number; failed: number }> => {
+    const params = { p_search: search || null };
+    const staffResult = await supabase.rpc('get_secretary_communication_summary_counts_staff', params);
+    if (isMissingStaffRpc(staffResult.error)) {
+      const [allResult, failedResult] = await Promise.all([
+        supabase.rpc('get_secretary_communication_summary_page', {
+          p_limit: 1,
+          p_cursor_last_activity: null,
+          p_cursor_appointment_id: null,
+          p_tab: 'all',
+          p_search: search || null,
+        }),
+        supabase.rpc('get_secretary_communication_summary_page', {
+          p_limit: 1,
+          p_cursor_last_activity: null,
+          p_cursor_appointment_id: null,
+          p_tab: 'failed',
+          p_search: search || null,
+        }),
+      ]);
+      if (allResult.error || failedResult.error) {
+        throw new Error(`Failed to fetch communication summary counts: ${(allResult.error || failedResult.error)?.message}`);
+      }
+      return {
+        all: Number(((allResult.data || [])[0] as { total_count?: number | string } | undefined)?.total_count || 0),
+        failed: Number(((failedResult.data || [])[0] as { total_count?: number | string } | undefined)?.total_count || 0),
+      };
+    }
+    if (staffResult.error) throw new Error(`Failed to fetch communication summary counts: ${staffResult.error.message}`);
+
+    const row = ((staffResult.data || [])[0] || {}) as { all_count?: number | string; failed_count?: number | string };
+    return {
+      all: Number(row.all_count || 0),
+      failed: Number(row.failed_count || 0),
     };
   };
 };

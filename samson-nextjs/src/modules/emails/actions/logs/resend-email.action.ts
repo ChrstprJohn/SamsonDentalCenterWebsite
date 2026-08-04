@@ -13,18 +13,17 @@ const resendEmailActionSchema = z.object({
 
 export async function resendEmailAction(data: { id: string }) {
   try {
-    const user = await authorizeRole('SECRETARY');
-    console.log('Authorized SECRETARY user for resend:', user.id);
+    await authorizeRole('SECRETARY');
 
     const { id } = resendEmailActionSchema.parse(data);
 
     // Setup DB client
     const supabase = await createAdminClient();
 
-    // Re-verify the event is indeed in a FAILED or PENDING state
+    // Re-verify the event and fetch only the fields needed to enqueue a retry.
     const { data: event, error: fetchError } = await supabase
       .from('outbox')
-      .select('*')
+      .select('id, event_type, payload, status, retry_count')
       .eq('id', id)
       .single();
 
@@ -32,10 +31,16 @@ export async function resendEmailAction(data: { id: string }) {
       return { error: 'Email log not found.' };
     }
 
+    const eventStatus = event.status as string;
+    if (!['FAILED', 'PENDING', 'PROCESSED'].includes(eventStatus)) {
+      return { error: 'This communication cannot be resent in its current state.' };
+    }
+
     // Refresh payload with current email from appointment
-    const eventPayload = (event as any).payload || {};
-    const apptId = eventPayload.appointmentId;
-    const eventType = (event as any).event_type || '';
+    const eventPayload = (event.payload || {}) as Record<string, unknown>;
+    const apptId = typeof eventPayload.appointmentId === 'string' ? eventPayload.appointmentId : null;
+    const eventType = event.event_type || '';
+    if (!eventType) return { error: 'Communication event type is missing.' };
     if (apptId) {
       const { data: gc } = await supabase
         .from('guest_contacts')
@@ -65,7 +70,6 @@ export async function resendEmailAction(data: { id: string }) {
       }
     }
 
-    const eventStatus = (event as any).status || '';
     const outbox = outboxCommands(supabase);
     let eventId = id;
 
@@ -90,13 +94,14 @@ export async function resendEmailAction(data: { id: string }) {
       }
     }
 
-    // Trigger dispatcher
+    // Dispatch only the event just re-queued/created. Do not claim unrelated
+    // pending events during a user-initiated resend.
     bootstrapEventSubscribers();
-    const dispatch = globalOutboxDispatcher(supabase);
+    const dispatch = globalOutboxDispatcher(supabase, true, eventId);
     await dispatch();
 
     return { data: { success: true } };
-  } catch (err: any) {
-    return { error: err.message || 'Failed to resend email' };
+  } catch (err: unknown) {
+    return { error: err instanceof Error ? err.message : 'Failed to resend email' };
   }
 }

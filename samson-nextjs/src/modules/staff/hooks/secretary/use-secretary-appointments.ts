@@ -4,19 +4,17 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { updateAppointmentStatusAction } from '@/modules/appointments/actions/status/update-appointment-status.action';
 import type { AppointmentDto } from '@/modules/appointments/dtos/shared/appointment.dto';
 import type { AvailableSlotDto } from '@/modules/appointments/dtos/availability/get-available-time-slots.dto';
-import { useBookingScheduler } from '@/modules/appointments/hooks/shared/use-booking-scheduler';
 import { getServicesAction } from '@/modules/services/actions/management/get-services.action';
 import type { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
 import { getDoctorsAction } from '@/modules/staff/actions/management/get-doctors.action';
 import { getClinicAppointmentsPageAction } from '@/modules/appointments/actions/clinic/get-clinic-appointments-page.action';
+import { getStaffAppointmentByIdAction } from '@/modules/appointments/actions/clinic/get-staff-appointment-by-id.action';
 
 export type AppointmentDirectoryTab = 'upcoming' | 'history';
 export type DoctorFilterItem = { id: string; firstName: string; lastName: string };
 export type AvailableDoctorItem = { doctorId: string; doctorName: string };
 
 export function useSecretaryAppointments() {
-  const scheduler = useBookingScheduler();
-  const { loadAvailableDates, loadDoctorsForDate, loadAvailableSlots } = scheduler;
   const [appointments, setAppointments] = useState<AppointmentDto[]>([]);
   const [doctors, setDoctors] = useState<DoctorFilterItem[]>([]);
   const [selectedAppointmentId, setSelectedAppointmentId] = useState<string | null>(null);
@@ -51,6 +49,11 @@ export function useSecretaryAppointments() {
   const [loadMoreError, setLoadMoreError] = useState<string | null>(null);
   const [tabTotals, setTabTotals] = useState<Record<AppointmentDirectoryTab, number>>({ upcoming: 0, history: 0 });
   const latestRequestId = useRef(0);
+  const doctorsLoadedRef = useRef(false);
+  const servicesLoadedRef = useRef(false);
+  const servicesLoadingRef = useRef<Promise<void> | null>(null);
+  const detailRequestIdRef = useRef(0);
+  const [selectedAppointmentDetails, setSelectedAppointmentDetails] = useState<AppointmentDto | null>(null);
   const nextCursorRef = useRef<string | null>(null);
   const loadingMoreRef = useRef(false);
   const hasLoadedRef = useRef(false);
@@ -58,7 +61,9 @@ export function useSecretaryAppointments() {
   const queryRef = useRef({ activeTab, searchTerm, doctorFilter, dateFilter, historyStatusFilter });
   queryRef.current = { activeTab, searchTerm, doctorFilter, dateFilter, historyStatusFilter };
 
-  const selectedAppointment = appointments.find((appointment) => appointment.id === selectedAppointmentId);
+  const selectedAppointment = selectedAppointmentDetails?.id === selectedAppointmentId
+    ? selectedAppointmentDetails
+    : appointments.find((appointment) => appointment.id === selectedAppointmentId);
   const activeServiceId = changeTreatment ? rescheduleServiceId : (selectedAppointment?.serviceId ?? '');
   const activeDoctorId = changeDoctor ? rescheduleDoctorId : (selectedAppointment?.doctorId ?? '');
   const availableDates: string[] = [];
@@ -75,7 +80,7 @@ export function useSecretaryAppointments() {
     ? ['APPROVED', 'CHECKED_IN']
     : ['COMPLETED', 'CANCELLED', 'REJECTED', 'DISPLACED', 'NO_SHOW'];
 
-  const buildPageParams = (tab: AppointmentDirectoryTab, cursor: string | null, includeSearch = true) => {
+  const buildPageParams = (tab: AppointmentDirectoryTab, cursor: string | null, includeSearch = true, countOnly = false) => {
     const current = queryRef.current;
     return {
       limit: 25,
@@ -85,6 +90,7 @@ export function useSecretaryAppointments() {
       doctorId: current.doctorFilter || undefined,
       date: current.dateFilter || undefined,
       status: tab === 'history' && current.historyStatusFilter ? current.historyStatusFilter : undefined,
+      countOnly: countOnly || undefined,
     };
   };
 
@@ -108,11 +114,11 @@ export function useSecretaryAppointments() {
     const currentTab = queryRef.current.activeTab;
     try {
       const activeRequest = getClinicAppointmentsPageAction(buildPageParams(currentTab, append ? nextCursorRef.current : null));
-      const doctorsRequest = append ? Promise.resolve(null) : getDoctorsAction({ includeHidden: true });
+      const doctorsRequest = append || doctorsLoadedRef.current ? Promise.resolve(null) : getDoctorsAction({ includeHidden: true });
       const otherTab: AppointmentDirectoryTab = currentTab === 'upcoming' ? 'history' : 'upcoming';
       const otherRequest = append
         ? Promise.resolve(null)
-        : getClinicAppointmentsPageAction(buildPageParams(otherTab, null));
+        : getClinicAppointmentsPageAction(buildPageParams(otherTab, null, true, true));
       const [appRes, docRes, otherRes] = await Promise.all([activeRequest, doctorsRequest, otherRequest]);
       if (requestId !== latestRequestId.current) return;
       if (!appRes.success || !appRes.data) throw new Error(appRes.error || 'Could not load appointments.');
@@ -129,13 +135,15 @@ export function useSecretaryAppointments() {
       if (otherRes?.success && otherRes.data) {
         setTabTotals((previous) => ({ ...previous, [otherTab]: otherRes.data.total ?? otherRes.data.items.length }));
       }
-      if (docRes?.success && docRes.data) setDoctors(docRes.data as DoctorFilterItem[]);
+      if (docRes?.success && docRes.data) {
+        setDoctors(docRes.data as DoctorFilterItem[]);
+        doctorsLoadedRef.current = true;
+      }
       hasLoadedRef.current = true;
     } catch (err) {
       if (requestId === latestRequestId.current) {
         if (append) setLoadMoreError(err instanceof Error ? err.message : 'Could not load more appointments.');
         else setError(err instanceof Error ? err.message : 'Could not load appointments.');
-        console.error('Failed to load data:', err);
       }
     } finally {
       if (requestId === latestRequestId.current) {
@@ -160,7 +168,28 @@ export function useSecretaryAppointments() {
     return () => document.removeEventListener('visibilitychange', refreshOnVisible);
   }, [fetchData]);
 
+  const loadServices = useCallback(async () => {
+    if (servicesLoadedRef.current) return;
+    if (servicesLoadingRef.current) return servicesLoadingRef.current;
+    setIsLoadingServices(true);
+    const request = getServicesAction('BOOKABLE')
+      .then((res) => {
+        if (res?.data) {
+          setServices(res.data as ServiceResponseDto[]);
+          servicesLoadedRef.current = true;
+        }
+      })
+      .catch((err) => setError(err instanceof Error ? err.message : 'Failed to load services'))
+      .finally(() => {
+        servicesLoadingRef.current = null;
+        setIsLoadingServices(false);
+      });
+    servicesLoadingRef.current = request;
+    return request;
+  }, []);
+
   const openRescheduleForm = useCallback(() => {
+    void loadServices();
     if (selectedAppointment) {
       setRescheduleServiceId(selectedAppointment.serviceId || '');
       setRescheduleDoctorId(selectedAppointment.doctorId || '');
@@ -181,7 +210,7 @@ export function useSecretaryAppointments() {
     }
     setShowRescheduleForm(true);
     setShowCancelForm(false);
-  }, [selectedAppointment]);
+  }, [loadServices, selectedAppointment]);
 
   const handleSetShowRescheduleForm = useCallback((show: boolean) => {
     if (show) {
@@ -207,19 +236,6 @@ export function useSecretaryAppointments() {
   }, []);
 
   useEffect(() => { resetActionForms(); }, [selectedAppointmentId, resetActionForms]);
-
-  useEffect(() => {
-    let active = true;
-    async function loadServices() {
-      setIsLoadingServices(true);
-      const res = await getServicesAction('BOOKABLE');
-      if (!active) return;
-      setIsLoadingServices(false);
-      if (res?.data) setServices(res.data as ServiceResponseDto[]);
-    }
-    loadServices();
-    return () => { active = false; };
-  }, []);
 
 
   const formatPatientName = (appointment: AppointmentDto): string => {
@@ -255,7 +271,24 @@ export function useSecretaryAppointments() {
   const selectTab = (tab: AppointmentDirectoryTab) => {
     setActiveTab(tab);
     setSelectedAppointmentId(null);
+    setSelectedAppointmentDetails(null);
   };
+
+  const selectAppointment = useCallback((appointmentId: string | null) => {
+    setSelectedAppointmentId(appointmentId);
+    if (!appointmentId) {
+      setSelectedAppointmentDetails(null);
+      return;
+    }
+    const summary = appointments.find((appointment) => appointment.id === appointmentId) || null;
+    setSelectedAppointmentDetails(summary);
+    const requestId = ++detailRequestIdRef.current;
+    void getStaffAppointmentByIdAction(appointmentId).then((result) => {
+      if (requestId !== detailRequestIdRef.current) return;
+      if (result.success && result.data) setSelectedAppointmentDetails(result.data);
+      else if (!result.success) setError(result.error || 'Failed to load appointment details');
+    });
+  }, [appointments]);
 
   const toggleChangeTreatment = () => {
     setChangeTreatment((current) => !current);
@@ -281,9 +314,18 @@ export function useSecretaryAppointments() {
   const submitReschedule = async () => {
     if (!selectedAppointment) return;
     const targetDoctorId = rescheduleDoctorId || selectedAppointment.doctorId || activeDoctorId;
-    if (!rescheduleDate || !targetDoctorId || !rescheduleStartTime || !rescheduleEndTime) return alert('Please complete all scheduling fields (date, doctor, timeslot).');
-    if (changeTreatment && !rescheduleServiceId) return alert('Please select a treatment service.');
-    if (!rescheduleJustification.trim()) return alert('Justification note is required.');
+    if (!rescheduleDate || !targetDoctorId || !rescheduleStartTime || !rescheduleEndTime) {
+      setError('Please complete all scheduling fields (date, doctor, timeslot).');
+      return;
+    }
+    if (changeTreatment && !rescheduleServiceId) {
+      setError('Please select a treatment service.');
+      return;
+    }
+    if (!rescheduleJustification.trim()) {
+      setError('Justification note is required.');
+      return;
+    }
     setIsSubmitting(true);
     try {
       const formatIso = (dateStr: string, timeStr: string) => {
@@ -305,14 +347,14 @@ export function useSecretaryAppointments() {
         confirmationChannel,
       });
       if (res.success) {
-        alert('Appointment rescheduled successfully.');
+        setError(null);
         setShowRescheduleForm(false);
         await fetchData();
       } else {
-        alert(res.error || 'Failed to reschedule.');
+        setError(res.error || 'Failed to reschedule.');
       }
     } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : 'An error occurred.');
+      setError(err instanceof Error ? err.message : 'An error occurred.');
     } finally {
       setIsSubmitting(false);
     }
@@ -321,7 +363,10 @@ export function useSecretaryAppointments() {
   const submitCancel = async () => {
     if (!selectedAppointment) return;
     const finalReason = cancelReasonPreset === 'CUSTOM' ? cancelReasonCustom : cancelReasonPreset;
-    if (!finalReason?.trim()) return alert('Please select or write a cancellation reason.');
+    if (!finalReason?.trim()) {
+      setError('Please select or write a cancellation reason.');
+      return;
+    }
     setIsSubmitting(true);
     try {
       const res = await updateAppointmentStatusAction({
@@ -331,30 +376,30 @@ export function useSecretaryAppointments() {
         confirmationChannel,
       });
       if (res.success) {
-        alert('Appointment cancelled successfully.');
+        setError(null);
         setShowCancelForm(false);
         await fetchData();
       } else {
-        alert(res.error || 'Failed to cancel.');
+        setError(res.error || 'Failed to cancel.');
       }
     } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : 'An error occurred.');
+      setError(err instanceof Error ? err.message : 'An error occurred.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return {
-    appointments, filteredAppointments, visibleAppointments, doctors, tabTotals, selectedAppointment, selectedAppointmentId, setSelectedAppointmentId,
+    appointments, filteredAppointments, visibleAppointments, doctors, tabTotals, selectedAppointment, selectedAppointmentId, setSelectedAppointmentId, selectAppointment,
     isLoading, isRefreshing, error, isSubmitting, activeTab, selectTab, searchTerm, setSearchTerm, doctorFilter, setDoctorFilter, dateFilter,
     setDateFilter, historyStatusFilter, setHistoryStatusFilter, showRescheduleForm, setShowRescheduleForm: handleSetShowRescheduleForm,
     rescheduleJustification, setRescheduleJustification, changeTreatment, services, rescheduleServiceId,
     isLoadingServices, changeDoctor, rescheduleDoctorId, setRescheduleDoctorId, availableRescheduleDoctors,
-    isLoadingRescheduleDoctors: scheduler.loadingKey === 'doctors', rescheduleMonth, setRescheduleMonth, availableDates,
-    isLoadingDays: scheduler.loadingKey === 'dates', rescheduleDate, timeslots, isLoadingSlots: scheduler.loadingKey === 'slots',
+    isLoadingRescheduleDoctors: false, rescheduleMonth, setRescheduleMonth, availableDates: [],
+    isLoadingDays: false, rescheduleDate, timeslots, isLoadingSlots: false,
     rescheduleStartTime, setRescheduleStartTime, rescheduleEndTime, setRescheduleEndTime, cancelReasonPreset, setCancelReasonPreset, cancelReasonCustom, setCancelReasonCustom,
     showCancelForm, setShowCancelForm, confirmationChannel, setConfirmationChannel, activeServiceId, activeDoctorId, formatPatientName, toggleChangeTreatment,
-    toggleChangeDoctor, selectRescheduleService, selectRescheduleDate, selectRescheduleSlot, submitReschedule, submitCancel, fetchData,
+    toggleChangeDoctor, selectRescheduleService, selectRescheduleDate, selectRescheduleSlot, submitReschedule, submitCancel, fetchData, loadServices,
     hasMore, isLoadingMore, loadMoreError, loadMore,
   };
 }

@@ -5,7 +5,6 @@ import { createClient } from '@/shared/database/client';
 import { getChatThreadsPageAction } from '@/modules/appointments/actions/chat/get-chat-threads-page.action';
 import { getStaffAppointmentByIdAction } from '@/modules/appointments/actions/clinic/get-staff-appointment-by-id.action';
 import { getMessagesAction } from '@/modules/appointments/actions/chat/get-messages.action';
-import { markMessagesAsReadAction } from '@/modules/appointments/actions/chat/mark-read.action';
 import { ChatThreadDto } from '@/modules/appointments/repositories/chat/chat.queries';
 import { MessageResponseDto } from '@/modules/appointments/dtos/chat/message-response.dto';
 import { PatientChatView } from '@/modules/appointments/views/chat/patient-chat-view';
@@ -875,7 +874,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false,
                 handleActionSubmit(fakeEvent);
             },
         };
-    }, [appointmentAdapter, activeAction, selectedThread, rescheduleServiceId, rescheduleDate, rescheduleDoctorId, rescheduleStartTime, rescheduleEndTime, doctors, services, actionReason, actionLoading, actionReasonPreset, handleActionSubmit, fetchThreads]);
+    }, [appointmentAdapter, activeAction, selectedThread, selectedThreadId, rescheduleServiceId, rescheduleDate, rescheduleDoctorId, rescheduleStartTime, rescheduleEndTime, doctors, services, actionReason, actionLoading, actionReasonPreset, handleActionSubmit, fetchThreads, loadActionResources, refreshFullAppointment]);
 
     const detailPanelContent = selectedThreadId && selectedThread && detailPaneView ? (
         <div className="flex flex-col h-full overflow-hidden">

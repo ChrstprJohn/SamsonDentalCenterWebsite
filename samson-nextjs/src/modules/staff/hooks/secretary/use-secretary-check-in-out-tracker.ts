@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useMemo, useState, useTransition } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import { getClinicAppointmentsAction } from '@/modules/appointments/actions/clinic/get-clinic-appointments.action';
 import { checkInAction } from '@/modules/appointments/actions/status/check-in.action';
 import { undoCheckInAction } from '@/modules/appointments/actions/status/undo-check-in.action';
 import { updateAppointmentStatusAction } from '@/modules/appointments/actions/status/update-appointment-status.action';
 import { resolveNoShowAction } from '@/modules/appointments/actions/status/resolve-no-show.action';
+import { getStaffAppointmentByIdAction } from '@/modules/appointments/actions/clinic/get-staff-appointment-by-id.action';
 import { getDoctorsAction } from '@/modules/staff/actions/management/get-doctors.action';
 import { getServicesAction } from '@/modules/services/actions/management/get-services.action';
 import { createClient } from '@/shared/database/client';
@@ -29,6 +30,12 @@ export function useSecretaryCheckInOutTracker() {
   const [rescheduleService, setRescheduleService] = useState('');
   const [rescheduleJustification, setRescheduleJustification] = useState('');
   const [servicesList, setServicesList] = useState<any[]>([]);
+  const servicesLoadedRef = useRef(false);
+  const servicesLoadingRef = useRef<Promise<void> | null>(null);
+  const requestIdRef = useRef(0);
+  const realtimeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const suppressRealtimeUntilRef = useRef(0);
+  const detailRequestIdRef = useRef(0);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -39,15 +46,16 @@ export function useSecretaryCheckInOutTracker() {
 
   const [doctorsList, setDoctorsList] = useState<any[]>([]);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
+    const requestId = ++requestIdRef.current;
     setIsLoading(true);
     setErrorMessage(null);
     try {
-      const [apptRes, docRes, svcRes] = await Promise.all([
+      const [apptRes, docRes] = await Promise.all([
         getClinicAppointmentsAction({ date: todayStr }),
         getDoctorsAction({ includeHidden: true }),
-        getServicesAction('BOOKABLE'),
       ]);
+      if (requestId !== requestIdRef.current) return;
       if (apptRes.success && apptRes.data) {
         setAppointments(apptRes.data);
       } else {
@@ -56,15 +64,41 @@ export function useSecretaryCheckInOutTracker() {
       if (docRes.success && docRes.data) {
         setDoctorsList(docRes.data);
       }
-      if (svcRes && (svcRes as any).data) {
-        setServicesList((svcRes as any).data);
-      }
     } catch (err: any) {
-      setErrorMessage(err.message || 'An unexpected error occurred');
+      if (requestId === requestIdRef.current) {
+        setErrorMessage(err.message || 'An unexpected error occurred');
+      }
     } finally {
-      setIsLoading(false);
+      if (requestId === requestIdRef.current) setIsLoading(false);
     }
-  };
+  }, [todayStr]);
+
+  const loadServices = useCallback(async () => {
+    if (servicesLoadedRef.current) return;
+    if (servicesLoadingRef.current) return servicesLoadingRef.current;
+    const load = (async () => {
+      const result = await getServicesAction('BOOKABLE');
+      if (result && (result as any).data) {
+        setServicesList((result as any).data);
+        servicesLoadedRef.current = true;
+      }
+      servicesLoadingRef.current = null;
+    })().catch((error) => {
+      servicesLoadingRef.current = null;
+      setErrorMessage(error instanceof Error ? error.message : 'Failed to load services');
+    });
+    servicesLoadingRef.current = load;
+    return load;
+  }, []);
+
+  const scheduleRealtimeRefresh = useCallback(() => {
+    if (Date.now() < suppressRealtimeUntilRef.current) return;
+    if (realtimeTimerRef.current) clearTimeout(realtimeTimerRef.current);
+    realtimeTimerRef.current = setTimeout(() => {
+      realtimeTimerRef.current = null;
+      void fetchData();
+    }, 250);
+  }, [fetchData]);
 
   const resetRescheduleDraft = () => {
     setRescheduleDate('');
@@ -92,17 +126,18 @@ export function useSecretaryCheckInOutTracker() {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   useEffect(() => {
     const channel = supabase
       .channel('check-in-out-tracker')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'appointments' }, () => fetchData())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'appointments', filter: `date=eq.${todayStr}` }, scheduleRealtimeRefresh)
       .subscribe();
     return () => {
+      if (realtimeTimerRef.current) clearTimeout(realtimeTimerRef.current);
       supabase.removeChannel(channel);
     };
-  }, [supabase]);
+  }, [supabase, scheduleRealtimeRefresh, todayStr]);
 
   const parseLocalTime = (date: string, time: string | null) => {
     if (!time) return null;
@@ -137,10 +172,11 @@ export function useSecretaryCheckInOutTracker() {
   const runStatusAction = (action: () => Promise<any>, fallback: string) => {
     startTransition(async () => {
       const res = await action();
-      if (!res.success) alert(res.error || fallback);
+      if (!res.success) setErrorMessage(res.error || fallback);
       else {
         clearSelection();
-        fetchData();
+        suppressRealtimeUntilRef.current = Date.now() + 500;
+        await fetchData();
       }
     });
   };
@@ -159,10 +195,11 @@ export function useSecretaryCheckInOutTracker() {
         status: 'COMPLETED',
         statusReason: reason || 'Checked out patient and dispatched Thank You & Post-Care Review Request message.',
       });
-      if (!res.success) alert(res.error || 'Failed to complete checkout');
+      if (!res.success) setErrorMessage(res.error || 'Failed to complete checkout');
       else {
         clearSelection();
-        fetchData();
+        suppressRealtimeUntilRef.current = Date.now() + 500;
+        await fetchData();
       }
     });
   };
@@ -178,10 +215,11 @@ export function useSecretaryCheckInOutTracker() {
   }) => {
     startTransition(async () => {
       const res = await resolveNoShowAction(payload);
-      if (!res.success) alert(res.error || 'Failed to resolve no-show');
+      if (!res.success) setErrorMessage(res.error || 'Failed to resolve no-show');
       else {
         clearSelection();
-        fetchData();
+        suppressRealtimeUntilRef.current = Date.now() + 500;
+        await fetchData();
       }
     });
   };
@@ -209,10 +247,11 @@ export function useSecretaryCheckInOutTracker() {
         newDoctorId: rescheduleDoctor || rescheduleAppt.doctorId || undefined,
         newServiceId: rescheduleService || rescheduleAppt.serviceId,
       });
-      if (!res.success) alert(res.error || 'Failed to reschedule');
+      if (!res.success) setErrorMessage(res.error || 'Failed to reschedule');
       else {
         clearSelection();
-        fetchData();
+        suppressRealtimeUntilRef.current = Date.now() + 500;
+        await fetchData();
       }
     });
   };
@@ -221,6 +260,12 @@ export function useSecretaryCheckInOutTracker() {
     clearSelection();
     setViewAppt(appointment);
     setSelectionVersion((version) => version + 1);
+    const detailRequestId = ++detailRequestIdRef.current;
+    void getStaffAppointmentByIdAction(appointment.id).then((result) => {
+      if (detailRequestId !== detailRequestIdRef.current) return;
+      if (result.success && result.data) setViewAppt(result.data);
+      else if (!result.success) setErrorMessage(result.error || 'Failed to load appointment details');
+    });
   };
 
   const openCheckIn = (appointment: AppointmentDto) => {
@@ -240,6 +285,7 @@ export function useSecretaryCheckInOutTracker() {
 
   const openReschedule = (appointment: AppointmentDto) => {
     clearSelection();
+    void loadServices();
     setRescheduleAppt(appointment);
   };
 
@@ -296,6 +342,8 @@ export function useSecretaryCheckInOutTracker() {
     rescheduleJustification,
     setRescheduleJustification,
     servicesList,
+    loadServices,
+    fetchData,
     getCheckInStatus,
     handleCheckIn,
     handleUndoCheckIn,

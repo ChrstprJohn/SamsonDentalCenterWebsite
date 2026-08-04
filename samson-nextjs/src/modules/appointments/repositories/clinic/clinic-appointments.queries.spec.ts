@@ -13,7 +13,7 @@ describe('ClinicAppointmentsQueries', () => {
     };
   });
 
-  it('should call select with status_history and order by start_time', async () => {
+  it('should use the compact appointment projection and order by start_time', async () => {
     // Arrange
     const mockAppointments = [
       {
@@ -25,16 +25,6 @@ describe('ClinicAppointmentsQueries', () => {
         end_time: '11:00',
         status: 'APPROVED',
         doctor_assignment_source: 'SYSTEM',
-        status_history: [
-          {
-            id: 'sh-1',
-            previous_status: null,
-            new_status: 'APPROVED',
-            reason: 'Initial booking',
-            created_at: '2026-06-01T09:00:00Z',
-            actor_role: 'PATIENT',
-          }
-        ]
       }
     ];
 
@@ -47,12 +37,9 @@ describe('ClinicAppointmentsQueries', () => {
 
     // Assert
     expect(mockSupabase.from).toHaveBeenCalledWith('appointments');
-    expect(mockSupabase.select).toHaveBeenCalledWith(
-      expect.stringContaining('status_history:appointment_status_history')
-    );
+    expect(mockSupabase.select).toHaveBeenCalledWith(expect.not.stringContaining('status_history'));
     expect(mockSupabase.order).toHaveBeenCalledWith('start_time', { ascending: true });
     expect(result.length).toBe(1);
-    expect(result[0].statusHistory.length).toBe(1);
-    expect(result[0].statusHistory[0].newStatus).toBe('APPROVED');
+    expect(result[0].statusHistory).toEqual([]);
   });
 });

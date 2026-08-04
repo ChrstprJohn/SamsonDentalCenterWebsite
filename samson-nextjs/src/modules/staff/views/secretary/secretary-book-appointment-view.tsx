@@ -7,8 +7,6 @@ import { AppointmentDetailPane } from './sub-components/appointment-detail-pane'
 import { Calendar } from '@/components/ui/calendar';
 import { getClinicAppointmentsAction } from '@/modules/appointments/actions/clinic/get-clinic-appointments.action';
 import { updateAppointmentStatusAction } from '@/modules/appointments/actions/status/update-appointment-status.action';
-import { getDoctorsAction } from '@/modules/staff/actions/management/get-doctors.action';
-import { getServicesAction } from '@/modules/services/actions/management/get-services.action';
 import { Button } from '@/components/ui/button';
 import { InquiryToast } from './sub-components/inquiry-toast';
 import {
@@ -63,6 +61,7 @@ export function SecretaryBookAppointmentView() {
   const [viewMode, setViewMode] = React.useState<'day' | 'week'>('day');
   const [weekAppointments, setWeekAppointments] = React.useState<any[]>([]);
   const [isWeekLoading, setIsWeekLoading] = React.useState(false);
+  const weekRequestIdRef = React.useRef(0);
   const [mobileView, setMobileView] = React.useState<'timeline' | 'detail'>('timeline');
   const [isBookingOpen, setIsBookingOpen] = React.useState(false);
   const [isDentistsOpen, setIsDentistsOpen] = React.useState(true);
@@ -78,17 +77,6 @@ export function SecretaryBookAppointmentView() {
   const [cancelReasonPreset, setCancelReasonPreset] = React.useState('');
   const [cancelReasonCustom, setCancelReasonCustom] = React.useState('');
   const [isActionSubmitting, setIsActionSubmitting] = React.useState(false);
-  const [doctors, setDoctors] = React.useState<{ id: string; firstName: string; lastName: string }[]>([]);
-  const [services, setServices] = React.useState<any[]>([]);
-
-  React.useEffect(() => {
-    getDoctorsAction().then((res) => {
-      if (res.success && res.data) setDoctors(res.data);
-    });
-    getServicesAction('BOOKABLE').then((res) => {
-      if (res.data) setServices(res.data);
-    });
-  }, []);
 
   const handleCalendarReschedule = async () => {
     if (!view.selectedAppointmentDetails) return;
@@ -112,12 +100,12 @@ export function SecretaryBookAppointmentView() {
       });
       if (res.success) {
         setIsRescheduleOpen(false);
-        view.loadTimelineData(view.selectedDate);
+        await view.loadTimelineData(view.selectedDate);
       } else {
-        alert(res.error || 'Failed to reschedule appointment');
+        view.setInlineError(res.error || 'Failed to reschedule appointment');
       }
     } catch (err: any) {
-      alert(err.message || 'An error occurred during reschedule');
+      view.setInlineError(err.message || 'An error occurred during reschedule');
     } finally {
       setIsActionSubmitting(false);
     }
@@ -127,7 +115,7 @@ export function SecretaryBookAppointmentView() {
     if (!view.selectedAppointmentDetails) return;
     const finalReason = cancelReasonPreset === 'CUSTOM' ? cancelReasonCustom : cancelReasonPreset;
     if (!finalReason?.trim()) {
-      alert('Please select or enter a cancellation reason.');
+      view.setInlineError('Please select or enter a cancellation reason.');
       return;
     }
     setIsActionSubmitting(true);
@@ -139,12 +127,12 @@ export function SecretaryBookAppointmentView() {
       });
       if (res.success) {
         setIsCancelOpen(false);
-        view.loadTimelineData(view.selectedDate);
+        await view.loadTimelineData(view.selectedDate);
       } else {
-        alert(res.error || 'Failed to cancel appointment');
+        view.setInlineError(res.error || 'Failed to cancel appointment');
       }
     } catch (err: any) {
-      alert(err.message || 'An error occurred during cancellation');
+      view.setInlineError(err.message || 'An error occurred during cancellation');
     } finally {
       setIsActionSubmitting(false);
     }
@@ -189,26 +177,25 @@ export function SecretaryBookAppointmentView() {
   React.useEffect(() => {
     if (viewMode === 'week') {
       const fetchWeekData = async () => {
+        const requestId = ++weekRequestIdRef.current;
         setIsWeekLoading(true);
+        view.setInlineError('');
         try {
-          const promises = daysOfWeek.map(date => getClinicAppointmentsAction({ date }));
-          const results = await Promise.all(promises);
-          const allApps: any[] = [];
-          results.forEach(res => {
-            if (res.success && res.data) {
-              allApps.push(...res.data);
-            }
-          });
-          setWeekAppointments(allApps);
+          const result = await getClinicAppointmentsAction({ dateFrom: daysOfWeek[0], dateTo: daysOfWeek.at(-1) });
+          if (requestId !== weekRequestIdRef.current) return;
+          if (result.success && result.data) setWeekAppointments(result.data);
+          else if (!result.success) view.setInlineError(result.error || 'Failed to load the selected week.');
         } catch (e) {
-          console.error(e);
+          if (requestId === weekRequestIdRef.current) {
+            view.setInlineError(e instanceof Error ? e.message : 'Failed to load the selected week.');
+          }
         } finally {
-          setIsWeekLoading(false);
+          if (requestId === weekRequestIdRef.current) setIsWeekLoading(false);
         }
       };
       fetchWeekData();
     }
-  }, [viewMode, daysOfWeek, view.appointments]);
+  }, [viewMode, daysOfWeek, view.timelineVersion]);
 
   const isAllDoctorsChecked = view.doctorsList.length > 0 && view.doctorsList.every(d => checkedDoctorIds[d.id]);
   const toggleAllDoctors = () => {
@@ -370,7 +357,7 @@ export function SecretaryBookAppointmentView() {
             appointments={viewMode === 'week' ? weekAppointments : view.appointments}
             isLoading={viewMode === 'week' ? (view.isLoadingAppointments || isWeekLoading) : view.isLoadingAppointments}
             selectedAppointmentId={view.selectedAppointmentDetails?.id}
-            onSelectAppointment={view.setSelectedAppointmentDetails}
+            onSelectAppointment={view.selectAppointment}
             viewMode={viewMode}
             selectedDate={view.selectedDate}
             onSlotClick={({ doctorId, date, startTime }) => {
@@ -380,6 +367,7 @@ export function SecretaryBookAppointmentView() {
               if (startTime) view.setSelectedTime(startTime);
               // Close appointment detail if open, open booking panel
               view.setSelectedAppointmentDetails(null);
+              void view.loadActionResources();
               setIsBookingOpen(true);
             }}
           />
@@ -428,6 +416,7 @@ export function SecretaryBookAppointmentView() {
                   showRescheduleForm: isRescheduleOpen,
                   setShowRescheduleForm: (show: boolean) => {
                     if (show) {
+                      void view.loadActionResources();
                       setIsRescheduleOpen(true);
                       setIsCancelOpen(false);
                       setRescheduleServiceId(view.selectedAppointmentDetails?.serviceId || '');
@@ -463,15 +452,15 @@ export function SecretaryBookAppointmentView() {
                   },
                   changeTreatment: true,
                   toggleChangeTreatment: () => {},
-                  services: services,
+                  services: view.services,
                   rescheduleServiceId: rescheduleServiceId,
                   selectRescheduleService: setRescheduleServiceId,
-                  isLoadingServices: false,
+                  isLoadingServices: view.isLoadingServices,
                   changeDoctor: true,
                   toggleChangeDoctor: () => {},
                   rescheduleDoctorId: rescheduleDoctorId,
                   setRescheduleDoctorId: setRescheduleDoctorId,
-                  availableRescheduleDoctors: doctors.map(d => ({ doctorId: d.id, doctorName: `Dr. ${d.firstName} ${d.lastName}` })),
+                  availableRescheduleDoctors: view.doctorsList.map(d => ({ doctorId: d.id, doctorName: `Dr. ${d.firstName} ${d.lastName}` })),
                   isLoadingRescheduleDoctors: false,
                   rescheduleMonth: new Date(),
                   setRescheduleMonth: () => {},
@@ -807,7 +796,7 @@ export function SecretaryBookAppointmentView() {
             <SidebarFooter>
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <SidebarMenuButton onClick={() => { view.resetForm(); setIsBookingOpen(true); }}>
+                  <SidebarMenuButton onClick={() => { view.resetForm(); void view.loadActionResources(); setIsBookingOpen(true); }}>
                     <Plus className="size-4 mr-2" />
                     <span>Book New Appointment</span>
                   </SidebarMenuButton>

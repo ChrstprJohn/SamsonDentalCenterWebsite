@@ -9,7 +9,7 @@ vi.mock('@/orchestrators/event-subscribers', () => ({
   bootstrapEventSubscribers: vi.fn(),
 }));
 
-let mockSingle = vi.fn().mockImplementation(() => {
+const mockSingle = vi.fn().mockImplementation(() => {
   return Promise.resolve({
     data: {
       id: 'd9b7f54c-1111-4444-9999-555555555555',
@@ -23,6 +23,7 @@ vi.mock('@/shared/database/server', () => {
   const mockDbClient = {
     from: vi.fn().mockReturnThis(),
     select: vi.fn().mockReturnThis(),
+    insert: vi.fn().mockReturnThis(),
     update: vi.fn().mockReturnThis(),
     eq: vi.fn().mockReturnThis(),
     single: vi.fn().mockImplementation((...args) => mockSingle(...args)),
@@ -40,6 +41,8 @@ describe('resendEmailAction', () => {
     mockSingle.mockResolvedValue({
       data: {
         id: 'd9b7f54c-1111-4444-9999-555555555555',
+        event_type: 'APPOINTMENT_BOOKED',
+        payload: {},
         status: 'PROCESSED',
       },
       error: null,
@@ -48,17 +51,18 @@ describe('resendEmailAction', () => {
     expect(result.data?.success).toBe(true);
   });
 
-  it('should fail if email is not processed (e.g. still failed or pending)', async () => {
+  it('should requeue a failed email for a targeted resend', async () => {
     mockSingle.mockResolvedValue({
       data: {
         id: 'd9b7f54c-1111-4444-9999-555555555555',
+        event_type: 'APPOINTMENT_BOOKED',
+        payload: {},
         status: 'FAILED',
         error_logs: 'Failed to connect to SMTP server',
       },
       error: null,
     });
     const result = await resendEmailAction({ id: 'd9b7f54c-1111-4444-9999-555555555555' });
-    expect(result.error).toContain('Email sending failed again');
-    expect(result.error).toContain('Failed to connect to SMTP server');
+    expect(result.data?.success).toBe(true);
   });
 });

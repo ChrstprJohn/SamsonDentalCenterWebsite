@@ -203,6 +203,69 @@ FOR INSERT
 TO authenticated
 WITH CHECK (public.current_user_role() IN ('SECRETARY'::public.user_role, 'ADMIN'::public.user_role));
 
+-- Keep the related detail tables on the same server-owned role boundary. The
+-- legacy policies used mutable JWT metadata and could disagree with the
+-- appointment/inquiry policies above.
+ALTER TABLE public.dependents ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Allow select for owners and staff" ON public.dependents;
+DROP POLICY IF EXISTS "Allow insert for owners and staff" ON public.dependents;
+DROP POLICY IF EXISTS "Allow update for owners and staff" ON public.dependents;
+DROP POLICY IF EXISTS "Allow delete for owners and staff" ON public.dependents;
+CREATE POLICY "secretary_v2_dependents_select"
+ON public.dependents FOR SELECT TO authenticated
+USING (
+  auth.uid() = patient_id OR
+  public.current_user_role() IN ('DOCTOR'::public.user_role, 'SECRETARY'::public.user_role, 'ADMIN'::public.user_role)
+);
+CREATE POLICY "secretary_v2_dependents_write"
+ON public.dependents FOR ALL TO authenticated
+USING (public.current_user_role() IN ('SECRETARY'::public.user_role, 'ADMIN'::public.user_role))
+WITH CHECK (public.current_user_role() IN ('SECRETARY'::public.user_role, 'ADMIN'::public.user_role));
+
+ALTER TABLE public.guest_contacts ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Staff can manage guest contacts" ON public.guest_contacts;
+CREATE POLICY "secretary_v2_guest_contacts_staff"
+ON public.guest_contacts FOR ALL TO authenticated
+USING (public.current_user_role() IN ('DOCTOR'::public.user_role, 'SECRETARY'::public.user_role, 'ADMIN'::public.user_role))
+WITH CHECK (public.current_user_role() IN ('DOCTOR'::public.user_role, 'SECRETARY'::public.user_role, 'ADMIN'::public.user_role));
+
+ALTER TABLE public.appointment_status_history ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Allow select for owners and staff on status history" ON public.appointment_status_history;
+DROP POLICY IF EXISTS "Allow insert for owners and staff on status history" ON public.appointment_status_history;
+CREATE POLICY "secretary_v2_status_history_select"
+ON public.appointment_status_history FOR SELECT TO authenticated
+USING (
+  public.current_user_role() IN ('DOCTOR'::public.user_role, 'SECRETARY'::public.user_role, 'ADMIN'::public.user_role)
+  OR EXISTS (
+    SELECT 1 FROM public.appointments AS a
+    WHERE a.id = appointment_status_history.appointment_id AND a.patient_id = auth.uid()
+  )
+);
+CREATE POLICY "secretary_v2_status_history_insert"
+ON public.appointment_status_history FOR INSERT TO authenticated
+WITH CHECK (
+  public.current_user_role() IN ('DOCTOR'::public.user_role, 'SECRETARY'::public.user_role, 'ADMIN'::public.user_role)
+  OR EXISTS (
+    SELECT 1 FROM public.appointments AS a
+    WHERE a.id = appointment_status_history.appointment_id AND a.patient_id = auth.uid()
+  )
+);
+
+ALTER TABLE public.services ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Allow write access to admin users" ON public.services;
+DROP POLICY IF EXISTS "Allow write access to admin and secretary users" ON public.services;
+CREATE POLICY "secretary_v2_services_write"
+ON public.services FOR ALL TO authenticated
+USING (public.current_user_role() IN ('SECRETARY'::public.user_role, 'ADMIN'::public.user_role))
+WITH CHECK (public.current_user_role() IN ('SECRETARY'::public.user_role, 'ADMIN'::public.user_role));
+
+ALTER TABLE public.doctor_schedules ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Allow staff write access to doctor_schedules" ON public.doctor_schedules;
+CREATE POLICY "secretary_v2_doctor_schedules_write"
+ON public.doctor_schedules FOR ALL TO authenticated
+USING (public.current_user_role() IN ('SECRETARY'::public.user_role, 'ADMIN'::public.user_role))
+WITH CHECK (public.current_user_role() IN ('SECRETARY'::public.user_role, 'ADMIN'::public.user_role));
+
 -- Outbox payloads include recipient data and are server/worker-only.
 ALTER TABLE public.outbox ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON TABLE public.outbox FROM anon, authenticated;
@@ -309,12 +372,13 @@ BEGIN
     MAX(o.created_at),
     BOOL_OR(o.status = 'FAILED'::public.outbox_status),
     COUNT(*) FILTER (WHERE o.status = 'FAILED'::public.outbox_status),
-    BOOL_OR(o.event_type NOT LIKE '%_SMS' AND COALESCE(o.payload->>'phoneNumber', o.payload->>'phone', o.payload->>'mobileNumber') IS NULL),
+    BOOL_OR(o.event_type NOT LIKE '%_SMS' AND COALESCE(o.payload->>'email', o.payload->>'guestEmail') IS NOT NULL),
     BOOL_OR(o.event_type LIKE '%_SMS' OR COALESCE(o.payload->>'phoneNumber', o.payload->>'phone', o.payload->>'mobileNumber') IS NOT NULL),
     (ARRAY_AGG(o.event_type ORDER BY o.created_at DESC, o.id DESC))[1],
     (ARRAY_AGG(COALESCE(o.payload->>'email', o.payload->>'guestEmail', o.payload->>'phoneNumber', o.payload->>'phone', o.payload->>'mobileNumber', '') ORDER BY o.created_at DESC, o.id DESC))[1],
     NOW()
   FROM public.outbox AS o
+  INNER JOIN public.appointments AS a ON a.id = o.appointment_id
   WHERE o.appointment_id = p_appointment_id
   GROUP BY o.appointment_id
   ON CONFLICT (appointment_id) DO UPDATE SET
@@ -344,10 +408,11 @@ SECURITY DEFINER
 SET search_path = public
 AS $$
 BEGIN
-  PERFORM public.refresh_communication_activity_summary(COALESCE(NEW.appointment_id, OLD.appointment_id));
   IF TG_OP = 'DELETE' THEN
+    PERFORM public.refresh_communication_activity_summary(OLD.appointment_id);
     RETURN OLD;
   END IF;
+  PERFORM public.refresh_communication_activity_summary(NEW.appointment_id);
   RETURN NEW;
 END;
 $$;
@@ -370,12 +435,13 @@ SELECT
   MAX(o.created_at),
   BOOL_OR(o.status = 'FAILED'::public.outbox_status),
   COUNT(*) FILTER (WHERE o.status = 'FAILED'::public.outbox_status),
-  BOOL_OR(o.event_type NOT LIKE '%_SMS' AND COALESCE(o.payload->>'phoneNumber', o.payload->>'phone', o.payload->>'mobileNumber') IS NULL),
+  BOOL_OR(o.event_type NOT LIKE '%_SMS' AND COALESCE(o.payload->>'email', o.payload->>'guestEmail') IS NOT NULL),
   BOOL_OR(o.event_type LIKE '%_SMS' OR COALESCE(o.payload->>'phoneNumber', o.payload->>'phone', o.payload->>'mobileNumber') IS NOT NULL),
   (ARRAY_AGG(o.event_type ORDER BY o.created_at DESC, o.id DESC))[1],
   (ARRAY_AGG(COALESCE(o.payload->>'email', o.payload->>'guestEmail', o.payload->>'phoneNumber', o.payload->>'phone', o.payload->>'mobileNumber', '') ORDER BY o.created_at DESC, o.id DESC))[1],
   NOW()
 FROM public.outbox AS o
+INNER JOIN public.appointments AS a ON a.id = o.appointment_id
 WHERE o.appointment_id IS NOT NULL
 GROUP BY o.appointment_id
 ON CONFLICT (appointment_id) DO UPDATE SET
@@ -525,6 +591,45 @@ GRANT EXECUTE ON FUNCTION public.get_secretary_communication_summary_page(INT, T
 REVOKE ALL ON FUNCTION public.get_secretary_communication_summary_page_staff(INT, TIMESTAMPTZ, UUID, TEXT, TEXT) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.get_secretary_communication_summary_page_staff(INT, TIMESTAMPTZ, UUID, TEXT, TEXT) TO authenticated, service_role;
 
+CREATE OR REPLACE FUNCTION public.get_secretary_communication_summary_counts_staff(
+  p_search TEXT DEFAULT NULL
+)
+RETURNS TABLE(all_count BIGINT, failed_count BIGINT)
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  PERFORM public.require_staff_access();
+  RETURN QUERY
+  SELECT
+    COUNT(*)::BIGINT,
+    COUNT(*) FILTER (WHERE c.has_failed)::BIGINT
+  FROM public.communication_activity_summaries AS c
+  INNER JOIN public.appointments AS a ON a.id = c.appointment_id
+  LEFT JOIN public.users AS u ON u.id = a.patient_id
+  LEFT JOIN public.dependents AS dep ON dep.id = a.dependent_id
+  LEFT JOIN public.guest_contacts AS gc ON gc.appointment_id = a.id
+  LEFT JOIN public.users AS d ON d.id = a.doctor_id
+  LEFT JOIN public.services AS s ON s.id = a.service_id
+  WHERE p_search IS NULL OR
+    lower(COALESCE(u.first_name, '')) LIKE '%' || lower(p_search) || '%' OR
+    lower(COALESCE(u.last_name, '')) LIKE '%' || lower(p_search) || '%' OR
+    lower(COALESCE(dep.first_name, '')) LIKE '%' || lower(p_search) || '%' OR
+    lower(COALESCE(dep.last_name, '')) LIKE '%' || lower(p_search) || '%' OR
+    lower(COALESCE(gc.first_name, '')) LIKE '%' || lower(p_search) || '%' OR
+    lower(COALESCE(gc.last_name, '')) LIKE '%' || lower(p_search) || '%' OR
+    lower(COALESCE(s.name, '')) LIKE '%' || lower(p_search) || '%' OR
+    lower(COALESCE(d.first_name, '')) LIKE '%' || lower(p_search) || '%' OR
+    lower(COALESCE(d.last_name, '')) LIKE '%' || lower(p_search) || '%' OR
+    lower(COALESCE(c.latest_event_type, '')) LIKE '%' || lower(p_search) || '%' OR
+    lower(COALESCE(c.latest_recipient, '')) LIKE '%' || lower(p_search) || '%';
+END;
+$$;
+
+REVOKE ALL ON FUNCTION public.get_secretary_communication_summary_counts_staff(TEXT) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.get_secretary_communication_summary_counts_staff(TEXT) TO authenticated, service_role;
+
 -- Restrict chat RPCs. The application uses the staff wrapper below; the old
 -- service-role functions remain available only to server-side callers.
 REVOKE ALL ON FUNCTION public.get_secretary_chat_threads(INT, INT, INT) FROM PUBLIC, anon, authenticated;
@@ -577,5 +682,32 @@ $$;
 
 REVOKE ALL ON FUNCTION public.get_secretary_chat_threads_page_staff(INT, TIMESTAMPTZ, UUID, TEXT, TEXT, BOOLEAN) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.get_secretary_chat_threads_page_staff(INT, TIMESTAMPTZ, UUID, TEXT, TEXT, BOOLEAN) TO authenticated, service_role;
+
+-- Limit appointment trigger work to the columns each trigger actually reads.
+-- This prevents edits to unrelated notes/contact fields from rebuilding
+-- reminders, notifications, approval messages, or communication outbox rows.
+DROP TRIGGER IF EXISTS trg_appointment_notifications ON public.appointments;
+CREATE TRIGGER trg_appointment_notifications
+AFTER INSERT OR UPDATE OF status ON public.appointments
+FOR EACH ROW
+EXECUTE FUNCTION public.trigger_notify_appointment_status_changes();
+
+DROP TRIGGER IF EXISTS trg_appointment_status_change_outbox ON public.appointments;
+CREATE TRIGGER trg_appointment_status_change_outbox
+AFTER UPDATE OF status, date, start_time ON public.appointments
+FOR EACH ROW
+EXECUTE FUNCTION public.trigger_on_appointment_status_change_outbox();
+
+DROP TRIGGER IF EXISTS trg_appointment_approved_message ON public.appointments;
+CREATE TRIGGER trg_appointment_approved_message
+AFTER INSERT OR UPDATE OF status ON public.appointments
+FOR EACH ROW
+EXECUTE FUNCTION public.trigger_on_appointment_approved();
+
+DROP TRIGGER IF EXISTS trg_initialize_appointment_reminders ON public.appointments;
+CREATE TRIGGER trg_initialize_appointment_reminders
+BEFORE INSERT OR UPDATE OF date, start_time, confirmation_channel ON public.appointments
+FOR EACH ROW
+EXECUTE FUNCTION public.initialize_appointment_reminders();
 
 COMMIT;

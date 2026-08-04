@@ -9,6 +9,7 @@ import { AppointmentRescheduleForm, isRescheduleFormComplete } from './appointme
 import { AppointmentDetailPane } from './appointment-detail-pane';
 import { updateConfirmationChannelAction } from '@/modules/appointments/actions/status/update-confirmation-channel.action';
 import { resendNotificationAction } from '@/modules/appointments/actions/status/resend-notification.action';
+import { useToast } from '@/components/feedback/toast-container';
 
 function getPatientDisplayName(app: any): string {
   if (!app) return 'Guest Patient';
@@ -1069,6 +1070,7 @@ function StandaloneReschedule({ view, onClose }: { view: any; onClose: () => voi
 }
 
 function MessageLogContent({ appointment, view }: { appointment: any; view: any }) {
+  const { addToast } = useToast();
   const ch = (appointment.confirmationChannel || appointment.confirmation_channel) as 'EMAIL' | 'SMS' | 'BOTH' | 'NONE' || 'EMAIL';
   const [channel, setChannel] = useState(ch);
   const [draftChannel, setDraftChannel] = useState(ch);
@@ -1140,7 +1142,7 @@ function MessageLogContent({ appointment, view }: { appointment: any; view: any 
       });
       if (view?.fetchData) view.fetchData();
     } else {
-      alert(res.error || 'Failed to resend notification.');
+      addToast(res.error || 'Failed to resend notification.', 'error');
     }
     setResending(null);
   };

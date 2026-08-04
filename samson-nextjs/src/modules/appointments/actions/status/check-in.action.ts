@@ -2,7 +2,7 @@
 
 import { z } from 'zod';
 import { createClient } from '@/shared/database/server';
-import { authorizeRole, getAuthenticatedUser } from '@/shared/auth/auth.util';
+import { authorizeRole } from '@/shared/auth/auth.util';
 import { DomainError } from '@/shared/errors';
 import { checkInSchema, CheckInDto } from '../../dtos/status/check-in.dto';
 import { getAppointmentByIdQuery, updateAppointmentStatusTransactionCommand } from '../../repositories/exports';
@@ -14,8 +14,7 @@ import { checkInUseCase } from '../../use-cases/status/check-in.use-case';
  */
 export async function checkInAction(formData: CheckInDto) {
   try {
-    await authorizeRole('SECRETARY');
-    const user = await getAuthenticatedUser();
+    const user = await authorizeRole('SECRETARY');
 
     const validData = checkInSchema.parse(formData);
     const supabase = await createClient();

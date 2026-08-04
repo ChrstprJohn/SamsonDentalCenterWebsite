@@ -80,7 +80,7 @@ export function SecretaryAppointmentsView() {
           onRetry={view.fetchData}
           onLoadMore={view.loadMore}
           formatPatientName={view.formatPatientName}
-          onSelect={(id) => { view.setSelectedAppointmentId(id); setMobileView('detail'); }}
+            onSelect={(id) => { view.selectAppointment(id); setMobileView('detail'); }}
         />
       </div>
 

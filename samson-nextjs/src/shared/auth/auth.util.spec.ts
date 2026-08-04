@@ -1,6 +1,6 @@
 ﻿import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { getAuthenticatedUser, authorizeRole } from './auth.util';
-import { createClient } from '@/shared/database/server';
+import { createAdminClient, createClient } from '@/shared/database/server';
 import { UnauthorizedError } from '@/shared/errors';
 
 // Mock server-only to prevent it from throwing in Vitest
@@ -8,12 +8,34 @@ vi.mock('server-only', () => ({}));
 
 vi.mock('@/shared/database/server', () => ({
   createClient: vi.fn(),
+  createAdminClient: vi.fn(),
 }));
 
 describe('Auth Utilities', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
+
+  function mockTrustedProfile(role: 'PATIENT' | 'SECRETARY' | 'DOCTOR' | 'ADMIN') {
+    const profile = {
+      id: '123',
+      email: 'user@example.com',
+      first_name: 'Test',
+      last_name: 'User',
+      middle_name: null,
+      suffix: null,
+      avatar_url: null,
+      role,
+      is_active: true,
+      status: 'ACTIVE',
+    };
+    vi.mocked(createAdminClient).mockResolvedValue({
+      from: vi.fn().mockReturnThis(),
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      maybeSingle: vi.fn().mockResolvedValue({ data: profile, error: null }),
+    } as any);
+  }
 
   it('throws UnauthorizedError if no user is logged in', async () => {
     // Scenario: User attempts to access a protected route without a session
@@ -39,22 +61,24 @@ describe('Auth Utilities', () => {
 
   it('authorizes user if role matches', async () => {
     // Scenario: User has the exact required role for the action
-    const mockUser = { id: '123', user_metadata: { role: 'ADMIN' } };
+    const mockUser = { id: '123' };
     const mockSupabase = {
       auth: { getUser: vi.fn().mockResolvedValue({ data: { user: mockUser }, error: null }) }
     };
     vi.mocked(createClient).mockResolvedValue(mockSupabase as any);
+    mockTrustedProfile('ADMIN');
 
     await expect(authorizeRole('ADMIN')).resolves.toBeDefined();
   });
 
   it('throws UnauthorizedError if role does not match', async () => {
     // Scenario: User is logged in but lacks the required permission level
-    const mockUser = { id: '123', user_metadata: { role: 'PATIENT' } };
+    const mockUser = { id: '123' };
     const mockSupabase = {
       auth: { getUser: vi.fn().mockResolvedValue({ data: { user: mockUser }, error: null }) }
     };
     vi.mocked(createClient).mockResolvedValue(mockSupabase as any);
+    mockTrustedProfile('PATIENT');
 
     await expect(authorizeRole('ADMIN')).rejects.toThrow(UnauthorizedError);
   });

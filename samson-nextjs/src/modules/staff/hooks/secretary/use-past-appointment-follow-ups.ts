@@ -1,11 +1,12 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react';
+import { useCallback, useEffect, useRef, useState, useTransition } from 'react';
 import { getClinicAppointmentsPageAction } from '@/modules/appointments/actions/clinic/get-clinic-appointments-page.action';
 import { updateAppointmentStatusAction } from '@/modules/appointments/actions/status/update-appointment-status.action';
 import { resolveNoShowAction } from '@/modules/appointments/actions/status/resolve-no-show.action';
 import { getDoctorsAction } from '@/modules/staff/actions/management/get-doctors.action';
 import { getServicesAction } from '@/modules/services/actions/management/get-services.action';
+import { getStaffAppointmentByIdAction } from '@/modules/appointments/actions/clinic/get-staff-appointment-by-id.action';
 import type { AppointmentDto } from '@/modules/appointments/dtos/exports';
 import { getTodayLocalDateStr } from '@/shared/utils/date.util';
 
@@ -30,6 +31,9 @@ export function usePastAppointmentFollowUps() {
   const [isPending, startTransition] = useTransition();
   const [doctorsList, setDoctorsList] = useState<any[]>([]);
   const [servicesList, setServicesList] = useState<any[]>([]);
+  const resourcesLoadedRef = useRef(false);
+  const resourcesLoadingRef = useRef<Promise<void> | null>(null);
+  const detailRequestIdRef = useRef(0);
   const [rescheduleDoctor, setRescheduleDoctor] = useState('');
   const [rescheduleDate, setRescheduleDate] = useState('');
   const [rescheduleTime, setRescheduleTime] = useState('');
@@ -73,7 +77,7 @@ export function usePastAppointmentFollowUps() {
     const otherTab: PastFollowUpTab = currentTab === 'missed-checkouts' ? 'no-show-follow-ups' : 'missed-checkouts';
     try {
       const activeRequest = getClinicAppointmentsPageAction(buildPageParams(currentTab, append ? nextCursorRef.current : null));
-      const otherRequest = append ? Promise.resolve(null) : getClinicAppointmentsPageAction(buildPageParams(otherTab, null));
+      const otherRequest = append ? Promise.resolve(null) : getClinicAppointmentsPageAction({ ...buildPageParams(otherTab, null), countOnly: true });
       const [apptRes, otherRes] = await Promise.all([activeRequest, otherRequest]);
       if (requestId !== latestRequestId.current) return;
       if (!apptRes.success || !apptRes.data) throw new Error(apptRes.error || 'Could not load past appointment follow-ups.');
@@ -116,16 +120,8 @@ export function usePastAppointmentFollowUps() {
     return () => document.removeEventListener('visibilitychange', refreshOnVisible);
   }, [fetchData]);
 
-  const missedCheckouts = useMemo(
-    () => appointments.filter((appointment) => appointment.date < today && appointment.status === 'CHECKED_IN'),
-    [appointments, today]
-  );
-  const unresolvedNoShows = useMemo(
-    () => appointments.filter((appointment) =>
-      appointment.date < today && appointment.status === 'NO_SHOW' && !appointment.noShowResolvedAt
-    ),
-    [appointments, today]
-  );
+  const missedCheckouts = appointments;
+  const unresolvedNoShows = appointments;
 
   const list = activeTab === 'missed-checkouts' ? missedCheckouts : unresolvedNoShows;
   const selectedAppointment = list.find((appointment) => appointment.id === selectedAppointmentId) || null;
@@ -141,6 +137,31 @@ export function usePastAppointmentFollowUps() {
     setActiveTab(tab);
     setSelectedAppointmentId(null);
   };
+
+  const selectAppointment = useCallback((appointmentId: string | null) => {
+    setSelectedAppointmentId(appointmentId);
+    if (!appointmentId) return;
+    const requestId = ++detailRequestIdRef.current;
+    void getStaffAppointmentByIdAction(appointmentId).then((result) => {
+      if (requestId !== detailRequestIdRef.current || !result.success || !result.data) return;
+      setAppointments((previous) => previous.map((appointment) => appointment.id === appointmentId ? result.data! : appointment));
+    });
+  }, []);
+
+  const loadActionResources = useCallback(async () => {
+    if (resourcesLoadedRef.current) return;
+    if (resourcesLoadingRef.current) return resourcesLoadingRef.current;
+    const request = Promise.all([getDoctorsAction({ includeHidden: true }), getServicesAction('BOOKABLE')])
+      .then(([doctorResult, serviceResult]) => {
+        if (doctorResult.success && doctorResult.data) setDoctorsList(doctorResult.data);
+        if (serviceResult.data) setServicesList(serviceResult.data);
+        resourcesLoadedRef.current = Boolean(doctorResult.data && serviceResult.data);
+      })
+      .catch((cause) => setActionError(cause instanceof Error ? cause.message : 'Failed to load reschedule resources'))
+      .finally(() => { resourcesLoadingRef.current = null; });
+    resourcesLoadingRef.current = request;
+    return request;
+  }, []);
 
   const loadMore = useCallback(() => { void fetchData({ append: true }); }, [fetchData]);
 
@@ -173,7 +194,7 @@ export function usePastAppointmentFollowUps() {
     startTransition(async () => {
       const result = await resolveNoShowAction(payload);
       if (!result.success) {
-        alert(result.error || 'Could not resolve the no-show.');
+        setActionError(result.error || 'Could not resolve the no-show.');
         return;
       }
       setResolveAppt(null);
@@ -186,7 +207,7 @@ export function usePastAppointmentFollowUps() {
     activeTab, selectTab, tabCounts, missedCheckouts, unresolvedNoShows, list, selectedAppointment, actionError, setActionError,
     selectedAppointmentId, setSelectedAppointmentId, isLoading, isRefreshing, error, lastRefreshedAt, isPending, fetchData,
     resolveAppt, setResolveAppt, completeMissedCheckout, handleResolveNoShowSubmit,
-    todayStr: today, doctorsList, servicesList,
+    todayStr: today, doctorsList, servicesList, selectAppointment, loadActionResources,
     rescheduleDoctor, setRescheduleDoctor, rescheduleDate, setRescheduleDate,
     rescheduleTime, setRescheduleTime, rescheduleEndTime, setRescheduleEndTime,
     rescheduleJustification, setRescheduleJustification,

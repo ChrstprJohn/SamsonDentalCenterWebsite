@@ -1,9 +1,11 @@
 'use server';
 
-import { createClient, createAdminClient } from '@/shared/database/server';
+import { z } from 'zod';
+import { createAdminClient } from '@/shared/database/server';
 import { outboxCommands } from '@/shared/outbox/outbox.commands';
 import { globalOutboxDispatcher } from '@/shared/outbox/outbox.dispatcher';
 import { bootstrapEventSubscribers } from '@/orchestrators/event-subscribers';
+import { authorizeRole } from '@/shared/auth/auth.util';
 
 export interface ResendNotificationInput {
   appointmentId: string;
@@ -11,26 +13,18 @@ export interface ResendNotificationInput {
   targetChannel?: 'EMAIL' | 'SMS' | 'BOTH';
 }
 
+const resendNotificationSchema = z.object({
+  appointmentId: z.string().uuid(),
+  eventType: z.enum(['APPOINTMENT_BOOKED', 'APPOINTMENT_REMINDER_48H', 'APPOINTMENT_REMINDER_24H', 'APPOINTMENT_CHECKOUT']),
+  targetChannel: z.enum(['EMAIL', 'SMS', 'BOTH']).optional(),
+});
+
 export async function resendNotificationAction(input: ResendNotificationInput) {
   try {
-    const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      return { success: false, error: 'Unauthorized user.' };
-    }
+    const parsed = resendNotificationSchema.parse(input);
+    await authorizeRole('DOCTOR');
 
     const supabaseAdmin = await createAdminClient();
-
-    const { data: userData } = await supabaseAdmin
-      .from('users')
-      .select('role')
-      .eq('id', user.id)
-      .single();
-
-    if (!userData || !['SECRETARY', 'ADMIN', 'DOCTOR'].includes(userData.role)) {
-      return { success: false, error: 'Permission denied. Staff role required.' };
-    }
 
     const { data: appointment, error: appError } = await supabaseAdmin
       .from('appointments')
@@ -46,7 +40,7 @@ export async function resendNotificationAction(input: ResendNotificationInput) {
         confirmation_channel,
         patient:users!appointments_patient_id_fkey(email, phone_number, first_name, last_name)
       `)
-      .eq('id', input.appointmentId)
+      .eq('id', parsed.appointmentId)
       .single();
 
     if (appError || !appointment) {
@@ -56,10 +50,10 @@ export async function resendNotificationAction(input: ResendNotificationInput) {
     const { data: gc } = await supabaseAdmin
       .from('guest_contacts')
       .select('id, email, phone_number, first_name, last_name')
-      .eq('appointment_id', input.appointmentId)
+      .eq('appointment_id', parsed.appointmentId)
       .single();
 
-    const channelToUse = input.targetChannel || (appointment.confirmation_channel as any) || 'EMAIL';
+    const channelToUse = parsed.targetChannel || (appointment.confirmation_channel as any) || 'EMAIL';
     if (channelToUse === 'NONE') {
       return { success: false, error: 'Notification channel is set to NONE (Opted out).' };
     }
@@ -93,7 +87,7 @@ export async function resendNotificationAction(input: ResendNotificationInput) {
         .from('outbox')
         .select('id')
         .eq('event_type', eventType)
-        .contains('payload', { appointmentId: input.appointmentId })
+        .contains('payload', { appointmentId: parsed.appointmentId })
         .in('status', ['FAILED', 'PENDING'])
         .order('created_at', { ascending: false })
         .limit(1);
@@ -112,16 +106,16 @@ export async function resendNotificationAction(input: ResendNotificationInput) {
     // Build atomic update payload based on event type and target channel
     const updatePayload: Record<string, boolean> = {};
 
-    if (input.eventType === 'APPOINTMENT_BOOKED') {
+    if (parsed.eventType === 'APPOINTMENT_BOOKED') {
       if (shouldSendEmail) updatePayload.email_confirmation_sent = true;
       if (shouldSendSms) updatePayload.sms_confirmation_sent = true;
-    } else if (input.eventType === 'APPOINTMENT_REMINDER_48H') {
+    } else if (parsed.eventType === 'APPOINTMENT_REMINDER_48H') {
       if (shouldSendEmail) updatePayload.email_reminder_48h_sent = true;
       if (shouldSendSms) updatePayload.sms_reminder_48h_sent = true;
-    } else if (input.eventType === 'APPOINTMENT_REMINDER_24H') {
+    } else if (parsed.eventType === 'APPOINTMENT_REMINDER_24H') {
       if (shouldSendEmail) updatePayload.email_reminder_24h_sent = true;
       if (shouldSendSms) updatePayload.sms_reminder_24h_sent = true;
-    } else if (input.eventType === 'APPOINTMENT_CHECKOUT') {
+    } else if (parsed.eventType === 'APPOINTMENT_CHECKOUT') {
       if (shouldSendEmail) updatePayload.email_checkout_sent = true;
       if (shouldSendSms) updatePayload.sms_checkout_sent = true;
     }
@@ -130,7 +124,7 @@ export async function resendNotificationAction(input: ResendNotificationInput) {
       const { error: updateErr } = await supabaseAdmin
         .from('appointments')
         .update(updatePayload)
-        .eq('id', input.appointmentId);
+        .eq('id', parsed.appointmentId);
 
       if (updateErr) {
         console.error('[resendNotificationAction] Atomic update error:', updateErr.message);
@@ -142,17 +136,17 @@ export async function resendNotificationAction(input: ResendNotificationInput) {
       let eventType: string;
       let payload: Record<string, any>;
 
-      if (input.eventType === 'APPOINTMENT_CHECKOUT') {
+      if (parsed.eventType === 'APPOINTMENT_CHECKOUT') {
         eventType = 'APPOINTMENT_COMPLETED_POST_CARE';
-        payload = { appointmentId: input.appointmentId, email: recipientEmail };
-      } else if (input.eventType === 'APPOINTMENT_REMINDER_24H' || input.eventType === 'APPOINTMENT_REMINDER_48H') {
-        eventType = input.eventType === 'APPOINTMENT_REMINDER_48H' ? 'APPOINTMENT_REMINDER_48H' : 'APPOINTMENT_REMINDER_24H';
-        payload = { appointmentId: input.appointmentId, email: recipientEmail };
+        payload = { appointmentId: parsed.appointmentId, email: recipientEmail };
+      } else if (parsed.eventType === 'APPOINTMENT_REMINDER_24H' || parsed.eventType === 'APPOINTMENT_REMINDER_48H') {
+        eventType = parsed.eventType === 'APPOINTMENT_REMINDER_48H' ? 'APPOINTMENT_REMINDER_48H' : 'APPOINTMENT_REMINDER_24H';
+        payload = { appointmentId: parsed.appointmentId, email: recipientEmail };
       } else {
         if (appointment.patient_id && appointment.source === 'STAFF_CREATED') {
           eventType = 'APPOINTMENT_MANUALLY_BOOKED_PATIENT';
           payload = {
-            appointmentId: input.appointmentId,
+            appointmentId: parsed.appointmentId,
             patientId: appointment.patient_id,
             serviceId: appointment.service_id,
             doctorId: appointment.doctor_id,
@@ -163,13 +157,13 @@ export async function resendNotificationAction(input: ResendNotificationInput) {
         } else if (!appointment.patient_id) {
           eventType = 'APPOINTMENT_MANUALLY_BOOKED_GUEST';
           payload = {
-            appointmentId: input.appointmentId,
+            appointmentId: parsed.appointmentId,
             serviceId: appointment.service_id,
             doctorId: appointment.doctor_id,
             date: appointment.date,
             startTime: appointment.start_time,
             durationMinutes: service?.duration_minutes || 60,
-            guestContactId: gc?.id || input.appointmentId,
+            guestContactId: gc?.id || parsed.appointmentId,
             guestName: gc ? `${gc.first_name || ''} ${gc.last_name || ''}`.trim() : 'Guest',
             guestEmail: gc?.email || recipientEmail || null,
             guestPhone: gc?.phone_number || recipientPhone || 'N/A',
@@ -177,7 +171,7 @@ export async function resendNotificationAction(input: ResendNotificationInput) {
         } else {
           eventType = 'APPOINTMENT_BOOKED';
           payload = {
-            appointmentId: input.appointmentId,
+            appointmentId: parsed.appointmentId,
             patientId: appointment.patient_id,
             serviceId: appointment.service_id,
             doctorId: appointment.doctor_id || null,
@@ -196,7 +190,7 @@ export async function resendNotificationAction(input: ResendNotificationInput) {
 
     // Dispatch SMS Event
     if (shouldSendSms && recipientPhone) {
-      const smsEventType = input.eventType === 'APPOINTMENT_CHECKOUT' ? 'APPOINTMENT_COMPLETED_POST_CARE_SMS' : 'APPOINTMENT_MANUALLY_BOOKED_SMS';
+      const smsEventType = parsed.eventType === 'APPOINTMENT_CHECKOUT' ? 'APPOINTMENT_COMPLETED_POST_CARE_SMS' : 'APPOINTMENT_MANUALLY_BOOKED_SMS';
       const smsPayload = {
         phoneNumber: recipientPhone,
         date: appointment.date,
@@ -215,6 +209,7 @@ export async function resendNotificationAction(input: ResendNotificationInput) {
       message: `Notification sent via ${dispatchedEvents.join(' & ')}.`,
     };
   } catch (error: any) {
+    if (error instanceof z.ZodError) return { success: false, error: `Validation failed: ${error.issues[0].message}` };
     console.error('[resendNotificationAction] Error:', error);
     return { success: false, error: error.message || 'Failed to resend notification.' };
   }

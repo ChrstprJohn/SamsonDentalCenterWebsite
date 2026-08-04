@@ -2,7 +2,7 @@
 
 import { z } from 'zod';
 import { createClient } from '@/shared/database/server';
-import { getAuthenticatedUser } from '@/shared/auth/auth.util';
+import { authorizeRole } from '@/shared/auth/auth.util';
 import { DomainError } from '@/shared/errors';
 import { getAvailableDoctorsForDateSchema, GetAvailableDoctorsForDateDto } from '../../dtos/exports';
 import { getDoctorSchedulesQuery } from '../../repositories/exports';
@@ -18,11 +18,7 @@ export async function getAvailableDoctorsForDateAction(formData: GetAvailableDoc
     const parsed = getAvailableDoctorsForDateSchema.parse(formData);
 
     // 2. Auth boundary verification
-    const user = await getAuthenticatedUser();
-    const role = user.user_metadata?.role || user.role;
-    if (role !== 'SECRETARY' && role !== 'ADMIN') {
-      throw new DomainError('Unauthorized: Access restricted to clinic staff.', 'UNAUTHORIZED_ACCESS');
-    }
+    await authorizeRole('SECRETARY');
 
     // 3. DI Setup
     const supabase = await createClient();

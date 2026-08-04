@@ -2,9 +2,10 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { getCommunicationSummaryPageAction } from '@/modules/emails/actions/logs/get-communication-summary-page.action';
+import { getCommunicationSummaryCountsAction } from '@/modules/emails/actions/logs/get-communication-summary-counts.action';
 import { getAppointmentCommunicationPageAction } from '@/modules/emails/actions/logs/get-appointment-communication-page.action';
 import { resendEmailAction } from '@/modules/emails/actions/logs/resend-email.action';
-import type { OutboxLogResponseDto } from '@/modules/emails/dtos/logs/outbox-log-response.dto';
+import type { AppointmentCommunicationSummaryDto } from '@/modules/emails/repositories/logs/appointment-communication-page.queries';
 
 export type LeftTab = 'all' | 'failed';
 
@@ -18,7 +19,7 @@ export interface TimelineEntry {
   timestamp: string;
   retryCount: number;
   errorLogs: string | null;
-  payload: Record<string, any>;
+  payload?: Record<string, any>;
 }
 
 export interface AppointmentCardData {
@@ -39,7 +40,7 @@ export interface AppointmentCardData {
 export function useAppointmentEmailTimeline() {
   const [appointmentCards, setAppointmentCards] = useState<AppointmentCardData[]>([]);
   const [selectedAppointmentId, setSelectedAppointmentId] = useState<string | null>(null);
-  const [emailLogs, setEmailLogs] = useState<OutboxLogResponseDto[]>([]);
+  const [emailLogs, setEmailLogs] = useState<AppointmentCommunicationSummaryDto[]>([]);
   const [isLoadingApps, setIsLoadingApps] = useState(true);
   const [isRefreshingApps, setIsRefreshingApps] = useState(false);
   const [isLoadingLogs, setIsLoadingLogs] = useState(false);
@@ -90,7 +91,7 @@ export function useAppointmentEmailTimeline() {
         ? [await getCommunicationSummaryPageAction(activeParams), null]
         : await Promise.all([
           getCommunicationSummaryPageAction(activeParams),
-          getCommunicationSummaryPageAction({ limit: 1, cursor: null, tab: leftTab === 'all' ? 'failed' : 'all', search: searchTerm || undefined }),
+          getCommunicationSummaryCountsAction({ search: searchTerm || undefined }),
         ]);
 
       if (requestId !== summaryRequestId.current) return;
@@ -105,11 +106,7 @@ export function useAppointmentEmailTimeline() {
       summaryCursorRef.current = activeResult.data.nextCursor;
       setSummaryHasMore(activeResult.data.hasMore);
       if (!append) {
-        const activeTotal = activeResult.data.total ?? 0;
-        const otherTotal = countResult?.data?.total ?? 0;
-        setTabCounts(leftTab === 'all'
-          ? { all: activeTotal, failed: otherTotal }
-          : { all: otherTotal, failed: activeTotal });
+        setTabCounts(countResult?.data ?? { all: activeResult.data.total ?? 0, failed: 0 });
       }
       hasLoadedSummary.current = true;
     } catch (cause) {
@@ -220,11 +217,11 @@ export function useAppointmentEmailTimeline() {
 
   const timelineEntries: TimelineEntry[] = useMemo(() => emailLogs.map((log) => ({
     id: log.id,
-    channel: log.eventType.endsWith('_SMS') || Boolean((log.payload as any)?.phoneNumber || (log.payload as any)?.phone) ? 'SMS' as const : 'EMAIL' as const,
+    channel: log.channel,
     eventType: log.eventType,
     status: log.status === 'PROCESSED' ? 'Sent' : log.status === 'FAILED' ? 'Failed' : 'Pending',
     rawStatus: log.status,
-    recipient: (log.payload as any)?.email || (log.payload as any)?.guestEmail || (log.payload as any)?.phoneNumber || (log.payload as any)?.phone || 'system',
+    recipient: log.recipient,
     timestamp: log.createdAt,
     retryCount: log.retryCount,
     errorLogs: log.errorLogs || null,

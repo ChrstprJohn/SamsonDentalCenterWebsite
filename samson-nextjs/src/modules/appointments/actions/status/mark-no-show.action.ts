@@ -2,7 +2,7 @@
 
 import { z } from 'zod';
 import { createClient } from '@/shared/database/server';
-import { authorizeRole, getAuthenticatedUser } from '@/shared/auth/auth.util';
+import { authorizeRole } from '@/shared/auth/auth.util';
 import { DomainError } from '@/shared/errors';
 import { markNoShowSchema, MarkNoShowDto } from '../../dtos/status/mark-no-show.dto';
 import { getAppointmentByIdQuery, updateAppointmentStatusTransactionCommand } from '../../repositories/exports';
@@ -14,8 +14,7 @@ import { markNoShowUseCase } from '../../use-cases/status/mark-no-show.use-case'
  */
 export async function markNoShowAction(formData: MarkNoShowDto) {
   try {
-    await authorizeRole('SECRETARY');
-    const user = await getAuthenticatedUser();
+    const user = await authorizeRole('SECRETARY');
 
     const validData = markNoShowSchema.parse(formData);
     const supabase = await createClient();

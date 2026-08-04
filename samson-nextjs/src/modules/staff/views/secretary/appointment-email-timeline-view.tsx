@@ -16,6 +16,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Mail, RotateCw, ChevronRight, UserRound } from 'lucide-react';
 import { RenderedEmailFrame } from '@/components/emails/email-renderer';
+import { getOutboxLogByIdAction } from '@/modules/emails/actions/logs/get-outbox-log-by-id.action';
 import { SecretaryListSkeleton, SecretaryListSkeletonTheme } from './sub-components/secretary-list-skeleton';
 
 // UI Label Mappings for Event Types (Guest vs Patient distinction noted in code comments)
@@ -174,6 +175,9 @@ function renderActualEmailComponent(eventType: string, payload: Record<string, a
 function TimelineEntryCard({ entry, onResend, resendingId }: { entry: TimelineEntry; onResend?: (id: string) => void; resendingId?: string | null }) {
   const [showPayload, setShowPayload] = useState(false);
   const [activeDetailTab, setActiveDetailTab] = useState<'preview' | 'payload'>('preview');
+  const [payload, setPayload] = useState<Record<string, any> | undefined>(entry.payload);
+  const [isLoadingPayload, setIsLoadingPayload] = useState(false);
+  const [payloadError, setPayloadError] = useState<string | null>(null);
 
   const statusColor =
     entry.rawStatus === 'FAILED'
@@ -191,8 +195,18 @@ function TimelineEntryCard({ entry, onResend, resendingId }: { entry: TimelineEn
 
   const isEmail = entry.channel === 'EMAIL';
 
-  // Helper to extract clean email summary fields from payload
-  const payload = entry.payload || {};
+  const togglePayload = async () => {
+    const nextVisible = !showPayload;
+    setShowPayload(nextVisible);
+    if (nextVisible && payload === undefined && !isLoadingPayload) {
+      setIsLoadingPayload(true);
+      setPayloadError(null);
+      const result = await getOutboxLogByIdAction(entry.id);
+      if (result.success) setPayload(result.data.payload);
+      else setPayloadError(result.error);
+      setIsLoadingPayload(false);
+    }
+  };
 
   return (
     <div className="relative flex gap-3 pb-5 last:pb-0">
@@ -205,7 +219,7 @@ function TimelineEntryCard({ entry, onResend, resendingId }: { entry: TimelineEn
 
       <div className="flex-1 min-w-0">
         <button
-          onClick={() => setShowPayload(!showPayload)}
+          onClick={() => { void togglePayload(); }}
           className="w-full text-left"
         >
           <div className="flex items-start justify-between gap-3">
@@ -262,6 +276,9 @@ function TimelineEntryCard({ entry, onResend, resendingId }: { entry: TimelineEn
               </div>
             )}
 
+            {isLoadingPayload ? <div className="text-xs text-muted-foreground">Loading communication details...</div> : null}
+            {payloadError ? <div className="text-xs text-destructive">{payloadError}</div> : null}
+            {!isLoadingPayload && !payloadError && payload ? <>
             {/* Sub-tabs for Preview vs Payload */}
             <div className="flex gap-1 border-b border-card-border/40 pb-1 text-xs">
               <button
@@ -292,9 +309,10 @@ function TimelineEntryCard({ entry, onResend, resendingId }: { entry: TimelineEn
               </div>
             ) : (
               <div className="bg-secondary-bg/30 border border-card-border/40 rounded-lg p-2.5 text-[11px] font-mono text-text-secondary leading-relaxed whitespace-pre-wrap max-h-48 overflow-y-auto">
-                {JSON.stringify(entry.payload, null, 2)}
+                {JSON.stringify(payload, null, 2)}
               </div>
             )}
+            </> : null}
           </div>
         )}
       </div>

@@ -2,7 +2,7 @@
 
 import { z } from 'zod';
 import { createClient } from '@/shared/database/server';
-import { authorizeRole, getAuthenticatedUser } from '@/shared/auth/auth.util';
+import { authorizeRole } from '@/shared/auth/auth.util';
 import { DomainError } from '@/shared/errors';
 import { undoCheckInSchema, UndoCheckInDto } from '../../dtos/status/undo-check-in.dto';
 import { getAppointmentByIdQuery, updateAppointmentStatusTransactionCommand } from '../../repositories/exports';
@@ -14,8 +14,7 @@ import { undoCheckInUseCase } from '../../use-cases/status/undo-check-in.use-cas
  */
 export async function undoCheckInAction(formData: UndoCheckInDto) {
   try {
-    await authorizeRole('SECRETARY');
-    const user = await getAuthenticatedUser();
+    const user = await authorizeRole('SECRETARY');
 
     const validData = undoCheckInSchema.parse(formData);
     const supabase = await createClient();

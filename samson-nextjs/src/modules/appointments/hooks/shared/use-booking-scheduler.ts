@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { z } from 'zod';
 import { getAvailableDaysAction } from '../../actions/availability/get-available-days.action';
 import { getAvailableDoctorsForDateAction } from '../../actions/availability/get-available-doctors-for-date.action';
@@ -24,6 +24,7 @@ export function useBookingScheduler() {
   const [availableSlots, setAvailableSlots] = useState<AvailableSlotDto[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loadingKey, setLoadingKey] = useState<'dates' | 'doctors' | 'slots' | null>(null);
+  const requestIds = useRef({ dates: 0, doctors: 0, slots: 0 });
 
   const normalizeDoctorId = (doctorId?: string) => (doctorId && doctorId !== 'ANY' ? doctorId : undefined);
 
@@ -35,9 +36,11 @@ export function useBookingScheduler() {
       return;
     }
 
+    const requestId = ++requestIds.current.doctors;
     setLoadingKey('doctors');
     setError(null);
     const response = await getDoctorsAction({ serviceId: parsed.data.serviceId });
+    if (requestId !== requestIds.current.doctors) return;
     setAvailableDoctors(response.success && response.data ? response.data : []);
     setLoadingKey(null);
   }, []);
@@ -51,6 +54,7 @@ export function useBookingScheduler() {
       return;
     }
 
+    const requestId = ++requestIds.current.dates;
     setLoadingKey('dates');
     setError(null);
     const response = await getAvailableDaysAction({
@@ -58,6 +62,7 @@ export function useBookingScheduler() {
       month: parsed.data.month,
       doctorId: normalizeDoctorId(parsed.data.doctorId),
     });
+    if (requestId !== requestIds.current.dates) return;
     setAvailableDates(response.success && response.data ? response.data.availableDates : []);
     setAvailabilityMap(response.success && response.data ? response.data.availabilityMap : {});
     setLoadingKey(null);
@@ -71,12 +76,14 @@ export function useBookingScheduler() {
       return;
     }
 
+    const requestId = ++requestIds.current.doctors;
     setLoadingKey('doctors');
     setError(null);
     const response = await getAvailableDoctorsForDateAction({
       serviceId: parsed.data.serviceId,
       date: parsed.data.date,
     });
+    if (requestId !== requestIds.current.doctors) return;
     setAvailableDoctors(response.success && response.data ? response.data : []);
     setLoadingKey(null);
   }, []);
@@ -89,6 +96,7 @@ export function useBookingScheduler() {
       return;
     }
 
+    const requestId = ++requestIds.current.slots;
     setLoadingKey('slots');
     setError(null);
     const response = await getAvailableTimeSlotsAction({
@@ -96,6 +104,7 @@ export function useBookingScheduler() {
       date: parsed.data.date,
       doctorId: normalizeDoctorId(parsed.data.doctorId),
     });
+    if (requestId !== requestIds.current.slots) return;
     setAvailableSlots(response.success && response.data ? response.data.availableSlots : []);
     setLoadingKey(null);
   }, []);

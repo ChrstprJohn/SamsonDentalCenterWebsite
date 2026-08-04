@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { getAvailableDoctorsForDateAction } from './get-available-doctors-for-date.action';
-import { getAuthenticatedUser } from '@/shared/auth/auth.util';
+import { authorizeRole } from '@/shared/auth/auth.util';
 import { createClient } from '@/shared/database/server';
 
 vi.mock('server-only', () => ({}));
@@ -29,10 +29,7 @@ describe('getAvailableDoctorsForDateAction', () => {
   });
 
   it('should fetch schedules, deduplicate, and return distinct doctors list', async () => {
-    vi.mocked(getAuthenticatedUser).mockResolvedValue({
-      id: 'secretary-uuid',
-      role: 'SECRETARY',
-    } as any);
+    vi.mocked(authorizeRole).mockResolvedValue({ id: 'secretary-uuid' } as any);
 
     vi.mocked(createClient).mockResolvedValue({} as any);
 
@@ -79,10 +76,7 @@ describe('getAvailableDoctorsForDateAction', () => {
   });
 
   it('should return unauthorized error for PATIENT role', async () => {
-    vi.mocked(getAuthenticatedUser).mockResolvedValue({
-      id: 'patient-uuid',
-      role: 'PATIENT',
-    } as any);
+    vi.mocked(authorizeRole).mockRejectedValue(new Error('Unauthorized'));
 
     const payload = {
       date: '2026-06-25',

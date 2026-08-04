@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { convertInquiryAction } from './convert-inquiry.action';
-import { getAuthenticatedUser } from '@/shared/auth/auth.util';
+import { authorizeRole } from '@/shared/auth/auth.util';
 import { createClient } from '@/shared/database/server';
 
 // 1. Hoist environment mocks to resolve server-only / Next.js dependency errors in Vitest
@@ -47,10 +47,7 @@ describe('convertInquiryAction', () => {
   });
 
   it('should validate inputs, check user role, run use case and return success', async () => {
-    vi.mocked(getAuthenticatedUser).mockResolvedValue({
-      id: 'secretary-uuid',
-      role: 'SECRETARY',
-    } as any);
+    vi.mocked(authorizeRole).mockResolvedValue({ id: 'secretary-uuid' } as any);
 
     vi.mocked(createClient).mockResolvedValue({} as any);
     mockGetServiceDuration.mockResolvedValueOnce(30);
@@ -75,10 +72,7 @@ describe('convertInquiryAction', () => {
   });
 
   it('should return error for unauthorized patient roles', async () => {
-    vi.mocked(getAuthenticatedUser).mockResolvedValue({
-      id: 'patient-uuid',
-      role: 'PATIENT',
-    } as any);
+    vi.mocked(authorizeRole).mockRejectedValue(new Error('Unauthorized'));
 
     const payload = {
       inquiryId: 'd3b07384-d113-4ec2-a5e6-ec083b0f5cc5',

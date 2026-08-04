@@ -2,8 +2,7 @@
 
 import { z } from 'zod';
 import { createClient } from '@/shared/database/server';
-import { getAuthenticatedUser } from '@/shared/auth/auth.util';
-import { DomainError } from '@/shared/errors';
+import { authorizeRole } from '@/shared/auth/auth.util';
 import { dropInquirySchema, DropInquiryDto } from '../../dtos/booking/drop-inquiry.dto';
 import { dropInquiryCommand } from '../../repositories/booking/appointment-inquiries.commands';
 import { dropInquiryUseCase } from '../../use-cases/booking/drop-inquiry.use-case';
@@ -14,13 +13,7 @@ export async function dropInquiryAction(data: DropInquiryDto) {
     const parsed = dropInquirySchema.parse(data);
 
     // 2. DI Setup & Auth boundary verification
-    const user = await getAuthenticatedUser();
-    
-    // Auth Role validation (Must be SECRETARY or ADMIN to drop inquiry)
-    const role = user.user_metadata?.role || user.role;
-    if (role !== 'SECRETARY' && role !== 'ADMIN') {
-      throw new DomainError('Unauthorized: Access restricted to clinic staff.', 'UNAUTHORIZED_ACCESS');
-    }
+    await authorizeRole('SECRETARY');
 
     const supabase = await createClient();
     const useCase = dropInquiryUseCase({
@@ -36,9 +29,6 @@ export async function dropInquiryAction(data: DropInquiryDto) {
         success: false,
         error: 'Validation failed: ' + error.issues[0].message,
       };
-    }
-    if (error instanceof DomainError) {
-      return { success: false, error: error.message };
     }
     console.error('ACTION ERROR (dropInquiry):', error);
     return { success: false, error: error.message || 'An unexpected system error occurred' };

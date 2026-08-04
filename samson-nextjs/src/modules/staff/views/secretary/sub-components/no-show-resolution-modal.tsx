@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Select } from '@/components/ui/select';
 import { AppointmentRescheduleForm, isRescheduleFormComplete } from './appointment-reschedule-form';
 import { updateConfirmationChannelAction } from '@/modules/appointments/actions/status/update-confirmation-channel.action';
+import { useToast } from '@/components/feedback/toast-container';
 
 function getPatientDisplayName(app: any): string {
   if (!app) return 'Patient';
@@ -16,6 +17,7 @@ function getPatientDisplayName(app: any): string {
 }
 
 export function NoShowResolutionModal({ view }: { view: any }) {
+  const { addToast } = useToast();
   const appointment = view.resolveAppt;
   const ch = (appointment?.confirmationChannel || appointment?.confirmation_channel) as 'EMAIL' | 'SMS' | 'BOTH' | 'NONE' || 'EMAIL';
 
@@ -82,7 +84,7 @@ export function NoShowResolutionModal({ view }: { view: any }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!reason.trim()) {
-      alert('Please provide a reason for resolving this no-show.');
+      addToast('Please provide a reason for resolving this no-show.', 'error');
       return;
     }
 

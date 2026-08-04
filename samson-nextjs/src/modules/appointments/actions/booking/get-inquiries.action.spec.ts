@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { getInquiriesAction } from './get-inquiries.action';
-import { getAuthenticatedUser } from '@/shared/auth/auth.util';
+import { authorizeRole } from '@/shared/auth/auth.util';
 import { createClient } from '@/shared/database/server';
 
 vi.mock('server-only', () => ({}));
@@ -27,10 +27,7 @@ describe('getInquiriesAction', () => {
   });
 
   it('should return inquiries list for SECRETARY role', async () => {
-    vi.mocked(getAuthenticatedUser).mockResolvedValue({
-      id: 'secretary-uuid',
-      role: 'SECRETARY',
-    } as any);
+    vi.mocked(authorizeRole).mockResolvedValue({ id: 'secretary-uuid' } as any);
 
     vi.mocked(createClient).mockResolvedValue({} as any);
     
@@ -56,10 +53,7 @@ describe('getInquiriesAction', () => {
   });
 
   it('should return inquiries list for ADMIN role', async () => {
-    vi.mocked(getAuthenticatedUser).mockResolvedValue({
-      id: 'admin-uuid',
-      role: 'ADMIN',
-    } as any);
+    vi.mocked(authorizeRole).mockResolvedValue({ id: 'admin-uuid' } as any);
 
     vi.mocked(createClient).mockResolvedValue({} as any);
     mockGetInquiriesQuery.mockResolvedValueOnce([]);
@@ -70,10 +64,7 @@ describe('getInquiriesAction', () => {
   });
 
   it('should return unauthorized error for PATIENT role', async () => {
-    vi.mocked(getAuthenticatedUser).mockResolvedValue({
-      id: 'patient-uuid',
-      role: 'PATIENT',
-    } as any);
+    vi.mocked(authorizeRole).mockRejectedValue(new Error('Unauthorized'));
 
     const response = await getInquiriesAction();
     expect(response.success).toBe(false);

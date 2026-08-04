@@ -1,20 +1,18 @@
 'use client';
 
-import { useEffect, useMemo, useState, useCallback } from 'react';
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { createManualBookingAction } from '@/modules/appointments/actions/booking/create-manual-booking.action';
-import { useBookingScheduler } from '@/modules/appointments/hooks/shared/use-booking-scheduler';
 import { getUserDependentsAction } from '@/modules/patients/actions/dependents/get-user-dependents.action';
 import { searchPatientsAction } from '@/modules/patients/actions/profile/search-patients.action';
 import { getServicesAction } from '@/modules/services/actions/management/get-services.action';
 import { getDoctorsAction } from '@/modules/staff/actions/management/get-doctors.action';
 import { getClinicAppointmentsAction } from '@/modules/appointments/actions/clinic/get-clinic-appointments.action';
+import { getStaffAppointmentByIdAction } from '@/modules/appointments/actions/clinic/get-staff-appointment-by-id.action';
 
 export type BookingFor = 'SELF' | 'EXISTING_DEP' | 'NEW_DEP';
 export type PatientMode = 'SEARCH' | 'GUEST';
 
 export function useSecretaryBookAppointment() {
-  const scheduler = useBookingScheduler();
-  const { loadAvailableDates, loadDoctorsForDate, loadAvailableSlots } = scheduler;
   const [patientMode, setPatientMode] = useState<PatientMode>('GUEST');
   const [patientSearchQuery, setPatientSearchQuery] = useState('');
   const [patientSearchResults, setPatientSearchResults] = useState<any[]>([]);
@@ -60,10 +58,11 @@ export function useSecretaryBookAppointment() {
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [booked, setBooked] = useState(false);
   const [confirmationChannel, setConfirmationChannel] = useState<'EMAIL' | 'SMS' | 'NONE' | 'BOTH'>('NONE');
-
-  const availableDates: string[] = [];
-  const availableDoctors: any[] = [];
-  const timeslots: any[] = [];
+  const actionResourcesLoadedRef = useRef(false);
+  const actionResourcesLoadingRef = useRef<Promise<void> | null>(null);
+  const timelineRequestIdRef = useRef(0);
+  const detailRequestIdRef = useRef(0);
+  const [timelineVersion, setTimelineVersion] = useState(0);
 
   useEffect(() => {
     if (!toast) return;
@@ -71,29 +70,40 @@ export function useSecretaryBookAppointment() {
     return () => clearTimeout(timer);
   }, [toast]);
 
-  useEffect(() => {
-    async function loadServices() {
-      setIsLoadingServices(true);
-      const res = await getServicesAction('BOOKABLE');
-      setIsLoadingServices(false);
-      if (res.data) setServices(res.data);
-    }
-    loadServices();
+  const loadActionResources = useCallback(async () => {
+    if (actionResourcesLoadedRef.current) return;
+    if (actionResourcesLoadingRef.current) return actionResourcesLoadingRef.current;
+    setIsLoadingServices(true);
+    const request = getServicesAction('BOOKABLE')
+      .then((serviceResult) => {
+        if (serviceResult.data) setServices(serviceResult.data);
+        actionResourcesLoadedRef.current = Boolean(serviceResult.data);
+      })
+      .catch((error) => setInlineError(error instanceof Error ? error.message : 'Failed to load booking resources'))
+      .finally(() => {
+        actionResourcesLoadingRef.current = null;
+        setIsLoadingServices(false);
+      });
+    actionResourcesLoadingRef.current = request;
+    return request;
   }, []);
 
   const loadTimelineData = useCallback(async (date: string) => {
     if (!date) return;
+    const requestId = ++timelineRequestIdRef.current;
     setIsLoadingAppointments(true);
     const res = await getClinicAppointmentsAction({ date });
+    if (requestId !== timelineRequestIdRef.current) return;
     setIsLoadingAppointments(false);
     if (res.success && res.data) {
       setAppointments(res.data);
+      setTimelineVersion((version) => version + 1);
       setSelectedAppointmentDetails((prev: any) => {
         if (!prev) return null;
         const updated = res.data.find((a: any) => a.id === prev.id);
         return updated || prev;
       });
-    }
+    } else if (!res.success) setInlineError(res.error || 'Failed to load appointments');
   }, []);
 
   useEffect(() => {
@@ -104,6 +114,20 @@ export function useSecretaryBookAppointment() {
       }
     }
     loadDoctors();
+  }, []);
+
+  const selectAppointment = useCallback((appointment: any | null) => {
+    if (!appointment) {
+      setSelectedAppointmentDetails(null);
+      return;
+    }
+    setSelectedAppointmentDetails(appointment);
+    const requestId = ++detailRequestIdRef.current;
+    void getStaffAppointmentByIdAction(appointment.id).then((result) => {
+      if (requestId !== detailRequestIdRef.current) return;
+      if (result.success && result.data) setSelectedAppointmentDetails(result.data);
+      else if (!result.success) setInlineError(result.error || 'Failed to load appointment details');
+    });
   }, []);
 
   useEffect(() => {
@@ -265,7 +289,7 @@ export function useSecretaryBookAppointment() {
       if (res.success) {
         setBooked(true);
         setToast({ message: 'Appointment booked successfully!', type: 'success' });
-        loadTimelineData(selectedDate);
+        await loadTimelineData(selectedDate);
       } else {
         setInlineError(res.error || 'Booking failed');
         setToast({ message: res.error || 'Booking failed', type: 'error' });
@@ -285,11 +309,13 @@ export function useSecretaryBookAppointment() {
     setNewDepMiddleName, newDepLastName, setNewDepLastName, newDepSuffix, setNewDepSuffix, newDepDOB, setNewDepDOB,
     newDepRelationship, setNewDepRelationship, firstName, setFirstName, middleName, setMiddleName, lastName, setLastName,
     suffix, setSuffix, phoneNumber, setPhoneNumber, email, setEmail, services, selectedService, selectService, currentMonth,
-    setCurrentMonth, availableDates, selectedDate, selectDate, availableDoctors, selectedDoctor, selectDoctor, timeslots,
-    selectedTime, setSelectedTime, selectedEndTime, setSelectedEndTime, selectTimeslot, patientNote, setPatientNote, isLoadingServices, isLoadingDays: scheduler.loadingKey === 'dates',
-    isLoadingDoctors: scheduler.loadingKey === 'doctors', isLoadingSlots: scheduler.loadingKey === 'slots', isSubmitting,
+    setCurrentMonth, selectedDate, selectDate, selectedDoctor, selectDoctor,
+    selectedTime, setSelectedTime, selectedEndTime, setSelectedEndTime, selectTimeslot, patientNote, setPatientNote, isLoadingServices,
+    isLoadingDoctors: false, isLoadingSlots: false, isSubmitting,
     inlineError, toast, booked, isReadyToSubmit, bookedPatientLabel, resetForm, submit,
+    setInlineError,
     confirmationChannel, setConfirmationChannel,
-    doctorsList, appointments, isLoadingAppointments, selectedAppointmentDetails, setSelectedAppointmentDetails, loadTimelineData
+    doctorsList, appointments, isLoadingAppointments, selectedAppointmentDetails, setSelectedAppointmentDetails,
+    selectAppointment, loadTimelineData, loadActionResources, timelineVersion
   };
 }

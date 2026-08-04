@@ -9,6 +9,16 @@ export const getClinicAppointmentsSchema = z.object({
     .regex(DATE_REGEX, 'Date must be in YYYY-MM-DD format')
     .optional()
     .or(emptyStringToUndefined),
+  dateFrom: z
+    .string()
+    .regex(DATE_REGEX, 'Start date must be in YYYY-MM-DD format')
+    .optional()
+    .or(emptyStringToUndefined),
+  dateTo: z
+    .string()
+    .regex(DATE_REGEX, 'End date must be in YYYY-MM-DD format')
+    .optional()
+    .or(emptyStringToUndefined),
   status: z.string().trim().optional().or(emptyStringToUndefined),
   doctorId: z
     .string()
@@ -43,6 +53,7 @@ export const getClinicAppointmentsPageSchema = z.object({
     .optional()
     .or(emptyStringToUndefined),
   noShowUnresolvedOnly: z.boolean().optional(),
+  countOnly: z.boolean().optional(),
 });
 
 export type GetClinicAppointmentsPageDto = z.infer<typeof getClinicAppointmentsPageSchema>;

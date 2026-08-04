@@ -6,6 +6,7 @@ export const getInquiriesPageSchema = z.object({
   status: z.enum(['NEW', 'CONVERTED', 'DROPPED']).optional(),
   search: z.string().trim().max(120).optional().or(z.literal('').transform(() => undefined)),
   sortDirection: z.enum(['asc', 'desc']).default('desc'),
+  countOnly: z.boolean().optional(),
 });
 
 export type GetInquiriesPageDto = z.infer<typeof getInquiriesPageSchema>;

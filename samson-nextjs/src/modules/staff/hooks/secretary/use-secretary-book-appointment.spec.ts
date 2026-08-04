@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { createManualBookingAction } from '@/modules/appointments/actions/booking/create-manual-booking.action';
 import { getServicesAction } from '@/modules/services/actions/management/get-services.action';
 import { getDoctorsAction } from '@/modules/staff/actions/management/get-doctors.action';
+import { getClinicAppointmentsAction } from '@/modules/appointments/actions/clinic/get-clinic-appointments.action';
 import { useSecretaryBookAppointment } from './use-secretary-book-appointment';
 
 vi.mock('server-only', () => ({}));
@@ -36,6 +37,9 @@ vi.mock('@/modules/appointments/actions/booking/create-manual-booking.action', (
 vi.mock('@/modules/services/actions/management/get-services.action', () => ({
   getServicesAction: vi.fn(),
 }));
+vi.mock('@/modules/appointments/actions/clinic/get-clinic-appointments.action', () => ({
+  getClinicAppointmentsAction: vi.fn(),
+}));
 vi.mock('@/modules/patients/actions/profile/search-patients.action', () => ({
   searchPatientsAction: vi.fn(),
 }));
@@ -47,11 +51,13 @@ describe('useSecretaryBookAppointment', () => {
   it('submits the manual guest booking payload unchanged', async () => {
     vi.mocked(getServicesAction).mockResolvedValue({ success: true, data: [{ id: 'service-1', name: 'Cleaning' }] } as any);
     vi.mocked(getDoctorsAction).mockResolvedValue({ success: true, data: [{ id: 'doctor-1', firstName: 'Lia', lastName: 'Santos' }] } as any);
+    vi.mocked(getClinicAppointmentsAction).mockResolvedValue({ success: true, data: [] } as any);
     vi.mocked(createManualBookingAction).mockResolvedValue({ success: true } as any);
 
 
     const { result } = renderHook(() => useSecretaryBookAppointment());
 
+    await act(async () => result.current.loadActionResources());
     await waitFor(() => expect(result.current.services).toHaveLength(1));
     act(() => {
       result.current.switchPatientMode('GUEST');

@@ -2,7 +2,7 @@
 
 import { z } from 'zod';
 import { createAdminClient } from '@/shared/database/server';
-import { getAuthenticatedUser } from '@/shared/auth/auth.util';
+import { authorizeRole } from '@/shared/auth/auth.util';
 import { DomainError } from '@/shared/errors';
 
 const updateConfirmationChannelSchema = z.object({
@@ -16,12 +16,7 @@ export async function updateConfirmationChannelAction(input: {
 }) {
   try {
     const parsed = updateConfirmationChannelSchema.parse(input);
-    const user = await getAuthenticatedUser();
-    const role = user.user_metadata?.role || user.role;
-
-    if (role !== 'SECRETARY' && role !== 'ADMIN') {
-      throw new DomainError('Unauthorized: Access restricted to clinic staff.', 'UNAUTHORIZED_ACCESS');
-    }
+    await authorizeRole('SECRETARY');
 
     const supabaseAdmin = await createAdminClient();
     const { error } = await supabaseAdmin

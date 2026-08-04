@@ -13,6 +13,7 @@ import { resendNotificationAction } from '@/modules/appointments/actions/status/
 import { getEmailLogsByAppointmentAction } from '@/modules/emails/actions/logs/get-email-logs-by-appointment.action';
 import { computeNotificationStatus } from '@/modules/notifications/utils/notification-status.util';
 import type { OutboxLogResponseDto } from '@/modules/emails/dtos/logs/outbox-log-response.dto';
+import { useToast } from '@/components/feedback/toast-container';
 
 interface AppointmentNotificationsTabProps {
   appointment: AppointmentDto;
@@ -21,6 +22,7 @@ interface AppointmentNotificationsTabProps {
 }
 
 export function AppointmentNotificationsTab({ appointment, view, compact }: AppointmentNotificationsTabProps) {
+  const { addToast } = useToast();
   const [resending, setResending] = useState<string | null>(null);
   const [detailResendingId, setDetailResendingId] = useState<string | null>(null);
   const [outboxLogs, setOutboxLogs] = useState<OutboxLogResponseDto[]>([]);
@@ -60,17 +62,10 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
       setLoadingLogs(false);
     });
 
-    const refreshTimers = [750, 1750, 3000].map((delay) => window.setTimeout(() => {
-      getEmailLogsByAppointmentAction(appointment.id).then((res) => {
-        if (!cancelled && res.success && res.data) setOutboxLogs(res.data);
-      });
-    }, delay));
-
     return () => {
       cancelled = true;
-      refreshTimers.forEach((timer) => window.clearTimeout(timer));
     };
-  }, [appointment.id, appointment.status, appointment.date, appointment.startTime]);
+  }, [appointment.id]);
 
   useEffect(() => {
     setChannel(ch);
@@ -178,7 +173,7 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
         view.fetchData();
       }
     } else {
-      alert(res.error || 'Failed to resend notification.');
+      addToast(res.error || 'Failed to resend notification.', 'error');
     }
     setResending(null);
   };

@@ -141,7 +141,7 @@ export function SecretaryPastAppointmentFollowUpsView() {
           {!view.isLoading && !view.error && visibleAppointments.length === 0 ? (
             <div className="p-8 text-center text-sm text-muted-foreground">Nothing needs follow-up in this section.</div>
           ) : visibleAppointments.map((appointment) => (
-            <button key={appointment.id} onClick={() => { view.setSelectedAppointmentId(appointment.id); setMobileView('detail'); }} className={`flex w-full flex-col gap-2 border-b border-card-border/40 p-4 text-left transition-colors last:border-b-0 hover:bg-sidebar-accent ${view.selectedAppointmentId === appointment.id ? 'bg-sidebar-accent' : ''}`}>
+            <button key={appointment.id} onClick={() => { view.selectAppointment(appointment.id); setMobileView('detail'); }} className={`flex w-full flex-col gap-2 border-b border-card-border/40 p-4 text-left transition-colors last:border-b-0 hover:bg-sidebar-accent ${view.selectedAppointmentId === appointment.id ? 'bg-sidebar-accent' : ''}`}>
               <div className="flex items-center gap-2"><span className="font-medium text-sm truncate">{patientName(appointment)}</span><span className={`ml-auto rounded px-1.5 py-0.5 text-[10px] font-semibold ${appointment.status === 'CHECKED_IN' ? 'bg-cyan-500/10 text-cyan-700' : 'bg-amber-500/10 text-amber-700'}`}>{appointment.status === 'CHECKED_IN' ? 'CHECKED IN' : 'NO SHOW'}</span></div>
               <span className="text-xs font-medium truncate">{appointment.service?.name || 'Treatment'}</span>
               <div className="flex justify-between gap-2 text-[11px] text-muted-foreground"><span>{formatShortDate(appointment.date)}</span><span>{daysWaiting(appointment.date)}</span></div>
@@ -513,6 +513,7 @@ function FollowUpDetail({ appointment, view, onBack, className }: { appointment:
                   view.setRescheduleTime(toHHMM(appointment.startTime ?? undefined));
                   view.setRescheduleEndTime(toHHMM(appointment.endTime ?? undefined));
                   view.setRescheduleJustification('');
+                  void view.loadActionResources();
                   setShowRescheduleForm(true);
                   setShowResolveForm(false);
                 }}

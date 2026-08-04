@@ -10,41 +10,37 @@ export function useNotificationsRealtime(userId: string | null) {
   const router = useRouter();
 
   useEffect(() => {
+    if (!userId) return;
+
     const supabase = createClient();
 
-    console.log('[Realtime] Subscribing to notifications. User ID:', userId);
-
     const channel = supabase
-      .channel('realtime_notifications_channels')
+      .channel(`realtime_notifications_${userId}`)
       .on(
         'postgres_changes',
         {
           event: 'INSERT',
           schema: 'public',
           table: 'notifications',
+          filter: 'recipient_role=eq.SECRETARY',
         },
         (payload: any) => {
           const newNotif = payload.new;
-          console.log('[Realtime] New notification inserted:', newNotif);
 
           const isRoleMatch = newNotif.recipient_role === 'SECRETARY';
           const isUserMatch = !newNotif.recipient_id || newNotif.recipient_id === userId;
 
           if (isRoleMatch && isUserMatch) {
             if (newNotif.priority === 'HIGH') {
-              console.log('[Realtime] Firing toast popup for:', newNotif.title);
               addToast(`[ALERT] ${newNotif.title}: ${newNotif.message}`, 'info');
               router.refresh();
             }
           }
         }
       )
-      .subscribe((status) => {
-        console.log('[Realtime] Subscription status:', status);
-      });
+      .subscribe();
 
     return () => {
-      console.log('[Realtime] Cleaning up channel subscription.');
       supabase.removeChannel(channel);
     };
   }, [userId, addToast, router]);

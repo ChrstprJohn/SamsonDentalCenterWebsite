@@ -8,7 +8,6 @@ import { updateInquiryAction } from '@/modules/appointments/actions/booking/upda
 import { useBookingScheduler } from '@/modules/appointments/hooks/shared/use-booking-scheduler';
 import { searchPatientsAction } from '@/modules/patients/actions/profile/search-patients.action';
 import { getServicesAction } from '@/modules/services/actions/management/get-services.action';
-import { getDoctorsAction } from '@/modules/staff/actions/management/get-doctors.action';
 
 
 export type InquiryDecision = 'CONVERT' | 'DROP' | '';
@@ -46,9 +45,10 @@ export function useSecretaryInquiriesQueue() {
   const [isSearchingPatients, setIsSearchingPatients] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<any | null>(null);
   const [services, setServices] = useState<{ id: string; name: string }[]>([]);
-  const [allDoctors, setAllDoctors] = useState<{ doctorId: string; doctorName: string }[]>([]);
-  const [currentMonth, setCurrentMonth] = useState<Date>(new Date(2026, 5, 1));
+  const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const [isLoadingServices, setIsLoadingServices] = useState(false);
+  const servicesLoadedRef = useRef(false);
+  const servicesLoadingRef = useRef<Promise<void> | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [inlineError, setInlineError] = useState('');
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
@@ -76,22 +76,32 @@ export function useSecretaryInquiriesQueue() {
     [inquiries, selectedInquiryId]
   );
   const availableDates = stagedInquiryService ? scheduler.availableDates : [];
-  const availableDoctors = allDoctors;
+  const availableDoctors = scheduler.availableDoctors as { doctorId: string; doctorName: string }[];
   const timeslots = stagedInquiryDoctor ? scheduler.availableSlots as any[] : [];
   const isAvailabilityLoading = isLoadingServices || scheduler.loadingKey !== null;
 
   const showToast = (message: string, type: 'success' | 'error') => setToast({ message, type });
 
-  useEffect(() => {
-    getDoctorsAction({ includeHidden: true }).then((res) => {
-      if (res.success && res.data) {
-        const mapped = res.data.map((d: any) => ({
-          doctorId: d.id,
-          doctorName: `Dr. ${d.firstName} ${d.lastName}`,
-        }));
-        setAllDoctors(mapped);
-      }
-    });
+  const loadServices = useCallback(async () => {
+    if (servicesLoadedRef.current) return;
+    if (servicesLoadingRef.current) return servicesLoadingRef.current;
+    setIsLoadingServices(true);
+    const request = getServicesAction('BOOKABLE')
+      .then((res) => {
+        if (res.data) {
+          setServices(res.data);
+          servicesLoadedRef.current = true;
+        } else if (res.error) {
+          showToast(res.error, 'error');
+        }
+      })
+      .catch((error) => showToast(error instanceof Error ? error.message : 'Failed to load services', 'error'))
+      .finally(() => {
+        servicesLoadingRef.current = null;
+        setIsLoadingServices(false);
+      });
+    servicesLoadingRef.current = request;
+    return request;
   }, []);
 
 
@@ -144,7 +154,7 @@ export function useSecretaryInquiriesQueue() {
       const otherTabs: InquiryTab[] = ['NEW', 'CONVERTED', 'DROPPED'].filter((tab) => tab !== currentTab) as InquiryTab[];
       const otherRequests = append
         ? Promise.resolve([])
-        : Promise.all(otherTabs.map((status) => getInquiriesPageAction({ limit: 1, cursor: null, status, search, sortDirection: 'desc' })));
+        : Promise.all(otherTabs.map((status) => getInquiriesPageAction({ limit: 1, cursor: null, status, search, sortDirection: 'desc', countOnly: true })));
       const [activeResult, otherResults] = await Promise.all([activeRequest, otherRequests]);
       if (requestId !== latestInquiriesRequest.current) return;
       if (!activeResult.success || !activeResult.data) throw new Error(activeResult.error || 'Failed to load inquiries queue.');
@@ -195,21 +205,15 @@ export function useSecretaryInquiriesQueue() {
   }, [loadInquiries]);
 
   useEffect(() => {
-    async function loadServices() {
-      setIsLoadingServices(true);
-      const res = await getServicesAction('BOOKABLE');
-      setIsLoadingServices(false);
-      if (res.data) setServices(res.data);
-      else if (res.error) showToast(res.error, 'error');
-    }
-    loadServices();
-  }, []);
-
-  useEffect(() => {
     if (!stagedInquiryService) return;
     const month = `${currentMonth.getFullYear()}-${(currentMonth.getMonth() + 1).toString().padStart(2, '0')}`;
     loadAvailableDates({ serviceId: stagedInquiryService, month });
   }, [stagedInquiryService, currentMonth, loadAvailableDates]);
+
+  useEffect(() => {
+    if (!stagedInquiryService || !stagedInquiryDate) return;
+    void loadDoctorsForDate({ serviceId: stagedInquiryService, date: stagedInquiryDate });
+  }, [stagedInquiryService, stagedInquiryDate, loadDoctorsForDate]);
 
 
   useEffect(() => {
@@ -240,6 +244,7 @@ export function useSecretaryInquiriesQueue() {
       return;
     }
     setSelectedInquiryId(inquiry.id);
+    void loadServices();
     setStagedInquiryAction('');
     setStagedInquiryService(inquiry.preferredServiceId);
     setStagedInquiryDate(inquiry.preferredDate || '');
