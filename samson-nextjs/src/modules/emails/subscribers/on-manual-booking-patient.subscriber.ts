@@ -38,14 +38,15 @@ export const onManualBookingPatientSubscriber = {
 
     let doctorName = 'Assigned Dentist';
     if (doctorId) {
-      const { data: doctor } = await supabaseAdmin
+      const { data: doctor, error: doctorError } = await supabaseAdmin
         .from('users')
         .select('first_name, last_name')
         .eq('id', doctorId)
         .single();
-      if (doctor) {
-        doctorName = `Dr. ${doctor.first_name} ${doctor.last_name}`;
+      if (doctorError || !doctor) {
+        throw new Error(`Failed to fetch doctor: ${doctorError?.message || 'Not found'}`);
       }
+      doctorName = `Dr. ${doctor.first_name} ${doctor.last_name}`;
     }
 
     // Use dependent name if booking is for a dependent, otherwise account holder's name

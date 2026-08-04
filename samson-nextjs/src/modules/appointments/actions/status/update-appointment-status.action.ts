@@ -28,7 +28,7 @@ export async function updateAppointmentStatusAction(formData: StaffUpdateAppoint
       updateAppointmentStatusTransaction: updateAppointmentStatusTransactionCommand(supabase),
     });
 
-    // The appointment status trigger creates cancellation/reschedule
+    // The appointment status trigger creates cancellation/reschedule/rejection
     // notifications. Persist the selected channel first so the trigger sees
     // the channel chosen for this status transition (including NONE).
     if (validData.confirmationChannel) {
@@ -64,11 +64,10 @@ export async function updateAppointmentStatusAction(formData: StaffUpdateAppoint
       rescheduleMetadata
     );
 
-    // Emit outbox events for COMPLETED status only.
+    // CANCEL_BOOKING, RESCHEDULE_BOOKING, and REJECT_INQUIRY
+    // → All emitted automatically by Postgres DB trigger trigger_on_appointment_status_change_outbox().
     //
-    // CANCEL_BOOKING + CANCEL_BOOKING_SMS    → emitted by DB trigger trg_appointment_status_change_outbox
-    // RESCHEDULE_BOOKING + RESCHEDULE_BOOKING_SMS → emitted by DB trigger trg_appointment_status_change_outbox
-    // APPOINTMENT_COMPLETED_POST_CARE (email + SMS) → no DB trigger exists; emitted here.
+    // APPOINTMENT_COMPLETED_POST_CARE (email + SMS) → emitted here upon completion.
     if (validData.status === 'COMPLETED') {
       try {
         const { outboxCommands } = await import('@/shared/outbox/outbox.commands');

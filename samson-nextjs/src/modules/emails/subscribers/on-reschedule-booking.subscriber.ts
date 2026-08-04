@@ -8,13 +8,19 @@ export const onRescheduleBookingSubscriber = {
    * Handles RESCHEDULE_BOOKING outbox events by sending a reschedule confirmation email.
    */
   async handle(payload: Record<string, any>): Promise<void> {
-    const { appointmentId, patientId, date, startTime } = payload;
+    const { appointmentId, date, startTime } = payload;
     const supabaseAdmin = await createAdminClient();
 
-    // 1. Fetch appointment token
+    // 1. Fetch appointment details including service & doctor
     const { data: appt, error: apptError } = await supabaseAdmin
       .from('appointments')
-      .select('chat_token, patient_id, confirmation_channel')
+      .select(`
+        chat_token,
+        patient_id,
+        confirmation_channel,
+        service:services(name),
+        doctor:users!appointments_doctor_id_fkey(first_name, last_name)
+      `)
       .eq('id', appointmentId)
       .single();
 
@@ -58,6 +64,11 @@ export const onRescheduleBookingSubscriber = {
       return;
     }
 
+    const serviceName = (appt.service as any)?.name || 'Dental Treatment';
+    const doctorName = appt.doctor
+      ? `Dr. ${appt.doctor.first_name} ${appt.doctor.last_name}`
+      : 'Dr. Adrian Samson';
+
     const dateStr = formatShortDate(date);
     const timeRangeStr = formatClinicTime(startTime);
     const baseUrl = getBaseUrl();
@@ -66,14 +77,17 @@ export const onRescheduleBookingSubscriber = {
     await ResendService.sendTemplatedEmail(
       recipientEmail,
       'Appointment Rescheduled – Samson Dental Center',
-      'appointment_rescheduled' as any,
+      'appointment_rescheduled',
       {
-        patientName: patientName || 'Patient',
+        patientName: patientName || 'Valued Patient',
+        serviceName,
+        doctorName,
         dateStr,
         timeRangeStr,
+        appointmentId,
         chatToken,
         baseUrl,
-      } as any
+      }
     );
 
     await supabaseAdmin.from('appointments').update({ email_reschedule_sent: true }).eq('id', appointmentId);

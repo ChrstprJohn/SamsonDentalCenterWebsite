@@ -1,6 +1,7 @@
 import { createAdminClient } from '@/shared/database/server';
 import { ResendService } from '@/shared/services/email/resend.service';
 import { formatShortDate } from '@/shared/utils/date.util';
+import { getBaseUrl } from '@/shared/utils/get-base-url.util';
 
 export const onCancelBookingSubscriber = {
   /**
@@ -55,15 +56,19 @@ export const onCancelBookingSubscriber = {
     }
 
     const dateStr = formatShortDate(date);
+    const cancellationReason = payload.cancellationReason || payload.reason || 'This appointment has been cancelled as requested.';
+    const baseUrl = getBaseUrl();
 
     await ResendService.sendTemplatedEmail(
       recipientEmail,
       'Appointment Cancelled – Samson Dental Center',
-      'appointment_cancelled' as any,
+      'appointment_cancelled',
       {
-        patientName: patientName || 'Patient',
+        patientName: patientName || 'Valued Patient',
         dateStr,
-      } as any
+        cancellationReason,
+        baseUrl,
+      }
     );
 
     await supabaseAdmin.from('appointments').update({ email_cancel_sent: true }).eq('id', appointmentId);

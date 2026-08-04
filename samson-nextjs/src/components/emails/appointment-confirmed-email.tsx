@@ -2,174 +2,170 @@ import {
   Body,
   Container,
   Head,
-  Heading,
-  Hr,
   Html,
+  Img,
+  Link,
   Preview,
   Section,
   Text,
-  Tailwind,
 } from '@react-email/components';
 import * as React from 'react';
 
-interface AppointmentConfirmedEmailProps {
-  patientName: string;
-  serviceName: string;
-  doctorName: string;
-  dateStr: string;
-  timeRangeStr: string;
-  appointmentId: string;
+export interface AppointmentConfirmedEmailProps {
+  patientName?: string;
+  serviceName?: string;
+  doctorName?: string;
+  dateStr?: string;
+  timeRangeStr?: string;
+  appointmentId?: string;
   chatToken?: string;
   baseUrl?: string;
 }
 
-const row = (label: string, value: React.ReactNode) => (
-  <div
-    style={{
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'flex-start',
-      padding: '8px 0',
-      borderBottom: '1px solid #f0f0f0',
-    }}
-  >
-    <span style={{ color: '#6b7280', fontSize: '13px', minWidth: '140px' }}>{label}</span>
-    <span style={{ color: '#111827', fontSize: '13px', fontWeight: '600', textAlign: 'right', flex: 1 }}>
-      {value}
-    </span>
-  </div>
-);
+const pStyle: React.CSSProperties = {
+  margin: '0 0 16px',
+  color: '#1a1a1a',
+  fontSize: '14px',
+  lineHeight: 1.75,
+};
+
+const boldStyle: React.CSSProperties = {
+  fontWeight: 700,
+};
+
+const linkStyle: React.CSSProperties = {
+  color: '#2563eb',
+  textDecoration: 'underline',
+  fontWeight: 600,
+};
 
 export const AppointmentConfirmedEmail = ({
-  patientName = 'Patient Name',
-  serviceName = 'Dental Treatment',
-  doctorName = 'Dr. John Doe',
-  dateStr = 'Jun 4, 2026',
-  timeRangeStr = '9:00 AM – 9:30 AM',
-  appointmentId = 'f616dc57-4194-428c-901b-2e30205c97e4',
+  patientName = 'Valued Patient',
+  serviceName = 'Dental Consultation & Cleaning',
+  doctorName = 'Dr. Adrian Samson',
+  dateStr = 'Monday, June 22, 2026',
+  timeRangeStr = '2:00 PM – 2:45 PM',
+  appointmentId = 'APT-SAMPLE',
   chatToken = '',
   baseUrl = 'http://localhost:3000',
 }: AppointmentConfirmedEmailProps) => {
   const previewText = `Your appointment at Samson Dental Center is confirmed for ${dateStr}.`;
+  const logoUrl = `${baseUrl}/images/SamsonLOGOGO-removebg-preview.png`;
+  const chatUrl = `${baseUrl}/manage?token=${chatToken || appointmentId}&openChat=true`;
 
   return (
-    <Tailwind>
-      <Html lang="en">
-        <Head />
-        <Preview>{previewText}</Preview>
-        <Body style={{ backgroundColor: '#f8fafc', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif', margin: '0', padding: '0' }}>
-          <Container style={{ maxWidth: '520px', margin: '40px auto', padding: '0 16px' }}>
+    <Html lang="en">
+      <Head />
+      <Preview>{previewText}</Preview>
+      <Body style={{ backgroundColor: '#ffffff', fontFamily: 'Arial, Helvetica, sans-serif', margin: '0', padding: '0' }}>
+        <Container style={{ maxWidth: '600px', margin: '0 auto', padding: '36px 40px 48px' }}>
+          
+          {/* Logo */}
+          <Section style={{ marginBottom: '28px', textAlign: 'center' }}>
+            <Img
+              src={logoUrl}
+              alt="Samson Dental Center"
+              width="130"
+              style={{ height: 'auto', objectFit: 'contain', margin: '0 auto', display: 'block' }}
+            />
+          </Section>
 
-            {/* Header */}
-            <Section style={{ backgroundColor: '#ffffff', borderRadius: '8px 8px 0 0', padding: '32px 40px 24px', borderTop: '4px solid #16a34a', textAlign: 'center' }}>
-              <Heading style={{ margin: '0 0 4px', fontSize: '20px', fontWeight: '700', color: '#111827', letterSpacing: '-0.3px' }}>
-                Samson Dental Center
-              </Heading>
-              <Text style={{ margin: '0', fontSize: '12px', color: '#6b7280', letterSpacing: '0.5px', textTransform: 'uppercase' }}>
-                Appointment Confirmed
+          {/* Greeting */}
+          <Text style={pStyle}>
+            Dear <span style={boldStyle}>{patientName}</span>,
+          </Text>
+
+          {/* Intro */}
+          <Text style={pStyle}>
+            We are delighted to confirm your upcoming dental appointment at Samson Dental Center. Below are your visit details. Please review this information to ensure its accuracy.
+          </Text>
+
+          {/* Details list */}
+          <Section style={{ margin: '0 0 20px', paddingLeft: 0 }}>
+            <Text style={{ ...pStyle, margin: '0 0 4px' }}>
+              <span style={boldStyle}>Status:</span>{' '}
+              <span style={{ fontWeight: 700, color: '#2563eb' }}>Confirmed / Approved</span>
+            </Text>
+            {doctorName && (
+              <Text style={{ ...pStyle, margin: '0 0 4px' }}>
+                <span style={boldStyle}>Doctor:</span> {doctorName}
               </Text>
-            </Section>
-
-            {/* Body */}
-            <Section style={{ backgroundColor: '#ffffff', padding: '0 40px 32px' }}>
-
-              {/* Greeting */}
-              <Text style={{ fontSize: '14px', color: '#374151', lineHeight: '22px', margin: '0 0 8px' }}>
-                Dear {patientName},
+            )}
+            {serviceName && (
+              <Text style={{ ...pStyle, margin: '0 0 4px' }}>
+                <span style={boldStyle}>Service:</span> {serviceName}
               </Text>
-              <Text style={{ fontSize: '14px', color: '#374151', lineHeight: '22px', margin: '0 0 28px' }}>
-                Your appointment at Samson Dental Center has been scheduled and confirmed. We look forward to seeing you. Please find the details of your appointment below:
+            )}
+            <Text style={{ ...pStyle, margin: '0 0 4px' }}>
+              <span style={boldStyle}>Location:</span> Samson Dental Center, Quezon City, Metro Manila
+            </Text>
+            {dateStr && (
+              <Text style={{ ...pStyle, margin: '0 0 4px' }}>
+                <span style={boldStyle}>Date:</span> {dateStr}
               </Text>
-
-              {/* Summary Card */}
-              <Section style={{ backgroundColor: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '8px', padding: '20px 24px', marginBottom: '28px' }}>
-                <Text style={{ margin: '0 0 12px', fontSize: '11px', fontWeight: '700', color: '#6b7280', letterSpacing: '0.6px', textTransform: 'uppercase' }}>
-                  Appointment Summary
-                </Text>
-
-                {row('Patient Name', patientName)}
-                {row('Treatment Service', serviceName)}
-                {row('Assigned Doctor', doctorName)}
-                {row('Appointment Date', dateStr)}
-                {row('Confirmed Time', timeRangeStr)}
-                {row(
-                  'Current Status',
-                  <span style={{ color: '#15803d', backgroundColor: '#dcfce7', padding: '2px 10px', borderRadius: '10px', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase' }}>
-                    Confirmed
-                  </span>
-                )}
-
-                {/* Appointment ID — muted at the bottom */}
-                <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid #e5e7eb' }}>
-                  <Text style={{ margin: '0', fontSize: '11px', color: '#9ca3af' }}>
-                    Reference ID
-                  </Text>
-                  <Text style={{ margin: '4px 0 0', fontSize: '11px', fontFamily: 'monospace', color: '#6b7280', wordBreak: 'break-all' }}>
-                    {appointmentId}
-                  </Text>
-                </div>
-              </Section>
-
-              {chatToken && baseUrl && (
-                <Section style={{ textAlign: 'center', marginTop: '24px', marginBottom: '24px' }}>
-                  <a
-                    href={`${baseUrl}/manage?token=${chatToken}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      backgroundColor: '#1e293b',
-                      borderRadius: '6px',
-                      color: '#ffffff',
-                      display: 'inline-block',
-                      fontSize: '13px',
-                      fontWeight: '600',
-                      lineHeight: '44px',
-                      textAlign: 'center',
-                      textDecoration: 'none',
-                      width: '100%',
-                    }}
-                  >
-                    Manage Appointment
-                  </a>
-                </Section>
-              )}
-
-              {/* Reminders */}
-              <Text style={{ margin: '0 0 12px', fontSize: '13px', fontWeight: '700', color: '#111827' }}>
-                Important Instructions
+            )}
+            {timeRangeStr && (
+              <Text style={{ ...pStyle, margin: '0 0 4px' }}>
+                <span style={boldStyle}>Time:</span> {timeRangeStr}
               </Text>
-
-              <div style={{ display: 'flex', gap: '10px', marginBottom: '12px' }}>
-                <span style={{ fontSize: '13px', fontWeight: '700', color: '#16a34a', minWidth: '20px' }}>•</span>
-                <Text style={{ margin: '0', fontSize: '13px', color: '#374151', lineHeight: '20px' }}>
-                  Please arrive <strong style={{ color: '#111827' }}>10–15 minutes early</strong> to complete any necessary paperwork.
-                </Text>
-              </div>
-
-              <div style={{ display: 'flex', gap: '10px', marginBottom: '28px' }}>
-                <span style={{ fontSize: '13px', fontWeight: '700', color: '#16a34a', minWidth: '20px' }}>•</span>
-                <Text style={{ margin: '0', fontSize: '13px', color: '#374151', lineHeight: '20px' }}>
-                  If you need to reschedule or cancel, please contact the clinic at least 24 hours in advance.
-                </Text>
-              </div>
-
-            </Section>
-
-            {/* Footer */}
-            <Section style={{ backgroundColor: '#f1f5f9', borderRadius: '0 0 8px 8px', padding: '20px 40px', textAlign: 'center' }}>
-              <Hr style={{ border: 'none', borderTop: '1px solid #e2e8f0', margin: '0 0 16px' }} />
-              <Text style={{ margin: '0 0 4px', fontSize: '12px', color: '#94a3b8' }}>
-                © {new Date().getFullYear()} Samson Dental Center. All rights reserved.
+            )}
+            {appointmentId && (
+              <Text style={{ ...pStyle, margin: '0 0 4px' }}>
+                <span style={boldStyle}>Reference ID:</span> {appointmentId}
               </Text>
-              <Text style={{ margin: '0', fontSize: '11px', color: '#94a3b8' }}>
-                This is an automated message. Please do not reply to this email.
-              </Text>
-            </Section>
+            )}
+          </Section>
 
-          </Container>
-        </Body>
-      </Html>
-    </Tailwind>
+          {/* Instructions */}
+          <Text style={pStyle}>
+            Please arrive 10 to 15 minutes before your scheduled time to complete check-in.
+          </Text>
+
+          <Text style={pStyle}>
+            Your health is our top priority, and we greatly appreciate your trust in our care. If you have any specific concerns or requests for your appointment, please feel free to let us know.
+          </Text>
+
+          {/* Contact & Chat block */}
+          <Text style={pStyle}>
+            If you have any questions, need to reschedule, or need further assistance, please don&apos;t hesitate to reach out. You can{' '}
+            <Link href={chatUrl} style={linkStyle}>click here to open the clinic chat</Link>{' '}
+            or call or text us at <Link href="tel:028123456" style={linkStyle}>(02) 8123-4567</Link>.{' '}
+            <span style={{ color: '#dc2626', fontWeight: 600 }}>Please note that replies to this email are not monitored.</span>
+          </Text>
+
+          {/* Closing */}
+          <Text style={{ ...pStyle, marginBottom: '24px' }}>
+            Thank you for choosing Samson Dental Center. We can&apos;t wait to see you on {dateStr} at {timeRangeStr}.
+          </Text>
+
+          {/* Signature */}
+          <Text style={{ ...pStyle, marginBottom: '4px' }}>Warm regards,</Text>
+          <Text style={{ ...pStyle, marginBottom: '2px', ...boldStyle }}>Samson Dental Center</Text>
+          <Text style={{ ...pStyle, color: '#64748b', marginBottom: 0 }}>
+            (02) 8123-4567 &nbsp;&middot;&nbsp;{' '}
+            <Link href={baseUrl} target="_blank" rel="noreferrer" style={{ color: '#2563eb' }}>
+              samsondentalcenter.com.ph
+            </Link>
+          </Text>
+
+          {/* Divider */}
+          <hr style={{ border: 'none', borderTop: '1px solid #e2e8f0', margin: '32px 0 20px' }} />
+
+          {/* Footer */}
+          <Text style={{ color: '#64748b', fontSize: '12px', lineHeight: 1.6, margin: 0 }}>
+            You received this email because you have an appointment with Samson Dental Center. If you believe this was sent in error, please contact our office.{' '}
+            <Link href={`${baseUrl}/terms`} target="_blank" rel="noreferrer" style={{ color: '#94a3b8' }}>
+              Terms of Service
+            </Link>{' '}
+            &middot;{' '}
+            <Link href={`${baseUrl}/privacy`} target="_blank" rel="noreferrer" style={{ color: '#94a3b8' }}>
+              Privacy Policy
+            </Link>
+          </Text>
+
+        </Container>
+      </Body>
+    </Html>
   );
 };
 

@@ -11,10 +11,9 @@ import {
 } from '@react-email/components';
 import * as React from 'react';
 
-export interface AppointmentCancelledEmailProps {
+export interface RequestRejectedEmailProps {
   patientName?: string;
-  dateStr?: string;
-  cancellationReason?: string;
+  rejectionReason?: string;
   baseUrl?: string;
 }
 
@@ -35,13 +34,12 @@ const linkStyle: React.CSSProperties = {
   fontWeight: 600,
 };
 
-export const AppointmentCancelledEmail = ({
+export const RequestRejectedEmail = ({
   patientName = 'Valued Patient',
-  dateStr = 'Monday, June 22, 2026',
-  cancellationReason = 'This appointment has been cancelled as requested.',
+  rejectionReason = 'Unfortunately, we are unable to accommodate your request at this time.',
   baseUrl = 'http://localhost:3000',
-}: AppointmentCancelledEmailProps) => {
-  const previewText = 'Your appointment cancellation has been processed. We hope to see you again soon.';
+}: RequestRejectedEmailProps) => {
+  const previewText = 'An update regarding your recent booking request at Samson Dental Center.';
   const logoUrl = `${baseUrl}/images/SamsonLOGOGO-removebg-preview.png`;
 
   return (
@@ -68,18 +66,17 @@ export const AppointmentCancelledEmail = ({
 
           {/* Intro */}
           <Text style={pStyle}>
-            We are writing to confirm that your appointment at Samson Dental Center has been cancelled as requested. We are sorry we will not be able to see you this time, and we hope to welcome you back soon.
+            Thank you for your interest in Samson Dental Center. After carefully reviewing your booking request, we regret to inform you that we are unable to accommodate your request at this time.
           </Text>
 
-          {/* Cancelled Date & Reason */}
-          {dateStr && (
-            <Text style={pStyle}>
-              Your appointment originally scheduled for <span style={boldStyle}>{dateStr}</span> has been cancelled.{' '}
-              <span style={boldStyle}>
-                {cancellationReason}
-              </span>
-            </Text>
-          )}
+          {/* Rejection reason paragraph */}
+          <Text style={pStyle}>
+            We sincerely apologize for any inconvenience this may cause.{' '}
+            <span style={{ fontWeight: 700 }}>
+              {rejectionReason}
+            </span>{' '}
+            If you would like to explore alternative dates or have any questions about our available services, please do not hesitate to contact us.
+          </Text>
 
           {/* Contact block */}
           <Text style={pStyle}>
@@ -90,7 +87,7 @@ export const AppointmentCancelledEmail = ({
 
           {/* Closing */}
           <Text style={{ ...pStyle, marginBottom: '24px' }}>
-            Thank you for letting us know, and we hope to welcome you back at Samson Dental Center soon.
+            We hope to have the opportunity to serve you in the future. Thank you for considering Samson Dental Center.
           </Text>
 
           {/* Signature */}
@@ -108,7 +105,7 @@ export const AppointmentCancelledEmail = ({
 
           {/* Footer */}
           <Text style={{ color: '#64748b', fontSize: '12px', lineHeight: 1.6, margin: 0 }}>
-            You received this email because you have an appointment with Samson Dental Center. If you believe this was sent in error, please contact our office.{' '}
+            You received this email because you submitted a booking inquiry with Samson Dental Center. If you believe this was sent in error, please contact our office.{' '}
             <Link href={`${baseUrl}/terms`} target="_blank" rel="noreferrer" style={{ color: '#94a3b8' }}>
               Terms of Service
             </Link>{' '}
@@ -124,4 +121,4 @@ export const AppointmentCancelledEmail = ({
   );
 };
 
-export default AppointmentCancelledEmail;
+export default RequestRejectedEmail;

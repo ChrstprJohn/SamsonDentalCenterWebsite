@@ -10,6 +10,8 @@ import AppointmentCancelledEmail from '@/components/emails/appointment-cancelled
 import AppointmentRescheduledEmail from '@/components/emails/appointment-rescheduled-email';
 import StaffReplyEmail from '@/components/emails/staff-reply-email';
 import AppointmentReminderEmail from '@/components/emails/appointment-reminder-email';
+import PostCareEmail from '@/components/emails/post-care-email';
+import RequestRejectedEmail from '@/components/emails/request-rejected-email';
 
 if (!process.env.RESEND_API_KEY) {
   // We don't throw an error at boot, but we will throw when attempting to send if missing.
@@ -59,18 +61,36 @@ type EmailTemplates = {
   'appointment_cancelled': {
     patientName: string;
     dateStr: string;
+    cancellationReason?: string;
+    baseUrl?: string;
   };
   'appointment_rescheduled': {
     patientName: string;
     dateStr: string;
     timeRangeStr: string;
-    chatToken: string;
-    baseUrl: string;
+    doctorName?: string;
+    serviceName?: string;
+    appointmentId?: string;
+    chatToken?: string;
+    baseUrl?: string;
   };
   'staff_reply': {
     patientName: string;
     chatToken: string;
     baseUrl: string;
+  };
+  'post_care': {
+    patientName: string;
+    serviceName?: string;
+    doctorName?: string;
+    dateStr?: string;
+    appointmentId?: string;
+    baseUrl?: string;
+  };
+  'request_rejected': {
+    patientName: string;
+    rejectionReason?: string;
+    baseUrl?: string;
   };
 };
 
@@ -161,6 +181,8 @@ export const ResendService = {
         html = await render(React.createElement(AppointmentCancelledEmail, {
           patientName: reqPayload.patientName,
           dateStr: reqPayload.dateStr,
+          cancellationReason: reqPayload.cancellationReason,
+          baseUrl: reqPayload.baseUrl,
         }));
         break;
       }
@@ -170,6 +192,9 @@ export const ResendService = {
           patientName: reqPayload.patientName,
           dateStr: reqPayload.dateStr,
           timeRangeStr: reqPayload.timeRangeStr,
+          doctorName: reqPayload.doctorName,
+          serviceName: reqPayload.serviceName,
+          appointmentId: reqPayload.appointmentId,
           chatToken: reqPayload.chatToken,
           baseUrl: reqPayload.baseUrl,
         }));
@@ -180,6 +205,27 @@ export const ResendService = {
         html = await render(React.createElement(StaffReplyEmail, {
           patientName: reqPayload.patientName,
           chatToken: reqPayload.chatToken,
+          baseUrl: reqPayload.baseUrl,
+        }));
+        break;
+      }
+      case 'post_care': {
+        const reqPayload = payload as EmailTemplates['post_care'];
+        html = await render(React.createElement(PostCareEmail, {
+          patientName: reqPayload.patientName,
+          serviceName: reqPayload.serviceName,
+          doctorName: reqPayload.doctorName,
+          dateStr: reqPayload.dateStr,
+          appointmentId: reqPayload.appointmentId,
+          baseUrl: reqPayload.baseUrl,
+        }));
+        break;
+      }
+      case 'request_rejected': {
+        const reqPayload = payload as EmailTemplates['request_rejected'];
+        html = await render(React.createElement(RequestRejectedEmail, {
+          patientName: reqPayload.patientName,
+          rejectionReason: reqPayload.rejectionReason,
           baseUrl: reqPayload.baseUrl,
         }));
         break;

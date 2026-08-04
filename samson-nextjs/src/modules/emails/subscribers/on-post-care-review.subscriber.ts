@@ -65,15 +65,13 @@ export const onPostCareReviewSubscriber = {
 
     await ResendService.sendTemplatedEmail(
       email,
-      'Thank You for Visiting Samson Dental Center – How Was Your Visit?',
-      'appointment_reminder',
+      'Thank You for Your Visit – Samson Dental Center',
+      'post_care',
       {
-        reminderTitle: 'Thank You for Visiting Samson Dental Center!',
         patientName,
         serviceName,
         doctorName,
         dateStr: appointment.date,
-        timeRangeStr: 'Visit Completed',
         appointmentId,
         baseUrl,
       }

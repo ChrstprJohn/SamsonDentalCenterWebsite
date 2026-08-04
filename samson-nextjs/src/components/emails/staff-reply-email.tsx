@@ -2,95 +2,122 @@ import {
   Body,
   Container,
   Head,
-  Heading,
-  Hr,
   Html,
+  Img,
+  Link,
   Preview,
   Section,
   Text,
-  Tailwind,
 } from '@react-email/components';
 import * as React from 'react';
 
-interface StaffReplyEmailProps {
-  patientName: string;
-  chatToken: string;
-  baseUrl: string;
+export interface StaffReplyEmailProps {
+  patientName?: string;
+  chatToken?: string;
+  baseUrl?: string;
 }
 
+const pStyle: React.CSSProperties = {
+  margin: '0 0 16px',
+  color: '#1a1a1a',
+  fontSize: '14px',
+  lineHeight: 1.75,
+};
+
+const boldStyle: React.CSSProperties = {
+  fontWeight: 700,
+};
+
+const linkStyle: React.CSSProperties = {
+  color: '#2563eb',
+  textDecoration: 'underline',
+  fontWeight: 600,
+};
+
 export const StaffReplyEmail = ({
-  patientName = 'Patient Name',
+  patientName = 'Valued Patient',
   chatToken = '',
   baseUrl = 'http://localhost:3000',
 }: StaffReplyEmailProps) => {
-  const previewText = `New message from Samson Dental Center regarding your appointment.`;
+  const previewText = 'A member of our clinic team has sent you a message. Click to view and reply.';
+  const logoUrl = `${baseUrl}/images/SamsonLOGOGO-removebg-preview.png`;
+  const chatUrl = `${baseUrl}/manage?token=${chatToken}&openChat=true`;
 
   return (
-    <Tailwind>
-      <Html lang="en">
-        <Head />
-        <Preview>{previewText}</Preview>
-        <Body style={{ backgroundColor: '#f8fafc', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif', margin: '0', padding: '0' }}>
-          <Container style={{ maxWidth: '520px', margin: '40px auto', padding: '0 16px' }}>
+    <Html lang="en">
+      <Head />
+      <Preview>{previewText}</Preview>
+      <Body style={{ backgroundColor: '#ffffff', fontFamily: 'Arial, Helvetica, sans-serif', margin: '0', padding: '0' }}>
+        <Container style={{ maxWidth: '600px', margin: '0 auto', padding: '36px 40px 48px' }}>
+          
+          {/* Logo */}
+          <Section style={{ marginBottom: '28px', textAlign: 'center' }}>
+            <Img
+              src={logoUrl}
+              alt="Samson Dental Center"
+              width="130"
+              style={{ height: 'auto', objectFit: 'contain', margin: '0 auto', display: 'block' }}
+            />
+          </Section>
 
-            {/* Header */}
-            <Section style={{ backgroundColor: '#ffffff', borderRadius: '8px 8px 0 0', padding: '32px 40px 24px', borderTop: '4px solid #3b82f6', textAlign: 'center' }}>
-              <Heading style={{ margin: '0 0 4px', fontSize: '20px', fontWeight: '700', color: '#111827', letterSpacing: '-0.3px' }}>
-                Samson Dental Center
-              </Heading>
-              <Text style={{ margin: '0', fontSize: '12px', color: '#6b7280', letterSpacing: '0.5px', textTransform: 'uppercase' }}>
-                New Message Received
-              </Text>
-            </Section>
+          {/* Greeting */}
+          <Text style={pStyle}>
+            Dear <span style={boldStyle}>{patientName}</span>,
+          </Text>
 
-            {/* Body */}
-            <Section style={{ backgroundColor: '#ffffff', padding: '0 40px 32px' }}>
-              <Text style={{ fontSize: '14px', color: '#374151', lineHeight: '22px', margin: '0 0 8px' }}>
-                Dear {patientName},
-              </Text>
-              <Text style={{ fontSize: '14px', color: '#374151', lineHeight: '22px', margin: '0 0 24px' }}>
-                Our clinic staff has sent a new message regarding your appointment. You can view the message and reply directly in the secure chat thread:
-              </Text>
+          {/* Intro */}
+          <Text style={pStyle}>
+            A member of our clinic staff has sent you a reply regarding your appointment or inquiry. We are standing by to help.
+          </Text>
 
-              {/* Action Button */}
-              <Section style={{ textAlign: 'center', marginTop: '24px', marginBottom: '24px' }}>
-                <a
-                  href={`${baseUrl}/manage?token=${chatToken}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    backgroundColor: '#1e293b',
-                    borderRadius: '6px',
-                    color: '#ffffff',
-                    display: 'inline-block',
-                    fontSize: '13px',
-                    fontWeight: '600',
-                    lineHeight: '44px',
-                    textAlign: 'center',
-                    textDecoration: 'none',
-                    width: '100%',
-                  }}
-                >
-                  View Message & Chat
-                </a>
-              </Section>
-            </Section>
+          {/* Action Link */}
+          <Text style={pStyle}>
+            Please{' '}
+            <Link href={chatUrl} style={linkStyle}>click here to open your clinic chat</Link>{' '}
+            to view the message and continue the conversation.
+          </Text>
 
-            {/* Footer */}
-            <Section style={{ backgroundColor: '#f1f5f9', borderRadius: '0 0 8px 8px', padding: '20px 40px', textAlign: 'center' }}>
-              <Hr style={{ border: 'none', borderTop: '1px solid #e2e8f0', margin: '0 0 16px' }} />
-              <Text style={{ margin: '0 0 4px', fontSize: '12px', color: '#94a3b8' }}>
-                © {new Date().getFullYear()} Samson Dental Center. All rights reserved.
-              </Text>
-              <Text style={{ margin: '0', fontSize: '11px', color: '#94a3b8' }}>
-                This is an automated message. Please do not reply to this email.
-              </Text>
-            </Section>
+          {/* Contact block */}
+          <Text style={pStyle}>
+            If you have any questions or need further assistance, please don&apos;t hesitate to reach out. You can{' '}
+            <Link href={chatUrl} style={linkStyle}>click here to open the clinic chat</Link>{' '}
+            or call or text us at <Link href="tel:028123456" style={linkStyle}>(02) 8123-4567</Link>.{' '}
+            <span style={{ color: '#dc2626', fontWeight: 600 }}>Please note that replies to this email are not monitored.</span>
+          </Text>
 
-          </Container>
-        </Body>
-      </Html>
-    </Tailwind>
+          {/* Closing */}
+          <Text style={{ ...pStyle, marginBottom: '24px' }}>
+            Thank you for choosing Samson Dental Center. We look forward to assisting you.
+          </Text>
+
+          {/* Signature */}
+          <Text style={{ ...pStyle, marginBottom: '4px' }}>Warm regards,</Text>
+          <Text style={{ ...pStyle, marginBottom: '2px', ...boldStyle }}>Samson Dental Center</Text>
+          <Text style={{ ...pStyle, color: '#64748b', marginBottom: 0 }}>
+            (02) 8123-4567 &nbsp;&middot;&nbsp;{' '}
+            <Link href={baseUrl} target="_blank" rel="noreferrer" style={{ color: '#2563eb' }}>
+              samsondentalcenter.com.ph
+            </Link>
+          </Text>
+
+          {/* Divider */}
+          <hr style={{ border: 'none', borderTop: '1px solid #e2e8f0', margin: '32px 0 20px' }} />
+
+          {/* Footer */}
+          <Text style={{ color: '#64748b', fontSize: '12px', lineHeight: 1.6, margin: 0 }}>
+            You received this email because you have an appointment with Samson Dental Center. If you believe this was sent in error, please contact our office.{' '}
+            <Link href={`${baseUrl}/terms`} target="_blank" rel="noreferrer" style={{ color: '#94a3b8' }}>
+              Terms of Service
+            </Link>{' '}
+            &middot;{' '}
+            <Link href={`${baseUrl}/privacy`} target="_blank" rel="noreferrer" style={{ color: '#94a3b8' }}>
+              Privacy Policy
+            </Link>
+          </Text>
+
+        </Container>
+      </Body>
+    </Html>
   );
 };
 

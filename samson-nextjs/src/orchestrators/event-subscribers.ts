@@ -20,6 +20,7 @@ import { onAppointmentReminder24hSmsSubscriber } from '@/modules/emails/subscrib
 import { onAppointmentReminder48hSmsSubscriber } from '@/modules/emails/subscribers/on-appointment-reminder-48h-sms.subscriber';
 import { onPostCareReviewSubscriber } from '@/modules/emails/subscribers/on-post-care-review.subscriber';
 import { onPostCareReviewSmsSubscriber } from '@/modules/emails/subscribers/on-post-care-review-sms.subscriber';
+import { onRequestRejectedSubscriber } from '@/modules/emails/subscribers/on-request-rejected.subscriber';
 
 import { onCancelBookingSmsSubscriber } from '@/modules/notifications/subscribers/on-cancel-booking-sms.subscriber';
 import { onRescheduleBookingSmsSubscriber } from '@/modules/notifications/subscribers/on-reschedule-booking-sms.subscriber';
@@ -50,6 +51,10 @@ export const bootstrapEventSubscribers = () => {
   registerSubscriber('STAFF_REPLIED_TO_CHAT', onStaffReplySubscriber.handle);
   registerSubscriber('APPOINTMENT_MANUALLY_BOOKED_SMS', onManualBookingSmsSubscriber.handle);
   registerSubscriber('APPOINTMENT_CONVERTED_FROM_INQUIRY_SMS', onManualBookingSmsSubscriber.handle);
+
+  // Request Rejected subscribers
+  registerSubscriber('REJECT_INQUIRY', onRequestRejectedSubscriber.handle);
+  registerSubscriber('BOOKING_REJECTED', onRequestRejectedSubscriber.handle);
   
   // 24h & 48h Reminders
   registerSubscriber('APPOINTMENT_REMINDER_24H', onAppointmentReminder24hSubscriber.handle);

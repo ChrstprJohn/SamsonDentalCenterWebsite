@@ -6,6 +6,9 @@ import ResetPasswordOtpEmail from './reset-password-otp-email';
 import AppointmentRequestReceivedEmail from './appointment-request-received-email';
 import AppointmentConfirmedEmail from './appointment-confirmed-email';
 
+import PostCareEmail from './post-care-email';
+import RequestRejectedEmail from './request-rejected-email';
+
 describe('Email Templates Rendering', () => {
   it('renders SignupOtpEmail without crashing', async () => {
     const html = await render(
@@ -66,8 +69,8 @@ describe('Email Templates Rendering', () => {
       })
     );
     expect(html).toContain('Maria Picardo');
-    expect(html).toContain('Spouse');
-    expect(html).toContain('Christopher Picardo');
+    expect(html).toContain('Composite Filling');
+    expect(html).toContain('Dr. John Smith');
     expect(html).toContain('da95a63c-333e-4b68-98e3-82bdf1a07bd2');
   });
 
@@ -86,5 +89,31 @@ describe('Email Templates Rendering', () => {
     expect(html).toContain('Teeth Whitening');
     expect(html).toContain('Dr. John Doe');
     expect(html).toContain('da95a63c-333e-4b68-98e3-82bdf1a07bd3');
+  });
+
+  it('renders PostCareEmail without crashing', async () => {
+    const html = await render(
+      React.createElement(PostCareEmail, {
+        patientName: 'Alice Guest',
+        serviceName: 'Dental Cleaning',
+        doctorName: 'Dr. Adrian Samson',
+        dateStr: 'Monday, June 22, 2026',
+        appointmentId: 'APT-SAMPLE-123',
+      })
+    );
+    expect(html).toContain('Alice Guest');
+    expect(html).toContain('Dental Cleaning');
+    expect(html).toContain('APT-SAMPLE-123');
+  });
+
+  it('renders RequestRejectedEmail without crashing', async () => {
+    const html = await render(
+      React.createElement(RequestRejectedEmail, {
+        patientName: 'Alice Guest',
+        rejectionReason: 'Fully booked on requested date',
+      })
+    );
+    expect(html).toContain('Alice Guest');
+    expect(html).toContain('Fully booked on requested date');
   });
 });
