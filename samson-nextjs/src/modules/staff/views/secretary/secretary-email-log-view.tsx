@@ -21,6 +21,8 @@ import { Mail, AlertCircle, Clock, CheckCircle2, RefreshCw, Search, MessageSquar
 import { InquiryToast } from './sub-components/inquiry-toast';
 
 const EVENT_NAME_MAP: Record<string, string> = {
+  'APPOINTMENT_INQUIRY_RECEIVED': 'Booking Inquiry Received',
+  'REJECT_INQUIRY': 'Inquiry Rejected / Declined',
   'APPOINTMENT_BOOKED': 'Booking Confirmation (Patient)',
   'APPOINTMENT_CONVERTED_FROM_INQUIRY': 'Inquiry Approved Confirmation',
   'APPOINTMENT_MANUALLY_BOOKED_PATIENT': 'Manual Booking (Patient)',
@@ -86,6 +88,11 @@ function formatMessageTime(dateStr: string) {
 }
 
 const STATUS_TABS = ['ALL', 'SENT', 'FAILED', 'PENDING'] as const;
+const CATEGORY_TABS = [
+  { key: 'ALL' as const, label: 'All Logs' },
+  { key: 'APPOINTMENTS' as const, label: 'Appointments' },
+  { key: 'INQUIRIES' as const, label: 'Inquiries & Rejections' },
+] as const;
 
 export function SecretaryEmailLogView() {
   const {
@@ -93,6 +100,8 @@ export function SecretaryEmailLogView() {
     setSearchTerm,
     statusFilter,
     setStatusFilter,
+    categoryFilter,
+    setCategoryFilter,
     selectedEmailId,
     setSelectedEmailId,
     selectedEmail,
@@ -130,7 +139,7 @@ export function SecretaryEmailLogView() {
           className={`flex-col lg:w-[350px] flex-1 lg:flex-none border-r border-card-border/40 bg-sidebar h-full overflow-hidden ${mobileView === 'list' ? 'flex' : 'hidden'} lg:flex`}
         >
           {/* Header */}
-          <SidebarHeader className="gap-3.5 border-b p-4 shrink-0">
+          <SidebarHeader className="gap-3 border-b p-4 shrink-0">
             <div className="flex w-full h-8 items-center justify-between">
               <div className="flex items-center gap-2">
                 <SidebarTrigger className="lg:hidden -ml-1 text-muted-foreground hover:text-foreground" />
@@ -150,6 +159,25 @@ export function SecretaryEmailLogView() {
               </Button>
             </div>
 
+            {/* Category Tabs */}
+            <div className="flex gap-1 bg-muted/30 p-1 rounded-xl">
+              {CATEGORY_TABS.map((tab) => (
+                <Button
+                  key={tab.key}
+                  onClick={() => { setCategoryFilter(tab.key); setSelectedEmailId(null); setMobileView('list'); }}
+                  variant="ghost"
+                  size="sm"
+                  className={`flex-1 h-7 text-[11px] font-semibold rounded-lg transition-all ${
+                    categoryFilter === tab.key
+                      ? 'bg-card text-foreground shadow-xs border border-border/40'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  {tab.label}
+                </Button>
+              ))}
+            </div>
+
             {/* Search */}
             <div className="px-1">
               <SidebarInput
@@ -160,11 +188,6 @@ export function SecretaryEmailLogView() {
               />
             </div>
 
-            <label className="flex items-center gap-2 px-1 text-xs text-muted-foreground">
-              <input type="checkbox" checked={onlyAppointments} onChange={(event) => setOnlyAppointments(event.target.checked)} />
-              Appointment emails only
-            </label>
-
             {/* Status Tabs */}
             <div className="flex gap-1 bg-muted/20 p-1 rounded-lg">
               {STATUS_TABS.map((tab) => (
@@ -173,9 +196,9 @@ export function SecretaryEmailLogView() {
                   onClick={() => { setStatusFilter(tab); setSelectedEmailId(null); setMobileView('list'); }}
                   variant="ghost"
                   size="sm"
-                  className={`flex-1 h-8 text-xs font-semibold rounded-xl transition-all ${
+                  className={`flex-1 h-7 text-[11px] font-semibold rounded-lg transition-all ${
                     statusFilter === tab
-                      ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground shadow-sm'
+                      ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground shadow-xs'
                       : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >

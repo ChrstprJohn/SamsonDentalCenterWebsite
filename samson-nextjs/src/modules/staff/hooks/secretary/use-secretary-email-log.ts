@@ -12,6 +12,7 @@ export function useSecretaryEmailLog() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
+  const [categoryFilter, setCategoryFilter] = useState<'ALL' | 'APPOINTMENTS' | 'INQUIRIES'>('ALL');
   const [selectedEmailId, setSelectedEmailId] = useState<string | null>(null);
   const [resendingId, setResendingId] = useState<string | null>(null);
   const [isRetryingAll, setIsRetryingAll] = useState(false);
@@ -51,6 +52,7 @@ export function useSecretaryEmailLog() {
         status: statusForQuery(),
         search: searchTerm || undefined,
         channel: 'EMAIL',
+        category: categoryFilter,
         onlyAppointments,
       });
       if (requestId !== latestRequestId.current) return;
@@ -85,7 +87,7 @@ export function useSecretaryEmailLog() {
         loadingMoreRef.current = false;
       }
     }
-  }, [onlyAppointments, searchTerm, statusFilter]);
+  }, [categoryFilter, onlyAppointments, searchTerm, statusFilter]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => { void fetchLogs(); }, 250);
@@ -175,6 +177,8 @@ export function useSecretaryEmailLog() {
     setSearchTerm,
     statusFilter,
     setStatusFilter,
+    categoryFilter,
+    setCategoryFilter,
     selectedEmailId,
     setSelectedEmailId,
     selectedEmail,

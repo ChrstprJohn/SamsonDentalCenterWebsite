@@ -28,6 +28,7 @@ type SummaryRow = {
 };
 
 const EVENT_LABELS: Record<string, string> = {
+  APPOINTMENT_INQUIRY_RECEIVED: 'Inquiry Received (Email)',
   APPOINTMENT_BOOKED: 'Booking Confirmation (Email)',
   APPOINTMENT_CONVERTED_FROM_INQUIRY: 'Inquiry Approved (Email)',
   APPOINTMENT_CONVERTED_FROM_INQUIRY_PATIENT: 'Inquiry Approved (Email)',

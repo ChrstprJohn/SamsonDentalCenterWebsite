@@ -6,7 +6,8 @@ export const getOutboxLogsPageSchema = z.object({
   status: z.enum(['PENDING', 'PROCESSING', 'PROCESSED', 'FAILED']).optional(),
   search: z.string().trim().max(120).optional().or(z.literal('').transform(() => undefined)),
   channel: z.enum(['ALL', 'EMAIL', 'SMS']).default('ALL'),
+  category: z.enum(['ALL', 'APPOINTMENTS', 'INQUIRIES']).optional().default('ALL'),
   onlyAppointments: z.boolean().default(false),
 });
 
-export type GetOutboxLogsPageDto = z.infer<typeof getOutboxLogsPageSchema>;
+export type GetOutboxLogsPageDto = z.input<typeof getOutboxLogsPageSchema>;

@@ -42,9 +42,22 @@ type CommunicationPageResult = {
 export const getAppointmentCommunicationPageQuery = (supabase: SupabaseClient) => {
   return async (params: GetAppointmentCommunicationPageDto): Promise<PageResult<AppointmentCommunicationSummaryDto>> => {
     const limit = params.limit ?? 25;
+
+    // Check if appointment originated from an inquiry
+    const { data: inquiryRecord } = await supabase
+      .from('appointment_inquiries')
+      .select('id')
+      .eq('linked_appointment_id', params.appointmentId)
+      .maybeSingle();
+
+    const linkedInquiryId = inquiryRecord?.id as string | undefined;
+    const matchFilter = linkedInquiryId
+      ? `appointment_id.eq.${params.appointmentId},payload->>appointmentId.eq.${params.appointmentId},payload->>inquiryId.eq.${linkedInquiryId}`
+      : `appointment_id.eq.${params.appointmentId},payload->>appointmentId.eq.${params.appointmentId}`;
+
     let query = supabase.from('outbox')
       .select('id, event_type, status, error_logs, retry_count, created_at, patient_id:payload->>patientId, email:payload->>email, guest_email:payload->>guestEmail, phone:payload->>phone, phone_number:payload->>phoneNumber, mobile_number:payload->>mobileNumber', { count: 'exact' })
-      .eq('appointment_id', params.appointmentId)
+      .or(matchFilter)
       .order('created_at', { ascending: false })
       .order('id', { ascending: false });
 

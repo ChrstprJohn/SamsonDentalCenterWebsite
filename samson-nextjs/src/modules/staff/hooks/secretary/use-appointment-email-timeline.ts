@@ -7,7 +7,7 @@ import { getAppointmentCommunicationPageAction } from '@/modules/emails/actions/
 import { resendEmailAction } from '@/modules/emails/actions/logs/resend-email.action';
 import type { AppointmentCommunicationSummaryDto } from '@/modules/emails/repositories/logs/appointment-communication-page.queries';
 
-export type LeftTab = 'all' | 'failed';
+export type LeftTab = 'all' | 'failed' | 'inquiries';
 
 export interface TimelineEntry {
   id: string;
@@ -49,7 +49,7 @@ export function useAppointmentEmailTimeline() {
   const [resendingId, setResendingId] = useState<string | null>(null);
   const [leftTab, setLeftTab] = useState<LeftTab>('all');
   const [searchTerm, setSearchTerm] = useState('');
-  const [tabCounts, setTabCounts] = useState({ all: 0, failed: 0 });
+  const [tabCounts, setTabCounts] = useState({ all: 0, failed: 0, inquiries: 0 });
   const [summaryHasMore, setSummaryHasMore] = useState(false);
   const [summaryIsLoadingMore, setSummaryIsLoadingMore] = useState(false);
   const [summaryLoadMoreError, setSummaryLoadMoreError] = useState<string | null>(null);
@@ -81,32 +81,75 @@ export function useAppointmentEmailTimeline() {
 
     const requestId = ++summaryRequestId.current;
     try {
-      const activeParams = {
-        limit: 25,
-        cursor: append ? summaryCursorRef.current : null,
-        tab: leftTab,
-        search: searchTerm || undefined,
-      } as const;
-      const [activeResult, countResult] = append
-        ? [await getCommunicationSummaryPageAction(activeParams), null]
-        : await Promise.all([
-          getCommunicationSummaryPageAction(activeParams),
-          getCommunicationSummaryCountsAction({ search: searchTerm || undefined }),
-        ]);
+      if (leftTab === 'inquiries') {
+        const { getOutboxLogsPageAction } = await import('@/modules/emails/actions/logs/get-outbox-logs-page.action');
+        const outboxRes = await getOutboxLogsPageAction({
+          limit: 25,
+          cursor: append ? summaryCursorRef.current : null,
+          category: 'INQUIRIES',
+          search: searchTerm || undefined,
+        });
+        if (requestId !== summaryRequestId.current) return;
+        if (!outboxRes.success || !outboxRes.data) throw new Error(outboxRes.error || 'Could not load inquiry history.');
+        const mappedCards: AppointmentCardData[] = outboxRes.data.items.map((log) => {
+          const payload = (log.payload as any) || {};
+          const guestName = `${payload.firstName || ''} ${payload.lastName || ''}`.trim() || payload.patientName || payload.guestEmail || payload.email || 'Guest Inquiry';
+          const label = log.eventType === 'REJECT_INQUIRY' ? 'Inquiry Declined' : 'Inquiry Received';
+          return {
+            id: log.id,
+            patientName: guestName,
+            treatmentName: label,
+            date: log.createdAt.slice(0, 10),
+            startTime: null,
+            endTime: null,
+            doctorName: '',
+            channelsUsed: { email: true, sms: false },
+            lastActivity: log.createdAt,
+            hasFailed: log.status === 'FAILED',
+            failureCount: log.retryCount || 0,
+            latestEventPreview: `${label} → ${payload.email || payload.recipientEmail || 'guest'}`,
+          };
+        });
+        setAppointmentCards((previous) => append
+          ? [...previous, ...mappedCards.filter((item) => !previous.some((existing) => existing.id === item.id))]
+          : mappedCards);
+        summaryCursorRef.current = outboxRes.data.nextCursor;
+        setSummaryHasMore(outboxRes.data.hasMore);
+        if (!append) {
+          setTabCounts((prev) => ({ ...prev, inquiries: outboxRes.data.total ?? mappedCards.length }));
+        }
+      } else {
+        const activeParams = {
+          limit: 25,
+          cursor: append ? summaryCursorRef.current : null,
+          tab: leftTab,
+          search: searchTerm || undefined,
+        } as const;
+        const [activeResult, countResult] = append
+          ? [await getCommunicationSummaryPageAction(activeParams), null]
+          : await Promise.all([
+            getCommunicationSummaryPageAction(activeParams),
+            getCommunicationSummaryCountsAction({ search: searchTerm || undefined }),
+          ]);
 
-      if (requestId !== summaryRequestId.current) return;
-      if (!activeResult.success || !activeResult.data) throw new Error(activeResult.error || 'Could not load communication history.');
-      if (!append && countResult && (!countResult.success || !countResult.data)) {
-        throw new Error(countResult.error || 'Could not load communication totals.');
-      }
+        if (requestId !== summaryRequestId.current) return;
+        if (!activeResult.success || !activeResult.data) throw new Error(activeResult.error || 'Could not load communication history.');
+        if (!append && countResult && (!countResult.success || !countResult.data)) {
+          throw new Error(countResult.error || 'Could not load communication totals.');
+        }
 
-      setAppointmentCards((previous) => append
-        ? [...previous, ...activeResult.data.items.filter((item) => !previous.some((existing) => existing.id === item.id))]
-        : activeResult.data.items);
-      summaryCursorRef.current = activeResult.data.nextCursor;
-      setSummaryHasMore(activeResult.data.hasMore);
-      if (!append) {
-        setTabCounts(countResult?.data ?? { all: activeResult.data.total ?? 0, failed: 0 });
+        setAppointmentCards((previous) => append
+          ? [...previous, ...activeResult.data.items.filter((item) => !previous.some((existing) => existing.id === item.id))]
+          : activeResult.data.items);
+        summaryCursorRef.current = activeResult.data.nextCursor;
+        setSummaryHasMore(activeResult.data.hasMore);
+        if (!append) {
+          setTabCounts((prev) => ({
+            all: countResult?.data?.all ?? prev.all,
+            failed: countResult?.data?.failed ?? prev.failed,
+            inquiries: prev.inquiries,
+          }));
+        }
       }
       hasLoadedSummary.current = true;
     } catch (cause) {
@@ -153,18 +196,39 @@ export function useAppointmentEmailTimeline() {
 
     const requestId = ++timelineRequestId.current;
     try {
-      const res = await getAppointmentCommunicationPageAction({
-        appointmentId,
-        limit: 25,
-        cursor: append ? timelineCursorRef.current : null,
-      });
-      if (requestId !== timelineRequestId.current) return;
-      if (!res.success || !res.data) throw new Error(res.error || 'Could not load communication timeline.');
-      setEmailLogs((previous) => append
-        ? [...previous, ...res.data.items.filter((item) => !previous.some((existing) => existing.id === item.id))]
-        : res.data.items);
-      timelineCursorRef.current = res.data.nextCursor;
-      setTimelineHasMore(res.data.hasMore);
+      if (leftTab === 'inquiries') {
+        const { getOutboxLogByIdAction } = await import('@/modules/emails/actions/logs/get-outbox-log-by-id.action');
+        const res = await getOutboxLogByIdAction(appointmentId);
+        if (requestId !== timelineRequestId.current) return;
+        if (!res.success || !('data' in res)) throw new Error((res as any).error || 'Could not load inquiry detail.');
+        const singleItem: AppointmentCommunicationSummaryDto = {
+          id: res.data.id,
+          channel: res.data.eventType.endsWith('_SMS') ? 'SMS' : 'EMAIL',
+          eventType: res.data.eventType,
+          status: res.data.status === 'PROCESSED' ? 'PROCESSED' : res.data.status,
+          recipient: (res.data.payload as any)?.email || (res.data.payload as any)?.guestEmail || (res.data.payload as any)?.recipientEmail || 'guest',
+          createdAt: res.data.createdAt,
+          retryCount: res.data.retryCount || 0,
+          errorLogs: res.data.errorLogs || null,
+          payload: res.data.payload,
+        };
+        setEmailLogs([singleItem]);
+        timelineCursorRef.current = null;
+        setTimelineHasMore(false);
+      } else {
+        const res = await getAppointmentCommunicationPageAction({
+          appointmentId,
+          limit: 25,
+          cursor: append ? timelineCursorRef.current : null,
+        });
+        if (requestId !== timelineRequestId.current) return;
+        if (!res.success || !res.data) throw new Error(res.error || 'Could not load communication timeline.');
+        setEmailLogs((previous) => append
+          ? [...previous, ...res.data.items.filter((item) => !previous.some((existing) => existing.id === item.id))]
+          : res.data.items);
+        timelineCursorRef.current = res.data.nextCursor;
+        setTimelineHasMore(res.data.hasMore);
+      }
     } catch (cause) {
       if (requestId === timelineRequestId.current) {
         if (append) setTimelineLoadMoreError(cause instanceof Error ? cause.message : 'Could not load more timeline entries.');
@@ -177,7 +241,7 @@ export function useAppointmentEmailTimeline() {
         timelineLoadingMoreRef.current = false;
       }
     }
-  }, []);
+  }, [leftTab]);
 
   const selectedAppointment = useMemo(
     () => appointmentCards.find((appointment) => appointment.id === selectedAppointmentId) ?? null,

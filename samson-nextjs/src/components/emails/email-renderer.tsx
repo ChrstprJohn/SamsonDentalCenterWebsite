@@ -18,12 +18,13 @@ interface RenderedEmailFrameProps {
 }
 
 export function RenderedEmailFrame({ eventType, payload }: RenderedEmailFrameProps) {
-  const patientName = payload.patientName || payload.accountHolderName || payload.firstName || 'Valued Patient';
+  const fullName = [payload.firstName, payload.lastName].filter(Boolean).join(' ');
+  const patientName = payload.patientName || payload.accountHolderName || fullName || 'Valued Patient';
   const serviceName = payload.serviceName || 'Dental Treatment';
   const doctorName = payload.doctorName || 'Dr. Assigned Dentist';
-  const dateStr = payload.dateStr || payload.appointmentDate || 'Jun 4, 2026';
-  const timeRangeStr = payload.timeRangeStr || '09:00 AM - 09:30 AM';
-  const appointmentId = payload.appointmentId || 'APT-SAMPLE';
+  const dateStr = payload.dateStr || payload.appointmentDate || payload.preferredDate || 'Jun 4, 2026';
+  const timeRangeStr = payload.timeRangeStr || payload.preferredStartTime || '09:00 AM - 09:30 AM';
+  const appointmentId = payload.appointmentId || payload.inquiryId || 'APT-SAMPLE';
   const otpCode = payload.otpCode || '123456';
   const chatToken = payload.chatToken || '';
   const baseUrl = payload.baseUrl || 'http://localhost:3000';
@@ -38,7 +39,16 @@ export function RenderedEmailFrame({ eventType, payload }: RenderedEmailFramePro
     return <ResetPasswordOtpEmail firstName={patientName} otpCode={otpCode} />;
   }
 
-  if (eventType === 'APPOINTMENT_BOOKED' || eventType.includes('REQUEST_RECEIVED')) {
+  if (eventType === 'APPOINTMENT_BOOKED' || eventType === 'APPOINTMENT_INQUIRY_RECEIVED' || eventType.includes('INQUIRY') || eventType.includes('REQUEST_RECEIVED')) {
+    if (eventType === 'REJECT_INQUIRY') {
+      return (
+        <RequestRejectedEmail
+          patientName={patientName}
+          rejectionReason={rejectionReason}
+          baseUrl={baseUrl}
+        />
+      );
+    }
     return (
       <AppointmentRequestReceivedEmail
         accountHolderName={payload.accountHolderName || patientName}

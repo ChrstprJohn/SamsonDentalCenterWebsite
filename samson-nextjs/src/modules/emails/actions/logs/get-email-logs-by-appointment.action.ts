@@ -12,10 +12,22 @@ export async function getEmailLogsByAppointmentAction(appointmentId: string) {
 
     const supabase = await createAdminClient();
 
+    // Check if appointment originated from an inquiry
+    const { data: inquiryRecord } = await supabase
+      .from('appointment_inquiries')
+      .select('id')
+      .eq('linked_appointment_id', parsedId)
+      .maybeSingle();
+
+    const linkedInquiryId = inquiryRecord?.id as string | undefined;
+    const matchFilter = linkedInquiryId
+      ? `appointment_id.eq.${parsedId},payload->>appointmentId.eq.${parsedId},payload->>inquiryId.eq.${linkedInquiryId}`
+      : `appointment_id.eq.${parsedId},payload->>appointmentId.eq.${parsedId}`;
+
     let { data, error } = await supabase
       .from('outbox')
       .select('id, event_type, status, error_logs, retry_count, created_at')
-      .eq('appointment_id', parsedId)
+      .or(matchFilter)
       .order('created_at', { ascending: false })
       .limit(100);
 

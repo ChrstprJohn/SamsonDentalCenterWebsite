@@ -21,6 +21,7 @@ import { SecretaryListSkeleton, SecretaryListSkeletonTheme } from './sub-compone
 
 // UI Label Mappings for Event Types (Guest vs Patient distinction noted in code comments)
 const EVENT_NAME_MAP: Record<string, string> = {
+  'APPOINTMENT_INQUIRY_RECEIVED': 'Inquiry Received (Email)',
   'APPOINTMENT_BOOKED': 'Booking Confirmation (Email)',
   'APPOINTMENT_CONVERTED_FROM_INQUIRY': 'Inquiry Approved (Email)', // Guest inquiry conversion email
   'APPOINTMENT_CONVERTED_FROM_INQUIRY_PATIENT': 'Inquiry Approved (Email)', // Patient inquiry conversion email
@@ -99,10 +100,7 @@ function formatTimeRange(start: string | null, end: string | null) {
   return '';
 }
 
-const LEFT_TABS: { key: LeftTab; label: string }[] = [
-  { key: 'all', label: 'All Logs' },
-  { key: 'failed', label: 'Failed / Delivery Alerts' },
-];
+
 
 function AppointmentCard({
   app,
@@ -278,47 +276,55 @@ function TimelineEntryCard({ entry, onResend, resendingId }: { entry: TimelineEn
 
             {isLoadingPayload ? <div className="text-xs text-muted-foreground">Loading communication details...</div> : null}
             {payloadError ? <div className="text-xs text-destructive">{payloadError}</div> : null}
-            {!isLoadingPayload && !payloadError && payload ? <>
-            {/* Sub-tabs for Preview vs Payload */}
-            <div className="flex gap-1 border-b border-card-border/40 pb-1 text-xs">
-              <button
-                onClick={() => setActiveDetailTab('preview')}
-                className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors ${
-                  activeDetailTab === 'preview'
-                    ? 'bg-primary/10 text-primary font-semibold'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                {isEmail ? '📧 Email Preview' : '💬 Message Preview'}
-              </button>
-              <button
-                onClick={() => setActiveDetailTab('payload')}
-                className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors ${
-                  activeDetailTab === 'payload'
-                    ? 'bg-primary/10 text-primary font-semibold'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                {'{ }'} Technical Payload
-              </button>
-            </div>
+            {!isLoadingPayload && !payloadError && payload ? (
+              <>
+                {/* Sub-tabs for Preview vs Payload */}
+                <div className="flex gap-1 border-b border-card-border/40 pb-1 text-xs">
+                  <button
+                    onClick={() => setActiveDetailTab('preview')}
+                    className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors ${
+                      activeDetailTab === 'preview'
+                        ? 'bg-primary/10 text-primary font-semibold'
+                        : 'text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    {isEmail ? '📧 Email Preview' : '💬 Message Preview'}
+                  </button>
+                  <button
+                    onClick={() => setActiveDetailTab('payload')}
+                    className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors ${
+                      activeDetailTab === 'payload'
+                        ? 'bg-primary/10 text-primary font-semibold'
+                        : 'text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    {'{ }'} Technical Payload
+                  </button>
+                </div>
 
-            {activeDetailTab === 'preview' ? (
-              <div className="rounded-xl border border-card-border/60 overflow-hidden shadow-2xs bg-white text-black max-h-[500px] overflow-y-auto">
-                {renderActualEmailComponent(entry.eventType, payload)}
-              </div>
-            ) : (
-              <div className="bg-secondary-bg/30 border border-card-border/40 rounded-lg p-2.5 text-[11px] font-mono text-text-secondary leading-relaxed whitespace-pre-wrap max-h-48 overflow-y-auto">
-                {JSON.stringify(payload, null, 2)}
-              </div>
-            )}
-            </> : null}
+                {activeDetailTab === 'preview' ? (
+                  <div className="rounded-xl border border-card-border/60 overflow-hidden shadow-2xs bg-white text-black max-h-[500px] overflow-y-auto">
+                    {renderActualEmailComponent(entry.eventType, payload)}
+                  </div>
+                ) : (
+                  <div className="bg-secondary-bg/30 border border-card-border/40 rounded-lg p-2.5 text-[11px] font-mono text-text-secondary leading-relaxed whitespace-pre-wrap max-h-48 overflow-y-auto">
+                    {JSON.stringify(payload, null, 2)}
+                  </div>
+                )}
+              </>
+            ) : null}
           </div>
         )}
       </div>
     </div>
   );
 }
+
+const LEFT_TABS: { key: LeftTab; label: string }[] = [
+  { key: 'all', label: 'All Appointments' },
+  { key: 'failed', label: 'Failed' },
+  { key: 'inquiries', label: 'Inquiries & Rejections' },
+];
 
 export function AppointmentEmailTimelineView() {
   const {

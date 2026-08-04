@@ -38,7 +38,13 @@ function applyFilters(query: any, params: GetOutboxLogsPageDto) {
     filtered = filtered.or('event_type.like.%_SMS,payload->>phone.not.is.null,payload->>mobileNumber.not.is.null,payload->>recipientPhone.not.is.null,payload->>phoneNumber.not.is.null');
   }
   if (params.channel === 'EMAIL') filtered = filtered.not('event_type', 'like', '%_SMS');
-  if (params.onlyAppointments) filtered = filtered.not('event_type', 'in', '(PATIENT_REGISTERED,PASSWORD_RESET_REQUESTED)');
+  if (params.category === 'APPOINTMENTS') {
+    filtered = filtered.not('event_type', 'in', '(APPOINTMENT_INQUIRY_RECEIVED,REJECT_INQUIRY,PATIENT_REGISTERED,PASSWORD_RESET_REQUESTED)');
+  } else if (params.category === 'INQUIRIES') {
+    filtered = filtered.in('event_type', ['APPOINTMENT_INQUIRY_RECEIVED', 'REJECT_INQUIRY']);
+  } else if (params.onlyAppointments) {
+    filtered = filtered.not('event_type', 'in', '(PATIENT_REGISTERED,PASSWORD_RESET_REQUESTED)');
+  }
   if (params.search) {
     const pattern = `%${escapeIlike(params.search)}%`;
     filtered = filtered.or(`event_type.ilike.${pattern},payload->>email.ilike.${pattern},payload->>guestEmail.ilike.${pattern},payload->>phone.ilike.${pattern},payload->>mobileNumber.ilike.${pattern},payload->>recipientPhone.ilike.${pattern},payload->>phoneNumber.ilike.${pattern}`);
