@@ -97,6 +97,7 @@ export const getAppointmentCommunicationPageQuery = (supabase: SupabaseClient) =
         createdAt: String(record.created_at || new Date().toISOString()),
         channel,
         recipient: recipient || 'system',
+        payload,
       };
     });
     const last = page.at(-1);
