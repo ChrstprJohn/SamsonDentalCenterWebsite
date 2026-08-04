@@ -94,9 +94,7 @@ export const onAppointmentBookedSubscriber = {
 
     const baseUrl = getBaseUrl();
 
-    const subject = patientType === 'DEPENDENT'
-      ? 'Family Member Appointment Request Received – Samson Dental Center'
-      : 'Appointment Request Received – Samson Dental Center';
+    const subject = "We've Received Your Booking Request";
 
     // Send email using Resend
     await ResendService.sendTemplatedEmail(

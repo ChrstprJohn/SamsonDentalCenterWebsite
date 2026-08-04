@@ -65,7 +65,7 @@ export const onPostCareReviewSubscriber = {
 
     await ResendService.sendTemplatedEmail(
       email,
-      'Thank You for Your Visit – Samson Dental Center',
+      'Thank You for Your Visit',
       'post_care',
       {
         patientName,

@@ -46,7 +46,7 @@ describe('resendReminderAction', () => {
 
   it('successfully resends a 24H reminder', async () => {
     const res = await resendReminderAction({
-      appointmentId: '12345678-1234-1234-1234-123456789012',
+      appointmentId: 'da95a63c-333e-4b68-98e3-82bdf1a07bd1',
       reminderType: '24H',
     });
 

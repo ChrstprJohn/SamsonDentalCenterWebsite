@@ -43,7 +43,7 @@ describe('onStaffReplySubscriber', () => {
     expect(createAdminClient).toHaveBeenCalled();
     expect(ResendService.sendTemplatedEmail).toHaveBeenCalledWith(
       'patient@example.com',
-      'New message from Samson Dental Center regarding your appointment',
+      'You Have a New Message',
       'staff_reply',
       expect.objectContaining({
         patientName: 'John Doe',

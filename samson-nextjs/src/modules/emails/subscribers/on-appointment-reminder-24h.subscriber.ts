@@ -84,7 +84,7 @@ export const onAppointmentReminder24hSubscriber = {
 
     await ResendService.sendTemplatedEmail(
       email,
-      'Appointment Reminder (24 Hours) – Samson Dental Center',
+      'Reminder: Your Appointment is Tomorrow',
       'appointment_reminder',
       {
         reminderTitle: '24-Hour Appointment Reminder',

@@ -185,6 +185,8 @@ export function EmailDesignPreview({
             ? "Thank you for choosing Samson Dental Center. We look forward to welcoming you soon."
             : isPostCare
             ? "Thank you for choosing Samson Dental Center. We're dedicated to providing you with the best possible dental care experience."
+            : isStaffReply
+            ? "Thank you for choosing Samson Dental Center. We look forward to assisting you."
             : `Thank you for choosing Samson Dental Center. We can't wait to see you on ${sample.dateStr || 'your appointment date'} at ${sample.timeRangeStr || 'the scheduled time'}.`
           }
         </p>

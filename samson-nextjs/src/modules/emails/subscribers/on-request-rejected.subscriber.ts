@@ -54,7 +54,7 @@ export const onRequestRejectedSubscriber = {
 
     await ResendService.sendTemplatedEmail(
       recipientEmail,
-      'Update on Your Booking Request – Samson Dental Center',
+      'Update on Your Booking Request',
       'request_rejected',
       {
         patientName: patientName || 'Valued Patient',

@@ -58,7 +58,7 @@ export const onStaffReplySubscriber = {
 
     await ResendService.sendTemplatedEmail(
       recipientEmail,
-      'New message from Samson Dental Center regarding your appointment',
+      'You Have a New Message',
       'staff_reply' as any,
       {
         patientName,

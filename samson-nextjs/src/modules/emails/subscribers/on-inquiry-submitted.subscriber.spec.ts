@@ -38,7 +38,7 @@ describe('onInquirySubmittedSubscriber', () => {
 
     expect(ResendService.sendTemplatedEmail).toHaveBeenCalledWith(
       'john.doe@example.com',
-      'Appointment Request Received – Samson Dental Center',
+      "We've Received Your Booking Request",
       'appointment_request_received',
       expect.objectContaining({
         accountHolderName: 'John Doe',

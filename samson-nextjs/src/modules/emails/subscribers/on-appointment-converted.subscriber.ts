@@ -87,7 +87,7 @@ export const onAppointmentConvertedSubscriber = {
     const end = calculateEndTime(startTime, duration);
     const timeRangeStr = `${formatClinicTime(start)} - ${formatClinicTime(end)}`;
 
-    const subject = 'Appointment Confirmed – Samson Dental Center';
+    const subject = 'Your Appointment is Confirmed';
 
     const { data: appt } = await supabaseAdmin
       .from('appointments')

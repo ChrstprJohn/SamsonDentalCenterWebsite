@@ -61,7 +61,7 @@ export const onCancelBookingSubscriber = {
 
     await ResendService.sendTemplatedEmail(
       recipientEmail,
-      'Appointment Cancelled – Samson Dental Center',
+      'Your Appointment Has Been Cancelled',
       'appointment_cancelled',
       {
         patientName: patientName || 'Valued Patient',

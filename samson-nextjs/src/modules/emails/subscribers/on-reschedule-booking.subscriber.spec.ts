@@ -46,7 +46,7 @@ describe('onRescheduleBookingSubscriber', () => {
     expect(createAdminClient).toHaveBeenCalled();
     expect(ResendService.sendTemplatedEmail).toHaveBeenCalledWith(
       'patient@example.com',
-      'Appointment Rescheduled – Samson Dental Center',
+      'Your Appointment Has Been Rescheduled',
       'appointment_rescheduled',
       expect.objectContaining({
         patientName: 'John Doe',

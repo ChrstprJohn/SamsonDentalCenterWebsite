@@ -37,7 +37,7 @@ export const onInquirySubmittedSubscriber = {
 
     await ResendService.sendTemplatedEmail(
       email,
-      'Appointment Request Received – Samson Dental Center',
+      "We've Received Your Booking Request",
       'appointment_request_received',
       {
         accountHolderName: patientName,

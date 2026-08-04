@@ -72,7 +72,7 @@ export const onManualBookingPatientSubscriber = {
 
     await ResendService.sendTemplatedEmail(
       patient.email,
-      'Appointment Confirmed – Samson Dental Center',
+      'Your Appointment is Confirmed',
       'appointment_confirmed',
       {
         patientName,
