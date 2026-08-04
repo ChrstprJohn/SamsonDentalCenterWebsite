@@ -1,0 +1,177 @@
+import React from 'react';
+import { Input } from '@/components/ui/input';
+import { PRESET_SCENARIOS } from './constants';
+import { SampleData } from './types';
+
+export interface DynamicDataControlsProps {
+  sample: SampleData;
+  visibleFields: Set<string>;
+  onUpdateField: <K extends keyof SampleData>(key: K, value: SampleData[K]) => void;
+  onApplyPreset: (presetData: SampleData) => void;
+  onClearAll: () => void;
+}
+
+export function DynamicDataControls({
+  sample,
+  visibleFields,
+  onUpdateField,
+  onApplyPreset,
+  onClearAll,
+}: DynamicDataControlsProps) {
+  return (
+    <aside className="hidden h-full min-h-0 flex-col border-t border-border bg-sidebar xl:flex xl:border-l xl:border-t-0 overflow-hidden">
+      <div className="flex h-[61px] items-center border-b border-border p-4 shrink-0 bg-sidebar">
+        <div>
+          <div className="text-base font-medium text-foreground">Dynamic Data Controls</div>
+          <p className="text-[11px] text-muted-foreground">Edit sample data fields live</p>
+        </div>
+      </div>
+
+      <div
+        data-lenis-prevent
+        style={{ scrollbarWidth: 'thin' }}
+        className="flex-1 min-h-0 !overflow-y-auto space-y-4 p-4 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
+      >
+        <div>
+          <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">Quick Presets</div>
+          <div className="flex flex-wrap gap-1.5">
+            {PRESET_SCENARIOS.map((preset) => (
+              <button
+                key={preset.label}
+                type="button"
+                onClick={() => onApplyPreset(preset.data)}
+                className="rounded-lg border border-border bg-background px-2.5 py-1.5 text-[11px] font-medium text-foreground transition hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+              >
+                {preset.label}
+              </button>
+            ))}
+            <button
+              type="button"
+              onClick={onClearAll}
+              className="rounded-lg border border-destructive/30 bg-destructive/10 px-2.5 py-1.5 text-[11px] font-medium text-destructive transition hover:bg-destructive/20"
+            >
+              Clear All
+            </button>
+          </div>
+        </div>
+
+        <hr className="border-border/60" />
+
+        <div className="space-y-3">
+          {visibleFields.has('patientName') && (
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Guest / Patient Name</label>
+              <Input
+                value={sample.patientName}
+                onChange={(event) => onUpdateField('patientName', event.target.value)}
+                placeholder="e.g. Alice Guest"
+                className="h-9 text-xs rounded-lg bg-background"
+              />
+            </div>
+          )}
+
+          {visibleFields.has('serviceName') && (
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Treatment Service</label>
+              <Input
+                value={sample.serviceName}
+                onChange={(event) => onUpdateField('serviceName', event.target.value)}
+                placeholder="e.g. Dental Cleaning"
+                className="h-9 text-xs rounded-lg bg-background"
+              />
+            </div>
+          )}
+
+          {visibleFields.has('doctorName') && (
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Assigned Doctor</label>
+              <Input
+                value={sample.doctorName}
+                onChange={(event) => onUpdateField('doctorName', event.target.value)}
+                placeholder="e.g. Dr. Adrian Samson"
+                className="h-9 text-xs rounded-lg bg-background"
+              />
+            </div>
+          )}
+
+          {visibleFields.has('dateStr') && (
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Appointment Date</label>
+              <Input
+                value={sample.dateStr}
+                onChange={(event) => onUpdateField('dateStr', event.target.value)}
+                placeholder="e.g. Monday, June 22, 2026"
+                className="h-9 text-xs rounded-lg bg-background"
+              />
+            </div>
+          )}
+
+          {visibleFields.has('timeRangeStr') && (
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Time Range</label>
+              <Input
+                value={sample.timeRangeStr}
+                onChange={(event) => onUpdateField('timeRangeStr', event.target.value)}
+                placeholder="e.g. 2:00 PM – 2:45 PM"
+                className="h-9 text-xs rounded-lg bg-background"
+              />
+            </div>
+          )}
+
+          {visibleFields.has('appointmentId') && (
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Reference ID</label>
+              <Input
+                value={sample.appointmentId}
+                onChange={(event) => onUpdateField('appointmentId', event.target.value)}
+                placeholder="e.g. APT-GUEST-2026"
+                className="h-9 text-xs rounded-lg bg-background"
+              />
+            </div>
+          )}
+
+          {visibleFields.has('baseUrl') && (
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Base URL (Chat Redirect Link)</label>
+              <Input
+                value={sample.baseUrl}
+                onChange={(event) => onUpdateField('baseUrl', event.target.value)}
+                placeholder="e.g. http://localhost:3000"
+                className="h-9 text-xs rounded-lg bg-background"
+              />
+              <span className="text-[10px] text-muted-foreground mt-1 block font-mono">
+                Action Link Target: {sample.baseUrl || 'http://localhost:3000'}/manage?token=...
+              </span>
+            </div>
+          )}
+
+          {visibleFields.has('rejectionReason') && (
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Rejection Reason</label>
+              <textarea
+                value={sample.rejectionReason}
+                onChange={(event) => onUpdateField('rejectionReason', event.target.value)}
+                placeholder="e.g. The requested time slot is no longer available..."
+                rows={3}
+                className="w-full text-xs p-2.5 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 resize-none"
+              />
+            </div>
+          )}
+
+          {visibleFields.has('cancellationReason') && (
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Cancellation Reason</label>
+              <textarea
+                value={sample.cancellationReason}
+                onChange={(event) => onUpdateField('cancellationReason', event.target.value)}
+                placeholder="e.g. This appointment has been cancelled as requested..."
+                rows={3}
+                className="w-full text-xs p-2.5 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 resize-none"
+              />
+            </div>
+          )}
+        </div>
+      </div>
+    </aside>
+  );
+}
