@@ -78,6 +78,21 @@ export const AppointmentRescheduledEmail = ({
                   Manage Appointment
                 </a>
               </Section>
+
+              {/* Before Your Visit */}
+              <Section style={{ borderLeft: '3px solid #2563eb', paddingLeft: '14px', marginTop: '8px' }}>
+                <Text style={{ margin: '0 0 10px', fontSize: '12px', fontWeight: '700', color: '#111827', letterSpacing: '0.5px', textTransform: 'uppercase' }}>
+                  Before your visit
+                </Text>
+                <Text style={{ margin: '0 0 8px', fontSize: '13px', color: '#374151', lineHeight: '20px' }}>
+                  <strong style={{ color: '#2563eb' }}>●</strong>{' '}
+                  Please arrive 10 to 15 minutes before your scheduled time to complete check-in.
+                </Text>
+                <Text style={{ margin: '0', fontSize: '13px', color: '#374151', lineHeight: '20px' }}>
+                  <strong style={{ color: '#2563eb' }}>●</strong>{' '}
+                  If you need to reschedule or have any questions before your visit, reach out through the chat thread above or call our reception desk.
+                </Text>
+              </Section>
             </Section>
 
             {/* Footer */}

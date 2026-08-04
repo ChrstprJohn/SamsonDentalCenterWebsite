@@ -27,7 +27,8 @@ import {
   MessageSquare,
   UserCheck,
   ClipboardCheck,
-  Mail
+  Mail,
+  Paintbrush,
 } from "lucide-react"
 
 const data = {
@@ -78,6 +79,11 @@ const data = {
       title: "Communication History",
       url: "/secretary-v2/communication-logs",
       icon: <Mail className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
+    },
+    {
+      title: "Email Templates",
+      url: "/secretary-v2/email-designs",
+      icon: <Paintbrush className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
     },
     {
       title: "Clinic Management",
