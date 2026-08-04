@@ -22,6 +22,8 @@ import { InquiryToast } from './sub-components/inquiry-toast';
 
 const EVENT_NAME_MAP: Record<string, string> = {
   'APPOINTMENT_BOOKED': 'Booking Confirmation (Patient)',
+  'REJECT_INQUIRY': 'Booking Inquiry Rejected',
+  'BOOKING_REJECTED': 'Booking Inquiry Rejected',
   'APPOINTMENT_CONVERTED_FROM_INQUIRY': 'Inquiry Approved Confirmation',
   'APPOINTMENT_MANUALLY_BOOKED_PATIENT': 'Manual Booking (Patient)',
   'APPOINTMENT_MANUALLY_BOOKED_GUEST': 'Manual Booking (Guest)',
