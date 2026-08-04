@@ -56,11 +56,11 @@ describe('appointmentConvertedEventSchema', () => {
     expect(result.success).toBe(false);
   });
 
-  it('should reject missing guestEmail', () => {
+  it('should allow missing guestEmail for patient or fallback conversion', () => {
     const payloadWithoutEmail = { ...validPayload };
     delete (payloadWithoutEmail as any).guestEmail;
 
     const result = appointmentConvertedEventSchema.safeParse(payloadWithoutEmail);
-    expect(result.success).toBe(false);
+    expect(result.success).toBe(true);
   });
 });

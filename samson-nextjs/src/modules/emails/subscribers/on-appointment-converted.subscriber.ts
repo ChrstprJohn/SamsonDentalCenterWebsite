@@ -12,14 +12,54 @@ export const onAppointmentConvertedSubscriber = {
   async handle(payload: Record<string, any>): Promise<void> {
     // Contract Validation
     const parsed = appointmentConvertedEventSchema.parse(payload);
-    const { appointmentId, serviceId, doctorId, date, startTime, durationMinutes, guestName, guestEmail } = parsed;
+    const { appointmentId, serviceId, doctorId, date, startTime, durationMinutes, inquiryId } = parsed;
+
+    let recipientEmail = parsed.guestEmail || '';
+    let recipientName = parsed.guestName || '';
 
     const supabaseAdmin = await createAdminClient();
 
-    // 1. Fetch Service details
+    // 1. Fallback recipient resolution if email or name missing
+    if (!recipientEmail || !recipientName) {
+      const { data: appt } = await supabaseAdmin
+        .from('appointments')
+        .select('patient_id, guest_contacts(first_name, last_name, email), patient:users!appointments_patient_id_fkey(first_name, last_name, email)')
+        .eq('id', appointmentId)
+        .maybeSingle();
+
+      if (appt) {
+        const gcData = Array.isArray(appt.guest_contacts) ? appt.guest_contacts[0] : (appt.guest_contacts as any);
+        if (gcData && (gcData.email || gcData.first_name)) {
+          recipientEmail = recipientEmail || gcData.email || '';
+          recipientName = recipientName || `${gcData.first_name || ''} ${gcData.last_name || ''}`.trim();
+        } else if (appt.patient) {
+          recipientEmail = recipientEmail || appt.patient.email || '';
+          recipientName = recipientName || `${appt.patient.first_name || ''} ${appt.patient.last_name || ''}`.trim();
+        }
+      }
+
+      if ((!recipientEmail || !recipientName) && inquiryId) {
+        const { data: inq } = await supabaseAdmin
+          .from('appointment_inquiries')
+          .select('first_name, last_name, email')
+          .eq('id', inquiryId)
+          .maybeSingle();
+        if (inq) {
+          recipientEmail = recipientEmail || inq.email || '';
+          recipientName = recipientName || `${inq.first_name} ${inq.last_name}`;
+        }
+      }
+    }
+
+    if (!recipientEmail) {
+      console.warn(`[Appointment Converted Email] Skipping: No recipient email found for payload`, payload);
+      return;
+    }
+
+    // 2. Fetch Service details
     const { data: service, error: serviceError } = await supabaseAdmin
       .from('services')
-      .select('name')
+      .select('name, duration_minutes')
       .eq('id', serviceId)
       .single();
 
@@ -27,7 +67,9 @@ export const onAppointmentConvertedSubscriber = {
       throw new Error(`Failed to fetch service for outbox email: ${serviceError?.message || 'Not found'}`);
     }
 
-    // 2. Fetch Doctor details
+    const duration = durationMinutes || service.duration_minutes || 30;
+
+    // 3. Fetch Doctor details
     let doctorName = 'Assigned Dentist';
     if (doctorId) {
       const { data: doctor } = await supabaseAdmin
@@ -42,11 +84,10 @@ export const onAppointmentConvertedSubscriber = {
     const dateStr = formatShortDate(date);
 
     const start = startTime;
-    const end = calculateEndTime(startTime, durationMinutes);
+    const end = calculateEndTime(startTime, duration);
     const timeRangeStr = `${formatClinicTime(start)} - ${formatClinicTime(end)}`;
 
     const subject = 'Appointment Confirmed – Samson Dental Center';
-
 
     const { data: appt } = await supabaseAdmin
       .from('appointments')
@@ -59,11 +100,11 @@ export const onAppointmentConvertedSubscriber = {
 
     // Send email using Resend
     await ResendService.sendTemplatedEmail(
-      guestEmail,
+      recipientEmail,
       subject,
       'appointment_confirmed',
       {
-        patientName: guestName,
+        patientName: recipientName || 'Valued Patient',
         serviceName: service.name,
         doctorName,
         dateStr,

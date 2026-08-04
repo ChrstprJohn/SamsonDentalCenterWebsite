@@ -21,6 +21,7 @@ import { onAppointmentReminder48hSmsSubscriber } from '@/modules/emails/subscrib
 import { onPostCareReviewSubscriber } from '@/modules/emails/subscribers/on-post-care-review.subscriber';
 import { onPostCareReviewSmsSubscriber } from '@/modules/emails/subscribers/on-post-care-review-sms.subscriber';
 import { onRequestRejectedSubscriber } from '@/modules/emails/subscribers/on-request-rejected.subscriber';
+import { onInquirySubmittedSubscriber } from '@/modules/emails/subscribers/on-inquiry-submitted.subscriber';
 
 import { onCancelBookingSmsSubscriber } from '@/modules/notifications/subscribers/on-cancel-booking-sms.subscriber';
 import { onRescheduleBookingSmsSubscriber } from '@/modules/notifications/subscribers/on-reschedule-booking-sms.subscriber';
@@ -29,6 +30,7 @@ export const bootstrapEventSubscribers = () => {
   registerSubscriber('PATIENT_REGISTERED', onPatientRegisteredSubscriber.handle);
   registerSubscriber('PASSWORD_RESET_REQUESTED', onPasswordResetRequestedSubscriber.handle);
   registerSubscriber('APPOINTMENT_BOOKED', onAppointmentBookedSubscriber.handle);
+  registerSubscriber('APPOINTMENT_INQUIRY_RECEIVED', onInquirySubmittedSubscriber.handle);
   registerSubscriber('APPOINTMENT_CONVERTED_FROM_INQUIRY', onAppointmentConvertedSubscriber.handle);
   registerSubscriber('APPOINTMENT_CONVERTED_FROM_INQUIRY_PATIENT', onManualBookingPatientSubscriber.handle);
   registerSubscriber('APPOINTMENT_MANUALLY_BOOKED_GUEST', onManualBookingGuestSubscriber.handle);

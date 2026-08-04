@@ -98,8 +98,19 @@ export function calculateEndTimeFromIso(isoString: string, durationMinutes: numb
  * Example: calculateEndTime('09:00', 25) -> '09:25'
  */
 export function calculateEndTime(startTime: string, durationMinutes: number): string {
-  const [hStr, mStr] = startTime.split(':');
-  const totalMinutes = parseInt(hStr, 10) * 60 + parseInt(mStr, 10) + durationMinutes;
+  if (!startTime) return '';
+  if (typeof startTime === 'string' && (startTime.includes('T') || (startTime.includes('-') && startTime.includes(':')))) {
+    const d = new Date(startTime);
+    if (!isNaN(d.getTime())) {
+      return new Date(d.getTime() + (durationMinutes || 0) * 60000).toISOString();
+    }
+  }
+  const timePart = startTime.includes(' ') ? startTime.split(' ')[1] : startTime;
+  const [hStr, mStr] = timePart.split(':');
+  const hNum = parseInt(hStr, 10);
+  const mNum = parseInt(mStr, 10);
+  if (isNaN(hNum) || isNaN(mNum)) return startTime;
+  const totalMinutes = hNum * 60 + mNum + (durationMinutes || 0);
   const h = Math.floor(totalMinutes / 60) % 24;
   const m = totalMinutes % 60;
   return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;

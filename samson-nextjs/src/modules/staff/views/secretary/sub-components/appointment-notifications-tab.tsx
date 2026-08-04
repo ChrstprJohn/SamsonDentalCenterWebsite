@@ -201,8 +201,6 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
 
   const EVENT_LABELS: Record<string, string> = {
     'APPOINTMENT_BOOKED': 'Booking Confirmation (Email)',
-    'REJECT_INQUIRY': 'Inquiry Rejected (Email)',
-    'BOOKING_REJECTED': 'Inquiry Rejected (Email)',
     'APPOINTMENT_CONVERTED_FROM_INQUIRY': 'Inquiry Approved (Email)',
     'APPOINTMENT_CONVERTED_FROM_INQUIRY_PATIENT': 'Inquiry Approved (Email)',
     'APPOINTMENT_CONVERTED_FROM_INQUIRY_SMS': 'Inquiry Approved (SMS)',

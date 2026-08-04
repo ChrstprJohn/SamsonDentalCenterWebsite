@@ -6,11 +6,12 @@ export const appointmentConvertedEventSchema = z.object({
   doctorId: z.string().uuid().nullable().optional(),
   date: z.string(),
   startTime: z.string(),
-  durationMinutes: z.number().int().positive(),
-  inquiryId: z.string().uuid(),
-  guestName: z.string().min(1),
-  guestEmail: z.string().email(),
-  guestPhone: z.string().min(1),
+  durationMinutes: z.number().int().positive().optional().nullable(),
+  inquiryId: z.string().uuid().optional().nullable(),
+  guestName: z.string().optional().nullable(),
+  guestEmail: z.string().email().optional().nullable(),
+  guestPhone: z.string().optional().nullable(),
+  patientId: z.string().uuid().optional().nullable(),
 });
 
 export type AppointmentConvertedEventDto = z.infer<typeof appointmentConvertedEventSchema>;

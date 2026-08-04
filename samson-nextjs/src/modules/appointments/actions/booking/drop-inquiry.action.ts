@@ -22,6 +22,32 @@ export async function dropInquiryAction(data: DropInquiryDto) {
 
     // 3. Execution
     const result = await useCase(parsed);
+
+    // Emit REJECT_INQUIRY event and dispatch email outbox notification
+    try {
+      const { createAdminClient } = await import('@/shared/database/server');
+      const { outboxCommands } = await import('@/shared/outbox/outbox.commands');
+      const { globalOutboxDispatcher } = await import('@/shared/outbox/outbox.dispatcher');
+      const { bootstrapEventSubscribers } = await import('@/orchestrators/event-subscribers');
+
+      const adminDb = await createAdminClient();
+      const outbox = outboxCommands(adminDb);
+      const recipientName = `${result.firstName || ''} ${result.lastName || ''}`.trim() || 'Valued Patient';
+      const reason = parsed.secretaryNotes || 'Unfortunately, we are unable to accommodate your inquiry at this time.';
+
+      const event = await outbox.emitEvent('REJECT_INQUIRY', {
+        inquiryId: result.id,
+        recipientEmail: result.email,
+        patientName: recipientName,
+        rejectionReason: reason,
+      });
+
+      bootstrapEventSubscribers();
+      await globalOutboxDispatcher(adminDb, false, event.id)();
+    } catch (outboxErr) {
+      console.warn('Failed to emit inquiry rejection outbox event:', outboxErr);
+    }
+
     return { success: true, data: result };
   } catch (error: any) {
     if (error instanceof z.ZodError) {
