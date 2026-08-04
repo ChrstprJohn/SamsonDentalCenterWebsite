@@ -220,7 +220,7 @@ const PRESET_SCENARIOS = [
 
 const DEFAULT_COPY: Record<EmailDesignId, DraftCopy> = {
   'appointment-confirmed': {
-    subject: 'Your Appointment is Confirmed - Samson Dental Center',
+    subject: 'Your Appointment is Confirmed',
     preheader: 'Your dental appointment has been successfully booked. View your visit details inside.',
     headerLabel: 'Appointment Confirmed',
     headline: 'Your Appointment is Confirmed',
@@ -235,7 +235,7 @@ const DEFAULT_COPY: Record<EmailDesignId, DraftCopy> = {
     showFooter: true,
   },
   'reminder-24h': {
-    subject: 'Reminder: Your Appointment is Tomorrow - Samson Dental Center',
+    subject: 'Reminder: Your Appointment is Tomorrow',
     preheader: 'Your dental appointment is scheduled for tomorrow. View your details inside.',
     headerLabel: 'Appointment Reminder',
     headline: 'Your Appointment is Tomorrow',
@@ -250,7 +250,7 @@ const DEFAULT_COPY: Record<EmailDesignId, DraftCopy> = {
     showFooter: true,
   },
   'reminder-48h': {
-    subject: 'Reminder: Your Appointment is in 2 Days - Samson Dental Center',
+    subject: 'Reminder: Your Appointment is in 2 Days',
     preheader: 'Your dental appointment is coming up in 2 days. Review your visit details.',
     headerLabel: 'Appointment Reminder',
     headline: 'Your Appointment is in 2 Days',
@@ -265,7 +265,7 @@ const DEFAULT_COPY: Record<EmailDesignId, DraftCopy> = {
     showFooter: true,
   },
   cancelled: {
-    subject: 'Your Appointment Has Been Cancelled - Samson Dental Center',
+    subject: 'Your Appointment Has Been Cancelled',
     preheader: 'Your appointment cancellation has been processed. We hope to see you again soon.',
     headerLabel: 'Appointment Cancelled',
     headline: 'Your Appointment Has Been Cancelled',
@@ -280,7 +280,7 @@ const DEFAULT_COPY: Record<EmailDesignId, DraftCopy> = {
     showFooter: true,
   },
   rescheduled: {
-    subject: 'Your Appointment Has Been Rescheduled - Samson Dental Center',
+    subject: 'Your Appointment Has Been Rescheduled',
     preheader: 'Your appointment has been moved to a new date and time. Review your updated schedule.',
     headerLabel: 'Appointment Rescheduled',
     headline: 'Your Appointment Has Been Rescheduled',
@@ -295,7 +295,7 @@ const DEFAULT_COPY: Record<EmailDesignId, DraftCopy> = {
     showFooter: true,
   },
   'staff-reply': {
-    subject: 'You Have a New Message from Samson Dental Center',
+    subject: 'You Have a New Message',
     preheader: 'A member of our clinic team has sent you a message. Click to view and reply.',
     headerLabel: 'New Message',
     headline: 'A Message from Our Clinic Team',
@@ -310,7 +310,7 @@ const DEFAULT_COPY: Record<EmailDesignId, DraftCopy> = {
     showFooter: true,
   },
   'post-care': {
-    subject: 'Thank You for Your Visit - Samson Dental Center',
+    subject: 'Thank You for Your Visit',
     preheader: 'We hope your visit went well. Your feedback means a lot to us.',
     headerLabel: 'Visit Complete',
     headline: 'Thank You for Your Visit',
@@ -325,7 +325,7 @@ const DEFAULT_COPY: Record<EmailDesignId, DraftCopy> = {
     showFooter: true,
   },
   'booking-request-received': {
-    subject: 'We\'ve Received Your Booking Request - Samson Dental Center',
+    subject: 'We\'ve Received Your Booking Request',
     preheader: 'Thank you for reaching out. We will review your request and be in touch shortly.',
     headerLabel: 'Booking Request Received',
     headline: 'We\'ve Received Your Booking Request',
@@ -340,7 +340,7 @@ const DEFAULT_COPY: Record<EmailDesignId, DraftCopy> = {
     showFooter: true,
   },
   'request-rejected': {
-    subject: 'Update on Your Booking Request - Samson Dental Center',
+    subject: 'Update on Your Booking Request',
     preheader: 'An update regarding your recent booking request at Samson Dental Center.',
     headerLabel: 'Request Update',
     headline: 'Update on Your Booking Request',
@@ -604,20 +604,20 @@ export function SecretaryEmailDesignStudioView() {
   };
 
   return (
-    <div className="grid h-full min-h-0 flex-1 grid-cols-1 overflow-hidden bg-background xl:grid-cols-[280px_minmax(0,1fr)_320px]">
+    <div className="grid h-full min-h-0 flex-1 grid-cols-1 overflow-hidden bg-background xl:grid-cols-[350px_minmax(0,1fr)_320px]">
       {/* Left Sidebar: Email Template Selector */}
-      <aside
-        data-lenis-prevent
-        style={{ scrollbarWidth: 'thin' }}
-        className="hidden min-h-0 !overflow-y-auto border-r border-card-border/70 bg-card xl:block [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
-      >
-        <div className="flex h-[61px] items-center border-b border-card-border/70 p-4 shrink-0">
+      <aside className="hidden h-full min-h-0 flex-col border-r border-border bg-sidebar xl:flex overflow-hidden">
+        <div className="flex h-[61px] items-center border-b border-border p-4 shrink-0 bg-sidebar">
           <div>
             <div className="text-base font-medium text-foreground">Email Templates</div>
             <p className="text-[11px] text-muted-foreground">Select an email notification to preview</p>
           </div>
         </div>
-        <div className="space-y-4 p-3">
+        <div
+          data-lenis-prevent
+          style={{ scrollbarWidth: 'thin' }}
+          className="flex-1 min-h-0 !overflow-y-auto space-y-4 p-3 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
+        >
           {Object.entries(groupedDesigns).map(([category, designs]) => (
             <div key={category}>
               <div className="px-1 pb-2 text-[11px] font-semibold text-muted-foreground">{category}</div>
@@ -631,8 +631,8 @@ export function SecretaryEmailDesignStudioView() {
                       onClick={() => setActiveId(design.id)}
                       className={`group flex w-full items-center justify-between rounded-xl border p-3 text-left transition-all ${
                         active
-                          ? 'border-primary/40 bg-primary/5 text-foreground font-semibold shadow-2xs'
-                          : 'border-card-border/50 bg-card text-foreground hover:border-card-border hover:bg-secondary-bg/30'
+                          ? 'border-primary/40 bg-sidebar-accent text-sidebar-accent-foreground font-semibold shadow-2xs'
+                          : 'border-border/50 bg-background text-foreground hover:border-border hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
                       }`}
                     >
                       <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -655,24 +655,46 @@ export function SecretaryEmailDesignStudioView() {
       </aside>
 
       {/* Center Main: Live Email Preview */}
-      <main
-        data-lenis-prevent
-        style={{ scrollbarWidth: 'thin' }}
-        className="flex h-full min-h-0 flex-col !overflow-y-auto bg-card [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
-      >
-        <div className="flex h-[61px] items-center justify-between gap-3 bg-card p-4 shrink-0">
+      <main className="flex h-full min-h-0 flex-col bg-background overflow-hidden">
+        <div className="flex h-[61px] items-center justify-between gap-3 bg-background border-b border-border p-4 shrink-0">
           <div className="min-w-0">
             <div className="text-sm font-semibold text-foreground truncate">{activeCopy.subject}</div>
             <span className="text-[11px] text-muted-foreground truncate block mt-0.5">{activeDesign.label}</span>
           </div>
-          <div className="flex items-center gap-1 rounded-xl border border-card-border bg-secondary-bg/50 p-1 shadow-sm">
-            <Button variant={previewMode === 'desktop' ? 'secondary' : 'ghost'} size="sm" onClick={() => setPreviewMode('desktop')} className="h-7 text-xs"><Monitor className="mr-1.5 size-3.5" /> Desktop</Button>
-            <Button variant={previewMode === 'mobile' ? 'secondary' : 'ghost'} size="sm" onClick={() => setPreviewMode('mobile')} className="h-7 text-xs"><Smartphone className="mr-1.5 size-3.5" /> Mobile</Button>
+          <div className="inline-flex items-center gap-1 rounded-xl border border-border/80 bg-muted/30 p-1 shadow-2xs">
+            <button
+              type="button"
+              onClick={() => setPreviewMode('desktop')}
+              className={`inline-flex items-center justify-center rounded-lg px-3 py-1 text-xs font-medium transition-all duration-200 ${
+                previewMode === 'desktop'
+                  ? 'bg-foreground text-background shadow-xs font-semibold'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-background/60'
+              }`}
+            >
+              <Monitor className="mr-1.5 size-3.5" />
+              Desktop
+            </button>
+            <button
+              type="button"
+              onClick={() => setPreviewMode('mobile')}
+              className={`inline-flex items-center justify-center rounded-lg px-3 py-1 text-xs font-medium transition-all duration-200 ${
+                previewMode === 'mobile'
+                  ? 'bg-foreground text-background shadow-xs font-semibold'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-background/60'
+              }`}
+            >
+              <Smartphone className="mr-1.5 size-3.5" />
+              Mobile
+            </button>
           </div>
         </div>
 
-        <div className="flex-1 min-h-0 overflow-auto">
-          <div className="p-3 xl:hidden">
+        <div
+          data-lenis-prevent
+          style={{ scrollbarWidth: 'thin' }}
+          className="flex-1 min-h-0 !overflow-y-auto bg-background p-4 md:p-6 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
+        >
+          <div className="pb-4 xl:hidden">
             <Select
               label="Email template"
               value={activeId}
@@ -681,26 +703,29 @@ export function SecretaryEmailDesignStudioView() {
             />
           </div>
 
-          <div className="mx-auto transition-all duration-300 h-full" style={{ width: previewMode === 'mobile' ? 375 : '100%', minWidth: previewMode === 'mobile' ? 375 : undefined }}>
+          <div
+            className="mx-auto transition-all duration-300 bg-white"
+            style={{ width: previewMode === 'mobile' ? 375 : '100%', maxWidth: previewMode === 'mobile' ? 375 : 680 }}
+          >
             <EmailDesignPreview design={activeDesign} tokens={DEFAULT_TOKENS} copy={activeCopy} sample={sample} />
           </div>
         </div>
       </main>
 
       {/* Right Sidebar: Dynamic Data Controls */}
-      <aside
-        data-lenis-prevent
-        style={{ scrollbarWidth: 'thin' }}
-        className="hidden min-h-0 !overflow-y-auto border-t border-card-border/70 bg-card xl:block xl:border-l xl:border-t-0 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
-      >
-        <div className="flex h-[61px] items-center border-b border-card-border/70 p-4 shrink-0">
+      <aside className="hidden h-full min-h-0 flex-col border-t border-border bg-sidebar xl:flex xl:border-l xl:border-t-0 overflow-hidden">
+        <div className="flex h-[61px] items-center border-b border-border p-4 shrink-0 bg-sidebar">
           <div>
             <div className="text-base font-medium text-foreground">Dynamic Data Controls</div>
             <p className="text-[11px] text-muted-foreground">Edit sample data fields live</p>
           </div>
         </div>
 
-        <div className="space-y-4 p-4">
+        <div
+          data-lenis-prevent
+          style={{ scrollbarWidth: 'thin' }}
+          className="flex-1 min-h-0 !overflow-y-auto space-y-4 p-4 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
+        >
           <div>
             <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">Quick Presets</div>
             <div className="flex flex-wrap gap-1.5">
@@ -709,7 +734,7 @@ export function SecretaryEmailDesignStudioView() {
                   key={preset.label}
                   type="button"
                   onClick={() => applyPreset(preset.data)}
-                  className="rounded-lg border border-border bg-secondary-bg/50 px-2.5 py-1.5 text-[11px] font-medium text-foreground transition hover:bg-accent hover:text-accent-foreground"
+                  className="rounded-lg border border-border bg-background px-2.5 py-1.5 text-[11px] font-medium text-foreground transition hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                 >
                   {preset.label}
                 </button>
@@ -717,7 +742,7 @@ export function SecretaryEmailDesignStudioView() {
               <button
                 type="button"
                 onClick={clearAllFields}
-                className="rounded-lg border border-red-200 bg-red-50 px-2.5 py-1.5 text-[11px] font-medium text-red-600 transition hover:bg-red-100"
+                className="rounded-lg border border-destructive/30 bg-destructive/10 px-2.5 py-1.5 text-[11px] font-medium text-destructive transition hover:bg-destructive/20"
               >
                 Clear All
               </button>
@@ -734,7 +759,7 @@ export function SecretaryEmailDesignStudioView() {
                   value={sample.patientName}
                   onChange={(event) => updateSampleField('patientName', event.target.value)}
                   placeholder="e.g. Alice Guest"
-                  className="h-9 text-xs rounded-lg"
+                  className="h-9 text-xs rounded-lg bg-background"
                 />
               </div>
             )}
@@ -746,7 +771,7 @@ export function SecretaryEmailDesignStudioView() {
                   value={sample.serviceName}
                   onChange={(event) => updateSampleField('serviceName', event.target.value)}
                   placeholder="e.g. Dental Cleaning"
-                  className="h-9 text-xs rounded-lg"
+                  className="h-9 text-xs rounded-lg bg-background"
                 />
               </div>
             )}
@@ -758,7 +783,7 @@ export function SecretaryEmailDesignStudioView() {
                   value={sample.doctorName}
                   onChange={(event) => updateSampleField('doctorName', event.target.value)}
                   placeholder="e.g. Dr. Adrian Samson"
-                  className="h-9 text-xs rounded-lg"
+                  className="h-9 text-xs rounded-lg bg-background"
                 />
               </div>
             )}
@@ -770,7 +795,7 @@ export function SecretaryEmailDesignStudioView() {
                   value={sample.dateStr}
                   onChange={(event) => updateSampleField('dateStr', event.target.value)}
                   placeholder="e.g. Monday, June 22, 2026"
-                  className="h-9 text-xs rounded-lg"
+                  className="h-9 text-xs rounded-lg bg-background"
                 />
               </div>
             )}
@@ -782,7 +807,7 @@ export function SecretaryEmailDesignStudioView() {
                   value={sample.timeRangeStr}
                   onChange={(event) => updateSampleField('timeRangeStr', event.target.value)}
                   placeholder="e.g. 2:00 PM – 2:45 PM"
-                  className="h-9 text-xs rounded-lg"
+                  className="h-9 text-xs rounded-lg bg-background"
                 />
               </div>
             )}
@@ -794,7 +819,7 @@ export function SecretaryEmailDesignStudioView() {
                   value={sample.appointmentId}
                   onChange={(event) => updateSampleField('appointmentId', event.target.value)}
                   placeholder="e.g. APT-GUEST-2026"
-                  className="h-9 text-xs rounded-lg"
+                  className="h-9 text-xs rounded-lg bg-background"
                 />
               </div>
             )}
@@ -806,13 +831,14 @@ export function SecretaryEmailDesignStudioView() {
                   value={sample.baseUrl}
                   onChange={(event) => updateSampleField('baseUrl', event.target.value)}
                   placeholder="e.g. http://localhost:3000"
-                  className="h-9 text-xs rounded-lg"
+                  className="h-9 text-xs rounded-lg bg-background"
                 />
                 <span className="text-[10px] text-muted-foreground mt-1 block font-mono">
                   Action Link Target: {sample.baseUrl || 'http://localhost:3000'}/manage?token=...
                 </span>
               </div>
             )}
+
             {visibleFields.has('rejectionReason') && (
               <div>
                 <label className="block text-xs font-medium text-muted-foreground mb-1">Rejection Reason</label>
