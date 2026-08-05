@@ -138,3 +138,20 @@ export function getClinicNaiveDate(d: Date = new Date()): Date {
   return new Date(d.getTime() - clinicOffsetMinutes * 60 * 1000);
 }
 
+/**
+ * Formats an appointment or inquiry ID into a short unique reference string.
+ * Example: 'd9b7f54c-1111-4444-9999-555555555555' -> 'D9B7F54C'
+ */
+export function formatRefId(id?: string): string {
+  if (!id) return '';
+  const clean = id.trim();
+  if (clean.includes('-')) {
+    const parts = clean.split('-');
+    if (parts[0].length >= 4) {
+      return parts[0].toUpperCase();
+    }
+    return parts.slice(0, 2).join('-').toUpperCase();
+  }
+  return clean.slice(0, 8).toUpperCase();
+}
+

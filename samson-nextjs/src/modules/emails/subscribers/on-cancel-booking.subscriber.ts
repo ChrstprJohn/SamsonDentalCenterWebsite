@@ -1,6 +1,6 @@
 import { createAdminClient } from '@/shared/database/server';
 import { ResendService } from '@/shared/services/email/resend.service';
-import { formatShortDate } from '@/shared/utils/date.util';
+import { formatShortDate, formatRefId } from '@/shared/utils/date.util';
 import { getBaseUrl } from '@/shared/utils/get-base-url.util';
 
 export const onCancelBookingSubscriber = {
@@ -58,10 +58,12 @@ export const onCancelBookingSubscriber = {
     const dateStr = formatShortDate(date);
     const cancellationReason = payload.cancellationReason || payload.reason || 'This appointment has been cancelled as requested.';
     const baseUrl = getBaseUrl();
+    const ref = formatRefId(appointmentId);
+    const subject = `Your Appointment Has Been Cancelled${ref ? ` [Ref: ${ref}]` : ''}`;
 
     await ResendService.sendTemplatedEmail(
       recipientEmail,
-      'Your Appointment Has Been Cancelled',
+      subject,
       'appointment_cancelled',
       {
         patientName: patientName || 'Valued Patient',

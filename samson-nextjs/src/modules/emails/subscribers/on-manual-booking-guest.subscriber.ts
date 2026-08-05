@@ -1,7 +1,7 @@
 import { createAdminClient } from '@/shared/database/server';
 import { ResendService } from '@/shared/services/email/resend.service';
 import { manualBookingGuestEventSchema } from '../dtos/events/manual-booking-guest.event.dto';
-import { formatShortDate, formatClinicTime, calculateEndTime } from '@/shared/utils/date.util';
+import { formatShortDate, formatClinicTime, calculateEndTime, formatRefId } from '@/shared/utils/date.util';
 import { getBaseUrl } from '@/shared/utils/get-base-url.util';
 
 export const onManualBookingGuestSubscriber = {
@@ -53,10 +53,12 @@ export const onManualBookingGuestSubscriber = {
 
     const chatToken = appt?.chat_token || '';
     const baseUrl = getBaseUrl();
+    const ref = formatRefId(appointmentId);
+    const subject = `Your Appointment is Confirmed${ref ? ` [Ref: ${ref}]` : ''}`;
 
     await ResendService.sendTemplatedEmail(
       guestEmail,
-      'Your Appointment is Confirmed',
+      subject,
       'appointment_confirmed',
       {
         patientName: guestName,

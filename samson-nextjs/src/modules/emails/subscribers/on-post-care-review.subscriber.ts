@@ -1,6 +1,6 @@
 import { createAdminClient } from '@/shared/database/server';
 import { ResendService } from '@/shared/services/email/resend.service';
-import { formatShortDate } from '@/shared/utils/date.util';
+import { formatShortDate, formatRefId } from '@/shared/utils/date.util';
 import { getBaseUrl } from '@/shared/utils/get-base-url.util';
 
 export const onPostCareReviewSubscriber = {
@@ -63,10 +63,12 @@ export const onPostCareReviewSubscriber = {
       : 'your Samson Dental Team';
 
     const baseUrl = getBaseUrl();
+    const ref = formatRefId(appointmentId);
+    const subject = `Thank You for Your Visit${ref ? ` [Ref: ${ref}]` : ''}`;
 
     await ResendService.sendTemplatedEmail(
       email,
-      'Thank You for Your Visit',
+      subject,
       'post_care',
       {
         patientName,

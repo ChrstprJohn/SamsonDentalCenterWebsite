@@ -1,6 +1,6 @@
 import { createAdminClient } from '@/shared/database/server';
 import { ResendService } from '@/shared/services/email/resend.service';
-import { formatShortDate, formatClinicTime, calculateEndTime } from '@/shared/utils/date.util';
+import { formatShortDate, formatClinicTime, calculateEndTime, formatRefId } from '@/shared/utils/date.util';
 import { getBaseUrl } from '@/shared/utils/get-base-url.util';
 
 export const onAppointmentReminder48hSubscriber = {
@@ -77,10 +77,12 @@ export const onAppointmentReminder48hSubscriber = {
       timeRangeStr = end ? `${formatClinicTime(start)} - ${formatClinicTime(end)}` : formatClinicTime(start);
     }
     const baseUrl = getBaseUrl();
+    const ref = formatRefId(appointmentId);
+    const subject = `Reminder: Your Appointment is in 2 Days${ref ? ` [Ref: ${ref}]` : ''}`;
 
     await ResendService.sendTemplatedEmail(
       email,
-      'Reminder: Your Appointment is in 2 Days',
+      subject,
       'appointment_reminder',
       {
         reminderTitle: '48-Hour Appointment Reminder',

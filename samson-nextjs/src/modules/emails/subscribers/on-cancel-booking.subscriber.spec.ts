@@ -45,7 +45,7 @@ describe('onCancelBookingSubscriber', () => {
     expect(createAdminClient).toHaveBeenCalled();
     expect(ResendService.sendTemplatedEmail).toHaveBeenCalledWith(
       'patient@example.com',
-      'Your Appointment Has Been Cancelled',
+      expect.stringContaining('Your Appointment Has Been Cancelled'),
       'appointment_cancelled',
       expect.objectContaining({
         patientName: 'John Doe',

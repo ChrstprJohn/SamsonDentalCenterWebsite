@@ -1,5 +1,6 @@
 import { createAdminClient } from '@/shared/database/server';
 import { ResendService } from '@/shared/services/email/resend.service';
+import { formatRefId } from '@/shared/utils/date.util';
 import { getBaseUrl } from '@/shared/utils/get-base-url.util';
 
 export const onRequestRejectedSubscriber = {
@@ -51,10 +52,12 @@ export const onRequestRejectedSubscriber = {
 
     const baseUrl = getBaseUrl();
     const reason = rejectionReason || payload.reason || 'Unfortunately, we are unable to accommodate your request at this time.';
+    const ref = formatRefId(appointmentId || inquiryId);
+    const subject = `Update on Your Booking Request${ref ? ` [Ref: ${ref}]` : ''}`;
 
     await ResendService.sendTemplatedEmail(
       recipientEmail,
-      'Update on Your Booking Request',
+      subject,
       'request_rejected',
       {
         patientName: patientName || 'Valued Patient',

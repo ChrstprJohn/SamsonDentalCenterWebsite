@@ -58,7 +58,7 @@ describe('onAppointmentBookedSubscriber', () => {
     expect(createAdminClient).toHaveBeenCalled();
     expect(ResendService.sendTemplatedEmail).toHaveBeenCalledWith(
       'patient@example.com',
-      "We've Received Your Booking Request",
+      expect.stringContaining("We've Received Your Booking Request"),
       'appointment_request_received',
       expect.objectContaining({
         accountHolderName: 'John A. Doe Jr.',
@@ -114,7 +114,7 @@ describe('onAppointmentBookedSubscriber', () => {
 
     expect(ResendService.sendTemplatedEmail).toHaveBeenCalledWith(
       'patient@example.com',
-      "We've Received Your Booking Request",
+      expect.stringContaining("We've Received Your Booking Request"),
       'appointment_request_received',
       expect.objectContaining({
         accountHolderName: 'Christopher John Picardo Sr.',
@@ -155,7 +155,7 @@ describe('onAppointmentBookedSubscriber', () => {
 
     expect(ResendService.sendTemplatedEmail).toHaveBeenCalledWith(
       'patient@example.com',
-      "We've Received Your Booking Request",
+      expect.stringContaining("We've Received Your Booking Request"),
       'appointment_request_received',
       expect.objectContaining({
         doctorName: 'Assigned Dentist',

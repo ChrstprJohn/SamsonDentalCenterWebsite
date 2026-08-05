@@ -1,6 +1,6 @@
 import { createAdminClient } from '@/shared/database/server';
 import { ResendService } from '@/shared/services/email/resend.service';
-import { formatShortDate, formatClinicTime } from '@/shared/utils/date.util';
+import { formatShortDate, formatClinicTime, formatRefId } from '@/shared/utils/date.util';
 import { getBaseUrl } from '@/shared/utils/get-base-url.util';
 
 export const onInquirySubmittedSubscriber = {
@@ -34,10 +34,12 @@ export const onInquirySubmittedSubscriber = {
     const dateStr = preferredDate ? formatShortDate(preferredDate) : 'To be confirmed';
     const timeRangeStr = preferredStartTime ? formatClinicTime(preferredStartTime) : 'Flexible Time';
     const baseUrl = getBaseUrl();
+    const ref = formatRefId(inquiryId);
+    const subject = `We've Received Your Booking Request${ref ? ` [Ref: ${ref}]` : ''}`;
 
     await ResendService.sendTemplatedEmail(
       email,
-      "We've Received Your Booking Request",
+      subject,
       'appointment_request_received',
       {
         accountHolderName: patientName,

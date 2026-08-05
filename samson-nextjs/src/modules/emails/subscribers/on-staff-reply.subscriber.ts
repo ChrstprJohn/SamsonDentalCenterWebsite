@@ -1,5 +1,6 @@
 import { createAdminClient } from '@/shared/database/server';
 import { ResendService } from '@/shared/services/email/resend.service';
+import { formatRefId } from '@/shared/utils/date.util';
 import { getBaseUrl } from '@/shared/utils/get-base-url.util';
 
 export const onStaffReplySubscriber = {
@@ -55,10 +56,12 @@ export const onStaffReplySubscriber = {
 
     const baseUrl = getBaseUrl();
     const chatToken = appt.chat_token;
+    const ref = formatRefId(appointmentId);
+    const subject = `You Have a New Message${ref ? ` [Ref: ${ref}]` : ''}`;
 
     await ResendService.sendTemplatedEmail(
       recipientEmail,
-      'You Have a New Message',
+      subject,
       'staff_reply' as any,
       {
         patientName,

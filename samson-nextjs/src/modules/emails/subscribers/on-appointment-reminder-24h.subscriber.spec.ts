@@ -45,7 +45,7 @@ describe('onAppointmentReminder24hSubscriber', () => {
 
     expect(ResendService.sendTemplatedEmail).toHaveBeenCalledWith(
       'alice@example.com',
-      'Reminder: Your Appointment is Tomorrow',
+      expect.stringContaining('Reminder: Your Appointment is Tomorrow'),
       'appointment_reminder',
       expect.objectContaining({
         patientName: 'Alice Smith',

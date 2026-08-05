@@ -59,7 +59,7 @@ describe('onAppointmentConvertedSubscriber', () => {
     expect(createAdminClient).toHaveBeenCalled();
     expect(ResendService.sendTemplatedEmail).toHaveBeenCalledWith(
       'jane.doe@example.com',
-      'Your Appointment is Confirmed',
+      expect.stringContaining('Your Appointment is Confirmed'),
       'appointment_confirmed',
       expect.objectContaining({
         patientName: 'Jane Doe',

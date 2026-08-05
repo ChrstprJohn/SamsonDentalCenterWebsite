@@ -51,7 +51,7 @@ describe('onManualBookingPatientSubscriber', () => {
 
     expect(ResendService.sendTemplatedEmail).toHaveBeenCalledWith(
       'john@example.com',
-      'Your Appointment is Confirmed',
+      expect.stringContaining('Your Appointment is Confirmed'),
       'appointment_confirmed',
       expect.objectContaining({
         patientName: 'John Doe',
@@ -83,7 +83,7 @@ describe('onManualBookingPatientSubscriber', () => {
 
     expect(ResendService.sendTemplatedEmail).toHaveBeenCalledWith(
       'john@example.com',
-      'Your Appointment is Confirmed',
+      expect.stringContaining('Your Appointment is Confirmed'),
       'appointment_confirmed',
       expect.objectContaining({ patientName: 'Maria Santos' })
     );

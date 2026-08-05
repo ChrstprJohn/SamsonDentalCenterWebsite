@@ -1,7 +1,7 @@
 import { createAdminClient } from '@/shared/database/server';
 import { ResendService } from '@/shared/services/email/resend.service';
 import { appointmentConvertedEventSchema } from '../dtos/events/appointment-converted.event.dto';
-import { formatShortDate, formatClinicTime, calculateEndTime } from '@/shared/utils/date.util';
+import { formatShortDate, formatClinicTime, calculateEndTime, formatRefId } from '@/shared/utils/date.util';
 import { getBaseUrl } from '@/shared/utils/get-base-url.util';
 
 export const onAppointmentConvertedSubscriber = {
@@ -87,7 +87,8 @@ export const onAppointmentConvertedSubscriber = {
     const end = calculateEndTime(startTime, duration);
     const timeRangeStr = `${formatClinicTime(start)} - ${formatClinicTime(end)}`;
 
-    const subject = 'Your Appointment is Confirmed';
+    const ref = formatRefId(appointmentId);
+    const subject = `Your Appointment is Confirmed${ref ? ` [Ref: ${ref}]` : ''}`;
 
     const { data: appt } = await supabaseAdmin
       .from('appointments')
