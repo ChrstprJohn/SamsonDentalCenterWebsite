@@ -47,9 +47,7 @@ describe('Email Templates Rendering', () => {
       })
     );
     expect(html).toContain('Bob Smith');
-    expect(html).toContain('Teeth Cleaning');
-    expect(html).toContain('Dr. Jane Smith');
-    expect(html).toContain('da95a63c-333e-4b68-98e3-82bdf1a07bd1');
+    expect(html).toContain('Thank you for reaching out to Samson Dental Center');
   });
 
   it('renders AppointmentRequestReceivedEmail without crashing (dependent booking)', async () => {
@@ -69,9 +67,7 @@ describe('Email Templates Rendering', () => {
       })
     );
     expect(html).toContain('Maria Picardo');
-    expect(html).toContain('Composite Filling');
-    expect(html).toContain('Dr. John Smith');
-    expect(html).toContain('da95a63c-333e-4b68-98e3-82bdf1a07bd2');
+    expect(html).toContain('Thank you for reaching out to Samson Dental Center');
   });
 
   it('renders AppointmentConfirmedEmail without crashing', async () => {

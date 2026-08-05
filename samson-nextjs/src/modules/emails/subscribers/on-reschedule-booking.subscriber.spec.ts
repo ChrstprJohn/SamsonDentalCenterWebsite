@@ -51,7 +51,7 @@ describe('onRescheduleBookingSubscriber', () => {
       expect.objectContaining({
         patientName: 'John Doe',
         dateStr: 'Jul 20, 2026',
-        timeRangeStr: '10:00 AM',
+        timeRangeStr: '10:00 AM - 10:30 AM',
         chatToken: 'chat-tok',
       })
     );

@@ -83,41 +83,7 @@ export const AppointmentRequestReceivedEmail = ({
             Thank you for reaching out to Samson Dental Center. We have successfully received your booking request and our team is currently reviewing it. We will get back to you as soon as possible to confirm your appointment details.
           </Text>
 
-          {/* Details list */}
-          <Section style={{ margin: '0 0 20px', paddingLeft: 0 }}>
-            <Text style={{ ...pStyle, margin: '0 0 4px' }}>
-              <span style={boldStyle}>Status:</span>{' '}
-              <span style={{ fontWeight: 700, color: '#2563eb' }}>Pending Review</span>
-            </Text>
-            {doctorName && (
-              <Text style={{ ...pStyle, margin: '0 0 4px' }}>
-                <span style={boldStyle}>Doctor:</span> {doctorName}
-              </Text>
-            )}
-            {serviceName && (
-              <Text style={{ ...pStyle, margin: '0 0 4px' }}>
-                <span style={boldStyle}>Service:</span> {serviceName}
-              </Text>
-            )}
-            <Text style={{ ...pStyle, margin: '0 0 4px' }}>
-              <span style={boldStyle}>Location:</span> Samson Dental Center, Quezon City, Metro Manila
-            </Text>
-            {dateStr && (
-              <Text style={{ ...pStyle, margin: '0 0 4px' }}>
-                <span style={boldStyle}>Date:</span> {dateStr}
-              </Text>
-            )}
-            {timeRangeStr && (
-              <Text style={{ ...pStyle, margin: '0 0 4px' }}>
-                <span style={boldStyle}>Time:</span> {timeRangeStr}
-              </Text>
-            )}
-            {appointmentId && (
-              <Text style={{ ...pStyle, margin: '0 0 4px' }}>
-                <span style={boldStyle}>Reference ID:</span> {appointmentId}
-              </Text>
-            )}
-          </Section>
+
 
           <Text style={pStyle}>
             We appreciate your patience while we review your request. Our team will reach out to you shortly to confirm the details of your appointment.

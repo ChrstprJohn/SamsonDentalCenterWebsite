@@ -1,5 +1,6 @@
 import { createAdminClient } from '@/shared/database/server';
 import { ResendService } from '@/shared/services/email/resend.service';
+import { formatShortDate } from '@/shared/utils/date.util';
 import { getBaseUrl } from '@/shared/utils/get-base-url.util';
 
 export const onPostCareReviewSubscriber = {
@@ -71,7 +72,7 @@ export const onPostCareReviewSubscriber = {
         patientName,
         serviceName,
         doctorName,
-        dateStr: appointment.date,
+        dateStr: formatShortDate(appointment.date),
         appointmentId,
         baseUrl,
       }

@@ -1,6 +1,6 @@
 import { createAdminClient } from '@/shared/database/server';
 import { ResendService } from '@/shared/services/email/resend.service';
-import { formatShortDate, formatClinicTime } from '@/shared/utils/date.util';
+import { formatShortDate, formatClinicTime, calculateEndTime } from '@/shared/utils/date.util';
 import { getBaseUrl } from '@/shared/utils/get-base-url.util';
 
 export const onRescheduleBookingSubscriber = {
@@ -20,7 +20,7 @@ export const onRescheduleBookingSubscriber = {
         confirmation_channel,
         date,
         start_time,
-        service:services(name),
+        service:services(name, duration_minutes),
         doctor:users!appointments_doctor_id_fkey(first_name, last_name)
       `)
       .eq('id', appointmentId)
@@ -75,8 +75,14 @@ export const onRescheduleBookingSubscriber = {
       ? `Dr. ${appt.doctor.first_name} ${appt.doctor.last_name}`
       : 'Dr. Adrian Samson';
 
+    const duration = (appt.service as any)?.duration_minutes || payload.durationMinutes || 30;
     const dateStr = formatShortDate(date);
-    const timeRangeStr = formatClinicTime(startTime);
+
+    let timeRangeStr = 'To be scheduled';
+    if (startTime) {
+      const end = calculateEndTime(startTime, duration);
+      timeRangeStr = end ? `${formatClinicTime(startTime)} - ${formatClinicTime(end)}` : formatClinicTime(startTime);
+    }
     const baseUrl = getBaseUrl();
     const chatToken = appt.chat_token;
 

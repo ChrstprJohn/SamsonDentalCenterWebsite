@@ -24,8 +24,10 @@ export function RenderedEmailFrame({ eventType, payload }: RenderedEmailFramePro
   const patientName = safePayload.patientName || safePayload.accountHolderName || fullName || 'Valued Patient';
   const serviceName = safePayload.serviceName || 'Dental Treatment';
   const doctorName = safePayload.doctorName || 'Dr. Assigned Dentist';
-  const dateStr = safePayload.dateStr || safePayload.appointmentDate || safePayload.preferredDate || 'Jun 4, 2026';
-  const timeRangeStr = safePayload.timeRangeStr || safePayload.preferredStartTime || '09:00 AM - 09:30 AM';
+  const rawDate = safePayload.dateStr || safePayload.appointmentDate || safePayload.preferredDate;
+  const dateStr = rawDate && !rawDate.includes('NaN') ? rawDate : 'Jun 4, 2026';
+  const rawTime = safePayload.timeRangeStr || safePayload.preferredStartTime;
+  const timeRangeStr = rawTime && !rawTime.includes('NaN') ? rawTime : '09:00 AM - 09:30 AM';
   const appointmentId = safePayload.appointmentId || safePayload.inquiryId || 'APT-SAMPLE';
   const otpCode = safePayload.otpCode || '123456';
   const chatToken = safePayload.chatToken || '';

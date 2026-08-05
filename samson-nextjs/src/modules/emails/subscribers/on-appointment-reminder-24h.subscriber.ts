@@ -1,6 +1,6 @@
 import { createAdminClient } from '@/shared/database/server';
 import { ResendService } from '@/shared/services/email/resend.service';
-import { formatShortDate, formatClinicTime } from '@/shared/utils/date.util';
+import { formatShortDate, formatClinicTime, calculateEndTime } from '@/shared/utils/date.util';
 import { getBaseUrl } from '@/shared/utils/get-base-url.util';
 
 export const onAppointmentReminder24hSubscriber = {
@@ -69,17 +69,13 @@ export const onAppointmentReminder24hSubscriber = {
 
     const dateStr = formatShortDate(appointment.date);
     const start = appointment.start_time;
-    
-    // Calculate end time
     const duration = (appointment.service as any)?.duration_minutes || 30;
-    const [h, m] = start.split(':').map(Number);
-    const dateObj = new Date();
-    dateObj.setHours(h, m + duration);
-    const endH = dateObj.getHours().toString().padStart(2, '0');
-    const endM = dateObj.getMinutes().toString().padStart(2, '0');
-    const end = `${endH}:${endM}`;
-    
-    const timeRangeStr = `${formatClinicTime(start)} - ${formatClinicTime(end)}`;
+
+    let timeRangeStr = 'To be scheduled';
+    if (start) {
+      const end = calculateEndTime(start, duration);
+      timeRangeStr = end ? `${formatClinicTime(start)} - ${formatClinicTime(end)}` : formatClinicTime(start);
+    }
     const baseUrl = getBaseUrl();
 
     await ResendService.sendTemplatedEmail(
