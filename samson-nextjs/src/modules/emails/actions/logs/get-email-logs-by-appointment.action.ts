@@ -21,8 +21,8 @@ export async function getEmailLogsByAppointmentAction(appointmentId: string) {
 
     const linkedInquiryId = inquiryRecord?.id as string | undefined;
     const matchFilter = linkedInquiryId
-      ? `appointment_id.eq.${parsedId},payload->>appointmentId.eq.${parsedId},payload->>inquiryId.eq.${linkedInquiryId}`
-      : `appointment_id.eq.${parsedId},payload->>appointmentId.eq.${parsedId}`;
+      ? `appointment_id.eq.${parsedId},payload->>appointmentId.eq.${parsedId},payload->>inquiryId.eq.${linkedInquiryId},payload->>inquiryId.eq.${parsedId}`
+      : `appointment_id.eq.${parsedId},payload->>appointmentId.eq.${parsedId},payload->>inquiryId.eq.${parsedId}`;
 
     let { data, error } = await supabase
       .from('outbox')

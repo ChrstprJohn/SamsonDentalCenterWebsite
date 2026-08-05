@@ -52,8 +52,8 @@ export const getAppointmentCommunicationPageQuery = (supabase: SupabaseClient) =
 
     const linkedInquiryId = inquiryRecord?.id as string | undefined;
     const matchFilter = linkedInquiryId
-      ? `appointment_id.eq.${params.appointmentId},payload->>appointmentId.eq.${params.appointmentId},payload->>inquiryId.eq.${linkedInquiryId}`
-      : `appointment_id.eq.${params.appointmentId},payload->>appointmentId.eq.${params.appointmentId}`;
+      ? `appointment_id.eq.${params.appointmentId},payload->>appointmentId.eq.${params.appointmentId},payload->>inquiryId.eq.${linkedInquiryId},payload->>inquiryId.eq.${params.appointmentId}`
+      : `appointment_id.eq.${params.appointmentId},payload->>appointmentId.eq.${params.appointmentId},payload->>inquiryId.eq.${params.appointmentId}`;
 
     let query = supabase.from('outbox')
       .select('id, event_type, status, error_logs, retry_count, created_at, payload, patient_id:payload->>patientId, email:payload->>email, guest_email:payload->>guestEmail, phone:payload->>phone, phone_number:payload->>phoneNumber, mobile_number:payload->>mobileNumber', { count: 'exact' })

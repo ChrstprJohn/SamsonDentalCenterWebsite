@@ -7,6 +7,8 @@ import { CoordinationHub } from './sub-components/coordination-hub';
 import { InquiryToast } from './sub-components/inquiry-toast';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import {
   ArrowLeft,
   Check,
@@ -60,9 +62,10 @@ export function SecretaryPendingRequestsViewV2() {
   const [scheduleSnapshot, setScheduleSnapshot] = React.useState<Record<string, string>>({});
   const { addToast } = useToast();
   const [assignedDoctorName, setAssignedDoctorName] = React.useState('');
-  const [isResendingEmail, setIsResendingEmail] = React.useState(false);
+  const [resendingEventType, setResendingEventType] = React.useState<string | null>(null);
   const [inquiryLogs, setInquiryLogs] = React.useState<OutboxLogResponseDto[]>([]);
   const [loadingInquiryLogs, setLoadingInquiryLogs] = React.useState(false);
+  const [allowOverrideResend, setAllowOverrideResend] = React.useState(false);
 
   const fetchInquiryLogs = React.useCallback(async (inquiryId: string) => {
     setLoadingInquiryLogs(true);
@@ -83,7 +86,7 @@ export function SecretaryPendingRequestsViewV2() {
 
   const handleResendInquiryEmail = async () => {
     if (!inquiriesView.selectedInquiry?.id) return;
-    setIsResendingEmail(true);
+    setResendingEventType('APPOINTMENT_INQUIRY_RECEIVED');
     const res = await resendInquiryNotificationAction({
       inquiryId: inquiriesView.selectedInquiry.id,
       eventType: 'APPOINTMENT_INQUIRY_RECEIVED',
@@ -94,12 +97,12 @@ export function SecretaryPendingRequestsViewV2() {
       addToast('Inquiry confirmation email sent successfully.', 'success');
       fetchInquiryLogs(inquiriesView.selectedInquiry.id);
     }
-    setIsResendingEmail(false);
+    setResendingEventType(null);
   };
 
   const handleResendRejectionEmail = async () => {
     if (!inquiriesView.selectedInquiry?.id) return;
-    setIsResendingEmail(true);
+    setResendingEventType('REJECT_INQUIRY');
     const res = await resendInquiryNotificationAction({
       inquiryId: inquiriesView.selectedInquiry.id,
       eventType: 'REJECT_INQUIRY',
@@ -110,7 +113,7 @@ export function SecretaryPendingRequestsViewV2() {
       addToast('Rejection email sent successfully.', 'success');
       fetchInquiryLogs(inquiriesView.selectedInquiry.id);
     }
-    setIsResendingEmail(false);
+    setResendingEventType(null);
   };
 
   const colMobile = (view: 'list' | 'detail' | 'quickLogs') =>
@@ -430,95 +433,158 @@ export function SecretaryPendingRequestsViewV2() {
                       </Badge>
                     </div>
 
-                    {inquiriesView.selectedInquiry?.status === 'NEW' && (() => {
-                      const log = inquiryLogs.find((l) => l.eventType === 'APPOINTMENT_INQUIRY_RECEIVED');
-                      const statusLabel = log ? (log.status === 'PROCESSED' ? 'SENT' : log.status === 'FAILED' ? 'FAILED' : 'PENDING') : 'NOT SENT';
-                      const badgeClass = statusLabel === 'SENT'
-                        ? 'bg-green-500/10 text-green-500'
-                        : statusLabel === 'FAILED'
-                          ? 'bg-rose-500/10 text-rose-600'
-                          : statusLabel === 'PENDING'
-                            ? 'bg-muted text-muted-foreground/60'
-                            : 'bg-slate-500/10 text-slate-500 dark:text-slate-400';
-                      const btnLabel = isResendingEmail
-                        ? 'Sending...'
+                  <hr className="border-card-border/40" />
+
+                  {/* Section: Notification History */}
+                  <div className="py-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-foreground block">Notification History</span>
+                      <Label className="flex items-center gap-1.5 text-[11px] text-muted-foreground cursor-pointer select-none">
+                        <span>Manual Resend</span>
+                        <Switch
+                          checked={allowOverrideResend}
+                          onCheckedChange={setAllowOverrideResend}
+                          className="scale-75 shadow-none"
+                        />
+                      </Label>
+                    </div>
+
+                    {/* Entry 1: Inquiry Request Received */}
+                    {(() => {
+                      const inquiryLog = inquiryLogs.find((l) => l.eventType === 'APPOINTMENT_INQUIRY_RECEIVED');
+                      const statusLabel = loadingInquiryLogs
+                        ? 'LOADING...'
+                        : inquiryLog
+                          ? (inquiryLog.status === 'PROCESSED' ? 'SENT' : inquiryLog.status === 'FAILED' ? 'FAILED' : 'PENDING')
+                          : (inquiriesView.selectedInquiry?.status === 'NEW' ? 'NOT SENT' : 'NOT APPLICABLE');
+
+                      const badgeClass = loadingInquiryLogs
+                        ? 'bg-muted text-muted-foreground/60 animate-pulse'
                         : statusLabel === 'SENT'
-                          ? 'Send New'
+                          ? 'bg-green-500/10 text-green-500'
                           : statusLabel === 'FAILED'
-                            ? 'Retry'
+                            ? 'bg-rose-500/10 text-rose-600'
                             : statusLabel === 'PENDING'
-                              ? 'Send Now'
-                              : 'Send Email';
+                              ? 'bg-muted text-muted-foreground/60'
+                              : 'bg-slate-500/10 text-slate-500 dark:text-slate-400';
+
+                      const isSendingThis = resendingEventType === 'APPOINTMENT_INQUIRY_RECEIVED';
+                      const btnLabel = loadingInquiryLogs
+                        ? 'Loading...'
+                        : isSendingThis
+                          ? 'Sending...'
+                          : statusLabel === 'SENT'
+                            ? 'Send New'
+                            : statusLabel === 'FAILED'
+                              ? 'Retry'
+                              : statusLabel === 'PENDING'
+                                ? 'Send Now'
+                                : statusLabel === 'NOT SENT' && inquiriesView.selectedInquiry?.status === 'NEW'
+                                  ? 'Send Email'
+                                  : 'Force Send';
+
+                      const isAllowed = !loadingInquiryLogs && !resendingEventType && (
+                        (Boolean(inquiryLog) && (statusLabel === 'PENDING' || statusLabel === 'FAILED')) ||
+                        (statusLabel === 'NOT SENT' && inquiriesView.selectedInquiry?.status === 'NEW') ||
+                        allowOverrideResend
+                      );
 
                       return (
-                        <div className="flex items-center justify-between p-3 rounded-xl bg-secondary-bg/20 border border-card-border/60 mt-1">
-                          <div className="flex items-center gap-2 min-w-0">
-                            <Mail className="size-3.5 text-muted-foreground shrink-0" />
-                            <div className="flex items-center gap-2 min-w-0">
-                              <span className="text-xs font-medium text-foreground truncate">Inquiry Request Received</span>
-                              <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded shrink-0 ${badgeClass}`}>
-                                {statusLabel}
-                              </span>
+                        <div className="space-y-1.5">
+                          <span className="text-xs text-muted-foreground">Inquiry Request Received</span>
+                          <div className="flex flex-col gap-2">
+                            <div className="flex items-center justify-between p-3 rounded-xl bg-secondary-bg/20 border border-card-border/60">
+                              <div className="flex items-center gap-2 min-w-0">
+                                <Mail className="size-3.5 text-muted-foreground shrink-0" />
+                                <span className="text-sm text-foreground">Email</span>
+                                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded shrink-0 ${badgeClass}`}>
+                                  {statusLabel}
+                                </span>
+                              </div>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                disabled={!isAllowed}
+                                onClick={handleResendInquiryEmail}
+                                className="text-[10px] h-7 px-2.5 gap-1 shrink-0 disabled:opacity-40 disabled:cursor-not-allowed"
+                              >
+                                <RotateCw className={`size-3 ${loadingInquiryLogs || isSendingThis ? 'animate-spin' : ''}`} />
+                                {btnLabel}
+                              </Button>
                             </div>
                           </div>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            disabled={isResendingEmail}
-                            onClick={handleResendInquiryEmail}
-                            className="text-[10px] h-7 px-2.5 gap-1 shrink-0 disabled:opacity-40"
-                          >
-                            <RotateCw className={`size-3 ${isResendingEmail ? 'animate-spin' : ''}`} />
-                            {btnLabel}
-                          </Button>
                         </div>
                       );
                     })()}
 
-                    {inquiriesView.selectedInquiry?.status === 'DROPPED' && (() => {
-                      const log = inquiryLogs.find((l) => l.eventType === 'REJECT_INQUIRY');
-                      const statusLabel = log ? (log.status === 'PROCESSED' ? 'SENT' : log.status === 'FAILED' ? 'FAILED' : 'PENDING') : 'NOT SENT';
-                      const badgeClass = statusLabel === 'SENT'
-                        ? 'bg-green-500/10 text-green-500'
-                        : statusLabel === 'FAILED'
-                          ? 'bg-rose-500/10 text-rose-600'
-                          : statusLabel === 'PENDING'
-                            ? 'bg-muted text-muted-foreground/60'
-                            : 'bg-slate-500/10 text-slate-500 dark:text-slate-400';
-                      const btnLabel = isResendingEmail
-                        ? 'Sending...'
+                    {/* Entry 2: Request Rejection */}
+                    {(() => {
+                      const rejectionLog = inquiryLogs.find((l) => l.eventType === 'REJECT_INQUIRY');
+                      const statusLabel = loadingInquiryLogs
+                        ? 'LOADING...'
+                        : rejectionLog
+                          ? (rejectionLog.status === 'PROCESSED' ? 'SENT' : rejectionLog.status === 'FAILED' ? 'FAILED' : 'PENDING')
+                          : (inquiriesView.selectedInquiry?.status === 'DROPPED' ? 'NOT SENT' : 'NOT APPLICABLE');
+
+                      const badgeClass = loadingInquiryLogs
+                        ? 'bg-muted text-muted-foreground/60 animate-pulse'
                         : statusLabel === 'SENT'
-                          ? 'Send New'
+                          ? 'bg-green-500/10 text-green-500'
                           : statusLabel === 'FAILED'
-                            ? 'Retry'
+                            ? 'bg-rose-500/10 text-rose-600'
                             : statusLabel === 'PENDING'
-                              ? 'Send Now'
-                              : 'Send Rejection';
+                              ? 'bg-muted text-muted-foreground/60'
+                              : 'bg-slate-500/10 text-slate-500 dark:text-slate-400';
+
+                      const isSendingThis = resendingEventType === 'REJECT_INQUIRY';
+                      const btnLabel = loadingInquiryLogs
+                        ? 'Loading...'
+                        : isSendingThis
+                          ? 'Sending...'
+                          : statusLabel === 'SENT'
+                            ? 'Send New'
+                            : statusLabel === 'FAILED'
+                              ? 'Retry'
+                              : statusLabel === 'PENDING'
+                                ? 'Send Now'
+                                : statusLabel === 'NOT SENT' && inquiriesView.selectedInquiry?.status === 'DROPPED'
+                                  ? 'Send Rejection'
+                                  : 'Force Send';
+
+                      const isAllowed = !loadingInquiryLogs && !resendingEventType && (
+                        (Boolean(rejectionLog) && (statusLabel === 'PENDING' || statusLabel === 'FAILED')) ||
+                        (statusLabel === 'NOT SENT' && inquiriesView.selectedInquiry?.status === 'DROPPED') ||
+                        allowOverrideResend
+                      );
 
                       return (
-                        <div className="flex items-center justify-between p-3 rounded-xl bg-secondary-bg/20 border border-card-border/60 mt-1">
-                          <div className="flex items-center gap-2 min-w-0">
-                            <Mail className="size-3.5 text-muted-foreground shrink-0" />
-                            <div className="flex items-center gap-2 min-w-0">
-                              <span className="text-xs font-medium text-foreground truncate">Request Rejection</span>
-                              <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded shrink-0 ${badgeClass}`}>
-                                {statusLabel}
-                              </span>
+                        <div className="space-y-1.5">
+                          <span className="text-xs text-muted-foreground">Request Rejection</span>
+                          <div className="flex flex-col gap-2">
+                            <div className="flex items-center justify-between p-3 rounded-xl bg-secondary-bg/20 border border-card-border/60">
+                              <div className="flex items-center gap-2 min-w-0">
+                                <Mail className="size-3.5 text-muted-foreground shrink-0" />
+                                <span className="text-sm text-foreground">Email</span>
+                                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded shrink-0 ${badgeClass}`}>
+                                  {statusLabel}
+                                </span>
+                              </div>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                disabled={!isAllowed}
+                                onClick={handleResendRejectionEmail}
+                                className="text-[10px] h-7 px-2.5 gap-1 shrink-0 border-rose-200 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/20 disabled:opacity-40 disabled:cursor-not-allowed"
+                              >
+                                <RotateCw className={`size-3 ${loadingInquiryLogs || isSendingThis ? 'animate-spin' : ''}`} />
+                                {btnLabel}
+                              </Button>
                             </div>
                           </div>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            disabled={isResendingEmail}
-                            onClick={handleResendRejectionEmail}
-                            className="text-[10px] h-7 px-2.5 gap-1 shrink-0 border-rose-200 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/20 disabled:opacity-40"
-                          >
-                            <RotateCw className={`size-3 ${isResendingEmail ? 'animate-spin' : ''}`} />
-                            {btnLabel}
-                          </Button>
                         </div>
                       );
                     })()}
+                  </div>
                   </div>
 
                   <hr className="border-card-border/40" />

@@ -56,6 +56,7 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
 
   useEffect(() => {
     let cancelled = false;
+    setOutboxLogs([]);
     setLoadingLogs(true);
     getEmailLogsByAppointmentAction(appointment.id).then((res) => {
       if (cancelled) return;
@@ -331,34 +332,40 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
                 inquiryLog
               );
 
-              const displayStatus = isConvertedInquiry
-                ? (!inquiryLog || inquiryLog.status === 'PROCESSED'
-                  ? 'SENT'
-                  : inquiryLog.status === 'FAILED'
-                    ? 'FAILED'
-                    : 'PENDING')
-                : 'NOT APPLICABLE';
+              const displayStatus = loadingLogs
+                ? 'LOADING...'
+                : isConvertedInquiry
+                  ? (!inquiryLog || inquiryLog.status === 'PROCESSED'
+                    ? 'SENT'
+                    : inquiryLog.status === 'FAILED'
+                      ? 'FAILED'
+                      : 'PENDING')
+                  : 'NOT APPLICABLE';
 
-              const badgeClass = displayStatus === 'SENT'
-                ? 'bg-green-500/10 text-green-500'
-                : displayStatus === 'FAILED'
-                  ? 'bg-rose-500/10 text-rose-600'
-                  : displayStatus === 'PENDING'
-                    ? 'bg-muted text-muted-foreground/60'
-                    : 'bg-slate-500/10 text-slate-500 dark:text-slate-400';
+              const badgeClass = loadingLogs
+                ? 'bg-muted text-muted-foreground/60 animate-pulse'
+                : displayStatus === 'SENT'
+                  ? 'bg-green-500/10 text-green-500'
+                  : displayStatus === 'FAILED'
+                    ? 'bg-rose-500/10 text-rose-600'
+                    : displayStatus === 'PENDING'
+                      ? 'bg-muted text-muted-foreground/60'
+                      : 'bg-slate-500/10 text-slate-500 dark:text-slate-400';
 
               const isSending = (Boolean(inquiryLog) && detailResendingId === inquiryLog?.id) || resending === 'APPOINTMENT_INQUIRY_RECEIVED_EMAIL';
-              const btnLabel = isSending
-                ? 'Sending...'
-                : displayStatus === 'SENT'
-                  ? 'Send New'
-                  : displayStatus === 'FAILED'
-                    ? 'Retry'
-                    : displayStatus === 'PENDING'
-                      ? 'Send Now'
-                      : 'Force Send';
+              const btnLabel = loadingLogs
+                ? 'Loading...'
+                : isSending
+                  ? 'Sending...'
+                  : displayStatus === 'SENT'
+                    ? 'Send New'
+                    : displayStatus === 'FAILED'
+                      ? 'Retry'
+                      : displayStatus === 'PENDING'
+                        ? 'Send Now'
+                        : 'Force Send';
 
-              const isAllowed = !isSending && (
+              const isAllowed = !loadingLogs && !isSending && (
                 (Boolean(inquiryLog) && (displayStatus === 'PENDING' || displayStatus === 'FAILED')) ||
                 allowOverrideResend
               );
@@ -388,7 +395,7 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
                         }}
                         className={`${compact ? 'text-[9px] h-6 px-2 gap-0.5' : 'text-[10px] h-7 px-2.5 gap-1'} shrink-0 disabled:opacity-40 disabled:cursor-not-allowed`}
                       >
-                        <RotateCw className={`size-3 ${isSending ? 'animate-spin' : ''}`} />
+                        <RotateCw className={`size-3 ${loadingLogs || isSending ? 'animate-spin' : ''}`} />
                         {btnLabel}
                       </Button>
                     </div>
@@ -505,28 +512,44 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
                       const isSent = eventType === 'CANCEL_BOOKING'
                         ? channelType === 'SMS' ? commState.smsCancelSent : commState.emailCancelSent
                         : channelType === 'SMS' ? commState.smsRescheduleSent : commState.emailRescheduleSent;
-                      const displayStatus = isSent ? 'SENT' : latestLog ? latestLog.status === 'FAILED' ? 'FAILED' : latestLog.status === 'PROCESSED' ? 'SENT' : 'PENDING' : eventOccurred ? 'NOT SENT' : 'NOT APPLICABLE';
-                      const statusBadgeClass = displayStatus === 'SENT'
-                        ? 'bg-green-500/10 text-green-500'
-                        : displayStatus === 'FAILED'
-                          ? 'bg-rose-500/10 text-rose-600'
-                          : displayStatus === 'PENDING'
-                            ? 'bg-muted text-muted-foreground/60'
-                            : 'bg-slate-500/10 text-slate-500 dark:text-slate-400';
+                      const displayStatus = loadingLogs
+                        ? 'LOADING...'
+                        : isSent
+                          ? 'SENT'
+                          : latestLog
+                            ? latestLog.status === 'FAILED'
+                              ? 'FAILED'
+                              : latestLog.status === 'PROCESSED'
+                                ? 'SENT'
+                                : 'PENDING'
+                            : eventOccurred
+                              ? 'NOT SENT'
+                              : 'NOT APPLICABLE';
+                      const statusBadgeClass = loadingLogs
+                        ? 'bg-muted text-muted-foreground/60 animate-pulse'
+                        : displayStatus === 'SENT'
+                          ? 'bg-green-500/10 text-green-500'
+                          : displayStatus === 'FAILED'
+                            ? 'bg-rose-500/10 text-rose-600'
+                            : displayStatus === 'PENDING'
+                              ? 'bg-muted text-muted-foreground/60'
+                              : 'bg-slate-500/10 text-slate-500 dark:text-slate-400';
                       const Icon = channelType === 'SMS' ? MessageSquare : Mail;
 
                       const isSending = (Boolean(latestLog) && detailResendingId === latestLog?.id) || resending === `${eventType}_${channelType}`;
-                      const btnLabel = isSending
-                        ? 'Sending...'
-                        : displayStatus === 'SENT'
-                          ? 'Send New'
-                          : displayStatus === 'FAILED'
-                            ? 'Retry'
-                            : displayStatus === 'PENDING' || displayStatus === 'NOT SENT'
-                              ? 'Send Now'
-                              : 'Force Send';
+                      const btnLabel = loadingLogs
+                        ? 'Loading...'
+                        : isSending
+                          ? 'Sending...'
+                          : displayStatus === 'SENT'
+                            ? 'Send New'
+                            : displayStatus === 'FAILED'
+                              ? 'Retry'
+                              : displayStatus === 'PENDING' || displayStatus === 'NOT SENT'
+                                ? 'Send Now'
+                                : 'Force Send';
 
-                      const isAllowed = !isSending && (
+                      const isAllowed = !loadingLogs && !isSending && (
                         (Boolean(latestLog) && (displayStatus === 'PENDING' || displayStatus === 'FAILED' || displayStatus === 'NOT SENT')) ||
                         allowOverrideResend
                       );
@@ -553,7 +576,7 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
                             }}
                             className={`${compact ? 'text-[9px] h-6 px-2 gap-0.5' : 'text-[10px] h-7 px-2.5 gap-1'} shrink-0 disabled:opacity-40 disabled:cursor-not-allowed`}
                           >
-                            <RotateCw className={`size-3 ${isSending ? 'animate-spin' : ''}`} />
+                            <RotateCw className={`size-3 ${loadingLogs || isSending ? 'animate-spin' : ''}`} />
                             {btnLabel}
                           </Button>
                         </div>

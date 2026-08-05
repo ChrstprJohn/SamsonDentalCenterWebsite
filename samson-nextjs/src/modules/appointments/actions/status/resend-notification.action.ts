@@ -153,6 +153,7 @@ export async function resendNotificationAction(input: ResendNotificationInput) {
       if (parsed.eventType === 'APPOINTMENT_INQUIRY_RECEIVED') {
         eventType = 'APPOINTMENT_INQUIRY_RECEIVED';
         payload = {
+          appointmentId: parsed.appointmentId,
           inquiryId: (appointment as any).inquiry_id || parsed.appointmentId,
           firstName: gc?.first_name || appointment.patient?.first_name || '',
           lastName: gc?.last_name || appointment.patient?.last_name || '',
