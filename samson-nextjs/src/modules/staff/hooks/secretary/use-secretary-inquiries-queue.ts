@@ -59,6 +59,7 @@ export function useSecretaryInquiriesQueue() {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [loadMoreError, setLoadMoreError] = useState<string | null>(null);
   const [tabCounts, setTabCounts] = useState<Record<InquiryTab, number>>({ NEW: 0, CONVERTED: 0, DROPPED: 0 });
+  const tabCacheRef = useRef<Partial<Record<InquiryTab, { items: any[]; nextCursor: string | null; hasMore: boolean; total: number }>>>({});
   const latestInquiriesRequest = useRef(0);
   const nextCursorRef = useRef<string | null>(null);
   const loadingMoreRef = useRef(false);
@@ -124,8 +125,20 @@ export function useSecretaryInquiriesQueue() {
     }
   }, [patientMode, selectedPatient, stagedInquiryAction, isNotesManual]);
 
-  const loadInquiries = useCallback(async (options?: { append?: boolean }) => {
+  const loadInquiries = useCallback(async (options?: { append?: boolean; force?: boolean }) => {
     const append = options?.append === true;
+    const force = options?.force === true;
+    if (!append && !force && !queryRef.current.searchTerm) {
+      const cached = tabCacheRef.current[queryRef.current.activeTab];
+      if (cached) {
+        setAllInquiries(cached.items);
+        setNextCursor(cached.nextCursor);
+        setHasMore(cached.hasMore);
+        setTabCounts((previous) => ({ ...previous, [queryRef.current.activeTab]: cached.total }));
+        setInquiriesError('');
+        return;
+      }
+    }
     if (append) {
       if (loadingMoreRef.current || !nextCursorRef.current) return;
       loadingMoreRef.current = true;
@@ -167,6 +180,9 @@ export function useSecretaryInquiriesQueue() {
       setNextCursor(page.nextCursor);
       setHasMore(page.hasMore);
       setTabCounts((previous) => ({ ...previous, [currentTab]: page.total ?? page.items.length }));
+      if (!append && !queryRef.current.searchTerm) {
+        tabCacheRef.current[currentTab] = { items: page.items, nextCursor: page.nextCursor, hasMore: page.hasMore, total: page.total ?? page.items.length };
+      }
       if (!append) {
         for (let index = 0; index < otherTabs.length; index += 1) {
           const result = otherResults[index];
@@ -192,13 +208,13 @@ export function useSecretaryInquiriesQueue() {
   }, []);
 
   useEffect(() => {
-    const timeout = window.setTimeout(() => { void loadInquiries(); }, 300);
+    const timeout = window.setTimeout(() => { void loadInquiries(); }, 600);
     return () => window.clearTimeout(timeout);
   }, [activeTab, searchTerm, loadInquiries]);
 
   useEffect(() => {
     const refreshOnVisible = () => {
-      if (document.visibilityState === 'visible') void loadInquiries();
+      if (document.visibilityState === 'visible') void loadInquiries({ force: true });
     };
     document.addEventListener('visibilitychange', refreshOnVisible);
     return () => document.removeEventListener('visibilitychange', refreshOnVisible);
@@ -370,7 +386,7 @@ export function useSecretaryInquiriesQueue() {
       const res = await updateInquiryAction(payload as any);
       if (res.success) {
         showToast('Changes saved', 'success');
-        await loadInquiries();
+        await loadInquiries({ force: true });
       } else {
         setInlineError(res.error || 'Failed to save changes');
         showToast(res.error || 'Failed to save changes', 'error');
@@ -416,7 +432,7 @@ export function useSecretaryInquiriesQueue() {
           showToast('Inquiry converted to appointment successfully', 'success');
           setSelectedInquiryId(null);
           setStagedInquiryAction('');
-          await loadInquiries();
+          await loadInquiries({ force: true });
         } else {
           setInlineError(res.error || 'Conversion failed');
           showToast(res.error || 'Failed to convert inquiry', 'error');
@@ -427,7 +443,7 @@ export function useSecretaryInquiriesQueue() {
           showToast('Inquiry dropped successfully', 'success');
           setSelectedInquiryId(null);
           setStagedInquiryAction('');
-          await loadInquiries();
+          await loadInquiries({ force: true });
         } else {
           setInlineError(res.error || 'Failed to drop inquiry');
           showToast(res.error || 'Failed to drop inquiry', 'error');

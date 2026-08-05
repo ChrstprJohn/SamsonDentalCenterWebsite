@@ -214,8 +214,14 @@ function getBadgeVariant(status: string) {
 export function SecretaryChatInboxView({ initialThreads, initialHasMore = false, initialTabCounts = { active: 0, archive: 0 } }: SecretaryChatInboxViewProps) {
     const [threads, setThreads] = useState<ChatThreadDto[]>(initialThreads);
     const [searchQuery, setSearchQuery] = useState('');
+    const [searchInput, setSearchInput] = useState('');
     const [activeTab, setActiveTab] = useState<'ACTIVE' | 'ARCHIVE'>('ACTIVE');
     const [showOnlyUnreads, setShowOnlyUnreads] = useState(false);
+
+    useEffect(() => {
+        const timer = setTimeout(() => setSearchQuery(searchInput), 400);
+        return () => clearTimeout(timer);
+    }, [searchInput]);
 
     const [mobileView, setMobileView] = useState<'list' | 'chat' | 'detail'>('list');
     const [isDetailPaneOpen, setIsDetailPaneOpen] = useState(true);
@@ -238,6 +244,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false,
     const nextThreadCursorRef = useRef<string | null>(null);
     const loadingMoreThreadsRef = useRef(false);
     const threadRequestId = useRef(0);
+    const skipInitialFetch = useRef(true);
 
     const [doctors, setDoctors] = useState<{ id: string; firstName: string; lastName: string }[]>([]);
     const [services, setServices] = useState<ServiceResponseDto[]>([]);
@@ -366,6 +373,10 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false,
     }, [activeTab, searchQuery, showOnlyUnreads]);
 
     useEffect(() => {
+        if (skipInitialFetch.current) {
+            skipInitialFetch.current = false;
+            return;
+        }
         void fetchThreads();
     }, [fetchThreads]);
 
@@ -945,7 +956,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false,
                         <SidebarInput
                             placeholder="Type to search..."
                             value={searchQuery}
-                            onChange={(e) => { setSearchQuery(e.target.value); setSelectedThreadId(null); }}
+                            onChange={(e) => { setSearchInput(e.target.value); setSelectedThreadId(null); }}
                             className="rounded-md"
                         />
                     </div>

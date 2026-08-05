@@ -44,6 +44,7 @@ export function usePastAppointmentFollowUps() {
   const nextCursorRef = useRef<string | null>(null);
   const loadingMoreRef = useRef(false);
   const hasLoadedRef = useRef(false);
+  const tabCacheRef = useRef<Partial<Record<PastFollowUpTab, { items: AppointmentDto[]; nextCursor: string | null; hasMore: boolean; total: number }>>>({});
   const queryRef = useRef({ activeTab, searchTerm });
   queryRef.current = { activeTab, searchTerm };
 
@@ -56,8 +57,20 @@ export function usePastAppointmentFollowUps() {
     search: queryRef.current.searchTerm || undefined,
   });
 
-  const fetchData = useCallback(async (options?: { append?: boolean }) => {
+  const fetchData = useCallback(async (options?: { append?: boolean; force?: boolean }) => {
     const append = options?.append === true;
+    const force = options?.force === true;
+    if (!append && !force && !queryRef.current.searchTerm) {
+      const cached = tabCacheRef.current[queryRef.current.activeTab];
+      if (cached) {
+        setAppointments(cached.items);
+        setNextCursor(cached.nextCursor);
+        setHasMore(cached.hasMore);
+        setTabCounts((previous) => ({ ...previous, [queryRef.current.activeTab]: cached.total }));
+        setError(null);
+        return;
+      }
+    }
     if (append) {
       if (loadingMoreRef.current || !nextCursorRef.current) return;
       loadingMoreRef.current = true;
@@ -90,6 +103,9 @@ export function usePastAppointmentFollowUps() {
       setHasMore(page.hasMore);
       setLastRefreshedAt(new Date());
       setTabCounts((previous) => ({ ...previous, [currentTab]: page.total ?? page.items.length }));
+      if (!append && !queryRef.current.searchTerm) {
+        tabCacheRef.current[currentTab] = { items: page.items, nextCursor: page.nextCursor, hasMore: page.hasMore, total: page.total ?? page.items.length };
+      }
       if (otherRes?.success && otherRes.data) setTabCounts((previous) => ({ ...previous, [otherTab]: otherRes.data.total ?? otherRes.data.items.length }));
       hasLoadedRef.current = true;
     } catch (cause) {
@@ -108,13 +124,13 @@ export function usePastAppointmentFollowUps() {
   }, []);
 
   useEffect(() => {
-    const timeout = window.setTimeout(() => { void fetchData(); }, 300);
+    const timeout = window.setTimeout(() => { void fetchData(); }, 600);
     return () => window.clearTimeout(timeout);
   }, [activeTab, searchTerm, fetchData]);
 
   useEffect(() => {
     const refreshOnVisible = () => {
-      if (document.visibilityState === 'visible') void fetchData();
+      if (document.visibilityState === 'visible') void fetchData({ force: true });
     };
     document.addEventListener('visibilitychange', refreshOnVisible);
     return () => document.removeEventListener('visibilitychange', refreshOnVisible);
@@ -178,7 +194,7 @@ export function usePastAppointmentFollowUps() {
         return;
       }
       setSelectedAppointmentId(null);
-      await fetchData();
+      await fetchData({ force: true });
     });
   };
 
@@ -199,7 +215,7 @@ export function usePastAppointmentFollowUps() {
       }
       setResolveAppt(null);
       setSelectedAppointmentId(null);
-      await fetchData();
+      await fetchData({ force: true });
     });
   };
 

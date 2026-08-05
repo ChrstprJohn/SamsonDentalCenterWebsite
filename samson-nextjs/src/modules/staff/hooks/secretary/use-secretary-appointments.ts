@@ -57,8 +57,13 @@ export function useSecretaryAppointments() {
   const nextCursorRef = useRef<string | null>(null);
   const loadingMoreRef = useRef(false);
   const hasLoadedRef = useRef(false);
+  const tabCacheRef = useRef<Partial<Record<AppointmentDirectoryTab, { items: AppointmentDto[]; nextCursor: string | null; hasMore: boolean; total: number }>>>({});
 
   const queryRef = useRef({ activeTab, searchTerm, doctorFilter, dateFilter, historyStatusFilter });
+  const isPristineQuery = () => {
+    const q = queryRef.current;
+    return !q.searchTerm && !q.doctorFilter && !q.dateFilter && !q.historyStatusFilter;
+  };
   queryRef.current = { activeTab, searchTerm, doctorFilter, dateFilter, historyStatusFilter };
 
   const selectedAppointment = selectedAppointmentDetails?.id === selectedAppointmentId
@@ -94,8 +99,21 @@ export function useSecretaryAppointments() {
     };
   };
 
-  const fetchData = useCallback(async (options?: { append?: boolean }) => {
+  const fetchData = useCallback(async (options?: { append?: boolean; force?: boolean }) => {
     const append = options?.append === true;
+    const force = options?.force === true;
+    if (!append && !force && isPristineQuery()) {
+      const cached = tabCacheRef.current[queryRef.current.activeTab];
+      if (cached) {
+        setAppointments(cached.items);
+        setNextCursor(cached.nextCursor);
+        setHasMore(cached.hasMore);
+        setTabTotals((previous) => ({ ...previous, [queryRef.current.activeTab]: cached.total }));
+        setError(null);
+        if (!doctorsLoadedRef.current) void getDoctorsAction({ includeHidden: true }).then((res) => { if (res.success && res.data) { setDoctors(res.data as DoctorFilterItem[]); doctorsLoadedRef.current = true; } });
+        return;
+      }
+    }
     if (append) {
       if (loadingMoreRef.current || !nextCursorRef.current) return;
       loadingMoreRef.current = true;
@@ -131,6 +149,9 @@ export function useSecretaryAppointments() {
       setNextCursor(page.nextCursor);
       setHasMore(page.hasMore);
       setTabTotals((previous) => ({ ...previous, [currentTab]: page.total ?? page.items.length }));
+      if (!append && isPristineQuery()) {
+        tabCacheRef.current[currentTab] = { items: page.items, nextCursor: page.nextCursor, hasMore: page.hasMore, total: page.total ?? page.items.length };
+      }
 
       if (otherRes?.success && otherRes.data) {
         setTabTotals((previous) => ({ ...previous, [otherTab]: otherRes.data.total ?? otherRes.data.items.length }));
@@ -156,13 +177,13 @@ export function useSecretaryAppointments() {
   }, []);
 
   useEffect(() => {
-    const timeout = window.setTimeout(() => { void fetchData(); }, 300);
+    const timeout = window.setTimeout(() => { void fetchData(); }, 600);
     return () => window.clearTimeout(timeout);
   }, [activeTab, searchTerm, doctorFilter, dateFilter, historyStatusFilter, fetchData]);
 
   useEffect(() => {
     const refreshOnVisible = () => {
-      if (document.visibilityState === 'visible') void fetchData();
+      if (document.visibilityState === 'visible') void fetchData({ force: true });
     };
     document.addEventListener('visibilitychange', refreshOnVisible);
     return () => document.removeEventListener('visibilitychange', refreshOnVisible);
@@ -349,7 +370,7 @@ export function useSecretaryAppointments() {
       if (res.success) {
         setError(null);
         setShowRescheduleForm(false);
-        await fetchData();
+        await fetchData({ force: true });
       } else {
         setError(res.error || 'Failed to reschedule.');
       }
@@ -378,7 +399,7 @@ export function useSecretaryAppointments() {
       if (res.success) {
         setError(null);
         setShowCancelForm(false);
-        await fetchData();
+        await fetchData({ force: true });
       } else {
         setError(res.error || 'Failed to cancel.');
       }

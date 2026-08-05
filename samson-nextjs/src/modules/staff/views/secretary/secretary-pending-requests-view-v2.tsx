@@ -180,7 +180,7 @@ export function SecretaryPendingRequestsViewV2() {
           isLoadingInquiries={inquiriesView.isLoadingInquiries}
           isRefreshingInquiries={inquiriesView.isRefreshingInquiries}
           inquiriesError={inquiriesView.inquiriesError}
-          onRetry={() => void inquiriesView.loadInquiries()}
+          onRetry={() => void inquiriesView.loadInquiries({ force: true })}
           searchTerm={inquiriesView.searchTerm}
           onSearchChange={inquiriesView.setSearchTerm}
           hasMore={inquiriesView.hasMore}
