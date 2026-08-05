@@ -56,4 +56,28 @@ describe('onRescheduleBookingSubscriber', () => {
       })
     );
   });
+
+  it('uses the appointment row slot over a stale payload slot', async () => {
+    mockSingle.mockResolvedValueOnce({
+      data: { chat_token: 'chat-tok', patient_id: 'pat-123', date: '2026-08-10', start_time: '2026-08-10T14:00:00.000Z' },
+      error: null,
+    });
+
+    await onRescheduleBookingSubscriber.handle({
+      appointmentId: 'appt-1',
+      patientId: 'pat-123',
+      date: '2026-07-20',
+      startTime: '2026-07-20T10:00:00.000Z',
+    });
+
+    expect(ResendService.sendTemplatedEmail).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.any(String),
+      'appointment_rescheduled',
+      expect.objectContaining({
+        dateStr: 'Aug 10, 2026',
+        timeRangeStr: expect.stringContaining('2:00 PM'),
+      })
+    );
+  });
 });

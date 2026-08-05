@@ -8,7 +8,7 @@ export const onRescheduleBookingSubscriber = {
    * Handles RESCHEDULE_BOOKING outbox events by sending a reschedule confirmation email.
    */
   async handle(payload: Record<string, any>): Promise<void> {
-    const { appointmentId, date, startTime } = payload;
+    const { appointmentId } = payload;
     const supabaseAdmin = await createAdminClient();
 
     // 1. Fetch appointment details including service & doctor
@@ -18,11 +18,17 @@ export const onRescheduleBookingSubscriber = {
         chat_token,
         patient_id,
         confirmation_channel,
+        date,
+        start_time,
         service:services(name),
         doctor:users!appointments_doctor_id_fkey(first_name, last_name)
       `)
       .eq('id', appointmentId)
       .single();
+
+    // Prefer the appointment's CURRENT slot — resent events may replay a stale payload
+    const date = appt?.date || payload.date;
+    const startTime = appt?.start_time || payload.startTime;
 
     if (apptError || !appt) {
       throw new Error(`Failed to fetch appointment for reschedule: ${apptError?.message || 'Not found'}`);

@@ -232,7 +232,9 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
     'APPOINTMENT_REMINDER_24H_SMS': '24-Hour Reminder (SMS)',
     'APPOINTMENT_REMINDER_48H_SMS': '48-Hour Reminder (SMS)',
     'RESCHEDULE_BOOKING': 'Rescheduled (Email)',
+    'RESCHEDULE_BOOKING_SMS': 'Rescheduled (SMS)',
     'CANCEL_BOOKING': 'Cancelled (Email)',
+    'CANCEL_BOOKING_SMS': 'Cancelled (SMS)',
     'APPOINTMENT_COMPLETED_POST_CARE': 'Post-Care Review (Email)',
     'APPOINTMENT_COMPLETED_POST_CARE_SMS': 'Post-Care (SMS)',
     'REJECT_INQUIRY': 'Request Rejected (Email)',
@@ -571,7 +573,7 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
                               if (latestLog) {
                                 handleDetailResend(latestLog.id);
                               } else {
-                                handleResend(eventType === 'CANCEL_BOOKING' ? 'APPOINTMENT_BOOKED' : 'APPOINTMENT_BOOKED', channelType);
+                                handleResend(eventType === 'CANCEL_BOOKING' ? 'CANCEL_BOOKING' : 'RESCHEDULE_BOOKING', channelType);
                               }
                             }}
                             className={`${compact ? 'text-[9px] h-6 px-2 gap-0.5' : 'text-[10px] h-7 px-2.5 gap-1'} shrink-0 disabled:opacity-40 disabled:cursor-not-allowed`}
@@ -603,12 +605,12 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
           <p className="text-xs text-muted-foreground italic">No events yet.</p>
         ) : (
           <div className="flex flex-col gap-2 max-h-[240px] overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
-            {groupedOutboxLogs.map((log) => {
+            {outboxLogs.map((log) => {
               const logStatus = log.status;
               const isFailed = logStatus === 'FAILED';
               const isProcessed = logStatus === 'PROCESSED';
               return (
-                <div key={log.eventType} className={`flex items-center gap-2 ${compact ? 'p-2 text-xs' : 'p-3 text-sm'} rounded-xl bg-secondary-bg/20 border border-card-border/60`}>
+                <div key={log.id} className={`flex items-center gap-2 ${compact ? 'p-2 text-xs' : 'p-3 text-sm'} rounded-xl bg-secondary-bg/20 border border-card-border/60`}>
                   <div className="shrink-0">
                     {isFailed ? <AlertCircle className="size-3.5 text-rose-500" /> : isProcessed ? <CheckCircle2 className="size-3.5 text-emerald-500" /> : <Clock className="size-3.5 text-amber-500" />}
                   </div>
