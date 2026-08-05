@@ -11,6 +11,8 @@ import {
 } from '@react-email/components';
 import * as React from 'react';
 
+import { getLogoUrl } from '@/shared/utils/get-base-url.util';
+
 export interface AppointmentRequestReceivedEmailProps {
   accountHolderName?: string;
   patientType?: 'SELF' | 'DEPENDENT';
@@ -54,7 +56,7 @@ export const AppointmentRequestReceivedEmail = ({
   baseUrl = 'http://localhost:3000',
 }: AppointmentRequestReceivedEmailProps) => {
   const previewText = 'Thank you for reaching out. We will review your request and be in touch shortly.';
-  const logoUrl = `${baseUrl}/images/SamsonLOGOGO-removebg-preview.png`;
+  const logoUrl = getLogoUrl(baseUrl);
 
   return (
     <Html lang="en">

@@ -11,6 +11,8 @@ import {
 } from '@react-email/components';
 import * as React from 'react';
 
+import { getLogoUrl } from '@/shared/utils/get-base-url.util';
+
 export interface PostCareEmailProps {
   patientName?: string;
   serviceName?: string;
@@ -46,7 +48,7 @@ export const PostCareEmail = ({
   baseUrl = 'http://localhost:3000',
 }: PostCareEmailProps) => {
   const previewText = 'Thank you for visiting Samson Dental Center. We hope your appointment went smoothly.';
-  const logoUrl = `${baseUrl}/images/SamsonLOGOGO-removebg-preview.png`;
+  const logoUrl = getLogoUrl(baseUrl);
   const feedbackUrl = `${baseUrl}/feedback?ref=${appointmentId}`;
 
   return (

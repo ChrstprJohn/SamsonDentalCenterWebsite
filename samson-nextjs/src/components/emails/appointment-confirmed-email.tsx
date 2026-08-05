@@ -11,6 +11,8 @@ import {
 } from '@react-email/components';
 import * as React from 'react';
 
+import { getLogoUrl } from '@/shared/utils/get-base-url.util';
+
 export interface AppointmentConfirmedEmailProps {
   patientName?: string;
   serviceName?: string;
@@ -50,7 +52,7 @@ export const AppointmentConfirmedEmail = ({
   baseUrl = 'http://localhost:3000',
 }: AppointmentConfirmedEmailProps) => {
   const previewText = `Your appointment at Samson Dental Center is confirmed for ${dateStr}.`;
-  const logoUrl = `${baseUrl}/images/SamsonLOGOGO-removebg-preview.png`;
+  const logoUrl = getLogoUrl(baseUrl);
   const chatUrl = `${baseUrl}/manage?token=${chatToken || appointmentId}&openChat=true`;
 
   return (

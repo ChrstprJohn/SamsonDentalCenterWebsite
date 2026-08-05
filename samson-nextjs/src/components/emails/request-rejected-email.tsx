@@ -11,6 +11,8 @@ import {
 } from '@react-email/components';
 import * as React from 'react';
 
+import { getLogoUrl } from '@/shared/utils/get-base-url.util';
+
 export interface RequestRejectedEmailProps {
   patientName?: string;
   rejectionReason?: string;
@@ -40,7 +42,7 @@ export const RequestRejectedEmail = ({
   baseUrl = 'http://localhost:3000',
 }: RequestRejectedEmailProps) => {
   const previewText = 'An update regarding your recent booking request at Samson Dental Center.';
-  const logoUrl = `${baseUrl}/images/SamsonLOGOGO-removebg-preview.png`;
+  const logoUrl = getLogoUrl(baseUrl);
 
   return (
     <Html lang="en">

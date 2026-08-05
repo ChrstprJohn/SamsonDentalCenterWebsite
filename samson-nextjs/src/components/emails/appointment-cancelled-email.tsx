@@ -11,6 +11,8 @@ import {
 } from '@react-email/components';
 import * as React from 'react';
 
+import { getLogoUrl } from '@/shared/utils/get-base-url.util';
+
 export interface AppointmentCancelledEmailProps {
   patientName?: string;
   dateStr?: string;
@@ -42,7 +44,7 @@ export const AppointmentCancelledEmail = ({
   baseUrl = 'http://localhost:3000',
 }: AppointmentCancelledEmailProps) => {
   const previewText = 'Your appointment cancellation has been processed. We hope to see you again soon.';
-  const logoUrl = `${baseUrl}/images/SamsonLOGOGO-removebg-preview.png`;
+  const logoUrl = getLogoUrl(baseUrl);
 
   return (
     <Html lang="en">

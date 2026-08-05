@@ -11,6 +11,8 @@ import {
 } from '@react-email/components';
 import * as React from 'react';
 
+import { getLogoUrl } from '@/shared/utils/get-base-url.util';
+
 export interface AppointmentRescheduledEmailProps {
   patientName?: string;
   serviceName?: string;
@@ -50,7 +52,7 @@ export const AppointmentRescheduledEmail = ({
   baseUrl = 'http://localhost:3000',
 }: AppointmentRescheduledEmailProps) => {
   const previewText = 'Your appointment has been moved to a new date and time. Review your updated schedule.';
-  const logoUrl = `${baseUrl}/images/SamsonLOGOGO-removebg-preview.png`;
+  const logoUrl = getLogoUrl(baseUrl);
   const chatUrl = `${baseUrl}/manage?token=${chatToken || appointmentId}&openChat=true`;
 
   return (

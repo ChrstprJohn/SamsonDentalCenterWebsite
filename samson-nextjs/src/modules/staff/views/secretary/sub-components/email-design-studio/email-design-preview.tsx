@@ -1,4 +1,5 @@
 import React from 'react';
+import { DEFAULT_LOGO_URL } from '@/shared/utils/get-base-url.util';
 import {
   DesignTokens,
   DraftCopy,
@@ -58,7 +59,7 @@ export function EmailDesignPreview({
         {/* Logo */}
         <div style={{ marginBottom: 28 }}>
           <img
-            src="/images/SamsonLOGOGO-removebg-preview.png"
+            src={DEFAULT_LOGO_URL}
             alt="Samson Dental Center"
             className="eml-logo"
             style={{ height: 'auto', objectFit: 'contain', display: 'block', margin: '0 auto' }}

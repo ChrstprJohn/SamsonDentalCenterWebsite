@@ -11,6 +11,8 @@ import {
 } from '@react-email/components';
 import * as React from 'react';
 
+import { getLogoUrl } from '@/shared/utils/get-base-url.util';
+
 export interface StaffReplyEmailProps {
   patientName?: string;
   chatToken?: string;
@@ -40,7 +42,7 @@ export const StaffReplyEmail = ({
   baseUrl = 'http://localhost:3000',
 }: StaffReplyEmailProps) => {
   const previewText = 'A member of our clinic team has sent you a message. Click to view and reply.';
-  const logoUrl = `${baseUrl}/images/SamsonLOGOGO-removebg-preview.png`;
+  const logoUrl = getLogoUrl(baseUrl);
   const chatUrl = `${baseUrl}/manage?token=${chatToken}&openChat=true`;
 
   return (

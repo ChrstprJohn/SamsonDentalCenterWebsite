@@ -11,6 +11,8 @@ import {
 } from '@react-email/components';
 import * as React from 'react';
 
+import { getLogoUrl } from '@/shared/utils/get-base-url.util';
+
 export interface AppointmentReminderEmailProps {
   reminderTitle?: string;
   patientName?: string;
@@ -60,7 +62,7 @@ export const AppointmentReminderEmail = ({
     ? "We're reaching out to remind you about your upcoming dental appointment with us at Samson Dental Center. Here are your visit details for tomorrow:"
     : "This is a friendly reminder about your upcoming dental appointment with us at Samson Dental Center. Here are your visit details:";
 
-  const logoUrl = `${baseUrl}/images/SamsonLOGOGO-removebg-preview.png`;
+  const logoUrl = getLogoUrl(baseUrl);
   const chatUrl = `${baseUrl}/manage?token=${chatToken || appointmentId}&openChat=true`;
 
   return (
