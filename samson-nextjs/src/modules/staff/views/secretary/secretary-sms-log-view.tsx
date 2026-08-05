@@ -125,7 +125,7 @@ export function SecretarySmsLogView() {
         {/* -- Left Sidebar: Card List -- */}
         <Sidebar
           collapsible="none"
-          className={`flex-col lg:w-[350px] flex-1 lg:flex-none border-r border-card-border/40 bg-sidebar h-full overflow-hidden ${mobileView === 'list' ? 'flex' : 'hidden'} lg:flex`}
+          className={`flex-col xl:w-[400px] lg:w-[380px] flex-1 lg:flex-none border-r border-card-border/40 bg-sidebar h-full overflow-hidden ${mobileView === 'list' ? 'flex' : 'hidden'} lg:flex`}
         >
           {/* Header */}
           <SidebarHeader className="gap-3.5 border-b p-4 shrink-0">

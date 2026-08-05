@@ -173,7 +173,7 @@ export function SecretaryPendingRequestsViewV2() {
 
   return (
     <div className="flex h-full w-full overflow-hidden">
-      <div className={`lg:w-[350px] flex-1 lg:flex-none flex-col border-r border-card-border/40 bg-sidebar h-full overflow-hidden ${colMobile('list')} lg:flex`}>
+      <div className={`xl:w-[400px] lg:w-[380px] flex-1 lg:flex-none flex-col border-r border-card-border/40 bg-sidebar h-full overflow-hidden ${colMobile('list')} lg:flex`}>
         <PendingRequestListV2
           inquiries={inquiriesView.inquiries}
           selectedInquiryId={inquiriesView.selectedInquiryId}

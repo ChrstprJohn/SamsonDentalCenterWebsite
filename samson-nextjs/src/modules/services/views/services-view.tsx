@@ -106,7 +106,7 @@ export function ServicesView({ initialServices }: ServicesViewProps) {
       {/* Left Roster Sidebar Pane */}
       <Sidebar
         collapsible="none"
-        className={`flex-col lg:w-[350px] flex-1 lg:flex-none border-r border-card-border/40 bg-sidebar h-full overflow-hidden ${colMobile('list')} lg:flex`}
+        className={`flex-col xl:w-[400px] lg:w-[380px] flex-1 lg:flex-none border-r border-card-border/40 bg-sidebar h-full overflow-hidden ${colMobile('list')} lg:flex`}
       >
         <SidebarHeader className="gap-3.5 border-b p-4 shrink-0">
           <div className="flex w-full h-8 items-center justify-between">

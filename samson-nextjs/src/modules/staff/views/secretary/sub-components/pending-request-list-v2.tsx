@@ -95,21 +95,6 @@ export function PendingRequestListV2(props: PendingRequestListV2Props) {
             </div>
           </div>
           <div className="flex items-center gap-1 shrink-0">
-            {props.lastRefreshedAt && (
-              <span className="hidden md:inline text-[10px] text-muted-foreground whitespace-nowrap">
-                Updated {props.lastRefreshedAt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
-              </span>
-            )}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={props.onRefresh}
-              disabled={props.isRefreshingInquiries}
-              className="h-8 w-8 px-0 text-muted-foreground hover:text-foreground transition-colors shrink-0"
-              title="Refresh"
-            >
-              <RotateCw className={`size-3 ${props.isRefreshingInquiries ? 'animate-spin' : ''}`} />
-            </Button>
             <Button
               variant="ghost"
               size="sm"
@@ -148,12 +133,28 @@ export function PendingRequestListV2(props: PendingRequestListV2Props) {
           ))}
         </div>
       </SidebarHeader>
-{props.isRefreshingInquiries && <SecretaryRefreshBar />}
+      {props.isRefreshingInquiries && <SecretaryRefreshBar />}
       <SidebarContent 
         data-lenis-prevent 
         style={{ scrollbarWidth: 'thin' }}
         className="!overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
       >
+        {props.lastRefreshedAt ? (
+          <div className="px-4 py-2 text-[10px] text-muted-foreground border-b border-card-border/20 flex items-center justify-between shrink-0">
+            <span>Updated {props.lastRefreshedAt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</span>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={props.onRefresh}
+              disabled={props.isRefreshingInquiries}
+              className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground transition-colors shrink-0"
+              aria-label="Refresh requests"
+              title="Refresh"
+            >
+              <RotateCw className={`size-3 ${props.isRefreshingInquiries ? 'animate-spin' : ''}`} />
+            </Button>
+          </div>
+        ) : null}
         <SidebarGroup className="px-0">
           <SidebarGroupContent className="flex flex-col">
             {isLoading ? (

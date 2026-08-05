@@ -58,7 +58,7 @@ export function SecretaryEmailDesignStudioView() {
   };
 
   return (
-    <div className="grid h-full min-h-0 flex-1 grid-cols-1 overflow-hidden bg-background xl:grid-cols-[350px_minmax(0,1fr)_320px]">
+    <div className="grid h-full min-h-0 flex-1 grid-cols-1 overflow-hidden bg-background xl:grid-cols-[400px_minmax(0,1fr)_320px]">
       {/* Left Sidebar: Email Template Selector */}
       <EmailTemplateSelector
         groupedDesigns={groupedDesigns}

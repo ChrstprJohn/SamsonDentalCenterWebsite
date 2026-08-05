@@ -32,7 +32,7 @@ export function SecretaryAppointmentsView() {
   return (
     <div className="flex flex-1 min-h-0 w-full overflow-hidden">
       {/* Column 1: Appointments List */}
-      <div className={`xl:w-[350px] lg:w-[320px] flex-1 lg:flex-none flex-col border-r border-card-border/40 bg-sidebar min-h-0 overflow-hidden ${colMobile('list')} lg:flex`}>
+      <div className={`xl:w-[400px] lg:w-[380px] flex-1 lg:flex-none flex-col border-r border-card-border/40 bg-sidebar min-h-0 overflow-hidden ${colMobile('list')} lg:flex`}>
         <SidebarHeader className="gap-3.5 border-b p-4 shrink-0">
           <div className="flex w-full h-8 items-center justify-between">
             <div className="flex items-center gap-2">
@@ -40,23 +40,6 @@ export function SecretaryAppointmentsView() {
               <div className="text-base font-medium text-foreground">
                 Appointments Directory
               </div>
-            </div>
-            <div className="flex items-center gap-1 shrink-0">
-              {view.lastRefreshedAt && (
-                <span className="hidden md:inline text-[10px] text-muted-foreground whitespace-nowrap">
-                  Updated {view.lastRefreshedAt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
-                </span>
-              )}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => void view.fetchData({ force: true })}
-                disabled={view.isLoading || view.isRefreshing}
-                className="h-8 w-8 px-0 text-muted-foreground hover:text-foreground transition-colors shrink-0"
-                title="Refresh"
-              >
-                <RotateCw className={`size-3 ${view.isRefreshing ? 'animate-spin' : ''}`} />
-              </Button>
             </div>
           </div>
           <div className="px-1">
@@ -85,6 +68,22 @@ export function SecretaryAppointmentsView() {
             ))}
           </div>
         </SidebarHeader>
+        {view.lastRefreshedAt ? (
+          <div className="px-4 py-2 text-[10px] text-muted-foreground border-b border-card-border/20 flex items-center justify-between shrink-0">
+            <span>Updated {view.lastRefreshedAt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</span>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => void view.fetchData({ force: true })}
+              disabled={view.isLoading || view.isRefreshing}
+              className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground transition-colors shrink-0"
+              aria-label="Refresh appointments"
+              title="Refresh"
+            >
+              <RotateCw className={`size-3 ${view.isRefreshing ? 'animate-spin' : ''}`} />
+            </Button>
+          </div>
+        ) : null}
         <AppointmentsTable
           appointments={view.visibleAppointments}
           selectedAppointmentId={view.selectedAppointmentId}
