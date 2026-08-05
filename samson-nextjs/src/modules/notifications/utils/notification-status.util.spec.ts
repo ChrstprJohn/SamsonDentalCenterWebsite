@@ -2,7 +2,21 @@ import { describe, expect, it, vi } from 'vitest';
 import { computeNotificationStatus } from './notification-status.util';
 
 describe('computeNotificationStatus', () => {
-  it('marks a 48-hour reminder skipped when booked inside the 48-hour lead window', () => {
+  it('returns SENT when isSent is true even if booked <48h', () => {
+    const status = computeNotificationStatus({
+      eventType: 'APPOINTMENT_REMINDER_48H',
+      targetChannel: 'EMAIL',
+      isSent: true,
+      currentChannel: 'BOTH',
+      createdAt: '2026-07-27T08:00:00Z',
+      startTime: '2026-07-28T07:00:00Z',
+    });
+
+    expect(status.label).toBe('SENT');
+    expect(status.variant).toBe('sent');
+  });
+
+  it('marks a 48-hour reminder skipped when booked inside the 48-hour lead window and not sent', () => {
     const status = computeNotificationStatus({
       eventType: 'APPOINTMENT_REMINDER_48H',
       targetChannel: 'EMAIL',
@@ -16,7 +30,7 @@ describe('computeNotificationStatus', () => {
     expect(status.variant).toBe('skipped_lead_time');
   });
 
-  it('marks a 24-hour reminder skipped when booked inside the 24-hour lead window', () => {
+  it('marks a 24-hour reminder skipped when booked inside the 24-hour lead window and not sent', () => {
     const status = computeNotificationStatus({
       eventType: 'APPOINTMENT_REMINDER_24H',
       targetChannel: 'SMS',
