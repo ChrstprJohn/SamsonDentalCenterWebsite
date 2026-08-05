@@ -1,94 +1,137 @@
 # Git & Vercel Development Workflow Guide
 
-This document outlines the standard Git branching strategy and deployment workflow for **Samson Dental Center Website**.
+This document outlines the standard Git branching strategy, fork workflow for contributors, and deployment process for the **Samson Dental Center Website**.
 
 ---
 
-## 🌿 Branching Overview
+## 1. Branch Structure
 
-- **`main`**: Production branch (Live Website: `samsondentalcenter-website.vercel.app`).
-- **`staging`**: Staging branch (Preview Website for testing features safely).
-- **`feature/*`**: Feature branches for new tasks or bug fixes created off `staging`.
+- **`main`**: Production branch (Live Website: `samsondentalcenter-website.vercel.app`). Only the Repository Owner merges into `main`.
+- **`staging`**: Staging branch for development and testing (Vercel Preview URL). All Pull Requests target this branch.
+- **`feature/*`**: Feature branches created off `staging` for specific tasks or bug fixes.
 
 ---
 
-## 🚀 Step-by-Step Developer Workflow
+## 2. Contributor Guide (Forking Workflow)
 
-### Step 1: Prepare Local Workspace
-Before starting any new feature or fix, ensure your local `staging` branch is up to date with GitHub:
+Classmates and contributors must follow these steps to propose code changes:
+
+```text
+[ MAIN REPOSITORY ]              [ YOUR FORK ]                 [ LOCAL PC ]
+
+staging (Target) <--- Open PR --- feature/my-task <--- push --- feature/my-task
+    │                                  ▲                             ▲
+    └── Sync / Pull ───────────────────┴────── checkout from ────────┘
+```
+
+### Step 1: Fork & Clone
+1. Click **Fork** on the main GitHub repository.
+2. Clone your fork locally to your computer.
+
+### Step 2: Create a Feature Branch
+Always create a feature branch off `staging`:
 
 ```bash
 git switch staging
-git pull origin staging
-```
-
-### Step 2: Create a Feature Branch
-Create and switch to a new feature branch from `staging`:
-
-```bash
 git switch -c feature/your-feature-name
 ```
+*Note: Do not commit directly to `main` or `staging`.*
 
-### Step 3: Work & Commit Changes
-Make your code changes, then stage and commit:
+### Step 3: Commit & Push
+Make your changes, stage them, and push to your fork:
 
 ```bash
 git add .
-git commit -m "feat: short description of what you built"
+git commit -m "feat: description of work"
+git push origin feature/your-feature-name
 ```
 
-### Step 4: Deploy to Staging (Test on Vercel Preview)
-When feature is complete, merge it into `staging` and push to GitHub:
+### Step 4: Open a Pull Request
+1. Open your fork on GitHub and click **Compare & Pull Request**.
+2. Set the target branches:
+   - **Base Repository**: Main Repo | **Base Branch**: `staging`
+   - **Head Repository**: Your Fork | **Compare Branch**: `feature/your-feature-name`
+3. Click **Create Pull Request**.
 
+---
+
+## 3. Syncing a Stale Fork
+
+When the main repository `staging` branch receives updates, sync your fork using either method:
+
+### Option A: GitHub UI (Recommended)
+1. Navigate to your fork on GitHub.
+2. Select the `staging` branch.
+3. Click **Sync fork** > **Update branch**.
+4. Pull the changes locally and merge into your feature branch:
+   ```bash
+   git switch staging
+   git pull origin staging
+   git switch feature/your-feature-name
+   git merge staging
+   ```
+
+### Option B: Terminal (`upstream`)
 ```bash
+# Add upstream remote (one-time setup)
+git remote add upstream https://github.com/your-username/samson-website.git
+
+# Sync staging
 git switch staging
-git merge feature/your-feature-name
+git pull upstream staging
 git push origin staging
-```
-> 💡 **Vercel** will automatically build a **Staging Preview URL**. Open the preview link and verify your changes work cleanly.
 
-### Step 5: Deploy to Production (Live Site)
-Once testing on staging is successful, merge `staging` into `main` and push to live production:
-
-```bash
-git switch main
+# Merge into active feature branch
+git switch feature/your-feature-name
 git merge staging
-git push origin main
-```
-> 🚀 **Vercel** will automatically deploy the changes to the live production domain!
-
-### Step 6: Switch Back to Staging for Next Task
-```bash
-git switch staging
 ```
 
 ---
 
-## ⚡ Command Quick Reference (`git switch`)
+## 4. Maintainer Workflow (Review & Deploy)
 
-| Task | Command |
+1. **Review PR**: Inspect code changes on GitHub.
+2. **Test Preview**: Verify functionality using the automatic Vercel Staging Preview URL.
+3. **Merge to Staging**: Approve and merge the PR into `staging`.
+4. **Deploy to Production**: Merge `staging` into `main` to trigger live deployment:
+   ```bash
+   git switch main
+   git merge staging
+   git push origin main
+   ```
+
+---
+
+## 5. Repository Protection Rules (GitHub)
+
+To protect the production branch:
+
+1. **Default Branch**: Set default branch to `staging` under **Settings** > **General** > **Default branch**.
+2. **Branch Protection**: Add rule for `main` under **Settings** > **Branches**:
+   - Enable "Require a pull request before merging"
+   - Enable "Restrict who can push to matching branches" (Limit to Repository Owner)
+
+---
+
+## 6. Quick Command Reference
+
+| Action | Command |
 | :--- | :--- |
-| **Switch branch** | `git switch <branch-name>` |
-| **Create & switch to new branch** | `git switch -c <new-branch-name>` |
-| **Pull latest changes from GitHub** | `git pull origin <branch-name>` |
-| **Push local changes to GitHub** | `git push origin <branch-name>` |
-| **Merge another branch into current** | `git merge <other-branch>` |
+| **Switch branch** | `git switch <branch>` |
+| **Create feature branch** | `git switch -c feature/<name>` |
+| **Stage changes** | `git add .` |
+| **Commit changes** | `git commit -m "msg"` |
+| **Push to fork** | `git push origin feature/<name>` |
+| **Pull latest staging** | `git pull origin staging` |
 
 ---
 
-## ⏰ Cron & Automated Reminders Setup
-
-- **Automated Outbox Handler**: `/api/outbox/process`
-- **Cron Service**: Configured on [cron-job.org](https://cron-job.org) (running every 15 minutes).
-- **Function**: Pings Next.js outbox endpoint every 15 minutes to send 24h & 48h appointment reminder emails/SMS via Resend/Twilio.
-
----
-
-## 🔧 Vercel Settings Configuration
+## 7. Vercel Configuration
 
 - **Root Directory**: `samson-nextjs`
 - **Production Branch**: `main`
-- **Required Environment Variables**:
+- **Preview Branch**: `staging`
+- **Environment Variables**:
   - `NEXT_PUBLIC_SUPABASE_URL`
   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
   - `SUPABASE_SERVICE_ROLE_KEY`
