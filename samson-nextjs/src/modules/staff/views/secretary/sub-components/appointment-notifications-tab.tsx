@@ -291,6 +291,7 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
 
   const isEmailAvailable = channel === 'EMAIL' || channel === 'BOTH';
   const isSmsAvailable = channel === 'SMS' || channel === 'BOTH';
+  const isAnyResending = resending !== null || detailResendingId !== null;
 
   return (
     <div className="space-y-4">
@@ -413,7 +414,7 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
                         ? 'Send Now'
                         : 'Force Send';
 
-              const isAllowed = isEmailAvailable && !loadingLogs && !isSending && (
+              const isAllowed = isEmailAvailable && !loadingLogs && !isAnyResending && (
                 (Boolean(inquiryLog) && (displayStatus === 'PENDING' || displayStatus === 'FAILED')) ||
                 allowOverrideResend
               );
@@ -498,6 +499,12 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
                 }
                 if (isSending) {
                   return { label: 'Sending...', allowed: false };
+                }
+                if (isAnyResending) {
+                  return {
+                    label: statusObj.label === 'SENT' ? 'Send New' : statusObj.label === 'PENDING' ? 'Send Now' : 'Force Send',
+                    allowed: false,
+                  };
                 }
                 if (statusObj.label === 'SENT') {
                   return { label: 'Send New', allowed: allowOverrideResend };
@@ -616,7 +623,7 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
                                 : 'Force Send';
 
                       const isChannelAvailable = channelType === 'SMS' ? isSmsAvailable : isEmailAvailable;
-                      const isAllowed = isChannelAvailable && !loadingLogs && !isSending && (
+                      const isAllowed = isChannelAvailable && !loadingLogs && !isAnyResending && (
                         (Boolean(latestLog) && (displayStatus === 'PENDING' || displayStatus === 'FAILED' || displayStatus === 'NOT SENT')) ||
                         allowOverrideResend
                       );
@@ -711,7 +718,7 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
                         size="sm"
                         onClick={() => handleDetailResend(log.id)}
                         className="h-6 w-6 p-0 text-rose-600 hover:text-rose-700 hover:bg-rose-500/10 shrink-0 disabled:opacity-50"
-                        disabled={detailResendingId === log.id}
+                        disabled={isAnyResending}
                         title={detailResendingId === log.id ? 'Sending...' : isProcessed ? 'Send New' : 'Resend'}
                       >
                         <RotateCw className={`size-3 ${detailResendingId === log.id ? 'animate-spin' : ''}`} />
@@ -720,7 +727,7 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
                       <button
                         onClick={() => handleDetailResend(log.id)}
                         className="text-xs font-semibold text-rose-600 hover:text-rose-700 shrink-0 disabled:opacity-50"
-                        disabled={detailResendingId === log.id}
+                        disabled={isAnyResending}
                       >
                         {detailResendingId === log.id ? 'Sending...' : isProcessed ? 'Send New' : 'Resend'}
                       </button>
