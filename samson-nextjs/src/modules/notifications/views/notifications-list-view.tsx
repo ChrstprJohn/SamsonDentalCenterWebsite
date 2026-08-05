@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { NotificationResponseDto } from '../dtos/management/notification-response.dto';
@@ -80,6 +80,12 @@ export function NotificationsListView({ initialNotifications }: NotificationsLis
     initialNotifications.length > 0 ? initialNotifications[0].id : null
   );
   const [mobileView, setMobileView] = useState<'list' | 'detail'>('list');
+
+  // Sync local state when server refreshes and passes new initialNotifications.
+  // This fires after router.refresh() from the realtime hook delivers new data.
+  useEffect(() => {
+    setNotifications(initialNotifications);
+  }, [initialNotifications]);
 
   const { addToast } = useToast();
   const router = useRouter();
@@ -257,7 +263,7 @@ export function NotificationsListView({ initialNotifications }: NotificationsLis
                             <span className={`text-[13px] truncate ${!notif.isRead ? 'font-bold text-foreground' : 'font-medium'}`}>
                               {notif.title}
                             </span>
-                            <span className="text-[10px] text-muted-foreground font-medium whitespace-nowrap shrink-0">
+                            <span className="text-[10px] text-muted-foreground font-medium whitespace-nowrap shrink-0" suppressHydrationWarning>
                               {formatRelativeTime(notif.createdAt)}
                             </span>
                           </div>
@@ -332,7 +338,7 @@ export function NotificationsListView({ initialNotifications }: NotificationsLis
                 </div>
                 <div className="bg-card border border-card-border rounded-xl p-3.5 flex flex-col gap-1">
                   <span className="text-[10px] uppercase tracking-widest font-bold text-text-muted">Received</span>
-                  <span className="text-sm font-semibold text-text-primary">
+                  <span className="text-sm font-semibold text-text-primary" suppressHydrationWarning>
                     {new Date(selectedNotif.createdAt).toLocaleString()}
                   </span>
                 </div>
