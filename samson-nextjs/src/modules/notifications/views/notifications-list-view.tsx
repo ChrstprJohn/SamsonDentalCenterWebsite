@@ -28,10 +28,9 @@ import {
   ArrowLeft,
   ExternalLink,
   Calendar,
-  AlertTriangle,
-  FileText,
   MailWarning,
   CircleAlert,
+  MessageSquare,
   Clock,
 } from 'lucide-react';
 
@@ -44,13 +43,10 @@ type TabType = (typeof TABS)[number];
 
 function getNotificationIcon(type: string) {
   switch (type) {
-    case 'NEW_APPOINTMENT_REQUEST':
-    case 'NEW_RESCHEDULE_REQUEST':
+    case 'NEW_INQUIRY':
       return <Calendar className="size-4 text-emerald-500" />;
-    case 'PATIENT_CANCEL_ALERT':
-      return <AlertTriangle className="size-4 text-rose-500" />;
-    case 'TREATMENT_RENDERED':
-      return <FileText className="size-4 text-blue-500" />;
+    case 'NEW_MESSAGE':
+      return <MessageSquare className="size-4 text-sky-500" />;
     case 'FAILED_EMAIL_ALERT':
       return <MailWarning className="size-4 text-amber-500" />;
     default:

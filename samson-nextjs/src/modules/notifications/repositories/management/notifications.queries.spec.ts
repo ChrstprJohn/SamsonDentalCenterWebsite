@@ -24,6 +24,7 @@ describe('NotificationsQueries', () => {
       from: vi.fn().mockReturnThis(),
       select: vi.fn().mockReturnThis(),
       eq: vi.fn().mockReturnThis(),
+      in: vi.fn().mockReturnThis(),
       order: vi.fn().mockReturnThis(),
       limit: vi.fn().mockReturnThis(),
       or: vi.fn().mockResolvedValue({ data: [mockNotification], count: 1, error: null }),

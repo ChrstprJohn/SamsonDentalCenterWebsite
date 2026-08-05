@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Calendar, MailWarning, AlertTriangle, CircleAlert, Check, FileText } from 'lucide-react';
+import { MessageSquare, MailWarning, CircleAlert, Check, Calendar } from 'lucide-react';
 import { NotificationResponseDto } from '../dtos/management/notification-response.dto';
 
 interface NotificationItemProps {
@@ -18,13 +18,10 @@ export function NotificationItem({ notification, onMarkRead }: NotificationItemP
 
   const getIcon = (type: string) => {
     switch (type) {
-      case 'NEW_APPOINTMENT_REQUEST':
-      case 'NEW_RESCHEDULE_REQUEST':
+      case 'NEW_INQUIRY':
         return <Calendar className="w-4 h-4 text-emerald-400" />;
-      case 'PATIENT_CANCEL_ALERT':
-        return <AlertTriangle className="w-4 h-4 text-rose-400" />;
-      case 'TREATMENT_RENDERED':
-        return <FileText className="w-4 h-4 text-blue-400" />;
+      case 'NEW_MESSAGE':
+        return <MessageSquare className="w-4 h-4 text-sky-400" />;
       case 'FAILED_EMAIL_ALERT':
         return <MailWarning className="w-4 h-4 text-amber-400" />;
       default:

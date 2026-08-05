@@ -5,11 +5,7 @@ import { onAppointmentBookedSubscriber } from '@/modules/emails/subscribers/on-a
 import { onAppointmentConvertedSubscriber } from '@/modules/emails/subscribers/on-appointment-converted.subscriber';
 import { onManualBookingGuestSubscriber } from '@/modules/emails/subscribers/on-manual-booking-guest.subscriber';
 import { onManualBookingPatientSubscriber } from '@/modules/emails/subscribers/on-manual-booking-patient.subscriber';
-import { onTreatmentRenderedSubscriber } from '@/modules/notifications/subscribers/on-treatment-rendered.subscriber';
 import { onEmailFailedSubscriber } from '@/modules/notifications/subscribers/on-email-failed.subscriber';
-import { onScheduleConflictSubscriber } from '@/modules/notifications/subscribers/on-schedule-conflict.subscriber';
-import { onNewBookingSubscriber } from '@/modules/notifications/subscribers/on-new-booking.subscriber';
-import { onCancelBookingSubscriber as onCancelBookingNotificationSubscriber } from '@/modules/notifications/subscribers/on-cancel-booking.subscriber';
 import { onCancelBookingSubscriber as onCancelBookingEmailSubscriber } from '@/modules/emails/subscribers/on-cancel-booking.subscriber';
 import { onRescheduleBookingSubscriber } from '@/modules/emails/subscribers/on-reschedule-booking.subscriber';
 import { onStaffReplySubscriber } from '@/modules/emails/subscribers/on-staff-reply.subscriber';
@@ -35,15 +31,11 @@ export const bootstrapEventSubscribers = () => {
   registerSubscriber('APPOINTMENT_CONVERTED_FROM_INQUIRY_PATIENT', onManualBookingPatientSubscriber.handle);
   registerSubscriber('APPOINTMENT_MANUALLY_BOOKED_GUEST', onManualBookingGuestSubscriber.handle);
   registerSubscriber('APPOINTMENT_MANUALLY_BOOKED_PATIENT', onManualBookingPatientSubscriber.handle);
-  
-  // Notification subscriptions
-  registerSubscriber('TREATMENT_RENDERED', onTreatmentRenderedSubscriber.handle);
+
+  // Email-failed alert (ops: guest email failed, manual resend needed)
   registerSubscriber('EMAIL_FAILED', onEmailFailedSubscriber.handle);
-  registerSubscriber('SCHEDULE_CONFLICT', onScheduleConflictSubscriber.handle);
-  registerSubscriber('NEW_APPOINTMENT_REQUEST', onNewBookingSubscriber.handle);
-  
+
   // Cancel subscribers
-  registerSubscriber('CANCEL_BOOKING', onCancelBookingNotificationSubscriber.handle);
   registerSubscriber('CANCEL_BOOKING', onCancelBookingEmailSubscriber.handle);
   registerSubscriber('CANCEL_BOOKING_SMS', onCancelBookingSmsSubscriber.handle);
   

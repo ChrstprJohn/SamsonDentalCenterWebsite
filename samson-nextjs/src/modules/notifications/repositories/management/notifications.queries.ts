@@ -1,6 +1,9 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { notificationResponseSchema, NotificationResponseDto } from '../../dtos/management/notification-response.dto';
 
+// Guest-only business: only these notification types are shown.
+export const KEPT_NOTIFICATION_TYPES = ['NEW_INQUIRY', 'NEW_MESSAGE', 'FAILED_EMAIL_ALERT'];
+
 export const getUnreadNotifications = (supabase: SupabaseClient) => async (
   userId: string | null,
   role: string,
@@ -10,6 +13,7 @@ export const getUnreadNotifications = (supabase: SupabaseClient) => async (
     .from('notifications')
     .select('*')
     .eq('is_archived', false)
+    .in('type', KEPT_NOTIFICATION_TYPES)
     .order('created_at', { ascending: false })
     .limit(limit);
 
@@ -33,7 +37,8 @@ export const getUnreadCount = (supabase: SupabaseClient) => async (
     .from('notifications')
     .select('*', { count: 'exact', head: true })
     .eq('is_read', false)
-    .eq('is_archived', false);
+    .eq('is_archived', false)
+    .in('type', KEPT_NOTIFICATION_TYPES);
 
   if (userId) {
     query = query.or(`recipient_id.eq.${userId},recipient_role.eq.${role}`);

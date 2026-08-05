@@ -31,10 +31,8 @@ export function useNotificationsRealtime(userId: string | null) {
           const isUserMatch = !newNotif.recipient_id || newNotif.recipient_id === userId;
 
           if (isRoleMatch && isUserMatch) {
-            if (newNotif.priority === 'HIGH') {
-              addToast(`[ALERT] ${newNotif.title}: ${newNotif.message}`, 'info');
-              router.refresh();
-            }
+            addToast(`${newNotif.title}: ${newNotif.message}`, 'info');
+            router.refresh();
           }
         }
       )
