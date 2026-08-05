@@ -160,23 +160,34 @@ export function SecretaryEmailLogView() {
             </div>
 
             {/* Category Tabs */}
-            <div className="flex gap-1 bg-muted/30 p-1 rounded-xl">
-              {CATEGORY_TABS.map((tab) => (
-                <Button
-                  key={tab.key}
-                  onClick={() => { setCategoryFilter(tab.key); setSelectedEmailId(null); setMobileView('list'); }}
-                  variant="ghost"
-                  size="sm"
-                  className={`flex-1 h-7 text-[11px] font-semibold rounded-lg transition-all ${
-                    categoryFilter === tab.key
-                      ? 'bg-card text-foreground shadow-xs border border-border/40'
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  {tab.label}
-                </Button>
-              ))}
-            </div>
+            {(() => {
+              const activeIndex = CATEGORY_TABS.findIndex((t) => t.key === categoryFilter);
+              const safeIndex = activeIndex < 0 ? 0 : activeIndex;
+              return (
+                <div className="relative grid grid-cols-3 gap-1 bg-muted/20 p-1 rounded-xl">
+                  <div
+                    className="absolute top-1 bottom-1 rounded-lg bg-primary transition-transform duration-200 ease-out shadow-xs"
+                    style={{
+                      width: 'calc((100% - 0.5rem) / 3)',
+                      transform: `translateX(calc(${safeIndex} * (100% + 0.25rem)))`,
+                    }}
+                  />
+                  {CATEGORY_TABS.map((tab) => (
+                    <button
+                      key={tab.key}
+                      onClick={() => { setCategoryFilter(tab.key); setSelectedEmailId(null); setMobileView('list'); }}
+                      className={`relative z-10 h-7 text-[11px] font-semibold rounded-lg transition-colors flex items-center justify-center ${
+                        categoryFilter === tab.key
+                          ? 'text-primary-foreground font-semibold'
+                          : 'text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
+              );
+            })()}
 
             {/* Search */}
             <div className="px-1">

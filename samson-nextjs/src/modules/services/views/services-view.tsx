@@ -134,23 +134,34 @@ export function ServicesView({ initialServices }: ServicesViewProps) {
             />
           </div>
 
-          <div className="flex gap-1 bg-muted/20 p-1 rounded-lg">
-            {TABS.map((tab) => (
-              <Button
-                key={tab.key}
-                onClick={() => setStatusFilter(tab.key)}
-                variant="ghost"
-                size="sm"
-                className={`flex-1 h-8 text-xs font-semibold rounded-xl transition-all ${
-                  statusFilter === tab.key
-                    ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                {tab.label} ({tab.count})
-              </Button>
-            ))}
-          </div>
+        {(() => {
+          const activeIndex = TABS.findIndex((t) => t.key === statusFilter);
+          const safeIndex = activeIndex < 0 ? 0 : activeIndex;
+          return (
+            <div className="relative grid grid-cols-3 gap-1 bg-muted/20 p-1 rounded-xl">
+              <div
+                className="absolute top-1 bottom-1 rounded-lg bg-primary transition-transform duration-200 ease-out shadow-xs"
+                style={{
+                  width: 'calc((100% - 0.5rem) / 3)',
+                  transform: `translateX(calc(${safeIndex} * (100% + 0.25rem)))`,
+                }}
+              />
+              {TABS.map((tab) => (
+                <button
+                  key={tab.key}
+                  onClick={() => setStatusFilter(tab.key)}
+                  className={`relative z-10 h-8 text-xs font-semibold rounded-lg transition-colors flex items-center justify-center ${
+                    statusFilter === tab.key
+                      ? 'text-primary-foreground font-semibold'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  {tab.label} ({tab.count})
+                </button>
+              ))}
+            </div>
+          );
+        })()}
         </SidebarHeader>
 
         <ServiceList

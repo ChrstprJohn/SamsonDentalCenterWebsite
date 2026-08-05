@@ -50,23 +50,34 @@ export function SecretaryAppointmentsView() {
               className="rounded-md"
             />
           </div>
-          <div className="flex gap-1 bg-muted/20 p-1 rounded-lg">
-            {TABS.map((tab) => (
-              <Button
-                key={tab.key}
-                onClick={() => view.selectTab(tab.key)}
-                variant="ghost"
-                size="sm"
-                className={`flex-1 h-8 text-xs font-semibold rounded-xl transition-all ${
-                  view.activeTab === tab.key
-                    ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                {tab.label} ({tab.count})
-              </Button>
-            ))}
-          </div>
+        {(() => {
+          const activeIndex = TABS.findIndex((t) => t.key === view.activeTab);
+          const safeIndex = activeIndex < 0 ? 0 : activeIndex;
+          return (
+            <div className="relative grid grid-cols-2 gap-1 bg-muted/20 p-1 rounded-xl">
+              <div
+                className="absolute top-1 bottom-1 rounded-lg bg-primary transition-transform duration-200 ease-out shadow-xs"
+                style={{
+                  width: 'calc((100% - 0.25rem) / 2)',
+                  transform: `translateX(calc(${safeIndex} * (100% + 0.25rem)))`,
+                }}
+              />
+              {TABS.map((tab) => (
+                <button
+                  key={tab.key}
+                  onClick={() => view.selectTab(tab.key)}
+                  className={`relative z-10 h-8 text-xs font-semibold rounded-lg transition-colors flex items-center justify-center ${
+                    view.activeTab === tab.key
+                      ? 'text-primary-foreground font-semibold'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  {tab.label} ({tab.count})
+                </button>
+              ))}
+            </div>
+          );
+        })()}
         </SidebarHeader>
         {view.lastRefreshedAt ? (
           <div className="px-4 py-2 text-[10px] text-muted-foreground border-b border-card-border/20 flex items-center justify-between shrink-0">

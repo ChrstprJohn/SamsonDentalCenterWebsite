@@ -962,32 +962,40 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false,
                     </div>
 
                     {/* Tabs */}
-                    <div className="flex gap-1 bg-muted/20 p-1 rounded-lg">
-                        <Button
+                    {(() => {
+                      const activeIndex = activeTab === 'ACTIVE' ? 0 : 1;
+                      return (
+                        <div className="relative grid grid-cols-2 gap-1 bg-muted/20 p-1 rounded-xl">
+                          <div
+                            className="absolute top-1 bottom-1 rounded-lg bg-primary transition-transform duration-200 ease-out shadow-xs"
+                            style={{
+                              width: 'calc((100% - 0.25rem) / 2)',
+                              transform: `translateX(calc(${activeIndex} * (100% + 0.25rem)))`,
+                            }}
+                          />
+                          <button
                             onClick={() => { setActiveTab('ACTIVE'); setSelectedThreadId(null); }}
-                            variant="ghost"
-                            size="sm"
-                            className={`flex-1 h-8 text-xs font-semibold rounded-xl transition-all ${
-                                activeTab === 'ACTIVE'
-                                    ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground shadow-sm'
-                                    : 'text-muted-foreground hover:text-foreground'
+                            className={`relative z-10 h-8 text-xs font-semibold rounded-lg transition-colors flex items-center justify-center ${
+                              activeTab === 'ACTIVE'
+                                ? 'text-primary-foreground font-semibold'
+                                : 'text-muted-foreground hover:text-foreground'
                             }`}
-                        >
+                          >
                             Active ({tabCounts.active})
-                        </Button>
-                        <Button
+                          </button>
+                          <button
                             onClick={() => { setActiveTab('ARCHIVE'); setSelectedThreadId(null); }}
-                            variant="ghost"
-                            size="sm"
-                            className={`flex-1 h-8 text-xs font-semibold rounded-xl transition-all ${
-                                activeTab === 'ARCHIVE'
-                                    ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground shadow-sm'
-                                    : 'text-muted-foreground hover:text-foreground'
+                            className={`relative z-10 h-8 text-xs font-semibold rounded-lg transition-colors flex items-center justify-center ${
+                              activeTab === 'ARCHIVE'
+                                ? 'text-primary-foreground font-semibold'
+                                : 'text-muted-foreground hover:text-foreground'
                             }`}
-                        >
+                          >
                             Archive ({tabCounts.archive})
-                        </Button>
-                    </div>
+                          </button>
+                        </div>
+                      );
+                    })()}
                 </SidebarHeader>
 
                 <SidebarContent 

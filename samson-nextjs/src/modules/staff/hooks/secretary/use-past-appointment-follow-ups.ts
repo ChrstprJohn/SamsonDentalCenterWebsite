@@ -160,10 +160,22 @@ export function usePastAppointmentFollowUps() {
     }
   }, [list, selectedAppointmentId]);
 
-  const selectTab = (tab: PastFollowUpTab) => {
+  const selectTab = useCallback((tab: PastFollowUpTab) => {
     setActiveTab(tab);
     setSelectedAppointmentId(null);
-  };
+    if (!queryRef.current.searchTerm) {
+      const cached = tabCacheRef.current[tab];
+      if (cached) {
+        setAppointments(cached.items);
+        setNextCursor(cached.nextCursor);
+        setHasMore(cached.hasMore);
+        setTabCounts((previous) => ({ ...previous, [tab]: cached.total }));
+        setError(null);
+        return;
+      }
+    }
+    void fetchData();
+  }, [fetchData]);
 
   const selectAppointment = useCallback((appointmentId: string | null) => {
     setSelectedAppointmentId(appointmentId);

@@ -57,32 +57,40 @@ export function SecretaryPastAppointmentFollowUpsView() {
               className="rounded-md"
             />
           </div>
-          <div className="flex gap-1 bg-muted/20 p-1 rounded-lg">
-            <Button
-              onClick={() => { view.selectTab('missed-checkouts'); setMobileView('list'); }}
-              variant="ghost"
-              size="sm"
-              className={`flex-1 h-8 text-xs font-semibold rounded-xl transition-all ${
-                view.activeTab === 'missed-checkouts'
-                  ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              Checkouts ({view.tabCounts['missed-checkouts']})
-            </Button>
-            <Button
-              onClick={() => { view.selectTab('no-show-follow-ups'); setMobileView('list'); }}
-              variant="ghost"
-              size="sm"
-              className={`flex-1 h-8 text-xs font-semibold rounded-xl transition-all ${
-                view.activeTab === 'no-show-follow-ups'
-                  ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              No-shows ({view.tabCounts['no-show-follow-ups']})
-            </Button>
-          </div>
+        {(() => {
+          const activeIndex = view.activeTab === 'missed-checkouts' ? 0 : 1;
+          return (
+            <div className="relative grid grid-cols-2 gap-1 bg-muted/20 p-1 rounded-xl">
+              <div
+                className="absolute top-1 bottom-1 rounded-lg bg-primary transition-transform duration-200 ease-out shadow-xs"
+                style={{
+                  width: 'calc((100% - 0.25rem) / 2)',
+                  transform: `translateX(calc(${activeIndex} * (100% + 0.25rem)))`,
+                }}
+              />
+              <button
+                onClick={() => { view.selectTab('missed-checkouts'); setMobileView('list'); }}
+                className={`relative z-10 h-8 text-xs font-semibold rounded-lg transition-colors flex items-center justify-center ${
+                  view.activeTab === 'missed-checkouts'
+                    ? 'text-primary-foreground font-semibold'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                Checkouts ({view.tabCounts['missed-checkouts']})
+              </button>
+              <button
+                onClick={() => { view.selectTab('no-show-follow-ups'); setMobileView('list'); }}
+                className={`relative z-10 h-8 text-xs font-semibold rounded-lg transition-colors flex items-center justify-center ${
+                  view.activeTab === 'no-show-follow-ups'
+                    ? 'text-primary-foreground font-semibold'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                No-shows ({view.tabCounts['no-show-follow-ups']})
+              </button>
+            </div>
+          );
+        })()}
         </SidebarHeader>
 
         <div

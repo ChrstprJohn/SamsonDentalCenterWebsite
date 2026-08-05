@@ -159,23 +159,34 @@ export function SecretarySmsLogView() {
             </div>
 
             {/* Status Tabs */}
-            <div className="flex gap-1 bg-muted/20 p-1 rounded-lg">
-              {STATUS_TABS.map((tab) => (
-                <Button
-                  key={tab}
-                  onClick={() => { setStatusFilter(tab); setSelectedSmsId(null); setMobileView('list'); }}
-                  variant="ghost"
-                  size="sm"
-                  className={`flex-1 h-8 text-xs font-semibold rounded-xl transition-all ${
-                    statusFilter === tab
-                      ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground shadow-sm'
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  {tab === 'ALL' ? 'All' : tab.charAt(0) + tab.slice(1).toLowerCase()}
-                </Button>
-              ))}
-            </div>
+            {(() => {
+              const activeIndex = STATUS_TABS.indexOf(statusFilter as any);
+              const safeIndex = activeIndex < 0 ? 0 : activeIndex;
+              return (
+                <div className="relative grid grid-cols-4 gap-1 bg-muted/20 p-1 rounded-xl">
+                  <div
+                    className="absolute top-1 bottom-1 rounded-lg bg-primary transition-transform duration-200 ease-out shadow-xs"
+                    style={{
+                      width: 'calc((100% - 0.75rem) / 4)',
+                      transform: `translateX(calc(${safeIndex} * (100% + 0.25rem)))`,
+                    }}
+                  />
+                  {STATUS_TABS.map((tab) => (
+                    <button
+                      key={tab}
+                      onClick={() => { setStatusFilter(tab); setSelectedSmsId(null); setMobileView('list'); }}
+                      className={`relative z-10 h-8 text-xs font-semibold rounded-lg transition-colors flex items-center justify-center ${
+                        statusFilter === tab
+                          ? 'text-primary-foreground font-semibold'
+                          : 'text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
+                      {tab === 'ALL' ? 'All' : tab.charAt(0) + tab.slice(1).toLowerCase()}
+                    </button>
+                  ))}
+                </div>
+              );
+            })()}
           </SidebarHeader>
 
           {/* Card List */}

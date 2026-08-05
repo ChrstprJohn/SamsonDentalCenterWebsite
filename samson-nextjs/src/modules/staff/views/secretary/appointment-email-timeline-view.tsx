@@ -443,23 +443,34 @@ export function AppointmentEmailTimelineView() {
             />
           </div>
 
-          <div className="flex gap-1 bg-muted/20 p-1 rounded-lg">
-            {LEFT_TABS.map((tab) => (
-              <Button
-                key={tab.key}
-                onClick={() => { selectTab(tab.key); setMobileView('list'); }}
-                variant="ghost"
-                size="sm"
-                className={`flex-1 h-8 text-xs font-semibold rounded-xl transition-all ${
-                  leftTab === tab.key
-                    ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                {tab.label} ({tabCounts[tab.key]})
-              </Button>
-            ))}
-          </div>
+        {(() => {
+          const activeIndex = LEFT_TABS.findIndex((t) => t.key === leftTab);
+          const safeIndex = activeIndex < 0 ? 0 : activeIndex;
+          return (
+            <div className="relative grid grid-cols-3 gap-1 bg-muted/20 p-1 rounded-xl">
+              <div
+                className="absolute top-1 bottom-1 rounded-lg bg-primary transition-transform duration-200 ease-out shadow-xs"
+                style={{
+                  width: 'calc((100% - 0.5rem) / 3)',
+                  transform: `translateX(calc(${safeIndex} * (100% + 0.25rem)))`,
+                }}
+              />
+              {LEFT_TABS.map((tab) => (
+                <button
+                  key={tab.key}
+                  onClick={() => { selectTab(tab.key); setMobileView('list'); }}
+                  className={`relative z-10 h-8 text-xs font-semibold rounded-lg transition-colors flex items-center justify-center ${
+                    leftTab === tab.key
+                      ? 'text-primary-foreground font-semibold'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  {tab.label} ({tabCounts[tab.key]})
+                </button>
+              ))}
+            </div>
+          );
+        })()}
         </SidebarHeader>
         {lastRefreshedAt ? (
           <div className="px-4 py-2 text-[10px] text-muted-foreground border-b border-card-border/20 flex items-center justify-between shrink-0">
