@@ -77,14 +77,13 @@ export const updateAppointmentStatusUseCase = (deps: {
         if (
           appointment.proposedDate &&
           appointment.proposedStartTime &&
-          appointment.proposedEndTime &&
-          appointment.proposedDoctorId
+          appointment.proposedEndTime
         ) {
           finalRescheduleMetadata = {
             date: appointment.proposedDate,
             startTime: appointment.proposedStartTime,
             endTime: appointment.proposedEndTime,
-            doctorId: appointment.proposedDoctorId,
+            doctorId: appointment.proposedDoctorId || appointment.doctorId,
           };
         }
         clearProposedMetadata = true;
