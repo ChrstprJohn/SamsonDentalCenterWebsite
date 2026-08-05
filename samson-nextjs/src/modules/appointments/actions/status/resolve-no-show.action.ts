@@ -20,14 +20,29 @@ export async function resolveNoShowAction(formData: ResolveNoShowDto) {
       updateAppointmentStatusTransaction: updateAppointmentStatusTransactionCommand(supabase),
     });
 
-    const rescheduleMetadata = validData.newDate && validData.newStartTime && validData.newEndTime && validData.newDoctorId
-      ? {
-          date: validData.newDate,
-          startTime: validData.newStartTime,
-          endTime: validData.newEndTime,
-          doctorId: validData.newDoctorId,
+    let rescheduleMetadata: { date: string; startTime: string; endTime: string; doctorId: string } | undefined = undefined;
+
+    if (validData.newDate && validData.newStartTime && validData.newEndTime && validData.newDoctorId) {
+      rescheduleMetadata = {
+        date: validData.newDate,
+        startTime: validData.newStartTime,
+        endTime: validData.newEndTime,
+        doctorId: validData.newDoctorId,
+      };
+    } else if (validData.newDate || validData.newStartTime || validData.newEndTime || validData.newDoctorId) {
+      const getAppt = getAppointmentByIdQuery(supabase);
+      const existingAppt = await getAppt(validData.appointmentId);
+      if (existingAppt) {
+        const date = validData.newDate || existingAppt.date;
+        const doctorId = validData.newDoctorId || existingAppt.doctorId;
+        const startTime = validData.newStartTime || (existingAppt.startTime ? `${date}T${existingAppt.startTime}` : undefined);
+        const endTime = validData.newEndTime || (existingAppt.endTime ? `${date}T${existingAppt.endTime}` : undefined);
+
+        if (date && startTime && endTime && doctorId) {
+          rescheduleMetadata = { date, startTime, endTime, doctorId };
         }
-      : undefined;
+      }
+    }
 
     const result = await useCase(
       validData.appointmentId,
