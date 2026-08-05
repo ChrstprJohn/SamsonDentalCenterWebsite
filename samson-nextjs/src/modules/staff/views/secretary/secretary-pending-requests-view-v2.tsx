@@ -12,10 +12,14 @@ import {
   Check,
   ChevronDown,
   ClipboardList,
+  Mail,
   Pencil,
+  RotateCw,
   UserRound,
   X,
 } from 'lucide-react';
+import { useToast } from '@/components/feedback/toast-container';
+import { resendInquiryNotificationAction } from '@/modules/appointments/actions/booking/resend-inquiry-notification.action';
 
 function getServiceName(services: { id: string; name: string }[], serviceId: string): string {
   if (!serviceId) return 'No service selected';
@@ -52,7 +56,39 @@ export function SecretaryPendingRequestsViewV2() {
   const [patientSnapshot, setPatientSnapshot] = React.useState<Record<string, string>>({});
   const [isEditingSchedule, setIsEditingSchedule] = React.useState(false);
   const [scheduleSnapshot, setScheduleSnapshot] = React.useState<Record<string, string>>({});
+  const { addToast } = useToast();
   const [assignedDoctorName, setAssignedDoctorName] = React.useState('');
+  const [isResendingEmail, setIsResendingEmail] = React.useState(false);
+
+  const handleResendInquiryEmail = async () => {
+    if (!inquiriesView.selectedInquiry?.id) return;
+    setIsResendingEmail(true);
+    const res = await resendInquiryNotificationAction({
+      inquiryId: inquiriesView.selectedInquiry.id,
+      eventType: 'APPOINTMENT_INQUIRY_RECEIVED',
+    });
+    if (!res.success) {
+      addToast(res.error || 'Failed to resend inquiry email.', 'error');
+    } else {
+      addToast('Inquiry confirmation email sent successfully.', 'success');
+    }
+    setIsResendingEmail(false);
+  };
+
+  const handleResendRejectionEmail = async () => {
+    if (!inquiriesView.selectedInquiry?.id) return;
+    setIsResendingEmail(true);
+    const res = await resendInquiryNotificationAction({
+      inquiryId: inquiriesView.selectedInquiry.id,
+      eventType: 'REJECT_INQUIRY',
+    });
+    if (!res.success) {
+      addToast(res.error || 'Failed to resend rejection email.', 'error');
+    } else {
+      addToast('Rejection email sent successfully.', 'success');
+    }
+    setIsResendingEmail(false);
+  };
 
   const colMobile = (view: 'list' | 'detail' | 'quickLogs') =>
     mobileView === view ? 'flex' : 'hidden';
@@ -363,11 +399,57 @@ export function SecretaryPendingRequestsViewV2() {
                   )}
 
                   {/* Section: Current Status */}
-                  <div className="flex items-center justify-between py-4">
-                    <span className="text-sm font-medium text-foreground">Current Status</span>
-                    <Badge variant={inquiriesView.selectedInquiry?.status === 'NEW' ? 'warning' : inquiriesView.selectedInquiry?.status === 'CONVERTED' ? 'success' : 'error'} className="text-xs px-3 py-1">
-                      {inquiriesView.selectedInquiry?.status === 'NEW' ? 'NEW / PENDING' : inquiriesView.selectedInquiry?.status === 'CONVERTED' ? 'CONVERTED / APPROVED' : 'DROPPED / REJECTED'}
-                    </Badge>
+                  <div className="flex flex-col gap-2 py-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-foreground">Current Status</span>
+                      <Badge variant={inquiriesView.selectedInquiry?.status === 'NEW' ? 'warning' : inquiriesView.selectedInquiry?.status === 'CONVERTED' ? 'success' : 'error'} className="text-xs px-3 py-1">
+                        {inquiriesView.selectedInquiry?.status === 'NEW' ? 'NEW / PENDING' : inquiriesView.selectedInquiry?.status === 'CONVERTED' ? 'CONVERTED / APPROVED' : 'DROPPED / REJECTED'}
+                      </Badge>
+                    </div>
+
+                    {inquiriesView.selectedInquiry?.status === 'NEW' && (
+                      <div className="flex items-center justify-between p-3 rounded-xl bg-secondary-bg/20 border border-card-border/60 mt-1">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <Mail className="size-3.5 text-muted-foreground shrink-0" />
+                          <div className="flex flex-col min-w-0">
+                            <span className="text-xs font-medium text-foreground">Inquiry Request Received</span>
+                            <span className="text-[10px] text-muted-foreground">Confirmation Email</span>
+                          </div>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={isResendingEmail}
+                          onClick={handleResendInquiryEmail}
+                          className="text-[10px] h-7 px-2.5 gap-1 shrink-0 disabled:opacity-40"
+                        >
+                          <RotateCw className={`size-3 ${isResendingEmail ? 'animate-spin' : ''}`} />
+                          {isResendingEmail ? 'Sending...' : 'Resend Request Email'}
+                        </Button>
+                      </div>
+                    )}
+
+                    {inquiriesView.selectedInquiry?.status === 'DROPPED' && (
+                      <div className="flex items-center justify-between p-3 rounded-xl bg-secondary-bg/20 border border-card-border/60 mt-1">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <Mail className="size-3.5 text-muted-foreground shrink-0" />
+                          <div className="flex flex-col min-w-0">
+                            <span className="text-xs font-medium text-foreground">Request Rejection</span>
+                            <span className="text-[10px] text-muted-foreground">Rejection Notice Email</span>
+                          </div>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={isResendingEmail}
+                          onClick={handleResendRejectionEmail}
+                          className="text-[10px] h-7 px-2.5 gap-1 shrink-0 border-rose-200 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/20 disabled:opacity-40"
+                        >
+                          <RotateCw className={`size-3 ${isResendingEmail ? 'animate-spin' : ''}`} />
+                          {isResendingEmail ? 'Sending...' : 'Resend Rejection Email'}
+                        </Button>
+                      </div>
+                    )}
                   </div>
 
                   <hr className="border-card-border/40" />
