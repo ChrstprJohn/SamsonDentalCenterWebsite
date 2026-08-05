@@ -169,23 +169,29 @@ export function useSecretaryCheckInOutTracker() {
     return currentTime > endTime;
   };
 
-  const runStatusAction = (action: () => Promise<any>, fallback: string) => {
+  const runStatusAction = (appointmentId: string, action: () => Promise<any>, fallback: string) => {
     startTransition(async () => {
       const res = await action();
       if (!res.success) setErrorMessage(res.error || fallback);
       else {
-        clearSelection();
         suppressRealtimeUntilRef.current = Date.now() + 500;
         await fetchData();
+        // Keep panel open, re-open in details view with the refreshed appointment.
+        const fresh = await getStaffAppointmentByIdAction(appointmentId);
+        if (fresh.success && fresh.data) {
+          clearSelection();
+          setViewAppt(fresh.data);
+          setSelectionVersion((version) => version + 1);
+        }
       }
     });
   };
 
   const handleCheckIn = (appointmentId: string, reason?: string) =>
-    runStatusAction(() => reason ? checkInAction({ appointmentId, reason }) : checkInAction({ appointmentId }), 'Failed to check in');
+    runStatusAction(appointmentId, () => reason ? checkInAction({ appointmentId, reason }) : checkInAction({ appointmentId }), 'Failed to check in');
 
   const handleUndoCheckIn = (appointmentId: string, reason?: string) => {
-    runStatusAction(() => undoCheckInAction({ appointmentId, reason }), 'Failed to undo check-in');
+    runStatusAction(appointmentId, () => undoCheckInAction({ appointmentId, reason }), 'Failed to undo check-in');
   };
 
   const handleCheckoutComplete = (appointmentId: string, reason?: string) => {
@@ -197,9 +203,15 @@ export function useSecretaryCheckInOutTracker() {
       });
       if (!res.success) setErrorMessage(res.error || 'Failed to complete checkout');
       else {
-        clearSelection();
         suppressRealtimeUntilRef.current = Date.now() + 500;
         await fetchData();
+        // Keep panel open, re-open in details view with the refreshed appointment.
+        const fresh = await getStaffAppointmentByIdAction(appointmentId);
+        if (fresh.success && fresh.data) {
+          clearSelection();
+          setViewAppt(fresh.data);
+          setSelectionVersion((version) => version + 1);
+        }
       }
     });
   };
@@ -217,15 +229,22 @@ export function useSecretaryCheckInOutTracker() {
       const res = await resolveNoShowAction(payload);
       if (!res.success) setErrorMessage(res.error || 'Failed to resolve no-show');
       else {
-        clearSelection();
         suppressRealtimeUntilRef.current = Date.now() + 500;
         await fetchData();
+        // Keep panel open, re-open in details view with the refreshed appointment.
+        const fresh = await getStaffAppointmentByIdAction(payload.appointmentId);
+        if (fresh.success && fresh.data) {
+          clearSelection();
+          setViewAppt(fresh.data);
+          setSelectionVersion((version) => version + 1);
+        }
       }
     });
   };
 
   const handleRescheduleSubmit = () => {
     if (!rescheduleAppt || !rescheduleDate || !rescheduleTime) return;
+    const appointmentId = rescheduleAppt.id;
     startTransition(async () => {
       const formatIso = (dateStr: string, timeStr: string) => {
         if (!dateStr || !timeStr) return undefined;
@@ -249,9 +268,15 @@ export function useSecretaryCheckInOutTracker() {
       });
       if (!res.success) setErrorMessage(res.error || 'Failed to reschedule');
       else {
-        clearSelection();
         suppressRealtimeUntilRef.current = Date.now() + 500;
         await fetchData();
+        // Keep panel open, re-open in details view with the refreshed appointment.
+        const fresh = await getStaffAppointmentByIdAction(appointmentId);
+        if (fresh.success && fresh.data) {
+          clearSelection();
+          setViewAppt(fresh.data);
+          setSelectionVersion((version) => version + 1);
+        }
       }
     });
   };

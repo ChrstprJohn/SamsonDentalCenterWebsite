@@ -34,6 +34,8 @@ export function usePastAppointmentFollowUps() {
   const resourcesLoadedRef = useRef(false);
   const resourcesLoadingRef = useRef<Promise<void> | null>(null);
   const detailRequestIdRef = useRef(0);
+  const preserveSelectionRef = useRef(false);
+  const [selectedAppointmentDetails, setSelectedAppointmentDetails] = useState<AppointmentDto | null>(null);
   const [rescheduleDoctor, setRescheduleDoctor] = useState('');
   const [rescheduleDate, setRescheduleDate] = useState('');
   const [rescheduleTime, setRescheduleTime] = useState('');
@@ -151,10 +153,15 @@ export function usePastAppointmentFollowUps() {
   const unresolvedNoShows = appointments;
 
   const list = activeTab === 'missed-checkouts' ? missedCheckouts : unresolvedNoShows;
-  const selectedAppointment = list.find((appointment) => appointment.id === selectedAppointmentId) || null;
+  const selectedAppointment = list.find((appointment) => appointment.id === selectedAppointmentId)
+    || (selectedAppointmentDetails?.id === selectedAppointmentId ? selectedAppointmentDetails : null);
 
   useEffect(() => {
     if (selectedAppointmentId && !list.some((appointment) => appointment.id === selectedAppointmentId)) {
+      if (preserveSelectionRef.current) {
+        preserveSelectionRef.current = false;
+        return;
+      }
       const timeout = window.setTimeout(() => setSelectedAppointmentId(null), 0);
       return () => window.clearTimeout(timeout);
     }
@@ -163,6 +170,7 @@ export function usePastAppointmentFollowUps() {
   const selectTab = useCallback((tab: PastFollowUpTab) => {
     setActiveTab(tab);
     setSelectedAppointmentId(null);
+    setSelectedAppointmentDetails(null);
     if (!queryRef.current.searchTerm) {
       const cached = tabCacheRef.current[tab];
       if (cached) {
@@ -179,10 +187,15 @@ export function usePastAppointmentFollowUps() {
 
   const selectAppointment = useCallback((appointmentId: string | null) => {
     setSelectedAppointmentId(appointmentId);
-    if (!appointmentId) return;
+    preserveSelectionRef.current = false;
+    if (!appointmentId) {
+      setSelectedAppointmentDetails(null);
+      return;
+    }
     const requestId = ++detailRequestIdRef.current;
     void getStaffAppointmentByIdAction(appointmentId).then((result) => {
       if (requestId !== detailRequestIdRef.current || !result.success || !result.data) return;
+      setSelectedAppointmentDetails(result.data);
       setAppointments((previous) => previous.map((appointment) => appointment.id === appointmentId ? result.data! : appointment));
     });
   }, []);
@@ -216,8 +229,11 @@ export function usePastAppointmentFollowUps() {
         setActionError(result.error || 'Could not complete the missed checkout.');
         return;
       }
-      setSelectedAppointmentId(null);
+      preserveSelectionRef.current = true;
       await fetchData({ force: true });
+      // Keep panel open and re-render with the updated appointment details.
+      const fresh = await getStaffAppointmentByIdAction(appointmentId);
+      if (fresh.success && fresh.data) setSelectedAppointmentDetails(fresh.data);
     });
   };
 
@@ -237,8 +253,11 @@ export function usePastAppointmentFollowUps() {
         return;
       }
       setResolveAppt(null);
-      setSelectedAppointmentId(null);
+      preserveSelectionRef.current = true;
       await fetchData({ force: true });
+      // Keep panel open and re-render with the resolved appointment details.
+      const fresh = await getStaffAppointmentByIdAction(payload.appointmentId);
+      if (fresh.success && fresh.data) setSelectedAppointmentDetails(fresh.data);
     });
   };
 

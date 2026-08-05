@@ -6,6 +6,7 @@ import { DoctorTimeline } from './sub-components/doctor-timeline';
 import { AppointmentDetailPane } from './sub-components/appointment-detail-pane';
 import { Calendar } from '@/components/ui/calendar';
 import { getClinicAppointmentsAction } from '@/modules/appointments/actions/clinic/get-clinic-appointments.action';
+import { getStaffAppointmentByIdAction } from '@/modules/appointments/actions/clinic/get-staff-appointment-by-id.action';
 import { updateAppointmentStatusAction } from '@/modules/appointments/actions/status/update-appointment-status.action';
 import { Button } from '@/components/ui/button';
 import { InquiryToast } from './sub-components/inquiry-toast';
@@ -100,6 +101,9 @@ export function SecretaryBookAppointmentView() {
       });
       if (res.success) {
         setIsRescheduleOpen(false);
+        // Keep panel open and refresh the selected appointment even if it moved off the visible day.
+        const fresh = await getStaffAppointmentByIdAction(view.selectedAppointmentDetails.id);
+        if (fresh.success && fresh.data) view.setSelectedAppointmentDetails(fresh.data);
         await view.loadTimelineData(view.selectedDate);
       } else {
         view.setInlineError(res.error || 'Failed to reschedule appointment');
@@ -127,6 +131,9 @@ export function SecretaryBookAppointmentView() {
       });
       if (res.success) {
         setIsCancelOpen(false);
+        // Keep panel open with cancelled status.
+        const fresh = await getStaffAppointmentByIdAction(view.selectedAppointmentDetails.id);
+        if (fresh.success && fresh.data) view.setSelectedAppointmentDetails(fresh.data);
         await view.loadTimelineData(view.selectedDate);
       } else {
         view.setInlineError(res.error || 'Failed to cancel appointment');

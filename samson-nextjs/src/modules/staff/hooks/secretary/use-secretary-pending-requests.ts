@@ -10,6 +10,7 @@ import { getAvailableDoctorsForDateAction } from '@/modules/appointments/actions
 import { getPatientDetailsForStaffAction } from '@/modules/patients/actions/profile/get-patient-details-for-staff.action';
 import { getServicesAction } from '@/modules/services/actions/management/get-services.action';
 import { getDoctorsAction } from '@/modules/staff/actions/management/get-doctors.action';
+import { getStaffAppointmentByIdAction } from '@/modules/appointments/actions/clinic/get-staff-appointment-by-id.action';
 
 export type PendingDecision = 'APPROVED' | 'REJECTED' | 'DISPLACED' | '';
 
@@ -21,6 +22,7 @@ export const PENDING_CLINIC_HOURS = [
 export function useSecretaryPendingRequests() {
   const [appointments, setAppointments] = useState<any[]>([]);
   const [selectedAppointmentId, setSelectedAppointmentId] = useState<string | null>(null);
+  const [selectedAppointmentDetails, setSelectedAppointmentDetails] = useState<any | null>(null);
   const [patientDetails, setPatientDetails] = useState<any>(null);
   const [doctorSchedule, setDoctorSchedule] = useState<any[]>([]);
   const [stagedStatus, setStagedStatus] = useState<PendingDecision>('');
@@ -54,8 +56,9 @@ export function useSecretaryPendingRequests() {
   useEffect(() => { fetchPending(); }, [fetchPending]);
 
   const selectedAppointment = useMemo(
-    () => appointments.find((appointment) => appointment.id === selectedAppointmentId),
-    [appointments, selectedAppointmentId]
+    () => appointments.find((appointment) => appointment.id === selectedAppointmentId)
+      || (selectedAppointmentDetails?.id === selectedAppointmentId ? selectedAppointmentDetails : null),
+    [appointments, selectedAppointmentId, selectedAppointmentDetails]
   );
 
   useEffect(() => {
@@ -112,6 +115,7 @@ export function useSecretaryPendingRequests() {
 
   const selectAppointment = (appointmentId: string) => {
     setSelectedAppointmentId(appointmentId);
+    setSelectedAppointmentDetails(null);
     setStagedStatus('');
     setStagedReason('');
   };
@@ -223,10 +227,6 @@ export function useSecretaryPendingRequests() {
     const res = await updateAppointmentStatusAction(payload);
     if (res.success) {
       alert('Review decision completed successfully.');
-      setSelectedAppointmentId(null);
-      setStagedStatus('');
-      setStagedReason('');
-      setCustomReason('');
       setIsEditing(false);
       setEditServiceId('');
       setEditDoctorId('');
@@ -234,7 +234,13 @@ export function useSecretaryPendingRequests() {
       setEditStartTime('');
       setEditEndTime('');
       setEditNote('');
+      setStagedStatus('');
+      setStagedReason('');
+      setCustomReason('');
       fetchPending();
+      // Keep panel open: refresh the reviewed appointment's own details.
+      const fresh = await getStaffAppointmentByIdAction(appointmentId);
+      if (fresh.success && fresh.data) setSelectedAppointmentDetails(fresh.data);
     } else {
       alert(res.error || 'Failed to update appointment status');
     }

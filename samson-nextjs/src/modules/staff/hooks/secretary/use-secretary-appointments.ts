@@ -54,6 +54,7 @@ export function useSecretaryAppointments() {
   const servicesLoadedRef = useRef(false);
   const servicesLoadingRef = useRef<Promise<void> | null>(null);
   const detailRequestIdRef = useRef(0);
+  const preserveSelectionRef = useRef(false);
   const [selectedAppointmentDetails, setSelectedAppointmentDetails] = useState<AppointmentDto | null>(null);
   const nextCursorRef = useRef<string | null>(null);
   const loadingMoreRef = useRef(false);
@@ -295,6 +296,12 @@ export function useSecretaryAppointments() {
 
   useEffect(() => {
     if (selectedAppointmentId && !appointments.some((appointment) => appointment.id === selectedAppointmentId)) {
+      // Keep the detail panel open right after an in-panel action (reschedule/cancel).
+      // Ref is set during submit*; fall through next time so normal list filtering still clears.
+      if (preserveSelectionRef.current) {
+        preserveSelectionRef.current = false;
+        return;
+      }
       const timeout = window.setTimeout(() => setSelectedAppointmentId(null), 0);
       return () => window.clearTimeout(timeout);
     }
@@ -383,7 +390,11 @@ export function useSecretaryAppointments() {
       if (res.success) {
         setError(null);
         setShowRescheduleForm(false);
+        preserveSelectionRef.current = true;
         await fetchData({ force: true });
+        // Keep panel open: refresh selected appointment details so the pane re-renders with new schedule.
+        const detail = await getStaffAppointmentByIdAction(selectedAppointment.id);
+        if (detail.success && detail.data) setSelectedAppointmentDetails(detail.data);
       } else {
         setError(res.error || 'Failed to reschedule.');
       }
@@ -412,7 +423,11 @@ export function useSecretaryAppointments() {
       if (res.success) {
         setError(null);
         setShowCancelForm(false);
+        preserveSelectionRef.current = true;
         await fetchData({ force: true });
+        // Keep panel open with cancelled status instead of clearing selection.
+        const detail = await getStaffAppointmentByIdAction(selectedAppointment.id);
+        if (detail.success && detail.data) setSelectedAppointmentDetails(detail.data);
       } else {
         setError(res.error || 'Failed to cancel.');
       }
