@@ -602,7 +602,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false,
                 if (!rescheduleDate || !rescheduleStartTime || !rescheduleEndTime || !rescheduleDoctorId) {
                     throw new Error('All rescheduling fields are required.');
                 }
-                const finalReason = actionReasonPreset === 'CUSTOM' ? actionReason.trim() : actionReasonPreset;
+                const finalReason = (actionReasonPreset === 'CUSTOM' ? actionReason.trim() : actionReasonPreset) || actionReason.trim();
                 if (!finalReason) {
                     throw new Error('A reason is required for rescheduling.');
                 }
@@ -625,13 +625,14 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false,
                     newServiceId: selectedThread.serviceId || undefined
                 });
             } else if (activeAction === 'CANCEL') {
-                if (!actionReason.trim()) {
+                const finalReason = (actionReasonPreset === 'CUSTOM' ? actionReason.trim() : actionReasonPreset) || actionReason.trim();
+                if (!finalReason) {
                     throw new Error('A cancellation reason is required.');
                 }
                 res = await updateAppointmentStatusAction({
                     appointmentId: selectedThreadId,
                     status: 'CANCELLED',
-                    statusReason: actionReason
+                    statusReason: finalReason
                 });
             } else if (activeAction === 'COMPLETE') {
                 const reason = actionReason.trim() || 'Appointment completed successfully';
