@@ -191,6 +191,8 @@ export function SecretaryPendingRequestsViewV2() {
           activeTab={inquiriesView.activeTab}
           setActiveTab={inquiriesView.setActiveTab}
           tabCounts={inquiriesView.tabCounts}
+          onRefresh={() => void inquiriesView.loadInquiries({ force: true })}
+          lastRefreshedAt={inquiriesView.lastRefreshedAt}
         />
       </div>
 

@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { ArrowUpDown, ClipboardList } from 'lucide-react';
+import { ArrowUpDown, ClipboardList, RotateCw } from 'lucide-react';
 import { formatShortDate, formatTimeString } from '@/shared/utils/date.util';
 import { SecretaryListSkeleton, SecretaryListSkeletonTheme, SecretaryRefreshBar } from './secretary-list-skeleton';
 import type { InquiryTab } from '../../../hooks/secretary/use-secretary-inquiries-queue';
@@ -21,6 +21,8 @@ interface PendingRequestListV2Props {
   selectedInquiryId: string | null;
   isLoadingInquiries: boolean;
   isRefreshingInquiries: boolean;
+  lastRefreshedAt: Date | null;
+  onRefresh: () => void;
   inquiriesError: string;
   onRetry: () => void;
   searchTerm: string;
@@ -92,16 +94,33 @@ export function PendingRequestListV2(props: PendingRequestListV2Props) {
               Appointment Requests
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setSortOrder(sortOrder === 'newest' ? 'oldest' : 'newest')}
-            className="h-8 gap-1 px-2 text-xs text-muted-foreground hover:text-foreground transition-colors shrink-0"
-            title={`Sort by ${sortOrder === 'newest' ? 'oldest' : 'newest'} first`}
-          >
-            <ArrowUpDown className="size-3" />
-            {sortOrder === 'newest' ? 'Newest' : 'Oldest'}
-          </Button>
+          <div className="flex items-center gap-1 shrink-0">
+            {props.lastRefreshedAt && (
+              <span className="hidden md:inline text-[10px] text-muted-foreground whitespace-nowrap">
+                Updated {props.lastRefreshedAt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+              </span>
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={props.onRefresh}
+              disabled={props.isRefreshingInquiries}
+              className="h-8 w-8 px-0 text-muted-foreground hover:text-foreground transition-colors shrink-0"
+              title="Refresh"
+            >
+              <RotateCw className={`size-3 ${props.isRefreshingInquiries ? 'animate-spin' : ''}`} />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSortOrder(sortOrder === 'newest' ? 'oldest' : 'newest')}
+              className="h-8 gap-1 px-2 text-xs text-muted-foreground hover:text-foreground transition-colors shrink-0"
+              title={`Sort by ${sortOrder === 'newest' ? 'oldest' : 'newest'} first`}
+            >
+              <ArrowUpDown className="size-3" />
+              {sortOrder === 'newest' ? 'Newest' : 'Oldest'}
+            </Button>
+          </div>
         </div>
         <div className="px-1">
           <SidebarInput

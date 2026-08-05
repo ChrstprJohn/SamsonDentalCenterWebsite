@@ -20,6 +20,7 @@ export function useSecretaryAppointments() {
   const [selectedAppointmentId, setSelectedAppointmentId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [lastRefreshedAt, setLastRefreshedAt] = useState<Date | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState<AppointmentDirectoryTab>('upcoming');
@@ -161,6 +162,7 @@ export function useSecretaryAppointments() {
         doctorsLoadedRef.current = true;
       }
       hasLoadedRef.current = true;
+      if (!append) setLastRefreshedAt(new Date());
     } catch (err) {
       if (requestId === latestRequestId.current) {
         if (append) setLoadMoreError(err instanceof Error ? err.message : 'Could not load more appointments.');
@@ -177,6 +179,17 @@ export function useSecretaryAppointments() {
   }, []);
 
   useEffect(() => {
+    if (isPristineQuery()) {
+      const cached = tabCacheRef.current[activeTab];
+      if (cached) {
+        setAppointments(cached.items);
+        setNextCursor(cached.nextCursor);
+        setHasMore(cached.hasMore);
+        setTabTotals((previous) => ({ ...previous, [activeTab]: cached.total }));
+        setError(null);
+        return;
+      }
+    }
     const timeout = window.setTimeout(() => { void fetchData(); }, 600);
     return () => window.clearTimeout(timeout);
   }, [activeTab, searchTerm, doctorFilter, dateFilter, historyStatusFilter, fetchData]);
@@ -412,7 +425,7 @@ export function useSecretaryAppointments() {
 
   return {
     appointments, filteredAppointments, visibleAppointments, doctors, tabTotals, selectedAppointment, selectedAppointmentId, setSelectedAppointmentId, selectAppointment,
-    isLoading, isRefreshing, error, isSubmitting, activeTab, selectTab, searchTerm, setSearchTerm, doctorFilter, setDoctorFilter, dateFilter,
+    isLoading, isRefreshing, lastRefreshedAt, error, isSubmitting, activeTab, selectTab, searchTerm, setSearchTerm, doctorFilter, setDoctorFilter, dateFilter,
     setDateFilter, historyStatusFilter, setHistoryStatusFilter, showRescheduleForm, setShowRescheduleForm: handleSetShowRescheduleForm,
     rescheduleJustification, setRescheduleJustification, changeTreatment, services, rescheduleServiceId,
     isLoadingServices, changeDoctor, rescheduleDoctorId, setRescheduleDoctorId, availableRescheduleDoctors,

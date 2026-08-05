@@ -51,7 +51,7 @@ export function SecretaryPastAppointmentFollowUpsView() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => void view.fetchData()}
+              onClick={() => void view.fetchData({ force: true })}
               disabled={view.isLoading || view.isRefreshing}
               className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
               aria-label="Refresh unresolved appointments"
@@ -125,7 +125,7 @@ export function SecretaryPastAppointmentFollowUpsView() {
             <div className="m-4 rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-xs text-destructive">
               <div className="flex items-center justify-between gap-3">
                 <span>{view.error}</span>
-                <Button variant="outline" size="sm" onClick={() => void view.fetchData()} className="h-7 shrink-0 text-xs">
+                <Button variant="outline" size="sm" onClick={() => void view.fetchData({ force: true })} className="h-7 shrink-0 text-xs">
                   Retry
                 </Button>
               </div>

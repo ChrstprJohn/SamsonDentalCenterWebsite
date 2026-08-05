@@ -5,7 +5,7 @@ import { useSecretaryAppointments } from '../../hooks/secretary/use-secretary-ap
 import { AppointmentDetailPane } from './sub-components/appointment-detail-pane';
 import { AppointmentsTable } from './sub-components/appointments-table';
 import { CoordinationHub } from './sub-components/coordination-hub';
-import { ArrowLeft, CalendarDays, ClipboardList } from 'lucide-react';
+import { ArrowLeft, CalendarDays, ClipboardList, RotateCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SidebarHeader, SidebarInput, SidebarTrigger } from '@/components/ui/sidebar';
 
@@ -40,6 +40,23 @@ export function SecretaryAppointmentsView() {
               <div className="text-base font-medium text-foreground">
                 Appointments Directory
               </div>
+            </div>
+            <div className="flex items-center gap-1 shrink-0">
+              {view.lastRefreshedAt && (
+                <span className="hidden md:inline text-[10px] text-muted-foreground whitespace-nowrap">
+                  Updated {view.lastRefreshedAt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                </span>
+              )}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => void view.fetchData({ force: true })}
+                disabled={view.isLoading || view.isRefreshing}
+                className="h-8 w-8 px-0 text-muted-foreground hover:text-foreground transition-colors shrink-0"
+                title="Refresh"
+              >
+                <RotateCw className={`size-3 ${view.isRefreshing ? 'animate-spin' : ''}`} />
+              </Button>
             </div>
           </div>
           <div className="px-1">
@@ -77,7 +94,7 @@ export function SecretaryAppointmentsView() {
           hasMore={view.hasMore}
           isLoadingMore={view.isLoadingMore}
           loadMoreError={view.loadMoreError}
-          onRetry={view.fetchData}
+          onRetry={() => void view.fetchData({ force: true })}
           onLoadMore={view.loadMore}
           formatPatientName={view.formatPatientName}
             onSelect={(id) => { view.selectAppointment(id); setMobileView('detail'); }}

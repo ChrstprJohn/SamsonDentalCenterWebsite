@@ -124,6 +124,17 @@ export function usePastAppointmentFollowUps() {
   }, []);
 
   useEffect(() => {
+    if (!searchTerm) {
+        const cached = tabCacheRef.current[activeTab];
+        if (cached) {
+            setAppointments(cached.items);
+            setNextCursor(cached.nextCursor);
+            setHasMore(cached.hasMore);
+            setTabCounts((previous) => ({ ...previous, [activeTab]: cached.total }));
+            setError(null);
+            return;
+        }
+    }
     const timeout = window.setTimeout(() => { void fetchData(); }, 600);
     return () => window.clearTimeout(timeout);
   }, [activeTab, searchTerm, fetchData]);

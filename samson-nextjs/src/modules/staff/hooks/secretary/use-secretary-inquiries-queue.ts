@@ -21,6 +21,7 @@ export function useSecretaryInquiriesQueue() {
   const [selectedInquiryId, setSelectedInquiryId] = useState<string | null>(null);
   const [isLoadingInquiries, setIsLoadingInquiries] = useState(true);
   const [isRefreshingInquiries, setIsRefreshingInquiries] = useState(false);
+  const [lastRefreshedAt, setLastRefreshedAt] = useState<Date | null>(null);
   const [inquiriesError, setInquiriesError] = useState('');
   const [stagedInquiryAction, setStagedInquiryAction] = useState<InquiryDecision>('');
   const [stagedInquiryService, setStagedInquiryService] = useState('');
@@ -192,6 +193,7 @@ export function useSecretaryInquiriesQueue() {
         }
       }
       hasLoadedRef.current = true;
+      if (!append) setLastRefreshedAt(new Date());
     } catch (cause) {
       if (requestId === latestInquiriesRequest.current) {
         if (append) setLoadMoreError(cause instanceof Error ? cause.message : 'Could not load more inquiries.');
@@ -208,6 +210,17 @@ export function useSecretaryInquiriesQueue() {
   }, []);
 
   useEffect(() => {
+    if (!searchTerm) {
+        const cached = tabCacheRef.current[activeTab];
+        if (cached) {
+            setAllInquiries(cached.items);
+            setNextCursor(cached.nextCursor);
+            setHasMore(cached.hasMore);
+            setTabCounts((previous) => ({ ...previous, [activeTab]: cached.total }));
+            setInquiriesError('');
+            return;
+        }
+    }
     const timeout = window.setTimeout(() => { void loadInquiries(); }, 600);
     return () => window.clearTimeout(timeout);
   }, [activeTab, searchTerm, loadInquiries]);
@@ -466,7 +479,7 @@ export function useSecretaryInquiriesQueue() {
       : !!(stagedInquiryService && stagedInquiryDate && stagedInquiryDoctor && stagedInquiryTime && stagedInquiryEndTime));
 
   return {
-    inquiries, selectedInquiry, selectedInquiryId, selectInquiry, isLoadingInquiries, isRefreshingInquiries, inquiriesError, loadInquiries,
+    inquiries, selectedInquiry, selectedInquiryId, selectInquiry, isLoadingInquiries, isRefreshingInquiries, lastRefreshedAt, inquiriesError, loadInquiries,
     stagedInquiryAction, setDecision, stagedInquiryService, selectService, stagedInquiryDoctor, selectDoctor,
     stagedInquiryDate, selectDate, stagedInquiryTime, setStagedInquiryTime, stagedInquiryEndTime, setStagedInquiryEndTime,
     selectSlot, stagedInquiryNote, setStagedInquiryNote,
