@@ -99,12 +99,15 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
       confirmationChannel: draftChannel,
     });
     if (res.success) {
+      addToast('Notification channel updated.', 'success');
       setChannel(draftChannel);
       appointment.confirmationChannel = draftChannel;
       if (draftChannel === 'NONE') {
         setAllowOverrideResend(false);
       }
       setIsEditingChannel(false);
+    } else {
+      addToast(res.error || 'Failed to update notification channel.', 'error');
     }
     setIsSavingChannel(false);
   };
@@ -122,6 +125,7 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
     setResending(key);
     const res = await resendNotificationAction({ appointmentId: appointment.id, eventType, targetChannel });
     if (res.success) {
+      addToast('Notification sent successfully.', 'success');
       if (eventType === 'APPOINTMENT_REMINDER_48H') {
         if (targetChannel === 'EMAIL') {
           (appointment as any).emailReminder48hSent = true;
@@ -207,9 +211,12 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
     setDetailResendingId(logId);
     const res = await import('@/modules/emails/actions/logs/resend-email.action').then(m => m.resendEmailAction({ id: logId }));
     if (!res?.error) {
+      addToast('Notification resent successfully.', 'success');
       getEmailLogsByAppointmentAction(appointment.id).then((r) => {
         if (r.success && r.data) setOutboxLogs(r.data);
       });
+    } else {
+      addToast(res.error || 'Failed to resend notification.', 'error');
     }
     setDetailResendingId(null);
   };
@@ -470,13 +477,25 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
 
               const isCheckoutApplicable = entry.eventType !== 'APPOINTMENT_CHECKOUT' || appointment.status === 'COMPLETED';
 
-              const displaySmsStatus = isCheckoutApplicable ? smsStatus : { ...smsStatus, label: 'NOT APPLICABLE', badgeClass: 'bg-slate-500/10 text-slate-500 dark:text-slate-400' };
-              const displayEmailStatus = isCheckoutApplicable ? emailStatus : { ...emailStatus, label: 'NOT APPLICABLE', badgeClass: 'bg-slate-500/10 text-slate-500 dark:text-slate-400' };
+              const displaySmsStatus = loadingLogs
+                ? { label: 'LOADING...', variant: 'pending' as const, badgeClass: 'bg-muted text-muted-foreground/60 animate-pulse' }
+                : isCheckoutApplicable
+                ? smsStatus
+                : { ...smsStatus, label: 'NOT APPLICABLE', badgeClass: 'bg-slate-500/10 text-slate-500 dark:text-slate-400' };
+
+              const displayEmailStatus = loadingLogs
+                ? { label: 'LOADING...', variant: 'pending' as const, badgeClass: 'bg-muted text-muted-foreground/60 animate-pulse' }
+                : isCheckoutApplicable
+                ? emailStatus
+                : { ...emailStatus, label: 'NOT APPLICABLE', badgeClass: 'bg-slate-500/10 text-slate-500 dark:text-slate-400' };
 
               const getActionProps = (targetChannel: 'SMS' | 'EMAIL', statusObj: typeof smsStatus) => {
                 const key = `${entry.eventType}_${targetChannel}`;
                 const isSending = resending === key;
 
+                if (loadingLogs) {
+                  return { label: 'Loading...', allowed: false };
+                }
                 if (isSending) {
                   return { label: 'Sending...', allowed: false };
                 }
@@ -500,7 +519,7 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
                       <div className="flex items-center gap-2 min-w-0">
                         <MessageSquare className={`${compact ? 'size-3' : 'size-3.5'} text-muted-foreground shrink-0`} />
                         <span className="text-sm text-foreground">SMS</span>
-                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${smsStatus.badgeClass}`}>
+                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${displaySmsStatus.badgeClass}`}>
                           {displaySmsStatus.label}
                         </span>
                       </div>
@@ -512,7 +531,7 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
                           onClick={() => handleResend(entry.eventType, 'SMS')}
                           className={`${compact ? 'text-[9px] h-6 px-2 gap-0.5' : 'text-[10px] h-7 px-2.5 gap-1'} shrink-0 disabled:opacity-40 disabled:cursor-not-allowed`}
                         >
-                          <RotateCw className={`size-3 ${resending === `${entry.eventType}_SMS` ? 'animate-spin' : ''}`} />
+                          <RotateCw className={`size-3 ${loadingLogs || resending === `${entry.eventType}_SMS` ? 'animate-spin' : ''}`} />
                           {smsAction.label}
                         </Button>
                       )}
@@ -522,7 +541,7 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
                       <div className="flex items-center gap-2 min-w-0">
                         <Mail className={`${compact ? 'size-3' : 'size-3.5'} text-muted-foreground shrink-0`} />
                         <span className="text-sm text-foreground">Email</span>
-                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${emailStatus.badgeClass}`}>
+                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${displayEmailStatus.badgeClass}`}>
                           {displayEmailStatus.label}
                         </span>
                       </div>
@@ -534,7 +553,7 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
                           onClick={() => handleResend(entry.eventType, 'EMAIL')}
                           className={`${compact ? 'text-[9px] h-6 px-2 gap-0.5' : 'text-[10px] h-7 px-2.5 gap-1'} shrink-0 disabled:opacity-40 disabled:cursor-not-allowed`}
                         >
-                          <RotateCw className={`size-3 ${resending === `${entry.eventType}_EMAIL` ? 'animate-spin' : ''}`} />
+                          <RotateCw className={`size-3 ${loadingLogs || resending === `${entry.eventType}_EMAIL` ? 'animate-spin' : ''}`} />
                           {emailAction.label}
                         </Button>
                       )}

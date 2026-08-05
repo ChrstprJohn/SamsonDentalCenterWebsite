@@ -67,18 +67,18 @@ export function SecretaryPendingRequestsViewV2() {
   const [loadingInquiryLogs, setLoadingInquiryLogs] = React.useState(false);
   const [allowOverrideResend, setAllowOverrideResend] = React.useState(false);
 
-  const fetchInquiryLogs = React.useCallback(async (inquiryId: string) => {
-    setLoadingInquiryLogs(true);
+  const fetchInquiryLogs = React.useCallback(async (inquiryId: string, showLoading = true) => {
+    if (showLoading) setLoadingInquiryLogs(true);
     const res = await getEmailLogsByInquiryAction(inquiryId);
     if (res.success && res.data) {
       setInquiryLogs(res.data);
     }
-    setLoadingInquiryLogs(false);
+    if (showLoading) setLoadingInquiryLogs(false);
   }, []);
 
   React.useEffect(() => {
     if (inquiriesView.selectedInquiryId) {
-      fetchInquiryLogs(inquiriesView.selectedInquiryId);
+      fetchInquiryLogs(inquiriesView.selectedInquiryId, true);
     } else {
       setInquiryLogs([]);
     }
@@ -95,7 +95,7 @@ export function SecretaryPendingRequestsViewV2() {
       addToast(res.error || 'Failed to resend inquiry email.', 'error');
     } else {
       addToast('Inquiry confirmation email sent successfully.', 'success');
-      fetchInquiryLogs(inquiriesView.selectedInquiry.id);
+      fetchInquiryLogs(inquiriesView.selectedInquiry.id, false);
     }
     setResendingEventType(null);
   };
@@ -111,7 +111,7 @@ export function SecretaryPendingRequestsViewV2() {
       addToast(res.error || 'Failed to resend rejection email.', 'error');
     } else {
       addToast('Rejection email sent successfully.', 'success');
-      fetchInquiryLogs(inquiriesView.selectedInquiry.id);
+      fetchInquiryLogs(inquiriesView.selectedInquiry.id, false);
     }
     setResendingEventType(null);
   };
