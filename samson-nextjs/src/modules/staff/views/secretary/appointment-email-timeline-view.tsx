@@ -360,9 +360,9 @@ function TimelineEntryCard({ entry, onResend, resendingId }: { entry: TimelineEn
 }
 
 const LEFT_TABS: { key: LeftTab; label: string }[] = [
-  { key: 'all', label: 'All Appointments' },
+  { key: 'all', label: 'Appointments' },
   { key: 'failed', label: 'Failed' },
-  { key: 'inquiries', label: 'Inquiries & Rejections' },
+  { key: 'inquiries', label: 'Inquiries' },
 ];
 
 export function AppointmentEmailTimelineView() {
@@ -374,13 +374,14 @@ export function AppointmentEmailTimelineView() {
     setSelectedAppointmentId,
     isLoadingApps,
     isRefreshingApps,
+    lastRefreshedAt,
     isLoadingLogs,
     appsError,
     logsError,
     resendEmail,
     resendingId,
     leftTab,
-    setLeftTab,
+    selectTab,
     searchTerm,
     setSearchTerm,
     tabCounts,
@@ -431,16 +432,6 @@ export function AppointmentEmailTimelineView() {
                 Communication List
               </div>
             </div>
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={refresh}
-              disabled={isRefreshingApps || isLoadingApps}
-              className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
-              title="Refresh logs"
-            >
-              <RotateCw className={`size-3.5 ${isLoadingApps || isRefreshingApps ? 'animate-spin' : ''}`} />
-            </Button>
           </div>
 
           <div className="px-1">
@@ -456,7 +447,7 @@ export function AppointmentEmailTimelineView() {
             {LEFT_TABS.map((tab) => (
               <Button
                 key={tab.key}
-                onClick={() => { setLeftTab(tab.key); setSelectedAppointmentId(null); setMobileView('list'); }}
+                onClick={() => { selectTab(tab.key); setMobileView('list'); }}
                 variant="ghost"
                 size="sm"
                 className={`flex-1 h-8 text-xs font-semibold rounded-xl transition-all ${
@@ -465,12 +456,27 @@ export function AppointmentEmailTimelineView() {
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
-                  {tab.label} ({tabCounts[tab.key]})
+                {tab.label} ({tabCounts[tab.key]})
               </Button>
             ))}
           </div>
         </SidebarHeader>
-        {isRefreshingApps && <SecretaryRefreshBar />}
+        {lastRefreshedAt ? (
+          <div className="px-4 py-2 text-[10px] text-muted-foreground border-b border-card-border/20 flex items-center justify-between shrink-0">
+            <span>Last updated {lastRefreshedAt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</span>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => void refresh({ force: true })}
+              disabled={isLoadingApps || isRefreshingApps}
+              className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground transition-colors shrink-0"
+              aria-label="Refresh communication history"
+              title="Refresh"
+            >
+              <RotateCw className={`size-3 ${isRefreshingApps ? 'animate-spin' : ''}`} />
+            </Button>
+          </div>
+        ) : null}
 
         <SidebarContent
           data-lenis-prevent
@@ -479,6 +485,7 @@ export function AppointmentEmailTimelineView() {
         >
           <SidebarGroup className="px-0">
             <SidebarGroupContent className="flex flex-col">
+              {isRefreshingApps && <SecretaryRefreshBar />}
               {isLoadingApps ? (
                 <SecretaryListSkeletonTheme>
                   <div className="flex flex-col w-full">

@@ -43,6 +43,7 @@ export function useAppointmentEmailTimeline() {
   const [emailLogs, setEmailLogs] = useState<AppointmentCommunicationSummaryDto[]>([]);
   const [isLoadingApps, setIsLoadingApps] = useState(true);
   const [isRefreshingApps, setIsRefreshingApps] = useState(false);
+  const [lastRefreshedAt, setLastRefreshedAt] = useState<Date | null>(null);
   const [isLoadingLogs, setIsLoadingLogs] = useState(false);
   const [appsError, setAppsError] = useState<string | null>(null);
   const [logsError, setLogsError] = useState<string | null>(null);
@@ -63,9 +64,31 @@ export function useAppointmentEmailTimeline() {
   const [timelineHasMore, setTimelineHasMore] = useState(false);
   const [timelineIsLoadingMore, setTimelineIsLoadingMore] = useState(false);
   const [timelineLoadMoreError, setTimelineLoadMoreError] = useState<string | null>(null);
+  const tabCacheRef = useRef<Partial<Record<LeftTab, { items: AppointmentCardData[]; nextCursor: string | null; hasMore: boolean; total: number }>>>({});
 
-  const fetchAppointments = useCallback(async (options?: { append?: boolean }) => {
+  const queryRef = useRef({ leftTab, searchTerm });
+  const isPristineQuery = () => {
+    const q = queryRef.current;
+    return !q.searchTerm;
+  };
+  queryRef.current = { leftTab, searchTerm };
+
+  const fetchAppointments = useCallback(async (options?: { append?: boolean; force?: boolean }) => {
     const append = options?.append === true;
+    const force = options?.force === true;
+
+    if (!append && !force && isPristineQuery()) {
+      const cached = tabCacheRef.current[queryRef.current.leftTab];
+      if (cached) {
+        setAppointmentCards(cached.items);
+        summaryCursorRef.current = cached.nextCursor;
+        setSummaryHasMore(cached.hasMore);
+        setTabCounts((previous) => ({ ...previous, [queryRef.current.leftTab]: cached.total }));
+        setAppsError(null);
+        return;
+      }
+    }
+
     if (append) {
       if (summaryLoadingMoreRef.current || !summaryCursorRef.current) return;
       summaryLoadingMoreRef.current = true;
@@ -80,14 +103,15 @@ export function useAppointmentEmailTimeline() {
     }
 
     const requestId = ++summaryRequestId.current;
+    const currentTab = queryRef.current.leftTab;
     try {
-      if (leftTab === 'inquiries') {
+      if (currentTab === 'inquiries') {
         const { getOutboxLogsPageAction } = await import('@/modules/emails/actions/logs/get-outbox-logs-page.action');
         const outboxRes = await getOutboxLogsPageAction({
           limit: 25,
           cursor: append ? summaryCursorRef.current : null,
           category: 'INQUIRIES',
-          search: searchTerm || undefined,
+          search: queryRef.current.searchTerm || undefined,
         });
         if (requestId !== summaryRequestId.current) return;
         if (!outboxRes.success || !outboxRes.data) throw new Error(outboxRes.error || 'Could not load inquiry history.');
@@ -110,26 +134,37 @@ export function useAppointmentEmailTimeline() {
             latestEventPreview: `${label} → ${payload.email || payload.recipientEmail || 'guest'}`,
           };
         });
+
         setAppointmentCards((previous) => append
           ? [...previous, ...mappedCards.filter((item) => !previous.some((existing) => existing.id === item.id))]
           : mappedCards);
         summaryCursorRef.current = outboxRes.data.nextCursor;
         setSummaryHasMore(outboxRes.data.hasMore);
+        const total = outboxRes.data.total ?? mappedCards.length;
         if (!append) {
-          setTabCounts((prev) => ({ ...prev, inquiries: outboxRes.data.total ?? mappedCards.length }));
+          setTabCounts((prev) => ({ ...prev, inquiries: total }));
+        }
+
+        if (!append && isPristineQuery()) {
+          tabCacheRef.current[currentTab] = {
+            items: mappedCards,
+            nextCursor: outboxRes.data.nextCursor,
+            hasMore: outboxRes.data.hasMore,
+            total,
+          };
         }
       } else {
         const activeParams = {
           limit: 25,
           cursor: append ? summaryCursorRef.current : null,
-          tab: leftTab,
-          search: searchTerm || undefined,
+          tab: currentTab,
+          search: queryRef.current.searchTerm || undefined,
         } as const;
         const [activeResult, countResult] = append
           ? [await getCommunicationSummaryPageAction(activeParams), null]
           : await Promise.all([
             getCommunicationSummaryPageAction(activeParams),
-            getCommunicationSummaryCountsAction({ search: searchTerm || undefined }),
+            getCommunicationSummaryCountsAction({ search: queryRef.current.searchTerm || undefined }),
           ]);
 
         if (requestId !== summaryRequestId.current) return;
@@ -143,6 +178,8 @@ export function useAppointmentEmailTimeline() {
           : activeResult.data.items);
         summaryCursorRef.current = activeResult.data.nextCursor;
         setSummaryHasMore(activeResult.data.hasMore);
+
+        const currentTotal = countResult?.data ? (countResult.data as any)[currentTab] : activeResult.data.items.length;
         if (!append) {
           setTabCounts((prev) => ({
             all: countResult?.data?.all ?? prev.all,
@@ -150,8 +187,18 @@ export function useAppointmentEmailTimeline() {
             inquiries: prev.inquiries,
           }));
         }
+
+        if (!append && isPristineQuery()) {
+          tabCacheRef.current[currentTab] = {
+            items: activeResult.data.items,
+            nextCursor: activeResult.data.nextCursor,
+            hasMore: activeResult.data.hasMore,
+            total: currentTotal,
+          };
+        }
       }
       hasLoadedSummary.current = true;
+      if (!append) setLastRefreshedAt(new Date());
     } catch (cause) {
       if (requestId === summaryRequestId.current) {
         if (append) setSummaryLoadMoreError(cause instanceof Error ? cause.message : 'Could not load more communication history.');
@@ -165,19 +212,47 @@ export function useAppointmentEmailTimeline() {
         summaryLoadingMoreRef.current = false;
       }
     }
-  }, [leftTab, searchTerm]);
+  }, []);
 
   useEffect(() => {
+    if (isPristineQuery()) {
+      const cached = tabCacheRef.current[leftTab];
+      if (cached) {
+        setAppointmentCards(cached.items);
+        summaryCursorRef.current = cached.nextCursor;
+        setSummaryHasMore(cached.hasMore);
+        setTabCounts((previous) => ({ ...previous, [leftTab]: cached.total }));
+        setAppsError(null);
+        return;
+      }
+    }
     const timer = window.setTimeout(() => { void fetchAppointments(); }, 250);
     return () => window.clearTimeout(timer);
-  }, [fetchAppointments]);
+  }, [leftTab, searchTerm, fetchAppointments]);
 
   useEffect(() => {
     const refreshOnVisible = () => {
-      if (document.visibilityState === 'visible') void fetchAppointments();
+      if (document.visibilityState === 'visible') void fetchAppointments({ force: true });
     };
     document.addEventListener('visibilitychange', refreshOnVisible);
     return () => document.removeEventListener('visibilitychange', refreshOnVisible);
+  }, [fetchAppointments]);
+
+  const selectTab = useCallback((tab: LeftTab) => {
+    setLeftTab(tab);
+    setSelectedAppointmentId(null);
+    if (isPristineQuery()) {
+      const cached = tabCacheRef.current[tab];
+      if (cached) {
+        setAppointmentCards(cached.items);
+        summaryCursorRef.current = cached.nextCursor;
+        setSummaryHasMore(cached.hasMore);
+        setTabCounts((previous) => ({ ...previous, [tab]: cached.total }));
+        setAppsError(null);
+        return;
+      }
+    }
+    void fetchAppointments();
   }, [fetchAppointments]);
 
   const fetchEmailLogs = useCallback(async (appointmentId: string, options?: { append?: boolean }) => {
@@ -274,7 +349,7 @@ export function useAppointmentEmailTimeline() {
       const res = await resendEmailAction({ id });
       if (res?.error) setLogsError(res.error);
       if (selectedAppointmentId) await fetchEmailLogs(selectedAppointmentId);
-      await fetchAppointments();
+      await fetchAppointments({ force: true });
     } finally {
       setResendingId(null);
     }
@@ -301,6 +376,7 @@ export function useAppointmentEmailTimeline() {
     setSelectedAppointmentId,
     isLoadingApps,
     isRefreshingApps,
+    lastRefreshedAt,
     isLoadingLogs,
     appsError,
     logsError,
@@ -308,6 +384,7 @@ export function useAppointmentEmailTimeline() {
     resendingId,
     leftTab,
     setLeftTab,
+    selectTab,
     searchTerm,
     setSearchTerm,
     tabCounts,
@@ -319,7 +396,7 @@ export function useAppointmentEmailTimeline() {
     timelineIsLoadingMore,
     timelineLoadMoreError,
     loadMoreTimeline: () => selectedAppointmentId && void fetchEmailLogs(selectedAppointmentId, { append: true }),
-    refresh: () => fetchAppointments(),
+    refresh: (options?: { force?: boolean }) => fetchAppointments(options ?? { force: true }),
     refreshTimeline: selectedAppointmentId ? () => fetchEmailLogs(selectedAppointmentId) : undefined,
   };
 }

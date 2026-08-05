@@ -91,7 +91,7 @@ const STATUS_TABS = ['ALL', 'SENT', 'FAILED', 'PENDING'] as const;
 const CATEGORY_TABS = [
   { key: 'ALL' as const, label: 'All Logs' },
   { key: 'APPOINTMENTS' as const, label: 'Appointments' },
-  { key: 'INQUIRIES' as const, label: 'Inquiries & Rejections' },
+  { key: 'INQUIRIES' as const, label: 'Inquiries' },
 ] as const;
 
 export function SecretaryEmailLogView() {

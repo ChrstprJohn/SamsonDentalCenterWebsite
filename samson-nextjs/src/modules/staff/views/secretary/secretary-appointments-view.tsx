@@ -70,7 +70,7 @@ export function SecretaryAppointmentsView() {
         </SidebarHeader>
         {view.lastRefreshedAt ? (
           <div className="px-4 py-2 text-[10px] text-muted-foreground border-b border-card-border/20 flex items-center justify-between shrink-0">
-            <span>Updated {view.lastRefreshedAt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</span>
+            <span>Last updated {view.lastRefreshedAt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</span>
             <Button
               variant="ghost"
               size="sm"

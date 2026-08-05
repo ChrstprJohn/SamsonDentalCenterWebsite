@@ -988,9 +988,6 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false,
                             Archive ({tabCounts.archive})
                         </Button>
                     </div>
-                    {fetchingThreads && !isInitialLoad && (
-                        <SecretaryRefreshBar />
-                    )}
                 </SidebarHeader>
 
                 <SidebarContent 
@@ -1000,6 +997,9 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false,
                 >
                     <SidebarGroup className="px-0">
                         <SidebarGroupContent className="flex flex-col">
+                            {fetchingThreads && !isInitialLoad && (
+                                <SecretaryRefreshBar />
+                            )}
                             {isInitialLoad ? (
                                 <SidebarThreadSkeleton />
                             ) : filteredThreads.length === 0 ? (
