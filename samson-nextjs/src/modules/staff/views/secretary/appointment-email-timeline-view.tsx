@@ -17,7 +17,7 @@ import { Button } from '@/components/ui/button';
 import { Mail, RotateCw, ChevronRight, UserRound } from 'lucide-react';
 import { RenderedEmailFrame } from '@/components/emails/email-renderer';
 import { getOutboxLogByIdAction } from '@/modules/emails/actions/logs/get-outbox-log-by-id.action';
-import { SecretaryListSkeleton, SecretaryListSkeletonTheme } from './sub-components/secretary-list-skeleton';
+import { SecretaryListSkeleton, SecretaryListSkeletonTheme, SecretaryRefreshBar } from './sub-components/secretary-list-skeleton';
 
 // UI Label Mappings for Event Types (Guest vs Patient distinction noted in code comments)
 const EVENT_NAME_MAP: Record<string, string> = {
@@ -470,6 +470,7 @@ export function AppointmentEmailTimelineView() {
             ))}
           </div>
         </SidebarHeader>
+        {isRefreshingApps && <SecretaryRefreshBar />}
 
         <SidebarContent
           data-lenis-prevent

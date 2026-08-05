@@ -23,7 +23,7 @@ import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { InquiryToast } from './sub-components/inquiry-toast';
 import { AppointmentDetailPane } from './sub-components/appointment-detail-pane';
-import { SecretaryListSkeleton, SecretaryListSkeletonTheme } from './sub-components/secretary-list-skeleton';
+import { SecretaryListSkeleton, SecretaryListSkeletonTheme, SecretaryRefreshBar } from './sub-components/secretary-list-skeleton';
 import type { AppointmentDto } from '@/modules/appointments/dtos/shared/appointment.dto';
 import { formatClinicTime } from '@/shared/utils/date.util';
 import { Search, Mail, Archive, MessageSquare, Calendar, XCircle, CheckCircle, AlertCircle, ArrowLeft, UserRound, Pencil, Check, X, ChevronDown } from 'lucide-react';
@@ -364,6 +364,10 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false,
             }
         }
     }, [activeTab, searchQuery, showOnlyUnreads]);
+
+    useEffect(() => {
+        void fetchThreads();
+    }, [fetchThreads]);
 
     const loadMoreThreads = useCallback(() => {
         void fetchThreads({ append: true });
@@ -974,9 +978,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false,
                         </Button>
                     </div>
                     {fetchingThreads && !isInitialLoad && (
-                        <div className="h-0.5 w-full overflow-hidden rounded-full bg-primary/15">
-                            <div className="h-full w-1/3 animate-pulse bg-primary" />
-                        </div>
+                        <SecretaryRefreshBar />
                     )}
                 </SidebarHeader>
 

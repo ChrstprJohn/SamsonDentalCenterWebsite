@@ -7,7 +7,7 @@ import { updateConfirmationChannelAction } from '@/modules/appointments/actions/
 import { SidebarHeader, SidebarInput, SidebarTrigger } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { formatClinicTime, formatShortDate } from '@/shared/utils/date.util';
-import { SecretaryListSkeleton, SecretaryListSkeletonTheme } from './sub-components/secretary-list-skeleton';
+import { SecretaryListSkeleton, SecretaryListSkeletonTheme, SecretaryRefreshBar } from './sub-components/secretary-list-skeleton';
 import type { AppointmentDto } from '@/modules/appointments/dtos/exports';
 import { usePastAppointmentFollowUps } from '../../hooks/secretary/use-past-appointment-follow-ups';
 import { AppointmentRescheduleForm, isRescheduleFormComplete } from './sub-components/appointment-reschedule-form';
@@ -120,9 +120,7 @@ export function SecretaryPastAppointmentFollowUpsView() {
               </div>
             </SecretaryListSkeletonTheme>
           ) : null}
-          {view.isRefreshing && (
-            <div className="h-0.5 w-full overflow-hidden rounded-full bg-primary/15"><div className="h-full w-1/3 animate-pulse bg-primary" /></div>
-          )}
+          {view.isRefreshing && <SecretaryRefreshBar />}
           {view.error ? (
             <div className="m-4 rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-xs text-destructive">
               <div className="flex items-center justify-between gap-3">

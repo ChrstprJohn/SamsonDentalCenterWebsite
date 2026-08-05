@@ -4,7 +4,7 @@ import { CalendarDays } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { AppointmentDto } from '@/modules/appointments/dtos/shared/appointment.dto';
 import { formatClinicTime, formatShortDate, formatTimeString } from '@/shared/utils/date.util';
-import { SecretaryListSkeleton, SecretaryListSkeletonTheme } from './secretary-list-skeleton';
+import { SecretaryListSkeleton, SecretaryListSkeletonTheme, SecretaryRefreshBar } from './secretary-list-skeleton';
 
 const BADGE_STYLES: Record<string, string> = {
   APPROVED: 'text-blue-600 bg-blue-500/10 dark:text-blue-400',
@@ -88,11 +88,7 @@ export function AppointmentsTable(props: AppointmentsTableProps) {
       style={{ scrollbarWidth: 'thin' }}
       data-lenis-prevent
     >
-      {props.isRefreshing && (
-        <div className="h-0.5 w-full overflow-hidden rounded-full bg-primary/15">
-          <div className="h-full w-1/3 animate-pulse bg-primary" />
-        </div>
-      )}
+{props.isRefreshing && <SecretaryRefreshBar />}
       <div className="flex flex-col">
         {props.error && (
           <div className="m-3 rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-xs text-destructive">

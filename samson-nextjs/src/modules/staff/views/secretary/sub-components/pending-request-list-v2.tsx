@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { ArrowUpDown, ClipboardList } from 'lucide-react';
 import { formatShortDate, formatTimeString } from '@/shared/utils/date.util';
-import { SecretaryListSkeleton, SecretaryListSkeletonTheme } from './secretary-list-skeleton';
+import { SecretaryListSkeleton, SecretaryListSkeletonTheme, SecretaryRefreshBar } from './secretary-list-skeleton';
 import type { InquiryTab } from '../../../hooks/secretary/use-secretary-inquiries-queue';
 import { Button } from '@/components/ui/button';
 import {
@@ -129,9 +129,7 @@ export function PendingRequestListV2(props: PendingRequestListV2Props) {
           ))}
         </div>
       </SidebarHeader>
-      {props.isRefreshingInquiries && (
-        <div className="h-0.5 w-full overflow-hidden bg-primary/15"><div className="h-full w-1/3 animate-pulse bg-primary" /></div>
-      )}
+{props.isRefreshingInquiries && <SecretaryRefreshBar />}
       <SidebarContent 
         data-lenis-prevent 
         style={{ scrollbarWidth: 'thin' }}
