@@ -49,8 +49,8 @@ export function computeNotificationStatus({
     startMs = new Date(startTime).getTime();
   }
 
-  const isShortLead48h = leadTimeHours !== null && leadTimeHours < 48;
-  const isShortLead24h = leadTimeHours !== null && leadTimeHours < 24;
+  const isShortLead48h = leadTimeHours !== null && leadTimeHours <= 48;
+  const isShortLead24h = leadTimeHours !== null && leadTimeHours <= 24;
 
   // Check if reminder trigger window has already passed in time
   const isWindowPassed48h = startMs !== null && !isNaN(startMs) && nowMs > (startMs - 48 * 3600 * 1000);
@@ -77,14 +77,14 @@ export function computeNotificationStatus({
   // 4. If short lead time for reminder at booking time
   if (eventType === 'APPOINTMENT_REMINDER_48H' && isShortLead48h) {
     return {
-      label: 'SKIPPED (Booked <48h)',
+      label: 'SKIPPED (Booked ≤48h)',
       variant: 'skipped_lead_time',
       badgeClass: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
     };
   }
   if (eventType === 'APPOINTMENT_REMINDER_24H' && isShortLead24h) {
     return {
-      label: 'SKIPPED (Booked <24h)',
+      label: 'SKIPPED (Booked ≤24h)',
       variant: 'skipped_lead_time',
       badgeClass: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
     };

@@ -72,6 +72,9 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
   useEffect(() => {
     setChannel(ch);
     setDraftChannel(ch);
+    if (ch === 'NONE') {
+      setAllowOverrideResend(false);
+    }
     setCommState({
       emailInquirySent: Boolean((appointment as any).inquiryId || (appointment as any).inquiry_id || (appointment as any).appointmentInquiryId || (appointment as any).appointment_inquiry_id),
       emailConfirmationSent: Boolean((appointment as any).emailConfirmationSent || (appointment as any).email_confirmation_sent),
@@ -98,6 +101,9 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
     if (res.success) {
       setChannel(draftChannel);
       appointment.confirmationChannel = draftChannel;
+      if (draftChannel === 'NONE') {
+        setAllowOverrideResend(false);
+      }
       setIsEditingChannel(false);
     }
     setIsSavingChannel(false);
@@ -244,6 +250,25 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
     'PASSWORD_RESET_REQUESTED': 'Password Reset OTP (Email)',
   };
 
+  const createdAt = (appointment as any).createdAt || (appointment as any).created_at;
+  const startTime = (appointment as any).startTime || (appointment as any).start_time || (appointment as any).date;
+
+  let leadTimeHours: number | null = null;
+  if (createdAt && startTime) {
+    const createdMs = new Date(createdAt).getTime();
+    const startMs = new Date(startTime).getTime();
+    if (!isNaN(createdMs) && !isNaN(startMs)) {
+      leadTimeHours = (startMs - createdMs) / (1000 * 3600);
+    }
+  }
+  const isShortLead48h = leadTimeHours !== null && leadTimeHours <= 48;
+  const isShortLead24h = leadTimeHours !== null && leadTimeHours <= 24;
+
+  const has48hEmailLog = groupedOutboxLogs.some((l) => l.eventType === 'APPOINTMENT_REMINDER_48H' && (l.status === 'PROCESSED' || l.status === 'PENDING'));
+  const has48hSmsLog = groupedOutboxLogs.some((l) => l.eventType === 'APPOINTMENT_REMINDER_48H_SMS' && (l.status === 'PROCESSED' || l.status === 'PENDING'));
+  const has24hEmailLog = groupedOutboxLogs.some((l) => l.eventType === 'APPOINTMENT_REMINDER_24H' && (l.status === 'PROCESSED' || l.status === 'PENDING'));
+  const has24hSmsLog = groupedOutboxLogs.some((l) => l.eventType === 'APPOINTMENT_REMINDER_24H_SMS' && (l.status === 'PROCESSED' || l.status === 'PENDING'));
+
   const commEntries: {
     key: string;
     label: string;
@@ -252,10 +277,13 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
     smsSent: boolean;
   }[] = [
     { key: 'confirmation', label: 'Booking Confirmation', eventType: 'APPOINTMENT_BOOKED', emailSent: commState.emailConfirmationSent, smsSent: commState.smsConfirmationSent },
-    { key: 'reminder48h', label: '48-Hour Reminder', eventType: 'APPOINTMENT_REMINDER_48H', emailSent: commState.emailReminder48hSent, smsSent: commState.smsReminder48hSent },
-    { key: 'reminder24h', label: '24-Hour Reminder', eventType: 'APPOINTMENT_REMINDER_24H', emailSent: commState.emailReminder24hSent, smsSent: commState.smsReminder24hSent },
+    { key: 'reminder48h', label: '48-Hour Reminder', eventType: 'APPOINTMENT_REMINDER_48H', emailSent: has48hEmailLog || (commState.emailReminder48hSent && !isShortLead48h), smsSent: has48hSmsLog || (commState.smsReminder48hSent && !isShortLead48h) },
+    { key: 'reminder24h', label: '24-Hour Reminder', eventType: 'APPOINTMENT_REMINDER_24H', emailSent: has24hEmailLog || (commState.emailReminder24hSent && !isShortLead24h), smsSent: has24hSmsLog || (commState.smsReminder24hSent && !isShortLead24h) },
     { key: 'checkout', label: 'Checkout / Thank You', eventType: 'APPOINTMENT_CHECKOUT', emailSent: commState.emailCheckoutSent, smsSent: commState.smsCheckoutSent },
   ];
+
+  const isEmailAvailable = channel === 'EMAIL' || channel === 'BOTH';
+  const isSmsAvailable = channel === 'SMS' || channel === 'BOTH';
 
   return (
     <div className="space-y-4">
@@ -302,6 +330,15 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
             {channel === 'EMAIL' ? 'Email' : channel === 'SMS' ? 'SMS' : channel === 'BOTH' ? 'Email & SMS' : 'None'}
           </div>
         )}
+        <p className="text-xs text-muted-foreground mt-2">
+          {channel === 'NONE'
+            ? 'Notifications are disabled for this appointment. Manual resends are unavailable.'
+            : channel === 'EMAIL'
+            ? 'Only email notifications are enabled for this appointment.'
+            : channel === 'SMS'
+            ? 'Only SMS notifications are enabled for this appointment.'
+            : 'Both email and SMS notifications are enabled for this appointment.'}
+        </p>
       </div>
 
       <hr className="border-card-border/40 mx-4" />
@@ -310,14 +347,16 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
       <div className="py-3 px-4 space-y-2">
         <div className="flex items-center justify-between">
           <span className="text-sm font-medium text-foreground block">Notification History</span>
-          <Label className="flex items-center gap-1.5 text-[11px] text-muted-foreground cursor-pointer select-none">
-            <span>Manual Resend</span>
-            <Switch
-              checked={allowOverrideResend}
-              onCheckedChange={setAllowOverrideResend}
-              className="scale-75 shadow-none"
-            />
-          </Label>
+          {channel !== 'NONE' && (
+            <Label className="flex items-center gap-1.5 text-[11px] text-muted-foreground cursor-pointer select-none">
+              <span>Manual Resend</span>
+              <Switch
+                checked={allowOverrideResend}
+                onCheckedChange={setAllowOverrideResend}
+                className="scale-75 shadow-none"
+              />
+            </Label>
+          )}
         </div>
         <div className={`flex flex-col ${compact ? 'gap-2' : 'gap-3'}`}>
           <>
@@ -367,7 +406,7 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
                         ? 'Send Now'
                         : 'Force Send';
 
-              const isAllowed = !loadingLogs && !isSending && (
+              const isAllowed = isEmailAvailable && !loadingLogs && !isSending && (
                 (Boolean(inquiryLog) && (displayStatus === 'PENDING' || displayStatus === 'FAILED')) ||
                 allowOverrideResend
               );
@@ -384,22 +423,24 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
                           {displayStatus}
                         </span>
                       </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        disabled={!isAllowed}
-                        onClick={() => {
-                          if (inquiryLog) {
-                            handleDetailResend(inquiryLog.id);
-                          } else {
-                            handleResend('APPOINTMENT_INQUIRY_RECEIVED', 'EMAIL');
-                          }
-                        }}
-                        className={`${compact ? 'text-[9px] h-6 px-2 gap-0.5' : 'text-[10px] h-7 px-2.5 gap-1'} shrink-0 disabled:opacity-40 disabled:cursor-not-allowed`}
-                      >
-                        <RotateCw className={`size-3 ${loadingLogs || isSending ? 'animate-spin' : ''}`} />
-                        {btnLabel}
-                      </Button>
+                      {isEmailAvailable && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={!isAllowed}
+                          onClick={() => {
+                            if (inquiryLog) {
+                              handleDetailResend(inquiryLog.id);
+                            } else {
+                              handleResend('APPOINTMENT_INQUIRY_RECEIVED', 'EMAIL');
+                            }
+                          }}
+                          className={`${compact ? 'text-[9px] h-6 px-2 gap-0.5' : 'text-[10px] h-7 px-2.5 gap-1'} shrink-0 disabled:opacity-40 disabled:cursor-not-allowed`}
+                        >
+                          <RotateCw className={`size-3 ${loadingLogs || isSending ? 'animate-spin' : ''}`} />
+                          {btnLabel}
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -463,16 +504,18 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
                           {displaySmsStatus.label}
                         </span>
                       </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        disabled={!smsAction.allowed}
-                        onClick={() => handleResend(entry.eventType, 'SMS')}
-                        className={`${compact ? 'text-[9px] h-6 px-2 gap-0.5' : 'text-[10px] h-7 px-2.5 gap-1'} shrink-0 disabled:opacity-40 disabled:cursor-not-allowed`}
-                      >
-                        <RotateCw className={`size-3 ${resending === `${entry.eventType}_SMS` ? 'animate-spin' : ''}`} />
-                        {smsAction.label}
-                      </Button>
+                      {isSmsAvailable && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={!smsAction.allowed}
+                          onClick={() => handleResend(entry.eventType, 'SMS')}
+                          className={`${compact ? 'text-[9px] h-6 px-2 gap-0.5' : 'text-[10px] h-7 px-2.5 gap-1'} shrink-0 disabled:opacity-40 disabled:cursor-not-allowed`}
+                        >
+                          <RotateCw className={`size-3 ${resending === `${entry.eventType}_SMS` ? 'animate-spin' : ''}`} />
+                          {smsAction.label}
+                        </Button>
+                      )}
                     </div>
 
                     <div className={`flex items-center justify-between ${compact ? 'p-2' : 'p-3'} bg-secondary-bg/20 border border-card-border/60 rounded-xl`}>
@@ -483,16 +526,18 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
                           {displayEmailStatus.label}
                         </span>
                       </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        disabled={!emailAction.allowed}
-                        onClick={() => handleResend(entry.eventType, 'EMAIL')}
-                        className={`${compact ? 'text-[9px] h-6 px-2 gap-0.5' : 'text-[10px] h-7 px-2.5 gap-1'} shrink-0 disabled:opacity-40 disabled:cursor-not-allowed`}
-                      >
-                        <RotateCw className={`size-3 ${resending === `${entry.eventType}_EMAIL` ? 'animate-spin' : ''}`} />
-                        {emailAction.label}
-                      </Button>
+                      {isEmailAvailable && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={!emailAction.allowed}
+                          onClick={() => handleResend(entry.eventType, 'EMAIL')}
+                          className={`${compact ? 'text-[9px] h-6 px-2 gap-0.5' : 'text-[10px] h-7 px-2.5 gap-1'} shrink-0 disabled:opacity-40 disabled:cursor-not-allowed`}
+                        >
+                          <RotateCw className={`size-3 ${resending === `${entry.eventType}_EMAIL` ? 'animate-spin' : ''}`} />
+                          {emailAction.label}
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -551,7 +596,8 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
                                 ? 'Send Now'
                                 : 'Force Send';
 
-                      const isAllowed = !loadingLogs && !isSending && (
+                      const isChannelAvailable = channelType === 'SMS' ? isSmsAvailable : isEmailAvailable;
+                      const isAllowed = isChannelAvailable && !loadingLogs && !isSending && (
                         (Boolean(latestLog) && (displayStatus === 'PENDING' || displayStatus === 'FAILED' || displayStatus === 'NOT SENT')) ||
                         allowOverrideResend
                       );
@@ -565,22 +611,24 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
                               {displayStatus}
                             </span>
                           </div>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            disabled={!isAllowed}
-                            onClick={() => {
-                              if (latestLog) {
-                                handleDetailResend(latestLog.id);
-                              } else {
-                                handleResend(eventType === 'CANCEL_BOOKING' ? 'CANCEL_BOOKING' : 'RESCHEDULE_BOOKING', channelType);
-                              }
-                            }}
-                            className={`${compact ? 'text-[9px] h-6 px-2 gap-0.5' : 'text-[10px] h-7 px-2.5 gap-1'} shrink-0 disabled:opacity-40 disabled:cursor-not-allowed`}
-                          >
-                            <RotateCw className={`size-3 ${loadingLogs || isSending ? 'animate-spin' : ''}`} />
-                            {btnLabel}
-                          </Button>
+                          {isChannelAvailable && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              disabled={!isAllowed}
+                              onClick={() => {
+                                if (latestLog) {
+                                  handleDetailResend(latestLog.id);
+                                } else {
+                                  handleResend(eventType === 'CANCEL_BOOKING' ? 'CANCEL_BOOKING' : 'RESCHEDULE_BOOKING', channelType);
+                                }
+                              }}
+                              className={`${compact ? 'text-[9px] h-6 px-2 gap-0.5' : 'text-[10px] h-7 px-2.5 gap-1'} shrink-0 disabled:opacity-40 disabled:cursor-not-allowed`}
+                            >
+                              <RotateCw className={`size-3 ${loadingLogs || isSending ? 'animate-spin' : ''}`} />
+                              {btnLabel}
+                            </Button>
+                          )}
                         </div>
                       );
                     })}
@@ -609,6 +657,8 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
               const logStatus = log.status;
               const isFailed = logStatus === 'FAILED';
               const isProcessed = logStatus === 'PROCESSED';
+              const isLogSms = log.eventType.endsWith('_SMS') || log.eventType.includes('SMS');
+              const isLogChannelAvailable = isLogSms ? isSmsAvailable : isEmailAvailable;
               return (
                 <div key={log.id} className={`flex items-center gap-2 ${compact ? 'p-2 text-xs' : 'p-3 text-sm'} rounded-xl bg-secondary-bg/20 border border-card-border/60`}>
                   <div className="shrink-0">
@@ -635,25 +685,27 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
                   <span className={`${compact ? 'text-[10px]' : 'text-xs'} text-muted-foreground shrink-0`}>
                     {new Date(log.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </span>
-                  {compact ? (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDetailResend(log.id)}
-                      className="h-6 w-6 p-0 text-rose-600 hover:text-rose-700 hover:bg-rose-500/10 shrink-0 disabled:opacity-50"
-                      disabled={detailResendingId === log.id}
-                      title={detailResendingId === log.id ? 'Sending...' : isProcessed ? 'Send New' : 'Resend'}
-                    >
-                      <RotateCw className={`size-3 ${detailResendingId === log.id ? 'animate-spin' : ''}`} />
-                    </Button>
-                  ) : (
-                    <button
-                      onClick={() => handleDetailResend(log.id)}
-                      className="text-xs font-semibold text-rose-600 hover:text-rose-700 shrink-0 disabled:opacity-50"
-                      disabled={detailResendingId === log.id}
-                    >
-                      {detailResendingId === log.id ? 'Sending...' : isProcessed ? 'Send New' : 'Resend'}
-                    </button>
+                  {isLogChannelAvailable && (
+                    compact ? (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDetailResend(log.id)}
+                        className="h-6 w-6 p-0 text-rose-600 hover:text-rose-700 hover:bg-rose-500/10 shrink-0 disabled:opacity-50"
+                        disabled={detailResendingId === log.id}
+                        title={detailResendingId === log.id ? 'Sending...' : isProcessed ? 'Send New' : 'Resend'}
+                      >
+                        <RotateCw className={`size-3 ${detailResendingId === log.id ? 'animate-spin' : ''}`} />
+                      </Button>
+                    ) : (
+                      <button
+                        onClick={() => handleDetailResend(log.id)}
+                        className="text-xs font-semibold text-rose-600 hover:text-rose-700 shrink-0 disabled:opacity-50"
+                        disabled={detailResendingId === log.id}
+                      >
+                        {detailResendingId === log.id ? 'Sending...' : isProcessed ? 'Send New' : 'Resend'}
+                      </button>
+                    )
                   )}
                 </div>
               );

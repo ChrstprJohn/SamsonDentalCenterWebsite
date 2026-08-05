@@ -26,7 +26,7 @@ describe('computeNotificationStatus', () => {
       startTime: '2026-07-28T07:00:00Z',
     });
 
-    expect(status.label).toBe('SKIPPED (Booked <48h)');
+    expect(status.label).toBe('SKIPPED (Booked ≤48h)');
     expect(status.variant).toBe('skipped_lead_time');
   });
 
@@ -40,7 +40,7 @@ describe('computeNotificationStatus', () => {
       startTime: '2026-07-28T07:00:00Z',
     });
 
-    expect(status.label).toBe('SKIPPED (Booked <24h)');
+    expect(status.label).toBe('SKIPPED (Booked ≤24h)');
     expect(status.variant).toBe('skipped_lead_time');
   });
 
@@ -57,7 +57,7 @@ describe('computeNotificationStatus', () => {
       startTime: '2026-07-27T07:00:00Z',
     });
 
-    expect(status.label).toBe('SKIPPED (Booked <24h)');
+    expect(status.label).toBe('SKIPPED (Booked ≤24h)');
     expect(status.variant).toBe('skipped_lead_time');
 
     vi.useRealTimers();
