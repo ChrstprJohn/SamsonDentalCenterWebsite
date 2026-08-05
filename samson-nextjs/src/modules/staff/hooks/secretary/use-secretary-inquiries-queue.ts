@@ -8,6 +8,8 @@ import { updateInquiryAction } from '@/modules/appointments/actions/booking/upda
 import { useBookingScheduler } from '@/modules/appointments/hooks/shared/use-booking-scheduler';
 import { searchPatientsAction } from '@/modules/patients/actions/profile/search-patients.action';
 import { getServicesAction } from '@/modules/services/actions/management/get-services.action';
+import { getDoctorsAction } from '@/modules/staff/actions/management/get-doctors.action';
+import type { UserProfileResponseDto } from '@/modules/staff/dtos/exports';
 
 
 export type InquiryDecision = 'CONVERT' | 'DROP' | '';
@@ -16,7 +18,7 @@ export type InquiryTab = 'NEW' | 'CONVERTED' | 'DROPPED';
 
 export function useSecretaryInquiriesQueue() {
   const scheduler = useBookingScheduler();
-  const { loadAvailableDates, loadDoctorsForDate, loadAvailableSlots } = scheduler;
+  const { loadAvailableDates, loadAvailableSlots } = scheduler;
   const [allInquiries, setAllInquiries] = useState<any[]>([]);
   const [selectedInquiryId, setSelectedInquiryId] = useState<string | null>(null);
   const [isLoadingInquiries, setIsLoadingInquiries] = useState(true);
@@ -78,7 +80,19 @@ export function useSecretaryInquiriesQueue() {
     [inquiries, selectedInquiryId]
   );
   const availableDates = stagedInquiryService ? scheduler.availableDates : [];
-  const availableDoctors = scheduler.availableDoctors as { doctorId: string; doctorName: string }[];
+  // Full doctor list, no service/date filter — secretary picks any doctor (like Book Appointment).
+  const [allDoctors, setAllDoctors] = useState<{ doctorId: string; doctorName: string }[]>([]);
+  useEffect(() => {
+    getDoctorsAction({ includeHidden: true }).then((res) => {
+      if (res.success && res.data) {
+        setAllDoctors(res.data.map((d: UserProfileResponseDto) => ({
+          doctorId: d.id,
+          doctorName: `Dr. ${d.firstName} ${d.lastName}`.trim(),
+        })));
+      }
+    });
+  }, []);
+  const availableDoctors = allDoctors;
   const timeslots = stagedInquiryDoctor ? scheduler.availableSlots as any[] : [];
   const isAvailabilityLoading = isLoadingServices || scheduler.loadingKey !== null;
 
@@ -238,11 +252,6 @@ export function useSecretaryInquiriesQueue() {
     const month = `${currentMonth.getFullYear()}-${(currentMonth.getMonth() + 1).toString().padStart(2, '0')}`;
     loadAvailableDates({ serviceId: stagedInquiryService, month });
   }, [stagedInquiryService, currentMonth, loadAvailableDates]);
-
-  useEffect(() => {
-    if (!stagedInquiryService || !stagedInquiryDate) return;
-    void loadDoctorsForDate({ serviceId: stagedInquiryService, date: stagedInquiryDate });
-  }, [stagedInquiryService, stagedInquiryDate, loadDoctorsForDate]);
 
 
   useEffect(() => {
