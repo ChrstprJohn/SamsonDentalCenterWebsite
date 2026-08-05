@@ -9,13 +9,21 @@ import { authorizeRole } from '@/shared/auth/auth.util';
 
 export interface ResendNotificationInput {
   appointmentId: string;
-  eventType: 'APPOINTMENT_BOOKED' | 'APPOINTMENT_REMINDER_48H' | 'APPOINTMENT_REMINDER_24H' | 'APPOINTMENT_CHECKOUT' | 'APPOINTMENT_INQUIRY_RECEIVED';
+  eventType: 'APPOINTMENT_BOOKED' | 'APPOINTMENT_REMINDER_48H' | 'APPOINTMENT_REMINDER_24H' | 'APPOINTMENT_CHECKOUT' | 'APPOINTMENT_INQUIRY_RECEIVED' | 'CANCEL_BOOKING' | 'RESCHEDULE_BOOKING';
   targetChannel?: 'EMAIL' | 'SMS' | 'BOTH';
 }
 
 const resendNotificationSchema = z.object({
   appointmentId: z.string().uuid(),
-  eventType: z.enum(['APPOINTMENT_BOOKED', 'APPOINTMENT_REMINDER_48H', 'APPOINTMENT_REMINDER_24H', 'APPOINTMENT_CHECKOUT', 'APPOINTMENT_INQUIRY_RECEIVED']),
+  eventType: z.enum([
+    'APPOINTMENT_BOOKED',
+    'APPOINTMENT_REMINDER_48H',
+    'APPOINTMENT_REMINDER_24H',
+    'APPOINTMENT_CHECKOUT',
+    'APPOINTMENT_INQUIRY_RECEIVED',
+    'CANCEL_BOOKING',
+    'RESCHEDULE_BOOKING',
+  ]),
   targetChannel: z.enum(['EMAIL', 'SMS', 'BOTH']).optional(),
 });
 
@@ -118,6 +126,12 @@ export async function resendNotificationAction(input: ResendNotificationInput) {
     } else if (parsed.eventType === 'APPOINTMENT_CHECKOUT') {
       if (shouldSendEmail) updatePayload.email_checkout_sent = true;
       if (shouldSendSms) updatePayload.sms_checkout_sent = true;
+    } else if (parsed.eventType === 'CANCEL_BOOKING') {
+      if (shouldSendEmail) updatePayload.email_cancel_sent = true;
+      if (shouldSendSms) updatePayload.sms_cancel_sent = true;
+    } else if (parsed.eventType === 'RESCHEDULE_BOOKING') {
+      if (shouldSendEmail) updatePayload.email_reschedule_sent = true;
+      if (shouldSendSms) updatePayload.sms_reschedule_sent = true;
     }
 
     if (Object.keys(updatePayload).length > 0) {
@@ -147,6 +161,12 @@ export async function resendNotificationAction(input: ResendNotificationInput) {
           preferredDate: appointment.date,
           preferredStartTime: appointment.start_time,
         };
+      } else if (parsed.eventType === 'CANCEL_BOOKING') {
+        eventType = 'CANCEL_BOOKING';
+        payload = { appointmentId: parsed.appointmentId, email: recipientEmail };
+      } else if (parsed.eventType === 'RESCHEDULE_BOOKING') {
+        eventType = 'RESCHEDULE_BOOKING';
+        payload = { appointmentId: parsed.appointmentId, email: recipientEmail };
       } else if (parsed.eventType === 'APPOINTMENT_CHECKOUT') {
         eventType = 'APPOINTMENT_COMPLETED_POST_CARE';
         payload = { appointmentId: parsed.appointmentId, email: recipientEmail };
@@ -201,7 +221,13 @@ export async function resendNotificationAction(input: ResendNotificationInput) {
 
     // Dispatch SMS Event
     if (shouldSendSms && recipientPhone) {
-      const smsEventType = parsed.eventType === 'APPOINTMENT_CHECKOUT' ? 'APPOINTMENT_COMPLETED_POST_CARE_SMS' : 'APPOINTMENT_MANUALLY_BOOKED_SMS';
+      const smsEventType = parsed.eventType === 'APPOINTMENT_CHECKOUT'
+        ? 'APPOINTMENT_COMPLETED_POST_CARE_SMS'
+        : parsed.eventType === 'CANCEL_BOOKING'
+          ? 'CANCEL_BOOKING_SMS'
+          : parsed.eventType === 'RESCHEDULE_BOOKING'
+            ? 'RESCHEDULE_BOOKING_SMS'
+            : 'APPOINTMENT_MANUALLY_BOOKED_SMS';
       const smsPayload = {
         phoneNumber: recipientPhone,
         date: appointment.date,

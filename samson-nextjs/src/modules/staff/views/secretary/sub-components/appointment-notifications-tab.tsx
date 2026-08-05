@@ -39,6 +39,7 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
   const ch = (appointment.confirmationChannel as any) || (appointment as any).confirmation_channel || 'EMAIL';
 
   const [commState, setCommState] = useState({
+    emailInquirySent: Boolean((appointment as any).inquiryId || (appointment as any).inquiry_id || (appointment as any).appointmentInquiryId || (appointment as any).appointment_inquiry_id),
     emailConfirmationSent: Boolean((appointment as any).emailConfirmationSent || (appointment as any).email_confirmation_sent),
     smsConfirmationSent: Boolean((appointment as any).smsConfirmationSent || (appointment as any).sms_confirmation_sent),
     emailReminder48hSent: Boolean((appointment as any).emailReminder48hSent || (appointment as any).email_reminder_48h_sent),
@@ -71,6 +72,7 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
     setChannel(ch);
     setDraftChannel(ch);
     setCommState({
+      emailInquirySent: Boolean((appointment as any).inquiryId || (appointment as any).inquiry_id || (appointment as any).appointmentInquiryId || (appointment as any).appointment_inquiry_id),
       emailConfirmationSent: Boolean((appointment as any).emailConfirmationSent || (appointment as any).email_confirmation_sent),
       smsConfirmationSent: Boolean((appointment as any).smsConfirmationSent || (appointment as any).sms_confirmation_sent),
       emailReminder48hSent: Boolean((appointment as any).emailReminder48hSent || (appointment as any).email_reminder_48h_sent),
@@ -105,7 +107,10 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
     setIsEditingChannel(false);
   };
 
-  const handleResend = async (eventType: 'APPOINTMENT_BOOKED' | 'APPOINTMENT_REMINDER_48H' | 'APPOINTMENT_REMINDER_24H' | 'APPOINTMENT_CHECKOUT' | 'APPOINTMENT_INQUIRY_RECEIVED', targetChannel: 'EMAIL' | 'SMS') => {
+  const handleResend = async (
+    eventType: 'APPOINTMENT_BOOKED' | 'APPOINTMENT_REMINDER_48H' | 'APPOINTMENT_REMINDER_24H' | 'APPOINTMENT_CHECKOUT' | 'APPOINTMENT_INQUIRY_RECEIVED' | 'CANCEL_BOOKING' | 'RESCHEDULE_BOOKING',
+    targetChannel: 'EMAIL' | 'SMS'
+  ) => {
     const key = `${eventType}_${targetChannel}`;
     setResending(key);
     const res = await resendNotificationAction({ appointmentId: appointment.id, eventType, targetChannel });
@@ -146,11 +151,18 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
           (appointment as any).smsCheckoutSent = true;
           (appointment as any).sms_checkout_sent = true;
         }
+      } else if (eventType === 'CANCEL_BOOKING') {
+        if (targetChannel === 'EMAIL') (appointment as any).email_cancel_sent = true;
+        if (targetChannel === 'SMS') (appointment as any).sms_cancel_sent = true;
+      } else if (eventType === 'RESCHEDULE_BOOKING') {
+        if (targetChannel === 'EMAIL') (appointment as any).email_reschedule_sent = true;
+        if (targetChannel === 'SMS') (appointment as any).sms_reschedule_sent = true;
       }
 
       setCommState((prev) => {
         const updates: Partial<typeof prev> = {};
-        if (eventType === 'APPOINTMENT_REMINDER_48H') {
+        if (eventType === 'APPOINTMENT_INQUIRY_RECEIVED') updates.emailInquirySent = true;
+        else if (eventType === 'APPOINTMENT_REMINDER_48H') {
           if (targetChannel === 'EMAIL') updates.emailReminder48hSent = true;
           if (targetChannel === 'SMS') updates.smsReminder48hSent = true;
         } else if (eventType === 'APPOINTMENT_REMINDER_24H') {
@@ -162,6 +174,12 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
         } else if (eventType === 'APPOINTMENT_CHECKOUT') {
           if (targetChannel === 'EMAIL') updates.emailCheckoutSent = true;
           if (targetChannel === 'SMS') updates.smsCheckoutSent = true;
+        } else if (eventType === 'CANCEL_BOOKING') {
+          if (targetChannel === 'EMAIL') updates.emailCancelSent = true;
+          if (targetChannel === 'SMS') updates.smsCancelSent = true;
+        } else if (eventType === 'RESCHEDULE_BOOKING') {
+          if (targetChannel === 'EMAIL') updates.emailRescheduleSent = true;
+          if (targetChannel === 'SMS') updates.smsRescheduleSent = true;
         }
         return { ...prev, ...updates };
       });
@@ -309,6 +327,7 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
                 (appointment as any).inquiry_id ||
                 (appointment as any).appointmentInquiryId ||
                 (appointment as any).appointment_inquiry_id ||
+                commState.emailInquirySent ||
                 inquiryLog
               );
 
@@ -328,7 +347,7 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
                     ? 'bg-muted text-muted-foreground/60'
                     : 'bg-slate-500/10 text-slate-500 dark:text-slate-400';
 
-              const isSending = (Boolean(inquiryLog) && detailResendingId === inquiryLog?.id) || resending === 'APPOINTMENT_BOOKED_EMAIL';
+              const isSending = (Boolean(inquiryLog) && detailResendingId === inquiryLog?.id) || resending === 'APPOINTMENT_INQUIRY_RECEIVED_EMAIL';
               const btnLabel = isSending
                 ? 'Sending...'
                 : displayStatus === 'SENT'
@@ -404,24 +423,24 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
               const displaySmsStatus = isCheckoutApplicable ? smsStatus : { ...smsStatus, label: 'NOT APPLICABLE', badgeClass: 'bg-slate-500/10 text-slate-500 dark:text-slate-400' };
               const displayEmailStatus = isCheckoutApplicable ? emailStatus : { ...emailStatus, label: 'NOT APPLICABLE', badgeClass: 'bg-slate-500/10 text-slate-500 dark:text-slate-400' };
 
-              const getActionProps = (targetChannel: 'SMS' | 'EMAIL', statusObj: typeof smsStatus, isSent: boolean) => {
+              const getActionProps = (targetChannel: 'SMS' | 'EMAIL', statusObj: typeof smsStatus) => {
                 const key = `${entry.eventType}_${targetChannel}`;
                 const isSending = resending === key;
 
                 if (isSending) {
                   return { label: 'Sending...', allowed: false };
                 }
-                if (isSent || statusObj.variant === 'sent') {
+                if (statusObj.label === 'SENT') {
                   return { label: 'Send New', allowed: allowOverrideResend };
                 }
-                if (statusObj.variant === 'pending' && isCheckoutApplicable) {
+                if (statusObj.label === 'PENDING' && isCheckoutApplicable) {
                   return { label: 'Send Now', allowed: true };
                 }
                 return { label: 'Force Send', allowed: allowOverrideResend };
               };
 
-              const smsAction = getActionProps('SMS', smsStatus, entry.smsSent);
-              const emailAction = getActionProps('EMAIL', emailStatus, entry.emailSent);
+              const smsAction = getActionProps('SMS', displaySmsStatus);
+              const emailAction = getActionProps('EMAIL', displayEmailStatus);
 
               return (
                 <div key={entry.key} className={compact ? 'space-y-1' : 'space-y-2'}>
