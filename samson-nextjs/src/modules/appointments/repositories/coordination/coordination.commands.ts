@@ -5,8 +5,34 @@ import { CoordinationLogResponseDto, coordinationLogResponseSchema } from '../..
 
 export const insertCoordinationLogCommand = (supabase: SupabaseClient) => {
   return async (data: CreateCoordinationLogDto, createdBy: string): Promise<CoordinationLogResponseDto> => {
+    let inquiryId = data.inquiryId || null;
+    let appointmentId = data.appointmentId || null;
+
+    // Defensive check: If only inquiryId is passed, verify if it belongs to appointment_inquiries or appointments
+    if (inquiryId && !appointmentId) {
+      const { data: inquiryCheck } = await supabase
+        .from('appointment_inquiries')
+        .select('id')
+        .eq('id', inquiryId)
+        .maybeSingle();
+
+      if (!inquiryCheck) {
+        const { data: apptCheck } = await supabase
+          .from('appointments')
+          .select('id')
+          .eq('id', inquiryId)
+          .maybeSingle();
+
+        if (apptCheck) {
+          appointmentId = inquiryId;
+          inquiryId = null;
+        }
+      }
+    }
+
     const dbPayload = {
-      inquiry_id: data.inquiryId,
+      inquiry_id: inquiryId,
+      appointment_id: appointmentId,
       action_type: data.actionType,
       message: data.message,
       created_by: createdBy,

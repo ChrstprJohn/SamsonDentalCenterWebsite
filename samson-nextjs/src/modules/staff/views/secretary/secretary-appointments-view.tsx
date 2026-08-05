@@ -161,7 +161,7 @@ export function SecretaryAppointmentsView() {
       {hasSelection && (
         <div className={`xl:w-[350px] lg:w-[320px] flex-col border-l border-card-border/40 min-h-0 overflow-hidden ${colMobile('quickLogs')} xl:flex`}>
           <CoordinationHub
-            inquiryId={view.selectedAppointmentId}
+            appointmentId={view.selectedAppointmentId}
             onBack={() => setMobileView('detail')}
           />
         </div>

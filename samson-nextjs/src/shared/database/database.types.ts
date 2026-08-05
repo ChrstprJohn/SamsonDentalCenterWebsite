@@ -602,7 +602,8 @@ export type Database = {
       coordination_logs: {
         Row: {
           id: string
-          inquiry_id: string
+          inquiry_id: string | null
+          appointment_id: string | null
           action_type: string
           message: string
           created_at: string
@@ -610,7 +611,8 @@ export type Database = {
         }
         Insert: {
           id?: string
-          inquiry_id: string
+          inquiry_id?: string | null
+          appointment_id?: string | null
           action_type: string
           message: string
           created_at?: string
@@ -618,7 +620,8 @@ export type Database = {
         }
         Update: {
           id?: string
-          inquiry_id?: string
+          inquiry_id?: string | null
+          appointment_id?: string | null
           action_type?: string
           message?: string
           created_at?: string
@@ -630,6 +633,13 @@ export type Database = {
             columns: ["inquiry_id"]
             isOneToOne: false
             referencedRelation: "appointment_inquiries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "coordination_logs_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
             referencedColumns: ["id"]
           },
         ]

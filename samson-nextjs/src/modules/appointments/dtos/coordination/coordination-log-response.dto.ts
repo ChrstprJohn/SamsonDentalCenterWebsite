@@ -2,7 +2,8 @@ import { z } from 'zod';
 
 const coordinationLogDbSchema = z.object({
   id: z.string().uuid(),
-  inquiry_id: z.string().uuid(),
+  inquiry_id: z.string().uuid().nullable().optional(),
+  appointment_id: z.string().uuid().nullable().optional(),
   action_type: z.string(),
   message: z.string(),
   created_at: z.string(),
@@ -11,7 +12,8 @@ const coordinationLogDbSchema = z.object({
 
 export const coordinationLogResponseSchema = coordinationLogDbSchema.transform((data) => ({
   id: data.id,
-  inquiryId: data.inquiry_id,
+  inquiryId: data.inquiry_id ?? undefined,
+  appointmentId: data.appointment_id ?? undefined,
   actionType: data.action_type as CreateCoordinationLogActionType,
   message: data.message,
   createdAt: data.created_at,

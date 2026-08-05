@@ -5,7 +5,8 @@ import { useCoordinationHub } from '../../../hooks/secretary/use-coordination-hu
 import type { CreateCoordinationLogActionType } from '@/modules/appointments/dtos/coordination/coordination-log-response.dto';
 
 interface CoordinationHubProps {
-  inquiryId: string | null;
+  inquiryId?: string | null;
+  appointmentId?: string | null;
   hideHeader?: boolean;
   hideActions?: boolean;
   onBack?: () => void;
@@ -51,8 +52,10 @@ function formatTime(iso: string): string {
   return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
 }
 
-export function CoordinationHub({ inquiryId, hideHeader, hideActions, onBack }: CoordinationHubProps) {
-  const { logs, isLoading, error, customNote, setCustomNote, addLog, removeLog, addCustomNote } = useCoordinationHub(inquiryId);
+export function CoordinationHub({ inquiryId, appointmentId, hideHeader, hideActions, onBack }: CoordinationHubProps) {
+  const targetId = appointmentId || inquiryId || null;
+  const targetType = appointmentId ? 'appointment' : 'inquiry';
+  const { logs, isLoading, error, customNote, setCustomNote, addLog, removeLog, addCustomNote } = useCoordinationHub(targetId, targetType);
 
   return (
     <div className="flex flex-col h-full overflow-hidden border-r border-card-border/40 bg-sidebar">
@@ -71,7 +74,7 @@ export function CoordinationHub({ inquiryId, hideHeader, hideActions, onBack }: 
         </div>
       )}
 
-      {!inquiryId ? null : (
+      {!targetId ? null : (
         <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
           <div className="overflow-y-auto flex-1 p-4 space-y-4 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent" style={{ scrollbarWidth: 'thin' }} data-lenis-prevent>
 
