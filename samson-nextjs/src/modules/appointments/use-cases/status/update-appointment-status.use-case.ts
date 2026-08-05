@@ -74,16 +74,18 @@ export const updateAppointmentStatusUseCase = (deps: {
     if (currentStatus === 'RESCHEDULE_REQUESTED') {
       if (status === 'APPROVED') {
         // SWAP: Staff approved patient's reschedule request → move proposed → actual
+        const resolvedDoctorId = appointment.proposedDoctorId || appointment.doctorId;
         if (
           appointment.proposedDate &&
           appointment.proposedStartTime &&
-          appointment.proposedEndTime
+          appointment.proposedEndTime &&
+          resolvedDoctorId
         ) {
           finalRescheduleMetadata = {
             date: appointment.proposedDate,
             startTime: appointment.proposedStartTime,
             endTime: appointment.proposedEndTime,
-            doctorId: appointment.proposedDoctorId || appointment.doctorId,
+            doctorId: resolvedDoctorId,
           };
         }
         clearProposedMetadata = true;
