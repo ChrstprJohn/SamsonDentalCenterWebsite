@@ -166,6 +166,32 @@ function recipientLabel(recipient: string): string {
   return recipient;
 }
 
+class EmailErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean; error: string | null }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: any) {
+    return { hasError: true, error: error?.message || 'Could not render preview.' };
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="p-4 text-xs text-rose-600 bg-rose-50 border border-rose-200 rounded-lg">
+          <p className="font-semibold">Unable to display message preview</p>
+          <p className="mt-1 text-[11px] font-mono text-muted-foreground">{this.state.error}</p>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 function renderActualEmailComponent(eventType: string, payload: Record<string, any>) {
   return <RenderedEmailFrame eventType={eventType} payload={payload} />;
 }
@@ -176,6 +202,10 @@ function TimelineEntryCard({ entry, onResend, resendingId }: { entry: TimelineEn
   const [payload, setPayload] = useState<Record<string, any> | undefined>(entry.payload);
   const [isLoadingPayload, setIsLoadingPayload] = useState(false);
   const [payloadError, setPayloadError] = useState<string | null>(null);
+
+  React.useEffect(() => {
+    setPayload(entry.payload);
+  }, [entry.payload]);
 
   const statusColor =
     entry.rawStatus === 'FAILED'
@@ -196,7 +226,7 @@ function TimelineEntryCard({ entry, onResend, resendingId }: { entry: TimelineEn
   const togglePayload = async () => {
     const nextVisible = !showPayload;
     setShowPayload(nextVisible);
-    if (nextVisible && payload === undefined && !isLoadingPayload) {
+    if (nextVisible && (!payload || Object.keys(payload).length === 0) && !isLoadingPayload) {
       setIsLoadingPayload(true);
       setPayloadError(null);
       const result = await getOutboxLogByIdAction(entry.id);
@@ -276,7 +306,7 @@ function TimelineEntryCard({ entry, onResend, resendingId }: { entry: TimelineEn
 
             {isLoadingPayload ? <div className="text-xs text-muted-foreground">Loading communication details...</div> : null}
             {payloadError ? <div className="text-xs text-destructive">{payloadError}</div> : null}
-            {!isLoadingPayload && !payloadError && payload ? (
+            {!isLoadingPayload && !payloadError ? (
               <>
                 {/* Sub-tabs for Preview vs Payload */}
                 <div className="flex gap-1 border-b border-card-border/40 pb-1 text-xs">
@@ -304,11 +334,20 @@ function TimelineEntryCard({ entry, onResend, resendingId }: { entry: TimelineEn
 
                 {activeDetailTab === 'preview' ? (
                   <div className="rounded-xl border border-card-border/60 overflow-hidden shadow-2xs bg-white text-black max-h-[500px] overflow-y-auto">
-                    {renderActualEmailComponent(entry.eventType, payload)}
+                    <EmailErrorBoundary>
+                      {isEmail ? (
+                        renderActualEmailComponent(entry.eventType, payload || {})
+                      ) : (
+                        <div className="p-4 bg-muted/10 text-xs leading-relaxed text-foreground font-sans">
+                          <div className="font-semibold text-muted-foreground text-[10px] uppercase tracking-wider mb-2">SMS Message Content</div>
+                          <p className="whitespace-pre-wrap">{payload?.smsBody || payload?.message || payload?.body || payload?.text || 'SMS notification dispatched to patient.'}</p>
+                        </div>
+                      )}
+                    </EmailErrorBoundary>
                   </div>
                 ) : (
                   <div className="bg-secondary-bg/30 border border-card-border/40 rounded-lg p-2.5 text-[11px] font-mono text-text-secondary leading-relaxed whitespace-pre-wrap max-h-48 overflow-y-auto">
-                    {JSON.stringify(payload, null, 2)}
+                    {JSON.stringify(payload || {}, null, 2)}
                   </div>
                 )}
               </>

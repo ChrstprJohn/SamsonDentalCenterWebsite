@@ -9,13 +9,13 @@ import { authorizeRole } from '@/shared/auth/auth.util';
 
 export interface ResendNotificationInput {
   appointmentId: string;
-  eventType: 'APPOINTMENT_BOOKED' | 'APPOINTMENT_REMINDER_48H' | 'APPOINTMENT_REMINDER_24H' | 'APPOINTMENT_CHECKOUT';
+  eventType: 'APPOINTMENT_BOOKED' | 'APPOINTMENT_REMINDER_48H' | 'APPOINTMENT_REMINDER_24H' | 'APPOINTMENT_CHECKOUT' | 'APPOINTMENT_INQUIRY_RECEIVED';
   targetChannel?: 'EMAIL' | 'SMS' | 'BOTH';
 }
 
 const resendNotificationSchema = z.object({
   appointmentId: z.string().uuid(),
-  eventType: z.enum(['APPOINTMENT_BOOKED', 'APPOINTMENT_REMINDER_48H', 'APPOINTMENT_REMINDER_24H', 'APPOINTMENT_CHECKOUT']),
+  eventType: z.enum(['APPOINTMENT_BOOKED', 'APPOINTMENT_REMINDER_48H', 'APPOINTMENT_REMINDER_24H', 'APPOINTMENT_CHECKOUT', 'APPOINTMENT_INQUIRY_RECEIVED']),
   targetChannel: z.enum(['EMAIL', 'SMS', 'BOTH']).optional(),
 });
 
@@ -136,7 +136,18 @@ export async function resendNotificationAction(input: ResendNotificationInput) {
       let eventType: string;
       let payload: Record<string, any>;
 
-      if (parsed.eventType === 'APPOINTMENT_CHECKOUT') {
+      if (parsed.eventType === 'APPOINTMENT_INQUIRY_RECEIVED') {
+        eventType = 'APPOINTMENT_INQUIRY_RECEIVED';
+        payload = {
+          inquiryId: (appointment as any).inquiry_id || parsed.appointmentId,
+          firstName: gc?.first_name || appointment.patient?.first_name || '',
+          lastName: gc?.last_name || appointment.patient?.last_name || '',
+          email: recipientEmail,
+          preferredServiceId: appointment.service_id,
+          preferredDate: appointment.date,
+          preferredStartTime: appointment.start_time,
+        };
+      } else if (parsed.eventType === 'APPOINTMENT_CHECKOUT') {
         eventType = 'APPOINTMENT_COMPLETED_POST_CARE';
         payload = { appointmentId: parsed.appointmentId, email: recipientEmail };
       } else if (parsed.eventType === 'APPOINTMENT_REMINDER_24H' || parsed.eventType === 'APPOINTMENT_REMINDER_48H') {

@@ -265,8 +265,8 @@ export function useAppointmentEmailTimeline() {
   }, [selectedAppointmentId, fetchEmailLogs]);
 
   useEffect(() => {
-    if (selectedAppointmentId && !selectedAppointment) setSelectedAppointmentId(null);
-  }, [selectedAppointment, selectedAppointmentId]);
+    if (selectedAppointmentId && !isLoadingApps && !selectedAppointment) setSelectedAppointmentId(null);
+  }, [selectedAppointment, selectedAppointmentId, isLoadingApps]);
 
   const resendEmail = useCallback(async (id: string) => {
     setResendingId(id);
@@ -274,10 +274,11 @@ export function useAppointmentEmailTimeline() {
       const res = await resendEmailAction({ id });
       if (res?.error) setLogsError(res.error);
       if (selectedAppointmentId) await fetchEmailLogs(selectedAppointmentId);
+      await fetchAppointments();
     } finally {
       setResendingId(null);
     }
-  }, [fetchEmailLogs, selectedAppointmentId]);
+  }, [fetchAppointments, fetchEmailLogs, selectedAppointmentId]);
 
   const timelineEntries: TimelineEntry[] = useMemo(() => emailLogs.map((log) => ({
     id: log.id,
