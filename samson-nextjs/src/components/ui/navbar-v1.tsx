@@ -4,8 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X } from 'lucide-react';
-import { AuthenticatedUserHeader } from '@/modules/patients/components/auth/authenticated-user-header';
+import { Menu, X, ArrowRight } from 'lucide-react';
 import type { AuthHeaderUser } from '@/modules/patients/hooks/auth/header/use-auth-header';
 import { NavbarMobileDrawer } from './navbar-mobile-drawer';
 
@@ -116,7 +115,7 @@ export function NavbarV1({ user }: NavbarProps) {
                     onClick={(e) => handleNavClick(e, item.href)}
                     className={`transition-colors duration-300 relative px-4 py-2.5 ${
                       isDarkNav
-                        ? isActive ? 'text-[#D94E4E]' : 'text-white/80 hover:text-[#D94E4E]'
+                        ? isActive ? 'text-[#D94E4E]' : 'text-white hover:text-[#D94E4E]'
                         : isActive ? 'text-[#D94E4E]' : 'text-[#1D1E1E]/75 hover:text-[#D94E4E]'
                     }`}
                     style={{ fontWeight: isActive ? '600' : '500' }}
@@ -139,7 +138,18 @@ export function NavbarV1({ user }: NavbarProps) {
           <div className="flex items-center gap-4 sm:gap-6">
             <div className="hidden md:flex items-center gap-5">
               {user ? (
-                <AuthenticatedUserHeader user={user} isDarkNav={isDarkNav} />
+                <Link href="/book" onClick={() => setIsMobileOpen(false)}>
+                  <button
+                    className={`px-4 py-2 rounded-full text-[11px] font-semibold uppercase tracking-widest transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] shadow-xs cursor-pointer flex items-center gap-1.5 ${
+                      isDarkNav
+                        ? 'bg-white text-[#141515] hover:bg-[#D94E4E] hover:text-white'
+                        : 'bg-[#141515] text-white hover:bg-[#D94E4E]'
+                    }`}
+                  >
+                    <ArrowRight className="w-3 h-3" />
+                    Request Appointment
+                  </button>
+                </Link>
               ) : (
                 <>
                   <Link

@@ -78,7 +78,6 @@ export function LandingView({ services, config }: LandingViewProps) {
   const {
     selectedService,
     setSelectedService,
-    contactForm,
     handleBookingCTA,
   } = useLandingView({ services: activeServices });
 
@@ -90,7 +89,7 @@ export function LandingView({ services, config }: LandingViewProps) {
       {/* <JourneySection /> */}
       <GallerySection />
       <TestimonialsSection />
-      <ContactSection config={config} services={activeServices} contactForm={contactForm} />
+      <ContactSection config={config} />
 
       {/* 🔍 Services Detail Popup Modal */}
       <Modal

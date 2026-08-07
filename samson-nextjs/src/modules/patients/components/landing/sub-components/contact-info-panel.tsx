@@ -6,7 +6,7 @@ import type { ClinicConfigResponseDto } from '@/modules/clinic-config/dtos/setti
 
 export function ContactInfoPanel({ config }: { config: ClinicConfigResponseDto }) {
   return (
-    <div className="lg:col-span-5 flex flex-col justify-between">
+    <div className="flex flex-col justify-between">
       <div>
         <span className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-4 font-sans">
           Reservations

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { TrustAndStats } from './trust-and-stats';
 
 interface HeroSectionProps {
@@ -112,8 +112,8 @@ export function HeroSectionV1({ onBookClick }: HeroSectionProps) {
               onClick={onBookClick}
               className="w-full sm:w-auto px-8 py-4 bg-white text-[#141515] rounded-full hover:bg-gray-100 transition-all duration-300 shadow-md flex items-center justify-center gap-2 cursor-pointer text-[clamp(11px,0.2vw+11px,14px)] font-sans font-semibold uppercase tracking-widest"
             >
-              Book Appointment
-              <ArrowRight className="w-4 h-4 text-[#141515]" />
+              Request Appointment
+              <ArrowLeft className="w-4 h-4 text-[#141515]" />
             </button>
             <a
               href="#services"
