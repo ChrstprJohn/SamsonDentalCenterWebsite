@@ -26,7 +26,7 @@ import { resendNotificationAction } from '@/modules/appointments/actions/status/
 import { updateConfirmationChannelAction } from '@/modules/appointments/actions/status/update-confirmation-channel.action';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Pencil, X, Check, Send, ChevronDown, Mail, MessageSquare, RotateCw, ChevronRight, UserRound } from 'lucide-react';
+import { Pencil, X, Check, ChevronDown, Mail, MessageSquare, RotateCw, ChevronRight, UserRound } from 'lucide-react';
 import { RenderedEmailFrame } from '@/components/emails/email-renderer';
 import { getOutboxLogByIdAction } from '@/modules/emails/actions/logs/get-outbox-log-by-id.action';
 import { computeNotificationStatus } from '@/modules/notifications/utils/notification-status.util';
@@ -86,7 +86,7 @@ function timeAgo(dateStr: string): string {
     if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
     if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
     if (diff < 604800) return `${Math.floor(diff / 86400)}d ago`;
-    return new Date(dateStr).toLocaleDateString([], { month: 'short', day: 'numeric' });
+    return `${Math.floor(diff / 604800)}w ago`;
   } catch {
     return '';
   }
@@ -209,7 +209,7 @@ function renderActualEmailComponent(eventType: string, payload: Record<string, a
   return <RenderedEmailFrame eventType={eventType} payload={payload} />;
 }
 
-function TimelineEntryCard({ entry, onResend, resendingId }: { entry: TimelineEntry; onResend?: (id: string) => void; resendingId?: string | null }) {
+function TimelineEntryCard({ entry }: { entry: TimelineEntry }) {
   const [showPayload, setShowPayload] = useState(false);
   const [activeDetailTab, setActiveDetailTab] = useState<'preview' | 'payload'>('preview');
   const [payload, setPayload] = useState<Record<string, any> | undefined>(entry.payload);
@@ -250,66 +250,39 @@ function TimelineEntryCard({ entry, onResend, resendingId }: { entry: TimelineEn
   };
 
   return (
-    <div className="relative flex gap-3 pb-5 last:pb-0">
-      <div className="flex flex-col items-center shrink-0">
-        <div className={`size-7 rounded-full flex items-center justify-center border-2 text-[10px] font-bold ${statusColor}`}>
-          {isEmail ? 'E' : 'S'}
+    <div className="rounded-xl bg-muted/30 border border-card-border p-3">
+      <div className="flex items-start gap-3">
+        <span className={`size-10 rounded-lg flex items-center justify-center shrink-0 ${statusColor}`}>
+          {isEmail ? <Mail className="size-4" /> : <MessageSquare className="size-4" />}
+        </span>
+        <div className="flex-1 min-w-0">
+          <span className="text-xs font-semibold text-foreground truncate block">
+            {EVENT_NAME_MAP[entry.eventType] || entry.eventType}
+          </span>
+          <span className="text-[11px] text-muted-foreground truncate block mt-1">
+            To: {recipientLabel(entry.recipient)}
+          </span>
         </div>
-        <div className="w-px flex-1 bg-border/60 mt-1" />
+        <div className="shrink-0 text-right flex flex-col items-end gap-1.5">
+          <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${statusPill}`}>
+            {entry.status}
+          </span>
+          <span className="text-[10px] text-muted-foreground whitespace-nowrap">
+            {formatTimeFull(entry.timestamp)} &middot; {timeAgo(entry.timestamp)}
+          </span>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => { void togglePayload(); }}
+              className="text-[11px] text-muted-foreground hover:text-foreground flex items-center gap-0.5"
+            >
+              <span>{showPayload ? 'Hide' : 'View'} Details & Preview</span>
+              <ChevronRight className={`size-3 transition-transform ${showPayload ? 'rotate-90' : ''}`} />
+            </button>
+          </div>
+        </div>
       </div>
 
-      <div className="flex-1 min-w-0">
-        <button
-          onClick={() => { void togglePayload(); }}
-          className="w-full text-left"
-        >
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex items-center gap-2 min-w-0">
-              <span className="text-sm font-semibold text-foreground truncate">
-                {EVENT_NAME_MAP[entry.eventType] || entry.eventType}
-              </span>
-              <span className="text-[9px] text-muted-foreground font-mono leading-none shrink-0">
-                {entry.eventType}
-              </span>
-            </div>
-            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0 ${statusPill}`}>
-              {entry.status}
-            </span>
-          </div>
-
-          <div className="text-xs text-muted-foreground mt-1 truncate">
-            To: {recipientLabel(entry.recipient)}
-          </div>
-
-          <div className="flex items-center gap-1 mt-1.5 text-[11px] text-muted-foreground/70">
-            <span>{showPayload ? 'Hide' : 'View'} Details & Preview</span>
-            <ChevronRight className={`size-3 transition-transform ${showPayload ? 'rotate-90' : ''}`} />
-          </div>
-
-          <div className="flex items-center gap-2 mt-1.5 text-[10px] text-muted-foreground">
-            <span>{formatTimeFull(entry.timestamp)}</span>
-            <span>&middot;</span>
-            <span>{timeAgo(entry.timestamp)}</span>
-            <span>&middot;</span>
-            <span>Retries: {entry.retryCount}/3</span>
-          </div>
-        </button>
-
-        {onResend && (
-          <button
-            onClick={(e) => { e.stopPropagation(); onResend(entry.id); }}
-            disabled={resendingId === entry.id}
-            className="mt-2 text-xs font-semibold text-rose-600 hover:text-rose-700 disabled:opacity-50"
-          >
-            {resendingId === entry.id
-              ? 'Sending...'
-              : entry.rawStatus === 'PROCESSED'
-                ? 'Send New'
-                : 'Resend'}
-          </button>
-        )}
-
-        {showPayload && (
+      {showPayload && (
           <div className="mt-3 space-y-2.5">
             {entry.errorLogs && (
               <div className="bg-rose-950/10 border border-rose-500/20 rounded-lg p-2.5 text-[11px] font-mono text-rose-600 whitespace-pre-wrap leading-relaxed">
@@ -367,7 +340,6 @@ function TimelineEntryCard({ entry, onResend, resendingId }: { entry: TimelineEn
             ) : null}
           </div>
         )}
-      </div>
     </div>
   );
 }
@@ -391,8 +363,6 @@ export function AppointmentEmailTimelineView() {
     isLoadingLogs,
     appsError,
     logsError,
-    resendEmail,
-    resendingId,
     leftTab,
     selectTab,
     searchTerm,
@@ -683,213 +653,6 @@ export function AppointmentEmailTimelineView() {
 
                 <div className="flex flex-wrap items-center gap-2 shrink-0">
                   {isLoadingLogs && <RotateCw className="size-3.5 text-muted-foreground animate-spin" />}
-
-                  {/* Channel Edit / Display */}
-                  <div className="flex items-center gap-1.5 bg-muted/30 border border-card-border/60 rounded-lg px-2.5 py-1 text-xs">
-                    <span className="text-[11px] text-muted-foreground font-medium">Channel:</span>
-                    {isEditingChannel ? (
-                      <div className="flex items-center gap-1.5">
-                        <Select
-                          value={draftChannel}
-                          onChange={(e) => setDraftChannel(e.target.value as any)}
-                          className="text-xs h-6 px-1.5 py-0 w-24 border-card-border/80"
-                          options={[
-                            { value: 'EMAIL', label: 'Email' },
-                            { value: 'SMS', label: 'SMS' },
-                            { value: 'BOTH', label: 'Email & SMS' },
-                            { value: 'NONE', label: 'None' },
-                          ]}
-                        />
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => { setDraftChannel(currentChannel); setIsEditingChannel(false); }}
-                          className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
-                          title="Cancel"
-                        >
-                          <X className="size-3" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          onClick={handleSaveChannel}
-                          disabled={isSavingChannel || draftChannel === currentChannel}
-                          className="h-6 px-2 text-[10px] gap-1 bg-slate-900 text-white rounded-md disabled:cursor-not-allowed"
-                        >
-                          <Check className="size-3" /> {isSavingChannel ? '...' : 'Save'}
-                        </Button>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-1.5">
-                        <span className="font-semibold text-foreground">
-                          {currentChannel === 'EMAIL' ? 'Email' : currentChannel === 'SMS' ? 'SMS' : currentChannel === 'BOTH' ? 'Email & SMS' : 'None'}
-                        </span>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setIsEditingChannel(true)}
-                          className="h-5 px-1 text-[10px] gap-1 text-muted-foreground hover:text-foreground"
-                        >
-                          <Pencil className="size-3" /> Edit
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Trigger Notification Dropdown */}
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        size="sm"
-                        disabled={currentChannel === 'NONE' || Boolean(isTriggeringNotification)}
-                        className="h-8 px-3 text-xs gap-1.5 bg-primary text-primary-foreground font-medium rounded-lg shadow-2xs disabled:opacity-50"
-                      >
-                        {isTriggeringNotification ? (
-                          <RotateCw className="size-3.5 animate-spin" />
-                        ) : (
-                          <Send className="size-3.5" />
-                        )}
-                        <span>{isTriggeringNotification ? 'Sending...' : 'Send Notification'}</span>
-                        <ChevronDown className="size-3 opacity-70" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-72">
-                      {(() => {
-                        const showEmail = currentChannel === 'EMAIL' || currentChannel === 'BOTH';
-                        const showSms = currentChannel === 'SMS' || currentChannel === 'BOTH';
-
-                        const NOTIFICATION_TYPES: {
-                          eventType: 'APPOINTMENT_BOOKED' | 'APPOINTMENT_REMINDER_48H' | 'APPOINTMENT_REMINDER_24H' | 'APPOINTMENT_CHECKOUT' | 'APPOINTMENT_INQUIRY_RECEIVED' | 'CANCEL_BOOKING' | 'RESCHEDULE_BOOKING';
-                          label: string;
-                          icon: string;
-                          isRose?: boolean;
-                          emailOnly?: boolean;
-                        }[] = [
-                          { eventType: 'APPOINTMENT_BOOKED', label: 'Booking Confirmation', icon: '📋' },
-                          { eventType: 'APPOINTMENT_REMINDER_48H', label: '48-Hour Reminder', icon: '⏰' },
-                          { eventType: 'APPOINTMENT_REMINDER_24H', label: '24-Hour Reminder', icon: '⏰' },
-                          { eventType: 'APPOINTMENT_CHECKOUT', label: 'Checkout / Thank You', icon: '✨' },
-                          { eventType: 'APPOINTMENT_INQUIRY_RECEIVED', label: 'Inquiry Request Received', icon: '📩', emailOnly: true },
-                          { eventType: 'CANCEL_BOOKING', label: 'Cancellation Notice', icon: '🚫', isRose: true },
-                          { eventType: 'RESCHEDULE_BOOKING', label: 'Reschedule Notice', icon: '📅' },
-                        ];
-
-                        const createdAt = (selectedCard as any)?.date || null;
-                        const startTime = selectedCard?.startTime || null;
-
-                        return NOTIFICATION_TYPES.map((type) => {
-                          const getBadge = (ch: 'EMAIL' | 'SMS') => {
-                            if (type.eventType === 'APPOINTMENT_INQUIRY_RECEIVED') {
-                              const inquiryLog = timelineEntries.find((log) => log.eventType === 'APPOINTMENT_INQUIRY_RECEIVED');
-                              const isConvertedInquiry = Boolean(
-                                (selectedCard as any)?.inquiryId ||
-                                (selectedCard as any)?.inquiry_id ||
-                                (selectedAppointment as any)?.inquiryId ||
-                                (selectedAppointment as any)?.inquiry_id ||
-                                (selectedAppointment as any)?.appointmentInquiryId ||
-                                (selectedAppointment as any)?.appointment_inquiry_id ||
-                                inquiryLog
-                              );
-                              const displayStatus = inquiryLog
-                                ? (inquiryLog.rawStatus === 'PROCESSED' ? 'SENT' : inquiryLog.rawStatus === 'FAILED' ? 'FAILED' : 'PENDING')
-                                : isConvertedInquiry
-                                  ? 'SENT'
-                                  : 'NOT APPLICABLE';
-
-                              const badgeClass = displayStatus === 'SENT'
-                                ? 'bg-green-500/10 text-green-500'
-                                : displayStatus === 'FAILED'
-                                  ? 'bg-rose-500/10 text-rose-600'
-                                  : displayStatus === 'PENDING'
-                                    ? 'bg-muted text-muted-foreground/60'
-                                    : 'bg-slate-500/10 text-slate-500 dark:text-slate-400';
-
-                              return { label: displayStatus, badgeClass };
-                            }
-
-                            if (type.eventType === 'CANCEL_BOOKING' || type.eventType === 'RESCHEDULE_BOOKING') {
-                              const logEventType = ch === 'SMS' ? `${type.eventType}_SMS` : type.eventType;
-                              const log = timelineEntries.find((e) => (e.eventType === logEventType || e.eventType === type.eventType) && e.channel === ch);
-                              const isSent = log?.rawStatus === 'PROCESSED';
-                              const displayStatus = isSent ? 'SENT' : log ? (log.rawStatus === 'FAILED' ? 'FAILED' : 'PENDING') : 'NOT APPLICABLE';
-                              const badgeClass = displayStatus === 'SENT'
-                                ? 'bg-green-500/10 text-green-500'
-                                : displayStatus === 'FAILED'
-                                  ? 'bg-rose-500/10 text-rose-600'
-                                  : displayStatus === 'PENDING'
-                                    ? 'bg-muted text-muted-foreground/60'
-                                    : 'bg-slate-500/10 text-slate-500 dark:text-slate-400';
-
-                              return { label: displayStatus, badgeClass };
-                            }
-
-                            const isCore = ['APPOINTMENT_BOOKED', 'APPOINTMENT_REMINDER_48H', 'APPOINTMENT_REMINDER_24H', 'APPOINTMENT_CHECKOUT'].includes(type.eventType);
-                            if (!isCore) return null;
-                            const log = timelineEntries.find((e) => {
-                              if (e.channel !== ch) return false;
-                              if (type.eventType === 'APPOINTMENT_BOOKED') {
-                                return ['APPOINTMENT_BOOKED', 'APPOINTMENT_CONVERTED_FROM_INQUIRY', 'APPOINTMENT_CONVERTED_FROM_INQUIRY_PATIENT', 'APPOINTMENT_CONVERTED_FROM_INQUIRY_SMS', 'APPOINTMENT_MANUALLY_BOOKED_PATIENT', 'APPOINTMENT_MANUALLY_BOOKED_GUEST', 'APPOINTMENT_MANUALLY_BOOKED_SMS'].includes(e.eventType);
-                              }
-                              if (type.eventType === 'APPOINTMENT_CHECKOUT') {
-                                return ['APPOINTMENT_CHECKOUT', 'APPOINTMENT_COMPLETED_POST_CARE', 'APPOINTMENT_COMPLETED_POST_CARE_SMS'].includes(e.eventType);
-                              }
-                              if (type.eventType === 'APPOINTMENT_REMINDER_48H') {
-                                return ['APPOINTMENT_REMINDER_48H', 'APPOINTMENT_REMINDER_48H_SMS'].includes(e.eventType);
-                              }
-                              if (type.eventType === 'APPOINTMENT_REMINDER_24H') {
-                                return ['APPOINTMENT_REMINDER_24H', 'APPOINTMENT_REMINDER_24H_SMS'].includes(e.eventType);
-                              }
-                              return e.eventType === type.eventType;
-                            });
-
-                            const isSent = log?.rawStatus === 'PROCESSED';
-                            const st = computeNotificationStatus({
-                              eventType: type.eventType as any,
-                              targetChannel: ch,
-                              isSent,
-                              currentChannel,
-                              createdAt,
-                              startTime,
-                            });
-                            return st;
-                          };
-
-                          const emailStatus = getBadge('EMAIL');
-                          const smsStatus = getBadge('SMS');
-
-                          return (
-                            <React.Fragment key={type.eventType}>
-                              {showEmail && (
-                                <DropdownMenuItem
-                                  onClick={() => handleTriggerNotification(type.eventType, 'EMAIL')}
-                                  className={`text-xs flex items-center justify-between cursor-pointer ${type.isRose ? 'text-rose-600 focus:text-rose-600' : ''}`}
-                                >
-                                  <span className="truncate">{type.icon} {type.label} (Email)</span>
-                                  {emailStatus && (
-                                    <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded shrink-0 ml-2 ${emailStatus.badgeClass}`}>
-                                      {emailStatus.label}
-                                    </span>
-                                  )}
-                                </DropdownMenuItem>
-                              )}
-                              {showSms && !type.emailOnly && (
-                                <DropdownMenuItem
-                                  onClick={() => handleTriggerNotification(type.eventType, 'SMS')}
-                                  className={`text-xs flex items-center justify-between cursor-pointer ${type.isRose ? 'text-rose-600 focus:text-rose-600' : ''}`}
-                                >
-                                  <span className="truncate">💬 {type.label} (SMS)</span>
-                                  {smsStatus && (
-                                    <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded shrink-0 ml-2 ${smsStatus.badgeClass}`}>
-                                      {smsStatus.label}
-                                    </span>
-                                  )}
-                                </DropdownMenuItem>
-                              )}
-                            </React.Fragment>
-                          );
-                        });
-                      })()}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
                 </div>
               </div>
             </div>
@@ -897,204 +660,250 @@ export function AppointmentEmailTimelineView() {
             <div className="flex-1 overflow-y-auto px-4 py-3 space-y-4" data-lenis-prevent style={{ scrollbarWidth: 'thin' }}>
               {/* Notification History Section Overview */}
               {selectedAppointmentId && (
-                <div className="bg-muted/15 border border-card-border/60 rounded-xl p-3.5 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-foreground">Notification Status Overview</span>
-                    <span className="text-[10px] text-muted-foreground font-medium">
-                      Channel: {currentChannel}
-                    </span>
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-foreground">Notification Status Overview</span>
+                    <div className="flex items-center gap-1.5 bg-muted/30 border border-card-border/60 rounded-lg px-2.5 py-1 text-xs">
+                      <span className="text-[11px] text-muted-foreground font-medium">Channel:</span>
+                      {isEditingChannel ? (
+                        <div className="flex items-center gap-1.5">
+                          <Select
+                            value={draftChannel}
+                            onChange={(e) => setDraftChannel(e.target.value as any)}
+                            className="text-xs h-6 px-1.5 py-0 w-24 border-card-border/80"
+                            options={[
+                              { value: 'EMAIL', label: 'Email' },
+                              { value: 'SMS', label: 'SMS' },
+                              { value: 'BOTH', label: 'Email & SMS' },
+                              { value: 'NONE', label: 'None' },
+                            ]}
+                          />
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => { setDraftChannel(currentChannel); setIsEditingChannel(false); }}
+                            className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
+                            title="Cancel"
+                          >
+                            <X className="size-3" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={handleSaveChannel}
+                            disabled={isSavingChannel || draftChannel === currentChannel}
+                            className="h-6 px-2 text-[10px] gap-1 bg-slate-900 text-white rounded-md disabled:cursor-not-allowed"
+                          >
+                            <Check className="size-3" /> {isSavingChannel ? '...' : 'Save'}
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-semibold text-foreground">
+                            {currentChannel === 'EMAIL' ? 'Email' : currentChannel === 'SMS' ? 'SMS' : currentChannel === 'BOTH' ? 'Email & SMS' : 'None'}
+                          </span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setIsEditingChannel(true)}
+                            className="h-5 w-5 p-0 text-muted-foreground hover:text-foreground"
+                            title="Edit channel"
+                          >
+                            <Pencil className="size-3" />
+                          </Button>
+                        </div>
+                      )}
+                    </div>
                   </div>
 
-                  <div className="flex flex-col gap-2.5">
-                    {/* 1. Inquiry Request Received */}
-                    {(() => {
-                      const inquiryLog = timelineEntries.find((log) => log.eventType === 'APPOINTMENT_INQUIRY_RECEIVED');
-                      const isConvertedInquiry = Boolean(
-                        (selectedCard as any)?.inquiryId ||
-                        (selectedCard as any)?.inquiry_id ||
-                        (selectedAppointment as any)?.inquiryId ||
-                        (selectedAppointment as any)?.inquiry_id ||
-                        (selectedAppointment as any)?.appointmentInquiryId ||
-                        (selectedAppointment as any)?.appointment_inquiry_id ||
-                        inquiryLog
-                      );
+                  {(() => {
+                    const showEmail = currentChannel === 'EMAIL' || currentChannel === 'BOTH';
+                    const showSms = currentChannel === 'SMS' || currentChannel === 'BOTH';
 
-                      const displayStatus = isLoadingLogs
-                        ? 'LOADING...'
-                        : inquiryLog
-                          ? (inquiryLog.rawStatus === 'PROCESSED'
-                            ? 'SENT'
-                            : inquiryLog.rawStatus === 'FAILED'
-                              ? 'FAILED'
-                              : 'PENDING')
+                    const NOTIFICATION_TYPES: {
+                      eventType: 'APPOINTMENT_BOOKED' | 'APPOINTMENT_REMINDER_48H' | 'APPOINTMENT_REMINDER_24H' | 'APPOINTMENT_CHECKOUT' | 'APPOINTMENT_INQUIRY_RECEIVED' | 'CANCEL_BOOKING' | 'RESCHEDULE_BOOKING';
+                      label: string;
+                      isRose?: boolean;
+                      emailOnly?: boolean;
+                    }[] = [
+                      { eventType: 'APPOINTMENT_BOOKED', label: 'Booking Confirmation' },
+                      { eventType: 'APPOINTMENT_REMINDER_48H', label: '48-Hour Reminder' },
+                      { eventType: 'APPOINTMENT_REMINDER_24H', label: '24-Hour Reminder' },
+                      { eventType: 'APPOINTMENT_CHECKOUT', label: 'Checkout / Thank You' },
+                      { eventType: 'APPOINTMENT_INQUIRY_RECEIVED', label: 'Inquiry Request Received', emailOnly: true },
+                      { eventType: 'CANCEL_BOOKING', label: 'Cancellation Notice', isRose: true },
+                      { eventType: 'RESCHEDULE_BOOKING', label: 'Reschedule Notice' },
+                    ];
+
+                    const createdAt = (selectedCard as any)?.date || null;
+                    const startTime = selectedCard?.startTime || null;
+
+                    const badgeClassFor = (status: string) =>
+                      status === 'SENT'
+                        ? 'bg-emerald-100 text-emerald-700'
+                        : status === 'FAILED'
+                          ? 'bg-rose-100 text-rose-700'
+                          : status === 'PENDING'
+                            ? 'bg-amber-100 text-amber-700'
+                            : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400';
+
+                    const getStatus = (type: (typeof NOTIFICATION_TYPES)[number], ch: 'EMAIL' | 'SMS') => {
+                      if (isLoadingLogs) return { label: 'LOADING...', badgeClass: 'bg-muted text-muted-foreground/60 animate-pulse' };
+
+                      if (type.eventType === 'APPOINTMENT_INQUIRY_RECEIVED') {
+                        const inquiryLog = timelineEntries.find((log) => log.eventType === 'APPOINTMENT_INQUIRY_RECEIVED');
+                        const isConvertedInquiry = Boolean(
+                          (selectedCard as any)?.inquiryId ||
+                          (selectedCard as any)?.inquiry_id ||
+                          (selectedAppointment as any)?.inquiryId ||
+                          (selectedAppointment as any)?.inquiry_id ||
+                          (selectedAppointment as any)?.appointmentInquiryId ||
+                          (selectedAppointment as any)?.appointment_inquiry_id ||
+                          inquiryLog
+                        );
+                        const status = inquiryLog
+                          ? (inquiryLog.rawStatus === 'PROCESSED' ? 'SENT' : inquiryLog.rawStatus === 'FAILED' ? 'FAILED' : 'PENDING')
                           : isConvertedInquiry
                             ? 'SENT'
                             : 'NOT APPLICABLE';
+                        return { label: status, badgeClass: badgeClassFor(status) };
+                      }
 
-                      const badgeClass = isLoadingLogs
-                        ? 'bg-muted text-muted-foreground/60 animate-pulse'
-                        : displayStatus === 'SENT'
-                          ? 'bg-green-500/10 text-green-500'
-                          : displayStatus === 'FAILED'
-                            ? 'bg-rose-500/10 text-rose-600'
-                            : displayStatus === 'PENDING'
-                              ? 'bg-muted text-muted-foreground/60'
-                              : 'bg-slate-500/10 text-slate-500 dark:text-slate-400';
+                      if (type.eventType === 'CANCEL_BOOKING' || type.eventType === 'RESCHEDULE_BOOKING') {
+                        const logEventType = ch === 'SMS' ? `${type.eventType}_SMS` : type.eventType;
+                        const log = timelineEntries.find((e) => (e.eventType === logEventType || e.eventType === type.eventType) && e.channel === ch);
+                        const status = log?.rawStatus === 'PROCESSED'
+                          ? 'SENT'
+                          : log
+                            ? (log.rawStatus === 'FAILED' ? 'FAILED' : 'PENDING')
+                            : 'NOT APPLICABLE';
+                        return { label: status, badgeClass: badgeClassFor(status) };
+                      }
 
-                      return (
-                        <div className="space-y-1">
-                          <span className="text-xs text-muted-foreground">Inquiry Request Received</span>
-                          <div className="flex items-center justify-between p-2.5 bg-secondary-bg/20 border border-card-border/60 rounded-xl">
-                            <div className="flex items-center gap-2 min-w-0">
-                              <Mail className="size-3.5 text-muted-foreground shrink-0" />
-                              <span className="text-xs font-medium text-foreground">Email</span>
-                              <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${badgeClass}`}>
-                                {displayStatus}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })()}
-
-                    {/* 2. Core Notification Events (Confirmation, 48h, 24h, Checkout) */}
-                    {(() => {
-                      const commEntries: {
-                        key: string;
-                        label: string;
-                        eventType: 'APPOINTMENT_BOOKED' | 'APPOINTMENT_REMINDER_48H' | 'APPOINTMENT_REMINDER_24H' | 'APPOINTMENT_CHECKOUT';
-                      }[] = [
-                        { key: 'confirmation', label: 'Booking Confirmation', eventType: 'APPOINTMENT_BOOKED' },
-                        { key: 'reminder48h', label: '48-Hour Reminder', eventType: 'APPOINTMENT_REMINDER_48H' },
-                        { key: 'reminder24h', label: '24-Hour Reminder', eventType: 'APPOINTMENT_REMINDER_24H' },
-                        { key: 'checkout', label: 'Checkout / Thank You', eventType: 'APPOINTMENT_CHECKOUT' },
-                      ];
-
-                      const createdAt = (selectedCard as any)?.date || null;
-                      const startTime = selectedCard?.startTime || null;
-
-                      return commEntries.map((entry) => {
-                        const getEventPillStatus = (eventType: string, targetChannel: 'EMAIL' | 'SMS') => {
-                          const log = timelineEntries.find((e) => {
-                            if (e.channel !== targetChannel) return false;
-                            if (eventType === 'APPOINTMENT_BOOKED') {
-                              return ['APPOINTMENT_BOOKED', 'APPOINTMENT_CONVERTED_FROM_INQUIRY', 'APPOINTMENT_CONVERTED_FROM_INQUIRY_PATIENT', 'APPOINTMENT_CONVERTED_FROM_INQUIRY_SMS', 'APPOINTMENT_MANUALLY_BOOKED_PATIENT', 'APPOINTMENT_MANUALLY_BOOKED_GUEST', 'APPOINTMENT_MANUALLY_BOOKED_SMS'].includes(e.eventType);
-                            }
-                            if (eventType === 'APPOINTMENT_CHECKOUT') {
-                              return ['APPOINTMENT_CHECKOUT', 'APPOINTMENT_COMPLETED_POST_CARE', 'APPOINTMENT_COMPLETED_POST_CARE_SMS'].includes(e.eventType);
-                            }
-                            if (eventType === 'APPOINTMENT_REMINDER_48H') {
-                              return ['APPOINTMENT_REMINDER_48H', 'APPOINTMENT_REMINDER_48H_SMS'].includes(e.eventType);
-                            }
-                            if (eventType === 'APPOINTMENT_REMINDER_24H') {
-                              return ['APPOINTMENT_REMINDER_24H', 'APPOINTMENT_REMINDER_24H_SMS'].includes(e.eventType);
-                            }
-                            return e.eventType === eventType;
-                          });
-
-                          return computeNotificationStatus({
-                            eventType: eventType as any,
-                            targetChannel,
-                            isSent: log?.rawStatus === 'PROCESSED',
-                            currentChannel,
-                            createdAt,
-                            startTime,
-                          });
-                        };
-
-                        const smsStatus = getEventPillStatus(entry.eventType, 'SMS');
-                        const emailStatus = getEventPillStatus(entry.eventType, 'EMAIL');
-
-                        return (
-                          <div key={entry.key} className="space-y-1">
-                            <span className="text-xs text-muted-foreground">{entry.label}</span>
-                            <div className="flex flex-col gap-2">
-                              {/* SMS row */}
-                              <div className="flex items-center justify-between p-2.5 bg-secondary-bg/20 border border-card-border/60 rounded-xl">
-                                <div className="flex items-center gap-2 min-w-0">
-                                  <MessageSquare className="size-3.5 text-muted-foreground shrink-0" />
-                                  <span className="text-xs font-medium text-foreground">SMS</span>
-                                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${smsStatus.badgeClass}`}>
-                                    {smsStatus.label}
-                                  </span>
-                                </div>
-                              </div>
-
-                              {/* Email row */}
-                              <div className="flex items-center justify-between p-2.5 bg-secondary-bg/20 border border-card-border/60 rounded-xl">
-                                <div className="flex items-center gap-2 min-w-0">
-                                  <Mail className="size-3.5 text-muted-foreground shrink-0" />
-                                  <span className="text-xs font-medium text-foreground">Email</span>
-                                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${emailStatus.badgeClass}`}>
-                                    {emailStatus.label}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        );
+                      const log = timelineEntries.find((e) => {
+                        if (e.channel !== ch) return false;
+                        if (type.eventType === 'APPOINTMENT_BOOKED') {
+                          return ['APPOINTMENT_BOOKED', 'APPOINTMENT_CONVERTED_FROM_INQUIRY', 'APPOINTMENT_CONVERTED_FROM_INQUIRY_PATIENT', 'APPOINTMENT_CONVERTED_FROM_INQUIRY_SMS', 'APPOINTMENT_MANUALLY_BOOKED_PATIENT', 'APPOINTMENT_MANUALLY_BOOKED_GUEST', 'APPOINTMENT_MANUALLY_BOOKED_SMS'].includes(e.eventType);
+                        }
+                        if (type.eventType === 'APPOINTMENT_CHECKOUT') {
+                          return ['APPOINTMENT_CHECKOUT', 'APPOINTMENT_COMPLETED_POST_CARE', 'APPOINTMENT_COMPLETED_POST_CARE_SMS'].includes(e.eventType);
+                        }
+                        if (type.eventType === 'APPOINTMENT_REMINDER_48H') {
+                          return ['APPOINTMENT_REMINDER_48H', 'APPOINTMENT_REMINDER_48H_SMS'].includes(e.eventType);
+                        }
+                        if (type.eventType === 'APPOINTMENT_REMINDER_24H') {
+                          return ['APPOINTMENT_REMINDER_24H', 'APPOINTMENT_REMINDER_24H_SMS'].includes(e.eventType);
+                        }
+                        return e.eventType === type.eventType;
                       });
-                    })()}
 
-                    {/* 3. Cancellation & Reschedule Notice */}
-                    {(['CANCEL_BOOKING', 'RESCHEDULE_BOOKING'] as const).map((eventType) => {
-                      const label = eventType === 'CANCEL_BOOKING' ? 'Cancellation' : 'Reschedule';
+                      if (log) {
+                        if (log.rawStatus === 'FAILED') {
+                          return { label: 'FAILED', badgeClass: badgeClassFor('FAILED') };
+                        }
+                        if (log.rawStatus === 'PROCESSED') {
+                          return { label: 'SENT', badgeClass: badgeClassFor('SENT') };
+                        }
+                        if (log.rawStatus === 'PENDING') {
+                          return { label: 'PENDING', badgeClass: badgeClassFor('PENDING') };
+                        }
+                      }
 
-                      return (
-                        <div key={eventType} className="space-y-1">
-                          <span className="text-xs text-muted-foreground">{label}</span>
-                          <div className="flex flex-col gap-2">
-                            {(['EMAIL', 'SMS'] as const).map((channelType) => {
-                              const logEventType = channelType === 'SMS' ? `${eventType}_SMS` : eventType;
-                              const latestLog = timelineEntries.find((e) => (e.eventType === logEventType || e.eventType === eventType) && e.channel === channelType);
-                              const isSent = latestLog?.rawStatus === 'PROCESSED';
-                              const displayStatus = isLoadingLogs
-                                ? 'LOADING...'
-                                : isSent
-                                  ? 'SENT'
-                                  : latestLog
-                                    ? latestLog.rawStatus === 'FAILED'
-                                      ? 'FAILED'
-                                      : 'PENDING'
-                                    : 'NOT APPLICABLE';
+                      const st = computeNotificationStatus({
+                        eventType: type.eventType as any,
+                        targetChannel: ch,
+                        isSent: false,
+                        currentChannel,
+                        createdAt,
+                        startTime,
+                      });
+                      return st;
+                    };
 
-                              const statusBadgeClass = isLoadingLogs
-                                ? 'bg-muted text-muted-foreground/60 animate-pulse'
-                                : displayStatus === 'SENT'
-                                  ? 'bg-green-500/10 text-green-500'
-                                  : displayStatus === 'FAILED'
-                                    ? 'bg-rose-500/10 text-rose-600'
-                                    : displayStatus === 'PENDING'
-                                      ? 'bg-muted text-muted-foreground/60'
-                                      : 'bg-slate-500/10 text-slate-500 dark:text-slate-400';
+                    return (
+                      <table className="w-full text-xs">
+                        <thead>
+                          <tr className="text-left text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                            <th className="py-1 pr-2 font-semibold">Type</th>
+                            {showSms && <th className="py-1 pr-2 font-semibold">SMS</th>}
+                            {showEmail && <th className="py-1 pr-2 font-semibold">Email</th>}
+                            <th className="py-1 font-semibold text-right">Action</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {NOTIFICATION_TYPES.map((type) => {
+                            const hasSmsItem = showSms && !type.emailOnly;
+                            const hasEmailItem = showEmail;
+                            const disabled = currentChannel === 'NONE' || isTriggeringNotification !== null || (!hasSmsItem && !hasEmailItem);
+                            const emailStatus = getStatus(type, 'EMAIL');
+                            const smsStatus = getStatus(type, 'SMS');
 
-                              const Icon = channelType === 'SMS' ? MessageSquare : Mail;
-
-                              return (
-                                <div key={channelType} className="flex items-center justify-between p-2.5 bg-secondary-bg/20 border border-card-border/60 rounded-xl">
-                                  <div className="flex items-center gap-2 min-w-0">
-                                    <Icon className="size-3.5 text-muted-foreground shrink-0" />
-                                    <span className="text-xs font-medium text-foreground">{channelType === 'SMS' ? 'SMS' : 'Email'}</span>
-                                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${statusBadgeClass}`}>
-                                      {displayStatus}
-                                    </span>
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
+                            return (
+                              <tr key={type.eventType} className="border-t border-card-border/60">
+                                <td className={`py-1 pr-2 whitespace-nowrap text-xs font-medium ${type.isRose ? 'text-rose-600' : 'text-foreground'}`}>
+                                  {type.label}
+                                </td>
+                                {showSms && (
+                                  <td className="py-1 pr-2">
+                                    {type.emailOnly
+                                      ? <span className="text-muted-foreground/40">—</span>
+                                      : <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${smsStatus.badgeClass}`}>{smsStatus.label}</span>}
+                                  </td>
+                                )}
+                                {showEmail && (
+                                  <td className="py-1 pr-2">
+                                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${emailStatus.badgeClass}`}>{emailStatus.label}</span>
+                                  </td>
+                                )}
+                                <td className="py-1 text-right">
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                      <Button variant="ghost" size="sm" disabled={disabled} className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground" title="Send notification">
+                                        {isTriggeringNotification === type.eventType ? <RotateCw className="size-3 animate-spin" /> : <ChevronDown className="size-3.5" />}
+                                      </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end" className="w-72">
+                                      {hasEmailItem && (
+                                        <DropdownMenuItem onClick={() => handleTriggerNotification(type.eventType, 'EMAIL')} className="text-xs flex items-center justify-between cursor-pointer">
+                                          <span className="flex items-center gap-1.5 truncate">
+                                            <Mail className="size-3 text-muted-foreground shrink-0" />
+                                            {emailStatus.label === 'FAILED' ? 'Retry via Email' : emailStatus.label === 'SENT' ? 'Resend via Email' : 'Send via Email'}
+                                          </span>
+                                          <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full shrink-0 ml-2 ${emailStatus.badgeClass}`}>
+                                            {emailStatus.label}
+                                          </span>
+                                        </DropdownMenuItem>
+                                      )}
+                                      {hasSmsItem && (
+                                        <DropdownMenuItem onClick={() => handleTriggerNotification(type.eventType, 'SMS')} className="text-xs flex items-center justify-between cursor-pointer">
+                                          <span className="flex items-center gap-1.5 truncate">
+                                            <MessageSquare className="size-3 text-muted-foreground shrink-0" />
+                                            {smsStatus.label === 'FAILED' ? 'Retry via SMS' : smsStatus.label === 'SENT' ? 'Resend via SMS' : 'Send via SMS'}
+                                          </span>
+                                          <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full shrink-0 ml-2 ${smsStatus.badgeClass}`}>
+                                            {smsStatus.label}
+                                          </span>
+                                        </DropdownMenuItem>
+                                      )}
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    );
+                  })()}
                 </div>
               )}
+
+              <span className="text-sm font-medium text-foreground block">Delivery Logs</span>
 
               {isLoadingLogs ? (
                 <div className="space-y-3">
                   {[1, 2, 3].map((i) => (
-                    <div key={i} className="flex gap-3 animate-pulse">
-                      <div className="size-8 rounded-full bg-muted/30 shrink-0" />
+                    <div key={i} className="rounded-xl bg-muted/30 border border-card-border p-3 flex gap-3 animate-pulse">
+                      <div className="size-10 rounded-lg bg-muted/30 shrink-0" />
                       <div className="flex-1 space-y-2">
                         <div className="h-3.5 w-40 rounded bg-muted/40" />
                         <div className="h-3 w-60 rounded bg-muted/30" />
@@ -1121,9 +930,9 @@ export function AppointmentEmailTimelineView() {
                   </p>
                 </div>
               ) : (
-                <div>
+                <div className="space-y-3">
                   {timelineEntries.map((entry) => (
-                    <TimelineEntryCard key={entry.id} entry={entry} onResend={resendEmail} resendingId={resendingId} />
+                    <TimelineEntryCard key={entry.id} entry={entry} />
                   ))}
                   {timelineLoadMoreError && (
                     <div className="mt-3 rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-xs text-destructive">

@@ -276,6 +276,36 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
   const has24hEmailLog = groupedOutboxLogs.some((l) => l.eventType === 'APPOINTMENT_REMINDER_24H' && (l.status === 'PROCESSED' || l.status === 'PENDING'));
   const has24hSmsLog = groupedOutboxLogs.some((l) => l.eventType === 'APPOINTMENT_REMINDER_24H_SMS' && (l.status === 'PROCESSED' || l.status === 'PENDING'));
 
+  const getLatestLogForEntry = (eventType: string, targetChannel: 'EMAIL' | 'SMS') => {
+    return outboxLogs.find((l) => {
+      const isSms = l.eventType.endsWith('_SMS') || l.eventType.includes('SMS');
+      if (targetChannel === 'SMS' && !isSms) return false;
+      if (targetChannel === 'EMAIL' && isSms) return false;
+
+      if (eventType === 'APPOINTMENT_BOOKED') {
+        return [
+          'APPOINTMENT_BOOKED',
+          'APPOINTMENT_CONVERTED_FROM_INQUIRY',
+          'APPOINTMENT_CONVERTED_FROM_INQUIRY_PATIENT',
+          'APPOINTMENT_CONVERTED_FROM_INQUIRY_SMS',
+          'APPOINTMENT_MANUALLY_BOOKED_PATIENT',
+          'APPOINTMENT_MANUALLY_BOOKED_GUEST',
+          'APPOINTMENT_MANUALLY_BOOKED_SMS',
+        ].includes(l.eventType);
+      }
+      if (eventType === 'APPOINTMENT_CHECKOUT') {
+        return ['APPOINTMENT_CHECKOUT', 'APPOINTMENT_COMPLETED_POST_CARE', 'APPOINTMENT_COMPLETED_POST_CARE_SMS'].includes(l.eventType);
+      }
+      if (eventType === 'APPOINTMENT_REMINDER_48H') {
+        return ['APPOINTMENT_REMINDER_48H', 'APPOINTMENT_REMINDER_48H_SMS'].includes(l.eventType);
+      }
+      if (eventType === 'APPOINTMENT_REMINDER_24H') {
+        return ['APPOINTMENT_REMINDER_24H', 'APPOINTMENT_REMINDER_24H_SMS'].includes(l.eventType);
+      }
+      return l.eventType === eventType;
+    });
+  };
+
   const commEntries: {
     key: string;
     label: string;
@@ -458,41 +488,51 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
               const createdAt = (appointment as any).createdAt || (appointment as any).created_at;
               const startTime = (appointment as any).startTime || (appointment as any).start_time || (appointment as any).date;
 
-              const smsStatus = computeNotificationStatus({
-                eventType: entry.eventType,
-                targetChannel: 'SMS',
-                isSent: entry.smsSent,
-                currentChannel: channel,
-                createdAt,
-                startTime,
-              });
+              const getDisplayChannelStatus = (targetChannel: 'SMS' | 'EMAIL', fallbackSent: boolean) => {
+                const latestLog = getLatestLogForEntry(entry.eventType, targetChannel);
+                if (latestLog) {
+                  if (latestLog.status === 'FAILED') {
+                    return { label: 'FAILED', badgeClass: 'bg-rose-500/10 text-rose-600', logId: latestLog.id };
+                  }
+                  if (latestLog.status === 'PROCESSED') {
+                    return { label: 'SENT', badgeClass: 'bg-green-500/10 text-green-500', logId: latestLog.id };
+                  }
+                  if (latestLog.status === 'PENDING') {
+                    return { label: 'PENDING', badgeClass: 'bg-muted text-muted-foreground/60', logId: latestLog.id };
+                  }
+                }
 
-              const emailStatus = computeNotificationStatus({
-                eventType: entry.eventType,
-                targetChannel: 'EMAIL',
-                isSent: entry.emailSent,
-                currentChannel: channel,
-                createdAt,
-                startTime,
-              });
+                const computed = computeNotificationStatus({
+                  eventType: entry.eventType,
+                  targetChannel,
+                  isSent: fallbackSent,
+                  currentChannel: channel,
+                  createdAt,
+                  startTime,
+                });
 
+                return { ...computed, logId: undefined };
+              };
+
+              const smsStatus = getDisplayChannelStatus('SMS', entry.smsSent);
+              const emailStatus = getDisplayChannelStatus('EMAIL', entry.emailSent);
               const isCheckoutApplicable = entry.eventType !== 'APPOINTMENT_CHECKOUT' || appointment.status === 'COMPLETED';
 
               const displaySmsStatus = loadingLogs
-                ? { label: 'LOADING...', variant: 'pending' as const, badgeClass: 'bg-muted text-muted-foreground/60 animate-pulse' }
+                ? { label: 'LOADING...', badgeClass: 'bg-muted text-muted-foreground/60 animate-pulse', logId: undefined }
                 : isCheckoutApplicable
                 ? smsStatus
-                : { ...smsStatus, label: 'NOT APPLICABLE', badgeClass: 'bg-slate-500/10 text-slate-500 dark:text-slate-400' };
+                : { label: 'NOT APPLICABLE', badgeClass: 'bg-slate-500/10 text-slate-500 dark:text-slate-400', logId: undefined };
 
               const displayEmailStatus = loadingLogs
-                ? { label: 'LOADING...', variant: 'pending' as const, badgeClass: 'bg-muted text-muted-foreground/60 animate-pulse' }
+                ? { label: 'LOADING...', badgeClass: 'bg-muted text-muted-foreground/60 animate-pulse', logId: undefined }
                 : isCheckoutApplicable
                 ? emailStatus
-                : { ...emailStatus, label: 'NOT APPLICABLE', badgeClass: 'bg-slate-500/10 text-slate-500 dark:text-slate-400' };
+                : { label: 'NOT APPLICABLE', badgeClass: 'bg-slate-500/10 text-slate-500 dark:text-slate-400', logId: undefined };
 
-              const getActionProps = (targetChannel: 'SMS' | 'EMAIL', statusObj: typeof smsStatus) => {
+              const getActionProps = (targetChannel: 'SMS' | 'EMAIL', statusObj: typeof displaySmsStatus) => {
                 const key = `${entry.eventType}_${targetChannel}`;
-                const isSending = resending === key;
+                const isSending = resending === key || (Boolean(statusObj.logId) && detailResendingId === statusObj.logId);
 
                 if (loadingLogs) {
                   return { label: 'Loading...', allowed: false };
@@ -502,9 +542,12 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
                 }
                 if (isAnyResending) {
                   return {
-                    label: statusObj.label === 'SENT' ? 'Send New' : statusObj.label === 'PENDING' ? 'Send Now' : 'Force Send',
+                    label: statusObj.label === 'SENT' ? 'Send New' : statusObj.label === 'FAILED' ? 'Retry' : statusObj.label === 'PENDING' ? 'Send Now' : 'Force Send',
                     allowed: false,
                   };
+                }
+                if (statusObj.label === 'FAILED') {
+                  return { label: 'Retry', allowed: true };
                 }
                 if (statusObj.label === 'SENT') {
                   return { label: 'Send New', allowed: allowOverrideResend };
@@ -535,10 +578,16 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
                           variant="outline"
                           size="sm"
                           disabled={!smsAction.allowed}
-                          onClick={() => handleResend(entry.eventType, 'SMS')}
+                          onClick={() => {
+                            if (displaySmsStatus.logId) {
+                              handleDetailResend(displaySmsStatus.logId);
+                            } else {
+                              handleResend(entry.eventType, 'SMS');
+                            }
+                          }}
                           className={`${compact ? 'text-[9px] h-6 px-2 gap-0.5' : 'text-[10px] h-7 px-2.5 gap-1'} shrink-0 disabled:opacity-40 disabled:cursor-not-allowed`}
                         >
-                          <RotateCw className={`size-3 ${loadingLogs || resending === `${entry.eventType}_SMS` ? 'animate-spin' : ''}`} />
+                          <RotateCw className={`size-3 ${loadingLogs || resending === `${entry.eventType}_SMS` || (Boolean(displaySmsStatus.logId) && detailResendingId === displaySmsStatus.logId) ? 'animate-spin' : ''}`} />
                           {smsAction.label}
                         </Button>
                       )}
@@ -557,10 +606,16 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
                           variant="outline"
                           size="sm"
                           disabled={!emailAction.allowed}
-                          onClick={() => handleResend(entry.eventType, 'EMAIL')}
+                          onClick={() => {
+                            if (displayEmailStatus.logId) {
+                              handleDetailResend(displayEmailStatus.logId);
+                            } else {
+                              handleResend(entry.eventType, 'EMAIL');
+                            }
+                          }}
                           className={`${compact ? 'text-[9px] h-6 px-2 gap-0.5' : 'text-[10px] h-7 px-2.5 gap-1'} shrink-0 disabled:opacity-40 disabled:cursor-not-allowed`}
                         >
-                          <RotateCw className={`size-3 ${loadingLogs || resending === `${entry.eventType}_EMAIL` ? 'animate-spin' : ''}`} />
+                          <RotateCw className={`size-3 ${loadingLogs || resending === `${entry.eventType}_EMAIL` || (Boolean(displayEmailStatus.logId) && detailResendingId === displayEmailStatus.logId) ? 'animate-spin' : ''}`} />
                           {emailAction.label}
                         </Button>
                       )}
