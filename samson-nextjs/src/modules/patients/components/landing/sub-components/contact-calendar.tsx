@@ -24,22 +24,22 @@ export function ContactCalendar({
 
   return (
     <div className="p-5 bg-white border border-gray-200/80 shadow-2xs rounded-none">
-      <div className="flex justify-between items-center text-xs text-gray-900 mb-4 pb-3 border-b border-gray-100 font-sans">
+      <div className="flex justify-between items-center mb-4 pb-3 border-b border-gray-100 font-sans">
         <button
           type="button"
           onClick={() => onMonthChange(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1))}
-          className="p-1.5 hover:bg-gray-100 transition-colors text-gray-600 hover:text-black cursor-pointer"
+          className="p-1.5 hover:bg-[#D94E4E]/10 transition-colors text-gray-600 hover:text-[#D94E4E] cursor-pointer"
           aria-label="Previous month"
         >
           <ChevronLeft className="w-4 h-4" />
         </button>
-        <div className="text-xs font-semibold tracking-wider uppercase text-gray-800">
+        <div className="font-sans text-base sm:text-lg font-normal tracking-[-0.04em] text-[#141515]">
           {currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
         </div>
         <button
           type="button"
           onClick={() => onMonthChange(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1))}
-          className="p-1.5 hover:bg-gray-100 transition-colors text-gray-600 hover:text-black cursor-pointer"
+          className="p-1.5 hover:bg-[#D94E4E]/10 transition-colors text-gray-600 hover:text-[#D94E4E] cursor-pointer"
           aria-label="Next month"
         >
           <ChevronRight className="w-4 h-4" />
@@ -51,7 +51,7 @@ export function ContactCalendar({
       ) : (
         <div className="grid grid-cols-7 gap-1.5 text-center text-xs font-sans">
           {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((dayName, idx) => (
-            <div key={`${dayName}-${idx}`} className="font-semibold text-[10px] uppercase tracking-wider text-gray-400 py-1.5">
+            <div key={`${dayName}-${idx}`} className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold font-sans py-1.5">
               {dayName}
             </div>
           ))}
@@ -67,11 +67,11 @@ export function ContactCalendar({
                 type="button"
                 disabled={!isAvailable}
                 onClick={() => onDateSelect(date)}
-                className={`h-10 sm:h-12 flex items-center justify-center text-xs sm:text-sm transition-all border rounded-none ${
+                className={`h-10 sm:h-12 flex items-center justify-center font-josefin text-xs sm:text-sm transition-all border rounded-none ${
                   isSelected
                     ? 'bg-[#1D1E1E] text-white border-[#1D1E1E] font-semibold shadow-xs'
                     : isAvailable
-                    ? 'text-gray-800 bg-white border-gray-200 hover:border-[#1D1E1E] hover:bg-gray-50 cursor-pointer font-medium'
+                    ? 'text-[#141515] bg-white border-gray-200 hover:border-[#1D1E1E] hover:bg-gray-50 cursor-pointer font-normal'
                     : 'text-gray-300 border-transparent bg-gray-50/50 opacity-40 cursor-not-allowed'
                 }`}
               >

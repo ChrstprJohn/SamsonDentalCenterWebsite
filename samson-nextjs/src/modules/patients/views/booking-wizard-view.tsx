@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Calendar, Check, ChevronRight, User, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, ChevronRight, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
 import type { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
 import type { ClinicConfigResponseDto } from '@/modules/clinic-config/dtos/settings/get-clinic-config.dto';
@@ -111,20 +111,20 @@ export function BookingWizardView({ services, initialServiceId }: BookingWizardV
     <div className="min-h-screen bg-[#FDFDFD] text-[#1D1E1E] flex flex-col justify-between">
       {/* Custom Integrated Header Navbar matching Homepage Navbar Height & Padding */}
       {!contactSection.submittedLocal && (
-        <header className="sticky top-0 z-40 h-[76px] bg-white/95 backdrop-blur-md border-b border-gray-200/80 px-6 sm:px-12 py-4 flex items-center shadow-xs">
+        <header className="sticky top-0 z-40 h-[76px] bg-white/95 backdrop-blur-md border-b border-gray-200/80 px-6 sm:px-12 py-2.5 flex items-center shadow-xs">
         <div className="max-w-7xl mx-auto w-full flex items-center justify-between gap-4">
           {/* Left: Slightly Larger Return Link */}
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-[#D94E4E] transition-colors"
+            className="inline-flex items-center gap-2 font-sans text-sm font-medium text-gray-700 hover:text-[#D94E4E] transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Return home</span>
+            <span>Return Homepage</span>
           </Link>
 
           {/* Center: Centered Stepper Navigation Pills with boxed number badge */}
           <div className="flex-1 flex justify-center">
-            <div className="flex items-center gap-3 sm:gap-4 text-sm font-medium text-gray-700">
+            <div className="flex items-center gap-3 sm:gap-4 font-sans text-[13px] tracking-[0.1em] font-medium uppercase text-gray-700">
               <button
                 type="button"
                 onClick={() => wizard.handleStepClick(1)}
@@ -215,8 +215,8 @@ export function BookingWizardView({ services, initialServiceId }: BookingWizardV
       )}
 
       {/* Main Content Area */}
-      <main className="max-w-4xl mx-auto w-full flex-grow flex flex-col justify-center py-8 sm:py-12 px-4">
-        <div className={contactSection.submittedLocal ? 'py-4' : 'bg-white border border-gray-200 p-6 sm:p-10 shadow-sm rounded-none'}>
+      <main className="max-w-4xl mx-auto w-full flex-grow flex flex-col justify-center pt-1 sm:pt-2 pb-6 sm:pb-10 px-4">
+        <div className={contactSection.submittedLocal ? 'py-4' : 'p-6 sm:p-10'}>
           {!contactSection.submittedLocal ? (
             <AnimatePresence mode="wait">
               {/* STEP 1: Select Service Cards + Filter Switch */}
@@ -231,10 +231,10 @@ export function BookingWizardView({ services, initialServiceId }: BookingWizardV
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200/60 pb-3">
                     <div>
-                      <h2 className="font-serif text-xl sm:text-2xl font-medium text-gray-900">
+                      <h2 className="font-sans text-[clamp(20px,2vw+10px,32px)] font-normal tracking-[-0.04em] text-[#141515] leading-[1.05]">
                         Service
                       </h2>
-                      <p className="text-xs text-gray-500 font-sans mt-0.5">
+                      <p className="text-[clamp(12px,0.3vw+11px,14px)] font-normal text-gray-500 leading-[1.65] font-sans mt-0.5">
                         Choose your required dental treatment to proceed.
                       </p>
                     </div>
@@ -292,7 +292,7 @@ export function BookingWizardView({ services, initialServiceId }: BookingWizardV
                         >
                           <div>
                             <div className="flex items-start justify-between gap-2 mb-2">
-                              <span className="text-[11px] font-sans font-medium tracking-wider text-[#D94E4E] uppercase">
+                              <span className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold font-sans">
                                 {srv.serviceType}
                               </span>
                               {isSelected && (
@@ -301,11 +301,11 @@ export function BookingWizardView({ services, initialServiceId }: BookingWizardV
                                 </span>
                               )}
                             </div>
-                            <h3 className="font-serif text-lg font-semibold tracking-tight text-gray-900 group-hover:text-[#D94E4E] transition-colors leading-snug">
+                            <h3 className="font-sans text-lg sm:text-xl font-normal tracking-[-0.04em] text-[#141515] leading-[1.05]">
                               {srv.name}
                             </h3>
                             <div className="border-t border-gray-100/80 my-2.5" />
-                            <p className="text-[13px] text-gray-600 font-sans leading-relaxed tracking-normal font-light">
+                            <p className="text-[13px] text-gray-500 font-sans font-normal leading-[1.65]">
                               {srv.description || 'Full comprehensive treatment administered by certified medical practitioners.'}
                             </p>
                           </div>
@@ -341,17 +341,17 @@ export function BookingWizardView({ services, initialServiceId }: BookingWizardV
                   className="space-y-6"
                 >
                   <div className="border-b border-gray-200/60 pb-3">
-                    <h2 className="font-serif text-xl sm:text-2xl font-medium text-gray-900">
+                    <h2 className="font-sans text-[clamp(20px,2vw+10px,32px)] font-normal tracking-[-0.04em] text-[#141515] leading-[1.05]">
                       Schedule
                     </h2>
-                    <p className="text-xs text-gray-500 font-sans mt-0.5">
+                    <p className="text-[clamp(12px,0.3vw+11px,14px)] font-normal text-gray-500 leading-[1.65] font-sans mt-0.5">
                       Pick your preferred target date and time for your appointment request.
                     </p>
                   </div>
 
                   {/* Date First */}
                   <div className="flex flex-col gap-2 font-sans">
-                    <label className="text-xs tracking-wider font-semibold text-gray-500">
+                    <label className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold font-sans">
                       Preferred Date *
                     </label>
                     <ContactCalendar
@@ -362,24 +362,6 @@ export function BookingWizardView({ services, initialServiceId }: BookingWizardV
                       onMonthChange={contactSection.setCurrentMonth}
                       onDateSelect={handleDateSelect}
                     />
-                    {contactSection.targetDate && (
-                      <div className="flex flex-col gap-1.5 mt-2">
-                        <label className="text-xs tracking-wider font-semibold text-gray-500">
-                          Selected Date
-                        </label>
-                        <div className="w-full bg-white border border-[#E4E4DC] px-4 py-3 text-xs sm:text-sm font-semibold flex items-center justify-between">
-                          <span className="text-gray-900 font-extrabold">
-                            {new Date(contactSection.targetDate + 'T00:00:00').toLocaleDateString('en-US', {
-                              weekday: 'short',
-                              month: 'short',
-                              day: 'numeric',
-                              year: 'numeric',
-                            })}
-                          </span>
-                          <Calendar className="w-4 h-4 text-gray-400" />
-                        </div>
-                      </div>
-                    )}
                   </div>
 
                   {/* Time Second */}
@@ -431,43 +413,39 @@ export function BookingWizardView({ services, initialServiceId }: BookingWizardV
                   className="space-y-6"
                 >
                   <div className="border-b border-gray-200/60 pb-3">
-                    <h2 className="font-serif text-xl sm:text-2xl font-medium text-gray-900">
+                    <h2 className="font-sans text-[clamp(20px,2vw+10px,32px)] font-normal tracking-[-0.04em] text-[#141515] leading-[1.05]">
                       Patient Information
                     </h2>
-                    <p className="text-xs text-gray-500 font-sans mt-0.5">
+                    <p className="text-[clamp(12px,0.3vw+11px,14px)] font-normal text-gray-500 leading-[1.65] font-sans mt-0.5">
                       Review your summary and complete your contact details below.
                     </p>
                   </div>
 
-                  <div className="text-sm font-bold text-gray-900 mb-3">Request Summary</div>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <div className="flex flex-col gap-2 min-w-0">
-                      <span className="text-xs tracking-wider font-semibold text-gray-500">Service *</span>
-                      <div className="min-w-0 border border-gray-100 bg-white p-3.5 text-xs sm:text-sm">
-                        <span className="font-bold text-gray-900 truncate block" title={selectedService?.name}>
-                          {selectedService?.name}
+                  <div className="font-sans text-lg font-normal tracking-[-0.04em] text-[#141515] mb-3">Request Summary</div>
+                  <div className="divide-y divide-gray-100/80 border-y border-gray-100/80">
+                    <div className="flex flex-col gap-2 py-4 min-w-0">
+                      <span className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold font-sans">Service *</span>
+                      <span className="text-sm text-gray-700 truncate" title={selectedService?.name}>
+                        {selectedService?.name}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 sm:gap-6 py-4">
+                      <div className="flex flex-col gap-2 min-w-0">
+                        <span className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold font-sans">Preferred Date *</span>
+                        <span className="text-sm text-gray-700">
+                          {contactSection.targetDate
+                            ? new Date(contactSection.targetDate + 'T00:00:00').toLocaleDateString('en-US', {
+                                weekday: 'short',
+                                month: 'short',
+                                day: 'numeric',
+                                year: 'numeric',
+                              })
+                            : 'N/A'}
                         </span>
                       </div>
-                    </div>
-                    <div className="flex flex-col gap-2 min-w-0">
-                      <span className="text-xs tracking-wider font-semibold text-gray-500">Preferred Date *</span>
-                      <div className="min-w-0 border border-gray-100 bg-white p-3.5 text-xs sm:text-sm">
-                        <span className="font-bold text-gray-900 block">
-                        {contactSection.targetDate
-                          ? new Date(contactSection.targetDate + 'T00:00:00').toLocaleDateString('en-US', {
-                              weekday: 'short',
-                              month: 'short',
-                              day: 'numeric',
-                              year: 'numeric',
-                            })
-                          : 'N/A'}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex flex-col gap-2 min-w-0">
-                      <span className="text-xs tracking-wider font-semibold text-gray-500">Preferred Time *</span>
-                      <div className="min-w-0 border border-gray-100 bg-white p-3.5 text-xs sm:text-sm">
-                        <span className="font-bold text-gray-900 block">
+                      <div className="flex flex-col gap-2 min-w-0">
+                        <span className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold font-sans">Preferred Time *</span>
+                      <span className="text-sm text-gray-700">
                         {fields.preferredStartTime
                           ? fields.preferredStartTime.includes('AM') || fields.preferredStartTime.includes('PM')
                             ? fields.preferredStartTime
@@ -536,7 +514,7 @@ export function BookingWizardView({ services, initialServiceId }: BookingWizardV
                   <div className="w-16 h-16 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 mx-auto">
                     <CheckCircle2 className="w-8 h-8" />
                   </div>
-                  <h2 className="font-serif text-2xl font-normal text-gray-900 text-center">Request Submitted Successfully!</h2>
+                  <h2 className="font-sans text-2xl font-normal text-gray-900 text-center">Request Submitted Successfully!</h2>
                   <p className="text-sm font-light text-gray-600 leading-relaxed">
                     Thanks {fields.firstName}! Your booking request has been received and is currently under review by our team.
                   </p>

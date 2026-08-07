@@ -146,8 +146,8 @@ export function NavbarV1({ user }: NavbarProps) {
                         : 'bg-[#141515] text-white hover:bg-[#D94E4E]'
                     }`}
                   >
-                    <ArrowRight className="w-3 h-3" />
                     Request Appointment
+                    <ArrowRight className="w-3 h-3" />
                   </button>
                 </Link>
               ) : (

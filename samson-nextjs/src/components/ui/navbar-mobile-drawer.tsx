@@ -54,8 +54,8 @@ export function NavbarMobileDrawer({
             <div className="flex flex-col gap-4 items-center">
               <Link href="/book" onClick={onClose} className="w-full">
                 <button className="w-full px-6 py-3.5 bg-[#141515] text-white rounded-full text-[14px] font-semibold hover:bg-[#D94E4E] tracking-[0.2em] transition-all cursor-pointer flex items-center justify-center gap-2">
-                  <ArrowRight className="w-4 h-4" />
                   Request Appointment
+                  <ArrowRight className="w-4 h-4" />
                 </button>
               </Link>
             </div>

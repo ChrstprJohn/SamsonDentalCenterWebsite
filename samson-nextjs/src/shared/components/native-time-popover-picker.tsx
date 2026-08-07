@@ -131,11 +131,11 @@ export function NativeTimePopoverPicker({
       {/* Trigger Input Field */}
       <div
         onClick={togglePopover}
-        className={`w-full bg-white border border-[#E4E4DC] px-4 py-3 text-xs sm:text-sm font-semibold flex items-center justify-between cursor-pointer hover:border-[#D94E4E] transition-colors ${
+        className={`w-full bg-white border border-[#E4E4DC] px-4 py-3 text-xs sm:text-sm font-normal flex items-center justify-between cursor-pointer hover:border-[#D94E4E] transition-colors ${
           disabled ? 'opacity-50 cursor-not-allowed bg-gray-50' : ''
         }`}
       >
-        <span className={value ? 'text-gray-900 font-extrabold' : 'text-gray-400 font-medium'}>
+        <span className={value ? 'text-gray-700' : 'text-gray-400 font-medium'}>
           {getDisplayLabel(value)}
         </span>
         <Clock className="w-4 h-4 text-gray-400" />
