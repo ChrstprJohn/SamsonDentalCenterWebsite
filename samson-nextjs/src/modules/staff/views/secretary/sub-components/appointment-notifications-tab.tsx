@@ -21,6 +21,8 @@ import { resendNotificationAction } from '@/modules/appointments/actions/status/
 import { getEmailLogsByAppointmentAction } from '@/modules/emails/actions/logs/get-email-logs-by-appointment.action';
 import { getOutboxLogByIdAction } from '@/modules/emails/actions/logs/get-outbox-log-by-id.action';
 import { computeNotificationStatus } from '@/modules/notifications/utils/notification-status.util';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import type { OutboxLogResponseDto } from '@/modules/emails/dtos/logs/outbox-log-response.dto';
 import { useToast } from '@/components/feedback/toast-container';
 import { RenderedEmailFrame } from '@/components/emails/email-renderer';
@@ -167,6 +169,7 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
   const [draftChannel, setDraftChannel] = useState<'EMAIL' | 'SMS' | 'BOTH' | 'NONE'>(currentChannel);
   const [isEditingChannel, setIsEditingChannel] = useState(false);
   const [isSavingChannel, setIsSavingChannel] = useState(false);
+  const [allowOverrideResend, setAllowOverrideResend] = useState(false);
 
   const fetchLogs = React.useCallback(async () => {
     setLoadingLogs(true);
@@ -451,18 +454,24 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
 
       {/* Section 2: Notification Lifecycle */}
       <div className="space-y-3">
-        <span className="text-sm font-medium text-foreground block">Notification Lifecycle</span>
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-medium text-foreground block">Notification Lifecycle</span>
+          <Label className="flex items-center gap-1.5 text-[11px] text-muted-foreground cursor-pointer select-none">
+            <span>Manual Resend</span>
+            <Switch
+              checked={allowOverrideResend}
+              onCheckedChange={setAllowOverrideResend}
+              className="scale-75 shadow-none"
+            />
+          </Label>
+        </div>
 
         <div className="relative pl-4 space-y-4 pt-1 before:absolute before:left-1.5 before:top-3.5 before:bottom-3.5 before:w-0.5 before:bg-card-border/60">
           {NOTIFICATION_TYPES.map((type) => {
             const hasSmsItem = showSms && !type.emailOnly;
             const hasEmailItem = showEmail;
-            const disabled = currentChannel === 'NONE' || isTriggeringNotification !== null || (!hasSmsItem && !hasEmailItem);
             const emailStatus = getStatus(type, 'EMAIL');
             const smsStatus = getStatus(type, 'SMS');
-
-            const isAnySent = emailStatus.label === 'SENT' || smsStatus.label === 'SENT';
-            const isAnyFailed = emailStatus.label === 'FAILED' || smsStatus.label === 'FAILED';
 
             const isEmailSkippedOrNA = emailStatus.label === 'NOT APPLICABLE' || emailStatus.label.startsWith('SKIPPED');
             const isSmsSkippedOrNA = smsStatus.label === 'NOT APPLICABLE' || smsStatus.label.startsWith('SKIPPED');
@@ -471,6 +480,20 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
             const isFullySkipped =
               (!showEmail || isEmailSkippedOrNA) &&
               (!showSms || type.emailOnly || isSmsSkippedOrNA);
+
+            const isEmailAllowed = !loadingLogs && isTriggeringNotification === null && (
+              emailStatus.label === 'FAILED' || emailStatus.label === 'PENDING' || emailStatus.label === 'NOT SENT' || allowOverrideResend
+            );
+
+            const isSmsAllowed = !loadingLogs && isTriggeringNotification === null && (
+              smsStatus.label === 'FAILED' || smsStatus.label === 'PENDING' || smsStatus.label === 'NOT SENT' || allowOverrideResend
+            );
+
+            const isAllowed = isEmailAllowed || isSmsAllowed;
+            const disabled = currentChannel === 'NONE' || isTriggeringNotification !== null || (!hasSmsItem && !hasEmailItem) || !isAllowed;
+
+            const isAnySent = emailStatus.label === 'SENT' || smsStatus.label === 'SENT';
+            const isAnyFailed = emailStatus.label === 'FAILED' || smsStatus.label === 'FAILED';
 
             return (
               <div key={type.eventType} className={`relative flex items-start justify-between gap-2 ${isFullySkipped ? 'opacity-60' : ''}`}>
@@ -516,7 +539,7 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
                       variant="ghost"
                       size="sm"
                       disabled={disabled}
-                      className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground shrink-0"
+                      className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground shrink-0 disabled:opacity-40"
                       title="Send notification"
                     >
                       {isTriggeringNotification === type.eventType ? (
@@ -529,8 +552,9 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
                   <DropdownMenuContent align="end" className="w-72">
                     {hasEmailItem && (
                       <DropdownMenuItem
-                        onClick={() => handleTriggerNotification(type.eventType, 'EMAIL')}
-                        className="text-xs flex items-center justify-between cursor-pointer"
+                        disabled={!isEmailAllowed}
+                        onClick={() => isEmailAllowed && handleTriggerNotification(type.eventType, 'EMAIL')}
+                        className="text-xs flex items-center justify-between cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <span className="flex items-center gap-1.5 truncate">
                           <Mail className="size-3 text-muted-foreground shrink-0" />
@@ -543,8 +567,9 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
                     )}
                     {hasSmsItem && (
                       <DropdownMenuItem
-                        onClick={() => handleTriggerNotification(type.eventType, 'SMS')}
-                        className="text-xs flex items-center justify-between cursor-pointer"
+                        disabled={!isSmsAllowed}
+                        onClick={() => isSmsAllowed && handleTriggerNotification(type.eventType, 'SMS')}
+                        className="text-xs flex items-center justify-between cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <span className="flex items-center gap-1.5 truncate">
                           <MessageSquare className="size-3 text-muted-foreground shrink-0" />
