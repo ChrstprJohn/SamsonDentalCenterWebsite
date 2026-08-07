@@ -1,6 +1,7 @@
 'use client';
 
-import { Check } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Check, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
 import type { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
 
@@ -18,16 +19,15 @@ export interface ContactFormFields {
   setContactMessage: (val: string) => void;
 }
 
+import { NativeTimePopoverPicker } from '@/shared/components/native-time-popover-picker';
+
 export function PreferenceFields({ fields }: { fields: ContactFormFields }) {
   return (
-    <div className="flex flex-col gap-2 font-sans">
-      <label className="text-[10px] tracking-wider uppercase font-semibold text-gray-500">Preferred Start Time *</label>
-      <input
-        type="time"
-        required
+    <div className="flex flex-col gap-2">
+      <NativeTimePopoverPicker
         value={fields.preferredStartTime}
-        onChange={(event) => fields.setPreferredStartTime(event.target.value)}
-        className="w-full bg-white border border-[#E4E4DC] px-4 py-3 rounded-none text-xs sm:text-sm focus:outline-none focus:border-[#D94E4E] transition-colors"
+        onChange={fields.setPreferredStartTime}
+        placeholder="Select Preferred Start Time..."
       />
     </div>
   );
