@@ -132,18 +132,18 @@ function TimelineEntryRow({ entry }: { entry: TimelineEntry }) {
 
   return (
     <tr className="border-b border-card-border/40 last:border-b-0 hover:bg-muted/20 transition-colors">
-      <td className="py-2.5 pr-3 text-xs font-medium text-foreground">
-        <span>{subjectOrType}</span>
+      <td className="py-2.5 pr-3 text-xs font-medium text-foreground max-w-[130px] truncate" title={subjectOrType}>
+        <span className="truncate block">{subjectOrType}</span>
       </td>
-      <td className="py-2.5 pr-3 text-xs text-muted-foreground" title={entry.recipient}>
-        {entry.recipient}
+      <td className="py-2.5 pr-3 text-xs text-muted-foreground max-w-[120px] truncate" title={entry.recipient}>
+        <span className="truncate block">{entry.recipient}</span>
       </td>
-      <td className="py-2.5 pr-3">
+      <td className="py-2.5 pr-3 whitespace-nowrap">
         <span className={`inline-flex items-center text-[10px] font-semibold px-2 py-0.5 rounded-full ${statusPill}`}>
           {entry.status}
         </span>
       </td>
-      <td className="py-2.5 pl-2 text-right text-xs text-muted-foreground font-mono text-[11px]">
+      <td className="py-2.5 pl-2 text-right text-xs text-muted-foreground font-mono text-[11px] whitespace-nowrap">
         {formatTimeFull(entry.timestamp)}
       </td>
     </tr>
@@ -294,9 +294,9 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
     { eventType: 'APPOINTMENT_BOOKED', label: 'Booking Confirmation' },
     { eventType: 'APPOINTMENT_REMINDER_48H', label: '48-Hour Reminder' },
     { eventType: 'APPOINTMENT_REMINDER_24H', label: '24-Hour Reminder' },
-    { eventType: 'APPOINTMENT_CHECKOUT', label: 'Checkout / Thank You' },
-    { eventType: 'CANCEL_BOOKING', label: 'Cancellation Notice' },
     { eventType: 'RESCHEDULE_BOOKING', label: 'Reschedule Notice' },
+    { eventType: 'CANCEL_BOOKING', label: 'Cancellation Notice' },
+    { eventType: 'APPOINTMENT_CHECKOUT', label: 'Checkout / Thank You' },
   ];
 
   const createdAt = (appointment as any).createdAt || (appointment as any).created_at || null;
@@ -464,8 +464,16 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
             const isAnySent = emailStatus.label === 'SENT' || smsStatus.label === 'SENT';
             const isAnyFailed = emailStatus.label === 'FAILED' || smsStatus.label === 'FAILED';
 
+            const isEmailSkippedOrNA = emailStatus.label === 'NOT APPLICABLE' || emailStatus.label.startsWith('SKIPPED');
+            const isSmsSkippedOrNA = smsStatus.label === 'NOT APPLICABLE' || smsStatus.label.startsWith('SKIPPED');
+
+            // Determine if the whole event type is skipped / non-applicable for active channels
+            const isFullySkipped =
+              (!showEmail || isEmailSkippedOrNA) &&
+              (!showSms || type.emailOnly || isSmsSkippedOrNA);
+
             return (
-              <div key={type.eventType} className="relative flex items-start justify-between gap-2">
+              <div key={type.eventType} className={`relative flex items-start justify-between gap-2 ${isFullySkipped ? 'opacity-60' : ''}`}>
                 {/* Circle Marker */}
                 <div
                   className={`absolute -left-4 top-1 size-3 rounded-full border-2 bg-background ${
@@ -473,12 +481,14 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
                       ? 'border-emerald-500 bg-emerald-500'
                       : isAnyFailed
                       ? 'border-rose-500 bg-rose-500'
+                      : isFullySkipped
+                      ? 'border-muted-foreground/20 bg-muted/40'
                       : 'border-muted-foreground/40'
                   }`}
                 />
 
                 <div className="space-y-1 min-w-0">
-                  <span className="text-xs font-medium text-foreground block">
+                  <span className={`text-xs font-medium block ${isFullySkipped ? 'text-muted-foreground line-through/0' : 'text-foreground'}`}>
                     {type.label}
                   </span>
                   <div className="flex items-center gap-1.5 flex-wrap">
@@ -590,7 +600,11 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
           </div>
         ) : (
           <div className="space-y-2">
-            <div className="overflow-x-auto">
+            <div
+              className="overflow-x-auto [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
+              style={{ scrollbarWidth: 'thin' }}
+              data-lenis-prevent
+            >
               <table className="w-full text-xs">
                 <thead>
                   <tr className="text-left text-xs font-semibold text-muted-foreground border-y border-card-border/40">

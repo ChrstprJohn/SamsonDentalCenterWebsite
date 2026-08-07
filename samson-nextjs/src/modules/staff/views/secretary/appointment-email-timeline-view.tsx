@@ -724,13 +724,13 @@ export function AppointmentEmailTimelineView() {
                       isRose?: boolean;
                       emailOnly?: boolean;
                     }[] = [
+                      { eventType: 'APPOINTMENT_INQUIRY_RECEIVED', label: 'Inquiry Request Received', emailOnly: true },
                       { eventType: 'APPOINTMENT_BOOKED', label: 'Booking Confirmation' },
                       { eventType: 'APPOINTMENT_REMINDER_48H', label: '48-Hour Reminder' },
                       { eventType: 'APPOINTMENT_REMINDER_24H', label: '24-Hour Reminder' },
-                      { eventType: 'APPOINTMENT_CHECKOUT', label: 'Checkout / Thank You' },
-                      { eventType: 'APPOINTMENT_INQUIRY_RECEIVED', label: 'Inquiry Request Received', emailOnly: true },
-                      { eventType: 'CANCEL_BOOKING', label: 'Cancellation Notice', isRose: true },
                       { eventType: 'RESCHEDULE_BOOKING', label: 'Reschedule Notice' },
+                      { eventType: 'CANCEL_BOOKING', label: 'Cancellation Notice', isRose: true },
+                      { eventType: 'APPOINTMENT_CHECKOUT', label: 'Checkout / Thank You' },
                     ];
 
                     const createdAt = (selectedCard as any)?.date || null;
@@ -845,9 +845,15 @@ export function AppointmentEmailTimelineView() {
                             const emailStatus = getStatus(type, 'EMAIL');
                             const smsStatus = getStatus(type, 'SMS');
 
+                            const isEmailSkippedOrNA = emailStatus.label === 'NOT APPLICABLE' || emailStatus.label.startsWith('SKIPPED');
+                            const isSmsSkippedOrNA = smsStatus.label === 'NOT APPLICABLE' || smsStatus.label.startsWith('SKIPPED');
+                            const isFullySkipped =
+                              (!showEmail || isEmailSkippedOrNA) &&
+                              (!showSms || type.emailOnly || isSmsSkippedOrNA);
+
                             return (
-                              <tr key={type.eventType} className="border-t border-card-border/60">
-                                <td className={`py-1 pr-2 whitespace-nowrap text-xs font-medium ${type.isRose ? 'text-rose-600' : 'text-foreground'}`}>
+                              <tr key={type.eventType} className={`border-t border-card-border/60 ${isFullySkipped ? 'opacity-60' : ''}`}>
+                                <td className={`py-1 pr-2 whitespace-nowrap text-xs font-medium ${isFullySkipped ? 'text-muted-foreground' : type.isRose ? 'text-rose-600' : 'text-foreground'}`}>
                                   {type.label}
                                 </td>
                                 {showSms && (
