@@ -27,14 +27,14 @@ export function NativeTimePopoverPicker({
   const [popoverPosition, setPopoverPosition] = useState<'top' | 'bottom'>('bottom');
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Extract initial values or fallback to 09:00 AM
+  // Extract initial values or fallback to 08:00 AM
   const parseValue = (val: string): { hour: string; min: string; period: 'AM' | 'PM' } => {
-    if (!val) return { hour: '09', min: '00', period: 'AM' };
+    if (!val) return { hour: '08', min: '00', period: 'AM' };
     const parts = val.split(' ');
     const period: 'AM' | 'PM' = parts[1]?.toUpperCase() === 'PM' ? 'PM' : 'AM';
-    const timeParts = parts[0]?.split(':') || ['09', '00'];
+    const timeParts = parts[0]?.split(':') || ['08', '00'];
     return {
-      hour: timeParts[0] || '09',
+      hour: timeParts[0] || '08',
       min: timeParts[1] || '00',
       period,
     };
@@ -94,17 +94,19 @@ export function NativeTimePopoverPicker({
     onChange(formatted);
   };
 
+  const displayTime = value || '08:00 AM';
+
   return (
     <div ref={containerRef} className={`relative w-full ${className}`}>
-      {/* Trigger Input Field */}
+      {/* Trigger Input Field (Defaults to fixed 08:00 AM if empty) */}
       <div
         onClick={togglePopover}
         className={`w-full bg-white border border-[#E4E4DC] px-4 py-3 text-xs sm:text-sm font-semibold text-gray-800 flex items-center justify-between cursor-pointer hover:border-[#D94E4E] transition-colors ${
           disabled ? 'opacity-50 cursor-not-allowed bg-gray-50' : ''
         }`}
       >
-        <span className={value ? 'text-gray-900 font-extrabold' : 'text-gray-400'}>
-          {value ? value : placeholder}
+        <span className="text-gray-900 font-extrabold">
+          {displayTime}
         </span>
         <Clock className="w-4 h-4 text-gray-400" />
       </div>
@@ -118,16 +120,16 @@ export function NativeTimePopoverPicker({
         >
           {/* 3 Columns Grid: Hour | Minute | AM/PM */}
           <div className="grid grid-cols-3 gap-1">
-            {/* 1. Hour Column (Looping Scroll) */}
+            {/* 1. Hour Column (Fixed List starting at 08 AM) */}
             <div
               data-lenis-prevent="true"
               className="h-[238px] overflow-y-auto flex flex-col gap-1 pr-0 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
             >
-              {[...availableHours, ...availableHours, ...availableHours].map((h, index) => {
+              {availableHours.map((h) => {
                 const isSelected = selectedHour === h;
                 return (
                   <button
-                    key={`${h}-${index}`}
+                    key={h}
                     type="button"
                     onClick={() => {
                       setSelectedHour(h);
@@ -149,16 +151,16 @@ export function NativeTimePopoverPicker({
               })}
             </div>
 
-            {/* 2. Minute Column (Looping 1-Min Scroll 00-59) */}
+            {/* 2. Minute Column (Fixed 1-Min Scroll 00-59) */}
             <div
               data-lenis-prevent="true"
               className="h-[238px] overflow-y-auto flex flex-col gap-1 pr-0 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
             >
-              {[...fullMinuteList, ...fullMinuteList, ...fullMinuteList].map((m, index) => {
+              {fullMinuteList.map((m) => {
                 const isSelected = selectedMin === m;
                 return (
                   <button
-                    key={`${m}-${index}`}
+                    key={m}
                     type="button"
                     onClick={() => {
                       setSelectedMin(m);
