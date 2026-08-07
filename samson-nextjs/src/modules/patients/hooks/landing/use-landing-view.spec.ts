@@ -9,6 +9,13 @@ import { InquiryResponseDto } from '@/modules/appointments/dtos/booking/submit-i
 import { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 
+const mockPush = vi.fn();
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: mockPush,
+  }),
+}));
+
 vi.mock('@/components/feedback/toast-container', () => ({
   useToast: vi.fn(),
 }));
@@ -41,13 +48,7 @@ describe('useLandingView', () => {
     vi.mocked(useToast).mockReturnValue({ addToast: mockAddToast } as unknown as ReturnType<typeof useToast>);
   });
 
-  it('should scroll to #contact when booking CTA is triggered', () => {
-    const scrollIntoViewMock = vi.fn();
-    const contactEl = document.createElement('section');
-    contactEl.id = 'contact';
-    contactEl.scrollIntoView = scrollIntoViewMock;
-    document.body.appendChild(contactEl);
-
+  it('should redirect to /book?serviceId=... when booking CTA is triggered with service id', () => {
     const { result } = renderHook(() =>
       useLandingView({ services: mockServices })
     );
@@ -56,17 +57,10 @@ describe('useLandingView', () => {
       result.current.handleBookingCTA('s-1');
     });
 
-    expect(scrollIntoViewMock).toHaveBeenCalledWith({ behavior: 'smooth', block: 'start' });
-    document.body.removeChild(contactEl);
+    expect(mockPush).toHaveBeenCalledWith('/book?serviceId=s-1');
   });
 
-  it('should scroll to #contact when booking CTA is triggered without service id', () => {
-    const scrollIntoViewMock = vi.fn();
-    const contactEl = document.createElement('section');
-    contactEl.id = 'contact';
-    contactEl.scrollIntoView = scrollIntoViewMock;
-    document.body.appendChild(contactEl);
-
+  it('should redirect to /book when booking CTA is triggered without service id', () => {
     const { result } = renderHook(() =>
       useLandingView({ services: mockServices })
     );
@@ -75,8 +69,7 @@ describe('useLandingView', () => {
       result.current.handleBookingCTA();
     });
 
-    expect(scrollIntoViewMock).toHaveBeenCalledWith({ behavior: 'smooth', block: 'start' });
-    document.body.removeChild(contactEl);
+    expect(mockPush).toHaveBeenCalledWith('/book');
   });
 
   it('should validate contact form before submitting', async () => {

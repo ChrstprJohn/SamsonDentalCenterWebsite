@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, type PathValue } from 'react-hook-form';
 import { z } from 'zod';
@@ -31,7 +32,7 @@ const contactInquirySchema = z.object({
     .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format')
     .or(z.literal(''))
     .optional(),
-  preferredStartTime: z.string().regex(/^\d{2}:\d{2} (AM|PM)$/i, 'Preferred start time must be in HH:MM AM/PM format').or(z.literal('')).optional(),
+  preferredStartTime: z.string().regex(/^(?:[01]\d|2[0-3]):[0-5]\d$/, 'Preferred start time must be in HH:MM format').or(z.literal('')).optional(),
 });
 
 type ContactInquiryFormValues = z.infer<typeof contactInquirySchema>;
@@ -73,17 +74,15 @@ export function useLandingView({ services }: UseLandingViewProps) {
         shouldValidate: false,
       });
 
-  // Per new booking strategy (Flow 1): guests submit inquiries via the contact form.
-  // No auth wall — scroll to the contact section instead.
-  const handleBookingCTA = (_serviceId?: string) => {
+  const router = useRouter();
+
+  // Redirect to dedicated 2-Step Booking Wizard page
+  const handleBookingCTA = (serviceId?: string) => {
     setSelectedService(null);
-    const contactSection = document.getElementById('contact');
-    if (contactSection) {
-      if (typeof window !== 'undefined' && (window as any).lenis) {
-        (window as any).lenis.scrollTo(contactSection, { offset: -80 });
-      } else {
-        contactSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
+    if (serviceId) {
+      router.push(`/book?serviceId=${encodeURIComponent(serviceId)}`);
+    } else {
+      router.push('/book');
     }
   };
 

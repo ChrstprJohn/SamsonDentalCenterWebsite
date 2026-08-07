@@ -25,31 +25,84 @@ export function PreferenceFields({ fields }: { fields: ContactFormFields }) {
   return (
     <div className="flex flex-col gap-2 font-sans">
       <label className="text-[10px] tracking-wider uppercase font-semibold text-gray-500">
-        Preferred Start Time *
+        Preferred Time *
       </label>
       <NativeTimePopoverPicker
         value={fields.preferredStartTime}
         onChange={fields.setPreferredStartTime}
-        placeholder="Select Preferred Start Time..."
+        placeholder="Select time"
       />
     </div>
   );
 }
 
-export function NameFields({ fields }: { fields: ContactFormFields }) {
+export function NameFields({
+  fields,
+  touched = false,
+}: {
+  fields: ContactFormFields;
+  touched?: boolean;
+}) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-      <TextField label="First Name *" value={fields.firstName} onChange={fields.setFirstName} required placeholder="Eleanor" />
-      <TextField label="Last Name *" value={fields.lastName} onChange={fields.setLastName} required placeholder="Vance" />
+      <TextField
+        label="First Name *"
+        value={fields.firstName}
+        onChange={fields.setFirstName}
+        required
+        placeholder="Eleanor"
+        touched={touched}
+        isValid={fields.firstName.trim().length > 0}
+      />
+      <TextField
+        label="Last Name *"
+        value={fields.lastName}
+        onChange={fields.setLastName}
+        required
+        placeholder="Vance"
+        touched={touched}
+        isValid={fields.lastName.trim().length > 0}
+      />
     </div>
   );
 }
 
-export function ContactFields({ fields, phone, setPhone }: { fields: ContactFormFields; phone: string; setPhone: (value: string) => void }) {
+export function ContactFields({
+  fields,
+  phone,
+  setPhone,
+  touched = false,
+}: {
+  fields: ContactFormFields;
+  phone: string;
+  setPhone: (value: string) => void;
+  touched?: boolean;
+}) {
+  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.contactEmail.trim());
+  const isPhoneValid = phone.trim().length >= 7;
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-      <TextField label="Email Address *" type="email" value={fields.contactEmail} onChange={fields.setContactEmail} required placeholder="eleanor@domain.com" />
-      <TextField label="Phone Number *" type="tel" value={phone} onChange={setPhone} required placeholder="+1 (555) 000-0000" />
+      <TextField
+        label="Email Address *"
+        type="email"
+        value={fields.contactEmail}
+        onChange={fields.setContactEmail}
+        required
+        placeholder="eleanor@domain.com"
+        touched={touched}
+        isValid={isEmailValid}
+      />
+      <TextField
+        label="Phone Number *"
+        type="tel"
+        value={phone}
+        onChange={setPhone}
+        required
+        placeholder="+1 (555) 000-0000"
+        touched={touched}
+        isValid={isPhoneValid}
+      />
     </div>
   );
 }
@@ -68,8 +121,16 @@ export function PathwaySelect({ services, pathway, setPathway }: { services: Ser
 export function NotesField({ notes, setNotes }: { notes: string; setNotes: (value: string) => void }) {
   return (
     <div className="flex flex-col gap-2 font-sans">
-      <label className="text-[10px] tracking-wider uppercase font-semibold text-gray-500">Inquiry notes or health records outline</label>
-      <textarea rows={4} value={notes} onChange={(event) => setNotes(event.target.value)} placeholder="Please note any sensory preferences, prior dentist notes, or targets..." className="w-full bg-white border border-[#E4E4DC] px-4 py-3 rounded-none text-xs sm:text-sm focus:outline-none focus:border-[#D94E4E] transition-colors resize-none" />
+      <label className="text-[10px] tracking-wider uppercase font-semibold text-gray-500">
+        Anything else we should know? <span className="text-gray-400 font-normal">(Optional)</span>
+      </label>
+      <textarea
+        rows={4}
+        value={notes}
+        onChange={(event) => setNotes(event.target.value)}
+        placeholder="Doctor preference, allergies, medical conditions, or special requests..."
+        className="w-full bg-white border border-[#E4E4DC] px-4 py-3 rounded-none text-xs sm:text-sm focus:outline-none focus:border-[#D94E4E] transition-colors resize-none"
+      />
     </div>
   );
 }
@@ -99,18 +160,47 @@ export function ContactSuccess({ firstName, lastName, phone, onReset }: { firstN
   );
 }
 
-function TextField({ label, value, onChange, type = 'text', required = false, placeholder = '' }: {
+function TextField({
+  label,
+  value,
+  onChange,
+  type = 'text',
+  required = false,
+  placeholder = '',
+  touched = false,
+  isValid = false,
+}: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   type?: string;
   required?: boolean;
   placeholder?: string;
+  touched?: boolean;
+  isValid?: boolean;
 }) {
+  const showRed = touched && required && !value.trim();
+  const showGreen = value.trim().length > 0 && isValid;
+
   return (
     <div className="flex flex-col gap-2 font-sans">
       <label className="text-[10px] tracking-wider uppercase font-semibold text-gray-500">{label}</label>
-      <input type={type} required={required} value={value} onChange={(event) => onChange(event.target.value)} placeholder={placeholder} className="w-full bg-white border border-[#E4E4DC] px-4 py-3 rounded-none text-xs sm:text-sm focus:outline-none focus:border-[#D94E4E] transition-colors" />
+      <div className="relative w-full">
+        <input
+          type={type}
+          required={required}
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          placeholder={placeholder}
+          className={`w-full bg-white px-4 py-3 rounded-none text-xs sm:text-sm focus:outline-none transition-colors border ${
+            showRed
+              ? 'border-red-500 text-red-900 bg-red-50/20 focus:border-red-600 ring-1 ring-red-500'
+              : showGreen
+              ? 'border-emerald-500 text-gray-900 focus:border-emerald-600'
+              : 'border-[#E4E4DC] focus:border-[#D94E4E]'
+          }`}
+        />
+      </div>
     </div>
   );
 }

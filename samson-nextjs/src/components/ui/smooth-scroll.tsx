@@ -1,9 +1,22 @@
 'use client';
 
 import React, { useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import Script from 'next/script';
 
 export function SmoothScroll() {
+  const pathname = usePathname();
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.scrollTo(0, 0);
+      if ((window as any).lenis) {
+        (window as any).lenis.scrollTo(0, { immediate: true });
+        (window as any).lenis.resize();
+      }
+    }
+  }, [pathname]);
+
   useEffect(() => {
     // If Lenis is already loaded globally via Script onLoad
     if (typeof window !== 'undefined' && (window as any).Lenis) {

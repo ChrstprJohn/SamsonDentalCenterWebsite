@@ -1,5 +1,7 @@
 'use client';
 
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+
 interface ContactCalendarProps {
   currentMonth: Date;
   availableDates: string[];
@@ -21,27 +23,39 @@ export function ContactCalendar({
   const days = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0).getDate();
 
   return (
-    <div className="p-4 bg-white border border-[#E4E4DC] rounded-none">
-      <div className="flex justify-between items-center text-xs text-gray-900 mb-3 font-semibold bg-gray-50 p-2 border border-gray-100">
-        <button type="button" onClick={() => onMonthChange(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1))} className="px-2 py-1 hover:bg-gray-100 font-bold">
-          Prev
+    <div className="p-5 bg-white border border-gray-200/80 shadow-2xs rounded-none">
+      <div className="flex justify-between items-center text-xs text-gray-900 mb-4 pb-3 border-b border-gray-100 font-sans">
+        <button
+          type="button"
+          onClick={() => onMonthChange(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1))}
+          className="p-1.5 hover:bg-gray-100 transition-colors text-gray-600 hover:text-black cursor-pointer"
+          aria-label="Previous month"
+        >
+          <ChevronLeft className="w-4 h-4" />
         </button>
-        <div className="uppercase tracking-wider font-sans font-bold">
+        <div className="text-xs font-semibold tracking-wider uppercase text-gray-800">
           {currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
         </div>
-        <button type="button" onClick={() => onMonthChange(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1))} className="px-2 py-1 hover:bg-gray-100 font-bold">
-          Next
+        <button
+          type="button"
+          onClick={() => onMonthChange(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1))}
+          className="p-1.5 hover:bg-gray-100 transition-colors text-gray-600 hover:text-black cursor-pointer"
+          aria-label="Next month"
+        >
+          <ChevronRight className="w-4 h-4" />
         </button>
       </div>
 
       {isLoadingDays ? (
-        <div className="text-center text-xs text-gray-400 py-6 animate-pulse font-sans">Scanning available dates...</div>
+        <div className="text-center text-xs text-gray-400 py-12 animate-pulse font-sans">Scanning available dates...</div>
       ) : (
-        <div className="grid grid-cols-7 gap-1 text-center text-[10px]">
-          {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((dayName, idx) => (
-            <div key={`${dayName}-${idx}`} className="font-bold text-gray-400 py-1 font-sans">{dayName}</div>
+        <div className="grid grid-cols-7 gap-1.5 text-center text-xs font-sans">
+          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((dayName, idx) => (
+            <div key={`${dayName}-${idx}`} className="font-semibold text-[10px] uppercase tracking-wider text-gray-400 py-1.5">
+              {dayName}
+            </div>
           ))}
-          {Array.from({ length: blanks }).map((_, idx) => <div key={`blank-${idx}`} className="py-2" />)}
+          {Array.from({ length: blanks }).map((_, idx) => <div key={`blank-${idx}`} className="h-10 sm:h-12" />)}
           {Array.from({ length: days }).map((_, idx) => {
             const day = idx + 1;
             const date = `${currentMonth.getFullYear()}-${String(currentMonth.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
@@ -53,12 +67,12 @@ export function ContactCalendar({
                 type="button"
                 disabled={!isAvailable}
                 onClick={() => onDateSelect(date)}
-                className={`py-2 text-xs font-semibold transition-all border ${
+                className={`h-10 sm:h-12 flex items-center justify-center text-xs sm:text-sm transition-all border rounded-none ${
                   isSelected
-                    ? 'bg-[#D94E4E] text-white border-[#D94E4E] shadow-sm font-bold'
+                    ? 'bg-[#1D1E1E] text-white border-[#1D1E1E] font-semibold shadow-xs'
                     : isAvailable
-                    ? 'text-gray-900 bg-emerald-500/5 border-emerald-500/20 hover:bg-[#D94E4E]/5 hover:border-[#D94E4E]/50 cursor-pointer font-bold'
-                    : 'text-gray-300 border-transparent opacity-30 cursor-not-allowed'
+                    ? 'text-gray-800 bg-white border-gray-200 hover:border-[#1D1E1E] hover:bg-gray-50 cursor-pointer font-medium'
+                    : 'text-gray-300 border-transparent bg-gray-50/50 opacity-40 cursor-not-allowed'
                 }`}
               >
                 {day}

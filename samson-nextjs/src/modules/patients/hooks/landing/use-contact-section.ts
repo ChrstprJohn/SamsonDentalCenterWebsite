@@ -6,6 +6,7 @@ import type { ServiceResponseDto } from '@/modules/services/dtos/management/serv
 
 interface UseContactSectionProps {
   services: ServiceResponseDto[];
+  initialPathway?: string;
   handleRealInquirySubmit: (data: {
     phone: string;
     pathway: string;
@@ -14,9 +15,9 @@ interface UseContactSectionProps {
   }) => Promise<boolean>;
 }
 
-export function useContactSection({ services, handleRealInquirySubmit }: UseContactSectionProps) {
+export function useContactSection({ services, initialPathway, handleRealInquirySubmit }: UseContactSectionProps) {
   const [phone, setPhone] = useState('');
-  const [pathway, setPathway] = useState(services[0]?.id || '');
+  const [pathway, setPathway] = useState(initialPathway || '');
   const [targetDate, setTargetDate] = useState('');
   const [notes, setNotes] = useState('');
   const [submittedLocal, setSubmittedLocal] = useState(false);
@@ -26,10 +27,6 @@ export function useContactSection({ services, handleRealInquirySubmit }: UseCont
   });
   const [availableDates, setAvailableDates] = useState<string[]>([]);
   const [isLoadingDays, setIsLoadingDays] = useState(false);
-
-  useEffect(() => {
-    if (services.length > 0 && !pathway) setPathway(services[0].id);
-  }, [pathway, services]);
 
   useEffect(() => {
     setTargetDate('');

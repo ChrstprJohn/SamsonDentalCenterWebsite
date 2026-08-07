@@ -1,0 +1,562 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowLeft, ArrowRight, Calendar, Check, ChevronRight, User, CheckCircle2 } from 'lucide-react';
+import Link from 'next/link';
+import type { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
+import type { ClinicConfigResponseDto } from '@/modules/clinic-config/dtos/settings/get-clinic-config.dto';
+import { useBookingWizard } from '../hooks/landing/use-booking-wizard';
+import { ContactCalendar } from '../components/landing/sub-components/contact-calendar';
+import {
+  NameFields,
+  ContactFields,
+  PreferenceFields,
+  NotesField,
+} from '../components/landing/sub-components/contact-form-fields';
+
+interface BookingWizardViewProps {
+  services: ServiceResponseDto[];
+  config?: ClinicConfigResponseDto;
+  initialServiceId?: string;
+}
+
+export function BookingWizardView({ services, initialServiceId }: BookingWizardViewProps) {
+  const wizard = useBookingWizard({ services, initialServiceId });
+  const { step, contactSection, fields, isSubmitting, redirectCountdown, selectService } = wizard;
+  const [filterType, setFilterType] = useState<'ALL' | 'GENERAL' | 'SPECIALIZED'>('ALL');
+  const [formTouched, setFormTouched] = useState(false);
+
+  const selectedService = services.find((s) => s.id === contactSection.pathway);
+
+  const filteredServices = services.filter((srv) => {
+    if (filterType === 'ALL') return true;
+    return srv.serviceType === filterType;
+  });
+
+  // Recalculate page dimensions and scroll to top when changing steps or filter
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.scrollTo(0, 0);
+      if ((window as any).lenis) {
+        (window as any).lenis.scrollTo(0, { immediate: true });
+        (window as any).lenis.resize();
+      }
+
+      // Fire multiple resizes as Framer Motion transitions run
+      const t1 = setTimeout(() => (window as any).lenis?.resize(), 50);
+      const t2 = setTimeout(() => (window as any).lenis?.resize(), 150);
+      const t3 = setTimeout(() => (window as any).lenis?.resize(), 300);
+
+      return () => {
+        clearTimeout(t1);
+        clearTimeout(t2);
+        clearTimeout(t3);
+      };
+    }
+  }, [step, filterType, contactSection.targetDate]);
+
+  const handleCardClick = (serviceId: string) => {
+    selectService(serviceId);
+    setTimeout(() => {
+      if (typeof window !== 'undefined') {
+        if ((window as any).lenis) {
+          (window as any).lenis.resize();
+        }
+        const bottomButton = document.getElementById('step-1-next-btn');
+        if (bottomButton) {
+          if ((window as any).lenis) {
+            (window as any).lenis.scrollTo(bottomButton, { offset: -100 });
+          } else {
+            bottomButton.scrollIntoView({ behavior: 'smooth', block: 'end' });
+          }
+        }
+      }
+    }, 100);
+  };
+
+  const handleDateSelect = (date: string) => {
+    contactSection.setTargetDate(date);
+    setTimeout(() => {
+      if (typeof window !== 'undefined') {
+        const timeElement = document.getElementById('step-2-time-picker');
+        if (timeElement) {
+          if ((window as any).lenis) {
+            (window as any).lenis.scrollTo(timeElement, { offset: -100 });
+          } else {
+            timeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }
+      }
+    }, 50);
+  };
+
+  const handleTimeSelect = (timeStr: string) => {
+    fields.setPreferredStartTime(timeStr);
+    setTimeout(() => {
+      if (typeof window !== 'undefined') {
+        const nextButton = document.getElementById('step-2-next-btn');
+        if (nextButton) {
+          if ((window as any).lenis) {
+            (window as any).lenis.scrollTo(nextButton, { offset: -100 });
+          } else {
+            nextButton.scrollIntoView({ behavior: 'smooth', block: 'end' });
+          }
+        }
+      }
+    }, 50);
+  };
+
+  return (
+    <div className="min-h-screen bg-[#FDFDFD] text-[#1D1E1E] flex flex-col justify-between">
+      {/* Custom Integrated Header Navbar matching Homepage Navbar Height & Padding */}
+      <header className="sticky top-0 z-40 h-[76px] bg-white/95 backdrop-blur-md border-b border-gray-200/80 px-6 sm:px-12 py-4 flex items-center shadow-xs">
+        <div className="max-w-7xl mx-auto w-full flex items-center justify-between gap-4">
+          {/* Left: Slightly Larger Return Link */}
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-[#D94E4E] transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Return home</span>
+          </Link>
+
+          {/* Center: Centered Stepper Navigation Pills with boxed number badge */}
+          <div className="flex-1 flex justify-center">
+            <div className="flex items-center gap-3 sm:gap-4 text-sm font-medium text-gray-700">
+              <button
+                type="button"
+                onClick={() => wizard.handleStepClick(1)}
+                className={`flex items-center gap-2 py-1 transition-all cursor-pointer text-xs sm:text-sm ${
+                  step === 1
+                    ? 'text-gray-900 font-semibold'
+                    : step > 1
+                    ? 'text-emerald-700 font-medium'
+                    : 'text-gray-500 font-normal'
+                }`}
+              >
+                <span
+                  className={`w-6 h-6 rounded-none flex items-center justify-center text-xs font-bold shrink-0 leading-none transition-all ${
+                    step === 1
+                      ? 'bg-[#1D1E1E] text-white shadow-xs'
+                      : step > 1
+                      ? 'bg-emerald-600 text-white'
+                      : 'bg-gray-100 border border-gray-300 text-gray-600'
+                  }`}
+                >
+                  {step > 1 ? <Check className="w-3.5 h-3.5 stroke-[3]" /> : '1'}
+                </span>
+                <span>Select service</span>
+              </button>
+
+              <ChevronRight className="w-4 h-4 text-gray-400 shrink-0" />
+
+              <button
+                type="button"
+                onClick={() => wizard.handleStepClick(2)}
+                disabled={wizard.maxReachedStep < 2 && !contactSection.pathway}
+                className={`flex items-center gap-2 py-1 transition-all text-xs sm:text-sm ${
+                  step === 2
+                    ? 'text-gray-900 font-semibold cursor-pointer'
+                    : step > 2
+                    ? 'text-emerald-700 font-medium cursor-pointer'
+                    : wizard.maxReachedStep >= 2 || contactSection.pathway
+                    ? 'text-gray-700 font-normal cursor-pointer hover:text-gray-900'
+                    : 'text-gray-400 font-normal opacity-50 cursor-not-allowed'
+                }`}
+              >
+                <span
+                  className={`w-6 h-6 rounded-none flex items-center justify-center text-xs font-bold shrink-0 leading-none transition-all ${
+                    step === 2
+                      ? 'bg-[#1D1E1E] text-white shadow-xs'
+                      : step > 2
+                      ? 'bg-emerald-600 text-white'
+                      : 'bg-gray-100 border border-gray-300 text-gray-600'
+                  }`}
+                >
+                  {step > 2 ? <Check className="w-3.5 h-3.5 stroke-[3]" /> : '2'}
+                </span>
+                <span>Schedule</span>
+              </button>
+
+              <ChevronRight className="w-4 h-4 text-gray-400 shrink-0" />
+
+              <button
+                type="button"
+                onClick={() => wizard.handleStepClick(3)}
+                disabled={wizard.maxReachedStep < 3 && (!contactSection.targetDate || !fields.preferredStartTime)}
+                className={`flex items-center gap-2 py-1 transition-all text-xs sm:text-sm ${
+                  step === 3
+                    ? 'text-gray-900 font-semibold cursor-pointer'
+                    : wizard.maxReachedStep >= 3
+                    ? 'text-gray-700 font-normal cursor-pointer hover:text-gray-900'
+                    : 'text-gray-400 font-normal opacity-50 cursor-not-allowed'
+                }`}
+              >
+                <span
+                  className={`w-6 h-6 rounded-none flex items-center justify-center text-xs font-bold shrink-0 leading-none transition-all ${
+                    step === 3
+                      ? 'bg-[#1D1E1E] text-white shadow-xs'
+                      : 'bg-gray-100 border border-gray-300 text-gray-600'
+                  }`}
+                >
+                  3
+                </span>
+                <span>Patient details</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Right Spacer to balance centering */}
+          <div className="w-[90px] hidden sm:block pointer-events-none" />
+        </div>
+      </header>
+
+      {/* Main Content Area */}
+      <main className="max-w-4xl mx-auto w-full flex-grow flex flex-col justify-center py-8 sm:py-12 px-4">
+        <div className="bg-[#F9F9F6] border border-gray-200/70 p-6 sm:p-10 shadow-xs rounded-none">
+          {!contactSection.submittedLocal ? (
+            <AnimatePresence mode="wait">
+              {/* STEP 1: Select Service Cards + Filter Switch */}
+              {step === 1 && (
+                <motion.div
+                  key="step-1"
+                  initial={{ opacity: 0, x: -15 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 15 }}
+                  transition={{ duration: 0.25 }}
+                  className="space-y-6"
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200/60 pb-3">
+                    <div>
+                      <h2 className="font-serif text-xl sm:text-2xl font-medium text-gray-900">
+                        Select a service
+                      </h2>
+                      <p className="text-xs text-gray-500 font-sans mt-0.5">
+                        Choose your required dental treatment to proceed.
+                      </p>
+                    </div>
+
+                    {/* Filter Switch (All / General / Specialized) */}
+                    <div className="inline-flex items-center bg-gray-200/70 p-1 border border-gray-300/50 text-xs font-medium self-start sm:self-auto">
+                      <button
+                        type="button"
+                        onClick={() => setFilterType('ALL')}
+                        className={`px-3 py-1 transition-colors cursor-pointer ${
+                          filterType === 'ALL'
+                            ? 'bg-white text-gray-900 shadow-xs font-semibold'
+                            : 'text-gray-600 hover:text-gray-900'
+                        }`}
+                      >
+                        All
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setFilterType('GENERAL')}
+                        className={`px-3 py-1 transition-colors cursor-pointer ${
+                          filterType === 'GENERAL'
+                            ? 'bg-white text-gray-900 shadow-xs font-semibold'
+                            : 'text-gray-600 hover:text-gray-900'
+                        }`}
+                      >
+                        General
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setFilterType('SPECIALIZED')}
+                        className={`px-3 py-1 transition-colors cursor-pointer ${
+                          filterType === 'SPECIALIZED'
+                            ? 'bg-white text-gray-900 shadow-xs font-semibold'
+                            : 'text-gray-600 hover:text-gray-900'
+                        }`}
+                      >
+                        Specialized
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                    {filteredServices.map((srv) => {
+                      const isSelected = contactSection.pathway === srv.id;
+                      return (
+                        <div
+                          key={srv.id}
+                          onClick={() => handleCardClick(srv.id)}
+                          className={`relative p-5 border text-left cursor-pointer transition-all duration-300 flex flex-col justify-between gap-3 ${
+                            isSelected
+                              ? 'border-[#1D1E1E] bg-white shadow-md ring-1 ring-[#1D1E1E]'
+                              : 'border-gray-200 bg-white hover:border-gray-400 hover:shadow-sm'
+                          }`}
+                        >
+                          <div>
+                            <div className="flex items-start justify-between gap-2 mb-2">
+                              <span className="text-[11px] font-sans font-medium tracking-wider text-[#D94E4E] uppercase">
+                                {srv.serviceType}
+                              </span>
+                              {isSelected && (
+                                <span className="w-5 h-5 rounded-full bg-[#1D1E1E] text-white flex items-center justify-center text-xs">
+                                  <Check className="w-3 h-3" />
+                                </span>
+                              )}
+                            </div>
+                            <h3 className="font-serif text-lg font-semibold tracking-tight text-gray-900 group-hover:text-[#D94E4E] transition-colors leading-snug">
+                              {srv.name}
+                            </h3>
+                            <div className="border-t border-gray-100/80 my-2.5" />
+                            <p className="text-[13px] text-gray-600 font-sans leading-relaxed tracking-normal font-light">
+                              {srv.description || 'Full comprehensive treatment administered by certified medical practitioners.'}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <div className="pt-4 border-t border-gray-200/60 flex justify-end items-center" id="step-1-next-btn">
+                    {contactSection.pathway ? (
+                      <button
+                        type="button"
+                        onClick={wizard.goToStep2}
+                        className="py-3 px-7 bg-[#1D1E1E] text-white rounded-none text-xs font-semibold tracking-widest uppercase hover:bg-[#D94E4E] transition-all duration-300 shadow-xs flex items-center gap-2 cursor-pointer"
+                      >
+                        Next: Schedule slot <ArrowRight className="w-4 h-4" />
+                      </button>
+                    ) : (
+                      <div className="text-xs text-gray-400 font-sans italic">Select a service above to proceed</div>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+
+              {/* STEP 2: Schedule (Date & Time) */}
+              {step === 2 && (
+                <motion.div
+                  key="step-2"
+                  initial={{ opacity: 0, x: 15 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -15 }}
+                  transition={{ duration: 0.25 }}
+                  className="space-y-6"
+                >
+                  <div className="border-b border-gray-200/60 pb-3">
+                    <h2 className="font-serif text-xl sm:text-2xl font-medium text-gray-900">
+                      Schedule
+                    </h2>
+                    <p className="text-xs text-gray-500 font-sans mt-0.5">
+                      Pick your preferred target date and time for your consultation.
+                    </p>
+                  </div>
+
+                  {/* Date First */}
+                  <div className="flex flex-col gap-2 font-sans">
+                    <label className="text-[10px] tracking-wider uppercase font-semibold text-gray-500">
+                      Preferred Date *
+                    </label>
+                    <ContactCalendar
+                      currentMonth={contactSection.currentMonth}
+                      availableDates={contactSection.availableDates}
+                      targetDate={contactSection.targetDate}
+                      isLoadingDays={contactSection.isLoadingDays}
+                      onMonthChange={contactSection.setCurrentMonth}
+                      onDateSelect={handleDateSelect}
+                    />
+                    {contactSection.targetDate && (
+                      <div className="flex flex-col gap-1.5 mt-2">
+                        <label className="text-[10px] tracking-wider uppercase font-semibold text-gray-500">
+                          Selected Date
+                        </label>
+                        <div className="w-full bg-white border border-[#E4E4DC] px-4 py-3 text-xs sm:text-sm font-semibold flex items-center justify-between">
+                          <span className="text-gray-900 font-extrabold">
+                            {new Date(contactSection.targetDate + 'T00:00:00').toLocaleDateString('en-US', {
+                              weekday: 'short',
+                              month: 'short',
+                              day: 'numeric',
+                              year: 'numeric',
+                            })}
+                          </span>
+                          <Calendar className="w-4 h-4 text-gray-400" />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Time Second */}
+                  <div id="step-2-time-picker">
+                    <PreferenceFields
+                      fields={{
+                        ...fields,
+                        setPreferredStartTime: handleTimeSelect,
+                      }}
+                    />
+                  </div>
+
+                  <div className="pt-6 border-t border-gray-200/60 flex items-center justify-between gap-4" id="step-2-next-btn">
+                    <button
+                      type="button"
+                      onClick={wizard.goToStep1}
+                      className="py-3 px-5 border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 transition-all text-xs font-semibold tracking-widest uppercase flex items-center gap-2 cursor-pointer"
+                    >
+                      <ArrowLeft className="w-4 h-4" /> Back to services
+                    </button>
+
+                    {contactSection.targetDate && fields.preferredStartTime ? (
+                      <button
+                        type="button"
+                        onClick={wizard.goToStep3}
+                        className="py-3 px-7 bg-[#1D1E1E] text-white rounded-none text-xs font-semibold tracking-widest uppercase hover:bg-[#D94E4E] transition-all duration-300 shadow-xs flex items-center gap-2 cursor-pointer"
+                      >
+                        Next: Patient details <ArrowRight className="w-4 h-4" />
+                      </button>
+                    ) : (
+                      <div className="text-xs text-gray-400 font-sans italic">
+                        {!contactSection.targetDate
+                          ? 'Select a date above to proceed'
+                          : 'Select a time slot to proceed'}
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+
+              {/* STEP 3: Patient Details */}
+              {step === 3 && (
+                <motion.div
+                  key="step-3"
+                  initial={{ opacity: 0, x: 15 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -15 }}
+                  transition={{ duration: 0.25 }}
+                  className="space-y-6"
+                >
+                  <div className="border-b border-gray-200/60 pb-3">
+                    <h2 className="font-serif text-xl sm:text-2xl font-medium text-gray-900">
+                      Patient details
+                    </h2>
+                    <p className="text-xs text-gray-500 font-sans mt-0.5">
+                      Review your appointment summary below and complete your official contact details to finalize your booking.
+                    </p>
+                  </div>
+
+                  {/* Redesigned Premium Summary Card */}
+                  <div className="bg-white border border-gray-200 p-4 sm:p-5 shadow-2xs font-sans">
+                    <div className="text-[10px] uppercase font-bold tracking-wider text-gray-400 mb-3 flex items-center gap-1.5">
+                      <Check className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>Appointment Summary</span>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-gray-50/70 p-3.5 border border-gray-100 text-xs">
+                      <div className="min-w-0">
+                        <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider block mb-0.5">Service</span>
+                        <span className="font-bold text-gray-900 truncate block" title={selectedService?.name}>
+                          {selectedService?.name}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider block mb-0.5">Preferred Date</span>
+                        <span className="font-bold text-gray-900 block">
+                          {contactSection.targetDate
+                            ? new Date(contactSection.targetDate + 'T00:00:00').toLocaleDateString('en-US', {
+                                weekday: 'short',
+                                month: 'short',
+                                day: 'numeric',
+                                year: 'numeric',
+                              })
+                            : 'N/A'}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider block mb-0.5">Preferred Time</span>
+                        <span className="font-bold text-gray-900 block">
+                          {fields.preferredStartTime
+                            ? fields.preferredStartTime.includes('AM') || fields.preferredStartTime.includes('PM')
+                              ? fields.preferredStartTime
+                              : (() => {
+                                  const [hStr, mStr] = fields.preferredStartTime.split(':');
+                                  const h = parseInt(hStr, 10);
+                                  if (isNaN(h)) return fields.preferredStartTime;
+                                  const period = h >= 12 ? 'PM' : 'AM';
+                                  const h12 = h % 12 === 0 ? 12 : h % 12;
+                                  return `${String(h12).padStart(2, '0')}:${mStr || '00'} ${period}`;
+                                })()
+                            : 'Flexible / Standard'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <NameFields fields={fields} touched={formTouched} />
+                  <ContactFields fields={fields} phone={contactSection.phone} setPhone={contactSection.setPhone} touched={formTouched} />
+                  <NotesField notes={contactSection.notes} setNotes={contactSection.setNotes} />
+
+                  <div className="pt-6 border-t border-gray-200/60 flex items-center justify-between gap-4">
+                    <button
+                      type="button"
+                      onClick={wizard.goToStep2}
+                      disabled={isSubmitting}
+                      className="py-3 px-5 border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 transition-all text-xs font-semibold tracking-widest uppercase flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                    >
+                      <ArrowLeft className="w-4 h-4" /> Back to schedule
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        setFormTouched(true);
+                        await contactSection.submitInquiry();
+                      }}
+                      disabled={isSubmitting}
+                      className="py-3 px-7 bg-[#1D1E1E] text-white rounded-none text-xs font-semibold tracking-widest uppercase hover:bg-[#D94E4E] transition-all duration-300 shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:pointer-events-none disabled:opacity-50"
+                    >
+                      {isSubmitting ? (
+                        'Submitting Request...'
+                      ) : (
+                        <>
+                          Submit appointment request <Check className="w-4 h-4 ml-1" />
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          ) : (
+            /* Confirmation Screen with 10s Auto-Redirect */
+            <motion.div
+              key="success-card"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="text-center py-12 space-y-4"
+            >
+              <div className="w-16 h-16 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 mx-auto">
+                <CheckCircle2 className="w-8 h-8" />
+              </div>
+              <h3 className="font-serif text-2xl font-normal text-gray-900 mt-6">Appointment Request Confirmed!</h3>
+              <p className="text-sm font-light text-gray-600 max-w-md mx-auto leading-relaxed font-sans">
+                Thank you, <span className="font-medium text-gray-900">{fields.firstName} {fields.lastName}</span>. Our desk will confirm your appointment at <span className="font-medium text-gray-900">{contactSection.phone}</span> shortly.
+              </p>
+
+              {redirectCountdown !== null && (
+                <div className="bg-gray-100 border border-gray-200/80 p-3 max-w-sm mx-auto text-xs text-gray-600 font-sans mt-4">
+                  Redirecting to homepage in <span className="font-bold text-[#D94E4E]">{redirectCountdown} seconds</span>...
+                </div>
+              )}
+
+              <div className="pt-4">
+                <Link
+                  href="/"
+                  className="px-6 py-3 bg-[#1D1E1E] hover:bg-[#D94E4E] text-white text-xs font-semibold uppercase tracking-widest transition-all shadow-sm inline-block"
+                >
+                  Return to home now
+                </Link>
+              </div>
+            </motion.div>
+          )}
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="py-4 text-center text-xs text-gray-400 font-sans border-t border-gray-200/40">
+        © {new Date().getFullYear()} Samson Dental Center. All rights reserved.
+      </footer>
+    </div>
+  );
+}

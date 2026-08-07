@@ -27,15 +27,47 @@ export function NativeTimePopoverPicker({
   const [popoverPosition, setPopoverPosition] = useState<'top' | 'bottom'>('bottom');
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Convert 12-hour (h, m, p) to 24-hour HH:MM format
+  const to24Hour = (h: string, m: string, p: 'AM' | 'PM'): string => {
+    let hourNum = parseInt(h, 10);
+    if (p === 'PM' && hourNum < 12) hourNum += 12;
+    if (p === 'AM' && hourNum === 12) hourNum = 0;
+    return `${String(hourNum).padStart(2, '0')}:${m}`;
+  };
+
+  // Convert any value (24-hour "HH:MM" or 12-hour "HH:MM AM/PM") to display 12-hour label
+  const getDisplayLabel = (val: string): string => {
+    if (!val) return placeholder;
+    if (val.includes('AM') || val.includes('PM')) return val;
+    const [hStr, mStr] = val.split(':');
+    const h = parseInt(hStr, 10);
+    if (isNaN(h)) return val;
+    const period = h >= 12 ? 'PM' : 'AM';
+    const h12 = h % 12 === 0 ? 12 : h % 12;
+    return `${String(h12).padStart(2, '0')}:${mStr || '00'} ${period}`;
+  };
+
   // Extract initial values or fallback to 08:00 AM
   const parseValue = (val: string): { hour: string; min: string; period: 'AM' | 'PM' } => {
     if (!val) return { hour: '08', min: '00', period: 'AM' };
-    const parts = val.split(' ');
-    const period: 'AM' | 'PM' = parts[1]?.toUpperCase() === 'PM' ? 'PM' : 'AM';
-    const timeParts = parts[0]?.split(':') || ['08', '00'];
+    if (val.includes('AM') || val.includes('PM')) {
+      const parts = val.split(' ');
+      const period: 'AM' | 'PM' = parts[1]?.toUpperCase() === 'PM' ? 'PM' : 'AM';
+      const timeParts = parts[0]?.split(':') || ['08', '00'];
+      return {
+        hour: timeParts[0] || '08',
+        min: timeParts[1] || '00',
+        period,
+      };
+    }
+    const [hStr, mStr] = val.split(':');
+    const h = parseInt(hStr, 10);
+    if (isNaN(h)) return { hour: '08', min: '00', period: 'AM' };
+    const period: 'AM' | 'PM' = h >= 12 ? 'PM' : 'AM';
+    const h12 = h % 12 === 0 ? 12 : h % 12;
     return {
-      hour: timeParts[0] || '08',
-      min: timeParts[1] || '00',
+      hour: String(h12).padStart(2, '0'),
+      min: mStr || '00',
       period,
     };
   };
@@ -90,8 +122,8 @@ export function NativeTimePopoverPicker({
   };
 
   const handleSelectTime = (h: string, m: string, p: 'AM' | 'PM') => {
-    const formatted = `${h}:${m} ${p}`;
-    onChange(formatted);
+    const time24 = to24Hour(h, m, p);
+    onChange(time24);
   };
 
   return (
@@ -104,7 +136,7 @@ export function NativeTimePopoverPicker({
         }`}
       >
         <span className={value ? 'text-gray-900 font-extrabold' : 'text-gray-400 font-medium'}>
-          {value ? value : placeholder}
+          {getDisplayLabel(value)}
         </span>
         <Clock className="w-4 h-4 text-gray-400" />
       </div>
