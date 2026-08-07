@@ -21,7 +21,7 @@ export function NativeTimePopoverPicker({
   placeholder = 'Select Preferred Time...',
   className = '',
   disabled = false,
-  availableHours = ['08', '09', '10', '11', '12', '01', '02', '03', '04', '05'],
+  availableHours = ['08', '09', '10', '11', '12', '01', '02', '03', '04'],
 }: NativeTimePopoverPickerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [popoverPosition, setPopoverPosition] = useState<'top' | 'bottom'>('bottom');
@@ -120,7 +120,7 @@ export function NativeTimePopoverPicker({
         >
           {/* 3 Columns Grid: Hour | Minute | AM/PM */}
           <div className="grid grid-cols-3 gap-1">
-            {/* 1. Hour Column (Fixed List starting at 08 AM) */}
+            {/* 1. Hour Column (Available hours 08 AM to 04 PM) */}
             <div
               data-lenis-prevent="true"
               className="h-[238px] overflow-y-auto flex flex-col gap-1 pr-0 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
@@ -137,10 +137,7 @@ export function NativeTimePopoverPicker({
                       if (['08', '09', '10', '11'].includes(h)) newP = 'AM';
                       else newP = 'PM';
                       setSelectedPeriod(newP);
-                      // If selecting 05 PM, reset minute to '00' (clinic closing boundary)
-                      const newM = (h === '05' && newP === 'PM') ? '00' : selectedMin;
-                      if (h === '05' && newP === 'PM') setSelectedMin('00');
-                      handleSelectTime(h, newM, newP);
+                      handleSelectTime(h, selectedMin, newP);
                     }}
                     className={`w-full h-8 shrink-0 flex items-center justify-center text-sm font-semibold rounded-xs transition-colors ${
                       isSelected
@@ -154,21 +151,18 @@ export function NativeTimePopoverPicker({
               })}
             </div>
 
-            {/* 2. Minute Column (Fixed 1-Min Scroll 00-59) */}
+            {/* 2. Minute Column (Any minute 00 to 59 allowed for 04 PM) */}
             <div
               data-lenis-prevent="true"
               className="h-[238px] overflow-y-auto flex flex-col gap-1 pr-0 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
             >
               {fullMinuteList.map((m) => {
                 const isSelected = selectedMin === m;
-                // At closing hour (05 PM), only :00 is allowed. Minutes > 00 are disabled.
-                const isMinDisabled = selectedHour === '05' && selectedPeriod === 'PM' && m !== '00';
 
                 return (
                   <button
                     key={m}
                     type="button"
-                    disabled={isMinDisabled}
                     onClick={() => {
                       setSelectedMin(m);
                       handleSelectTime(selectedHour, m, selectedPeriod);
@@ -176,8 +170,6 @@ export function NativeTimePopoverPicker({
                     className={`w-full h-8 shrink-0 flex items-center justify-center text-sm font-semibold rounded-xs transition-colors ${
                       isSelected
                         ? 'bg-[#0075FF] text-white font-bold'
-                        : isMinDisabled
-                        ? 'text-gray-300 cursor-not-allowed opacity-40'
                         : 'text-gray-800 hover:bg-gray-100'
                     }`}
                   >
@@ -195,7 +187,7 @@ export function NativeTimePopoverPicker({
               {['AM', 'PM'].map((p) => {
                 const isSelected = selectedPeriod === p;
                 const isDisabled =
-                  (p === 'AM' && ['12', '01', '02', '03', '04', '05'].includes(selectedHour)) ||
+                  (p === 'AM' && ['12', '01', '02', '03', '04'].includes(selectedHour)) ||
                   (p === 'PM' && ['08', '09', '10', '11'].includes(selectedHour));
 
                 return (
