@@ -20,6 +20,7 @@ export const onRescheduleBookingSubscriber = {
         confirmation_channel,
         date,
         start_time,
+        end_time,
         service:services(name, duration_minutes),
         doctor:users!appointments_doctor_id_fkey(first_name, last_name)
       `)
@@ -29,6 +30,7 @@ export const onRescheduleBookingSubscriber = {
     // Prefer the appointment's CURRENT slot — resent events may replay a stale payload
     const date = appt?.date || payload.date;
     const startTime = appt?.start_time || payload.startTime;
+    const endTime = appt?.end_time || payload.endTime;
 
     if (apptError || !appt) {
       throw new Error(`Failed to fetch appointment for reschedule: ${apptError?.message || 'Not found'}`);
@@ -80,8 +82,10 @@ export const onRescheduleBookingSubscriber = {
 
     let timeRangeStr = 'To be scheduled';
     if (startTime) {
-      const end = calculateEndTime(startTime, duration);
-      timeRangeStr = end ? `${formatClinicTime(startTime)} - ${formatClinicTime(end)}` : formatClinicTime(startTime);
+      const end = endTime || calculateEndTime(startTime, duration);
+      const startFmt = formatClinicTime(startTime);
+      const endFmt = formatClinicTime(end);
+      timeRangeStr = startFmt && endFmt ? `${startFmt} - ${endFmt}` : startFmt || 'To be scheduled';
     }
     const baseUrl = getBaseUrl();
     const chatToken = appt.chat_token;

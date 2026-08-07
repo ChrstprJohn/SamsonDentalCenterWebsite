@@ -6,6 +6,7 @@ export const manualBookingGuestEventSchema = z.object({
   doctorId: z.string().uuid().nullable().optional(),
   date: z.string(),
   startTime: z.string(),
+  endTime: z.string().nullable().optional(),
   durationMinutes: z.number().int().positive(),
   guestContactId: z.string().uuid(),
   guestName: z.string().min(1),

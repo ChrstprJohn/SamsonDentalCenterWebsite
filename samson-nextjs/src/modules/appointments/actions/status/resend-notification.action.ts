@@ -184,6 +184,7 @@ export async function resendNotificationAction(input: ResendNotificationInput) {
             doctorId: appointment.doctor_id,
             date: appointment.date,
             startTime: appointment.start_time,
+            endTime: appointment.end_time,
             durationMinutes: service?.duration_minutes || 60,
           };
         } else if (!appointment.patient_id) {
@@ -194,6 +195,7 @@ export async function resendNotificationAction(input: ResendNotificationInput) {
             doctorId: appointment.doctor_id,
             date: appointment.date,
             startTime: appointment.start_time,
+            endTime: appointment.end_time,
             durationMinutes: service?.duration_minutes || 60,
             guestContactId: gc?.id || parsed.appointmentId,
             guestName: gc ? `${gc.first_name || ''} ${gc.last_name || ''}`.trim() : 'Guest',
@@ -209,6 +211,7 @@ export async function resendNotificationAction(input: ResendNotificationInput) {
             doctorId: appointment.doctor_id || null,
             date: appointment.date,
             startTime: appointment.start_time || null,
+            endTime: appointment.end_time || null,
             durationMinutes: service?.duration_minutes || 60,
           };
         }

@@ -1,10 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { formatClinicDate, formatClinicTime } from './date.util';
+import { formatClinicDate, formatClinicTime, formatTimeString, calculateEndTime, formatShortDate } from './date.util';
 
 describe('Date Utilities', () => {
   it('formats a date object correctly', () => {
     const date = new Date('2026-05-27T10:00:00Z');
-    // Note: This test implies standard timezone is handled by Intl, but in testing we ensure it returns a string
     const formatted = formatClinicDate(date);
     expect(typeof formatted).toBe('string');
     expect(formatted).toContain('2026');
@@ -16,8 +15,34 @@ describe('Date Utilities', () => {
     expect(formatted).toContain('2026');
   });
 
-  it('formats time correctly', () => {
+  it('formats ISO time string correctly', () => {
     const formatted = formatClinicTime('2026-05-27T14:30:00Z');
     expect(formatted).toBe('2:30 PM');
+  });
+
+  it('formats ISO time string with timezone offset correctly', () => {
+    const formatted = formatClinicTime('2026-06-22T14:00:00+08:00');
+    expect(formatted).toBe('2:00 PM');
+  });
+
+  it('formats bare 24h time strings correctly without timezone drift', () => {
+    expect(formatClinicTime('14:00:00')).toBe('2:00 PM');
+    expect(formatClinicTime('09:00')).toBe('9:00 AM');
+    expect(formatClinicTime('00:30')).toBe('12:30 AM');
+    expect(formatClinicTime('12:00')).toBe('12:00 PM');
+  });
+
+  it('preserves already formatted AM/PM time strings', () => {
+    expect(formatClinicTime('2:00 PM – 2:45 PM')).toBe('2:00 PM – 2:45 PM');
+    expect(formatClinicTime('9:00 AM')).toBe('9:00 AM');
+  });
+
+  it('calculates end time accurately', () => {
+    expect(calculateEndTime('09:00', 30)).toBe('09:30');
+    expect(calculateEndTime('14:00:00', 45)).toBe('14:45');
+  });
+
+  it('formats short date correctly', () => {
+    expect(formatShortDate('2026-06-22')).toBe('Jun 22, 2026');
   });
 });

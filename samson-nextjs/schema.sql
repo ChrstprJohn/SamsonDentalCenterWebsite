@@ -860,6 +860,7 @@ BEGIN
             'doctorId', p_doctor_id,
             'date', p_date,
             'startTime', p_start_time,
+            'endTime', p_end_time,
             'durationMinutes', v_duration,
             'inquiryId', p_inquiry_id,
             'guestContactId', v_guest_contact_id,
@@ -879,6 +880,7 @@ BEGIN
             'doctorId', p_doctor_id,
             'date', p_date,
             'startTime', p_start_time,
+            'endTime', p_end_time,
             'durationMinutes', v_duration,
             'inquiryId', p_inquiry_id
         );

@@ -13,6 +13,8 @@ import RequestRejectedEmail from './request-rejected-email';
 import SignupOtpEmail from './signup-otp-email';
 import ResetPasswordOtpEmail from './reset-password-otp-email';
 
+import { formatShortDate, formatClinicTime, calculateEndTime } from '@/shared/utils/date.util';
+
 interface RenderedEmailFrameProps {
   eventType: string;
   payload: Record<string, any>;
@@ -24,10 +26,32 @@ export function RenderedEmailFrame({ eventType, payload }: RenderedEmailFramePro
   const patientName = safePayload.patientName || safePayload.accountHolderName || fullName || 'Valued Patient';
   const serviceName = safePayload.serviceName || 'Dental Treatment';
   const doctorName = safePayload.doctorName || 'Dr. Assigned Dentist';
-  const rawDate = safePayload.dateStr || safePayload.appointmentDate || safePayload.preferredDate;
-  const dateStr = rawDate && !rawDate.includes('NaN') ? rawDate : 'Jun 4, 2026';
-  const rawTime = safePayload.timeRangeStr || safePayload.preferredStartTime;
-  const timeRangeStr = rawTime && !rawTime.includes('NaN') ? rawTime : '09:00 AM - 09:30 AM';
+
+  const rawDate = safePayload.dateStr || safePayload.date || safePayload.appointmentDate || safePayload.preferredDate;
+  const formattedDate = rawDate ? formatShortDate(rawDate) : '';
+  const dateStr = formattedDate && !formattedDate.includes('NaN') ? formattedDate : 'Jun 4, 2026';
+
+  const rawTime = safePayload.timeRangeStr || safePayload.startTime || safePayload.preferredStartTime;
+  let timeRangeStr = '09:00 AM - 09:30 AM';
+
+  if (rawTime && !rawTime.includes('NaN')) {
+    if (rawTime.includes('-') || rawTime.includes('–')) {
+      timeRangeStr = rawTime;
+    } else {
+      const start = rawTime;
+      const duration = safePayload.durationMinutes || safePayload.duration_minutes || 30;
+      const end = safePayload.endTime || calculateEndTime(start, duration);
+      const startFormatted = formatClinicTime(start);
+      const endFormatted = formatClinicTime(end);
+      if (startFormatted && endFormatted) {
+        timeRangeStr = `${startFormatted} - ${endFormatted}`;
+      } else if (startFormatted) {
+        timeRangeStr = startFormatted;
+      } else {
+        timeRangeStr = rawTime;
+      }
+    }
+  }
   const appointmentId = safePayload.appointmentId || safePayload.inquiryId || 'APT-SAMPLE';
   const otpCode = safePayload.otpCode || '123456';
   const chatToken = safePayload.chatToken || '';
@@ -41,7 +65,7 @@ export function RenderedEmailFrame({ eventType, payload }: RenderedEmailFramePro
     element = <SignupOtpEmail firstName={patientName} otpCode={otpCode} />;
   } else if (eventType === 'PASSWORD_RESET_REQUESTED') {
     element = <ResetPasswordOtpEmail firstName={patientName} otpCode={otpCode} />;
-  } else if (eventType === 'APPOINTMENT_BOOKED' || eventType === 'APPOINTMENT_INQUIRY_RECEIVED' || eventType.includes('INQUIRY') || eventType.includes('REQUEST_RECEIVED')) {
+  } else if (eventType === 'APPOINTMENT_BOOKED' || eventType === 'APPOINTMENT_INQUIRY_RECEIVED' || eventType === 'INQUIRY_RECEIVED' || eventType.includes('REQUEST_RECEIVED')) {
     if (eventType === 'REJECT_INQUIRY') {
       element = (
         <RequestRejectedEmail

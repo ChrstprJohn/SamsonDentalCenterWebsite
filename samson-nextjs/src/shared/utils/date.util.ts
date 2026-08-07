@@ -36,12 +36,26 @@ export function formatShortDate(date: Date | string): string {
  * Also handles bare "HH:MM" or "HH:MM:SS" naive local strings (no timezone).
  * Example: '2:30 PM'
  */
+/**
+ * Formats a Date object or ISO string into a standard time string.
+ * Also handles bare "HH:MM" or "HH:MM:SS" naive local strings (no timezone).
+ * Example: '2:30 PM'
+ */
 export function formatClinicTime(date: Date | string | null): string {
   if (!date) return '';
 
-  // Fast-path: bare HH:MM or HH:MM:SS naive local time — route through formatTimeString
-  if (typeof date === 'string' && /^\d{2}:\d{2}(:\d{2})?$/.test(date)) {
-    return formatTimeString(date);
+  if (typeof date === 'string') {
+    if (date.includes('AM') || date.includes('PM')) {
+      return date;
+    }
+    let timeStr = date;
+    if (date.includes('T')) {
+      timeStr = date.split('T')[1].split('.')[0].replace('Z', '').split('+')[0];
+    }
+    // Fast-path: bare HH:MM or HH:MM:SS naive local time — route through formatTimeString
+    if (/^\d{2}:\d{2}(:\d{2})?$/.test(timeStr)) {
+      return formatTimeString(timeStr);
+    }
   }
 
   const d = typeof date === 'string' ? new Date(date) : date;
@@ -57,7 +71,7 @@ export function formatClinicTime(date: Date | string | null): string {
     hour: 'numeric',
     minute: '2-digit',
     hour12: true,
-    timeZone: 'UTC'
+    timeZone: 'Asia/Manila'
   }).format(d);
 }
 
@@ -71,16 +85,19 @@ export function formatTimeString(timeStr: string): string {
   if (timeStr === 'AFTERNOON') return 'Afternoon (01:00 PM - 05:00 PM)';
   if (timeStr.includes('AM') || timeStr.includes('PM')) return timeStr;
 
-  const cleanTime = timeStr.length === 5 ? `${timeStr}:00` : timeStr;
-  try {
-    const formatted = formatClinicTime(`2000-01-01T${cleanTime}Z`);
-    if (formatted === `2000-01-01T${cleanTime}Z` || !formatted) {
-      return timeStr;
+  const timePart = timeStr.includes(' ') ? timeStr.split(' ')[1] : timeStr;
+  const parts = timePart.split(':');
+  if (parts.length >= 2) {
+    const h = parseInt(parts[0], 10);
+    const m = parseInt(parts[1], 10);
+    if (!isNaN(h) && !isNaN(m)) {
+      const period = h >= 12 ? 'PM' : 'AM';
+      const h12 = h % 12 === 0 ? 12 : h % 12;
+      const mStr = String(m).padStart(2, '0');
+      return `${h12}:${mStr} ${period}`;
     }
-    return formatted;
-  } catch {
-    return timeStr;
   }
+  return timeStr;
 }
 
 /**

@@ -7,6 +7,7 @@ export const appointmentBookedEventSchema = z.object({
   doctorId: z.string().uuid().nullable().optional(),
   date: z.string(),
   startTime: z.string().nullable().optional(),
+  endTime: z.string().nullable().optional(),
   durationMinutes: z.number().int().positive().optional(),
   dependentId: z.string().uuid().nullable().optional(),
 });

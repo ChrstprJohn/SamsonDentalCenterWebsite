@@ -137,7 +137,7 @@ export const AppointmentConfirmedEmail = ({
 
           {/* Closing */}
           <Text style={{ ...pStyle, marginBottom: '24px' }}>
-            Thank you for choosing Samson Dental Center. We can&apos;t wait to see you on {dateStr} at {timeRangeStr}.
+            Thank you for choosing Samson Dental Center. We can&apos;t wait to see you on {dateStr || 'your appointment date'} at {timeRangeStr || 'the scheduled time'}.
           </Text>
 
           {/* Signature */}

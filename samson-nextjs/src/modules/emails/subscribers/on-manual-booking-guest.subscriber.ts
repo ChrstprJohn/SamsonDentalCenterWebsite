@@ -11,7 +11,7 @@ export const onManualBookingGuestSubscriber = {
    */
   async handle(payload: Record<string, any>): Promise<void> {
     const parsed = manualBookingGuestEventSchema.parse(payload);
-    const { appointmentId, serviceId, doctorId, date, startTime, durationMinutes, guestName, guestEmail } = parsed;
+    const { appointmentId, serviceId, doctorId, date, startTime, endTime, durationMinutes, guestName, guestEmail } = parsed;
 
     // Skip email if no address was captured
     if (!guestEmail) return;
@@ -41,9 +41,13 @@ export const onManualBookingGuestSubscriber = {
       doctorName = `Dr. ${doctor.first_name} ${doctor.last_name}`;
     }
     const dateStr = formatShortDate(date);
-    const start = startTime;
-    const end = calculateEndTime(startTime, durationMinutes);
-    const timeRangeStr = `${formatClinicTime(start)} - ${formatClinicTime(end)}`;
+    let timeRangeStr = 'To be scheduled';
+    if (startTime) {
+      const end = endTime || calculateEndTime(startTime, durationMinutes);
+      const startFmt = formatClinicTime(startTime);
+      const endFmt = formatClinicTime(end);
+      timeRangeStr = startFmt && endFmt ? `${startFmt} - ${endFmt}` : startFmt || 'To be scheduled';
+    }
 
     const { data: appt } = await supabaseAdmin
       .from('appointments')

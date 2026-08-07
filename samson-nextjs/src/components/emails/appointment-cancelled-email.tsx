@@ -74,14 +74,12 @@ export const AppointmentCancelledEmail = ({
           </Text>
 
           {/* Cancelled Date & Reason */}
-          {dateStr && (
-            <Text style={pStyle}>
-              Your appointment originally scheduled for <span style={boldStyle}>{dateStr}</span> has been cancelled.{' '}
-              <span style={boldStyle}>
-                {cancellationReason}
-              </span>
-            </Text>
-          )}
+          <Text style={pStyle}>
+            Your appointment {dateStr ? <>originally scheduled for <span style={boldStyle}>{dateStr}</span> </> : ''}has been cancelled.{' '}
+            <span style={boldStyle}>
+              {cancellationReason}
+            </span>
+          </Text>
 
           {/* Contact block */}
           <Text style={pStyle}>

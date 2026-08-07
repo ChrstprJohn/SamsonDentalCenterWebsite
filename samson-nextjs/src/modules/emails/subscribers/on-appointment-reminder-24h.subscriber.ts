@@ -22,6 +22,7 @@ export const onAppointmentReminder24hSubscriber = {
         patient_id,
         date,
         start_time,
+        end_time,
         confirmation_channel,
         service:services(name, duration_minutes),
         doctor:users!appointments_doctor_id_fkey(first_name, last_name),
@@ -73,8 +74,10 @@ export const onAppointmentReminder24hSubscriber = {
 
     let timeRangeStr = 'To be scheduled';
     if (start) {
-      const end = calculateEndTime(start, duration);
-      timeRangeStr = end ? `${formatClinicTime(start)} - ${formatClinicTime(end)}` : formatClinicTime(start);
+      const end = (appointment as any).end_time || calculateEndTime(start, duration);
+      const startFmt = formatClinicTime(start);
+      const endFmt = formatClinicTime(end);
+      timeRangeStr = startFmt && endFmt ? `${startFmt} - ${endFmt}` : startFmt || 'To be scheduled';
     }
     const baseUrl = getBaseUrl();
     const ref = formatRefId(appointmentId);

@@ -12,7 +12,7 @@ export const onManualBookingPatientSubscriber = {
    */
   async handle(payload: Record<string, any>): Promise<void> {
     const parsed = manualBookingPatientEventSchema.parse(payload);
-    const { appointmentId, patientId, serviceId, doctorId, date, startTime, durationMinutes, dependentName } = parsed;
+    const { appointmentId, patientId, serviceId, doctorId, date, startTime, endTime, durationMinutes, dependentName } = parsed;
 
     const supabaseAdmin = await createAdminClient();
 
@@ -53,13 +53,15 @@ export const onManualBookingPatientSubscriber = {
     const accountHolderName = [patient.first_name, patient.middle_name, patient.last_name, patient.suffix]
       .filter(Boolean)
       .join(' ')
-      .trim();
-
     const patientName = dependentName || accountHolderName;
     const dateStr = formatShortDate(date);
-    const start = startTime;
-    const end = calculateEndTime(startTime, durationMinutes);
-    const timeRangeStr = `${formatClinicTime(start)} - ${formatClinicTime(end)}`;
+    let timeRangeStr = 'To be scheduled';
+    if (startTime) {
+      const end = endTime || calculateEndTime(startTime, durationMinutes);
+      const startFmt = formatClinicTime(startTime);
+      const endFmt = formatClinicTime(end);
+      timeRangeStr = startFmt && endFmt ? `${startFmt} - ${endFmt}` : startFmt || 'To be scheduled';
+    }
 
     const { data: appt } = await supabaseAdmin
       .from('appointments')

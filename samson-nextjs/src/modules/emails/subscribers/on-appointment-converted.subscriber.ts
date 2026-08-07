@@ -81,11 +81,15 @@ export const onAppointmentConvertedSubscriber = {
         doctorName = `Dr. ${doctor.first_name} ${doctor.last_name}`;
       }
     }
-    const dateStr = formatShortDate(date);
 
-    const start = startTime;
-    const end = calculateEndTime(startTime, duration);
-    const timeRangeStr = `${formatClinicTime(start)} - ${formatClinicTime(end)}`;
+    const dateStr = formatShortDate(date);
+    let timeRangeStr = 'To be scheduled';
+    if (startTime) {
+      const end = parsed.endTime || calculateEndTime(startTime, duration);
+      const startFmt = formatClinicTime(startTime);
+      const endFmt = formatClinicTime(end);
+      timeRangeStr = startFmt && endFmt ? `${startFmt} - ${endFmt}` : startFmt || 'To be scheduled';
+    }
 
     const ref = formatRefId(appointmentId);
     const subject = `Your Appointment is Confirmed${ref ? ` [Ref: ${ref}]` : ''}`;

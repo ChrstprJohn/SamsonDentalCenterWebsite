@@ -12,7 +12,7 @@ export const onAppointmentBookedSubscriber = {
   async handle(payload: Record<string, any>): Promise<void> {
     // Contract Validation
     const parsed = appointmentBookedEventSchema.parse(payload);
-    const { appointmentId, patientId, serviceId, doctorId, date, startTime, durationMinutes, dependentId } = parsed;
+    const { appointmentId, patientId, serviceId, doctorId, date, startTime, endTime, durationMinutes, dependentId } = parsed;
 
     const supabaseAdmin = await createAdminClient();
 
@@ -87,9 +87,10 @@ export const onAppointmentBookedSubscriber = {
 
     let timeRangeStr = 'To be scheduled';
     if (startTime) {
-      const start = startTime;
-      const end = calculateEndTime(startTime, durationMinutes || 60);
-      timeRangeStr = `${formatClinicTime(start)} - ${formatClinicTime(end)}`;
+      const end = endTime || calculateEndTime(startTime, durationMinutes || 60);
+      const startFmt = formatClinicTime(startTime);
+      const endFmt = formatClinicTime(end);
+      timeRangeStr = startFmt && endFmt ? `${startFmt} - ${endFmt}` : startFmt || 'To be scheduled';
     }
 
     const baseUrl = getBaseUrl();

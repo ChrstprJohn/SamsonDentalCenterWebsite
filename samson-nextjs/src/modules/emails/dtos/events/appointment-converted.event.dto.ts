@@ -6,6 +6,7 @@ export const appointmentConvertedEventSchema = z.object({
   doctorId: z.string().uuid().nullable().optional(),
   date: z.string(),
   startTime: z.string(),
+  endTime: z.string().nullable().optional(),
   durationMinutes: z.number().int().positive().optional().nullable(),
   inquiryId: z.string().uuid().optional().nullable(),
   guestName: z.string().optional().nullable(),
