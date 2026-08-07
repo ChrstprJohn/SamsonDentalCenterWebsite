@@ -231,7 +231,11 @@ export async function resendNotificationAction(input: ResendNotificationInput) {
           ? 'CANCEL_BOOKING_SMS'
           : parsed.eventType === 'RESCHEDULE_BOOKING'
             ? 'RESCHEDULE_BOOKING_SMS'
-            : 'APPOINTMENT_MANUALLY_BOOKED_SMS';
+            : parsed.eventType === 'APPOINTMENT_REMINDER_48H'
+              ? 'APPOINTMENT_REMINDER_48H_SMS'
+              : parsed.eventType === 'APPOINTMENT_REMINDER_24H'
+                ? 'APPOINTMENT_REMINDER_24H_SMS'
+                : 'APPOINTMENT_MANUALLY_BOOKED_SMS';
       const smsPayload = {
         phoneNumber: recipientPhone,
         date: appointment.date,
