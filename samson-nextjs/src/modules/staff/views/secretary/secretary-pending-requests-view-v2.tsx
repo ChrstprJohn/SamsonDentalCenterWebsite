@@ -495,7 +495,7 @@ export function SecretaryPendingRequestsViewV2() {
             </div>
 
             {/* Sub-Header Tabs matching AppointmentDetailPane */}
-            <div className="shrink-0 border-b border-card-border/40 px-5 bg-sidebar">
+            <div className="shrink-0 border-b border-card-border/40 px-5 bg-card">
               <div className="relative flex gap-6">
                 {TABS.map((tab, idx) => {
                   const isActive = detailTab === tab.key;
@@ -796,7 +796,7 @@ export function SecretaryPendingRequestsViewV2() {
 
                 {/* Section 3: Master Action Bar */}
                 {inquiriesView.selectedInquiry?.status === 'NEW' && (
-                  <div className="border-t border-card-border/40 px-5 py-4 shrink-0 bg-sidebar">
+                  <div className="border-t border-card-border/40 px-5 py-4 shrink-0 bg-card">
                     <div className="flex flex-col gap-3">
                       {isEditing && (
                         <p className="text-xs text-muted-foreground">Press Save to apply changes before approving or rejecting</p>
@@ -1063,17 +1063,11 @@ export function SecretaryPendingRequestsViewV2() {
 
             {/* Tab 3: TIMELINE */}
             {detailTab === 'timeline' && (
-              <div className="flex-1 !overflow-y-auto min-h-0 space-y-4 py-2 animate-in fade-in duration-200 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
+              <div className="flex-1 !overflow-y-auto min-h-0 py-2 animate-in fade-in duration-200 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
                 style={{ scrollbarWidth: 'thin' }}
                 data-lenis-prevent
               >
                 <InquiryTimeline inquiry={inquiriesView.selectedInquiry} />
-                <hr className="border-card-border/40 mx-4" />
-                <CoordinationHub
-                  inquiryId={inquiriesView.selectedInquiryId}
-                  hideHeader={true}
-                  hideActions={!inquiriesView.selectedInquiry || inquiriesView.selectedInquiry.status !== 'NEW'}
-                />
               </div>
             )}
           </>
