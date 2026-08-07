@@ -63,7 +63,7 @@ export function CoordinationHub({ inquiryId, appointmentId, hideHeader, hideActi
         <div className="p-4 border-b border-card-border/40 shrink-0 h-14 flex items-center">
           <div className="flex items-center gap-2 min-w-0 flex-1">
             {onBack && (
-              <button onClick={onBack} className="xl:hidden p-1 -ml-1 text-muted-foreground hover:text-foreground shrink-0">
+              <button onClick={onBack} className="p-1 -ml-1 text-muted-foreground hover:text-foreground shrink-0" title="Close Staff Notes & Logs">
                 <ArrowLeft className="size-5" />
               </button>
             )}

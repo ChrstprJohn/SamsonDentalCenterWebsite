@@ -12,6 +12,7 @@ import { SidebarHeader, SidebarInput, SidebarTrigger } from '@/components/ui/sid
 export function SecretaryAppointmentsView() {
   const view = useSecretaryAppointments();
   const [mobileView, setMobileView] = useState<'list' | 'detail' | 'quickLogs'>('list');
+  const [showNotesPanel, setShowNotesPanel] = useState(false);
   const [search, setSearch] = useState('');
 
   const colMobile = (v: 'list' | 'detail' | 'quickLogs') =>
@@ -135,15 +136,22 @@ export function SecretaryAppointmentsView() {
                 {view.showRescheduleForm ? 'Reschedule Appointment' : view.showCancelForm ? 'Cancel Appointment' : 'Appointment Details'}
               </div>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setMobileView('quickLogs')}
-              className="xl:hidden gap-1.5 text-xs h-8"
-            >
-              <ClipboardList className="size-3.5" />
-              <span>Notes & Logs</span>
-            </Button>
+            {/* Top Right Toggle Button for Staff Notes (Visible when panel is closed) */}
+            {!showNotesPanel && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setShowNotesPanel(true);
+                  setMobileView('quickLogs');
+                }}
+                className="gap-1.5 text-xs h-8"
+                title="Open Staff Notes & Logs"
+              >
+                <ClipboardList className="size-3.5" />
+                <span>Notes & Logs</span>
+              </Button>
+            )}
           </div>
           <AppointmentDetailPane view={view} />
         </div>
@@ -157,12 +165,15 @@ export function SecretaryAppointmentsView() {
         </div>
       )}
 
-      {/* Column 3: Staff Notes & Logs */}
-      {hasSelection && (
-        <div className={`xl:w-[350px] lg:w-[320px] flex-col border-l border-card-border/40 min-h-0 overflow-hidden ${colMobile('quickLogs')} xl:flex`}>
+      {/* Column 3: Staff Notes & Logs (Default Collapsed) */}
+      {hasSelection && showNotesPanel && (
+        <div className={`xl:w-[350px] lg:w-[320px] flex-col border-l border-card-border/40 min-h-0 overflow-hidden ${colMobile('quickLogs')} flex`}>
           <CoordinationHub
             appointmentId={view.selectedAppointmentId}
-            onBack={() => setMobileView('detail')}
+            onBack={() => {
+              setShowNotesPanel(false);
+              setMobileView('detail');
+            }}
           />
         </div>
       )}

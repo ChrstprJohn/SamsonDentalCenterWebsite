@@ -209,7 +209,7 @@ function renderActualEmailComponent(eventType: string, payload: Record<string, a
   return <RenderedEmailFrame eventType={eventType} payload={payload} />;
 }
 
-function TimelineEntryCard({ entry }: { entry: TimelineEntry }) {
+function TimelineEntryRow({ entry }: { entry: TimelineEntry }) {
   const [showPayload, setShowPayload] = useState(false);
   const [activeDetailTab, setActiveDetailTab] = useState<'preview' | 'payload'>('preview');
   const [payload, setPayload] = useState<Record<string, any> | undefined>(entry.payload);
@@ -219,13 +219,6 @@ function TimelineEntryCard({ entry }: { entry: TimelineEntry }) {
   React.useEffect(() => {
     setPayload(entry.payload);
   }, [entry.payload]);
-
-  const statusColor =
-    entry.rawStatus === 'FAILED'
-      ? 'border-rose-300 bg-rose-50 text-rose-600'
-      : entry.rawStatus === 'PROCESSED'
-        ? 'border-emerald-300 bg-emerald-50 text-emerald-600'
-        : 'border-amber-300 bg-amber-50 text-amber-600';
 
   const statusPill =
     entry.rawStatus === 'FAILED'
@@ -249,98 +242,104 @@ function TimelineEntryCard({ entry }: { entry: TimelineEntry }) {
     }
   };
 
+  const subjectOrType = EVENT_NAME_MAP[entry.eventType] || entry.eventType;
+
   return (
-    <div className="rounded-xl bg-muted/30 border border-card-border p-3">
-      <div className="flex items-start gap-3">
-        <span className={`size-10 rounded-lg flex items-center justify-center shrink-0 ${statusColor}`}>
-          {isEmail ? <Mail className="size-4" /> : <MessageSquare className="size-4" />}
-        </span>
-        <div className="flex-1 min-w-0">
-          <span className="text-xs font-semibold text-foreground truncate block">
-            {EVENT_NAME_MAP[entry.eventType] || entry.eventType}
-          </span>
-          <span className="text-[11px] text-muted-foreground truncate block mt-1">
-            To: {recipientLabel(entry.recipient)}
-          </span>
-        </div>
-        <div className="shrink-0 text-right flex flex-col items-end gap-1.5">
+    <>
+      <tr className="border-t border-card-border/60 hover:bg-muted/20 transition-colors">
+        <td className="py-2 pr-2 whitespace-nowrap text-xs text-foreground font-medium truncate max-w-[140px]" title={recipientLabel(entry.recipient)}>
+          {recipientLabel(entry.recipient)}
+        </td>
+        <td className="py-2 pr-2 whitespace-nowrap">
           <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${statusPill}`}>
             {entry.status}
           </span>
-          <span className="text-[10px] text-muted-foreground whitespace-nowrap">
-            {formatTimeFull(entry.timestamp)} &middot; {timeAgo(entry.timestamp)}
-          </span>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => { void togglePayload(); }}
-              className="text-[11px] text-muted-foreground hover:text-foreground flex items-center gap-0.5"
-            >
-              <span>{showPayload ? 'Hide' : 'View'} Details & Preview</span>
-              <ChevronRight className={`size-3 transition-transform ${showPayload ? 'rotate-90' : ''}`} />
-            </button>
+        </td>
+        <td className="py-2 pr-2 text-xs text-foreground font-medium truncate max-w-[180px]" title={subjectOrType}>
+          <div className="flex items-center gap-1.5 truncate">
+            {isEmail ? <Mail className="size-3 text-muted-foreground shrink-0" /> : <MessageSquare className="size-3 text-muted-foreground shrink-0" />}
+            <span className="truncate">{subjectOrType}</span>
           </div>
-        </div>
-      </div>
+        </td>
+        <td className="py-2 pr-2 whitespace-nowrap text-xs text-muted-foreground">
+          {formatTimeFull(entry.timestamp)}
+        </td>
+        <td className="py-2 text-right whitespace-nowrap">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => { void togglePayload(); }}
+            className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
+            title={showPayload ? 'Hide details' : 'View details'}
+          >
+            <ChevronDown className={`size-3.5 transition-transform duration-200 ${showPayload ? 'rotate-180' : ''}`} />
+          </Button>
+        </td>
+      </tr>
 
       {showPayload && (
-          <div className="mt-3 space-y-2.5">
-            {entry.errorLogs && (
-              <div className="bg-rose-950/10 border border-rose-500/20 rounded-lg p-2.5 text-[11px] font-mono text-rose-600 whitespace-pre-wrap leading-relaxed">
-                {entry.errorLogs}
-              </div>
-            )}
-
-            {isLoadingPayload ? <div className="text-xs text-muted-foreground">Loading communication details...</div> : null}
-            {payloadError ? <div className="text-xs text-destructive">{payloadError}</div> : null}
-            {!isLoadingPayload && !payloadError ? (
-              <>
-                {/* Sub-tabs for Preview vs Payload */}
-                <div className="flex gap-1 border-b border-card-border/40 pb-1 text-xs">
-                  <button
-                    onClick={() => setActiveDetailTab('preview')}
-                    className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors ${
-                      activeDetailTab === 'preview'
-                        ? 'bg-primary/10 text-primary font-semibold'
-                        : 'text-muted-foreground hover:text-foreground'
-                    }`}
-                  >
-                    {isEmail ? '📧 Email Preview' : '💬 Message Preview'}
-                  </button>
-                  <button
-                    onClick={() => setActiveDetailTab('payload')}
-                    className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors ${
-                      activeDetailTab === 'payload'
-                        ? 'bg-primary/10 text-primary font-semibold'
-                        : 'text-muted-foreground hover:text-foreground'
-                    }`}
-                  >
-                    {'{ }'} Technical Payload
-                  </button>
+        <tr className="border-t border-card-border/30 bg-muted/10">
+          <td colSpan={5} className="p-3">
+            <div className="space-y-2.5">
+              {entry.errorLogs && (
+                <div className="bg-rose-950/10 border border-rose-500/20 rounded-lg p-2.5 text-[11px] font-mono text-rose-600 whitespace-pre-wrap leading-relaxed">
+                  {entry.errorLogs}
                 </div>
+              )}
 
-                {activeDetailTab === 'preview' ? (
-                  <div className="rounded-xl border border-card-border/60 overflow-hidden shadow-2xs bg-white text-black max-h-[500px] overflow-y-auto">
-                    <EmailErrorBoundary>
-                      {isEmail ? (
-                        renderActualEmailComponent(entry.eventType, payload || {})
-                      ) : (
-                        <div className="p-4 bg-muted/10 text-xs leading-relaxed text-foreground font-sans">
-                          <div className="font-semibold text-muted-foreground text-[10px] uppercase tracking-wider mb-2">SMS Message Content</div>
-                          <p className="whitespace-pre-wrap">{payload?.smsBody || payload?.message || payload?.body || payload?.text || 'SMS notification dispatched to patient.'}</p>
-                        </div>
-                      )}
-                    </EmailErrorBoundary>
+              {isLoadingPayload ? <div className="text-xs text-muted-foreground">Loading communication details...</div> : null}
+              {payloadError ? <div className="text-xs text-destructive">{payloadError}</div> : null}
+              {!isLoadingPayload && !payloadError ? (
+                <>
+                  {/* Sub-tabs for Preview vs Payload */}
+                  <div className="flex gap-1 border-b border-card-border/40 pb-1 text-xs">
+                    <button
+                      onClick={() => setActiveDetailTab('preview')}
+                      className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors ${
+                        activeDetailTab === 'preview'
+                          ? 'bg-primary/10 text-primary font-semibold'
+                          : 'text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
+                      {isEmail ? '📧 Email Preview' : '💬 Message Preview'}
+                    </button>
+                    <button
+                      onClick={() => setActiveDetailTab('payload')}
+                      className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors ${
+                        activeDetailTab === 'payload'
+                          ? 'bg-primary/10 text-primary font-semibold'
+                          : 'text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
+                      {'{ }'} Technical Payload
+                    </button>
                   </div>
-                ) : (
-                  <div className="bg-secondary-bg/30 border border-card-border/40 rounded-lg p-2.5 text-[11px] font-mono text-text-secondary leading-relaxed whitespace-pre-wrap max-h-48 overflow-y-auto">
-                    {JSON.stringify(payload || {}, null, 2)}
-                  </div>
-                )}
-              </>
-            ) : null}
-          </div>
-        )}
-    </div>
+
+                  {activeDetailTab === 'preview' ? (
+                    <div className="rounded-xl border border-card-border/60 overflow-hidden shadow-2xs bg-white text-black max-h-[500px] overflow-y-auto">
+                      <EmailErrorBoundary>
+                        {isEmail ? (
+                          renderActualEmailComponent(entry.eventType, payload || {})
+                        ) : (
+                          <div className="p-4 bg-muted/10 text-xs leading-relaxed text-foreground font-sans">
+                            <div className="font-semibold text-muted-foreground text-[10px] uppercase tracking-wider mb-2">SMS Message Content</div>
+                            <p className="whitespace-pre-wrap">{payload?.smsBody || payload?.message || payload?.body || payload?.text || 'SMS notification dispatched to patient.'}</p>
+                          </div>
+                        )}
+                      </EmailErrorBoundary>
+                    </div>
+                  ) : (
+                    <div className="bg-secondary-bg/30 border border-card-border/40 rounded-lg p-2.5 text-[11px] font-mono text-text-secondary leading-relaxed whitespace-pre-wrap max-h-48 overflow-y-auto">
+                      {JSON.stringify(payload || {}, null, 2)}
+                    </div>
+                  )}
+                </>
+              ) : null}
+            </div>
+          </td>
+        </tr>
+      )}
+    </>
   );
 }
 
@@ -939,10 +938,23 @@ export function AppointmentEmailTimelineView() {
                   </p>
                 </div>
               ) : (
-                <div className="space-y-3">
-                  {timelineEntries.map((entry) => (
-                    <TimelineEntryCard key={entry.id} entry={entry} />
-                  ))}
+                <div>
+                  <table className="w-full text-xs">
+                    <thead>
+                      <tr className="text-left text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                        <th className="py-1 pr-2 font-semibold">To</th>
+                        <th className="py-1 pr-2 font-semibold">Status</th>
+                        <th className="py-1 pr-2 font-semibold">Subject</th>
+                        <th className="py-1 pr-2 font-semibold">Sent</th>
+                        <th className="py-1 font-semibold text-right">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {timelineEntries.map((entry) => (
+                        <TimelineEntryRow key={entry.id} entry={entry} />
+                      ))}
+                    </tbody>
+                  </table>
                   {timelineLoadMoreError && (
                     <div className="mt-3 rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-xs text-destructive">
                       <div className="flex items-center justify-between gap-3">
