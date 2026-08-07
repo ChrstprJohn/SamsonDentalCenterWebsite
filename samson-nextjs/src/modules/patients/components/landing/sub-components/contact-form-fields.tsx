@@ -23,7 +23,10 @@ import { NativeTimePopoverPicker } from '@/shared/components/native-time-popover
 
 export function PreferenceFields({ fields }: { fields: ContactFormFields }) {
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2 font-sans">
+      <label className="text-[10px] tracking-wider uppercase font-semibold text-gray-500">
+        Preferred Start Time *
+      </label>
       <NativeTimePopoverPicker
         value={fields.preferredStartTime}
         onChange={fields.setPreferredStartTime}

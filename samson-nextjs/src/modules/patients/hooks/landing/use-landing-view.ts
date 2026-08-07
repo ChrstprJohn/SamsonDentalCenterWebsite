@@ -31,7 +31,7 @@ const contactInquirySchema = z.object({
     .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format')
     .or(z.literal(''))
     .optional(),
-  preferredStartTime: z.string().regex(/^\d{2}:\d{2}$/, 'Preferred start time must be in HH:MM format'),
+  preferredStartTime: z.string().regex(/^\d{2}:\d{2} (AM|PM)$/i, 'Preferred start time must be in HH:MM AM/PM format'),
 });
 
 type ContactInquiryFormValues = z.infer<typeof contactInquirySchema>;
@@ -54,7 +54,7 @@ export function useLandingView({ services }: UseLandingViewProps) {
       targetDate: '',
       notes: '',
       dateOfBirth: '',
-      preferredStartTime: '09:00',
+      preferredStartTime: '08:00 AM',
     },
   });
 
@@ -65,7 +65,7 @@ export function useLandingView({ services }: UseLandingViewProps) {
   const contactEmail = form.watch('contactEmail');
   const contactMessage = form.watch('contactMessage') ?? '';
   const dateOfBirth = form.watch('dateOfBirth') ?? '';
-  const preferredStartTime = form.watch('preferredStartTime') ?? '09:00';
+  const preferredStartTime = form.watch('preferredStartTime') ?? '08:00 AM';
   const setField = <TName extends keyof ContactInquiryFormValues>(name: TName) =>
     (value: ContactInquiryFormValues[TName]) =>
       form.setValue(name, value as PathValue<ContactInquiryFormValues, TName>, {
