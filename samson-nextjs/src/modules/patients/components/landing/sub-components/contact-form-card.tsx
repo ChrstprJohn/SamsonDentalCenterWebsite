@@ -62,7 +62,7 @@ export function ContactFormCard(props: ContactFormCardProps) {
               <PathwaySelect services={props.services} pathway={props.pathway} setPathway={props.setPathway} />
               <PreferenceFields fields={fields} />
               <div className="flex flex-col gap-2 font-sans">
-                <label className="text-[10px] tracking-wider uppercase font-semibold text-gray-500">Preferred Target Date *</label>
+                <label className="text-xs tracking-wider font-semibold text-gray-500">Preferred Target Date *</label>
                 <ContactCalendar
                   currentMonth={props.currentMonth}
                   availableDates={props.availableDates}

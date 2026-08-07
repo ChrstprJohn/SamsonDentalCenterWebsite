@@ -24,7 +24,7 @@ import { NativeTimePopoverPicker } from '@/shared/components/native-time-popover
 export function PreferenceFields({ fields }: { fields: ContactFormFields }) {
   return (
     <div className="flex flex-col gap-2 font-sans">
-      <label className="text-[10px] tracking-wider uppercase font-semibold text-gray-500">
+      <label className="text-xs tracking-wider font-semibold text-gray-500">
         Preferred Time *
       </label>
       <NativeTimePopoverPicker
@@ -110,7 +110,7 @@ export function ContactFields({
 export function PathwaySelect({ services, pathway, setPathway }: { services: ServiceResponseDto[]; pathway: string; setPathway: (value: string) => void }) {
   return (
     <div className="flex flex-col gap-2 font-sans">
-      <label className="text-[10px] tracking-wider uppercase font-semibold text-gray-500">Select Specialty Pathway *</label>
+      <label className="text-xs tracking-wider font-semibold text-gray-500">Select Specialty Pathway *</label>
       <select value={pathway} onChange={(event) => setPathway(event.target.value)} className="w-full bg-white border border-[#E4E4DC] px-4 py-3 rounded-none text-xs sm:text-sm focus:outline-none focus:border-[#D94E4E] transition-colors appearance-none">
         {services.map((srv) => <option key={srv.id} value={srv.id}>{srv.name}</option>)}
       </select>
@@ -121,7 +121,7 @@ export function PathwaySelect({ services, pathway, setPathway }: { services: Ser
 export function NotesField({ notes, setNotes }: { notes: string; setNotes: (value: string) => void }) {
   return (
     <div className="flex flex-col gap-2 font-sans">
-      <label className="text-[10px] tracking-wider uppercase font-semibold text-gray-500">
+      <label className="text-xs tracking-wider font-semibold text-gray-500">
         Anything else we should know? <span className="text-gray-400 font-normal">(Optional)</span>
       </label>
       <textarea
@@ -129,7 +129,11 @@ export function NotesField({ notes, setNotes }: { notes: string; setNotes: (valu
         value={notes}
         onChange={(event) => setNotes(event.target.value)}
         placeholder="Doctor preference, allergies, medical conditions, or special requests..."
-        className="w-full bg-white border border-[#E4E4DC] px-4 py-3 rounded-none text-xs sm:text-sm focus:outline-none focus:border-[#D94E4E] transition-colors resize-none"
+        className={`w-full bg-white border px-4 py-3 rounded-none text-xs sm:text-sm font-bold text-gray-900 focus:outline-none transition-colors resize-none ${
+          notes.trim().length > 0
+            ? 'border-emerald-500 focus:border-emerald-600'
+            : 'border-[#E4E4DC] focus:border-[#D94E4E]'
+        }`}
       />
     </div>
   );
@@ -179,12 +183,12 @@ function TextField({
   touched?: boolean;
   isValid?: boolean;
 }) {
-  const showRed = touched && required && !value.trim();
+  const showRed = touched && required && (!value.trim() || !isValid);
   const showGreen = value.trim().length > 0 && isValid;
 
   return (
     <div className="flex flex-col gap-2 font-sans">
-      <label className="text-[10px] tracking-wider uppercase font-semibold text-gray-500">{label}</label>
+      <label className="text-xs tracking-wider font-semibold text-gray-500">{label}</label>
       <div className="relative w-full">
         <input
           type={type}
@@ -192,7 +196,7 @@ function TextField({
           value={value}
           onChange={(event) => onChange(event.target.value)}
           placeholder={placeholder}
-          className={`w-full bg-white px-4 py-3 rounded-none text-xs sm:text-sm focus:outline-none transition-colors border ${
+          className={`w-full bg-white px-4 py-3 rounded-none text-xs sm:text-sm font-bold text-gray-900 focus:outline-none transition-colors border ${
             showRed
               ? 'border-red-500 text-red-900 bg-red-50/20 focus:border-red-600 ring-1 ring-red-500'
               : showGreen

@@ -178,7 +178,6 @@ export function useBookingWizard({ services, initialServiceId }: UseBookingWizar
     });
 
     if (!parsed.success) {
-      addToast(parsed.error.issues[0]?.message || 'Please complete all required patient information.', 'error');
       return false;
     }
 

@@ -146,7 +146,7 @@ export function BookingWizardView({ services, initialServiceId }: BookingWizardV
                 >
                   {step > 1 ? <Check className="w-3.5 h-3.5 stroke-[3]" /> : '1'}
                 </span>
-                <span>Select service</span>
+                <span>Service</span>
               </button>
 
               <ChevronRight className="w-4 h-4 text-gray-400 shrink-0" />
@@ -202,7 +202,7 @@ export function BookingWizardView({ services, initialServiceId }: BookingWizardV
                 >
                   3
                 </span>
-                <span>Patient details</span>
+                <span>Patient Information</span>
               </button>
             </div>
           </div>
@@ -230,7 +230,7 @@ export function BookingWizardView({ services, initialServiceId }: BookingWizardV
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200/60 pb-3">
                     <div>
                       <h2 className="font-serif text-xl sm:text-2xl font-medium text-gray-900">
-                        Select a service
+                        Service
                       </h2>
                       <p className="text-xs text-gray-500 font-sans mt-0.5">
                         Choose your required dental treatment to proceed.
@@ -317,9 +317,9 @@ export function BookingWizardView({ services, initialServiceId }: BookingWizardV
                       <button
                         type="button"
                         onClick={wizard.goToStep2}
-                        className="py-3 px-7 bg-[#1D1E1E] text-white rounded-none text-xs font-semibold tracking-widest uppercase hover:bg-[#D94E4E] transition-all duration-300 shadow-xs flex items-center gap-2 cursor-pointer"
+                        className="py-3 px-7 bg-[#1D1E1E] text-white rounded-none text-sm font-semibold tracking-widest hover:bg-[#D94E4E] transition-all duration-300 shadow-xs flex items-center gap-2 cursor-pointer"
                       >
-                        Next: Schedule slot <ArrowRight className="w-4 h-4" />
+                        Next: Schedule Slot <ArrowRight className="w-4 h-4" />
                       </button>
                     ) : (
                       <div className="text-xs text-gray-400 font-sans italic">Select a service above to proceed</div>
@@ -343,13 +343,13 @@ export function BookingWizardView({ services, initialServiceId }: BookingWizardV
                       Schedule
                     </h2>
                     <p className="text-xs text-gray-500 font-sans mt-0.5">
-                      Pick your preferred target date and time for your consultation.
+                      Pick your preferred target date and time for your appointment request.
                     </p>
                   </div>
 
                   {/* Date First */}
                   <div className="flex flex-col gap-2 font-sans">
-                    <label className="text-[10px] tracking-wider uppercase font-semibold text-gray-500">
+                    <label className="text-xs tracking-wider font-semibold text-gray-500">
                       Preferred Date *
                     </label>
                     <ContactCalendar
@@ -362,7 +362,7 @@ export function BookingWizardView({ services, initialServiceId }: BookingWizardV
                     />
                     {contactSection.targetDate && (
                       <div className="flex flex-col gap-1.5 mt-2">
-                        <label className="text-[10px] tracking-wider uppercase font-semibold text-gray-500">
+                        <label className="text-xs tracking-wider font-semibold text-gray-500">
                           Selected Date
                         </label>
                         <div className="w-full bg-white border border-[#E4E4DC] px-4 py-3 text-xs sm:text-sm font-semibold flex items-center justify-between">
@@ -394,18 +394,18 @@ export function BookingWizardView({ services, initialServiceId }: BookingWizardV
                     <button
                       type="button"
                       onClick={wizard.goToStep1}
-                      className="py-3 px-5 border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 transition-all text-xs font-semibold tracking-widest uppercase flex items-center gap-2 cursor-pointer"
+                      className="py-3 px-5 border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 transition-all text-sm font-semibold tracking-widest flex items-center gap-2 cursor-pointer"
                     >
-                      <ArrowLeft className="w-4 h-4" /> Back to services
+                      <ArrowLeft className="w-4 h-4" /> Back To Services
                     </button>
 
                     {contactSection.targetDate && fields.preferredStartTime ? (
                       <button
                         type="button"
                         onClick={wizard.goToStep3}
-                        className="py-3 px-7 bg-[#1D1E1E] text-white rounded-none text-xs font-semibold tracking-widest uppercase hover:bg-[#D94E4E] transition-all duration-300 shadow-xs flex items-center gap-2 cursor-pointer"
+                        className="py-3 px-7 bg-[#1D1E1E] text-white rounded-none text-sm font-semibold tracking-widest hover:bg-[#D94E4E] transition-all duration-300 shadow-xs flex items-center gap-2 cursor-pointer"
                       >
-                        Next: Patient details <ArrowRight className="w-4 h-4" />
+                        Next: Patient Information <ArrowRight className="w-4 h-4" />
                       </button>
                     ) : (
                       <div className="text-xs text-gray-400 font-sans italic">
@@ -430,58 +430,60 @@ export function BookingWizardView({ services, initialServiceId }: BookingWizardV
                 >
                   <div className="border-b border-gray-200/60 pb-3">
                     <h2 className="font-serif text-xl sm:text-2xl font-medium text-gray-900">
-                      Patient details
+                      Patient Information
                     </h2>
                     <p className="text-xs text-gray-500 font-sans mt-0.5">
-                      Review your appointment summary below and complete your official contact details to finalize your booking.
+                      Review your summary and complete your contact details below.
                     </p>
                   </div>
 
-                  {/* Redesigned Premium Summary Card */}
-                  <div className="bg-white border border-gray-200 p-4 sm:p-5 shadow-2xs font-sans">
-                    <div className="text-[10px] uppercase font-bold tracking-wider text-gray-400 mb-3 flex items-center gap-1.5">
-                      <Check className="w-3.5 h-3.5 text-emerald-600" />
-                      <span>Appointment Summary</span>
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-gray-50/70 p-3.5 border border-gray-100 text-xs">
-                      <div className="min-w-0">
-                        <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider block mb-0.5">Service</span>
+                  <div className="text-sm font-bold text-gray-900 mb-3">Request Summary</div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div className="flex flex-col gap-2 min-w-0">
+                      <span className="text-xs tracking-wider font-semibold text-gray-500">Service *</span>
+                      <div className="min-w-0 border border-gray-100 bg-white p-3.5 text-xs sm:text-sm">
                         <span className="font-bold text-gray-900 truncate block" title={selectedService?.name}>
                           {selectedService?.name}
                         </span>
                       </div>
-                      <div>
-                        <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider block mb-0.5">Preferred Date</span>
+                    </div>
+                    <div className="flex flex-col gap-2 min-w-0">
+                      <span className="text-xs tracking-wider font-semibold text-gray-500">Preferred Date *</span>
+                      <div className="min-w-0 border border-gray-100 bg-white p-3.5 text-xs sm:text-sm">
                         <span className="font-bold text-gray-900 block">
-                          {contactSection.targetDate
-                            ? new Date(contactSection.targetDate + 'T00:00:00').toLocaleDateString('en-US', {
-                                weekday: 'short',
-                                month: 'short',
-                                day: 'numeric',
-                                year: 'numeric',
-                              })
-                            : 'N/A'}
+                        {contactSection.targetDate
+                          ? new Date(contactSection.targetDate + 'T00:00:00').toLocaleDateString('en-US', {
+                              weekday: 'short',
+                              month: 'short',
+                              day: 'numeric',
+                              year: 'numeric',
+                            })
+                          : 'N/A'}
                         </span>
                       </div>
-                      <div>
-                        <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider block mb-0.5">Preferred Time</span>
+                    </div>
+                    <div className="flex flex-col gap-2 min-w-0">
+                      <span className="text-xs tracking-wider font-semibold text-gray-500">Preferred Time *</span>
+                      <div className="min-w-0 border border-gray-100 bg-white p-3.5 text-xs sm:text-sm">
                         <span className="font-bold text-gray-900 block">
-                          {fields.preferredStartTime
-                            ? fields.preferredStartTime.includes('AM') || fields.preferredStartTime.includes('PM')
-                              ? fields.preferredStartTime
-                              : (() => {
-                                  const [hStr, mStr] = fields.preferredStartTime.split(':');
-                                  const h = parseInt(hStr, 10);
-                                  if (isNaN(h)) return fields.preferredStartTime;
-                                  const period = h >= 12 ? 'PM' : 'AM';
-                                  const h12 = h % 12 === 0 ? 12 : h % 12;
-                                  return `${String(h12).padStart(2, '0')}:${mStr || '00'} ${period}`;
-                                })()
-                            : 'Flexible / Standard'}
+                        {fields.preferredStartTime
+                          ? fields.preferredStartTime.includes('AM') || fields.preferredStartTime.includes('PM')
+                            ? fields.preferredStartTime
+                            : (() => {
+                                const [hStr, mStr] = fields.preferredStartTime.split(':');
+                                const h = parseInt(hStr, 10);
+                                if (isNaN(h)) return fields.preferredStartTime;
+                                const period = h >= 12 ? 'PM' : 'AM';
+                                const h12 = h % 12 === 0 ? 12 : h % 12;
+                                return `${String(h12).padStart(2, '0')}:${mStr || '00'} ${period}`;
+                              })()
+                          : 'Flexible / Standard'}
                         </span>
                       </div>
                     </div>
                   </div>
+
+                  <div className="border-t border-gray-200/60" />
 
                   <NameFields fields={fields} touched={formTouched} />
                   <ContactFields fields={fields} phone={contactSection.phone} setPhone={contactSection.setPhone} touched={formTouched} />
@@ -492,9 +494,9 @@ export function BookingWizardView({ services, initialServiceId }: BookingWizardV
                       type="button"
                       onClick={wizard.goToStep2}
                       disabled={isSubmitting}
-                      className="py-3 px-5 border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 transition-all text-xs font-semibold tracking-widest uppercase flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                      className="py-3 px-5 border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 transition-all text-sm font-semibold tracking-widest flex items-center gap-2 cursor-pointer disabled:opacity-50"
                     >
-                      <ArrowLeft className="w-4 h-4" /> Back to schedule
+                      <ArrowLeft className="w-4 h-4" /> Back To Schedule
                     </button>
 
                     <button
@@ -504,13 +506,13 @@ export function BookingWizardView({ services, initialServiceId }: BookingWizardV
                         await contactSection.submitInquiry();
                       }}
                       disabled={isSubmitting}
-                      className="py-3 px-7 bg-[#1D1E1E] text-white rounded-none text-xs font-semibold tracking-widest uppercase hover:bg-[#D94E4E] transition-all duration-300 shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:pointer-events-none disabled:opacity-50"
+                      className="py-3 px-7 bg-[#1D1E1E] text-white rounded-none text-sm font-semibold tracking-widest hover:bg-[#D94E4E] transition-all duration-300 shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:pointer-events-none disabled:opacity-50"
                     >
                       {isSubmitting ? (
                         'Submitting Request...'
                       ) : (
                         <>
-                          Submit appointment request <Check className="w-4 h-4 ml-1" />
+                          Confirm & Submit Request <Check className="w-4 h-4 ml-1" />
                         </>
                       )}
                     </button>
@@ -543,7 +545,7 @@ export function BookingWizardView({ services, initialServiceId }: BookingWizardV
               <div className="pt-4">
                 <Link
                   href="/"
-                  className="px-6 py-3 bg-[#1D1E1E] hover:bg-[#D94E4E] text-white text-xs font-semibold uppercase tracking-widest transition-all shadow-sm inline-block"
+                  className="px-6 py-3 bg-[#1D1E1E] hover:bg-[#D94E4E] text-white text-sm font-semibold tracking-widest transition-all shadow-sm inline-block"
                 >
                   Return to home now
                 </Link>
