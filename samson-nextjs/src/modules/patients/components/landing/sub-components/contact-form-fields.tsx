@@ -50,18 +50,20 @@ export function NameFields({
         value={fields.firstName}
         onChange={fields.setFirstName}
         required
-        placeholder="Eleanor"
+        placeholder="e.g. Eleanor"
         touched={touched}
-        isValid={fields.firstName.trim().length > 0}
+        isValid={/^[A-Za-z\s'-]+$/.test(fields.firstName.trim()) && fields.firstName.trim().length > 0}
+        errorMessage="Enter your first name (letters only)."
       />
       <TextField
         label="Last Name *"
         value={fields.lastName}
         onChange={fields.setLastName}
         required
-        placeholder="Vance"
+        placeholder="e.g. Vance"
         touched={touched}
-        isValid={fields.lastName.trim().length > 0}
+        isValid={/^[A-Za-z\s'-]+$/.test(fields.lastName.trim()) && fields.lastName.trim().length > 0}
+        errorMessage="Enter your last name (letters only)."
       />
     </div>
   );
@@ -89,9 +91,10 @@ export function ContactFields({
         value={fields.contactEmail}
         onChange={fields.setContactEmail}
         required
-        placeholder="eleanor@domain.com"
+        placeholder="example@gmail.com"
         touched={touched}
         isValid={isEmailValid}
+        errorMessage="Please enter a valid email address."
       />
       <TextField
         label="Phone Number *"
@@ -102,6 +105,7 @@ export function ContactFields({
         placeholder="+1 (555) 000-0000"
         touched={touched}
         isValid={isPhoneValid}
+        errorMessage="Please enter a valid phone number."
       />
     </div>
   );
@@ -173,6 +177,7 @@ function TextField({
   placeholder = '',
   touched = false,
   isValid = false,
+  errorMessage = '',
 }: {
   label: string;
   value: string;
@@ -182,6 +187,7 @@ function TextField({
   placeholder?: string;
   touched?: boolean;
   isValid?: boolean;
+  errorMessage?: string;
 }) {
   const showRed = touched && required && (!value.trim() || !isValid);
   const showGreen = value.trim().length > 0 && isValid;
@@ -205,6 +211,9 @@ function TextField({
           }`}
         />
       </div>
+      {showRed && errorMessage && (
+        <span className="text-[11px] text-red-600 font-medium font-sans">{errorMessage}</span>
+      )}
     </div>
   );
 }

@@ -23,7 +23,7 @@ interface BookingWizardViewProps {
 
 export function BookingWizardView({ services, initialServiceId }: BookingWizardViewProps) {
   const wizard = useBookingWizard({ services, initialServiceId });
-  const { step, contactSection, fields, isSubmitting, redirectCountdown, selectService } = wizard;
+  const { step, contactSection, fields, isSubmitting, redirectCountdown, submittedReference, selectService } = wizard;
   const [filterType, setFilterType] = useState<'ALL' | 'GENERAL' | 'SPECIALIZED'>('ALL');
   const [formTouched, setFormTouched] = useState(false);
 
@@ -110,7 +110,8 @@ export function BookingWizardView({ services, initialServiceId }: BookingWizardV
   return (
     <div className="min-h-screen bg-[#FDFDFD] text-[#1D1E1E] flex flex-col justify-between">
       {/* Custom Integrated Header Navbar matching Homepage Navbar Height & Padding */}
-      <header className="sticky top-0 z-40 h-[76px] bg-white/95 backdrop-blur-md border-b border-gray-200/80 px-6 sm:px-12 py-4 flex items-center shadow-xs">
+      {!contactSection.submittedLocal && (
+        <header className="sticky top-0 z-40 h-[76px] bg-white/95 backdrop-blur-md border-b border-gray-200/80 px-6 sm:px-12 py-4 flex items-center shadow-xs">
         <div className="max-w-7xl mx-auto w-full flex items-center justify-between gap-4">
           {/* Left: Slightly Larger Return Link */}
           <Link
@@ -210,11 +211,12 @@ export function BookingWizardView({ services, initialServiceId }: BookingWizardV
           {/* Right Spacer to balance centering */}
           <div className="w-[90px] hidden sm:block pointer-events-none" />
         </div>
-      </header>
+        </header>
+      )}
 
       {/* Main Content Area */}
       <main className="max-w-4xl mx-auto w-full flex-grow flex flex-col justify-center py-8 sm:py-12 px-4">
-        <div className="bg-[#F9F9F6] border border-gray-200/70 p-6 sm:p-10 shadow-xs rounded-none">
+        <div className={contactSection.submittedLocal ? 'py-4' : 'bg-white border border-gray-200 p-6 sm:p-10 shadow-sm rounded-none'}>
           {!contactSection.submittedLocal ? (
             <AnimatePresence mode="wait">
               {/* STEP 1: Select Service Cards + Filter Switch */}
@@ -504,6 +506,7 @@ export function BookingWizardView({ services, initialServiceId }: BookingWizardV
                       onClick={async () => {
                         setFormTouched(true);
                         await contactSection.submitInquiry();
+                        if (contactSection.submittedLocal) window.scrollTo({ top: 0, behavior: 'smooth' });
                       }}
                       disabled={isSubmitting}
                       className="py-3 px-7 bg-[#1D1E1E] text-white rounded-none text-sm font-semibold tracking-widest hover:bg-[#D94E4E] transition-all duration-300 shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:pointer-events-none disabled:opacity-50"
@@ -521,34 +524,49 @@ export function BookingWizardView({ services, initialServiceId }: BookingWizardV
               )}
             </AnimatePresence>
           ) : (
-            /* Confirmation Screen with 10s Auto-Redirect */
+            /* Confirmation Screen */
             <motion.div
               key="success-card"
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               className="text-center py-12 space-y-4"
             >
-              <div className="w-16 h-16 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 mx-auto">
-                <CheckCircle2 className="w-8 h-8" />
-              </div>
-              <h3 className="font-serif text-2xl font-normal text-gray-900 mt-6">Appointment Request Confirmed!</h3>
-              <p className="text-sm font-light text-gray-600 max-w-md mx-auto leading-relaxed font-sans">
-                Thank you, <span className="font-medium text-gray-900">{fields.firstName} {fields.lastName}</span>. Our desk will confirm your appointment at <span className="font-medium text-gray-900">{contactSection.phone}</span> shortly.
-              </p>
+              <div className="bg-white border border-gray-200 p-4 pt-8 pb-8 sm:p-8 max-w-lg mx-auto font-sans space-y-4">
+                <div className="space-y-3 text-center">
+                  <div className="w-16 h-16 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 mx-auto">
+                    <CheckCircle2 className="w-8 h-8" />
+                  </div>
+                  <h2 className="font-serif text-2xl font-normal text-gray-900 text-center">Request Submitted Successfully!</h2>
+                  <p className="text-sm font-light text-gray-600 leading-relaxed">
+                    Thanks {fields.firstName}! Your booking request has been received and is currently under review by our team.
+                  </p>
 
-              {redirectCountdown !== null && (
-                <div className="bg-gray-100 border border-gray-200/80 p-3 max-w-sm mx-auto text-xs text-gray-600 font-sans mt-4">
-                  Redirecting to homepage in <span className="font-bold text-[#D94E4E]">{redirectCountdown} seconds</span>...
+                  {submittedReference && (
+                    <div className="text-sm font-semibold text-gray-800">
+                      Ref ID: {submittedReference}
+                    </div>
+                  )}
                 </div>
-              )}
 
-              <div className="pt-4">
-                <Link
-                  href="/"
-                  className="px-6 py-3 bg-[#1D1E1E] hover:bg-[#D94E4E] text-white text-sm font-semibold tracking-widest transition-all shadow-sm inline-block"
-                >
-                  Return to home now
-                </Link>
+                <div className="pt-4 border-t border-gray-200/80">
+                  <span className="text-xs text-gray-500 font-sans">
+                    Need immediate help? Call us at <span className="font-semibold text-gray-800">(02) 8123-4567</span>.
+                  </span>
+                </div>
+
+                <div className="pt-4 border-t border-gray-200/80 flex flex-col items-center gap-3">
+                  <Link
+                    href="/"
+                    className="px-6 py-3 bg-[#1D1E1E] hover:bg-[#D94E4E] text-white text-sm font-semibold tracking-widest transition-all shadow-sm inline-block"
+                  >
+                    Return to Home
+                  </Link>
+                  {redirectCountdown !== null && (
+                    <p className="text-xs text-gray-500 font-sans">
+                      Redirecting to homepage in <span className="font-bold text-[#D94E4E]">{redirectCountdown} seconds</span>...
+                    </p>
+                  )}
+                </div>
               </div>
             </motion.div>
           )}
@@ -556,9 +574,11 @@ export function BookingWizardView({ services, initialServiceId }: BookingWizardV
       </main>
 
       {/* Footer */}
-      <footer className="py-4 text-center text-xs text-gray-400 font-sans border-t border-gray-200/40">
-        © {new Date().getFullYear()} Samson Dental Center. All rights reserved.
-      </footer>
+      {!contactSection.submittedLocal && (
+        <footer className="py-4 text-center text-xs text-gray-400 font-sans border-t border-gray-200/40">
+          © {new Date().getFullYear()} Samson Dental Center. All rights reserved.
+        </footer>
+      )}
     </div>
   );
 }

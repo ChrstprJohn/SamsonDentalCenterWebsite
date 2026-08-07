@@ -36,6 +36,7 @@ export function useBookingWizard({ services, initialServiceId }: UseBookingWizar
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [maxReachedStep, setMaxReachedStep] = useState<1 | 2 | 3>(1);
   const [redirectCountdown, setRedirectCountdown] = useState<number | null>(null);
+  const [submittedReference, setSubmittedReference] = useState<string | null>(null);
   const { addToast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
@@ -215,7 +216,8 @@ export function useBookingWizard({ services, initialServiceId }: UseBookingWizar
       if (res.success) {
         addToast('Your appointment request has been successfully submitted!', 'success');
         setIsSubmitting(false);
-        setRedirectCountdown(10);
+        setSubmittedReference(res.data?.id ? `REF-${res.data.id.replace(/-/g, '').slice(-8).toUpperCase()}` : null);
+        setRedirectCountdown(15);
         return true;
       }
 
@@ -238,6 +240,7 @@ export function useBookingWizard({ services, initialServiceId }: UseBookingWizar
     handleStepClick,
     selectService,
     redirectCountdown,
+    submittedReference,
     services,
     contactSection,
     isSubmitting,
