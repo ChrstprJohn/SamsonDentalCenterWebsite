@@ -65,7 +65,7 @@ export function RenderedEmailFrame({ eventType, payload }: RenderedEmailFramePro
     element = <SignupOtpEmail firstName={patientName} otpCode={otpCode} />;
   } else if (eventType === 'PASSWORD_RESET_REQUESTED') {
     element = <ResetPasswordOtpEmail firstName={patientName} otpCode={otpCode} />;
-  } else if (eventType === 'APPOINTMENT_BOOKED' || eventType === 'APPOINTMENT_INQUIRY_RECEIVED' || eventType === 'INQUIRY_RECEIVED' || eventType.includes('REQUEST_RECEIVED')) {
+  } else if (eventType === 'APPOINTMENT_INQUIRY_RECEIVED' || eventType === 'INQUIRY_RECEIVED' || eventType.includes('REQUEST_RECEIVED')) {
     if (eventType === 'REJECT_INQUIRY') {
       element = (
         <RequestRejectedEmail
