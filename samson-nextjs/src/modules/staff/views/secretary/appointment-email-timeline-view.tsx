@@ -14,7 +14,17 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
-import { Mail, RotateCw, ChevronRight, UserRound } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Select } from '@/components/ui/select';
+import { useToast } from '@/components/feedback/toast-container';
+import { resendNotificationAction } from '@/modules/appointments/actions/status/resend-notification.action';
+import { updateConfirmationChannelAction } from '@/modules/appointments/actions/status/update-confirmation-channel.action';
+import { Pencil, X, Check, Send, ChevronDown, Mail, RotateCw, ChevronRight, UserRound } from 'lucide-react';
 import { RenderedEmailFrame } from '@/components/emails/email-renderer';
 import { getOutboxLogByIdAction } from '@/modules/emails/actions/logs/get-outbox-log-by-id.action';
 import { SecretaryListSkeleton, SecretaryListSkeletonTheme, SecretaryRefreshBar } from './sub-components/secretary-list-skeleton';
@@ -397,24 +407,98 @@ export function AppointmentEmailTimelineView() {
     refreshTimeline,
   } = useAppointmentEmailTimeline();
 
+  const { addToast } = useToast();
   const [mobileView, setMobileView] = useState<'list' | 'timeline'>('list');
+
+  // Channel edit & Send notification states
+  const [isEditingChannel, setIsEditingChannel] = useState(false);
+  const [isSavingChannel, setIsSavingChannel] = useState(false);
+  const [currentChannel, setCurrentChannel] = useState<'EMAIL' | 'SMS' | 'BOTH' | 'NONE'>('EMAIL');
+  const [draftChannel, setDraftChannel] = useState<'EMAIL' | 'SMS' | 'BOTH' | 'NONE'>('EMAIL');
+  const [isTriggeringNotification, setIsTriggeringNotification] = useState<string | null>(null);
 
   const filteredCards = appointmentCards;
 
   const handleSelect = (id: string) => {
     setSelectedAppointmentId(id);
     setMobileView('timeline');
+    setIsEditingChannel(false);
   };
 
   const handleSearch = (value: string) => {
     setSearchTerm(value);
     setSelectedAppointmentId(null);
     setMobileView('list');
+    setIsEditingChannel(false);
   };
 
   const selectedCard = appointmentCards.find((a) => a.id === selectedAppointmentId);
   const patientName = selectedCard?.patientName ?? '';
   const treatmentName = selectedAppointment?.treatmentName ?? '';
+
+  // Sync current channel state when selected appointment changes by fetching actual DB value
+  React.useEffect(() => {
+    let cancelled = false;
+    if (selectedAppointmentId) {
+      import('@/shared/database/client').then(({ createClient }) => {
+        const supabase = createClient();
+        supabase
+          .from('appointments')
+          .select('confirmation_channel')
+          .eq('id', selectedAppointmentId)
+          .single()
+          .then(({ data }) => {
+            if (cancelled) return;
+            const ch = (data?.confirmation_channel as any) || 'EMAIL';
+            setCurrentChannel(ch);
+            setDraftChannel(ch);
+          });
+      });
+    }
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedAppointmentId]);
+
+  const handleSaveChannel = async () => {
+    if (!selectedAppointmentId) return;
+    setIsSavingChannel(true);
+    const res = await updateConfirmationChannelAction({
+      appointmentId: selectedAppointmentId,
+      confirmationChannel: draftChannel,
+    });
+    if (res.success) {
+      addToast('Notification channel updated.', 'success');
+      setCurrentChannel(draftChannel);
+      if (selectedAppointment) {
+        (selectedAppointment as any).confirmationChannel = draftChannel;
+      }
+      setIsEditingChannel(false);
+      refresh({ force: true });
+    } else {
+      addToast(res.error || 'Failed to update notification channel.', 'error');
+    }
+    setIsSavingChannel(false);
+  };
+
+  const handleTriggerNotification = async (
+    eventType: 'APPOINTMENT_BOOKED' | 'APPOINTMENT_REMINDER_48H' | 'APPOINTMENT_REMINDER_24H' | 'APPOINTMENT_CHECKOUT' | 'APPOINTMENT_INQUIRY_RECEIVED' | 'CANCEL_BOOKING' | 'RESCHEDULE_BOOKING'
+  ) => {
+    if (!selectedAppointmentId) return;
+    setIsTriggeringNotification(eventType);
+    const res = await resendNotificationAction({
+      appointmentId: selectedAppointmentId,
+      eventType,
+    });
+    if (res.success) {
+      addToast('Notification sent successfully.', 'success');
+      refreshTimeline?.();
+      refresh({ force: true });
+    } else {
+      addToast(res.error || 'Failed to send notification.', 'error');
+    }
+    setIsTriggeringNotification(null);
+  };
 
   return (
     <div className="flex h-full w-full overflow-hidden">
@@ -582,25 +666,130 @@ export function AppointmentEmailTimelineView() {
               >
                 &larr; Back to appointments
               </button>
-              <div className="flex items-center justify-between gap-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="min-w-0">
                   <h3 className="text-base font-semibold text-foreground">Communication Details</h3>
                   <p className="text-[11px] text-muted-foreground mt-0.5 truncate">
                     {patientName} &middot; {treatmentName}
                   </p>
                 </div>
-                <div className="flex items-center gap-2 shrink-0">
+
+                <div className="flex flex-wrap items-center gap-2 shrink-0">
                   {isLoadingLogs && <RotateCw className="size-3.5 text-muted-foreground animate-spin" />}
-                  {selectedCard?.channelsUsed.email && (
-                    <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-blue-500/10 text-blue-600 border border-blue-500/20 shadow-2xs">
-                      Email
-                    </span>
-                  )}
-                  {selectedCard?.channelsUsed.sms && (
-                    <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-purple-500/10 text-purple-600 border border-purple-500/20 shadow-2xs">
-                      SMS
-                    </span>
-                  )}
+
+                  {/* Channel Edit / Display */}
+                  <div className="flex items-center gap-1.5 bg-muted/30 border border-card-border/60 rounded-lg px-2.5 py-1 text-xs">
+                    <span className="text-[11px] text-muted-foreground font-medium">Channel:</span>
+                    {isEditingChannel ? (
+                      <div className="flex items-center gap-1.5">
+                        <Select
+                          value={draftChannel}
+                          onChange={(e) => setDraftChannel(e.target.value as any)}
+                          className="text-xs h-6 px-1.5 py-0 w-24 border-card-border/80"
+                          options={[
+                            { value: 'EMAIL', label: 'Email' },
+                            { value: 'SMS', label: 'SMS' },
+                            { value: 'BOTH', label: 'Email & SMS' },
+                            { value: 'NONE', label: 'None' },
+                          ]}
+                        />
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => { setDraftChannel(currentChannel); setIsEditingChannel(false); }}
+                          className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
+                          title="Cancel"
+                        >
+                          <X className="size-3" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          onClick={handleSaveChannel}
+                          disabled={isSavingChannel || draftChannel === currentChannel}
+                          className="h-6 px-2 text-[10px] gap-1 bg-slate-900 text-white rounded-md disabled:cursor-not-allowed"
+                        >
+                          <Check className="size-3" /> {isSavingChannel ? '...' : 'Save'}
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-semibold text-foreground">
+                          {currentChannel === 'EMAIL' ? 'Email' : currentChannel === 'SMS' ? 'SMS' : currentChannel === 'BOTH' ? 'Email & SMS' : 'None'}
+                        </span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setIsEditingChannel(true)}
+                          className="h-5 px-1 text-[10px] gap-1 text-muted-foreground hover:text-foreground"
+                        >
+                          <Pencil className="size-3" /> Edit
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Trigger Notification Dropdown */}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        size="sm"
+                        disabled={currentChannel === 'NONE' || Boolean(isTriggeringNotification)}
+                        className="h-8 px-3 text-xs gap-1.5 bg-primary text-primary-foreground font-medium rounded-lg shadow-2xs disabled:opacity-50"
+                      >
+                        {isTriggeringNotification ? (
+                          <RotateCw className="size-3.5 animate-spin" />
+                        ) : (
+                          <Send className="size-3.5" />
+                        )}
+                        <span>{isTriggeringNotification ? 'Sending...' : 'Send Notification'}</span>
+                        <ChevronDown className="size-3 opacity-70" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-56">
+                      <DropdownMenuItem
+                        onClick={() => handleTriggerNotification('APPOINTMENT_BOOKED')}
+                        className="text-xs gap-2 cursor-pointer"
+                      >
+                        <span>📧 Booking Confirmation</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleTriggerNotification('APPOINTMENT_REMINDER_48H')}
+                        className="text-xs gap-2 cursor-pointer"
+                      >
+                        <span>⏰ 48-Hour Reminder</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleTriggerNotification('APPOINTMENT_REMINDER_24H')}
+                        className="text-xs gap-2 cursor-pointer"
+                      >
+                        <span>⏰ 24-Hour Reminder</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleTriggerNotification('APPOINTMENT_CHECKOUT')}
+                        className="text-xs gap-2 cursor-pointer"
+                      >
+                        <span>✨ Checkout / Thank You</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleTriggerNotification('APPOINTMENT_INQUIRY_RECEIVED')}
+                        className="text-xs gap-2 cursor-pointer"
+                      >
+                        <span>📩 Inquiry Request Received</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleTriggerNotification('CANCEL_BOOKING')}
+                        className="text-xs gap-2 cursor-pointer text-rose-600 focus:text-rose-600"
+                      >
+                        <span>🚫 Cancellation Notice</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleTriggerNotification('RESCHEDULE_BOOKING')}
+                        className="text-xs gap-2 cursor-pointer"
+                      >
+                        <span>📅 Reschedule Notice</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </div>
             </div>
