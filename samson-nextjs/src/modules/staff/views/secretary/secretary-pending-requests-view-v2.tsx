@@ -13,8 +13,11 @@ import {
   ArrowLeft,
   Check,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   ClipboardList,
   Mail,
+  MoreHorizontal,
   Pencil,
   RotateCw,
   UserRound,
@@ -24,6 +27,41 @@ import { useToast } from '@/components/feedback/toast-container';
 import { resendInquiryNotificationAction } from '@/modules/appointments/actions/booking/resend-inquiry-notification.action';
 import { getEmailLogsByInquiryAction } from '@/modules/emails/actions/logs/get-email-logs-by-inquiry.action';
 import type { OutboxLogResponseDto } from '@/modules/emails/dtos/logs/outbox-log-response.dto';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+
+const EVENT_NAME_MAP: Record<string, string> = {
+  'APPOINTMENT_INQUIRY_RECEIVED': 'Inquiry Request Received',
+  'REJECT_INQUIRY': 'Request Rejection',
+};
+
+const badgeClassFor = (status: string) =>
+  status === 'SENT'
+    ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400'
+    : status === 'FAILED'
+    ? 'bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400'
+    : status === 'PENDING'
+    ? 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400'
+    : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400';
+
+function formatTimeFull(dateStr: string) {
+  try {
+    const d = new Date(dateStr);
+    return d.toLocaleDateString([], {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  } catch {
+    return '';
+  }
+}
 
 function getServiceName(services: { id: string; name: string }[], serviceId: string): string {
   if (!serviceId) return 'No service selected';
@@ -54,6 +92,7 @@ const COMMON_REASONS = [
 
 export function SecretaryPendingRequestsViewV2() {
   const inquiriesView = useSecretaryInquiriesQueue();
+  const [detailTab, setDetailTab] = React.useState<'overview' | 'notifications' | 'timeline'>('overview');
   const [approvalReason, setApprovalReason] = React.useState('');
   const [mobileView, setMobileView] = React.useState<'list' | 'detail' | 'quickLogs'>('list');
   const [isEditingPatient, setIsEditingPatient] = React.useState(false);
@@ -66,6 +105,32 @@ export function SecretaryPendingRequestsViewV2() {
   const [inquiryLogs, setInquiryLogs] = React.useState<OutboxLogResponseDto[]>([]);
   const [loadingInquiryLogs, setLoadingInquiryLogs] = React.useState(false);
   const [allowOverrideResend, setAllowOverrideResend] = React.useState(false);
+  const [logPage, setLogPage] = React.useState(1);
+
+  const TABS = [
+    { key: 'overview' as const, label: 'Overview' },
+    { key: 'notifications' as const, label: 'Notifications' },
+    { key: 'timeline' as const, label: 'Timeline' },
+  ];
+
+  const activeIndex = TABS.findIndex((t) => t.key === detailTab);
+  const [tabOffsets, setTabOffsets] = React.useState<{ left: number; width: number }>({ left: 0, width: 0 });
+
+  const tabRef0 = React.useRef<HTMLButtonElement | null>(null);
+  const tabRef1 = React.useRef<HTMLButtonElement | null>(null);
+  const tabRef2 = React.useRef<HTMLButtonElement | null>(null);
+
+  const tabRefs = React.useMemo(() => [tabRef0, tabRef1, tabRef2], []);
+
+  React.useEffect(() => {
+    const currentBtn = tabRefs[activeIndex]?.current;
+    if (currentBtn) {
+      setTabOffsets({
+        left: currentBtn.offsetLeft,
+        width: currentBtn.offsetWidth,
+      });
+    }
+  }, [detailTab, activeIndex, tabRefs]);
 
   const fetchInquiryLogs = React.useCallback(async (inquiryId: string, showLoading = true) => {
     if (showLoading) setLoadingInquiryLogs(true);
@@ -77,12 +142,39 @@ export function SecretaryPendingRequestsViewV2() {
   }, []);
 
   React.useEffect(() => {
+    setLogPage(1);
     if (inquiriesView.selectedInquiryId) {
       fetchInquiryLogs(inquiriesView.selectedInquiryId, true);
     } else {
       setInquiryLogs([]);
     }
   }, [inquiriesView.selectedInquiryId, fetchInquiryLogs]);
+
+  const timelineEntries = React.useMemo(() => {
+    return inquiryLogs.map((log) => {
+      const fallbackEmail = inquiriesView.guestEmail || '';
+      const rawRecipient = (log as any).recipient || log.payload?.to || log.payload?.recipient || log.payload?.email || log.payload?.guestEmail || '';
+      const finalRecipient = rawRecipient && rawRecipient !== 'system' ? rawRecipient : (fallbackEmail || 'System Automated Dispatch');
+
+      return {
+        id: log.id,
+        channel: 'EMAIL' as const,
+        eventType: log.eventType,
+        status: log.status === 'PROCESSED' ? 'SENT' : log.status === 'FAILED' ? 'FAILED' : 'PENDING',
+        rawStatus: log.status,
+        recipient: finalRecipient,
+        timestamp: log.createdAt,
+        retryCount: log.retryCount || 0,
+        errorLogs: log.errorLogs || null,
+        payload: log.payload,
+      };
+    });
+  }, [inquiryLogs, inquiriesView.guestEmail]);
+
+  const LOGS_PER_PAGE = 7;
+  const totalLogPages = Math.ceil(timelineEntries.length / LOGS_PER_PAGE) || 1;
+  const startIndex = (logPage - 1) * LOGS_PER_PAGE;
+  const paginatedEntries = timelineEntries.slice(startIndex, startIndex + LOGS_PER_PAGE);
 
   const handleResendInquiryEmail = async () => {
     if (!inquiriesView.selectedInquiry?.id) return;
@@ -401,10 +493,45 @@ export function SecretaryPendingRequestsViewV2() {
                 <span className="text-[10px] leading-none">Notes</span>
               </button>
             </div>
-            <div className="flex-1 !overflow-y-auto max-md:px-5 px-5 space-y-0 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
-              style={{ scrollbarWidth: 'thin' }}
-              data-lenis-prevent
-            >
+
+            {/* Sub-Header Tabs matching AppointmentDetailPane */}
+            <div className="shrink-0 border-b border-card-border/40 px-5 bg-sidebar">
+              <div className="relative flex gap-6">
+                {TABS.map((tab, idx) => {
+                  const isActive = detailTab === tab.key;
+                  return (
+                    <button
+                      key={tab.key}
+                      ref={tabRefs[idx]}
+                      onClick={() => setDetailTab(tab.key)}
+                      className={`py-2.5 text-xs xl:text-sm font-medium transition-colors ${
+                        isActive
+                          ? 'text-primary font-semibold'
+                          : 'text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  );
+                })}
+                {/* Sliding underline indicator */}
+                <div
+                  className="absolute bottom-0 h-0.5 bg-primary transition-all duration-300 ease-in-out"
+                  style={{
+                    left: `${tabOffsets.left}px`,
+                    width: `${tabOffsets.width}px`,
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Tab 1: OVERVIEW */}
+            {detailTab === 'overview' && (
+              <>
+                <div className="flex-1 !overflow-y-auto max-md:px-5 px-5 space-y-0 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent animate-in fade-in duration-200"
+                  style={{ scrollbarWidth: 'thin' }}
+                  data-lenis-prevent
+                >
                   <div className="flex flex-col items-center pt-4 pb-3">
                     <div className="size-12 shrink-0 rounded-full bg-muted-foreground/10 flex items-center justify-center border-2 border-border/60 overflow-hidden mb-3">
                       <UserRound className="size-10 text-muted-foreground/70 translate-y-0.5" />
@@ -434,159 +561,6 @@ export function SecretaryPendingRequestsViewV2() {
                         {inquiriesView.selectedInquiry?.status === 'NEW' ? 'NEW / PENDING' : inquiriesView.selectedInquiry?.status === 'CONVERTED' ? 'CONVERTED / APPROVED' : 'DROPPED / REJECTED'}
                       </Badge>
                     </div>
-
-                  <hr className="border-card-border/40" />
-
-                  {/* Section: Notification History */}
-                  <div className="py-4 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-foreground block">Notification History</span>
-                      <Label className="flex items-center gap-1.5 text-[11px] text-muted-foreground cursor-pointer select-none">
-                        <span>Manual Resend</span>
-                        <Switch
-                          checked={allowOverrideResend}
-                          onCheckedChange={setAllowOverrideResend}
-                          className="scale-75 shadow-none"
-                        />
-                      </Label>
-                    </div>
-
-                    {/* Entry 1: Inquiry Request Received */}
-                    {(() => {
-                      const inquiryLog = inquiryLogs.find((l) => l.eventType === 'APPOINTMENT_INQUIRY_RECEIVED');
-                      const statusLabel = loadingInquiryLogs
-                        ? 'LOADING...'
-                        : inquiryLog
-                          ? (inquiryLog.status === 'PROCESSED' ? 'SENT' : inquiryLog.status === 'FAILED' ? 'FAILED' : 'PENDING')
-                          : (inquiriesView.selectedInquiry?.status === 'NEW' ? 'NOT SENT' : 'NOT APPLICABLE');
-
-                      const badgeClass = loadingInquiryLogs
-                        ? 'bg-muted text-muted-foreground/60 animate-pulse'
-                        : statusLabel === 'SENT'
-                          ? 'bg-green-500/10 text-green-500'
-                          : statusLabel === 'FAILED'
-                            ? 'bg-rose-500/10 text-rose-600'
-                            : statusLabel === 'PENDING'
-                              ? 'bg-muted text-muted-foreground/60'
-                              : 'bg-slate-500/10 text-slate-500 dark:text-slate-400';
-
-                      const isSendingThis = resendingEventType === 'APPOINTMENT_INQUIRY_RECEIVED';
-                      const btnLabel = loadingInquiryLogs
-                        ? 'Loading...'
-                        : isSendingThis
-                          ? 'Sending...'
-                          : statusLabel === 'SENT'
-                            ? 'Send New'
-                            : statusLabel === 'FAILED'
-                              ? 'Retry'
-                              : statusLabel === 'PENDING'
-                                ? 'Send Now'
-                                : statusLabel === 'NOT SENT' && inquiriesView.selectedInquiry?.status === 'NEW'
-                                  ? 'Send Email'
-                                  : 'Force Send';
-
-                      const isAllowed = !loadingInquiryLogs && !resendingEventType && (
-                        (Boolean(inquiryLog) && (statusLabel === 'PENDING' || statusLabel === 'FAILED')) ||
-                        (statusLabel === 'NOT SENT' && inquiriesView.selectedInquiry?.status === 'NEW') ||
-                        allowOverrideResend
-                      );
-
-                      return (
-                        <div className="space-y-1.5">
-                          <span className="text-xs text-muted-foreground">Inquiry Request Received</span>
-                          <div className="flex flex-col gap-2">
-                            <div className="flex items-center justify-between p-3 rounded-xl bg-secondary-bg/20 border border-card-border/60">
-                              <div className="flex items-center gap-2 min-w-0">
-                                <Mail className="size-3.5 text-muted-foreground shrink-0" />
-                                <span className="text-sm text-foreground">Email</span>
-                                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded shrink-0 ${badgeClass}`}>
-                                  {statusLabel}
-                                </span>
-                              </div>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                disabled={!isAllowed}
-                                onClick={handleResendInquiryEmail}
-                                className="text-[10px] h-7 px-2.5 gap-1 shrink-0 disabled:opacity-40 disabled:cursor-not-allowed"
-                              >
-                                <RotateCw className={`size-3 ${loadingInquiryLogs || isSendingThis ? 'animate-spin' : ''}`} />
-                                {btnLabel}
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })()}
-
-                    {/* Entry 2: Request Rejection */}
-                    {(() => {
-                      const rejectionLog = inquiryLogs.find((l) => l.eventType === 'REJECT_INQUIRY');
-                      const statusLabel = loadingInquiryLogs
-                        ? 'LOADING...'
-                        : rejectionLog
-                          ? (rejectionLog.status === 'PROCESSED' ? 'SENT' : rejectionLog.status === 'FAILED' ? 'FAILED' : 'PENDING')
-                          : (inquiriesView.selectedInquiry?.status === 'DROPPED' ? 'NOT SENT' : 'NOT APPLICABLE');
-
-                      const badgeClass = loadingInquiryLogs
-                        ? 'bg-muted text-muted-foreground/60 animate-pulse'
-                        : statusLabel === 'SENT'
-                          ? 'bg-green-500/10 text-green-500'
-                          : statusLabel === 'FAILED'
-                            ? 'bg-rose-500/10 text-rose-600'
-                            : statusLabel === 'PENDING'
-                              ? 'bg-muted text-muted-foreground/60'
-                              : 'bg-slate-500/10 text-slate-500 dark:text-slate-400';
-
-                      const isSendingThis = resendingEventType === 'REJECT_INQUIRY';
-                      const btnLabel = loadingInquiryLogs
-                        ? 'Loading...'
-                        : isSendingThis
-                          ? 'Sending...'
-                          : statusLabel === 'SENT'
-                            ? 'Send New'
-                            : statusLabel === 'FAILED'
-                              ? 'Retry'
-                              : statusLabel === 'PENDING'
-                                ? 'Send Now'
-                                : statusLabel === 'NOT SENT' && inquiriesView.selectedInquiry?.status === 'DROPPED'
-                                  ? 'Send Rejection'
-                                  : 'Force Send';
-
-                      const isAllowed = !loadingInquiryLogs && !resendingEventType && (
-                        (Boolean(rejectionLog) && (statusLabel === 'PENDING' || statusLabel === 'FAILED')) ||
-                        (statusLabel === 'NOT SENT' && inquiriesView.selectedInquiry?.status === 'DROPPED') ||
-                        allowOverrideResend
-                      );
-
-                      return (
-                        <div className="space-y-1.5">
-                          <span className="text-xs text-muted-foreground">Request Rejection</span>
-                          <div className="flex flex-col gap-2">
-                            <div className="flex items-center justify-between p-3 rounded-xl bg-secondary-bg/20 border border-card-border/60">
-                              <div className="flex items-center gap-2 min-w-0">
-                                <Mail className="size-3.5 text-muted-foreground shrink-0" />
-                                <span className="text-sm text-foreground">Email</span>
-                                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded shrink-0 ${badgeClass}`}>
-                                  {statusLabel}
-                                </span>
-                              </div>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                disabled={!isAllowed}
-                                onClick={handleResendRejectionEmail}
-                                className="text-[10px] h-7 px-2.5 gap-1 shrink-0 border-rose-200 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/20 disabled:opacity-40 disabled:cursor-not-allowed"
-                              >
-                                <RotateCw className={`size-3 ${loadingInquiryLogs || isSendingThis ? 'animate-spin' : ''}`} />
-                                {btnLabel}
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })()}
-                  </div>
                   </div>
 
                   <hr className="border-card-border/40" />
@@ -818,42 +792,288 @@ export function SecretaryPendingRequestsViewV2() {
                       </div>
                     )}
                   </div>
+                </div>
 
-                  <hr className="border-card-border/40" />
+                {/* Section 3: Master Action Bar */}
+                {inquiriesView.selectedInquiry?.status === 'NEW' && (
+                  <div className="border-t border-card-border/40 px-5 py-4 shrink-0 bg-sidebar">
+                    <div className="flex flex-col gap-3">
+                      {isEditing && (
+                        <p className="text-xs text-muted-foreground">Press Save to apply changes before approving or rejecting</p>
+                      )}
+                      {!isEditing && !isReady && (
+                        <p className="text-xs text-muted-foreground">Fill the required fields to enable approval</p>
+                      )}
+                      <div className="flex gap-3">
+                        <Button
+                          variant="default"
+                          size="default"
+                          disabled={isEditing || !isReady}
+                          className="flex-1 py-3 text-sm font-semibold shadow-sm !from-slate-900 !to-slate-900 !text-white hover:!from-slate-800 hover:!to-slate-800 disabled:!from-slate-400 disabled:!to-slate-400"
+                          onClick={() => { inquiriesView.setDecision('CONVERT'); setApprovalReason(''); }}
+                        >
+                          Approve/Convert
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="default"
+                          disabled={isEditing}
+                          className="flex-1 border-red-200 text-red-700 hover:bg-red-50 h-auto py-3 text-sm"
+                          onClick={() => { inquiriesView.setDecision('DROP'); setApprovalReason(''); }}
+                        >
+                          Reject/Drop
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
 
-            </div>
+            {/* Tab 2: NOTIFICATIONS */}
+            {detailTab === 'notifications' && (
+              <div className="flex-1 !overflow-y-auto p-4 space-y-6 text-sm [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent animate-in fade-in duration-200"
+                style={{ scrollbarWidth: 'thin' }}
+                data-lenis-prevent
+              >
+                {/* Section 1: Notification Lifecycle */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-foreground block">Notification Lifecycle</span>
+                    <Label className="flex items-center gap-1.5 text-[11px] text-muted-foreground cursor-pointer select-none">
+                      <span>Manual Resend</span>
+                      <Switch
+                        checked={allowOverrideResend}
+                        onCheckedChange={setAllowOverrideResend}
+                        className="scale-75 shadow-none"
+                      />
+                    </Label>
+                  </div>
 
-            {/* Section 3: Master Action Bar */}
-            {inquiriesView.selectedInquiry?.status === 'NEW' && (
-              <div className="border-t border-card-border/40 px-5 py-4 shrink-0">
-                <div className="flex flex-col gap-3">
-                  {isEditing && (
-                    <p className="text-xs text-muted-foreground">Press Save to apply changes before approving or rejecting</p>
-                  )}
-                  {!isEditing && !isReady && (
-                    <p className="text-xs text-muted-foreground">Fill the required fields to enable approval</p>
-                  )}
-                  <div className="flex gap-3">
-                    <Button
-                      variant="default"
-                      size="default"
-                      disabled={isEditing || !isReady}
-                      className="flex-1 py-3 text-sm font-semibold shadow-sm !from-slate-900 !to-slate-900 !text-white hover:!from-slate-800 hover:!to-slate-800 disabled:!from-slate-400 disabled:!to-slate-400"
-                      onClick={() => { inquiriesView.setDecision('CONVERT'); setApprovalReason(''); }}
-                    >
-                      Approve/Convert
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="default"
-                      disabled={isEditing}
-                      className="flex-1 border-red-200 text-red-700 hover:bg-red-50 h-auto py-3 text-sm"
-                      onClick={() => { inquiriesView.setDecision('DROP'); setApprovalReason(''); }}
-                    >
-                      Reject/Drop
-                    </Button>
+                  <div className="relative pl-4 space-y-4 pt-1 before:absolute before:left-1.5 before:top-3.5 before:bottom-3.5 before:w-0.5 before:bg-card-border/60">
+                    {[
+                      { eventType: 'APPOINTMENT_INQUIRY_RECEIVED', label: 'Inquiry Request Received' },
+                      { eventType: 'REJECT_INQUIRY', label: 'Request Rejection' },
+                    ].map((type) => {
+                      const inquiryLog = inquiryLogs.find((l) => l.eventType === type.eventType);
+                      const statusLabel = loadingInquiryLogs
+                        ? 'LOADING...'
+                        : inquiryLog
+                          ? (inquiryLog.status === 'PROCESSED' ? 'SENT' : inquiryLog.status === 'FAILED' ? 'FAILED' : 'PENDING')
+                          : type.eventType === 'APPOINTMENT_INQUIRY_RECEIVED'
+                            ? (inquiriesView.selectedInquiry?.status === 'NEW' ? 'NOT SENT' : 'NOT APPLICABLE')
+                            : (inquiriesView.selectedInquiry?.status === 'DROPPED' ? 'NOT SENT' : 'NOT APPLICABLE');
+
+                      const badgeClass = loadingInquiryLogs
+                        ? 'bg-muted text-muted-foreground/60 animate-pulse'
+                        : badgeClassFor(statusLabel);
+
+                      const isSent = statusLabel === 'SENT';
+                      const isFailed = statusLabel === 'FAILED';
+                      const isSkipped = statusLabel === 'NOT APPLICABLE';
+
+                      const isSendingThis = resendingEventType === type.eventType;
+                      const isAllowed = !loadingInquiryLogs && !resendingEventType && (
+                        (Boolean(inquiryLog) && (statusLabel === 'PENDING' || statusLabel === 'FAILED')) ||
+                        (type.eventType === 'APPOINTMENT_INQUIRY_RECEIVED' && statusLabel === 'NOT SENT' && inquiriesView.selectedInquiry?.status === 'NEW') ||
+                        (type.eventType === 'REJECT_INQUIRY' && statusLabel === 'NOT SENT' && inquiriesView.selectedInquiry?.status === 'DROPPED') ||
+                        allowOverrideResend
+                      );
+
+                      const triggerAction = type.eventType === 'APPOINTMENT_INQUIRY_RECEIVED'
+                        ? handleResendInquiryEmail
+                        : handleResendRejectionEmail;
+
+                      return (
+                        <div key={type.eventType} className={`relative flex items-start justify-between gap-2 ${isSkipped ? 'opacity-60' : ''}`}>
+                          {/* Circle Marker */}
+                          <div
+                            className={`absolute -left-4 top-1 size-3 rounded-full border-2 bg-background ${
+                              isSent
+                                ? 'border-emerald-500 bg-emerald-500'
+                                : isFailed
+                                ? 'border-rose-500 bg-rose-500'
+                                : isSkipped
+                                ? 'border-muted-foreground/20 bg-muted/40'
+                                : 'border-muted-foreground/40'
+                            }`}
+                          />
+
+                          <div className="space-y-1 min-w-0">
+                            <span className={`text-xs font-medium block ${isSkipped ? 'text-muted-foreground' : 'text-foreground'}`}>
+                              {type.label}
+                            </span>
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span className={`inline-flex items-center text-[10px] font-semibold px-2 py-0.5 rounded-full ${badgeClass}`}>
+                                Email: {statusLabel}
+                              </span>
+                            </div>
+                          </div>
+
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                disabled={!isAllowed}
+                                className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground shrink-0 disabled:opacity-40"
+                                title="Send notification"
+                              >
+                                {isSendingThis ? (
+                                  <RotateCw className="size-3 animate-spin" />
+                                ) : (
+                                  <MoreHorizontal className="size-3.5" />
+                                )}
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-72">
+                              <DropdownMenuItem
+                                onClick={triggerAction}
+                                className="text-xs flex items-center justify-between cursor-pointer"
+                              >
+                                <span className="flex items-center gap-1.5 truncate">
+                                  <Mail className="size-3 text-muted-foreground shrink-0" />
+                                  {statusLabel === 'FAILED' ? 'Retry via Email' : statusLabel === 'SENT' ? 'Resend via Email' : 'Send via Email'}
+                                </span>
+                                <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full shrink-0 ml-2 ${badgeClass}`}>
+                                  {statusLabel}
+                                </span>
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
+
+                <hr className="border-card-border/40" />
+
+                {/* Section 2: Delivery Logs Table */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-foreground block">Delivery Logs</span>
+                    {timelineEntries.length > 0 && (
+                      <span className="text-[11px] text-muted-foreground font-mono">
+                        {startIndex + 1}–{Math.min(startIndex + LOGS_PER_PAGE, timelineEntries.length)} of {timelineEntries.length}
+                      </span>
+                    )}
+                  </div>
+
+                  {loadingInquiryLogs ? (
+                    <div className="space-y-3">
+                      {[1, 2, 3].map((i) => (
+                        <div key={i} className="rounded-xl bg-muted/30 border border-card-border p-3 flex gap-3 animate-pulse">
+                          <div className="size-10 rounded-lg bg-muted/30 shrink-0" />
+                          <div className="flex-1 space-y-2">
+                            <div className="h-3.5 w-40 rounded bg-muted/40" />
+                            <div className="h-3 w-60 rounded bg-muted/30" />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : timelineEntries.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-10 text-center border border-dashed border-card-border/60 rounded-xl">
+                      <div className="size-10 rounded-full bg-muted/20 flex items-center justify-center mb-2">
+                        <Mail className="size-5 text-muted-foreground/50" />
+                      </div>
+                      <p className="text-xs font-medium text-foreground">No delivery logs found</p>
+                      <p className="text-[11px] text-muted-foreground mt-0.5 max-w-[220px]">
+                        This appointment request has no recorded notification logs yet.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <div
+                        className="overflow-x-auto [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
+                        style={{ scrollbarWidth: 'thin' }}
+                        data-lenis-prevent
+                      >
+                        <table className="w-full text-xs">
+                          <thead>
+                            <tr className="text-left text-xs font-semibold text-muted-foreground border-y border-card-border/40">
+                              <th className="py-2.5 pr-3 font-semibold">Type</th>
+                              <th className="py-2.5 pr-3 font-semibold">To</th>
+                              <th className="py-2.5 pr-3 font-semibold">Status</th>
+                              <th className="py-2.5 pl-2 text-right font-semibold">Time</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {paginatedEntries.map((entry) => {
+                              const statusPill = badgeClassFor(entry.status);
+                              const subjectOrType = EVENT_NAME_MAP[entry.eventType] || entry.eventType;
+
+                              return (
+                                <tr key={entry.id} className="border-b border-card-border/40 last:border-b-0 hover:bg-muted/20 transition-colors">
+                                  <td className="py-2.5 pr-3 text-xs font-medium text-foreground max-w-[130px] truncate" title={subjectOrType}>
+                                    <span className="truncate block">{subjectOrType}</span>
+                                  </td>
+                                  <td className="py-2.5 pr-3 text-xs text-muted-foreground max-w-[120px] truncate" title={entry.recipient}>
+                                    <span className="truncate block">{entry.recipient}</span>
+                                  </td>
+                                  <td className="py-2.5 pr-3 whitespace-nowrap">
+                                    <span className={`inline-flex items-center text-[10px] font-semibold px-2 py-0.5 rounded-full ${statusPill}`}>
+                                      {entry.status}
+                                    </span>
+                                  </td>
+                                  <td className="py-2.5 pl-2 text-right text-xs text-muted-foreground font-mono text-[11px] whitespace-nowrap">
+                                    {formatTimeFull(entry.timestamp)}
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+
+                      {totalLogPages > 1 && (
+                        <div className="flex items-center justify-between pt-2 border-t border-card-border/40">
+                          <span className="text-[11px] text-muted-foreground">
+                            Page {logPage} of {totalLogPages}
+                          </span>
+                          <div className="flex items-center gap-1.5 ml-auto">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setLogPage((p) => Math.max(1, p - 1))}
+                              disabled={logPage <= 1}
+                              className="h-7 px-2 text-xs gap-1 text-muted-foreground hover:text-foreground"
+                              title="Newer logs"
+                            >
+                              <ChevronLeft className="size-3.5" /> Newer
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setLogPage((p) => Math.min(totalLogPages, p + 1))}
+                              disabled={logPage >= totalLogPages}
+                              className="h-7 px-2 text-xs gap-1 text-muted-foreground hover:text-foreground"
+                              title="Older logs"
+                            >
+                              Older <ChevronRight className="size-3.5" />
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Tab 3: TIMELINE */}
+            {detailTab === 'timeline' && (
+              <div className="flex-1 !overflow-y-auto min-h-0 space-y-4 py-2 animate-in fade-in duration-200 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
+                style={{ scrollbarWidth: 'thin' }}
+                data-lenis-prevent
+              >
+                <InquiryTimeline inquiry={inquiriesView.selectedInquiry} />
+                <hr className="border-card-border/40 mx-4" />
+                <CoordinationHub
+                  inquiryId={inquiriesView.selectedInquiryId}
+                  hideHeader={true}
+                  hideActions={!inquiriesView.selectedInquiry || inquiriesView.selectedInquiry.status !== 'NEW'}
+                />
               </div>
             )}
           </>
@@ -875,6 +1095,102 @@ export function SecretaryPendingRequestsViewV2() {
       </div>
     )}
       <InquiryToast toast={inquiriesView.toast} />
+    </div>
+  );
+}
+
+function InquiryTimeline({ inquiry }: { inquiry: any }) {
+  if (!inquiry) return null;
+
+  const entries: {
+    id: string;
+    status: string;
+    label: string;
+    time: string;
+    reason: string | null;
+    actor: string;
+  }[] = [];
+
+  // Entry 1: Requested / Created
+  const guestName = formatPatientName(inquiry.guestFirstName, inquiry.guestMiddleName, inquiry.guestLastName, inquiry.guestSuffix);
+  entries.push({
+    id: 'requested',
+    status: 'PENDING',
+    label: 'Request Submitted',
+    time: inquiry.createdAt || inquiry.preferredDate || new Date().toISOString(),
+    reason: inquiry.notes || inquiry.stagedInquiryNote || null,
+    actor: guestName !== '' ? `${guestName} (Guest)` : 'Patient',
+  });
+
+  // Entry 2: Status transition if converted or dropped
+  if (inquiry.status === 'CONVERTED') {
+    entries.push({
+      id: 'converted',
+      status: 'APPROVED',
+      label: 'Approved & Converted',
+      time: inquiry.updatedAt || new Date().toISOString(),
+      reason: inquiry.secretaryNotes || 'Inquiry converted to confirmed appointment',
+      actor: 'Secretary',
+    });
+  } else if (inquiry.status === 'DROPPED') {
+    entries.push({
+      id: 'dropped',
+      status: 'REJECTED',
+      label: 'Rejected / Dropped',
+      time: inquiry.updatedAt || new Date().toISOString(),
+      reason: inquiry.secretaryNotes || inquiry.dropReason || 'Inquiry archived/dropped by staff',
+      actor: 'Secretary',
+    });
+  }
+
+  const getStatusStyle = (status: string) => {
+    switch (status) {
+      case 'PENDING': return { dot: '#f59e0b', bg: '#fef3c7' };
+      case 'APPROVED': return { dot: '#22c55e', bg: '#dcfce7' };
+      case 'REJECTED': return { dot: '#ef4444', bg: '#fee2e2' };
+      default: return { dot: '#6b7280', bg: '#f3f4f6' };
+    }
+  };
+
+  const formatTimelineTime = (iso: string) => {
+    try {
+      const d = new Date(iso);
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) +
+        ', ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+    } catch {
+      return iso;
+    }
+  };
+
+  return (
+    <div className="py-3 px-4 space-y-2">
+      <span className="text-sm font-medium text-foreground block">Request Timeline</span>
+      <div className="relative">
+        <div className="absolute left-[11px] top-2 bottom-2 w-px bg-border/60" />
+        <div className="flex flex-col">
+          {entries.map((entry) => {
+            const style = getStatusStyle(entry.status);
+            return (
+              <div key={entry.id} className="relative pl-8 pb-5 last:pb-0">
+                <div
+                  className="absolute left-[5px] top-[5px] size-3 rounded-full border-2 z-10"
+                  style={{ borderColor: style.dot, backgroundColor: style.bg }}
+                />
+                <div className="flex flex-col gap-0.5">
+                  <div className="flex items-baseline gap-2 flex-wrap">
+                    <span className="text-xs font-semibold" style={{ color: style.dot }}>{entry.label}</span>
+                    <span className="text-xs text-muted-foreground">{formatTimelineTime(entry.time)}</span>
+                  </div>
+                  {entry.reason && (
+                    <p className="text-xs text-muted-foreground leading-relaxed italic">&ldquo;{entry.reason}&rdquo;</p>
+                  )}
+                  <span className="text-[10px] text-muted-foreground/80">- {entry.actor}</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }
