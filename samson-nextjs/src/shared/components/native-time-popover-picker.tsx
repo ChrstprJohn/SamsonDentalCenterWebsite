@@ -94,19 +94,17 @@ export function NativeTimePopoverPicker({
     onChange(formatted);
   };
 
-  const displayTime = value || '08:00 AM';
-
   return (
     <div ref={containerRef} className={`relative w-full ${className}`}>
-      {/* Trigger Input Field (Defaults to fixed 08:00 AM if empty) */}
+      {/* Trigger Input Field */}
       <div
         onClick={togglePopover}
-        className={`w-full bg-white border border-[#E4E4DC] px-4 py-3 text-xs sm:text-sm font-semibold text-gray-800 flex items-center justify-between cursor-pointer hover:border-[#D94E4E] transition-colors ${
+        className={`w-full bg-white border border-[#E4E4DC] px-4 py-3 text-xs sm:text-sm font-semibold flex items-center justify-between cursor-pointer hover:border-[#D94E4E] transition-colors ${
           disabled ? 'opacity-50 cursor-not-allowed bg-gray-50' : ''
         }`}
       >
-        <span className="text-gray-900 font-extrabold">
-          {displayTime}
+        <span className={value ? 'text-gray-900 font-extrabold' : 'text-gray-400 font-medium'}>
+          {value ? value : placeholder}
         </span>
         <Clock className="w-4 h-4 text-gray-400" />
       </div>
