@@ -489,6 +489,19 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
               const startTime = (appointment as any).startTime || (appointment as any).start_time || (appointment as any).date;
 
               const getDisplayChannelStatus = (targetChannel: 'SMS' | 'EMAIL', fallbackSent: boolean) => {
+                const isChannelEnabled =
+                  channel === 'BOTH' ||
+                  (targetChannel === 'EMAIL' && channel === 'EMAIL') ||
+                  (targetChannel === 'SMS' && channel === 'SMS');
+
+                if (!isChannelEnabled) {
+                  return {
+                    label: 'SKIPPED (Channel Off)',
+                    badgeClass: 'bg-slate-500/10 text-slate-500 dark:text-slate-400',
+                    logId: undefined,
+                  };
+                }
+
                 const latestLog = getLatestLogForEntry(entry.eventType, targetChannel);
                 if (latestLog) {
                   if (latestLog.status === 'FAILED') {

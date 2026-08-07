@@ -796,6 +796,15 @@ export function AppointmentEmailTimelineView() {
                         return e.eventType === type.eventType;
                       });
 
+                      const isChannelEnabled =
+                        currentChannel === 'BOTH' ||
+                        (ch === 'EMAIL' && currentChannel === 'EMAIL') ||
+                        (ch === 'SMS' && currentChannel === 'SMS');
+
+                      if (!isChannelEnabled) {
+                        return { label: 'SKIPPED (Channel Off)', badgeClass: badgeClassFor('SKIPPED') };
+                      }
+
                       if (log) {
                         if (log.rawStatus === 'FAILED') {
                           return { label: 'FAILED', badgeClass: badgeClassFor('FAILED') };
