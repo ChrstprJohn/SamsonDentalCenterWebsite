@@ -59,7 +59,7 @@ export function PendingRequestDetailPane({ view }: PendingRequestDetailPaneProps
   return (
     <div className="flex flex-col flex-1 min-h-0 h-full">
       {/* Sub-Header Tabs matching AppointmentDetailPane */}
-      <div className="shrink-0 border-b border-card-border/40 mb-4 px-1 bg-card">
+      <div className="shrink-0 border-b border-card-border/40 -mx-6 -mt-6 px-6 mb-5 bg-card">
         <div className="relative flex gap-6">
           {TABS.map((tab, idx) => {
             const isActive = detailTab === tab.key;
