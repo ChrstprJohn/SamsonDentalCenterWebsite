@@ -137,7 +137,10 @@ export function NativeTimePopoverPicker({
                       if (['08', '09', '10', '11'].includes(h)) newP = 'AM';
                       else newP = 'PM';
                       setSelectedPeriod(newP);
-                      handleSelectTime(h, selectedMin, newP);
+                      // If selecting 05 PM, reset minute to '00' (clinic closing boundary)
+                      const newM = (h === '05' && newP === 'PM') ? '00' : selectedMin;
+                      if (h === '05' && newP === 'PM') setSelectedMin('00');
+                      handleSelectTime(h, newM, newP);
                     }}
                     className={`w-full h-8 shrink-0 flex items-center justify-center text-sm font-semibold rounded-xs transition-colors ${
                       isSelected
@@ -158,10 +161,14 @@ export function NativeTimePopoverPicker({
             >
               {fullMinuteList.map((m) => {
                 const isSelected = selectedMin === m;
+                // At closing hour (05 PM), only :00 is allowed. Minutes > 00 are disabled.
+                const isMinDisabled = selectedHour === '05' && selectedPeriod === 'PM' && m !== '00';
+
                 return (
                   <button
                     key={m}
                     type="button"
+                    disabled={isMinDisabled}
                     onClick={() => {
                       setSelectedMin(m);
                       handleSelectTime(selectedHour, m, selectedPeriod);
@@ -169,6 +176,8 @@ export function NativeTimePopoverPicker({
                     className={`w-full h-8 shrink-0 flex items-center justify-center text-sm font-semibold rounded-xs transition-colors ${
                       isSelected
                         ? 'bg-[#0075FF] text-white font-bold'
+                        : isMinDisabled
+                        ? 'text-gray-300 cursor-not-allowed opacity-40'
                         : 'text-gray-800 hover:bg-gray-100'
                     }`}
                   >
