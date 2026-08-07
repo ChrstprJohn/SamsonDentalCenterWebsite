@@ -290,11 +290,11 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
     isRose?: boolean;
     emailOnly?: boolean;
   }[] = [
+    { eventType: 'APPOINTMENT_INQUIRY_RECEIVED', label: 'Inquiry Request Received', emailOnly: true },
     { eventType: 'APPOINTMENT_BOOKED', label: 'Booking Confirmation' },
     { eventType: 'APPOINTMENT_REMINDER_48H', label: '48-Hour Reminder' },
     { eventType: 'APPOINTMENT_REMINDER_24H', label: '24-Hour Reminder' },
     { eventType: 'APPOINTMENT_CHECKOUT', label: 'Checkout / Thank You' },
-    { eventType: 'APPOINTMENT_INQUIRY_RECEIVED', label: 'Inquiry Request Received', emailOnly: true },
     { eventType: 'CANCEL_BOOKING', label: 'Cancellation Notice' },
     { eventType: 'RESCHEDULE_BOOKING', label: 'Reschedule Notice' },
   ];
@@ -449,83 +449,107 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
 
       <hr className="border-card-border/40" />
 
-      {/* Section 2: Notification Status Overview */}
-      <div className="space-y-2">
-        <span className="text-sm font-medium text-foreground block">Notification Status Overview</span>
+      {/* Section 2: Notification Lifecycle */}
+      <div className="space-y-3">
+        <span className="text-sm font-medium text-foreground block">Notification Lifecycle</span>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs">
-            <thead>
-              <tr className="text-left text-xs font-semibold text-muted-foreground border-y border-card-border/40">
-                <th className="py-2.5 pr-3 font-semibold">Type</th>
-                {showSms && <th className="py-2.5 pr-3 font-semibold">SMS</th>}
-                {showEmail && <th className="py-2.5 pr-3 font-semibold">Email</th>}
-                <th className="py-2.5 pl-2 text-right font-semibold">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {NOTIFICATION_TYPES.map((type) => {
-                const hasSmsItem = showSms && !type.emailOnly;
-                const hasEmailItem = showEmail;
-                const disabled = currentChannel === 'NONE' || isTriggeringNotification !== null || (!hasSmsItem && !hasEmailItem);
-                const emailStatus = getStatus(type, 'EMAIL');
-                const smsStatus = getStatus(type, 'SMS');
+        <div className="relative pl-4 space-y-4 pt-1 before:absolute before:left-1.5 before:top-3.5 before:bottom-3.5 before:w-0.5 before:bg-card-border/60">
+          {NOTIFICATION_TYPES.map((type) => {
+            const hasSmsItem = showSms && !type.emailOnly;
+            const hasEmailItem = showEmail;
+            const disabled = currentChannel === 'NONE' || isTriggeringNotification !== null || (!hasSmsItem && !hasEmailItem);
+            const emailStatus = getStatus(type, 'EMAIL');
+            const smsStatus = getStatus(type, 'SMS');
 
-                return (
-                  <tr key={type.eventType} className="border-b border-card-border/40 last:border-b-0 hover:bg-muted/20 transition-colors">
-                    <td className="py-2.5 pr-3 text-xs font-medium text-foreground">
-                      {type.label}
-                    </td>
-                    {showSms && (
-                      <td className="py-2.5 pr-3">
-                        {type.emailOnly
-                          ? <span className="text-muted-foreground/40">—</span>
-                          : <span className={`inline-flex items-center text-[10px] font-semibold px-2 py-0.5 rounded-full ${smsStatus.badgeClass}`}>{smsStatus.label}</span>}
-                      </td>
-                    )}
+            const isAnySent = emailStatus.label === 'SENT' || smsStatus.label === 'SENT';
+            const isAnyFailed = emailStatus.label === 'FAILED' || smsStatus.label === 'FAILED';
+
+            return (
+              <div key={type.eventType} className="relative flex items-start justify-between gap-2">
+                {/* Circle Marker */}
+                <div
+                  className={`absolute -left-4 top-1 size-3 rounded-full border-2 bg-background ${
+                    isAnySent
+                      ? 'border-emerald-500 bg-emerald-500'
+                      : isAnyFailed
+                      ? 'border-rose-500 bg-rose-500'
+                      : 'border-muted-foreground/40'
+                  }`}
+                />
+
+                <div className="space-y-1 min-w-0">
+                  <span className="text-xs font-medium text-foreground block">
+                    {type.label}
+                  </span>
+                  <div className="flex items-center gap-1.5 flex-wrap">
                     {showEmail && (
-                      <td className="py-2.5 pr-3">
-                        <span className={`inline-flex items-center text-[10px] font-semibold px-2 py-0.5 rounded-full ${emailStatus.badgeClass}`}>{emailStatus.label}</span>
-                      </td>
+                      <span className={`inline-flex items-center text-[10px] font-semibold px-2 py-0.5 rounded-full ${emailStatus.badgeClass}`}>
+                        Email: {emailStatus.label}
+                      </span>
                     )}
-                    <td className="py-2.5 pl-2 text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm" disabled={disabled} className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground" title="Send notification">
-                            {isTriggeringNotification === type.eventType ? <RotateCw className="size-3 animate-spin" /> : <MoreHorizontal className="size-3.5" />}
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-72">
-                          {hasEmailItem && (
-                            <DropdownMenuItem onClick={() => handleTriggerNotification(type.eventType, 'EMAIL')} className="text-xs flex items-center justify-between cursor-pointer">
-                              <span className="flex items-center gap-1.5 truncate">
-                                <Mail className="size-3 text-muted-foreground shrink-0" />
-                                {emailStatus.label === 'FAILED' ? 'Retry via Email' : emailStatus.label === 'SENT' ? 'Resend via Email' : 'Send via Email'}
-                              </span>
-                              <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full shrink-0 ml-2 ${emailStatus.badgeClass}`}>
-                                {emailStatus.label}
-                              </span>
-                            </DropdownMenuItem>
-                          )}
-                          {hasSmsItem && (
-                            <DropdownMenuItem onClick={() => handleTriggerNotification(type.eventType, 'SMS')} className="text-xs flex items-center justify-between cursor-pointer">
-                              <span className="flex items-center gap-1.5 truncate">
-                                <MessageSquare className="size-3 text-muted-foreground shrink-0" />
-                                {smsStatus.label === 'FAILED' ? 'Retry via SMS' : smsStatus.label === 'SENT' ? 'Resend via SMS' : 'Send via SMS'}
-                              </span>
-                              <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full shrink-0 ml-2 ${smsStatus.badgeClass}`}>
-                                {smsStatus.label}
-                              </span>
-                            </DropdownMenuItem>
-                          )}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                    {showSms && !type.emailOnly && (
+                      <span className={`inline-flex items-center text-[10px] font-semibold px-2 py-0.5 rounded-full ${smsStatus.badgeClass}`}>
+                        SMS: {smsStatus.label}
+                      </span>
+                    )}
+                    {showSms && type.emailOnly && (
+                      <span className="text-[10px] text-muted-foreground/50 italic">
+                        (Email Only)
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      disabled={disabled}
+                      className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground shrink-0"
+                      title="Send notification"
+                    >
+                      {isTriggeringNotification === type.eventType ? (
+                        <RotateCw className="size-3 animate-spin" />
+                      ) : (
+                        <MoreHorizontal className="size-3.5" />
+                      )}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-72">
+                    {hasEmailItem && (
+                      <DropdownMenuItem
+                        onClick={() => handleTriggerNotification(type.eventType, 'EMAIL')}
+                        className="text-xs flex items-center justify-between cursor-pointer"
+                      >
+                        <span className="flex items-center gap-1.5 truncate">
+                          <Mail className="size-3 text-muted-foreground shrink-0" />
+                          {emailStatus.label === 'FAILED' ? 'Retry via Email' : emailStatus.label === 'SENT' ? 'Resend via Email' : 'Send via Email'}
+                        </span>
+                        <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full shrink-0 ml-2 ${emailStatus.badgeClass}`}>
+                          {emailStatus.label}
+                        </span>
+                      </DropdownMenuItem>
+                    )}
+                    {hasSmsItem && (
+                      <DropdownMenuItem
+                        onClick={() => handleTriggerNotification(type.eventType, 'SMS')}
+                        className="text-xs flex items-center justify-between cursor-pointer"
+                      >
+                        <span className="flex items-center gap-1.5 truncate">
+                          <MessageSquare className="size-3 text-muted-foreground shrink-0" />
+                          {smsStatus.label === 'FAILED' ? 'Retry via SMS' : smsStatus.label === 'SENT' ? 'Resend via SMS' : 'Send via SMS'}
+                        </span>
+                        <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full shrink-0 ml-2 ${smsStatus.badgeClass}`}>
+                          {smsStatus.label}
+                        </span>
+                      </DropdownMenuItem>
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            );
+          })}
         </div>
       </div>
 
