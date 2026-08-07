@@ -15,7 +15,7 @@ export const APPOINTMENT_SUMMARY_SELECT = `
   no_show_resolution, created_at, updated_at,
   doctor:doctor_id (id, first_name, last_name, suffix),
   service:service_id (id, name, duration_minutes),
-  patient:patient_id (id, first_name, last_name),
+  patient:patient_id (id, first_name, last_name, email, phone_number),
   dependent:dependents!appointments_dependent_id_fkey
     (id, first_name, last_name, relationship, date_of_birth),
   guest_contacts (first_name, middle_name, last_name, suffix, email, phone_number)

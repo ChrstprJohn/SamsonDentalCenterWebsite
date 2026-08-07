@@ -33,12 +33,17 @@ const appointmentPatientDbSchema = z.object({
   id: z.string().uuid(),
   first_name: z.string(),
   last_name: z.string(),
+  email: z.string().nullable().optional(),
+  phone: z.string().nullable().optional(),
+  phone_number: z.string().nullable().optional(),
 });
 
 export const appointmentPatientSchema = appointmentPatientDbSchema.transform((data) => ({
   id: data.id,
   firstName: data.first_name,
   lastName: data.last_name,
+  email: data.email || null,
+  phone: data.phone || data.phone_number || null,
 }));
 
 const guestContactDbSchema = z.object({

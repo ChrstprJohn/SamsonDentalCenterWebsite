@@ -26,7 +26,7 @@ export async function getEmailLogsByAppointmentAction(appointmentId: string) {
 
     let { data, error } = await supabase
       .from('outbox')
-      .select('id, event_type, status, error_logs, retry_count, created_at')
+      .select('id, event_type, payload, status, error_logs, retry_count, created_at')
       .or(matchFilter)
       .order('created_at', { ascending: false })
       .limit(100);
@@ -44,10 +44,52 @@ export async function getEmailLogsByAppointmentAction(appointmentId: string) {
       throw new Error(`Failed to fetch email logs: ${error.message}`);
     }
 
-    const records = (data || []).map((record: Record<string, unknown>) => ({
-      ...(record as Record<string, unknown>),
-      payload: {},
-    })) as Record<string, unknown>[];
+    const rawRecords = (data || []) as Record<string, unknown>[];
+
+    // Collect patient IDs to backfill email/phone if missing in payload
+    const patientIds = rawRecords
+      .map((r) => {
+        const payload = (r.payload || {}) as Record<string, unknown>;
+        return !payload.email && !payload.guestEmail && !payload.to && !payload.phone && !payload.phoneNumber
+          ? (payload.patientId as string | undefined)
+          : null;
+      })
+      .filter((id): id is string => typeof id === 'string' && id.length > 0);
+
+    let userMap: Record<string, { email?: string; phone?: string }> = {};
+    if (patientIds.length > 0) {
+      const { data: users } = await supabase
+        .from('users')
+        .select('id, email, phone_number')
+        .in('id', patientIds);
+      if (users) {
+        userMap = (users as Array<Record<string, any>>).reduce(
+          (acc: Record<string, { email?: string; phone?: string }>, u: Record<string, any>) => {
+            acc[u.id] = { email: u.email || undefined, phone: u.phone_number || undefined };
+            return acc;
+          },
+          {} as Record<string, { email?: string; phone?: string }>
+        );
+      }
+    }
+
+    const records = rawRecords.map((record) => {
+      const payload = { ...((record.payload || {}) as Record<string, unknown>) };
+      const patientId = payload.patientId as string | undefined;
+      if (patientId && userMap[patientId]) {
+        if (!payload.email && !payload.to && userMap[patientId].email) {
+          payload.email = userMap[patientId].email;
+        }
+        if (!payload.phone && !payload.phoneNumber && userMap[patientId].phone) {
+          payload.phone = userMap[patientId].phone;
+        }
+      }
+      return {
+        ...record,
+        payload,
+      };
+    });
+
     const logs = mapOutboxRecords(records);
     return { success: true, data: logs };
   } catch (error: unknown) {

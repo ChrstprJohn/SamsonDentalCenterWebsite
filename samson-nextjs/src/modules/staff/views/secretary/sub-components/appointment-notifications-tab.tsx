@@ -13,6 +13,8 @@ import {
   MessageSquare,
   ChevronDown,
   MoreHorizontal,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { updateConfirmationChannelAction } from '@/modules/appointments/actions/status/update-confirmation-channel.action';
 import { resendNotificationAction } from '@/modules/appointments/actions/status/resend-notification.action';
@@ -29,29 +31,30 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-// UI Label Mappings for Event Types
+// UI Label Mappings for Event Types (Matching Notification Status Overview)
 const EVENT_NAME_MAP: Record<string, string> = {
-  'APPOINTMENT_INQUIRY_RECEIVED': 'Inquiry Received (Email)',
-  'APPOINTMENT_BOOKED': 'Booking Confirmation (Email)',
-  'APPOINTMENT_CONVERTED_FROM_INQUIRY': 'Inquiry Approved (Email)',
-  'APPOINTMENT_CONVERTED_FROM_INQUIRY_PATIENT': 'Inquiry Approved (Email)',
-  'APPOINTMENT_CONVERTED_FROM_INQUIRY_SMS': 'Inquiry Approved (SMS)',
-  'APPOINTMENT_MANUALLY_BOOKED_PATIENT': 'Manual Booking (Email)',
-  'APPOINTMENT_MANUALLY_BOOKED_GUEST': 'Manual Booking (Email)',
-  'APPOINTMENT_MANUALLY_BOOKED_SMS': 'Manual Booking (SMS)',
-  'APPOINTMENT_REMINDER_24H': '24-Hour Reminder (Email)',
-  'APPOINTMENT_REMINDER_48H': '48-Hour Reminder (Email)',
-  'APPOINTMENT_REMINDER_24H_SMS': '24-Hour Reminder (SMS)',
-  'APPOINTMENT_REMINDER_48H_SMS': '48-Hour Reminder (SMS)',
-  'RESCHEDULE_BOOKING': 'Rescheduled (Email)',
-  'RESCHEDULE_BOOKING_SMS': 'Rescheduled (SMS)',
-  'CANCEL_BOOKING': 'Cancelled (Email)',
-  'CANCEL_BOOKING_SMS': 'Cancelled (SMS)',
-  'STAFF_REPLIED_TO_CHAT': 'Staff Reply (Email)',
-  'APPOINTMENT_COMPLETED_POST_CARE': 'Post-Care Review (Email)',
-  'APPOINTMENT_COMPLETED_POST_CARE_SMS': 'Post-Care (SMS)',
-  'PATIENT_REGISTERED': 'Registration OTP (Email)',
-  'PASSWORD_RESET_REQUESTED': 'Password Reset OTP (Email)',
+  'APPOINTMENT_INQUIRY_RECEIVED': 'Inquiry Request Received',
+  'APPOINTMENT_BOOKED': 'Booking Confirmation',
+  'APPOINTMENT_CONVERTED_FROM_INQUIRY': 'Booking Confirmation',
+  'APPOINTMENT_CONVERTED_FROM_INQUIRY_PATIENT': 'Booking Confirmation',
+  'APPOINTMENT_CONVERTED_FROM_INQUIRY_SMS': 'Booking Confirmation',
+  'APPOINTMENT_MANUALLY_BOOKED_PATIENT': 'Booking Confirmation',
+  'APPOINTMENT_MANUALLY_BOOKED_GUEST': 'Booking Confirmation',
+  'APPOINTMENT_MANUALLY_BOOKED_SMS': 'Booking Confirmation',
+  'APPOINTMENT_REMINDER_24H': '24-Hour Reminder',
+  'APPOINTMENT_REMINDER_48H': '48-Hour Reminder',
+  'APPOINTMENT_REMINDER_24H_SMS': '24-Hour Reminder',
+  'APPOINTMENT_REMINDER_48H_SMS': '48-Hour Reminder',
+  'RESCHEDULE_BOOKING': 'Reschedule Notice',
+  'RESCHEDULE_BOOKING_SMS': 'Reschedule Notice',
+  'CANCEL_BOOKING': 'Cancellation Notice',
+  'CANCEL_BOOKING_SMS': 'Cancellation Notice',
+  'STAFF_REPLIED_TO_CHAT': 'Staff Reply',
+  'APPOINTMENT_CHECKOUT': 'Checkout / Thank You',
+  'APPOINTMENT_COMPLETED_POST_CARE': 'Checkout / Thank You',
+  'APPOINTMENT_COMPLETED_POST_CARE_SMS': 'Checkout / Thank You',
+  'PATIENT_REGISTERED': 'Registration OTP',
+  'PASSWORD_RESET_REQUESTED': 'Password Reset OTP',
 };
 
 function formatTimeFull(dateStr: string) {
@@ -158,6 +161,7 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
   const [outboxLogs, setOutboxLogs] = useState<OutboxLogResponseDto[]>([]);
   const [loadingLogs, setLoadingLogs] = useState(false);
   const [isTriggeringNotification, setIsTriggeringNotification] = useState<string | null>(null);
+  const [logPage, setLogPage] = useState(1);
 
   const currentChannel = (appointment.confirmationChannel as any) || (appointment as any).confirmation_channel || 'EMAIL';
   const [draftChannel, setDraftChannel] = useState<'EMAIL' | 'SMS' | 'BOTH' | 'NONE'>(currentChannel);
@@ -174,6 +178,7 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
   }, [appointment.id]);
 
   useEffect(() => {
+    setLogPage(1);
     fetchLogs();
   }, [fetchLogs]);
 
@@ -224,17 +229,22 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
     
     const fallbackEmail =
       (appointment as any)?.patientEmail ||
+      (appointment as any)?.patient?.email ||
+      (appointment as any)?.guestContact?.email ||
       (appointment as any)?.email ||
       (appointment as any)?.guestEmail ||
       (appointment as any)?.patient_email ||
-      (appointment as any)?.patient?.email ||
+      (appointment as any)?.inquiry?.email ||
       '';
 
     const fallbackPhone =
       (appointment as any)?.patientPhone ||
+      (appointment as any)?.patient?.phone ||
+      (appointment as any)?.patient?.phoneNumber ||
+      (appointment as any)?.guestContact?.phone ||
       (appointment as any)?.phone ||
       (appointment as any)?.patient_phone ||
-      (appointment as any)?.patient?.phone ||
+      (appointment as any)?.inquiry?.phone ||
       '';
 
     const defaultRecipient = isSms ? fallbackPhone : fallbackEmail;
@@ -247,6 +257,7 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
       log.payload?.guestEmail ||
       log.payload?.phone ||
       log.payload?.phoneNumber ||
+      log.payload?.mobileNumber ||
       '';
 
     const finalRecipient = recipientLabel(rawRecipient, defaultRecipient);
@@ -264,6 +275,11 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
       payload: log.payload,
     };
   });
+
+  const LOGS_PER_PAGE = 7;
+  const totalLogPages = Math.ceil(timelineEntries.length / LOGS_PER_PAGE) || 1;
+  const startIndex = (logPage - 1) * LOGS_PER_PAGE;
+  const paginatedEntries = timelineEntries.slice(startIndex, startIndex + LOGS_PER_PAGE);
 
   const showEmail = currentChannel === 'EMAIL' || currentChannel === 'BOTH';
   const showSms = currentChannel === 'SMS' || currentChannel === 'BOTH';
@@ -444,7 +460,7 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
                 <th className="py-2.5 pr-3 font-semibold">Type</th>
                 {showSms && <th className="py-2.5 pr-3 font-semibold">SMS</th>}
                 {showEmail && <th className="py-2.5 pr-3 font-semibold">Email</th>}
-                <th className="py-2.5 pl-2 text-right"></th>
+                <th className="py-2.5 pl-2 text-right font-semibold">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -517,7 +533,14 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
 
       {/* Section 3: Delivery Logs Table */}
       <div className="space-y-2">
-        <span className="text-sm font-medium text-foreground block">Delivery Logs</span>
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-medium text-foreground block">Delivery Logs</span>
+          {timelineEntries.length > 0 && (
+            <span className="text-[11px] text-muted-foreground font-mono">
+              {startIndex + 1}–{Math.min(startIndex + LOGS_PER_PAGE, timelineEntries.length)} of {timelineEntries.length}
+            </span>
+          )}
+        </div>
 
         {loadingLogs ? (
           <div className="space-y-3">
@@ -542,22 +565,54 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs">
-              <thead>
-                <tr className="text-left text-xs font-semibold text-muted-foreground border-y border-card-border/40">
-                  <th className="py-2.5 pr-3 font-semibold">Type</th>
-                  <th className="py-2.5 pr-3 font-semibold">To</th>
-                  <th className="py-2.5 pr-3 font-semibold">Status</th>
-                  <th className="py-2.5 pl-2 text-right font-semibold">Time</th>
-                </tr>
-              </thead>
-              <tbody>
-                {timelineEntries.map((entry) => (
-                  <TimelineEntryRow key={entry.id} entry={entry} />
-                ))}
-              </tbody>
-            </table>
+          <div className="space-y-2">
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="text-left text-xs font-semibold text-muted-foreground border-y border-card-border/40">
+                    <th className="py-2.5 pr-3 font-semibold">Type</th>
+                    <th className="py-2.5 pr-3 font-semibold">To</th>
+                    <th className="py-2.5 pr-3 font-semibold">Status</th>
+                    <th className="py-2.5 pl-2 text-right font-semibold">Time</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {paginatedEntries.map((entry) => (
+                    <TimelineEntryRow key={entry.id} entry={entry} />
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {totalLogPages > 1 && (
+              <div className="flex items-center justify-between pt-2 border-t border-card-border/40">
+                <span className="text-[11px] text-muted-foreground">
+                  Page {logPage} of {totalLogPages}
+                </span>
+                <div className="flex items-center gap-1.5 ml-auto">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setLogPage((p) => Math.max(1, p - 1))}
+                    disabled={logPage <= 1}
+                    className="h-7 px-2 text-xs gap-1 text-muted-foreground hover:text-foreground"
+                    title="Newer logs"
+                  >
+                    <ChevronLeft className="size-3.5" /> Newer
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setLogPage((p) => Math.min(totalLogPages, p + 1))}
+                    disabled={logPage >= totalLogPages}
+                    className="h-7 px-2 text-xs gap-1 text-muted-foreground hover:text-foreground"
+                    title="Older logs"
+                  >
+                    Older <ChevronRight className="size-3.5" />
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
