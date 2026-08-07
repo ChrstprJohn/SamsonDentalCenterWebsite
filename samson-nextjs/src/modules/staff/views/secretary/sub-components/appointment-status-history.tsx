@@ -47,7 +47,7 @@ function formatTime(iso: string) {
     ', ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
 }
 
-export function AppointmentStatusHistory({ appointment, activeTab, compact }: { appointment: AppointmentDto; activeTab: 'upcoming' | 'history'; compact?: boolean }) {
+export function AppointmentStatusHistory({ appointment, activeTab, compact }: { appointment: AppointmentDto; activeTab: 'upcoming' | 'history' | 'pending'; compact?: boolean }) {
   const entries = buildTimelineEntries(appointment);
 
   return (

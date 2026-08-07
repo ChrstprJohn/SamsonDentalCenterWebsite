@@ -1,11 +1,8 @@
 'use client';
 
 import { useSecretaryPendingRequests } from '../../hooks/secretary/use-secretary-pending-requests';
-import { PendingDecisionForm } from './sub-components/pending-decision-form';
-import { PendingDoctorSchedule } from './sub-components/pending-doctor-schedule';
-import { PendingEditPanel } from './sub-components/pending-edit-panel';
 import { PendingRequestList } from './sub-components/pending-request-list';
-import { PendingRequestOverview } from './sub-components/pending-request-overview';
+import { PendingRequestDetailPane } from './sub-components/pending-request-detail-pane';
 
 export function SecretaryPendingRequestsView() {
   const view = useSecretaryPendingRequests();
@@ -23,61 +20,8 @@ export function SecretaryPendingRequestsView() {
           isLoading={view.isLoading}
           onSelect={view.selectAppointment}
         />
-        <div className="lg:col-span-7 border border-card-border bg-card rounded-3xl p-6 shadow-md flex flex-col gap-5 justify-between">
-          {view.selectedAppointment ? (
-            view.isLoadingDetails ? (
-              <div className="h-full flex items-center justify-center text-xs text-text-muted">Loading request details...</div>
-            ) : (
-              <div className="flex flex-col gap-5 h-full justify-between animate-in fade-in duration-200">
-                <div className="flex flex-col gap-4">
-                  <PendingRequestOverview
-                    appointment={view.selectedAppointment}
-                    patientDetails={view.patientDetails}
-                    conflictingAppointment={view.conflictingAppointment}
-                  />
-                  <PendingDoctorSchedule appointment={view.selectedAppointment} doctorSchedule={view.doctorSchedule} />
-                </div>
-                <PendingEditPanel
-                  isEditing={view.isEditing}
-                  services={view.editServices}
-                  serviceId={view.editServiceId}
-                  doctors={view.editDoctors}
-                  doctorId={view.editDoctorId}
-                  availableDates={view.editAvailableDates}
-                  date={view.editDate}
-                  currentMonth={view.editCurrentMonth}
-                  startTime={view.editStartTime}
-                  endTime={view.editEndTime}
-                  note={view.editNote}
-                  isLoadingDays={view.isLoadingEditDays}
-                  onToggle={view.toggleEditing}
-                  onServiceChange={view.setEditService}
-                  onDoctorChange={view.setEditDoctor}
-                  onDateChange={view.setEditAppointmentDate}
-                  onMonthChange={view.setEditCurrentMonth}
-                  onStartTimeChange={view.setEditStartTime}
-                  onEndTimeChange={view.setEditEndTime}
-                  onNoteChange={view.setEditNote}
-                />
-                <PendingDecisionForm
-                  stagedStatus={view.stagedStatus}
-                  stagedReason={view.stagedReason}
-                  customReason={view.customReason}
-                  confirmationChannel={view.confirmationChannel}
-                  isSubmitting={view.isSubmitting}
-                  onDecisionChange={view.setDecision}
-                  onReasonChange={view.setReason}
-                  onCustomReasonChange={view.setCustomReason}
-                  onConfirmationChannelChange={view.setConfirmationChannel}
-                  onConfirm={() => view.finishAppointmentReview(view.selectedAppointment.id)}
-                />
-              </div>
-            )
-          ) : (
-            <div className="h-full flex items-center justify-center text-xs text-text-muted text-center py-12">
-              Select a pending appointment request from the table to start reviewing details.
-            </div>
-          )}
+        <div className="lg:col-span-7 border border-card-border bg-card rounded-3xl p-6 shadow-md flex flex-col justify-between overflow-hidden">
+          <PendingRequestDetailPane view={view} />
         </div>
       </div>
     </div>
