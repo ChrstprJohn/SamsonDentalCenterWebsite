@@ -39,7 +39,6 @@ interface PendingRequestListV2Props {
 
 const TABS: { key: InquiryTab; label: string }[] = [
   { key: 'NEW', label: 'New' },
-  { key: 'CONVERTED', label: 'Converted' },
   { key: 'DROPPED', label: 'Dropped' },
 ];
 
@@ -119,11 +118,11 @@ export function PendingRequestListV2(props: PendingRequestListV2Props) {
           const activeIndex = TABS.findIndex((t) => t.key === props.activeTab);
           const safeIndex = activeIndex < 0 ? 0 : activeIndex;
           return (
-            <div className="relative grid grid-cols-3 gap-1 bg-muted/20 p-1 rounded-xl">
+            <div className="relative grid grid-cols-2 gap-1 bg-muted/20 p-1 rounded-xl">
               <div
                 className="absolute top-1 bottom-1 rounded-lg bg-primary transition-transform duration-200 ease-out shadow-xs"
                 style={{
-                  width: 'calc((100% - 0.5rem) / 3)',
+                  width: 'calc((100% - 0.5rem) / 2)',
                   transform: `translateX(calc(${safeIndex} * (100% + 0.25rem)))`,
                 }}
               />
@@ -137,7 +136,7 @@ export function PendingRequestListV2(props: PendingRequestListV2Props) {
                       : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
-                  {tab.label} ({props.tabCounts[tab.key]})
+                  {tab.label} ({props.tabCounts[tab.key] ?? 0})
                 </button>
               ))}
             </div>
