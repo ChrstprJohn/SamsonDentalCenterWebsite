@@ -238,9 +238,10 @@ export const ResendService = {
     // For Resend testing without a domain, you can only send to yourself, 
     // or use onboarding@resend.dev (which Resend only allows sending to the registered account email)
     const fromAddress = process.env.RESEND_SENDER_EMAIL || 'onboarding@resend.dev';
+    const senderName = process.env.RESEND_SENDER_NAME || 'Samson Dental Center';
 
     const { data, error } = await resend.emails.send({
-      from: `Samson Dental <${fromAddress}>`,
+      from: `${senderName} <${fromAddress}>`,
       to: [to],
       subject,
       html,

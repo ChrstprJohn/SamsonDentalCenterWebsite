@@ -370,7 +370,7 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
           <>
             {(() => {
               const inquiryLog = groupedOutboxLogs.find(
-                (log) => log.eventType === 'APPOINTMENT_INQUIRY_RECEIVED' || log.eventType === 'APPOINTMENT_CONVERTED_FROM_INQUIRY'
+                (log) => log.eventType === 'APPOINTMENT_INQUIRY_RECEIVED'
               );
               const isConvertedInquiry = Boolean(
                 (appointment as any).inquiryId ||
