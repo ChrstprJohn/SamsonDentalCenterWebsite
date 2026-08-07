@@ -10,6 +10,8 @@ This document outlines the standard Git branching strategy, fork workflow for co
 - **`staging`**: Staging branch for development and testing (Vercel Preview URL). All Pull Requests target this branch.
 - **`feature/*`**: Feature branches created off `staging` for specific tasks or bug fixes.
 
+
+
 ---
 
 ## 2. Contributor Guide (Forking Workflow)
