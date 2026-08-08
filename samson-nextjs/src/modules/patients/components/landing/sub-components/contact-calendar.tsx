@@ -51,7 +51,7 @@ export function ContactCalendar({
       ) : (
         <div className="grid grid-cols-7 gap-1.5 text-center text-xs font-sans">
           {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((dayName, idx) => (
-            <div key={`${dayName}-${idx}`} className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold font-sans py-1.5">
+            <div key={`${dayName}-${idx}`} className="text-xs font-semibold text-gray-700 py-1.5">
               {dayName}
             </div>
           ))}

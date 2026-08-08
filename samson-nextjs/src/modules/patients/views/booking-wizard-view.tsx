@@ -351,8 +351,8 @@ export function BookingWizardView({ services, initialServiceId }: BookingWizardV
 
                   {/* Date First */}
                   <div className="flex flex-col gap-2 font-sans">
-                    <label className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold font-sans">
-                      Preferred Date *
+                    <label className="text-[clamp(11px,0.3vw+11px,13px)] font-semibold text-gray-700">
+                      Preferred Date <span className="text-[#D94E4E]">*</span>
                     </label>
                     <ContactCalendar
                       currentMonth={contactSection.currentMonth}
@@ -417,21 +417,21 @@ export function BookingWizardView({ services, initialServiceId }: BookingWizardV
                       Patient Information
                     </h2>
                     <p className="text-[clamp(12px,0.3vw+11px,14px)] font-normal text-gray-500 leading-[1.65] font-sans mt-0.5">
-                      Review your summary and complete your contact details below.
+                      Review your request, then complete your details below.
                     </p>
                   </div>
 
-                  <div className="font-sans text-lg font-normal tracking-[-0.04em] text-[#141515] mb-3">Request Summary</div>
-                  <div className="divide-y divide-gray-100/80 border-y border-gray-100/80">
-                    <div className="flex flex-col gap-2 py-4 min-w-0">
-                      <span className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold font-sans">Service *</span>
+                  <div className="text-[clamp(14px,0.4vw+14px,16px)] font-semibold text-[#141515] mb-3">Request Summary</div>
+                  <div className="divide-y divide-gray-100 bg-[#FAFAFA] border border-gray-100 px-4 sm:px-5">
+                    <div className="flex flex-col gap-2.5 py-4 min-w-0">
+                      <span className="text-[clamp(11px,0.3vw+11px,13px)] font-semibold text-gray-700">Service <span className="text-[#D94E4E]">*</span></span>
                       <span className="text-sm text-gray-700 truncate" title={selectedService?.name}>
                         {selectedService?.name}
                       </span>
                     </div>
                     <div className="grid grid-cols-2 gap-4 sm:gap-6 py-4">
-                      <div className="flex flex-col gap-2 min-w-0">
-                        <span className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold font-sans">Preferred Date *</span>
+                      <div className="flex flex-col gap-2.5 min-w-0">
+                        <span className="text-[clamp(11px,0.3vw+11px,13px)] font-semibold text-gray-700">Preferred Date <span className="text-[#D94E4E]">*</span></span>
                         <span className="text-sm text-gray-700">
                           {contactSection.targetDate
                             ? new Date(contactSection.targetDate + 'T00:00:00').toLocaleDateString('en-US', {
@@ -443,8 +443,8 @@ export function BookingWizardView({ services, initialServiceId }: BookingWizardV
                             : 'N/A'}
                         </span>
                       </div>
-                      <div className="flex flex-col gap-2 min-w-0">
-                        <span className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold font-sans">Preferred Time *</span>
+                      <div className="flex flex-col gap-2.5 min-w-0">
+                        <span className="text-[clamp(11px,0.3vw+11px,13px)] font-semibold text-gray-700">Preferred Time <span className="text-[#D94E4E]">*</span></span>
                       <span className="text-sm text-gray-700">
                         {fields.preferredStartTime
                           ? fields.preferredStartTime.includes('AM') || fields.preferredStartTime.includes('PM')
@@ -463,8 +463,7 @@ export function BookingWizardView({ services, initialServiceId }: BookingWizardV
                     </div>
                   </div>
 
-                  <div className="border-t border-gray-200/60" />
-
+                  <div className="text-[clamp(14px,0.4vw+14px,16px)] font-semibold text-[#141515] mt-8 mb-4">Contact Details</div>
                   <NameFields fields={fields} touched={formTouched} />
                   <ContactFields fields={fields} phone={contactSection.phone} setPhone={contactSection.setPhone} touched={formTouched} />
                   <NotesField notes={contactSection.notes} setNotes={contactSection.setNotes} />
@@ -516,7 +515,7 @@ export function BookingWizardView({ services, initialServiceId }: BookingWizardV
                   </div>
                   <h2 className="font-sans text-2xl font-normal text-gray-900 text-center">Request Submitted Successfully!</h2>
                   <p className="text-sm font-light text-gray-600 leading-relaxed">
-                    Thanks {fields.firstName}! Your booking request has been received and is currently under review by our team.
+                    Thank you for reaching out to Samson Dental Center. We've received your booking request and our team is reviewing it. We'll get back to you soon to confirm your appointment.
                   </p>
 
                   {submittedReference && (

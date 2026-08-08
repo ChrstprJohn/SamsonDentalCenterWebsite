@@ -24,8 +24,8 @@ import { NativeTimePopoverPicker } from '@/shared/components/native-time-popover
 export function PreferenceFields({ fields }: { fields: ContactFormFields }) {
   return (
     <div className="flex flex-col gap-2 font-sans">
-      <label className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold font-sans">
-        Preferred Time *
+      <label className="text-[clamp(11px,0.3vw+11px,13px)] font-semibold text-gray-700">
+        Preferred Time <span className="text-[#D94E4E]">*</span>
       </label>
       <NativeTimePopoverPicker
         value={fields.preferredStartTime}
@@ -114,7 +114,7 @@ export function ContactFields({
 export function PathwaySelect({ services, pathway, setPathway }: { services: ServiceResponseDto[]; pathway: string; setPathway: (value: string) => void }) {
   return (
     <div className="flex flex-col gap-2 font-sans">
-      <label className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold font-sans">Select Specialty Pathway *</label>
+      <label className="text-[clamp(11px,0.3vw+11px,13px)] font-semibold text-gray-700">Select Specialty Pathway <span className="text-[#D94E4E]">*</span></label>
       <select value={pathway} onChange={(event) => setPathway(event.target.value)} className="w-full bg-white border border-[#E4E4DC] px-4 py-3 rounded-none text-xs sm:text-sm focus:outline-none focus:border-[#D94E4E] transition-colors appearance-none">
         {services.map((srv) => <option key={srv.id} value={srv.id}>{srv.name}</option>)}
       </select>
@@ -125,7 +125,7 @@ export function PathwaySelect({ services, pathway, setPathway }: { services: Ser
 export function NotesField({ notes, setNotes }: { notes: string; setNotes: (value: string) => void }) {
   return (
     <div className="flex flex-col gap-2 font-sans">
-      <label className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold font-sans">
+      <label className="text-[clamp(11px,0.3vw+11px,13px)] font-semibold text-gray-700">
         Anything else we should know? <span className="text-gray-400 font-normal">(Optional)</span>
       </label>
       <textarea
@@ -194,7 +194,10 @@ function TextField({
 
   return (
     <div className="flex flex-col gap-2 font-sans">
-      <label className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold font-sans">{label}</label>
+      <label className="text-[clamp(11px,0.3vw+11px,13px)] font-semibold text-gray-700">
+        {label.replace(/\*$/, '')}
+        {label.endsWith('*') && <span className="text-[#D94E4E]"> *</span>}
+      </label>
       <div className="relative w-full">
         <input
           type={type}
