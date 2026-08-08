@@ -54,6 +54,17 @@ export function SecretaryEmailDesignStudioView() {
       baseUrl: 'http://localhost:3000',
       rejectionReason: '',
       cancellationReason: '',
+      approvalReason: '',
+      rescheduleReason: '',
+      checkoutNote: '',
+      preferredStartTimeStr: '',
+      patientNote: '',
+      referenceCode: '',
+      oldDateStr: '',
+      oldTimeRangeStr: '',
+      calendarAddUrl: '',
+      googleMapsUrl: '',
+      rebookUrl: '',
     });
   };
 
@@ -91,7 +102,7 @@ export function SecretaryEmailDesignStudioView() {
 
           <div
             className="mx-auto transition-all duration-300 bg-white"
-            style={{ width: previewMode === 'mobile' ? 375 : '100%', maxWidth: previewMode === 'mobile' ? 375 : 680 }}
+            style={{ width: previewMode === 'mobile' ? 410 : '100%', maxWidth: previewMode === 'mobile' ? 410 : 800 }}
           >
             <EmailDesignPreview design={activeDesign} tokens={DEFAULT_TOKENS} copy={activeCopy} sample={sample} />
           </div>

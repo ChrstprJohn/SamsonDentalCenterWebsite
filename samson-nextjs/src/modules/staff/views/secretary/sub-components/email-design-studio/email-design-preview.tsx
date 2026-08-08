@@ -1,5 +1,6 @@
 import React from 'react';
 import { DEFAULT_LOGO_URL } from '@/shared/utils/get-base-url.util';
+import { formatRefId } from '@/shared/utils/date.util';
 import {
   DesignTokens,
   DraftCopy,
@@ -37,8 +38,10 @@ export function EmailDesignPreview({
   const chatUrl = `${baseUrl}/manage?token=${sample.appointmentId || 'APT-SAMPLE'}&openChat=true`;
   const feedbackUrl = `${baseUrl}/feedback?ref=${sample.appointmentId || 'APT-SAMPLE'}`;
   const ctaHref = isPostCare ? feedbackUrl : chatUrl;
+  const referenceCode = sample.referenceCode || formatRefId(sample.appointmentId);
 
-  const statusLabel = isConfirmed || isReminder || isRescheduled ? 'Confirmed / Approved' : isPostCare ? 'Completed' : isBookingRequestReceived ? 'Pending Review' : null;
+  const statusLabel = isConfirmed || isReminder ? 'Confirmed / Approved' : isRescheduled ? 'Rescheduled' : isPostCare ? 'Completed' : isBookingRequestReceived ? 'Pending Review' : null;
+  const statusColor = isRescheduled ? '#d97706' : isPostCare ? '#0f766e' : '#2563eb';
 
   const showDetails = copy.showSummary && !isCancelled && !isStaffReply && !isRequestRejected;
 
@@ -54,7 +57,7 @@ export function EmailDesignPreview({
           .eml-p { font-size: 15px !important; line-height: 1.8 !important; }
         }
       `}</style>
-      <div className="eml-body" style={{ maxWidth: 600, margin: '0 auto', background: '#ffffff' }}>
+      <div className="eml-body" style={{ maxWidth: 720, margin: '0 auto', background: '#ffffff' }}>
 
         {/* Logo */}
         <div style={{ marginBottom: 28 }}>
@@ -75,12 +78,23 @@ export function EmailDesignPreview({
         {/* Appointment details block — label: value format */}
         {showDetails && (
           <div style={{ margin: '0 0 20px', paddingLeft: 0 }}>
+            {isRescheduled && (sample.oldDateStr || sample.oldTimeRangeStr) && (
+              <p style={{ ...p, margin: '0 0 8px' }}>
+                <span style={bold}>Previously scheduled:</span>{' '}
+                <span style={{ color: '#64748b', textDecoration: 'line-through' }}>
+                  {[sample.oldDateStr, sample.oldTimeRangeStr].filter(Boolean).join(' — ')}
+                </span>
+              </p>
+            )}
             {isRescheduled && (
               <p style={{ ...p, margin: '0 0 8px', fontWeight: 700 }}>Your new appointment details:</p>
             )}
+            {isPostCare && (
+              <p style={{ ...p, margin: '0 0 8px', fontWeight: 700 }}>Your recent visit:</p>
+            )}
             {statusLabel && (
               <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Status:</span>{' '}
-                <span style={{ fontWeight: 700, color: isPostCare ? '#0f766e' : '#2563eb' }}>{statusLabel}</span>
+                <span style={{ fontWeight: 700, color: statusColor }}>{statusLabel}</span>
                 {isBookingRequestReceived && (
                   <span style={{ fontWeight: 400, fontSize: 12, color: '#94a3b8', marginLeft: 6 }}>(preview only — actual status is NEW or CONVERTED)</span>
                 )}
@@ -92,27 +106,129 @@ export function EmailDesignPreview({
             {sample.serviceName && (
               <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Service:</span> {sample.serviceName}</p>
             )}
-            <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Location:</span> Samson Dental Center, Quezon City, Metro Manila</p>
+            <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Location:</span> Samson Dental Center, Quezon City, Metro Manila
+              {!isConfirmed && !isRescheduled && !isReminder && !isPostCare && sample.googleMapsUrl && (
+                <> (<a href={sample.googleMapsUrl} target="_blank" rel="noreferrer" style={link}>View on Google Maps</a>)</>
+              )}
+            </p>
             {sample.dateStr && (
               <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Date:</span> {sample.dateStr}</p>
             )}
             {sample.timeRangeStr && (
               <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Time:</span> {sample.timeRangeStr}</p>
             )}
-            {sample.appointmentId && (
-              <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Reference ID:</span> {sample.appointmentId}</p>
+            {referenceCode && (
+              <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Reference ID:</span> {referenceCode}</p>
             )}
           </div>
         )}
 
-        {/* Cancelled — date line + optional reason */}
-        {isCancelled && sample.dateStr && (
-          <p style={p}>
-            Your appointment originally scheduled for <span style={bold}>{sample.dateStr}</span> has been cancelled.{' '}
-            <span style={{ fontWeight: 700 }}>
-              {sample.cancellationReason || 'This appointment has been cancelled as requested.'}
-            </span>
-          </p>
+        {isRescheduled && sample.rescheduleReason && (
+          <p style={p}>Reschedule reason: <span style={bold}>{sample.rescheduleReason}</span></p>
+        )}
+
+        {/* Rescheduled — checklist bullets */}
+        {isRescheduled && (
+          <div style={{ margin: '0 0 20px', paddingLeft: 0 }}>
+            <p style={{ ...p, margin: '0 0 8px', fontWeight: 700 }}>Quick Reminders</p>
+            <ul style={{ margin: '0 0 16px', paddingLeft: 20, listStyle: 'disc', color: '#1a1a1a', fontSize: 14, lineHeight: 1.75 }}>
+              <li style={{ marginBottom: 6 }}>Please arrive 10-15 minutes early so we can get you checked in smoothly.</li>
+              <li style={{ marginBottom: 6 }}>
+                Have questions or need to reschedule?{' '}
+                <a href={ctaHref} style={link}>Click here to open clinic chat</a>, or call/text us at{' '}
+                <a href="tel:028123456" style={link}>(02) 8123-4567</a>.
+              </li>
+              <li>
+                <span style={{ color: '#dc2626', fontWeight: 600 }}>Note: Replies to this email are unmonitored.</span>
+              </li>
+            </ul>
+          </div>
+        )}
+
+        {isBookingRequestReceived && (
+          <div style={{ margin: '0 0 20px', paddingLeft: 0 }}>
+            <p style={{ ...p, margin: '0 0 8px', fontWeight: 700 }}>Here is a copy of your request:</p>
+            {sample.serviceName && <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Service:</span> {sample.serviceName}</p>}
+            {sample.dateStr && <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Preferred date:</span> {sample.dateStr}</p>}
+            {sample.preferredStartTimeStr && <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Preferred time:</span> {sample.preferredStartTimeStr}</p>}
+            {sample.appointmentId && <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Reference ID:</span> {sample.appointmentId}</p>}
+            <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Location:</span> Samson Dental Center, Quezon City, Metro Manila</p>
+            {sample.patientNote && <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Your note:</span> {sample.patientNote}</p>}
+          </div>
+        )}
+
+        {/* Booking request — what happens next */}
+        {isBookingRequestReceived && (
+          <div style={{ margin: '0 0 20px', paddingLeft: 0 }}>
+            <p style={{ ...p, margin: '0 0 8px', fontWeight: 700 }}>What happens next?</p>
+            <ul style={{ margin: '0 0 16px', paddingLeft: 20, listStyle: 'disc', color: '#1a1a1a', fontSize: 14, lineHeight: 1.75 }}>
+              <li style={{ marginBottom: 6 }}>Our staff reviews your request.</li>
+              <li style={{ marginBottom: 6 }}>Confirmation is sent by email or text.</li>
+              <li>No action needed from you — we&apos;ll be in touch.</li>
+            </ul>
+          </div>
+        )}
+
+        {/* Booking request — help checklist bullets */}
+        {isBookingRequestReceived && (
+          <div style={{ margin: '0 0 20px', paddingLeft: 0 }}>
+            <p style={{ ...p, margin: '0 0 8px', fontWeight: 700 }}>Need Help?</p>
+            <ul style={{ margin: '0 0 16px', paddingLeft: 20, listStyle: 'disc', color: '#1a1a1a', fontSize: 14, lineHeight: 1.75 }}>
+              <li style={{ marginBottom: 6 }}>
+                Questions? Call/text us at{' '}
+                <a href="tel:028123456" style={link}>(02) 8123-4567</a>.
+              </li>
+              <li>
+                <span style={{ color: '#dc2626', fontWeight: 600 }}>Note: Replies to this email are unmonitored.</span>
+              </li>
+            </ul>
+          </div>
+        )}
+
+        {/* Cancelled — details + optional reason + rebook CTA */}
+        {isCancelled && (
+          <>
+            <div style={{ margin: '0 0 16px', paddingLeft: 0 }}>
+              <p style={{ ...p, margin: '0 0 8px', fontWeight: 700 }}>Your cancelled appointment:</p>
+              {sample.serviceName && (
+                <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Service:</span> {sample.serviceName}</p>
+              )}
+              {sample.dateStr && (
+                <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Date:</span> {sample.dateStr}</p>
+              )}
+              {sample.timeRangeStr && (
+                <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Time:</span> {sample.timeRangeStr}</p>
+              )}
+              {referenceCode && (
+                <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Reference ID:</span> {referenceCode}</p>
+              )}
+            </div>
+            {sample.cancellationReason && (
+              <p style={p}>Cancellation reason: <span style={bold}>{sample.cancellationReason}</span></p>
+            )}
+          </>
+        )}
+
+        {/* Cancelled — help checklist bullets */}
+        {isCancelled && (
+          <div style={{ margin: '0 0 20px', paddingLeft: 0 }}>
+            <p style={{ ...p, margin: '0 0 8px', fontWeight: 700 }}>Need Help?</p>
+            <ul style={{ margin: '0 0 16px', paddingLeft: 20, listStyle: 'disc', color: '#1a1a1a', fontSize: 14, lineHeight: 1.75 }}>
+              <li style={{ marginBottom: 6 }}>
+                Questions? Call/text us at{' '}
+                <a href="tel:028123456" style={link}>(02) 8123-4567</a>.
+              </li>
+              {sample.rebookUrl && (
+                <li style={{ marginBottom: 6 }}>
+                  Ready to book again?{' '}
+                  <a href={sample.rebookUrl} target="_blank" rel="noreferrer" style={link}>Click here to make a new request</a>.
+                </li>
+              )}
+              <li>
+                <span style={{ color: '#dc2626', fontWeight: 600 }}>Note: Replies to this email are unmonitored.</span>
+              </li>
+            </ul>
+          </div>
         )}
 
         {/* Staff reply — primary CTA paragraph */}
@@ -124,8 +240,47 @@ export function EmailDesignPreview({
           </p>
         )}
 
+        {/* Staff reply — help checklist bullets */}
+        {isStaffReply && (
+          <div style={{ margin: '0 0 20px', paddingLeft: 0 }}>
+            <p style={{ ...p, margin: '0 0 8px', fontWeight: 700 }}>Need Help?</p>
+            <ul style={{ margin: '0 0 16px', paddingLeft: 20, listStyle: 'disc', color: '#1a1a1a', fontSize: 14, lineHeight: 1.75 }}>
+              <li style={{ marginBottom: 6 }}>
+                Questions? Call/text us at{' '}
+                <a href="tel:028123456" style={link}>(02) 8123-4567</a>.
+              </li>
+              <li>
+                <span style={{ color: '#dc2626', fontWeight: 600 }}>Note: Replies to this email are unmonitored.</span>
+              </li>
+            </ul>
+          </div>
+        )}
+
+        {/* Confirmed — checklist bullets */}
+        {isConfirmed && sample.approvalReason && (
+          <p style={p}>Approval reason: <span style={bold}>{sample.approvalReason}</span></p>
+        )}
+
+        {/* Confirmed & reminders — checklist bullets */}
+        {(isConfirmed || isReminder) && (
+          <div style={{ margin: '0 0 20px', paddingLeft: 0 }}>
+            <p style={{ ...p, margin: '0 0 8px', fontWeight: 700 }}>Quick Reminders</p>
+            <ul style={{ margin: '0 0 16px', paddingLeft: 20, listStyle: 'disc', color: '#1a1a1a', fontSize: 14, lineHeight: 1.75 }}>
+              <li style={{ marginBottom: 6 }}>Please arrive 10-15 minutes early so we can get you checked in smoothly.</li>
+              <li style={{ marginBottom: 6 }}>
+                Have questions or need to reschedule?{' '}
+                <a href={ctaHref} style={link}>Click here to open clinic chat</a>, or call/text us at{' '}
+                <a href="tel:028123456" style={link}>(02) 8123-4567</a>.
+              </li>
+              <li>
+                <span style={{ color: '#dc2626', fontWeight: 600 }}>Note: Replies to this email are unmonitored.</span>
+              </li>
+            </ul>
+          </div>
+        )}
+
         {/* Instructions */}
-        {copy.showInstructions && (copy.primaryInstruction || copy.secondaryInstruction) && (
+        {!isConfirmed && !isRescheduled && !isReminder && copy.showInstructions && (copy.primaryInstruction || copy.secondaryInstruction) && (
           <>
             {copy.primaryInstruction && <p style={p}>{copy.primaryInstruction}</p>}
             {copy.secondaryInstruction && <p style={p}>{copy.secondaryInstruction}</p>}
@@ -135,57 +290,108 @@ export function EmailDesignPreview({
         {/* Post-care feedback CTA */}
         {isPostCare && copy.showCta && copy.ctaLabel && (
           <p style={p}>
-            If you have a moment, we would love to hear about your experience &mdash; please{' '}
-            <a href={ctaHref} style={link}>click here to share your feedback</a>. Your feedback helps us continue to improve.
+            If you have a free moment, we would love to hear how your visit went —{' '}
+            <a href={ctaHref} style={link}>click here to share your feedback</a>. Your feedback helps us improve our service.
           </p>
         )}
 
-        {/* Appreciation / care paragraph */}
-        {!isCancelled && !isStaffReply && !isRequestRejected && (
+        {/* Post-care — after your visit bullets */}
+        {isPostCare && (
+          <div style={{ margin: '0 0 20px', paddingLeft: 0 }}>
+            <p style={{ ...p, margin: '0 0 8px', fontWeight: 700 }}>Quick Reminders</p>
+            <ul style={{ margin: '0 0 16px', paddingLeft: 20, listStyle: 'disc', color: '#1a1a1a', fontSize: 14, lineHeight: 1.75 }}>
+              <li style={{ marginBottom: 6 }}>Follow all post-treatment care instructions from your doctor.</li>
+              <li style={{ marginBottom: 6 }}>Concerns or questions? Call/text us at{' '}
+                <a href="tel:028123456" style={link}>(02) 8123-4567</a>.
+              </li>
+              <li>
+                <span style={{ color: '#dc2626', fontWeight: 600 }}>Note: Replies to this email are unmonitored.</span>
+              </li>
+            </ul>
+          </div>
+        )}
+
+        {/* Appreciation / care paragraph — skipped for confirmed, rescheduled, reminders & post-care (kept short) */}
+        {!isConfirmed && !isRescheduled && !isReminder && !isPostCare && !isCancelled && !isStaffReply && !isRequestRejected && (
           <p style={p}>
-            {isPostCare
-              ? 'Your health and well-being are our top priority, and we greatly appreciate your trust in our care. If you have any specific concerns following your visit, please feel free to let us know.'
-              : isBookingRequestReceived
+            {isBookingRequestReceived
               ? 'We appreciate your patience while we review your request. Our team will reach out to you shortly to confirm the details of your appointment.'
               : 'Your health is our top priority, and we greatly appreciate your trust in our care. If you have any specific concerns or requests for your appointment, please feel free to let us know.'
             }
           </p>
         )}
 
-        {/* Request rejected — apology paragraph + reason */}
+        {/* Request rejected — apology + labeled reason */}
         {isRequestRejected && (
-          <p style={p}>
-            We sincerely apologize for any inconvenience this may cause.{' '}
-            <span style={{ fontWeight: 700 }}>
-              {sample.rejectionReason || 'Unfortunately, we are unable to accommodate your request at this time.'}
-            </span>{' '}
-            If you would like to explore alternative dates or have any questions about our available services, please do not hesitate to contact us.
-          </p>
+          <>
+            <p style={p}>We sincerely apologize for any inconvenience this may cause.</p>
+            <p style={p}>Rejection reason: <span style={bold}>{sample.rejectionReason || 'Unfortunately, we are unable to accommodate your request at this time.'}</span></p>
+          </>
+        )}
+
+        {/* Request rejected — what was requested */}
+        {isRequestRejected && (
+          <div style={{ margin: '0 0 20px', paddingLeft: 0 }}>
+            <p style={{ ...p, margin: '0 0 8px', fontWeight: 700 }}>Your request:</p>
+            {sample.serviceName && <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Service:</span> {sample.serviceName}</p>}
+            {sample.dateStr && <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Preferred date:</span> {sample.dateStr}</p>}
+            {sample.preferredStartTimeStr && <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Preferred time:</span> {sample.preferredStartTimeStr}</p>}
+          </div>
+        )}
+
+        {/* Request rejected — what you can do */}
+        {isRequestRejected && (
+          <div style={{ margin: '0 0 20px', paddingLeft: 0 }}>
+            <p style={{ ...p, margin: '0 0 8px', fontWeight: 700 }}>Need Help?</p>
+            <ul style={{ margin: '0 0 16px', paddingLeft: 20, listStyle: 'disc', color: '#1a1a1a', fontSize: 14, lineHeight: 1.75 }}>
+              <li style={{ marginBottom: 6 }}>
+                Request a different date or time — call/text us at{' '}
+                <a href="tel:028123456" style={link}>(02) 8123-4567</a>.
+              </li>
+              {sample.rebookUrl && (
+                <li style={{ marginBottom: 6 }}>
+                  Ready to book again?{' '}
+                  <a href={sample.rebookUrl} target="_blank" rel="noreferrer" style={link}>Click here to make a new request</a>.
+                </li>
+              )}
+              <li>
+                <span style={{ color: '#dc2626', fontWeight: 600 }}>Note: Replies to this email are unmonitored.</span>
+              </li>
+            </ul>
+          </div>
         )}
 
         {/* Single consolidated contact block — chat link + phone if chat available, phone-only if not */}
-        <p style={p}>
-          {copy.showCta && !isPostCare
-            ? <>
-                If you have any questions{!isStaffReply && !isPostCare ? ', need to reschedule,' : ''} or need further assistance, please don&apos;t hesitate to reach out. You can{' '}
-                <a href={ctaHref} style={link}>click here to open the clinic chat</a>{' '}
-                or call or text us at <a href="tel:028123456" style={link}>(02) 8123-4567</a>.{' '}
-                <span style={{ color: '#dc2626', fontWeight: 600 }}>Please note that replies to this email are not monitored.</span>
-              </>
-            : <>If you have any questions or would like to reschedule a future appointment, please don&apos;t hesitate to call or text us at{' '}<a href="tel:028123456" style={link}>(02) 8123-4567</a>.{' '}<span style={{ color: '#dc2626', fontWeight: 600 }}>Please note that replies to this email are not monitored.</span></>
-          }
-        </p>
+        {!isConfirmed && !isCancelled && !isRescheduled && !isReminder && !isPostCare && !isStaffReply && !isBookingRequestReceived && !isRequestRejected && (
+          <p style={p}>
+            {copy.showCta && !isPostCare
+              ? <>
+                  If you have any questions{!isStaffReply && !isPostCare ? ', need to reschedule,' : ''} or need further assistance, please don&apos;t hesitate to reach out. You can{' '}
+                  <a href={ctaHref} style={link}>click here to open the clinic chat</a>{' '}
+                  or call or text us at <a href="tel:028123456" style={link}>(02) 8123-4567</a>.{' '}
+                  <span style={{ color: '#dc2626', fontWeight: 600 }}>Please note that replies to this email are not monitored.</span>
+                </>
+              : <>If you have any questions or would like to reschedule a future appointment, please don&apos;t hesitate to call or text us at{' '}<a href="tel:028123456" style={link}>(02) 8123-4567</a>.{' '}<span style={{ color: '#dc2626', fontWeight: 600 }}>Please note that replies to this email are not monitored.</span></>
+            }
+          </p>
+        )}
 
         {/* Closing */}
         <p style={{ ...p, marginBottom: 24 }}>
           {isCancelled
             ? "Thank you for letting us know, and we hope to welcome you back at Samson Dental Center soon."
+            : isConfirmed
+            ? "Thank you for choosing Samson Dental Center. See you soon!"
+            : isRescheduled
+            ? "Thank you for choosing Samson Dental Center. See you soon!"
+            : isReminder
+            ? "Thank you for choosing Samson Dental Center. See you soon!"
             : isRequestRejected
-            ? "We hope to have the opportunity to serve you in the future. Thank you for considering Samson Dental Center."
+            ? "Thank you for choosing Samson Dental Center."
             : isBookingRequestReceived
-            ? "Thank you for choosing Samson Dental Center. We look forward to welcoming you soon."
+            ? "Thank you for choosing Samson Dental Center."
             : isPostCare
-            ? "Thank you for choosing Samson Dental Center. We're dedicated to providing you with the best possible dental care experience."
+            ? "Thank you for choosing Samson Dental Center. We hope to see you again soon."
             : isStaffReply
             ? "Thank you for choosing Samson Dental Center. We look forward to assisting you."
             : `Thank you for choosing Samson Dental Center. We can't wait to see you on ${sample.dateStr || 'your appointment date'} at ${sample.timeRangeStr || 'the scheduled time'}.`
@@ -209,7 +415,7 @@ export function EmailDesignPreview({
             {isBookingRequestReceived || isRequestRejected
               ? 'You received this email because you submitted a booking inquiry with Samson Dental Center.'
               : 'You received this email because you have an appointment with Samson Dental Center.'}
-            {' '}If you believe this was sent in error, please contact our office.{' '}
+            {' '}
             <a href={`${baseUrl}/terms`} target="_blank" rel="noreferrer" style={{ color: '#94a3b8' }}>Terms of Service</a>
             {' '}·{' '}
             <a href={`${baseUrl}/privacy`} target="_blank" rel="noreferrer" style={{ color: '#94a3b8' }}>Privacy Policy</a>

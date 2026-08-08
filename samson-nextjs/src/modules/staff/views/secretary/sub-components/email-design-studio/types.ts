@@ -20,7 +20,18 @@ export type SampleDataField =
   | 'appointmentId'
   | 'baseUrl'
   | 'rejectionReason'
-  | 'cancellationReason';
+  | 'cancellationReason'
+  | 'preferredStartTimeStr'
+  | 'patientNote'
+  | 'approvalReason'
+  | 'rescheduleReason'
+  | 'checkoutNote'
+  | 'referenceCode'
+  | 'oldDateStr'
+  | 'oldTimeRangeStr'
+  | 'calendarAddUrl'
+  | 'googleMapsUrl'
+  | 'rebookUrl';
 
 export interface SampleData {
   patientName: string;
@@ -32,6 +43,17 @@ export interface SampleData {
   baseUrl: string;
   rejectionReason: string;
   cancellationReason: string;
+  preferredStartTimeStr: string;
+  patientNote: string;
+  approvalReason: string;
+  rescheduleReason: string;
+  checkoutNote: string;
+  referenceCode: string;
+  oldDateStr: string;
+  oldTimeRangeStr: string;
+  calendarAddUrl: string;
+  googleMapsUrl: string;
+  rebookUrl: string;
 }
 
 export interface DesignTokens {

@@ -118,6 +118,30 @@ export function DynamicDataControls({
             </div>
           )}
 
+          {visibleFields.has('oldDateStr') && (
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Previous Appointment Date</label>
+              <Input
+                value={sample.oldDateStr}
+                onChange={(event) => onUpdateField('oldDateStr', event.target.value)}
+                placeholder="e.g. Monday, June 15, 2026"
+                className="h-9 text-xs rounded-lg bg-background"
+              />
+            </div>
+          )}
+
+          {visibleFields.has('oldTimeRangeStr') && (
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Previous Time Range</label>
+              <Input
+                value={sample.oldTimeRangeStr}
+                onChange={(event) => onUpdateField('oldTimeRangeStr', event.target.value)}
+                placeholder="e.g. 9:00 AM – 9:30 AM"
+                className="h-9 text-xs rounded-lg bg-background"
+              />
+            </div>
+          )}
+
           {visibleFields.has('appointmentId') && (
             <div>
               <label className="block text-xs font-medium text-muted-foreground mb-1">Reference ID</label>
@@ -125,6 +149,57 @@ export function DynamicDataControls({
                 value={sample.appointmentId}
                 onChange={(event) => onUpdateField('appointmentId', event.target.value)}
                 placeholder="e.g. APT-GUEST-2026"
+                className="h-9 text-xs rounded-lg bg-background"
+              />
+            </div>
+          )}
+
+          {visibleFields.has('referenceCode') && (
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Reference Code (short)</label>
+              <Input
+                value={sample.referenceCode}
+                onChange={(event) => onUpdateField('referenceCode', event.target.value)}
+                placeholder="e.g. SDC-8921"
+                className="h-9 text-xs rounded-lg bg-background"
+              />
+              <span className="text-[10px] text-muted-foreground mt-1 block">
+                Falls back to the first 8 chars of the Reference ID when empty.
+              </span>
+            </div>
+          )}
+
+          {visibleFields.has('calendarAddUrl') && (
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Add-to-Calendar Link</label>
+              <Input
+                value={sample.calendarAddUrl}
+                onChange={(event) => onUpdateField('calendarAddUrl', event.target.value)}
+                placeholder="e.g. https://calendar.google.com/calendar/render?action=TEMPLATE&text=..."
+                className="h-9 text-xs rounded-lg bg-background"
+              />
+            </div>
+          )}
+
+          {visibleFields.has('googleMapsUrl') && (
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Google Maps Link</label>
+              <Input
+                value={sample.googleMapsUrl}
+                onChange={(event) => onUpdateField('googleMapsUrl', event.target.value)}
+                placeholder="e.g. https://maps.google.com/?q=Samson+Dental+Center"
+                className="h-9 text-xs rounded-lg bg-background"
+              />
+            </div>
+          )}
+
+          {visibleFields.has('rebookUrl') && (
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Rebook Link</label>
+              <Input
+                value={sample.rebookUrl}
+                onChange={(event) => onUpdateField('rebookUrl', event.target.value)}
+                placeholder="e.g. https://samson-dental.com/book"
                 className="h-9 text-xs rounded-lg bg-background"
               />
             </div>
@@ -165,6 +240,70 @@ export function DynamicDataControls({
                 value={sample.cancellationReason}
                 onChange={(event) => onUpdateField('cancellationReason', event.target.value)}
                 placeholder="e.g. This appointment has been cancelled as requested..."
+                rows={3}
+                className="w-full text-xs p-2.5 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 resize-none"
+              />
+            </div>
+          )}
+
+          {visibleFields.has('approvalReason') && (
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Approval Reason / Note</label>
+              <textarea
+                value={sample.approvalReason}
+                onChange={(event) => onUpdateField('approvalReason', event.target.value)}
+                placeholder="e.g. Slot confirmed by clinic..."
+                rows={3}
+                className="w-full text-xs p-2.5 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 resize-none"
+              />
+            </div>
+          )}
+
+          {visibleFields.has('rescheduleReason') && (
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Reschedule Reason</label>
+              <textarea
+                value={sample.rescheduleReason}
+                onChange={(event) => onUpdateField('rescheduleReason', event.target.value)}
+                placeholder="e.g. Patient requested new date..."
+                rows={3}
+                className="w-full text-xs p-2.5 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 resize-none"
+              />
+            </div>
+          )}
+
+          {visibleFields.has('checkoutNote') && (
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Visit / Checkout Note</label>
+              <textarea
+                value={sample.checkoutNote}
+                onChange={(event) => onUpdateField('checkoutNote', event.target.value)}
+                placeholder="e.g. Treatment completed and reviewed with patient..."
+                rows={3}
+                className="w-full text-xs p-2.5 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 resize-none"
+              />
+            </div>
+          )}
+
+          {visibleFields.has('preferredStartTimeStr') && (
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Preferred Time</label>
+              <Input
+                value={sample.preferredStartTimeStr}
+                onChange={(event) => onUpdateField('preferredStartTimeStr', event.target.value)}
+                placeholder="e.g. 2:00 PM"
+                className="h-9 text-xs rounded-lg bg-background"
+              />
+            </div>
+          )}
+
+          {visibleFields.has('patientNote') && (
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Patient Note</label>
+              <textarea
+                value={sample.patientNote}
+                onChange={(event) => onUpdateField('patientNote', event.target.value)}
+                placeholder="e.g. Prefer mornings if possible..."
                 rows={3}
                 className="w-full text-xs p-2.5 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 resize-none"
               />
