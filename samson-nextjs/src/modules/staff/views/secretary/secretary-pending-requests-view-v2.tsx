@@ -414,10 +414,8 @@ export function SecretaryPendingRequestsViewV2() {
                       value={approvalReason}
                       onChange={(e) => {
                         setApprovalReason(e.target.value);
-                        if (e.target.value !== 'Others') {
-                          inquiriesView.setStagedInquiryNote(e.target.value);
-                        } else {
-                          inquiriesView.setStagedInquiryNote('');
+                        if (inquiriesView.stagedInquiryAction === 'DROP') {
+                          inquiriesView.setStagedInquiryNote(e.target.value === 'Others' ? '' : e.target.value);
                         }
                       }}
                       className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border appearance-none"
@@ -434,8 +432,11 @@ export function SecretaryPendingRequestsViewV2() {
                   </div>
                   {approvalReason === 'Others' && (
                     <textarea
-                      value={inquiriesView.stagedInquiryNote}
-                      onChange={(e) => inquiriesView.setStagedInquiryNote(e.target.value)}
+                      value={inquiriesView.stagedInquiryAction === 'DROP' ? inquiriesView.stagedInquiryNote : approvalReason}
+                      onChange={(e) => {
+                        setApprovalReason(e.target.value);
+                        if (inquiriesView.stagedInquiryAction === 'DROP') inquiriesView.setStagedInquiryNote(e.target.value);
+                      }}
                       placeholder="Enter custom reason..."
                       rows={3}
                       className="w-full text-sm border border-card-border rounded-xl px-4 py-2.5 bg-card focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border resize-none mt-1"

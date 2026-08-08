@@ -34,6 +34,7 @@ export function useSecretaryInquiriesQueue() {
   const [stagedInquiryNote, setStagedInquiryNote] = useState('');
   const [linkedPatientId, setLinkedPatientId] = useState<string | null>(null);
   const [stagedSecretaryNotes, setStagedSecretaryNotes] = useState('');
+  const [approvalReason, setApprovalReason] = useState('');
   const [isNotesManual, setIsNotesManual] = useState(false);
   const [guestFirstName, setGuestFirstName] = useState('');
   const [guestMiddleName, setGuestMiddleName] = useState('');
@@ -301,6 +302,7 @@ export function useSecretaryInquiriesQueue() {
     setStagedInquiryEndTime(parseHHMM(inquiry.assignedEndTime));
     setStagedInquiryNote(inquiry.patientNote || '');
     setStagedSecretaryNotes('');
+    setApprovalReason('');
     setIsNotesManual(false);
     setLinkedPatientId(null);
     setPatientMode('GUEST');
@@ -438,7 +440,7 @@ export function useSecretaryInquiriesQueue() {
           startTime: stagedInquiryTime,
           endTime: stagedInquiryEndTime,
           patientNote: stagedInquiryNote || undefined,
-          secretaryNotes: stagedSecretaryNotes || undefined,
+          secretaryNotes: approvalReason || stagedSecretaryNotes || undefined,
           linkedPatientId: linkedPatientId || undefined,
           guestFirstName: guestFirstName || undefined,
           guestMiddleName: guestMiddleName || undefined,
@@ -482,7 +484,7 @@ export function useSecretaryInquiriesQueue() {
   const canSubmit = !isSubmitting
     && !isAvailabilityLoading
     && !!stagedInquiryAction
-    && !!stagedInquiryNote.trim()
+    && (stagedInquiryAction === 'CONVERT' ? !!approvalReason.trim() : !!stagedInquiryNote.trim())
     && (stagedInquiryAction === 'DROP'
       ? true
       : !!(stagedInquiryService && stagedInquiryDate && stagedInquiryDoctor && stagedInquiryTime && stagedInquiryEndTime));
@@ -492,7 +494,7 @@ export function useSecretaryInquiriesQueue() {
     stagedInquiryAction, setDecision, stagedInquiryService, selectService, stagedInquiryDoctor, selectDoctor,
     stagedInquiryDate, selectDate, stagedInquiryTime, setStagedInquiryTime, stagedInquiryEndTime, setStagedInquiryEndTime,
     selectSlot, stagedInquiryNote, setStagedInquiryNote,
-    stagedSecretaryNotes, setSecretaryNotes, guestFirstName, setGuestFirstName, guestMiddleName, setGuestMiddleName,
+    stagedSecretaryNotes, setSecretaryNotes, approvalReason, setApprovalReason, guestFirstName, setGuestFirstName, guestMiddleName, setGuestMiddleName,
     guestLastName, setGuestLastName, guestSuffix, setGuestSuffix, guestPhone, setGuestPhone, guestEmail, setGuestEmail,
     confirmationChannel, setConfirmationChannel,
     patientMode, setPatientMode, patientSearchQuery, setPatientSearchQuery, patientSearchResults, isSearchingPatients,
