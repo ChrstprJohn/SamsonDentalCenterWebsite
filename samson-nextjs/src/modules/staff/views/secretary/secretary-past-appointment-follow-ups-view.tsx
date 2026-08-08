@@ -202,7 +202,7 @@ function FollowUpDetail({ appointment, view, onBack, className }: { appointment:
   const [resolveReason, setResolveReason] = useState('');
   const [showCustomReason, setShowCustomReason] = useState(false);
   const resolveReasonOptions: Record<string, string[]> = {
-    COMPLETED: ['Secretary forgot to click check-in', 'Patient was seen but not checked in', 'Administrative oversight'],
+    COMPLETED: ['Visit completed but status updated late', 'Patient was seen but not checked in', 'Status corrected after visit'],
     CONFIRMED_NO_SHOW: ['Patient failed to arrive for appointment', 'Patient arrived after closing', 'Patient refused treatment'],
     RESCHEDULE: ['Patient requested new date', 'Doctor requested reschedule', 'Administrative reschedule'],
   };

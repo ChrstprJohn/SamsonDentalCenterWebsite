@@ -1,3 +1,4 @@
+// ponytail: dead code — no imports/route use this modal; superseded by check-in-detail-pane resolve flow. Delete when convenient.
 'use client';
 
 import { useState, useEffect } from 'react';

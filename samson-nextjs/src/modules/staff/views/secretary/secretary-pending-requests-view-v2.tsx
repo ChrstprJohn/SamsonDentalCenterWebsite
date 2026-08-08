@@ -82,11 +82,19 @@ function formatTime(time: string): string {
   return `${String(h12).padStart(2, '0')}:${m} ${ampm}`;
 }
 
-const COMMON_REASONS = [
-  'Patient request accepted',
-  'Appointment confirmed',
-  'Rescheduled from previous date',
+const CONVERT_REASONS = [
+  'Request approved - appointment confirmed',
+  'Slot confirmed by clinic',
+  'Patient accepted by phone/chat',
   'Emergency case accommodated',
+  'Others',
+];
+
+const DROP_REASONS = [
+  'Patient no longer interested',
+  'Duplicate inquiry',
+  'Patient unreachable / no reply',
+  'Patient requested removal',
   'Others',
 ];
 
@@ -423,7 +431,7 @@ export function SecretaryPendingRequestsViewV2() {
                       <option value="">
                         {inquiriesView.stagedInquiryAction === 'CONVERT' ? 'Select approval note...' : 'Select drop reason...'}
                       </option>
-                      {COMMON_REASONS.map((r) => (
+                      {(inquiriesView.stagedInquiryAction === 'CONVERT' ? CONVERT_REASONS : DROP_REASONS).map((r) => (
                         <option key={r} value={r}>{r}</option>
                       ))}
                     </select>

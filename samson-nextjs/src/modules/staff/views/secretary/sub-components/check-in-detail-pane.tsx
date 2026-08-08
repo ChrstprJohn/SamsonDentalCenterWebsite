@@ -51,7 +51,7 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
 
   const resolveReasonOptions: Record<string, string[]> = {
     CHECKED_IN: ['Patient arrived late - checked in directly', 'Check-in window passed before secretary clicked check-in', 'Patient is currently in waiting room / clinic'],
-    COMPLETED: ['Secretary forgot to click check-in', 'Patient was seen but not checked in', 'Administrative oversight'],
+    COMPLETED: ['Visit completed but status updated late', 'Patient was seen but not checked in', 'Status corrected after visit'],
     CONFIRMED_NO_SHOW: ['Patient failed to arrive for appointment', 'Patient arrived after closing', 'Patient refused treatment'],
   };
   const [selectedPreset, setSelectedPreset] = useState('');
@@ -807,7 +807,7 @@ function ResolveContent({ view, onClose }: { view: any; onClose: () => void }) {
   const reasonOptions = resolution === 'CHECKED_IN'
     ? ['Patient arrived late - checked in directly', 'Check-in window passed before secretary clicked check-in', 'Patient is currently in waiting room / clinic', 'CUSTOM']
     : resolution === 'COMPLETED'
-      ? ['Secretary forgot to click check-in', 'Visit completed but status was not updated', 'System issue prevented status update', 'CUSTOM']
+      ? ['Visit completed but status updated late', 'Visit completed but status was not updated', 'System issue prevented status update', 'CUSTOM']
       : ['Patient failed to arrive for appointment', 'Patient confirmed they would not attend', 'Patient left before check-in was completed', 'CUSTOM'];
 
   const resolutionWarning = resolution === 'CHECKED_IN'
