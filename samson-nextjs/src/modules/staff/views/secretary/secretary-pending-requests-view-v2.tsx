@@ -93,7 +93,6 @@ const COMMON_REASONS = [
 export function SecretaryPendingRequestsViewV2() {
   const inquiriesView = useSecretaryInquiriesQueue();
   const [detailTab, setDetailTab] = React.useState<'overview' | 'notifications' | 'timeline'>('overview');
-  const [approvalReason, setApprovalReason] = React.useState('');
   const [mobileView, setMobileView] = React.useState<'list' | 'detail' | 'quickLogs'>('list');
   const [isEditingPatient, setIsEditingPatient] = React.useState(false);
   const [patientSnapshot, setPatientSnapshot] = React.useState<Record<string, string>>({});
@@ -299,7 +298,7 @@ export function SecretaryPendingRequestsViewV2() {
             <div className="p-4 border-b border-card-border/40 shrink-0 h-14 flex items-center">
               <div className="flex items-center gap-2 min-w-0 flex-1">
                 <button
-                  onClick={() => { inquiriesView.setDecision(''); setApprovalReason(''); }}
+                  onClick={() => { inquiriesView.setDecision(''); inquiriesView.setApprovalReason(''); }}
                   className="p-1 -ml-1 text-muted-foreground hover:text-foreground shrink-0"
                 >
                   <ArrowLeft className="size-5" />
@@ -411,9 +410,9 @@ export function SecretaryPendingRequestsViewV2() {
                   </span>
                   <div className="relative mt-1">
                     <select
-                      value={approvalReason}
+                      value={inquiriesView.approvalReason}
                       onChange={(e) => {
-                        setApprovalReason(e.target.value);
+                        inquiriesView.setApprovalReason(e.target.value);
                         if (inquiriesView.stagedInquiryAction === 'DROP') {
                           inquiriesView.setStagedInquiryNote(e.target.value === 'Others' ? '' : e.target.value);
                         }
@@ -430,11 +429,11 @@ export function SecretaryPendingRequestsViewV2() {
                     </select>
                     <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
                   </div>
-                  {approvalReason === 'Others' && (
+                  {inquiriesView.approvalReason === 'Others' && (
                     <textarea
-                      value={inquiriesView.stagedInquiryAction === 'DROP' ? inquiriesView.stagedInquiryNote : approvalReason}
+                      value={inquiriesView.stagedInquiryAction === 'DROP' ? inquiriesView.stagedInquiryNote : inquiriesView.approvalReason}
                       onChange={(e) => {
-                        setApprovalReason(e.target.value);
+                        inquiriesView.setApprovalReason(e.target.value);
                         if (inquiriesView.stagedInquiryAction === 'DROP') inquiriesView.setStagedInquiryNote(e.target.value);
                       }}
                       placeholder="Enter custom reason..."
@@ -464,7 +463,7 @@ export function SecretaryPendingRequestsViewV2() {
               </Button>
               <Button
                 type="button"
-                onClick={() => { inquiriesView.setDecision(''); setApprovalReason(''); }}
+                onClick={() => { inquiriesView.setDecision(''); inquiriesView.setApprovalReason(''); }}
                 className="flex-1 h-[44px] text-sm font-medium border border-card-border text-foreground bg-transparent hover:bg-muted rounded-xl"
               >
                 Cancel
@@ -811,7 +810,7 @@ export function SecretaryPendingRequestsViewV2() {
                           size="default"
                           disabled={isEditing || !isReady}
                           className="flex-1 py-3 text-sm font-semibold shadow-sm !from-slate-900 !to-slate-900 !text-white hover:!from-slate-800 hover:!to-slate-800 disabled:!from-slate-400 disabled:!to-slate-400"
-                          onClick={() => { inquiriesView.setDecision('CONVERT'); setApprovalReason(''); }}
+                          onClick={() => { inquiriesView.setDecision('CONVERT'); inquiriesView.setApprovalReason(''); }}
                         >
                           Approve/Convert
                         </Button>
@@ -820,7 +819,7 @@ export function SecretaryPendingRequestsViewV2() {
                           size="default"
                           disabled={isEditing}
                           className="flex-1 border-red-200 text-red-700 hover:bg-red-50 h-auto py-3 text-sm"
-                          onClick={() => { inquiriesView.setDecision('DROP'); setApprovalReason(''); }}
+                          onClick={() => { inquiriesView.setDecision('DROP'); inquiriesView.setApprovalReason(''); }}
                         >
                           Reject/Drop
                         </Button>
