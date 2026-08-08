@@ -119,7 +119,7 @@ export function BookingWizardView({ services, initialServiceId }: BookingWizardV
             className="inline-flex items-center gap-2 font-sans text-sm font-medium text-gray-700 hover:text-[#D94E4E] transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Return Homepage</span>
+            <span>Return to Home</span>
           </Link>
 
           {/* Center: Centered Stepper Navigation Pills with boxed number badge */}
