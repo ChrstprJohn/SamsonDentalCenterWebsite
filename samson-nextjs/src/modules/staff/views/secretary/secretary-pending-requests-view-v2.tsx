@@ -83,7 +83,6 @@ function formatTime(time: string): string {
 }
 
 const CONVERT_REASONS = [
-  'Request approved - appointment confirmed',
   'Slot confirmed by clinic',
   'Patient accepted by phone/chat',
   'Emergency case accommodated',
