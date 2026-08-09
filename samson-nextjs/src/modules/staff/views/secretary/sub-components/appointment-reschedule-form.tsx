@@ -173,10 +173,13 @@ export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps)
     justification: props.justification,
   });
 
+  const [isEditingChannel, setIsEditingChannel] = useState(false);
+
   return (
     <FormWrapper
       onSubmit={props.noForm ? undefined : (event) => {
         event.preventDefault();
+        if (isEditingChannel) return;
         props.onSubmit();
       }}
       className="flex flex-col gap-4"
@@ -314,7 +317,14 @@ export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps)
         </div>
       </div>
 
-      {props.onConfirmationChannelChange && <NotificationChannelField appointmentId={props.appointment.id} value={props.confirmationChannel} onChange={props.onConfirmationChannelChange} />}
+      {props.onConfirmationChannelChange && (
+        <NotificationChannelField
+          appointmentId={props.appointment.id}
+          value={props.confirmationChannel}
+          onChange={props.onConfirmationChannelChange}
+          onEditingChange={setIsEditingChannel}
+        />
+      )}
 
       {/* 5. Justification / Reschedule Reason Dropdown + Custom Input */}
       <div className="flex flex-col gap-1.5">
@@ -353,7 +363,7 @@ export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps)
         <div className="flex gap-2 pt-3 border-t border-card-border/60">
           <Button
             type="submit"
-            disabled={props.isSubmitting || !isFormComplete}
+            disabled={props.isSubmitting || !isFormComplete || isEditingChannel}
             className="flex-1 h-[42px] text-sm font-medium bg-primary text-white hover:bg-primary/90 rounded-xl disabled:opacity-50"
           >
             {props.isSubmitting ? 'Saving...' : 'Confirm'}

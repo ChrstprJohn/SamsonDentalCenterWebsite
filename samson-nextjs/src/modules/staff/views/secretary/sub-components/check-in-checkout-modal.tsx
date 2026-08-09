@@ -124,6 +124,12 @@ export function CheckInCheckoutModal({ view }: { view: any }) {
         </div>
 
 
+        {isEditingChannel && (
+          <p className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center mb-2">
+            Please finish editing or save your channel changes before completing checkout.
+          </p>
+        )}
+
         <div className="flex justify-end gap-2 mt-2">
           <Button
             type="button"

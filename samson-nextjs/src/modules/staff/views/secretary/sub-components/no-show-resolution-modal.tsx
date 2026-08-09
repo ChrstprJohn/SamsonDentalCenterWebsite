@@ -406,29 +406,36 @@ export function NoShowResolutionModal({ view }: { view: any }) {
 
 
           {resolution !== 'RESCHEDULE' && (
-            <div className="flex justify-end gap-2 mt-2">
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={() => view.setResolveAppt(null)}
-                className="text-xs h-9 px-4 rounded-xl"
-              >
-                Back
-              </Button>
-              <Button
-                type="button"
-                onClick={(e) => handleSubmit(e as any)}
-                disabled={view.isPending}
-                className={`text-xs h-9 px-5 font-bold rounded-xl border-none ${
-                  resolution === 'CHECKED_IN'
-                    ? 'bg-blue-500 hover:bg-blue-600 text-white'
-                    : resolution === 'COMPLETED'
-                    ? 'bg-emerald-500 hover:bg-emerald-600 text-white'
-                    : 'bg-red-500 hover:bg-red-600 text-white'
-                }`}
-              >
-                Submit Resolution
-              </Button>
+            <div className="flex flex-col gap-2 mt-2">
+              {isEditingChannel && (
+                <p className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center">
+                  Please finish editing or save your channel changes before submitting resolution.
+                </p>
+              )}
+              <div className="flex justify-end gap-2">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => view.setResolveAppt(null)}
+                  className="text-xs h-9 px-4 rounded-xl"
+                >
+                  Back
+                </Button>
+                <Button
+                  type="button"
+                  onClick={(e) => handleSubmit(e as any)}
+                  disabled={view.isPending || isEditingChannel}
+                  className={`text-xs h-9 px-5 font-bold rounded-xl border-none disabled:opacity-40 ${
+                    resolution === 'CHECKED_IN'
+                      ? 'bg-blue-500 hover:bg-blue-600 text-white'
+                      : resolution === 'COMPLETED'
+                      ? 'bg-emerald-500 hover:bg-emerald-600 text-white'
+                      : 'bg-red-500 hover:bg-red-600 text-white'
+                  }`}
+                >
+                  Submit Resolution
+                </Button>
+              </div>
             </div>
           )}
         </div>

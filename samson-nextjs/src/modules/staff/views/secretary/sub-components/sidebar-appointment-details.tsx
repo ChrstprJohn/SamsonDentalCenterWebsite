@@ -425,11 +425,17 @@ export function SidebarAppointmentDetails({
           </div>
         )}
 
+        {isEditingGuestInfo && (
+          <p className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center mb-3">
+            Please finish editing or save guest information before taking action.
+          </p>
+        )}
+
         {activeAction === 'NONE' ? (
           <div className="w-full">
             {isActiveStatus ? (
               <div className="flex gap-2">
-                <Button variant="outline" className="flex-1" onClick={() => {
+                <Button variant="outline" disabled={isEditingGuestInfo} className="flex-1 disabled:opacity-40" onClick={() => {
                   setActiveAction('RESCHEDULE');
                   
                   const parseTimeToHHMM = (timeStr?: string | null) => {
@@ -450,7 +456,7 @@ export function SidebarAppointmentDetails({
                 }}>
                   <Calendar className="size-4" /> Reschedule
                 </Button>
-                <Button onClick={() => { setActiveAction('CANCEL'); setActionError(null); setActionSuccess(null); }} variant="outline" className="flex-1 border-destructive/50 text-destructive hover:bg-destructive/10">
+                <Button disabled={isEditingGuestInfo} onClick={() => { setActiveAction('CANCEL'); setActionError(null); setActionSuccess(null); }} variant="outline" className="flex-1 border-destructive/50 text-destructive hover:bg-destructive/10 disabled:opacity-40">
                   Cancel
                 </Button>
               </div>

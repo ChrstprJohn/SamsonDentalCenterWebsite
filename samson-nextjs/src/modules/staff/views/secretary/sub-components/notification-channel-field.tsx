@@ -12,10 +12,12 @@ export function NotificationChannelField({
   appointmentId,
   value,
   onChange,
+  onEditingChange,
 }: {
   appointmentId: string;
   value?: NotificationChannel;
   onChange?: (value: NotificationChannel) => void;
+  onEditingChange?: (isEditing: boolean) => void;
 }) {
   const current = value || 'EMAIL';
   const [channel, setChannel] = useState<NotificationChannel>(current);
@@ -25,11 +27,16 @@ export function NotificationChannelField({
 
   useEffect(() => { setChannel(current); setDraft(current); setEditing(false); }, [current, appointmentId]);
 
+  const toggleEditing = (isEdit: boolean) => {
+    setEditing(isEdit);
+    onEditingChange?.(isEdit);
+  };
+
   const save = async () => {
-    if (draft === channel) { setEditing(false); return; }
+    if (draft === channel) { toggleEditing(false); return; }
     setSaving(true);
     const result = await updateConfirmationChannelAction({ appointmentId, confirmationChannel: draft });
-    if (result.success) { setChannel(draft); onChange?.(draft); setEditing(false); }
+    if (result.success) { setChannel(draft); onChange?.(draft); toggleEditing(false); }
     setSaving(false);
   };
 
@@ -41,12 +48,12 @@ export function NotificationChannelField({
           <span className="text-xs text-muted-foreground">Which channel should be used to notify the patient?</span>
         </div>
         {!editing ? (
-          <Button type="button" variant="outline" size="sm" onClick={() => setEditing(true)} className="h-7 px-2.5 text-xs gap-1 shrink-0">
+          <Button type="button" variant="outline" size="sm" onClick={() => toggleEditing(true)} className="h-7 px-2.5 text-xs gap-1 shrink-0">
             <Pencil className="size-3.5" /> Edit
           </Button>
         ) : (
           <div className="flex items-center gap-2">
-            <Button type="button" variant="outline" size="sm" onClick={() => { setDraft(channel); setEditing(false); }} className="h-7 px-2.5 text-xs gap-1">
+            <Button type="button" variant="outline" size="sm" onClick={() => { setDraft(channel); toggleEditing(false); }} className="h-7 px-2.5 text-xs gap-1">
               <X className="size-3.5" /> Cancel
             </Button>
             <Button type="button" size="sm" onClick={save} disabled={saving || draft === channel} className="h-7 px-2.5 text-xs gap-1 bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50">
@@ -56,9 +63,14 @@ export function NotificationChannelField({
         )}
       </div>
       {editing ? (
-        <Select value={draft} onChange={(e) => setDraft(e.target.value as NotificationChannel)} className="text-sm w-full" options={[
-          { value: 'EMAIL', label: 'Email' }, { value: 'SMS', label: 'SMS' }, { value: 'BOTH', label: 'Email & SMS' }, { value: 'NONE', label: 'None' },
-        ]} />
+        <>
+          <p className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center">
+            Please finish editing or save notification channel before confirming.
+          </p>
+          <Select value={draft} onChange={(e) => setDraft(e.target.value as NotificationChannel)} className="text-sm w-full" options={[
+            { value: 'EMAIL', label: 'Email' }, { value: 'SMS', label: 'SMS' }, { value: 'BOTH', label: 'Email & SMS' }, { value: 'NONE', label: 'None' },
+          ]} />
+        </>
       ) : (
         <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">
           {channel === 'EMAIL' ? 'Email' : channel === 'SMS' ? 'SMS' : channel === 'BOTH' ? 'Email & SMS' : 'None'}

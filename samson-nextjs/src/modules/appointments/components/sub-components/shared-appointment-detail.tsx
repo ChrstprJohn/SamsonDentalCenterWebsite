@@ -22,9 +22,10 @@ interface SharedAppointmentDetailProps {
   actionsBar?: ReactNode;
   compact?: boolean;
   onAppointmentUpdated?: (updatedAppointment?: AppointmentDto) => void;
+  onEditingGuestInfoChange?: (isEditing: boolean) => void;
 }
 
-export function SharedAppointmentDetail({ appointment, extraSections, actionsBar, compact, onAppointmentUpdated }: SharedAppointmentDetailProps) {
+export function SharedAppointmentDetail({ appointment, extraSections, actionsBar, compact, onAppointmentUpdated, onEditingGuestInfoChange }: SharedAppointmentDetailProps) {
   const [localAppointment, setLocalAppointment] = useState<AppointmentDto>(appointment);
   const [patientProfile, setPatientProfile] = useState<{ email?: string; phoneNumber?: string } | null>(null);
   const [isEditingGuestInfo, setIsEditingGuestInfo] = useState(false);
@@ -35,7 +36,7 @@ export function SharedAppointmentDetail({ appointment, extraSections, actionsBar
     setLocalAppointment(appointment);
   }, [appointment]);
 
-  const hasGuestInfo = !!localAppointment.guestContact;
+  const hasGuestInfo = true;
   const isGuest = !localAppointment.patientId || localAppointment.source === 'STAFF_CREATED' || localAppointment.source === 'CONVERTED';
 
   const formatName = () => {
@@ -66,19 +67,22 @@ export function SharedAppointmentDetail({ appointment, extraSections, actionsBar
   );
 
   const startEditGuestInfo = () => {
-    if (!hasGuestInfo) return;
     setGuestInfoDraft({
-      firstName: localAppointment.guestContact?.firstName || '',
+      firstName: localAppointment.guestContact?.firstName || localAppointment.patient?.firstName || '',
       middleName: localAppointment.guestContact?.middleName || '',
-      lastName: localAppointment.guestContact?.lastName || '',
+      lastName: localAppointment.guestContact?.lastName || localAppointment.patient?.lastName || '',
       suffix: localAppointment.guestContact?.suffix || '',
-      email: localAppointment.guestContact?.email || '',
-      phone: localAppointment.guestContact?.phone || '',
+      email: localAppointment.guestContact?.email || patientProfile?.email || '',
+      phone: localAppointment.guestContact?.phone || patientProfile?.phoneNumber || '',
     });
     setIsEditingGuestInfo(true);
+    onEditingGuestInfoChange?.(true);
   };
 
-  const cancelEditGuestInfo = () => setIsEditingGuestInfo(false);
+  const cancelEditGuestInfo = () => {
+    setIsEditingGuestInfo(false);
+    onEditingGuestInfoChange?.(false);
+  };
 
   const saveGuestInfo = async () => {
     setSavingGuestInfo(true);
@@ -105,6 +109,7 @@ export function SharedAppointmentDetail({ appointment, extraSections, actionsBar
         },
       }));
       setIsEditingGuestInfo(false);
+      onEditingGuestInfoChange?.(false);
       if (onAppointmentUpdated) {
         onAppointmentUpdated();
       }
@@ -242,7 +247,14 @@ export function SharedAppointmentDetail({ appointment, extraSections, actionsBar
 
       {actionsBar && (
         <div className={`shrink-0 border-t border-border ${compact ? 'p-3 bg-sidebar' : 'p-4 bg-card'}`}>
-          {actionsBar}
+          {isEditingGuestInfo && (
+            <p className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center mb-3">
+              Please finish editing or save guest information before taking action.
+            </p>
+          )}
+          <div className={isEditingGuestInfo ? 'pointer-events-none opacity-40' : ''}>
+            {actionsBar}
+          </div>
         </div>
       )}
     </div>

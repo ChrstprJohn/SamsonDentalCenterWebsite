@@ -379,29 +379,36 @@ export function NeedsAttentionDetail({ appointment, view, onBack, className }: {
             </div>
           );
         })() : showResolveForm ? (
-          <div className="flex gap-2">
-            <button onClick={resetResolveState} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent transition-colors rounded-xl">Cancel</button>
-            {resolveMode === 'RESCHEDULE' ? (
-              <button
-                type="button"
-                onClick={() => {
-                  const toHHMM = (t?: string) => { if (!t) return ''; if (t.includes('T')) { const p = t.split('T')[1]; if (p) return p.slice(0, 5); } const m = t.match(/^(\d{2}):(\d{2})/); return m ? `${m[1]}:${m[2]}` : ''; };
-                  view.setRescheduleDoctor(appointment.doctorId || '');
-                  view.setRescheduleDate(appointment.date || '');
-                  view.setRescheduleTime(toHHMM(appointment.startTime ?? undefined));
-                  view.setRescheduleEndTime(toHHMM(appointment.endTime ?? undefined));
-                  view.setRescheduleJustification('');
-                  void view.loadActionResources();
-                  setShowRescheduleForm(true);
-                  setShowResolveForm(false);
-                }}
-                className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl"
-              >
-                Continue to Reschedule
-              </button>
-            ) : (
-              <button onClick={handleResolveSubmit} disabled={view.isPending || (!isMissedCheckout && !resolveReason.trim())} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl disabled:opacity-40">{view.isPending ? 'Submitting...' : 'Submit Resolution'}</button>
+          <div className="flex flex-col gap-2">
+            {isEditingChannel && (
+              <p className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center">
+                Please finish editing or save your channel changes before submitting resolution.
+              </p>
             )}
+            <div className="flex gap-2">
+              <button onClick={resetResolveState} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent transition-colors rounded-xl">Cancel</button>
+              {resolveMode === 'RESCHEDULE' ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const toHHMM = (t?: string) => { if (!t) return ''; if (t.includes('T')) { const p = t.split('T')[1]; if (p) return p.slice(0, 5); } const m = t.match(/^(\d{2}):(\d{2})/); return m ? `${m[1]}:${m[2]}` : ''; };
+                    view.setRescheduleDoctor(appointment.doctorId || '');
+                    view.setRescheduleDate(appointment.date || '');
+                    view.setRescheduleTime(toHHMM(appointment.startTime ?? undefined));
+                    view.setRescheduleEndTime(toHHMM(appointment.endTime ?? undefined));
+                    view.setRescheduleJustification('');
+                    void view.loadActionResources();
+                    setShowRescheduleForm(true);
+                    setShowResolveForm(false);
+                  }}
+                  className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl"
+                >
+                  Continue to Reschedule
+                </button>
+              ) : (
+                <button onClick={handleResolveSubmit} disabled={view.isPending || isEditingChannel || (!isMissedCheckout && !resolveReason.trim())} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl disabled:opacity-40">{view.isPending ? 'Submitting...' : 'Submit Resolution'}</button>
+              )}
+            </div>
           </div>
         ) : (
           <button onClick={() => { setShowResolveForm(true); setResolveMode('COMPLETED'); setResolveReason(''); setShowCustomReason(false); setSelectedPreset(''); }} className="w-full h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl">Resolve</button>

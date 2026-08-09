@@ -223,6 +223,7 @@ export function SecretaryPendingRequestsViewV2() {
   const hasSelection = !!inquiriesView.selectedInquiry;
 
   const startEditPatient = () => {
+    setIsEditingSchedule(false);
     setPatientSnapshot({
       firstName: inquiriesView.guestFirstName,
       middleName: inquiriesView.guestMiddleName,
@@ -250,6 +251,7 @@ export function SecretaryPendingRequestsViewV2() {
   };
 
   const startEditSchedule = () => {
+    setIsEditingPatient(false);
     setScheduleSnapshot({
       service: inquiriesView.stagedInquiryService,
       date: inquiriesView.stagedInquiryDate,
@@ -815,10 +817,14 @@ export function SecretaryPendingRequestsViewV2() {
                   <div className="border-t border-card-border/40 px-5 py-4 shrink-0 bg-card">
                     <div className="flex flex-col gap-3">
                       {isEditing && (
-                        <p className="text-xs text-muted-foreground">Press Save to apply changes before approving or rejecting</p>
+                        <p className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center">
+                          Please finish editing or save your changes before approving or rejecting this request.
+                        </p>
                       )}
                       {!isEditing && !isReady && (
-                        <p className="text-xs text-muted-foreground">Fill the required fields to enable approval</p>
+                        <p className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center">
+                          Please fill the required fields to enable approval.
+                        </p>
                       )}
                       <div className="flex gap-3">
                         <Button
@@ -834,7 +840,7 @@ export function SecretaryPendingRequestsViewV2() {
                           variant="outline"
                           size="default"
                           disabled={isEditing}
-                          className="flex-1 border-red-200 text-red-700 hover:bg-red-50 h-auto py-3 text-sm"
+                          className="flex-1 border-red-200 text-red-700 hover:bg-red-50 h-auto py-3 text-sm disabled:opacity-40 disabled:cursor-not-allowed"
                           onClick={() => { inquiriesView.setDecision('DROP'); inquiriesView.setApprovalReason(''); }}
                         >
                           Reject/Drop

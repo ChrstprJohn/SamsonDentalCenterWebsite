@@ -156,9 +156,10 @@ interface AppointmentNotificationsTabProps {
   appointment: AppointmentDto;
   view: any;
   compact?: boolean;
+  onEditingChannelChange?: (isEditing: boolean) => void;
 }
 
-export function AppointmentNotificationsTab({ appointment, view, compact }: AppointmentNotificationsTabProps) {
+export function AppointmentNotificationsTab({ appointment, view, compact, onEditingChannelChange }: AppointmentNotificationsTabProps) {
   const { addToast } = useToast();
   const [outboxLogs, setOutboxLogs] = useState<OutboxLogResponseDto[]>([]);
   const [loadingLogs, setLoadingLogs] = useState(false);
@@ -199,6 +200,7 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
       addToast('Notification channel updated.', 'success');
       appointment.confirmationChannel = draftChannel;
       setIsEditingChannel(false);
+      onEditingChannelChange?.(false);
     } else {
       addToast(res.error || 'Failed to update notification channel.', 'error');
     }
@@ -395,7 +397,7 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setIsEditingChannel(true)}
+              onClick={() => { setIsEditingChannel(true); onEditingChannelChange?.(true); }}
               className="h-7 px-2.5 text-xs gap-1"
             >
               <Pencil className="size-3.5" /> Edit
@@ -405,7 +407,7 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => { setDraftChannel(currentChannel); setIsEditingChannel(false); }}
+                onClick={() => { setDraftChannel(currentChannel); setIsEditingChannel(false); onEditingChannelChange?.(false); }}
                 className="h-7 px-2.5 text-xs gap-1"
               >
                 <X className="size-3.5" /> Cancel

@@ -36,6 +36,7 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
   const [showRescheduleForm, setShowRescheduleForm] = useState(false);
   const [showUndoForm, setShowUndoForm] = useState(false);
   const [showCheckoutForm, setShowCheckoutForm] = useState(false);
+  const [isEditingGuestInfo, setIsEditingGuestInfo] = useState(false);
   const [checkInReason, setCheckInReason] = useState('');
   const [checkInReasonMode, setCheckInReasonMode] = useState('');
   const [checkInCustomReason, setCheckInCustomReason] = useState('');
@@ -70,6 +71,7 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
     setShowRescheduleForm(false);
     setShowUndoForm(false);
     setShowCheckoutForm(false);
+    setIsEditingGuestInfo(false);
     setCheckInReason('');
     setCheckInReasonMode('');
     setCheckInCustomReason('');
@@ -197,6 +199,7 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
           activeTab="upcoming"
           compact
           hideActions
+          onEditingGuestInfoChange={setIsEditingGuestInfo}
         />
       ) : (
         <div className="flex-1 min-h-0 overflow-y-auto [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent" style={{ scrollbarWidth: 'thin' }} data-lenis-prevent>
@@ -291,7 +294,12 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
 
       {paneType !== 'reschedule' && (
         <div className="shrink-0 border-t border-border px-4 py-3">
-          <div className="flex gap-2">
+          {isEditingGuestInfo && (
+            <p className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center mb-3">
+              Please finish editing or save guest information before taking action.
+            </p>
+          )}
+          <div className={`flex gap-2 ${isEditingGuestInfo ? 'pointer-events-none opacity-40' : ''}`}>
             {paneType === 'details' && appointment.status === 'NO_SHOW' && showRescheduleForm ? (() => {
               const isFormValid = isRescheduleFormComplete({
                 serviceId: appointment.serviceId,
@@ -700,6 +708,12 @@ function CheckoutContent({
           />
         )}
       </div>
+
+      {isEditingChannel && (
+        <p className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center">
+          Please finish editing or save your channel changes before completing checkout.
+        </p>
+      )}
 
       <div className="flex flex-col gap-1.5">
         <div className="flex items-center justify-between mb-1">
@@ -1204,17 +1218,22 @@ function MessageLogContent({ appointment, view }: { appointment: any; view: any 
         </div>
 
         {isEditingChannel ? (
-          <Select
-            value={draftChannel}
-            onChange={(e) => setDraftChannel(e.target.value as any)}
-            className="text-sm w-full"
-            options={[
-              { label: 'Email Only', value: 'EMAIL' },
-              { label: 'SMS Only', value: 'SMS' },
-              { label: 'Both (Email & SMS)', value: 'BOTH' },
-              { label: 'None (Opted Out)', value: 'NONE' },
-            ]}
-          />
+          <div className="space-y-2">
+            <Select
+              value={draftChannel}
+              onChange={(e) => setDraftChannel(e.target.value as any)}
+              className="text-sm w-full"
+              options={[
+                { label: 'Email Only', value: 'EMAIL' },
+                { label: 'SMS Only', value: 'SMS' },
+                { label: 'Both (Email & SMS)', value: 'BOTH' },
+                { label: 'None (Opted Out)', value: 'NONE' },
+              ]}
+            />
+            <p className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center">
+              Please finish editing or save your channel changes before confirming check-in.
+            </p>
+          </div>
         ) : (
           <div className="p-3 bg-secondary-bg/20 border border-card-border/60 rounded-xl flex items-center justify-between">
             <span className="text-sm font-medium text-foreground">
@@ -1382,6 +1401,12 @@ function InlineCheckoutForm({ appointment, view, onCancel }: { appointment: any;
           </div>
         )}
       </div>
+
+      {isEditingChannel && (
+        <p className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center">
+          Please finish editing or save your channel changes before completing checkout.
+        </p>
+      )}
 
       <div className="p-4 border bg-amber-500/5 border-amber-500/20 rounded-2xl">
         <span className="text-[10px] font-semibold uppercase tracking-wider text-amber-600">Completion Notice</span>
