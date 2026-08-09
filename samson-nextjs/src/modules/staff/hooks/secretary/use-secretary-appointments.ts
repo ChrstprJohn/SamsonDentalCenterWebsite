@@ -30,6 +30,7 @@ export function useSecretaryAppointments() {
   const [doctorFilter, setDoctorFilter] = useState('');
   const [dateFilter, setDateFilter] = useState('');
   const [historyStatusFilter, setHistoryStatusFilter] = useState('');
+  const [sourceFilter, setSourceFilter] = useState('');
   const [showRescheduleForm, setShowRescheduleForm] = useState(false);
   const [rescheduleJustification, setRescheduleJustification] = useState('');
   const [changeTreatment, setChangeTreatment] = useState(false);
@@ -73,12 +74,12 @@ export function useSecretaryAppointments() {
   listRef.current = appointments;
   const pageBackStackRef = useRef<{ items: AppointmentDto[]; nextCursor: string | null }[]>([]);
 
-  const queryRef = useRef({ activeTab, searchTerm, doctorFilter, dateFilter, historyStatusFilter });
+  const queryRef = useRef({ activeTab, searchTerm, doctorFilter, dateFilter, historyStatusFilter, sourceFilter });
   const isPristineQuery = () => {
     const q = queryRef.current;
-    return !q.searchTerm && !q.doctorFilter && !q.dateFilter && !q.historyStatusFilter;
+    return !q.searchTerm && !q.doctorFilter && !q.dateFilter && !q.historyStatusFilter && !q.sourceFilter;
   };
-  queryRef.current = { activeTab, searchTerm, doctorFilter, dateFilter, historyStatusFilter };
+  queryRef.current = { activeTab, searchTerm, doctorFilter, dateFilter, historyStatusFilter, sourceFilter };
 
   const selectedAppointment = selectedAppointmentDetails?.id === selectedAppointmentId
     ? selectedAppointmentDetails
@@ -109,6 +110,7 @@ export function useSecretaryAppointments() {
       statuses: statusesForTab(tab),
       search: includeSearch ? current.searchTerm : undefined,
       doctorId: current.doctorFilter || undefined,
+      source: (current.sourceFilter || undefined) as 'SELF_BOOKED' | 'STAFF_CREATED' | 'CONVERTED' | undefined,
       date: current.dateFilter || undefined,
       dateBefore: tab === 'needs-attention' ? today : undefined,
       dateFrom: tab === 'upcoming' ? today : undefined,
@@ -218,7 +220,7 @@ export function useSecretaryAppointments() {
     }
     const timeout = window.setTimeout(() => { void fetchData(); }, 600);
     return () => window.clearTimeout(timeout);
-  }, [activeTab, searchTerm, doctorFilter, dateFilter, historyStatusFilter, fetchData]);
+  }, [activeTab, searchTerm, doctorFilter, dateFilter, historyStatusFilter, sourceFilter, fetchData]);
 
   useEffect(() => {
     const refreshOnVisible = () => {
@@ -522,7 +524,7 @@ export function useSecretaryAppointments() {
   return {
     appointments, filteredAppointments, visibleAppointments, doctors, tabTotals, selectedAppointment, selectedAppointmentId, setSelectedAppointmentId, selectAppointment,
     isLoading, isRefreshing, lastRefreshedAt, error, isSubmitting, activeTab, selectTab, searchTerm, setSearchTerm, doctorFilter, setDoctorFilter, dateFilter,
-    setDateFilter, historyStatusFilter, setHistoryStatusFilter, showRescheduleForm, setShowRescheduleForm: handleSetShowRescheduleForm,
+    setDateFilter, historyStatusFilter, setHistoryStatusFilter, sourceFilter, setSourceFilter, showRescheduleForm, setShowRescheduleForm: handleSetShowRescheduleForm,
     rescheduleJustification, setRescheduleJustification, changeTreatment, services, rescheduleServiceId,
     isLoadingServices, changeDoctor, rescheduleDoctor, setRescheduleDoctor, availableRescheduleDoctors,
     isLoadingRescheduleDoctors: false, rescheduleMonth, setRescheduleMonth, availableDates: [],

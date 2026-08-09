@@ -58,7 +58,8 @@ describe('Date Utilities', () => {
     expect(formatRelativeDay(day(3))).toBe('in 3d');
     expect(formatRelativeDay(day(30))).toBe('in 30d');
     expect(formatRelativeDay(day(31))).toBe('');
-    expect(formatRelativeDay(day(-1))).toBe('');
+    expect(formatRelativeDay(day(-1))).toBe('Yesterday');
+    expect(formatRelativeDay(day(-3))).toBe('3 days ago');
     expect(formatRelativeDay('')).toBe('');
     expect(formatRelativeDay('not-a-date')).toBe('');
   });

@@ -57,6 +57,7 @@ function applyAppointmentFilters(
   if (params.status) filterQuery = filterQuery.eq('status', params.status);
   if (params.statuses?.length) filterQuery = filterQuery.in('status', params.statuses);
   if (params.doctorId) filterQuery = filterQuery.eq('doctor_id', params.doctorId);
+  if (params.source) filterQuery = filterQuery.eq('source', params.source);
   if (params.noShowUnresolvedOnly) filterQuery = filterQuery.is('no_show_resolved_at', null);
   // History shows no-shows only after they are resolved; other statuses always visible.
   if (params.noShowResolvedOnly) filterQuery = filterQuery.or('status.neq.NO_SHOW,and(status.eq.NO_SHOW,no_show_resolved_at.not.is.null)');

@@ -6,8 +6,9 @@ import { AppointmentDetailPane } from './sub-components/appointment-detail-pane'
 import { AppointmentsTable } from './sub-components/appointments-table';
 import { CoordinationHub } from './sub-components/coordination-hub';
 import { NeedsAttentionDetail } from './sub-components/needs-attention-detail';
-import { ArrowLeft, CalendarDays, ClipboardList, RotateCw, SlidersHorizontal } from 'lucide-react';
+import { ArrowLeft, CalendarDays, CheckCircle2, AlertCircle, Clock, Search, Filter, ClipboardList, HelpCircle, RotateCw, SlidersHorizontal, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Modal } from '@/components/ui/modal';
 import { Select } from '@/components/ui/select';
 import { SidebarHeader, SidebarInput, SidebarTrigger } from '@/components/ui/sidebar';
 
@@ -16,11 +17,29 @@ export function SecretaryAppointmentsView() {
   const [mobileView, setMobileView] = useState<'list' | 'detail' | 'quickLogs'>('list');
   const [showNotesPanel, setShowNotesPanel] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+  const [showGuideModal, setShowGuideModal] = useState(false);
   const [search, setSearch] = useState('');
   const [draftDate, setDraftDate] = useState('');
   const [draftDoctor, setDraftDoctor] = useState('');
   const [draftStatus, setDraftStatus] = useState('');
+  const [draftSource, setDraftSource] = useState('');
   const filterBoxRef = useRef<HTMLDivElement>(null);
+  const [dismissedBanners, setDismissedBanners] = useState<Record<string, boolean>>(() => {
+    try {
+      return JSON.parse(localStorage.getItem('directory-banner-dismissed') ?? '{}');
+    } catch {
+      return {};
+    }
+  });
+  const dismissBanner = (key: string) => {
+    setDismissedBanners((prev) => {
+      const next = { ...prev, [key]: true };
+      try {
+        localStorage.setItem('directory-banner-dismissed', JSON.stringify(next));
+      } catch { /* ignore */ }
+      return next;
+    });
+  };
 
   useEffect(() => {
     if (!showFilters) return;
@@ -59,8 +78,19 @@ export function SecretaryAppointmentsView() {
           <div ref={filterBoxRef} className="relative flex w-full h-8 items-center justify-between">
             <div className="flex items-center gap-2">
               <SidebarTrigger className="lg:hidden -ml-1 text-muted-foreground hover:text-foreground" />
-              <div className="text-base font-medium text-foreground">
-                Appointments Directory
+              <div className="flex items-center gap-1.5">
+                <span className="text-base font-medium text-foreground">
+                  Appointments Directory
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setShowGuideModal(true)}
+                  className="inline-flex items-center justify-center text-muted-foreground hover:text-primary transition-colors p-0.5 rounded-full hover:bg-muted/60"
+                  aria-label="How to use Appointments Directory"
+                  title="How to use this page"
+                >
+                  <HelpCircle className="size-4" />
+                </button>
               </div>
             </div>
             <button
@@ -69,11 +99,12 @@ export function SecretaryAppointmentsView() {
                   setDraftDate(view.dateFilter);
                   setDraftDoctor(view.doctorFilter);
                   setDraftStatus(view.historyStatusFilter);
+                  setDraftSource(view.sourceFilter);
                 }
                 setShowFilters((v) => !v);
               }}
               className={`flex items-center gap-1 rounded-md p-1.5 text-xs transition-colors ${
-                showFilters || view.dateFilter || view.doctorFilter || view.historyStatusFilter
+                showFilters || view.dateFilter || view.doctorFilter || view.historyStatusFilter || view.sourceFilter
                   ? 'text-primary bg-primary/10'
                   : 'text-muted-foreground hover:text-foreground hover:bg-muted/40'
               }`}
@@ -86,7 +117,7 @@ export function SecretaryAppointmentsView() {
             {showFilters && (
               <div className="absolute right-0 top-full mt-2 z-50 w-80 rounded-xl bg-popover p-3 shadow-lg ring-1 ring-foreground/10 flex flex-col gap-3">
                 <label className="flex flex-col gap-1.5">
-                  <span className="text-xs font-medium text-muted-foreground">Date</span>
+                  <span className="text-xs font-medium text-muted-foreground">By Appointment Date</span>
                   <input
                     type="date"
                     value={draftDate}
@@ -96,7 +127,7 @@ export function SecretaryAppointmentsView() {
                   />
                 </label>
                 <label className="flex flex-col gap-1.5">
-                  <span className="text-xs font-medium text-muted-foreground">Doctor</span>
+                  <span className="text-xs font-medium text-muted-foreground">By Doctor</span>
                   <Select
                     value={draftDoctor}
                     onChange={(e) => setDraftDoctor(e.target.value)}
@@ -108,9 +139,23 @@ export function SecretaryAppointmentsView() {
                     aria-label="Filter by doctor"
                   />
                 </label>
+                <label className="flex flex-col gap-1.5">
+                  <span className="text-xs font-medium text-muted-foreground">By Source</span>
+                  <Select
+                    value={draftSource}
+                    onChange={(e) => setDraftSource(e.target.value)}
+                    className="h-8 w-full rounded-md border border-card-border/60 bg-transparent px-2! pr-8! py-0! text-xs"
+                    options={[
+                      { value: '', label: 'All sources' },
+                      { value: 'STAFF_CREATED', label: 'From Manual Booking' },
+                      { value: 'CONVERTED', label: 'From Online Request' },
+                    ]}
+                    aria-label="Filter by source"
+                  />
+                </label>
                 {view.activeTab === 'history' && (
                   <label className="flex flex-col gap-1.5">
-                    <span className="text-xs font-medium text-muted-foreground">Status</span>
+                    <span className="text-xs font-medium text-muted-foreground">By Status</span>
                     <Select
                       value={draftStatus}
                       onChange={(e) => setDraftStatus(e.target.value)}
@@ -135,9 +180,11 @@ export function SecretaryAppointmentsView() {
                       setDraftDate('');
                       setDraftDoctor('');
                       setDraftStatus('');
+                      setDraftSource('');
                       view.setDateFilter('');
                       view.setDoctorFilter('');
                       view.setHistoryStatusFilter('');
+                      view.setSourceFilter('');
                       setShowFilters(false);
                     }}
                     className="flex-1 h-8 text-xs"
@@ -151,9 +198,10 @@ export function SecretaryAppointmentsView() {
                       view.setDateFilter(draftDate);
                       view.setDoctorFilter(draftDoctor);
                       view.setHistoryStatusFilter(draftStatus);
+                      view.setSourceFilter(draftSource);
                       setShowFilters(false);
                     }}
-                    className="flex-1 h-8 text-xs"
+                    className="flex-1 h-8 text-xs bg-foreground text-background border-foreground hover:bg-foreground/90 hover:text-background"
                   >
                     Save Filters
                   </Button>
@@ -229,6 +277,23 @@ export function SecretaryAppointmentsView() {
             </Button>
           </div>
         ) : null}
+        {!dismissedBanners[view.activeTab] && (
+          <div className="mx-3 mt-3 mb-1 rounded-lg border border-card-border/60 bg-muted/30 px-3 py-2 flex items-start gap-2 shrink-0">
+            <p className="text-[11px] leading-snug text-muted-foreground flex-1">
+              {view.activeTab === 'upcoming' && 'Confirmed upcoming appointments and today\'s check-ins.'}
+              {view.activeTab === 'needs-attention' && 'Appointments needing action: checked-in visits and unresolved no-shows.'}
+              {view.activeTab === 'history' && 'Past appointments: completed, cancelled, rejected, displaced, and resolved no-shows.'}
+            </p>
+            <button
+              onClick={() => dismissBanner(view.activeTab)}
+              className="text-muted-foreground/60 hover:text-foreground transition-colors shrink-0"
+              aria-label="Dismiss explanation"
+              title="Dismiss"
+            >
+              <X className="size-3.5" />
+            </button>
+          </div>
+        )}
         <AppointmentsTable
           appointments={view.visibleAppointments}
           total={view.tabTotals[view.activeTab] ?? view.visibleAppointments.length}
@@ -320,6 +385,61 @@ export function SecretaryAppointmentsView() {
           />
         </div>
       )}
+
+      {/* Help Guide Modal */}
+      <Modal
+        isOpen={showGuideModal}
+        onClose={() => setShowGuideModal(false)}
+        title="Appointments Directory Guide"
+        size="lg"
+      >
+        <div className="space-y-4 text-sm">
+          <p className="text-muted-foreground">
+            Welcome to the Appointments Directory! Here is a quick guide on how to navigate and manage patient appointments effectively.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
+            <div className="rounded-xl border border-card-border/60 p-3 bg-muted/20 flex flex-col gap-2">
+              <div className="flex items-center gap-2 font-medium text-foreground">
+                <CheckCircle2 className="size-4 text-emerald-500" />
+                <span>Active Tab</span>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                View all scheduled and confirmed upcoming appointments. Click any row to review details or manage status.
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-amber-500/30 p-3 bg-amber-500/5 flex flex-col gap-2">
+              <div className="flex items-center gap-2 font-medium text-amber-700 dark:text-amber-400">
+                <AlertCircle className="size-4 text-amber-500" />
+                <span>Unresolved Tab</span>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Requires secretary action! Manage pending web bookings, reschedule requests, or unconfirmed cancellations.
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-card-border/60 p-3 bg-muted/20 flex flex-col gap-2">
+              <div className="flex items-center gap-2 font-medium text-foreground">
+                <Clock className="size-4 text-muted-foreground" />
+                <span>History Tab</span>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Access past completed, cancelled, or archived appointments for historical record lookup.
+              </p>
+            </div>
+          </div>
+
+          <div className="rounded-xl bg-primary/5 border border-primary/20 p-3 flex flex-col gap-1.5 text-xs">
+            <span className="font-semibold text-primary">Pro Tips & Shortcuts</span>
+            <ul className="list-disc list-inside text-muted-foreground space-y-1">
+              <li>Use the <strong>Filters button</strong> next to the title to narrow down by date range, specific doctor, or booking source.</li>
+              <li>Toggle <strong>Notes & Logs</strong> in the top right of the detail pane to record internal notes or review automated notifications.</li>
+              <li>In the <strong>Unresolved tab</strong>, quick action buttons allow one-click confirmation or rescheduling.</li>
+            </ul>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

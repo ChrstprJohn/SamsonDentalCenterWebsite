@@ -42,6 +42,10 @@ export const getClinicAppointmentsPageSchema = z.object({
     .uuid('Invalid Doctor ID format')
     .optional()
     .or(emptyStringToUndefined),
+  source: z
+    .enum(['SELF_BOOKED', 'STAFF_CREATED', 'CONVERTED'])
+    .optional()
+    .or(emptyStringToUndefined),
   date: z
     .string()
     .regex(DATE_REGEX, 'Date must be in YYYY-MM-DD format')

@@ -33,7 +33,7 @@ export function formatShortDate(date: Date | string): string {
 
 /**
  * Formats a naive appointment date ('YYYY-MM-DD') relative to today.
- * Returns 'Today', 'Tomorrow', 'in 3d' (≤30 days out), or '' when far.
+ * Returns 'Today', 'Tomorrow', 'in 3d' (≤30 days out), 'Yesterday', 'N days ago', or '' when far.
  */
 export function formatRelativeDay(date: string): string {
   if (!date) return '';
@@ -43,7 +43,9 @@ export function formatRelativeDay(date: string): string {
   const diffDays = Math.round((target.getTime() - today.getTime()) / 86400000);
   if (diffDays === 0) return 'Today';
   if (diffDays === 1) return 'Tomorrow';
+  if (diffDays === -1) return 'Yesterday';
   if (diffDays > 1 && diffDays <= 30) return `in ${diffDays}d`;
+  if (diffDays < -1) return `${-diffDays} days ago`;
   return '';
 }
 
