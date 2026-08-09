@@ -27,7 +27,6 @@ import {
   MessageSquare,
   UserCheck,
   ClipboardCheck,
-  Mail,
   Paintbrush,
 } from "lucide-react"
 
@@ -74,11 +73,6 @@ const data = {
       title: "Unresolved Appointments",
       url: "/secretary-v2/past-follow-ups",
       icon: <ClipboardCheck className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
-    },
-    {
-      title: "Communication History",
-      url: "/secretary-v2/communication-logs",
-      icon: <Mail className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
     },
     {
       title: "Email Templates",

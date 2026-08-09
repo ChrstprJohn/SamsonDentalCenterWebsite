@@ -1,3 +1,8 @@
+/**
+ * @deprecated Communication History feature removed from UI.
+ * Failed notifications are resent via the Notification Lifecycle tab in the
+ * appointment detail pane (AppointmentNotificationsTab). Kept for reference only.
+ */
 import { SupabaseClient } from '@supabase/supabase-js';
 import type { GetAppointmentCommunicationPageDto } from '../../dtos/logs/get-appointment-communication-page.dto';
 import type { OutboxLogResponseDto } from '../../dtos/logs/outbox-log-response.dto';

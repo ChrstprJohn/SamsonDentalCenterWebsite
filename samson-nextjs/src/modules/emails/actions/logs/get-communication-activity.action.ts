@@ -1,3 +1,8 @@
+/**
+ * @deprecated Communication History feature removed from UI.
+ * Failed notifications are resent via the Notification Lifecycle tab in the
+ * appointment detail pane (AppointmentNotificationsTab). Kept for reference only.
+ */
 "use server";
 
 import { createAdminClient } from '@/shared/database/server';
