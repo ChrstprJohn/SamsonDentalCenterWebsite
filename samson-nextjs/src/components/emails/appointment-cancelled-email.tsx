@@ -15,7 +15,10 @@ import { getLogoUrl } from '@/shared/utils/get-base-url.util';
 
 export interface AppointmentCancelledEmailProps {
   patientName?: string;
+  serviceName?: string;
   dateStr?: string;
+  timeRangeStr?: string;
+  appointmentId?: string;
   cancellationReason?: string;
   baseUrl?: string;
 }
@@ -39,7 +42,10 @@ const linkStyle: React.CSSProperties = {
 
 export const AppointmentCancelledEmail = ({
   patientName = 'Valued Patient',
+  serviceName = '',
   dateStr = 'Monday, June 22, 2026',
+  timeRangeStr = '',
+  appointmentId = '',
   cancellationReason = 'This appointment has been cancelled as requested.',
   baseUrl = 'http://localhost:3000',
 }: AppointmentCancelledEmailProps) => {
@@ -73,13 +79,41 @@ export const AppointmentCancelledEmail = ({
             We are writing to confirm that your appointment at Samson Dental Center has been cancelled as requested. We are sorry we will not be able to see you this time, and we hope to welcome you back soon.
           </Text>
 
-          {/* Cancelled Date & Reason */}
-          <Text style={pStyle}>
-            Your appointment {dateStr ? <>originally scheduled for <span style={boldStyle}>{dateStr}</span> </> : ''}has been cancelled.{' '}
-            <span style={boldStyle}>
-              {cancellationReason}
-            </span>
-          </Text>
+          {/* Cancelled Details */}
+          <Section style={{ margin: '0 0 20px', paddingLeft: 0 }}>
+            <Text style={{ ...pStyle, margin: '0 0 8px', fontWeight: 700 }}>
+              Your cancelled appointment:
+            </Text>
+            <Text style={{ ...pStyle, margin: '0 0 4px' }}>
+              <span style={boldStyle}>Status:</span>{' '}
+              <span style={{ fontWeight: 700, color: '#dc2626' }}>Cancelled</span>
+            </Text>
+            {serviceName && (
+              <Text style={{ ...pStyle, margin: '0 0 4px' }}>
+                <span style={boldStyle}>Service:</span> {serviceName}
+              </Text>
+            )}
+            {dateStr && (
+              <Text style={{ ...pStyle, margin: '0 0 4px' }}>
+                <span style={boldStyle}>Date:</span> {dateStr}
+              </Text>
+            )}
+            {timeRangeStr && (
+              <Text style={{ ...pStyle, margin: '0 0 4px' }}>
+                <span style={boldStyle}>Time:</span> {timeRangeStr}
+              </Text>
+            )}
+            {appointmentId && (
+              <Text style={{ ...pStyle, margin: '0 0 4px' }}>
+                <span style={boldStyle}>Reference ID:</span> {appointmentId}
+              </Text>
+            )}
+            {cancellationReason && (
+              <Text style={{ ...pStyle, margin: '8px 0 4px' }}>
+                Cancellation reason: <span style={boldStyle}>{cancellationReason}</span>
+              </Text>
+            )}
+          </Section>
 
           {/* Contact block */}
           <Text style={pStyle}>

@@ -60,7 +60,10 @@ type EmailTemplates = {
   };
   'appointment_cancelled': {
     patientName: string;
+    serviceName?: string;
     dateStr: string;
+    timeRangeStr?: string;
+    appointmentId?: string;
     cancellationReason?: string;
     baseUrl?: string;
   };
@@ -89,6 +92,9 @@ type EmailTemplates = {
   };
   'request_rejected': {
     patientName: string;
+    serviceName?: string;
+    dateStr?: string;
+    preferredStartTimeStr?: string;
     rejectionReason?: string;
     baseUrl?: string;
   };
@@ -180,7 +186,10 @@ export const ResendService = {
         const reqPayload = payload as EmailTemplates['appointment_cancelled'];
         html = await render(React.createElement(AppointmentCancelledEmail, {
           patientName: reqPayload.patientName,
+          serviceName: reqPayload.serviceName,
           dateStr: reqPayload.dateStr,
+          timeRangeStr: reqPayload.timeRangeStr,
+          appointmentId: reqPayload.appointmentId,
           cancellationReason: reqPayload.cancellationReason,
           baseUrl: reqPayload.baseUrl,
         }));
@@ -225,6 +234,9 @@ export const ResendService = {
         const reqPayload = payload as EmailTemplates['request_rejected'];
         html = await render(React.createElement(RequestRejectedEmail, {
           patientName: reqPayload.patientName,
+          serviceName: reqPayload.serviceName,
+          dateStr: reqPayload.dateStr,
+          preferredStartTimeStr: reqPayload.preferredStartTimeStr,
           rejectionReason: reqPayload.rejectionReason,
           baseUrl: reqPayload.baseUrl,
         }));

@@ -17,6 +17,8 @@ export interface AppointmentRescheduledEmailProps {
   patientName?: string;
   serviceName?: string;
   doctorName?: string;
+  oldDateStr?: string;
+  oldTimeRangeStr?: string;
   dateStr?: string;
   timeRangeStr?: string;
   appointmentId?: string;
@@ -45,6 +47,8 @@ export const AppointmentRescheduledEmail = ({
   patientName = 'Valued Patient',
   serviceName = 'Dental Consultation & Cleaning',
   doctorName = 'Dr. Adrian Samson',
+  oldDateStr = '',
+  oldTimeRangeStr = '',
   dateStr = 'Monday, June 22, 2026',
   timeRangeStr = '2:00 PM – 2:45 PM',
   appointmentId = 'APT-SAMPLE',
@@ -84,6 +88,16 @@ export const AppointmentRescheduledEmail = ({
 
           {/* Details list */}
           <Section style={{ margin: '0 0 20px', paddingLeft: 0 }}>
+            {(oldDateStr || oldTimeRangeStr) && (
+              <Text style={{ ...pStyle, margin: '0 0 8px' }}>
+                <span style={boldStyle}>Previously scheduled:</span>{' '}
+                <span style={{ color: '#64748b', textDecoration: 'line-through' }}>
+                  {oldDateStr && oldTimeRangeStr
+                    ? `${oldDateStr} (${oldTimeRangeStr})`
+                    : oldDateStr || oldTimeRangeStr}
+                </span>
+              </Text>
+            )}
             <Text style={{ ...pStyle, margin: '0 0 8px', fontWeight: 700 }}>
               Your new appointment details:
             </Text>

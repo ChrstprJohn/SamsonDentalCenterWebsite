@@ -15,6 +15,9 @@ import { getLogoUrl } from '@/shared/utils/get-base-url.util';
 
 export interface RequestRejectedEmailProps {
   patientName?: string;
+  serviceName?: string;
+  dateStr?: string;
+  preferredStartTimeStr?: string;
   rejectionReason?: string;
   baseUrl?: string;
 }
@@ -38,6 +41,9 @@ const linkStyle: React.CSSProperties = {
 
 export const RequestRejectedEmail = ({
   patientName = 'Valued Patient',
+  serviceName = '',
+  dateStr = '',
+  preferredStartTimeStr = '',
   rejectionReason = 'Unfortunately, we are unable to accommodate your request at this time.',
   baseUrl = 'http://localhost:3000',
 }: RequestRejectedEmailProps) => {
@@ -71,14 +77,33 @@ export const RequestRejectedEmail = ({
             Thank you for your interest in Samson Dental Center. After carefully reviewing your booking request, we regret to inform you that we are unable to accommodate your request at this time.
           </Text>
 
-          {/* Rejection reason paragraph */}
-          <Text style={pStyle}>
-            We sincerely apologize for any inconvenience this may cause.{' '}
-            <span style={{ fontWeight: 700 }}>
-              {rejectionReason}
-            </span>{' '}
-            If you would like to explore alternative dates or have any questions about our available services, please do not hesitate to contact us.
-          </Text>
+          {/* Rejection details section */}
+          <Section style={{ margin: '0 0 20px', paddingLeft: 0 }}>
+            <Text style={{ ...pStyle, margin: '0 0 4px' }}>
+              <span style={boldStyle}>Status:</span>{' '}
+              <span style={{ fontWeight: 700, color: '#dc2626' }}>Rejected</span>
+            </Text>
+            {serviceName && (
+              <Text style={{ ...pStyle, margin: '0 0 4px' }}>
+                <span style={boldStyle}>Service:</span> {serviceName}
+              </Text>
+            )}
+            {dateStr && (
+              <Text style={{ ...pStyle, margin: '0 0 4px' }}>
+                <span style={boldStyle}>Preferred Date:</span> {dateStr}
+              </Text>
+            )}
+            {preferredStartTimeStr && (
+              <Text style={{ ...pStyle, margin: '0 0 4px' }}>
+                <span style={boldStyle}>Preferred Time:</span> {preferredStartTimeStr}
+              </Text>
+            )}
+            {rejectionReason && (
+              <Text style={{ ...pStyle, margin: '0 0 4px' }}>
+                <span style={boldStyle}>Rejection Reason:</span> {rejectionReason}
+              </Text>
+            )}
+          </Section>
 
           {/* Contact block */}
           <Text style={pStyle}>

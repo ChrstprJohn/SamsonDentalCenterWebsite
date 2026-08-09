@@ -70,6 +70,9 @@ export function RenderedEmailFrame({ eventType, payload }: RenderedEmailFramePro
       element = (
         <RequestRejectedEmail
           patientName={patientName}
+          serviceName={serviceName}
+          dateStr={dateStr}
+          preferredStartTimeStr={rawTime}
           rejectionReason={rejectionReason}
           baseUrl={baseUrl}
         />
@@ -92,7 +95,10 @@ export function RenderedEmailFrame({ eventType, payload }: RenderedEmailFramePro
     element = (
       <AppointmentCancelledEmail
         patientName={patientName}
+        serviceName={serviceName}
         dateStr={dateStr}
+        timeRangeStr={timeRangeStr}
+        appointmentId={appointmentId}
         cancellationReason={cancellationReason}
         baseUrl={baseUrl}
       />
