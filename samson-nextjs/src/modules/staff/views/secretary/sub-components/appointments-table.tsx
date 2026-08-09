@@ -1,6 +1,6 @@
 'use client';
 
-import { CalendarDays, Globe, GlobeOff } from 'lucide-react';
+import { CalendarDays, ChevronLeft, ChevronRight, Globe, GlobeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { AppointmentDto } from '@/modules/appointments/dtos/shared/appointment.dto';
 import { formatClinicTime, formatRelativeDay, formatShortDate, formatTimeString } from '@/shared/utils/date.util';
@@ -16,8 +16,11 @@ const BADGE_STYLES: Record<string, string> = {
   DISPLACED: 'text-amber-600 bg-amber-500/10 dark:text-amber-400',
 };
 
+const PAGE_SIZE = 25;
+
 interface AppointmentsTableProps {
   appointments: AppointmentDto[];
+  total: number;
   selectedAppointmentId: string | null;
   isLoading: boolean;
   isRefreshing?: boolean;
@@ -25,8 +28,10 @@ interface AppointmentsTableProps {
   hasMore: boolean;
   isLoadingMore: boolean;
   loadMoreError: string | null;
+  canGoNewer: boolean;
   onRetry: () => void;
   onLoadMore: () => void;
+  onGoNewer: () => void;
   formatPatientName: (appointment: AppointmentDto) => string;
   onSelect: (appointmentId: string) => void;
 }
@@ -119,16 +124,40 @@ export function AppointmentsTable(props: AppointmentsTableProps) {
             </div>
           </div>
         )}
-        {props.hasMore && (
-          <Button
-            variant="ghost"
-            size="sm"
-            disabled={props.isLoadingMore}
-            onClick={props.onLoadMore}
-            className="w-full h-10 rounded-none border-t text-xs text-muted-foreground hover:text-foreground"
-          >
-            {props.isLoadingMore ? 'Loading…' : 'Show more'}
-          </Button>
+        {props.hasMore ? (
+          <div className="flex items-center justify-between border-t px-3 py-2">
+            <span className="text-[11px] text-muted-foreground">
+              Page {Math.max(1, Math.ceil(props.appointments.length / PAGE_SIZE))} of {Math.max(1, Math.ceil(props.total / PAGE_SIZE))}
+            </span>
+            <div className="flex items-center gap-1.5 ml-auto">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={props.onGoNewer}
+                disabled={!props.canGoNewer}
+                className="h-7 px-2 text-xs gap-1 text-muted-foreground hover:text-foreground"
+                title="Newer appointments"
+              >
+                <ChevronLeft className="size-3.5" /> Newer
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={props.onLoadMore}
+                disabled={props.isLoadingMore}
+                className="h-7 px-2 text-xs gap-1 text-muted-foreground hover:text-foreground"
+                title="Older appointments"
+              >
+                {props.isLoadingMore ? 'Loading…' : 'Older'} <ChevronRight className="size-3.5" />
+              </Button>
+            </div>
+          </div>
+        ) : (
+          props.appointments.length > 0 && (
+            <div className="border-t py-2.5 text-center text-[11px] text-muted-foreground">
+              1–{props.appointments.length} of {props.total} · Page {Math.max(1, Math.ceil(props.appointments.length / PAGE_SIZE))} of {Math.max(1, Math.ceil(props.total / PAGE_SIZE))}
+            </div>
+          )
         )}
       </div>
     </div>

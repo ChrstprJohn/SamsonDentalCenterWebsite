@@ -231,6 +231,7 @@ export function SecretaryAppointmentsView() {
         ) : null}
         <AppointmentsTable
           appointments={view.visibleAppointments}
+          total={view.tabTotals[view.activeTab] ?? view.visibleAppointments.length}
           selectedAppointmentId={view.selectedAppointmentId}
           isLoading={view.isLoading}
           isRefreshing={view.isRefreshing}
@@ -238,8 +239,10 @@ export function SecretaryAppointmentsView() {
           hasMore={view.hasMore}
           isLoadingMore={view.isLoadingMore}
           loadMoreError={view.loadMoreError}
+          canGoNewer={view.canGoNewer}
           onRetry={() => void view.fetchData({ force: true })}
           onLoadMore={view.loadMore}
+          onGoNewer={view.goNewer}
           formatPatientName={view.formatPatientName}
             onSelect={(id) => { view.selectAppointment(id); setMobileView('detail'); }}
         />

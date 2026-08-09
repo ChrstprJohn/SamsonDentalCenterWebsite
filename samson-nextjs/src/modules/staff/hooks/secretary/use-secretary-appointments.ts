@@ -69,6 +69,9 @@ export function useSecretaryAppointments() {
   const loadingMoreRef = useRef(false);
   const hasLoadedRef = useRef(false);
   const tabCacheRef = useRef<Partial<Record<AppointmentDirectoryTab, { items: AppointmentDto[]; nextCursor: string | null; hasMore: boolean; total: number }>>>({});
+  const listRef = useRef<AppointmentDto[]>([]);
+  listRef.current = appointments;
+  const pageBackStackRef = useRef<{ items: AppointmentDto[]; nextCursor: string | null }[]>([]);
 
   const queryRef = useRef({ activeTab, searchTerm, doctorFilter, dateFilter, historyStatusFilter });
   const isPristineQuery = () => {
@@ -137,6 +140,7 @@ export function useSecretaryAppointments() {
       setIsLoadingMore(true);
       setLoadMoreError(null);
     } else {
+      pageBackStackRef.current = [];
       if (hasLoadedRef.current) setIsRefreshing(true);
       else setIsLoading(true);
       setError(null);
@@ -159,6 +163,9 @@ export function useSecretaryAppointments() {
       if (!appRes.success || !appRes.data) throw new Error(appRes.error || 'Could not load appointments.');
 
       const page = appRes.data;
+      if (append) {
+        pageBackStackRef.current.push({ items: listRef.current, nextCursor: page.nextCursor });
+      }
       setAppointments((previous) => append
         ? [...previous, ...page.items.filter((item) => !previous.some((existing) => existing.id === item.id))]
         : page.items);
@@ -200,6 +207,7 @@ export function useSecretaryAppointments() {
     if (isPristineQuery()) {
       const cached = tabCacheRef.current[activeTab];
       if (cached) {
+        pageBackStackRef.current = [];
         setAppointments(cached.items);
         setNextCursor(cached.nextCursor);
         setHasMore(cached.hasMore);
@@ -523,6 +531,16 @@ export function useSecretaryAppointments() {
     showCancelForm, setShowCancelForm, confirmationChannel, setConfirmationChannel, activeServiceId, activeDoctorId, formatPatientName, toggleChangeTreatment,
     toggleChangeDoctor, selectRescheduleService, selectRescheduleDate, selectRescheduleSlot, submitReschedule, submitCancel, fetchData, loadServices,
     hasMore, isLoadingMore, loadMoreError, loadMore,
+    canGoNewer: pageBackStackRef.current.length > 0,
+    goNewer: useCallback(() => {
+      const snapshot = pageBackStackRef.current.pop();
+      if (!snapshot) return;
+      setAppointments(snapshot.items);
+      nextCursorRef.current = snapshot.nextCursor;
+      setNextCursor(snapshot.nextCursor);
+      setHasMore(true);
+      setLoadMoreError(null);
+    }, []),
     actionError, isPending, completeMissedCheckout, handleResolveNoShowSubmit, loadActionResources,
     doctorsList, servicesList, setRescheduleDate,
   };
