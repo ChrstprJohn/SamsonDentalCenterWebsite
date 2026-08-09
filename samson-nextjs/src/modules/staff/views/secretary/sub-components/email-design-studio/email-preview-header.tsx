@@ -4,6 +4,7 @@ import { PreviewMode } from './types';
 
 export interface EmailPreviewHeaderProps {
   subject: string;
+  preheader?: string;
   designLabel: string;
   previewMode: PreviewMode;
   onPreviewModeChange: (mode: PreviewMode) => void;
@@ -11,15 +12,22 @@ export interface EmailPreviewHeaderProps {
 
 export function EmailPreviewHeader({
   subject,
+  preheader,
   designLabel,
   previewMode,
   onPreviewModeChange,
 }: EmailPreviewHeaderProps) {
   return (
-    <div className="flex h-[61px] items-center justify-between gap-3 bg-background border-b border-border p-4 shrink-0">
-      <div className="min-w-0">
+    <div className="flex h-auto min-h-[61px] items-center justify-between gap-3 bg-background border-b border-border px-4 py-2.5 shrink-0">
+      <div className="min-w-0 flex-1">
         <div className="text-sm font-semibold text-foreground truncate">{subject}</div>
-        <span className="text-[11px] text-muted-foreground truncate block mt-0.5">{designLabel}</span>
+        {preheader ? (
+          <div className="text-[11px] text-muted-foreground truncate mt-0.5">
+            <span className="font-medium text-foreground/75">Snippet:</span> {preheader}
+          </div>
+        ) : (
+          <span className="text-[11px] text-muted-foreground truncate block mt-0.5">{designLabel}</span>
+        )}
       </div>
       <div className="inline-flex items-center gap-1 rounded-xl border border-border/80 bg-muted/30 p-1 shadow-2xs">
         <button

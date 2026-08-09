@@ -2,6 +2,7 @@
 
 import React, { useMemo, useState } from 'react';
 import { Select } from '@/components/ui/select';
+import { formatRefId } from '@/shared/utils/date.util';
 import {
   DEFAULT_COPY,
   DEFAULT_SAMPLE_DATA,
@@ -25,6 +26,9 @@ export function SecretaryEmailDesignStudioView() {
   const activeDesign = EMAIL_DESIGNS.find((design) => design.id === activeId) || EMAIL_DESIGNS[0];
   const activeCopy = DEFAULT_COPY[activeId];
   const visibleFields = useMemo(() => new Set(activeDesign.fields), [activeDesign]);
+
+  const shortRef = sample.referenceCode || formatRefId(sample.appointmentId) || 'SDC-8921';
+  const displaySubject = `${activeCopy.subject}${shortRef ? ` [Ref: ${shortRef}]` : ''}`;
 
   const groupedDesigns = useMemo(
     () =>
@@ -80,7 +84,8 @@ export function SecretaryEmailDesignStudioView() {
       {/* Center Main: Live Email Preview */}
       <main className="flex h-full min-h-0 flex-col bg-background overflow-hidden">
         <EmailPreviewHeader
-          subject={activeCopy.subject}
+          subject={displaySubject}
+          preheader={activeCopy.preheader}
           designLabel={activeDesign.label}
           previewMode={previewMode}
           onPreviewModeChange={setPreviewMode}
