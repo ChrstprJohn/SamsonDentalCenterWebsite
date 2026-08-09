@@ -308,6 +308,15 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
   const getStatus = (type: (typeof NOTIFICATION_TYPES)[number], ch: 'EMAIL' | 'SMS') => {
     if (loadingLogs) return { label: 'LOADING...', badgeClass: 'bg-muted text-muted-foreground/60 animate-pulse' };
 
+    const isChannelEnabled =
+      currentChannel === 'BOTH' ||
+      (ch === 'EMAIL' && currentChannel === 'EMAIL') ||
+      (ch === 'SMS' && currentChannel === 'SMS');
+
+    if (!isChannelEnabled && !type.emailOnly) {
+      return { label: 'SKIPPED (Channel Off)', badgeClass: badgeClassFor('SKIPPED') };
+    }
+
     if (type.eventType === 'APPOINTMENT_INQUIRY_RECEIVED') {
       const inquiryLog = timelineEntries.find((log) => log.eventType === 'APPOINTMENT_INQUIRY_RECEIVED');
       const isConvertedInquiry = Boolean(
@@ -352,15 +361,6 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
       }
       return e.eventType === type.eventType;
     });
-
-    const isChannelEnabled =
-      currentChannel === 'BOTH' ||
-      (ch === 'EMAIL' && currentChannel === 'EMAIL') ||
-      (ch === 'SMS' && currentChannel === 'SMS');
-
-    if (!isChannelEnabled) {
-      return { label: 'SKIPPED (Channel Off)', badgeClass: badgeClassFor('SKIPPED') };
-    }
 
     if (log) {
       if (log.rawStatus === 'FAILED') {
@@ -486,18 +486,34 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
 
             const disabled = currentChannel === 'NONE' || isTriggeringNotification !== null || (!hasSmsItem && !hasEmailItem) || !allowOverrideResend;
 
-            const isAnySent = emailStatus.label === 'SENT' || smsStatus.label === 'SENT';
-            const isAnyFailed = emailStatus.label === 'FAILED' || smsStatus.label === 'FAILED';
+            const configuredChannels: ('EMAIL' | 'SMS')[] = type.emailOnly
+              ? ['EMAIL']
+              : currentChannel === 'BOTH'
+              ? ['EMAIL', 'SMS']
+              : currentChannel === 'EMAIL'
+              ? ['EMAIL']
+              : currentChannel === 'SMS'
+              ? ['SMS']
+              : [];
+
+            const channelStatuses = configuredChannels.map((ch) => (ch === 'EMAIL' ? emailStatus : smsStatus));
+
+            const hasConfiguredChannels = configuredChannels.length > 0;
+            const isAllSent = hasConfiguredChannels && channelStatuses.every((st) => st.label === 'SENT');
+            const isAnyFailed = hasConfiguredChannels && channelStatuses.some((st) => st.label === 'FAILED');
+            const isAnySentOrPending = hasConfiguredChannels && channelStatuses.some((st) => st.label === 'SENT' || st.label === 'PENDING');
 
             return (
               <div key={type.eventType} className={`relative flex items-start justify-between gap-2 ${isFullySkipped ? 'opacity-60' : ''}`}>
                 {/* Circle Marker */}
                 <div
                   className={`absolute -left-4 top-1 size-3 rounded-full border-2 bg-background ${
-                    isAnySent
+                    isAllSent
                       ? 'border-emerald-500 bg-emerald-500'
                       : isAnyFailed
                       ? 'border-rose-500 bg-rose-500'
+                      : isAnySentOrPending
+                      ? 'border-amber-500 bg-amber-500'
                       : isFullySkipped
                       ? 'border-muted-foreground/20 bg-muted/40'
                       : 'border-muted-foreground/40'

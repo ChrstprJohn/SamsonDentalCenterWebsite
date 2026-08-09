@@ -748,6 +748,15 @@ export function AppointmentEmailTimelineView() {
                     const getStatus = (type: (typeof NOTIFICATION_TYPES)[number], ch: 'EMAIL' | 'SMS') => {
                       if (isLoadingLogs) return { label: 'LOADING...', badgeClass: 'bg-muted text-muted-foreground/60 animate-pulse' };
 
+                      const isChannelEnabled =
+                        currentChannel === 'BOTH' ||
+                        (ch === 'EMAIL' && currentChannel === 'EMAIL') ||
+                        (ch === 'SMS' && currentChannel === 'SMS');
+
+                      if (!isChannelEnabled && !type.emailOnly) {
+                        return { label: 'SKIPPED (Channel Off)', badgeClass: badgeClassFor('SKIPPED') };
+                      }
+
                       if (type.eventType === 'APPOINTMENT_INQUIRY_RECEIVED') {
                         const inquiryLog = timelineEntries.find((log) => log.eventType === 'APPOINTMENT_INQUIRY_RECEIVED');
                         const isConvertedInquiry = Boolean(
@@ -794,15 +803,6 @@ export function AppointmentEmailTimelineView() {
                         }
                         return e.eventType === type.eventType;
                       });
-
-                      const isChannelEnabled =
-                        currentChannel === 'BOTH' ||
-                        (ch === 'EMAIL' && currentChannel === 'EMAIL') ||
-                        (ch === 'SMS' && currentChannel === 'SMS');
-
-                      if (!isChannelEnabled) {
-                        return { label: 'SKIPPED (Channel Off)', badgeClass: badgeClassFor('SKIPPED') };
-                      }
 
                       if (log) {
                         if (log.rawStatus === 'FAILED') {
