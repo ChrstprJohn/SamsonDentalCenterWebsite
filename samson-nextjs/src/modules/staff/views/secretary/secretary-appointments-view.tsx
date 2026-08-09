@@ -24,22 +24,6 @@ export function SecretaryAppointmentsView() {
   const [draftStatus, setDraftStatus] = useState('');
   const [draftSource, setDraftSource] = useState('');
   const filterBoxRef = useRef<HTMLDivElement>(null);
-  const [dismissedBanners, setDismissedBanners] = useState<Record<string, boolean>>(() => {
-    try {
-      return JSON.parse(localStorage.getItem('directory-banner-dismissed') ?? '{}');
-    } catch {
-      return {};
-    }
-  });
-  const dismissBanner = (key: string) => {
-    setDismissedBanners((prev) => {
-      const next = { ...prev, [key]: true };
-      try {
-        localStorage.setItem('directory-banner-dismissed', JSON.stringify(next));
-      } catch { /* ignore */ }
-      return next;
-    });
-  };
 
   useEffect(() => {
     if (!showFilters) return;
@@ -277,23 +261,6 @@ export function SecretaryAppointmentsView() {
             </Button>
           </div>
         ) : null}
-        {!dismissedBanners[view.activeTab] && (
-          <div className="mx-3 mt-3 mb-1 rounded-lg border border-card-border/60 bg-muted/30 px-3 py-2 flex items-start gap-2 shrink-0">
-            <p className="text-[11px] leading-snug text-muted-foreground flex-1">
-              {view.activeTab === 'upcoming' && 'Confirmed upcoming appointments and today\'s check-ins.'}
-              {view.activeTab === 'needs-attention' && 'Appointments needing action: checked-in visits and unresolved no-shows.'}
-              {view.activeTab === 'history' && 'Past appointments: completed, cancelled, rejected, displaced, and resolved no-shows.'}
-            </p>
-            <button
-              onClick={() => dismissBanner(view.activeTab)}
-              className="text-muted-foreground/60 hover:text-foreground transition-colors shrink-0"
-              aria-label="Dismiss explanation"
-              title="Dismiss"
-            >
-              <X className="size-3.5" />
-            </button>
-          </div>
-        )}
         <AppointmentsTable
           appointments={view.visibleAppointments}
           total={view.tabTotals[view.activeTab] ?? view.visibleAppointments.length}
