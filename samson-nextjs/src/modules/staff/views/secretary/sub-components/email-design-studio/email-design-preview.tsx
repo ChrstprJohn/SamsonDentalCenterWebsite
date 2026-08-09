@@ -146,19 +146,36 @@ export function EmailDesignPreview({
       default:
         return null;
     }
-  }, [design.id, patientName, serviceName, doctorName, dateStr, timeRangeStr, appointmentId, baseUrl, sample.cancellationReason, sample.oldDateStr, sample.oldTimeRangeStr, sample.preferredStartTimeStr, sample.rejectionReason]);
+  }, [
+    design.id,
+    patientName,
+    serviceName,
+    doctorName,
+    dateStr,
+    timeRangeStr,
+    appointmentId,
+    baseUrl,
+    sample.cancellationReason,
+    sample.oldDateStr,
+    sample.oldTimeRangeStr,
+    sample.preferredStartTimeStr,
+    sample.rejectionReason,
+  ]);
 
   const htmlString = useMemo(() => {
     if (!element) return '';
-    return renderToStaticMarkup(element);
+    try {
+      return renderToStaticMarkup(element);
+    } catch {
+      return '';
+    }
   }, [element]);
 
   return (
     <iframe
       srcDoc={htmlString}
-      title="Email Preview"
-      className="w-full border-0 bg-white shadow-xs rounded-lg min-h-[680px]"
-      style={{ width: '100%', height: '680px', border: 'none' }}
+      title="Email Design Preview"
+      className="w-full h-[650px] border-0 bg-white shadow-xs rounded-xl"
     />
   );
 }
