@@ -897,11 +897,24 @@ function ResolveContent({ view, onClose, channel, draftChannel, isEditingChannel
     if (draftChannel !== channel) {
       await onSaveChannel();
     }
-    view.handleResolveNoShowSubmit({
-      appointmentId: appointment.id,
-      resolution,
-      reason: reason.trim(),
-    });
+    const payload: {
+      appointmentId: string;
+      resolution: 'COMPLETED' | 'CONFIRMED_NO_SHOW' | 'RESCHEDULE' | 'CHECKED_IN';
+      reason: string;
+      newDate?: string;
+      newStartTime?: string;
+      newEndTime?: string;
+      newDoctorId?: string;
+    } = { appointmentId: appointment.id, resolution, reason: reason.trim() };
+    if (resolution === 'RESCHEDULE') {
+      const fmt = (ds: string, ts: string) => `${ds}T${ts.length === 5 ? ts + ':00' : ts}Z`;
+      const date = view.rescheduleDate || appointment.date;
+      payload.newDate = date;
+      payload.newStartTime = view.rescheduleTime ? fmt(date, view.rescheduleTime) : undefined;
+      payload.newEndTime = view.rescheduleEndTime ? fmt(date, view.rescheduleEndTime) : undefined;
+      payload.newDoctorId = view.rescheduleDoctor || appointment.doctorId || undefined;
+    }
+    view.handleResolveNoShowSubmit(payload);
   };
 
   const selectResolution = (val: 'COMPLETED' | 'CONFIRMED_NO_SHOW' | 'RESCHEDULE' | 'CHECKED_IN') => {
@@ -909,6 +922,23 @@ function ResolveContent({ view, onClose, channel, draftChannel, isEditingChannel
     setReason('');
     setReasonMode('');
     setCustomReason('');
+    if (val === 'RESCHEDULE') {
+      const toHHMM = (t?: string) => {
+        if (!t) return '';
+        if (t.includes('T')) {
+          const p = t.split('T')[1];
+          if (p) return p.slice(0, 5);
+        }
+        const m = t.match(/^(\d{2}):(\d{2})/);
+        return m ? `${m[1]}:${m[2]}` : '';
+      };
+      view.setRescheduleDoctor?.(appointment.doctorId || '');
+      view.setRescheduleDate?.(appointment.date || '');
+      view.setRescheduleTime?.(toHHMM(appointment.startTime ?? undefined));
+      view.setRescheduleEndTime?.(toHHMM(appointment.endTime ?? undefined));
+      view.setRescheduleJustification?.('');
+      void view.loadServices?.();
+    }
   };
 
   const reasonOptions = resolution === 'CHECKED_IN'
