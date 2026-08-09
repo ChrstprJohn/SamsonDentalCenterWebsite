@@ -65,7 +65,7 @@ const appointmentDbSchema = z.object({
   start_time: z.string().nullable().optional(),
   end_time: z.string().nullable().optional(),
   status: appointmentStatusEnum,
-  source: z.enum(['SELF_BOOKED', 'STAFF_CREATED']).optional().default('SELF_BOOKED'),
+  source: z.enum(['SELF_BOOKED', 'STAFF_CREATED', 'CONVERTED']).optional().default('SELF_BOOKED'),
   doctor_assignment_source: z.enum(['SYSTEM', 'USER']).optional().default('SYSTEM'),
   preferred_start_time: z.string().nullable().optional(),
   proposed_preferred_start_time: z.string().nullable().optional(),

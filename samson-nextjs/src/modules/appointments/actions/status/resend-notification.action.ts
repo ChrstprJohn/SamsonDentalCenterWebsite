@@ -175,7 +175,7 @@ export async function resendNotificationAction(input: ResendNotificationInput) {
         eventType = parsed.eventType === 'APPOINTMENT_REMINDER_48H' ? 'APPOINTMENT_REMINDER_48H' : 'APPOINTMENT_REMINDER_24H';
         payload = { appointmentId: parsed.appointmentId, email: recipientEmail };
       } else {
-        if (appointment.patient_id && appointment.source === 'STAFF_CREATED') {
+        if (appointment.patient_id && (appointment.source === 'STAFF_CREATED' || appointment.source === 'CONVERTED')) {
           eventType = 'APPOINTMENT_MANUALLY_BOOKED_PATIENT';
           payload = {
             appointmentId: parsed.appointmentId,

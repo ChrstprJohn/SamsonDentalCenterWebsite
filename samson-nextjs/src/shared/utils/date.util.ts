@@ -32,10 +32,21 @@ export function formatShortDate(date: Date | string): string {
 }
 
 /**
- * Formats a Date object or ISO string into a standard time string.
- * Also handles bare "HH:MM" or "HH:MM:SS" naive local strings (no timezone).
- * Example: '2:30 PM'
+ * Formats a naive appointment date ('YYYY-MM-DD') relative to today.
+ * Returns 'Today', 'Tomorrow', 'in 3d' (≤30 days out), or '' when far.
  */
+export function formatRelativeDay(date: string): string {
+  if (!date) return '';
+  const today = new Date(getTodayLocalDateStr() + 'T00:00:00Z');
+  const target = new Date(date + 'T00:00:00Z');
+  if (isNaN(target.getTime())) return '';
+  const diffDays = Math.round((target.getTime() - today.getTime()) / 86400000);
+  if (diffDays === 0) return 'Today';
+  if (diffDays === 1) return 'Tomorrow';
+  if (diffDays > 1 && diffDays <= 30) return `in ${diffDays}d`;
+  return '';
+}
+
 /**
  * Formats a Date object or ISO string into a standard time string.
  * Also handles bare "HH:MM" or "HH:MM:SS" naive local strings (no timezone).

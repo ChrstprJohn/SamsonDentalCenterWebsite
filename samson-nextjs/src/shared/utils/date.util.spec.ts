@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { formatClinicDate, formatClinicTime, formatTimeString, calculateEndTime, formatShortDate } from './date.util';
+import { formatClinicDate, formatClinicTime, formatTimeString, calculateEndTime, formatShortDate, formatRelativeDay, getTodayLocalDateStr } from './date.util';
 
 describe('Date Utilities', () => {
   it('formats a date object correctly', () => {
@@ -44,5 +44,22 @@ describe('Date Utilities', () => {
 
   it('formats short date correctly', () => {
     expect(formatShortDate('2026-06-22')).toBe('Jun 22, 2026');
+  });
+
+  it('formats relative day from today', () => {
+    const today = getTodayLocalDateStr();
+    const day = (offset: number) => {
+      const d = new Date(today + 'T00:00:00Z');
+      d.setUTCDate(d.getUTCDate() + offset);
+      return d.toISOString().slice(0, 10);
+    };
+    expect(formatRelativeDay(day(0))).toBe('Today');
+    expect(formatRelativeDay(day(1))).toBe('Tomorrow');
+    expect(formatRelativeDay(day(3))).toBe('in 3d');
+    expect(formatRelativeDay(day(30))).toBe('in 30d');
+    expect(formatRelativeDay(day(31))).toBe('');
+    expect(formatRelativeDay(day(-1))).toBe('');
+    expect(formatRelativeDay('')).toBe('');
+    expect(formatRelativeDay('not-a-date')).toBe('');
   });
 });

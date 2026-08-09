@@ -93,7 +93,7 @@ export function DoctorTimeline({
         appointment.guestContact.suffix
       );
     }
-    if (appointment.source === 'STAFF_CREATED' && !appointment.patientId) {
+    if ((appointment.source === 'STAFF_CREATED' || appointment.source === 'CONVERTED') && !appointment.patientId) {
       return `${appointment.patient?.firstName ?? 'Guest'} ${appointment.patient?.lastName ?? ''} (Guest)`;
     }
     return appointment.patient ? `${appointment.patient.firstName} ${appointment.patient.lastName}` : 'Guest Patient';

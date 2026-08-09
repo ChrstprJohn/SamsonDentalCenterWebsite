@@ -295,7 +295,7 @@ export function useSecretaryAppointments() {
       const holder = appointment.patient ? `${appointment.patient.firstName} ${appointment.patient.lastName}` : 'Unknown';
       return `${appointment.dependent.firstName} ${appointment.dependent.lastName} (Dependent: ${holder})`;
     }
-    if (appointment.source === 'STAFF_CREATED' && !appointment.patientId) {
+    if ((appointment.source === 'STAFF_CREATED' || appointment.source === 'CONVERTED') && !appointment.patientId) {
       if (appointment.guestContact) {
         return `${appointment.guestContact.firstName ?? ''} ${appointment.guestContact.lastName ?? ''}`.trim() || 'Guest Patient';
       }

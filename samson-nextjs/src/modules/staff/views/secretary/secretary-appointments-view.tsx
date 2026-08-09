@@ -8,6 +8,7 @@ import { CoordinationHub } from './sub-components/coordination-hub';
 import { NeedsAttentionDetail } from './sub-components/needs-attention-detail';
 import { ArrowLeft, CalendarDays, ClipboardList, RotateCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Select } from '@/components/ui/select';
 import { SidebarHeader, SidebarInput, SidebarTrigger } from '@/components/ui/sidebar';
 
 export function SecretaryAppointmentsView() {
@@ -54,6 +55,41 @@ export function SecretaryAppointmentsView() {
               onChange={(e) => handleSearch(e.target.value)}
               className="rounded-md"
             />
+          </div>
+          <div className="px-1 grid grid-cols-2 gap-1.5">
+            <input
+              type="date"
+              value={view.dateFilter}
+              onChange={(e) => view.setDateFilter(e.target.value)}
+              className="h-8 w-full rounded-md border border-card-border/60 bg-transparent px-2 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+              aria-label="Filter by date"
+            />
+            <Select
+              value={view.doctorFilter}
+              onChange={(e) => view.setDoctorFilter(e.target.value)}
+              className="h-8 w-full rounded-md border border-card-border/60 bg-transparent px-2 py-0 text-xs"
+              options={[
+                { value: '', label: 'All doctors' },
+                ...view.doctors.map((doctor) => ({ value: doctor.id, label: `Dr. ${doctor.firstName} ${doctor.lastName}` })),
+              ]}
+              aria-label="Filter by doctor"
+            />
+            {view.activeTab === 'history' && (
+              <Select
+                value={view.historyStatusFilter}
+                onChange={(e) => view.setHistoryStatusFilter(e.target.value)}
+                className="col-span-2 h-8 w-full rounded-md border border-card-border/60 bg-transparent px-2 py-0 text-xs"
+                options={[
+                  { value: '', label: 'All statuses' },
+                  { value: 'COMPLETED', label: 'Completed' },
+                  { value: 'CANCELLED', label: 'Cancelled' },
+                  { value: 'REJECTED', label: 'Rejected' },
+                  { value: 'DISPLACED', label: 'Displaced' },
+                  { value: 'NO_SHOW', label: 'No Show' },
+                ]}
+                aria-label="Filter by status"
+              />
+            )}
           </div>
         {(() => {
           const activeIndex = TABS.findIndex((t) => t.key === view.activeTab);

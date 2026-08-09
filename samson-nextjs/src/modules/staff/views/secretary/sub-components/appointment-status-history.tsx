@@ -15,7 +15,7 @@ type TimelineEntry = {
 
 const statusLabels: Record<string, string> = {
   PENDING: 'Requested',
-  APPROVED: 'Approved',
+  APPROVED: 'Confirmed / Approved',
   REJECTED: 'Rejected',
   CANCELLED: 'Cancelled',
   RESCHEDULE_REQUESTED: 'Reschedule Requested',
@@ -110,7 +110,7 @@ function buildTimelineEntries(appointment: AppointmentDto): TimelineEntry[] {
 
   const hasPendingEntry = history.some((h) => h.newStatus === 'PENDING');
   if (!hasPendingEntry) {
-    const isStaffCreated = appointment.source === 'STAFF_CREATED';
+    const isStaffCreated = appointment.source === 'STAFF_CREATED' || appointment.source === 'CONVERTED';
     entries.push({
       id: 'initial',
       status: 'PENDING',

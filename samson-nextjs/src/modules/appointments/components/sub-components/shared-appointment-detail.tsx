@@ -30,7 +30,7 @@ export function SharedAppointmentDetail({ appointment, extraSections, actionsBar
   const [savingGuestInfo, setSavingGuestInfo] = useState(false);
 
   const hasGuestInfo = !!appointment.guestContact;
-  const isGuest = !appointment.patientId || appointment.source === 'STAFF_CREATED';
+  const isGuest = !appointment.patientId || appointment.source === 'STAFF_CREATED' || appointment.source === 'CONVERTED';
 
   const formatName = () => {
     if (appointment.dependent) {
@@ -123,7 +123,7 @@ export function SharedAppointmentDetail({ appointment, extraSections, actionsBar
 
         <div className="flex items-center justify-between py-3 px-4">
           <span className="text-sm font-medium text-foreground">Current Status</span>
-          <Badge variant={getBadgeVariant(appointment.status)} className="text-xs px-3 py-1">{appointment.status}</Badge>
+          <Badge variant={getBadgeVariant(appointment.status)} className="text-xs px-3 py-1">{appointment.status === 'APPROVED' ? 'Confirmed / Approved' : appointment.status}</Badge>
         </div>
 
         <hr className="border-card-border/40 mx-4" />

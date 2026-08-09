@@ -14,7 +14,7 @@ export type AppointmentStatus =
 
 export type PaymentMethod = 'CASH' | 'CARD' | 'HMO';
 export type InquiryStatus = 'NEW' | 'CONVERTED' | 'DROPPED';
-export type AppointmentSource = 'SELF_BOOKED' | 'STAFF_CREATED';
+export type AppointmentSource = 'SELF_BOOKED' | 'STAFF_CREATED' | 'CONVERTED';
 
 export interface PatientUser {
   id: string;

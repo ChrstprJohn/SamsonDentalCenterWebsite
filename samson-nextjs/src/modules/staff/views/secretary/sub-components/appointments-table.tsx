@@ -3,7 +3,7 @@
 import { CalendarDays } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { AppointmentDto } from '@/modules/appointments/dtos/shared/appointment.dto';
-import { formatClinicTime, formatShortDate, formatTimeString } from '@/shared/utils/date.util';
+import { formatClinicTime, formatRelativeDay, formatShortDate, formatTimeString } from '@/shared/utils/date.util';
 import { SecretaryListSkeleton, SecretaryListSkeletonTheme, SecretaryRefreshBar } from './secretary-list-skeleton';
 
 const BADGE_STYLES: Record<string, string> = {
@@ -144,6 +144,13 @@ function AppointmentRow({ appointment, isSelected, formatPatientName, onSelect }
       : 'Time Pending';
 
   const dateDisplay = formatShortDate(appointment.date);
+  const relativeDay = formatRelativeDay(appointment.date);
+  const sourceDot =
+    appointment.source === 'CONVERTED'
+      ? { color: 'bg-violet-500', label: 'Converted from online request' }
+      : appointment.source === 'STAFF_CREATED'
+        ? { color: 'bg-cyan-500', label: 'Created by staff' }
+        : { color: 'bg-emerald-500', label: 'Booked online' };
 
   return (
     <button
@@ -156,15 +163,19 @@ function AppointmentRow({ appointment, isSelected, formatPatientName, onSelect }
     >
       <div className="flex w-full items-center gap-2">
       <span className="min-w-0 truncate">{formatPatientName(appointment)}</span>
+        <span
+          title={sourceDot.label}
+          className={`size-1.5 rounded-full shrink-0 ${sourceDot.color}`}
+        />
         <span className={`ml-auto text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded shrink-0 ${BADGE_STYLES[status] || 'text-muted-foreground bg-muted/20'}`}>
-          {status}
+          {status === 'APPROVED' ? 'Confirmed' : status}
         </span>
       </div>
       <span className="font-medium truncate">
         {appointment.service?.name || 'Treatment'}
       </span>
       <div className="w-full flex items-center justify-between gap-2 text-xs">
-        <span className="truncate">{dateDisplay} &bull; {timeDisplay}</span>
+        <span className="truncate">{relativeDay ? `${relativeDay} · ` : ''}{dateDisplay} &bull; {timeDisplay}</span>
         <span className="text-[10px] text-muted-foreground shrink-0">{appointment.doctor ? `Dr. ${appointment.doctor.lastName}` : ''}</span>
       </div>
     </button>

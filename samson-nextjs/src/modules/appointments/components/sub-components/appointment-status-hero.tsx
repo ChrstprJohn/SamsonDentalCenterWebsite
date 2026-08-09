@@ -9,7 +9,7 @@ export function AppointmentStatusHero({ appt }: AppointmentStatusHeroProps) {
   const getStatusLabel = (status: string) => {
     switch (status) {
       case 'PENDING': return 'Pending Staff Review';
-      case 'APPROVED': return 'Approved';
+      case 'APPROVED': return 'Confirmed / Approved';
       case 'REJECTED': return 'Rejected';
       case 'CANCELLED': return 'Cancelled';
       case 'RESCHEDULE_REQUESTED': return 'Reschedule Requested';
