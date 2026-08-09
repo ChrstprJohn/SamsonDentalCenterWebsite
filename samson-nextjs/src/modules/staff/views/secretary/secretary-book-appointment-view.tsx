@@ -37,7 +37,6 @@ import {
   Check,
   Calendar as CalendarIcon,
   Users,
-  X,
   ArrowLeft,
 } from 'lucide-react';
 
@@ -308,7 +307,7 @@ export function SecretaryBookAppointmentView() {
                   }}
                   className="text-xs bg-background border border-border rounded-md px-2 py-1.5 text-foreground w-[140px] focus:outline-none focus:ring-1 focus:ring-ring"
                 >
-                  <option value="all">All Doctors</option>
+                  {viewMode === 'day' && <option value="all">All Doctors</option>}
                   {view.doctorsList.map((doc) => (
                     <option key={doc.id} value={doc.id}>Dr. {doc.firstName} {doc.lastName}</option>
                   ))}
@@ -367,7 +366,7 @@ export function SecretaryBookAppointmentView() {
                 }}
                 className="text-xs bg-transparent border border-border rounded-md px-2 py-1.5 text-foreground w-[140px]"
               >
-                <option value="all">All Doctors</option>
+                {viewMode === 'day' && <option value="all">All Doctors</option>}
                 {view.doctorsList.map((doctor) => (
                   <option key={doctor.id} value={doctor.id}>
                     Dr. {doctor.firstName} {doctor.lastName}
@@ -519,17 +518,17 @@ export function SecretaryBookAppointmentView() {
           </div>
         ) : isBookingOpen ? (
           <>
-            <div className="p-4 border-b border-border shrink-0 flex items-center justify-between">
+            <div className="p-4 border-b border-border shrink-0 flex items-center gap-2">
+              <button
+                onClick={() => setIsBookingOpen(false)}
+                className="p-1 -ml-1 text-muted-foreground hover:text-foreground shrink-0"
+              >
+                <ArrowLeft className="size-5" />
+              </button>
               <div className="flex flex-col gap-0.5">
                 <h1 className="text-base font-medium text-foreground">Book Appointment</h1>
                 <p className="text-xs text-muted-foreground">Fill in the details below.</p>
               </div>
-              <button
-                onClick={() => setIsBookingOpen(false)}
-                className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded-md hover:bg-muted"
-              >
-                <X className="size-4" />
-              </button>
             </div>
             <SidebarContent data-lenis-prevent className="overflow-y-auto px-3 py-3 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent" style={{ scrollbarWidth: 'thin' }}>
               {/* ── Section 1: Service & Schedule ── */}
@@ -686,40 +685,22 @@ export function SecretaryBookAppointmentView() {
                       className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
                     />
                   </div>
-                  {/* Notification Channel — radio group */}
-                  <div className="flex flex-col gap-1.5">
-                    <span className="text-xs text-muted-foreground">Notification Channel</span>
-                    <div className="flex flex-col gap-2">
-                      {([
-                        { value: 'NONE', label: 'None' },
-                        { value: 'SMS',  label: 'SMS' },
-                        { value: 'EMAIL', label: 'Email' },
-                        { value: 'BOTH', label: 'Both (SMS + Email)' },
-                      ] as const).map(({ value, label }) => {
-                        const needsEmail = value === 'EMAIL' || value === 'BOTH';
-                        const disabled = needsEmail && !view.email;
-                        return (
-                          <label
-                            key={value}
-                            className={`flex items-center gap-2.5 select-none ${
-                              disabled ? 'cursor-not-allowed opacity-40' : 'cursor-pointer'
-                            }`}
-                          >
-                            <div
-                              data-checked={view.confirmationChannel === value}
-                              onClick={() => { if (!disabled) view.setConfirmationChannel(value); }}
-                              className="group/rb flex aspect-square size-4 shrink-0 items-center justify-center rounded-full border border-card-border data-[checked=true]:border-primary transition-colors"
-                              style={{ cursor: disabled ? 'not-allowed' : 'pointer' }}
-                            >
-                              <div className="hidden size-2 rounded-full bg-primary group-data-[checked=true]/rb:block" />
-                            </div>
-                            <span className="text-sm text-foreground">
-                              {label}
-                              {disabled && <span className="ml-1 text-xs text-muted-foreground">(enter email above)</span>}
-                            </span>
-                          </label>
-                        );
-                      })}
+                  {/* Notification Channel — dropdown */}
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-sm font-medium text-foreground">Notification Channel <span className="text-destructive">*</span></span>
+                    <span className="text-xs text-muted-foreground">Which channel should be used to notify the patient?</span>
+                    <div className="relative flex items-center">
+                      <select
+                        value={view.confirmationChannel}
+                        onChange={(e) => view.setConfirmationChannel(e.target.value as 'EMAIL' | 'SMS' | 'BOTH' | 'NONE')}
+                        className="w-full px-4 pr-10 py-2.5 appearance-none rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
+                      >
+                        <option value="NONE">None (patient will not be notified)</option>
+                        <option value="SMS" disabled={!view.phoneNumber}>SMS{!view.phoneNumber ? ' (enter phone number above)' : ''}</option>
+                        <option value="EMAIL" disabled={!view.email}>Email{!view.email ? ' (enter email above)' : ''}</option>
+                        <option value="BOTH" disabled={!view.email || !view.phoneNumber}>Both (SMS + Email){!view.email || !view.phoneNumber ? ' (enter email & phone above)' : ''}</option>
+                      </select>
+                      <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
                     </div>
                   </div>
                   {/* Patient Note */}
@@ -728,7 +709,7 @@ export function SecretaryBookAppointmentView() {
                     <textarea
                       value={view.patientNote}
                       onChange={(e) => view.setPatientNote(e.target.value)}
-                      placeholder="Add a note for this appointment (optional)"
+                      placeholder="Optional — anything the patient wants us to know or a special request? Put it here..."
                       rows={3}
                       className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border resize-none"
                     />
@@ -900,11 +881,14 @@ function DatePicker({
           <Calendar
             mode="range"
             selected={{ from: rangeStart, to: rangeEnd }}
-            onSelect={(range) => {
-              const picked = range?.from;
-              if (picked) onSelectDate(toDateString(picked));
+            onSelect={(_range, day) => {
+              if (day) onSelectDate(toDateString(day));
             }}
-            className="w-full [&_table]:w-full [&_td]:w-[14.285%] [&_th]:w-[14.285%] [&_th]:text-center"
+            classNames={{
+              day_range_start: 'day-range-start',
+              day_range_end: 'day-range-end',
+            }}
+            className="w-full [&_table]:w-full [&_td]:w-[14.285%] [&_th]:w-[14.285%] [&_th]:text-center [&_[aria-selected].day-range-start]:ring-2 [&_[aria-selected].day-range-start]:ring-sidebar-primary [&_[aria-selected].day-range-start]:ring-offset-1"
           />
         </SidebarGroupContent>
       </SidebarGroup>
