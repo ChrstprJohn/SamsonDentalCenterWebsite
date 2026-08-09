@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useSecretaryBookAppointment } from '../../hooks/secretary/use-secretary-book-appointment';
-import { DoctorTimeline } from './sub-components/doctor-timeline';
+import { DoctorTimeline, getDoctorColor } from './sub-components/doctor-timeline';
 import { AppointmentDetailPane } from './sub-components/appointment-detail-pane';
 import { Calendar } from '@/components/ui/calendar';
 import { getClinicAppointmentsAction } from '@/modules/appointments/actions/clinic/get-clinic-appointments.action';
@@ -246,6 +246,27 @@ export function SecretaryBookAppointmentView() {
     }
   };
 
+  const handleSelectViewMode = (mode: 'day' | 'week') => {
+    setViewMode(mode);
+    if (mode === 'week') {
+      const selected = view.doctorsList.find((d) => checkedDoctorIds[d.id]);
+      const targetDoctorId = selected ? selected.id : view.doctorsList[0]?.id;
+      if (targetDoctorId) {
+        const next: Record<string, boolean> = {};
+        view.doctorsList.forEach((d) => {
+          next[d.id] = d.id === targetDoctorId;
+        });
+        setCheckedDoctorIds(next);
+      }
+    }
+  };
+
+  const getDynamicTitle = () => {
+    if (viewMode === 'day') return 'Doctor Schedules';
+    if (filteredDoctors.length === 1) return `Dr. ${filteredDoctors[0].firstName} ${filteredDoctors[0].lastName}'s Schedule`;
+    return 'Doctor Schedules';
+  };
+
   return (
     <div className="flex h-full w-full overflow-hidden bg-background">
       {/* Left Column: Doctor Schedules Timeline */}
@@ -255,7 +276,7 @@ export function SecretaryBookAppointmentView() {
           <div className="flex flex-col gap-0.5 shrink-0">
             <div className="flex items-center gap-2">
               <SidebarTrigger className="lg:hidden -ml-1 text-muted-foreground hover:text-foreground" />
-              <h1 className="text-base font-medium text-foreground">Doctor Schedules</h1>
+              <h1 className="text-base font-medium text-foreground">{getDynamicTitle()}</h1>
             </div>
             <p className="text-xs text-muted-foreground max-lg:hidden">{getHeaderDateString()}</p>
           </div>
@@ -296,7 +317,7 @@ export function SecretaryBookAppointmentView() {
             )}
             <div className="flex bg-muted p-0.5 rounded-lg text-xs font-medium">
               <button
-                onClick={() => setViewMode('day')}
+                onClick={() => handleSelectViewMode('day')}
                 className={`px-3.5 py-1.5 rounded-md transition-colors ${
                   viewMode === 'day' ? 'bg-white shadow text-foreground' : 'text-muted-foreground hover:text-foreground'
                 }`}
@@ -304,7 +325,7 @@ export function SecretaryBookAppointmentView() {
                 1 Day
               </button>
               <button
-                onClick={() => setViewMode('week')}
+                onClick={() => handleSelectViewMode('week')}
                 className={`px-3.5 py-1.5 rounded-md transition-colors ${
                   viewMode === 'week' ? 'bg-white shadow text-foreground' : 'text-muted-foreground hover:text-foreground'
                 }`}
@@ -754,6 +775,7 @@ export function SecretaryBookAppointmentView() {
               <DatePicker
                 selectedDate={view.selectedDate}
                 onSelectDate={view.selectDate}
+                weekDates={viewMode === 'week' ? daysOfWeek.map(d => ({ dateStr: d })) : undefined}
               />
               <SidebarSeparator className="mx-0" />
               <SidebarGroup className="py-0">
@@ -767,29 +789,60 @@ export function SecretaryBookAppointmentView() {
                   <CollapsibleContent>
                     <SidebarGroupContent>
                       <SidebarMenu>
-                        <SidebarMenuItem>
-                          <SidebarMenuButton onClick={toggleAllDoctors}>
-                            <div
-                              data-active={isAllDoctorsChecked}
-                              className="group/calendar-item flex aspect-square size-4 shrink-0 items-center justify-center rounded-sm border border-sidebar-border text-sidebar-primary-foreground data-[active=true]:border-sidebar-primary data-[active=true]:bg-sidebar-primary"
-                            >
-                              <Check className="hidden size-3 group-data-[active=true]/calendar-item:block" />
-                            </div>
-                            All Doctors
-                          </SidebarMenuButton>
-                        </SidebarMenuItem>
-                        {view.doctorsList.map((doctor) => {
+                        {viewMode === 'day' && (
+                          <SidebarMenuItem>
+                            <SidebarMenuButton onClick={toggleAllDoctors}>
+                              <div
+                                data-active={isAllDoctorsChecked}
+                                className="group/calendar-item flex aspect-square size-4 shrink-0 items-center justify-center rounded-sm border border-sidebar-border text-sidebar-primary-foreground data-[active=true]:border-sidebar-primary data-[active=true]:bg-sidebar-primary"
+                              >
+                                <Check className="hidden size-3 group-data-[active=true]/calendar-item:block" />
+                              </div>
+                              All Doctors
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
+                        )}
+                        {view.doctorsList.map((doctor, doctorIndex) => {
                           const isChecked = !!checkedDoctorIds[doctor.id];
+                          const isRadio = viewMode === 'week';
+                          const docColor = getDoctorColor(doctor.id, doctorIndex);
                           return (
                             <SidebarMenuItem key={doctor.id}>
-                              <SidebarMenuButton onClick={() => setCheckedDoctorIds(prev => ({ ...prev, [doctor.id]: !prev[doctor.id] }))}>
-                                <div
-                                  data-active={isChecked}
-                                  className="group/calendar-item flex aspect-square size-4 shrink-0 items-center justify-center rounded-sm border border-sidebar-border text-sidebar-primary-foreground data-[active=true]:border-sidebar-primary data-[active=true]:bg-sidebar-primary"
-                                >
-                                  <Check className="hidden size-3 group-data-[active=true]/calendar-item:block" />
-                                </div>
-                                Dr. {doctor.firstName} {doctor.lastName}
+                              <SidebarMenuButton onClick={() => {
+                                setCheckedDoctorIds(prev => {
+                                  if (viewMode === 'week') {
+                                    const next: Record<string, boolean> = {};
+                                    view.doctorsList.forEach(d => { next[d.id] = d.id === doctor.id; });
+                                    return next;
+                                  }
+                                  return { ...prev, [doctor.id]: !prev[doctor.id] };
+                                });
+                              }}>
+                                {isRadio ? (
+                                  /* Radio button — 5 Days view */
+                                  <div
+                                    className="flex aspect-square size-4 shrink-0 items-center justify-center rounded-full border-2 transition-colors"
+                                    style={{
+                                      borderColor: isChecked ? docColor.hex : undefined,
+                                    }}
+                                  >
+                                    {isChecked && (
+                                      <div className="size-2 rounded-full" style={{ backgroundColor: docColor.hex }} />
+                                    )}
+                                  </div>
+                                ) : (
+                                  /* Checkbox — 1 Day view */
+                                  <div
+                                    className="flex aspect-square size-4 shrink-0 items-center justify-center rounded-sm border transition-colors"
+                                    style={{
+                                      backgroundColor: isChecked ? docColor.hex : undefined,
+                                      borderColor: isChecked ? docColor.hex : undefined,
+                                    }}
+                                  >
+                                    {isChecked && <Check className="size-3 text-white" />}
+                                  </div>
+                                )}
+                                <span className="flex-1 truncate">Dr. {doctor.firstName} {doctor.lastName}</span>
                               </SidebarMenuButton>
                             </SidebarMenuItem>
                           );
@@ -822,11 +875,16 @@ export function SecretaryBookAppointmentView() {
 function DatePicker({
   selectedDate,
   onSelectDate,
+  weekDates,
 }: {
   selectedDate: string;
   onSelectDate: (date: string) => void;
+  weekDates?: { dateStr: string }[];
 }) {
   const date = selectedDate ? new Date(selectedDate + 'T00:00:00') : undefined;
+
+  const rangeStart = weekDates?.[0] ? new Date(weekDates[0].dateStr + 'T00:00:00') : undefined;
+  const rangeEnd = weekDates?.[4] ? new Date(weekDates[4].dateStr + 'T00:00:00') : undefined;
 
   return (
     <SidebarGroup className="px-0 flex justify-center">
@@ -842,6 +900,8 @@ function DatePicker({
               onSelectDate(`${y}-${m}-${day}`);
             }
           }}
+          modifiers={rangeStart && rangeEnd ? { range: { from: rangeStart, to: rangeEnd } } : undefined}
+          modifiersClassNames={{ range: 'bg-sidebar-accent/60 rounded-none' }}
           className="w-full [&_table]:w-full [&_td]:w-[14.285%] [&_th]:w-[14.285%] [&_th]:text-center [&_[role=gridcell].bg-accent]:bg-sidebar-primary [&_[role=gridcell].bg-accent]:text-sidebar-primary-foreground"
         />
       </SidebarGroupContent>

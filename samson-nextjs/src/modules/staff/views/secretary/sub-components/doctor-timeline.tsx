@@ -7,21 +7,23 @@ import { formatClinicTime } from '@/shared/utils/date.util';
 import { useIsMobile } from '@/shared/hooks/use-mobile';
 
 const COLORS_LIST = [
-  { bg: 'bg-blue-50/80', border: 'border-blue-200/80', hover: 'hover:bg-blue-100/90', accent: 'bg-blue-500', text: 'text-blue-950', subtext: 'text-blue-700/90' },
-  { bg: 'bg-emerald-50/80', border: 'border-emerald-200/80', hover: 'hover:bg-emerald-100/90', accent: 'bg-emerald-500', text: 'text-emerald-950', subtext: 'text-emerald-700/90' },
-  { bg: 'bg-violet-50/80', border: 'border-violet-200/80', hover: 'hover:bg-violet-100/90', accent: 'bg-violet-500', text: 'text-violet-950', subtext: 'text-violet-700/90' },
-  { bg: 'bg-amber-50/80', border: 'border-amber-200/80', hover: 'hover:bg-amber-100/90', accent: 'bg-amber-500', text: 'text-amber-950', subtext: 'text-amber-700/90' },
-  { bg: 'bg-rose-50/80', border: 'border-rose-200/80', hover: 'hover:bg-rose-100/90', accent: 'bg-rose-500', text: 'text-rose-950', subtext: 'text-rose-700/90' },
+  { bg: 'bg-blue-50/80', border: 'border-blue-200/80', hover: 'hover:bg-blue-100/90', accent: 'bg-blue-500', text: 'text-blue-950', subtext: 'text-blue-700/90', hex: '#3b82f6' },
+  { bg: 'bg-emerald-50/80', border: 'border-emerald-200/80', hover: 'hover:bg-emerald-100/90', accent: 'bg-emerald-500', text: 'text-emerald-950', subtext: 'text-emerald-700/90', hex: '#10b981' },
+  { bg: 'bg-violet-50/80', border: 'border-violet-200/80', hover: 'hover:bg-violet-100/90', accent: 'bg-violet-500', text: 'text-violet-950', subtext: 'text-violet-700/90', hex: '#8b5cf6' },
+  { bg: 'bg-amber-50/80', border: 'border-amber-200/80', hover: 'hover:bg-amber-100/90', accent: 'bg-amber-500', text: 'text-amber-950', subtext: 'text-amber-700/90', hex: '#f59e0b' },
+  { bg: 'bg-rose-50/80', border: 'border-rose-200/80', hover: 'hover:bg-rose-100/90', accent: 'bg-rose-500', text: 'text-rose-950', subtext: 'text-rose-700/90', hex: '#f43f5e' },
 ];
 
-const getDoctorColor = (doctorId: string) => {
+
+export const getDoctorColor = (doctorId: string, index?: number) => {
+  if (index !== undefined) return COLORS_LIST[index % COLORS_LIST.length];
   if (!doctorId) return COLORS_LIST[0];
   let hash = 0;
   for (let i = 0; i < doctorId.length; i++) {
     hash = doctorId.charCodeAt(i) + ((hash << 5) - hash);
   }
-  const index = Math.abs(hash) % COLORS_LIST.length;
-  return COLORS_LIST[index];
+  const idx = Math.abs(hash) % COLORS_LIST.length;
+  return COLORS_LIST[idx];
 };
 
 interface DoctorTimelineProps {
@@ -253,13 +255,17 @@ export function DoctorTimeline({
           ) : (
             doctors.map((doctor, index) => {
               const count = appointments.filter((app) => app.doctorId === doctor.id && ['APPROVED', 'CHECKED_IN', 'COMPLETED', 'NO_SHOW'].includes(app.status)).length;
+              const color = getDoctorColor(doctor.id, index);
               return (
                 <div
                   key={doctor.id}
-                  className="sticky top-0 bg-card border-r border-r-slate-300 border-b border-border px-4 py-2 text-center text-xs font-bold text-text-primary truncate z-20"
+                  className="sticky top-0 bg-card border-r border-r-slate-300 border-b border-border px-4 py-2 text-center text-xs font-bold text-text-primary z-20"
                   style={{ gridColumn: index + 2, gridRow: 1 }}
                 >
-                  Dr. {doctor.firstName} {doctor.lastName} ({count})
+                  <span className="inline-flex items-center justify-center gap-1.5 truncate">
+                    <span className={`size-2 rounded-full shrink-0 ${color.accent}`} />
+                    Dr. {doctor.firstName} {doctor.lastName} ({count})
+                  </span>
                 </div>
               );
             })
