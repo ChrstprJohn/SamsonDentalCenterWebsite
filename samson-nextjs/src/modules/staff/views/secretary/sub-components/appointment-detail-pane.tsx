@@ -101,13 +101,20 @@ function AppointmentDetails({ appointment, view, activeTab, compact, hideActions
           <AppointmentRescheduleForm appointment={appointment} {...getRescheduleProps(view)} noFooter />
         </div>
         <div className={`shrink-0 border-t border-border px-4 py-3 ${compact ? 'bg-sidebar' : 'bg-card'}`}>
-          <div className="flex gap-2">
-            <Button onClick={view.submitReschedule} disabled={view.isSubmitting || !isFormComplete} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl disabled:opacity-50">
-              {view.isSubmitting ? 'Saving...' : 'Confirm'}
-            </Button>
-            <Button variant="outline" onClick={() => view.setShowRescheduleForm(false)} className="flex-1 h-[42px] text-sm font-medium rounded-xl">
-              Back
-            </Button>
+          <div className="flex flex-col gap-2">
+            {isEditingChannel && (
+              <p className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center">
+                Please finish editing or save notification channel before taking action.
+              </p>
+            )}
+            <div className={`flex gap-2 ${isEditingChannel ? 'pointer-events-none opacity-40' : ''}`}>
+              <Button onClick={view.submitReschedule} disabled={view.isSubmitting || !isFormComplete} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl disabled:opacity-50">
+                {view.isSubmitting ? 'Saving...' : 'Confirm'}
+              </Button>
+              <Button variant="outline" onClick={() => view.setShowRescheduleForm(false)} className="flex-1 h-[42px] text-sm font-medium rounded-xl">
+                Back
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -137,21 +144,28 @@ function AppointmentDetails({ appointment, view, activeTab, compact, hideActions
           />
         </div>
         <div className={`shrink-0 border-t border-border px-4 py-3 ${compact ? 'bg-sidebar' : 'bg-card'}`}>
-          <div className="flex gap-2">
-            <Button
-              onClick={view.submitCancel}
-              disabled={view.isSubmitting || !isCancelValid}
-              className="flex-1 h-[42px] text-sm font-semibold bg-destructive text-white hover:bg-destructive/90 transition-colors rounded-xl disabled:opacity-50"
-            >
-              {view.isSubmitting ? 'Canceling...' : 'Confirm Cancellation'}
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => view.setShowCancelForm(false)}
-              className="flex-1 h-[42px] text-sm font-medium rounded-xl"
-            >
-              Back
-            </Button>
+          <div className="flex flex-col gap-2">
+            {isEditingChannel && (
+              <p className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center">
+                Please finish editing or save notification channel before taking action.
+              </p>
+            )}
+            <div className={`flex gap-2 ${isEditingChannel ? 'pointer-events-none opacity-40' : ''}`}>
+              <Button
+                onClick={view.submitCancel}
+                disabled={view.isSubmitting || !isCancelValid}
+                className="flex-1 h-[42px] text-sm font-semibold bg-destructive text-white hover:bg-destructive/90 transition-colors rounded-xl disabled:opacity-50"
+              >
+                {view.isSubmitting ? 'Canceling...' : 'Confirm Cancellation'}
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => view.setShowCancelForm(false)}
+                className="flex-1 h-[42px] text-sm font-medium rounded-xl"
+              >
+                Back
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -224,17 +238,24 @@ function AppointmentDetails({ appointment, view, activeTab, compact, hideActions
 
               if (!view.showRescheduleForm && !view.showCancelForm) {
                 return (
-                  <div className="flex gap-2">
-                    {(canModify || canRescheduleOnly) && (
-                      <Button variant="outline" className={`${canModify ? 'flex-1' : 'w-full'} h-[42px]`} onClick={() => view.setShowRescheduleForm(true)}>
-                        Reschedule
-                      </Button>
+                  <div className="flex flex-col gap-2">
+                    {isEditingChannel && (
+                      <p className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center">
+                        Please finish editing or save notification channel before taking action.
+                      </p>
                     )}
-                    {(canModify || canCancelOnly) && (
-                      <Button variant="outline" className={`${canModify ? 'flex-1' : 'w-full'} h-[42px] border-destructive/50 text-destructive hover:bg-destructive/10`} onClick={() => view.setShowCancelForm(true)}>
-                        Cancel
-                      </Button>
-                    )}
+                    <div className={`flex gap-2 ${isEditingChannel ? 'pointer-events-none opacity-40' : ''}`}>
+                      {(canModify || canRescheduleOnly) && (
+                        <Button variant="outline" className={`${canModify ? 'flex-1' : 'w-full'} h-[42px]`} onClick={() => view.setShowRescheduleForm(true)}>
+                          Reschedule
+                        </Button>
+                      )}
+                      {(canModify || canCancelOnly) && (
+                        <Button variant="outline" className={`${canModify ? 'flex-1' : 'w-full'} h-[42px] border-destructive/50 text-destructive hover:bg-destructive/10`} onClick={() => view.setShowCancelForm(true)}>
+                          Cancel
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 );
               }

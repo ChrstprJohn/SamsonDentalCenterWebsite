@@ -27,6 +27,7 @@ interface AppointmentRescheduleFormProps {
   endTime: string;
   confirmationChannel?: 'EMAIL' | 'SMS' | 'BOTH' | 'NONE';
   onConfirmationChannelChange?: (channel: 'EMAIL' | 'SMS' | 'BOTH' | 'NONE') => void;
+  onEditingChannelChange?: (isEditing: boolean) => void;
   justification: string;
   isSubmitting: boolean;
   onToggleTreatment?: () => void;
@@ -175,6 +176,11 @@ export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps)
 
   const [isEditingChannel, setIsEditingChannel] = useState(false);
 
+  const handleEditingChannelChange = (editing: boolean) => {
+    setIsEditingChannel(editing);
+    props.onEditingChannelChange?.(editing);
+  };
+
   return (
     <FormWrapper
       onSubmit={props.noForm ? undefined : (event) => {
@@ -322,7 +328,7 @@ export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps)
           appointmentId={props.appointment.id}
           value={props.confirmationChannel}
           onChange={props.onConfirmationChannelChange}
-          onEditingChange={setIsEditingChannel}
+          onEditingChange={handleEditingChannelChange}
         />
       )}
 
@@ -360,21 +366,28 @@ export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps)
       </div>
 
       {!props.noFooter && (
-        <div className="flex gap-2 pt-3 border-t border-card-border/60">
-          <Button
-            type="submit"
-            disabled={props.isSubmitting || !isFormComplete || isEditingChannel}
-            className="flex-1 h-[42px] text-sm font-medium bg-primary text-white hover:bg-primary/90 rounded-xl disabled:opacity-50"
-          >
-            {props.isSubmitting ? 'Saving...' : 'Confirm'}
-          </Button>
-          <Button
-            type="button"
-            onClick={props.onBack}
-            className="flex-1 h-[42px] text-sm font-medium border border-card-border text-foreground bg-transparent hover:bg-muted rounded-xl"
-          >
-            Back
-          </Button>
+        <div className="flex flex-col gap-2 pt-3 border-t border-card-border/60">
+          {isEditingChannel && (
+            <p className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center">
+              Please finish editing or save notification channel before confirming.
+            </p>
+          )}
+          <div className={`flex gap-2 ${isEditingChannel ? 'pointer-events-none opacity-40' : ''}`}>
+            <Button
+              type="submit"
+              disabled={props.isSubmitting || !isFormComplete || isEditingChannel}
+              className="flex-1 h-[42px] text-sm font-medium bg-primary text-white hover:bg-primary/90 rounded-xl disabled:opacity-50"
+            >
+              {props.isSubmitting ? 'Saving...' : 'Confirm'}
+            </Button>
+            <Button
+              type="button"
+              onClick={props.onBack}
+              className="flex-1 h-[42px] text-sm font-medium border border-card-border text-foreground bg-transparent hover:bg-muted rounded-xl"
+            >
+              Back
+            </Button>
+          </div>
         </div>
       )}
     </FormWrapper>

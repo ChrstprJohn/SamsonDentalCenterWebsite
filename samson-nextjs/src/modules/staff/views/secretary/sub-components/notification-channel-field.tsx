@@ -63,14 +63,9 @@ export function NotificationChannelField({
         )}
       </div>
       {editing ? (
-        <>
-          <p className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center">
-            Please finish editing or save notification channel before confirming.
-          </p>
-          <Select value={draft} onChange={(e) => setDraft(e.target.value as NotificationChannel)} className="text-sm w-full" options={[
-            { value: 'EMAIL', label: 'Email' }, { value: 'SMS', label: 'SMS' }, { value: 'BOTH', label: 'Email & SMS' }, { value: 'NONE', label: 'None' },
-          ]} />
-        </>
+        <Select value={draft} onChange={(e) => setDraft(e.target.value as NotificationChannel)} className="text-sm w-full" options={[
+          { value: 'EMAIL', label: 'Email' }, { value: 'SMS', label: 'SMS' }, { value: 'BOTH', label: 'Email & SMS' }, { value: 'NONE', label: 'None' },
+        ]} />
       ) : (
         <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">
           {channel === 'EMAIL' ? 'Email' : channel === 'SMS' ? 'SMS' : channel === 'BOTH' ? 'Email & SMS' : 'None'}
