@@ -1,6 +1,6 @@
 'use client';
 
-import { CalendarDays } from 'lucide-react';
+import { CalendarDays, Globe, GlobeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { AppointmentDto } from '@/modules/appointments/dtos/shared/appointment.dto';
 import { formatClinicTime, formatRelativeDay, formatShortDate, formatTimeString } from '@/shared/utils/date.util';
@@ -145,12 +145,8 @@ function AppointmentRow({ appointment, isSelected, formatPatientName, onSelect }
 
   const dateDisplay = formatShortDate(appointment.date);
   const relativeDay = formatRelativeDay(appointment.date);
-  const sourceDot =
-    appointment.source === 'CONVERTED'
-      ? { color: 'bg-violet-500', label: 'Converted from online request' }
-      : appointment.source === 'STAFF_CREATED'
-        ? { color: 'bg-cyan-500', label: 'Created by staff' }
-        : { color: 'bg-emerald-500', label: 'Booked online' };
+  const isManual = appointment.source === 'STAFF_CREATED';
+  const sourceTitle = isManual ? 'Created manually by staff' : appointment.source === 'CONVERTED' ? 'From online request' : 'Booked online';
 
   return (
     <button
@@ -163,10 +159,9 @@ function AppointmentRow({ appointment, isSelected, formatPatientName, onSelect }
     >
       <div className="flex w-full items-center gap-2">
       <span className="min-w-0 truncate">{formatPatientName(appointment)}</span>
-        <span
-          title={sourceDot.label}
-          className={`size-1.5 rounded-full shrink-0 ${sourceDot.color}`}
-        />
+        <span title={sourceTitle} className="shrink-0 text-muted-foreground/70">
+          {isManual ? <GlobeOff className="size-3.5" /> : <Globe className="size-3.5" />}
+        </span>
         <span className={`ml-auto text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded shrink-0 ${BADGE_STYLES[status] || 'text-muted-foreground bg-muted/20'}`}>
           {status === 'APPROVED' ? 'Confirmed' : status}
         </span>

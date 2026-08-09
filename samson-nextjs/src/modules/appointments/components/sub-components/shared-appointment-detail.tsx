@@ -125,6 +125,12 @@ export function SharedAppointmentDetail({ appointment, extraSections, actionsBar
           <span className="text-sm font-medium text-foreground">Current Status</span>
           <Badge variant={getBadgeVariant(appointment.status)} className="text-xs px-3 py-1">{appointment.status === 'APPROVED' ? 'Confirmed / Approved' : appointment.status}</Badge>
         </div>
+        <div className="flex items-center justify-between py-3 px-4 border-t border-card-border/40">
+          <span className="text-sm font-medium text-foreground">Source</span>
+          <Badge variant={sourcePillVariant(appointment.source)} className="text-xs px-3 py-1">
+            {sourcePillLabel(appointment.source)}
+          </Badge>
+        </div>
 
         <hr className="border-card-border/40 mx-4" />
 
@@ -242,4 +248,16 @@ function getBadgeVariant(status: string) {
   if (status === 'NO_SHOW' || status === 'DISPLACED') return 'warning';
   if (status === 'CANCELLED' || status === 'REJECTED') return 'error';
   return 'default';
+}
+
+function sourcePillLabel(source: string): string {
+  if (source === 'CONVERTED') return 'From Online Request';
+  if (source === 'STAFF_CREATED') return 'From Manual Booking';
+  return 'From Online Booking';
+}
+
+function sourcePillVariant(source: string): 'violet' | 'cyan' | 'success' {
+  if (source === 'CONVERTED') return 'violet';
+  if (source === 'STAFF_CREATED') return 'cyan';
+  return 'success';
 }
