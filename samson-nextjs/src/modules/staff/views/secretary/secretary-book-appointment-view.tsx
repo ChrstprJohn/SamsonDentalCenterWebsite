@@ -884,7 +884,32 @@ function DatePicker({
   const date = selectedDate ? new Date(selectedDate + 'T00:00:00') : undefined;
 
   const rangeStart = weekDates?.[0] ? new Date(weekDates[0].dateStr + 'T00:00:00') : undefined;
-  const rangeEnd = weekDates?.[4] ? new Date(weekDates[4].dateStr + 'T00:00:00') : undefined;
+  const rangeEnd = weekDates?.[weekDates.length - 1] ? new Date(weekDates[weekDates.length - 1].dateStr + 'T00:00:00') : undefined;
+
+  const toDateString = (d: Date) => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  };
+
+  if (weekDates && rangeStart && rangeEnd) {
+    return (
+      <SidebarGroup className="px-0 flex justify-center">
+        <SidebarGroupContent>
+          <Calendar
+            mode="range"
+            selected={{ from: rangeStart, to: rangeEnd }}
+            onSelect={(range) => {
+              const picked = range?.from;
+              if (picked) onSelectDate(toDateString(picked));
+            }}
+            className="w-full [&_table]:w-full [&_td]:w-[14.285%] [&_th]:w-[14.285%] [&_th]:text-center"
+          />
+        </SidebarGroupContent>
+      </SidebarGroup>
+    );
+  }
 
   return (
     <SidebarGroup className="px-0 flex justify-center">
@@ -893,15 +918,8 @@ function DatePicker({
           mode="single"
           selected={date}
           onSelect={(d) => {
-            if (d) {
-              const y = d.getFullYear();
-              const m = String(d.getMonth() + 1).padStart(2, '0');
-              const day = String(d.getDate()).padStart(2, '0');
-              onSelectDate(`${y}-${m}-${day}`);
-            }
+            if (d) onSelectDate(toDateString(d));
           }}
-          modifiers={rangeStart && rangeEnd ? { range: { from: rangeStart, to: rangeEnd } } : undefined}
-          modifiersClassNames={{ range: 'bg-sidebar-accent/60 rounded-none' }}
           className="w-full [&_table]:w-full [&_td]:w-[14.285%] [&_th]:w-[14.285%] [&_th]:text-center [&_[role=gridcell].bg-accent]:bg-sidebar-primary [&_[role=gridcell].bg-accent]:text-sidebar-primary-foreground"
         />
       </SidebarGroupContent>
