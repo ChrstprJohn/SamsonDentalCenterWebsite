@@ -880,12 +880,7 @@ export function SecretaryPendingRequestsViewV2() {
                       const isSkipped = statusLabel === 'NOT APPLICABLE';
 
                       const isSendingThis = resendingEventType === type.eventType;
-                      const isAllowed = !loadingInquiryLogs && !resendingEventType && (
-                        (Boolean(inquiryLog) && (statusLabel === 'PENDING' || statusLabel === 'FAILED')) ||
-                        (type.eventType === 'APPOINTMENT_INQUIRY_RECEIVED' && statusLabel === 'NOT SENT' && inquiriesView.selectedInquiry?.status === 'NEW') ||
-                        (type.eventType === 'REJECT_INQUIRY' && statusLabel === 'NOT SENT' && inquiriesView.selectedInquiry?.status === 'DROPPED') ||
-                        allowOverrideResend
-                      );
+                      const isAllowed = !loadingInquiryLogs && !resendingEventType && allowOverrideResend;
 
                       const triggerAction = type.eventType === 'APPOINTMENT_INQUIRY_RECEIVED'
                         ? handleResendInquiryEmail
@@ -935,8 +930,9 @@ export function SecretaryPendingRequestsViewV2() {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-72">
                               <DropdownMenuItem
-                                onClick={triggerAction}
-                                className="text-xs flex items-center justify-between cursor-pointer"
+                                disabled={!isAllowed}
+                                onClick={() => isAllowed && triggerAction()}
+                                className="text-xs flex items-center justify-between cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                               >
                                 <span className="flex items-center gap-1.5 truncate">
                                   <Mail className="size-3 text-muted-foreground shrink-0" />

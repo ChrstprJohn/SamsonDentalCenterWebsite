@@ -481,16 +481,10 @@ export function AppointmentNotificationsTab({ appointment, view, compact }: Appo
               (!showEmail || isEmailSkippedOrNA) &&
               (!showSms || type.emailOnly || isSmsSkippedOrNA);
 
-            const isEmailAllowed = !loadingLogs && isTriggeringNotification === null && (
-              emailStatus.label === 'FAILED' || emailStatus.label === 'PENDING' || emailStatus.label === 'NOT SENT' || allowOverrideResend
-            );
+            const isEmailAllowed = !loadingLogs && isTriggeringNotification === null && showEmail && allowOverrideResend;
+            const isSmsAllowed = !loadingLogs && isTriggeringNotification === null && showSms && !type.emailOnly && allowOverrideResend;
 
-            const isSmsAllowed = !loadingLogs && isTriggeringNotification === null && (
-              smsStatus.label === 'FAILED' || smsStatus.label === 'PENDING' || smsStatus.label === 'NOT SENT' || allowOverrideResend
-            );
-
-            const isAllowed = isEmailAllowed || isSmsAllowed;
-            const disabled = currentChannel === 'NONE' || isTriggeringNotification !== null || (!hasSmsItem && !hasEmailItem) || !isAllowed;
+            const disabled = currentChannel === 'NONE' || isTriggeringNotification !== null || (!hasSmsItem && !hasEmailItem) || !allowOverrideResend;
 
             const isAnySent = emailStatus.label === 'SENT' || smsStatus.label === 'SENT';
             const isAnyFailed = emailStatus.label === 'FAILED' || smsStatus.label === 'FAILED';

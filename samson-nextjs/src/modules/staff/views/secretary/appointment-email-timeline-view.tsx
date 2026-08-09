@@ -841,9 +841,12 @@ export function AppointmentEmailTimelineView() {
                           {NOTIFICATION_TYPES.map((type) => {
                             const hasSmsItem = showSms && !type.emailOnly;
                             const hasEmailItem = showEmail;
-                            const disabled = currentChannel === 'NONE' || isTriggeringNotification !== null || (!hasSmsItem && !hasEmailItem);
                             const emailStatus = getStatus(type, 'EMAIL');
                             const smsStatus = getStatus(type, 'SMS');
+
+                            const isEmailAllowed = !isLoadingLogs && isTriggeringNotification === null && showEmail && allowOverrideResend;
+                            const isSmsAllowed = !isLoadingLogs && isTriggeringNotification === null && showSms && !type.emailOnly && allowOverrideResend;
+                            const disabled = currentChannel === 'NONE' || isTriggeringNotification !== null || (!hasSmsItem && !hasEmailItem) || !allowOverrideResend;
 
                             const isEmailSkippedOrNA = emailStatus.label === 'NOT APPLICABLE' || emailStatus.label.startsWith('SKIPPED');
                             const isSmsSkippedOrNA = smsStatus.label === 'NOT APPLICABLE' || smsStatus.label.startsWith('SKIPPED');
@@ -871,13 +874,17 @@ export function AppointmentEmailTimelineView() {
                                 <td className="py-1 text-right">
                                   <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                      <Button variant="ghost" size="sm" disabled={disabled} className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground" title="Send notification">
+                                      <Button variant="ghost" size="sm" disabled={disabled} className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground disabled:opacity-40" title="Send notification">
                                         {isTriggeringNotification === type.eventType ? <RotateCw className="size-3 animate-spin" /> : <ChevronDown className="size-3.5" />}
                                       </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end" className="w-72">
                                       {hasEmailItem && (
-                                        <DropdownMenuItem onClick={() => handleTriggerNotification(type.eventType, 'EMAIL')} className="text-xs flex items-center justify-between cursor-pointer">
+                                        <DropdownMenuItem
+                                          disabled={!isEmailAllowed}
+                                          onClick={() => isEmailAllowed && handleTriggerNotification(type.eventType, 'EMAIL')}
+                                          className="text-xs flex items-center justify-between cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
                                           <span className="flex items-center gap-1.5 truncate">
                                             <Mail className="size-3 text-muted-foreground shrink-0" />
                                             {emailStatus.label === 'FAILED' ? 'Retry via Email' : emailStatus.label === 'SENT' ? 'Resend via Email' : 'Send via Email'}
@@ -888,7 +895,11 @@ export function AppointmentEmailTimelineView() {
                                         </DropdownMenuItem>
                                       )}
                                       {hasSmsItem && (
-                                        <DropdownMenuItem onClick={() => handleTriggerNotification(type.eventType, 'SMS')} className="text-xs flex items-center justify-between cursor-pointer">
+                                        <DropdownMenuItem
+                                          disabled={!isSmsAllowed}
+                                          onClick={() => isSmsAllowed && handleTriggerNotification(type.eventType, 'SMS')}
+                                          className="text-xs flex items-center justify-between cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
                                           <span className="flex items-center gap-1.5 truncate">
                                             <MessageSquare className="size-3 text-muted-foreground shrink-0" />
                                             {smsStatus.label === 'FAILED' ? 'Retry via SMS' : smsStatus.label === 'SENT' ? 'Resend via SMS' : 'Send via SMS'}
