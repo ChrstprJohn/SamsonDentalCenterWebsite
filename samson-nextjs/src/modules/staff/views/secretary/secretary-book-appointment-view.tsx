@@ -511,6 +511,13 @@ export function SecretaryBookAppointmentView() {
                   setCancelReasonCustom: setCancelReasonCustom,
                   submitReschedule: handleCalendarReschedule,
                   submitCancel: handleCalendarCancel,
+                  onAppointmentUpdated: async () => {
+                    if (view.selectedAppointmentDetails?.id) {
+                      const fresh = await getStaffAppointmentByIdAction(view.selectedAppointmentDetails.id);
+                      if (fresh.success && fresh.data) view.setSelectedAppointmentDetails(fresh.data);
+                    }
+                    await view.loadTimelineData(view.selectedDate);
+                  },
                 }}
               />
             </div>

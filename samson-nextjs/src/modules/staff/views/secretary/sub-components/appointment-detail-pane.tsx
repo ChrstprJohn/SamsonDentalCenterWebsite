@@ -25,9 +25,10 @@ interface AppointmentDetailPaneProps {
   appointment?: AppointmentDto;
   activeTab?: AppointmentDirectoryTab;
   hideActions?: boolean;
+  onAppointmentUpdated?: () => void;
 }
 
-export function AppointmentDetailPane({ view, compact, appointment: appointmentOverride, activeTab: activeTabOverride, hideActions }: AppointmentDetailPaneProps) {
+export function AppointmentDetailPane({ view, compact, appointment: appointmentOverride, activeTab: activeTabOverride, hideActions, onAppointmentUpdated }: AppointmentDetailPaneProps) {
   const appointment = appointmentOverride || (view.selectedAppointment as AppointmentDto | undefined);
   if (!appointment) {
     return (
@@ -42,10 +43,10 @@ export function AppointmentDetailPane({ view, compact, appointment: appointmentO
       </div>
     );
   }
-  return <AppointmentDetails appointment={appointment} view={view} activeTab={activeTabOverride || view.activeTab || 'upcoming'} compact={compact} hideActions={hideActions} />;
+  return <AppointmentDetails appointment={appointment} view={view} activeTab={activeTabOverride || view.activeTab || 'upcoming'} compact={compact} hideActions={hideActions} onAppointmentUpdated={onAppointmentUpdated} />;
 }
 
-function AppointmentDetails({ appointment, view, activeTab, compact, hideActions }: { appointment: AppointmentDto; view: any; activeTab: AppointmentDirectoryTab; compact?: boolean; hideActions?: boolean }) {
+function AppointmentDetails({ appointment, view, activeTab, compact, hideActions, onAppointmentUpdated }: { appointment: AppointmentDto; view: any; activeTab: AppointmentDirectoryTab; compact?: boolean; hideActions?: boolean; onAppointmentUpdated?: () => void }) {
   const router = useRouter();
   const [detailTab, setDetailTab] = useState<'overview' | 'notifications' | 'timeline'>('overview');
 
@@ -185,6 +186,17 @@ function AppointmentDetails({ appointment, view, activeTab, compact, hideActions
           <SharedAppointmentDetail
             appointment={appointment}
             compact={compact}
+            onAppointmentUpdated={() => {
+              if (onAppointmentUpdated) {
+                onAppointmentUpdated();
+              } else if (view?.onAppointmentUpdated) {
+                view.onAppointmentUpdated();
+              } else if (view?.refreshAppointment) {
+                view.refreshAppointment();
+              } else if (view?.fetchData) {
+                view.fetchData({ force: true });
+              }
+            }}
           />
         )}
 

@@ -21,53 +21,59 @@ interface SharedAppointmentDetailProps {
   extraSections?: ReactNode;
   actionsBar?: ReactNode;
   compact?: boolean;
+  onAppointmentUpdated?: (updatedAppointment?: AppointmentDto) => void;
 }
 
-export function SharedAppointmentDetail({ appointment, extraSections, actionsBar, compact }: SharedAppointmentDetailProps) {
+export function SharedAppointmentDetail({ appointment, extraSections, actionsBar, compact, onAppointmentUpdated }: SharedAppointmentDetailProps) {
+  const [localAppointment, setLocalAppointment] = useState<AppointmentDto>(appointment);
   const [patientProfile, setPatientProfile] = useState<{ email?: string; phoneNumber?: string } | null>(null);
   const [isEditingGuestInfo, setIsEditingGuestInfo] = useState(false);
   const [guestInfoDraft, setGuestInfoDraft] = useState({ firstName: '', middleName: '', lastName: '', suffix: '', email: '', phone: '' });
   const [savingGuestInfo, setSavingGuestInfo] = useState(false);
 
-  const hasGuestInfo = !!appointment.guestContact;
-  const isGuest = !appointment.patientId || appointment.source === 'STAFF_CREATED' || appointment.source === 'CONVERTED';
+  useEffect(() => {
+    setLocalAppointment(appointment);
+  }, [appointment]);
+
+  const hasGuestInfo = !!localAppointment.guestContact;
+  const isGuest = !localAppointment.patientId || localAppointment.source === 'STAFF_CREATED' || localAppointment.source === 'CONVERTED';
 
   const formatName = () => {
-    if (appointment.dependent) {
-      return `${appointment.dependent.firstName} ${appointment.dependent.lastName}`;
+    if (localAppointment.dependent) {
+      return `${localAppointment.dependent.firstName} ${localAppointment.dependent.lastName}`;
     }
-    if (appointment.guestContact) {
-      const initial = appointment.guestContact.middleName ? ` ${appointment.guestContact.middleName.charAt(0).toUpperCase()}.` : '';
-      return `${appointment.guestContact.firstName || ''}${initial} ${appointment.guestContact.lastName || ''}`.trim() + (appointment.guestContact.suffix ? `, ${appointment.guestContact.suffix}` : '');
+    if (localAppointment.guestContact) {
+      const initial = localAppointment.guestContact.middleName ? ` ${localAppointment.guestContact.middleName.charAt(0).toUpperCase()}.` : '';
+      return `${localAppointment.guestContact.firstName || ''}${initial} ${localAppointment.guestContact.lastName || ''}`.trim() + (localAppointment.guestContact.suffix ? `, ${localAppointment.guestContact.suffix}` : '');
     }
-    return appointment.patient ? `${appointment.patient.firstName} ${appointment.patient.lastName}` : 'Guest Patient';
+    return localAppointment.patient ? `${localAppointment.patient.firstName} ${localAppointment.patient.lastName}` : 'Guest Patient';
   };
 
-  const getFirstName = () => appointment.guestContact?.firstName || appointment.patient?.firstName || '-';
-  const getMiddleName = () => appointment.guestContact?.middleName || '-';
-  const getLastName = () => appointment.guestContact?.lastName || appointment.patient?.lastName || '-';
-  const getSuffix = () => appointment.guestContact?.suffix || '-';
-  const getEmail = () => appointment.guestContact?.email || patientProfile?.email || '-';
-  const getPhone = () => appointment.guestContact?.phone || patientProfile?.phoneNumber || '-';
+  const getFirstName = () => localAppointment.guestContact?.firstName || localAppointment.patient?.firstName || '-';
+  const getMiddleName = () => localAppointment.guestContact?.middleName || '-';
+  const getLastName = () => localAppointment.guestContact?.lastName || localAppointment.patient?.lastName || '-';
+  const getSuffix = () => localAppointment.guestContact?.suffix || '-';
+  const getEmail = () => localAppointment.guestContact?.email || patientProfile?.email || '-';
+  const getPhone = () => localAppointment.guestContact?.phone || patientProfile?.phoneNumber || '-';
 
   const hasGuestInfoChanges = isEditingGuestInfo && (
-    guestInfoDraft.firstName !== (appointment.guestContact?.firstName || '') ||
-    guestInfoDraft.middleName !== (appointment.guestContact?.middleName || '') ||
-    guestInfoDraft.lastName !== (appointment.guestContact?.lastName || '') ||
-    guestInfoDraft.suffix !== (appointment.guestContact?.suffix || '') ||
-    guestInfoDraft.email !== (appointment.guestContact?.email || '') ||
-    guestInfoDraft.phone !== (appointment.guestContact?.phone || '')
+    guestInfoDraft.firstName !== (localAppointment.guestContact?.firstName || '') ||
+    guestInfoDraft.middleName !== (localAppointment.guestContact?.middleName || '') ||
+    guestInfoDraft.lastName !== (localAppointment.guestContact?.lastName || '') ||
+    guestInfoDraft.suffix !== (localAppointment.guestContact?.suffix || '') ||
+    guestInfoDraft.email !== (localAppointment.guestContact?.email || '') ||
+    guestInfoDraft.phone !== (localAppointment.guestContact?.phone || '')
   );
 
   const startEditGuestInfo = () => {
     if (!hasGuestInfo) return;
     setGuestInfoDraft({
-      firstName: appointment.guestContact?.firstName || '',
-      middleName: appointment.guestContact?.middleName || '',
-      lastName: appointment.guestContact?.lastName || '',
-      suffix: appointment.guestContact?.suffix || '',
-      email: appointment.guestContact?.email || '',
-      phone: appointment.guestContact?.phone || '',
+      firstName: localAppointment.guestContact?.firstName || '',
+      middleName: localAppointment.guestContact?.middleName || '',
+      lastName: localAppointment.guestContact?.lastName || '',
+      suffix: localAppointment.guestContact?.suffix || '',
+      email: localAppointment.guestContact?.email || '',
+      phone: localAppointment.guestContact?.phone || '',
     });
     setIsEditingGuestInfo(true);
   };
@@ -77,7 +83,7 @@ export function SharedAppointmentDetail({ appointment, extraSections, actionsBar
   const saveGuestInfo = async () => {
     setSavingGuestInfo(true);
     const res = await updateGuestContactAction({
-      appointmentId: appointment.id,
+      appointmentId: localAppointment.id,
       firstName: guestInfoDraft.firstName,
       middleName: guestInfoDraft.middleName,
       lastName: guestInfoDraft.lastName,
@@ -86,7 +92,22 @@ export function SharedAppointmentDetail({ appointment, extraSections, actionsBar
       phone: guestInfoDraft.phone,
     });
     if (res.success) {
+      setLocalAppointment((prev) => ({
+        ...prev,
+        guestContact: {
+          ...prev.guestContact,
+          firstName: guestInfoDraft.firstName,
+          middleName: guestInfoDraft.middleName || null,
+          lastName: guestInfoDraft.lastName,
+          suffix: guestInfoDraft.suffix || null,
+          email: guestInfoDraft.email || null,
+          phone: guestInfoDraft.phone,
+        },
+      }));
       setIsEditingGuestInfo(false);
+      if (onAppointmentUpdated) {
+        onAppointmentUpdated();
+      }
     }
     setSavingGuestInfo(false);
   };

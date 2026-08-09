@@ -889,6 +889,12 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false,
                 const fakeEvent = { preventDefault: () => {} } as any;
                 handleActionSubmit(fakeEvent);
             },
+            onAppointmentUpdated: async () => {
+                if (selectedThreadId) {
+                    await fetchThreads();
+                    await refreshFullAppointment(selectedThreadId);
+                }
+            },
         };
     }, [appointmentAdapter, activeAction, selectedThread, selectedThreadId, rescheduleServiceId, rescheduleDate, rescheduleDoctorId, rescheduleStartTime, rescheduleEndTime, doctors, services, actionReason, actionLoading, actionReasonPreset, handleActionSubmit, fetchThreads, loadActionResources, refreshFullAppointment]);
 

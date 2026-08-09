@@ -14,6 +14,9 @@ import { useSecretaryPendingRequests } from './use-secretary-pending-requests';
 
 
 vi.mock('server-only', () => ({}));
+vi.mock('@/modules/appointments/actions/clinic/get-staff-appointment-by-id.action', () => ({
+  getStaffAppointmentByIdAction: vi.fn().mockResolvedValue({ success: true, data: null }),
+}));
 vi.mock('@/modules/appointments/actions/clinic/get-clinic-appointments.action', () => ({
   getClinicAppointmentsAction: vi.fn(),
 }));

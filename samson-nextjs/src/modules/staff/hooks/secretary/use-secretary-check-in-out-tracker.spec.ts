@@ -9,8 +9,12 @@ import { getInvoicesAction } from '@/modules/billing/actions/invoicing/get-invoi
 import { getServicesAction } from '@/modules/services/actions/management/get-services.action';
 import { useSecretaryCheckInOutTracker } from './use-secretary-check-in-out-tracker';
 
+vi.mock('server-only', () => ({}));
 vi.mock('@/modules/appointments/actions/clinic/get-clinic-appointments.action', () => ({
   getClinicAppointmentsAction: vi.fn(),
+}));
+vi.mock('@/modules/appointments/actions/clinic/get-staff-appointment-by-id.action', () => ({
+  getStaffAppointmentByIdAction: vi.fn().mockResolvedValue({ success: true, data: null }),
 }));
 vi.mock('@/modules/appointments/actions/status/check-in.action', () => ({
   checkInAction: vi.fn(),
@@ -37,9 +41,7 @@ vi.mock('@/shared/database/client', () => ({
   createClient: () => ({
     channel: () => ({
       on: () => ({
-        on: () => ({
-          subscribe: () => ({ id: 'channel' }),
-        }),
+        subscribe: () => ({ id: 'channel' }),
       }),
     }),
     removeChannel: vi.fn(),

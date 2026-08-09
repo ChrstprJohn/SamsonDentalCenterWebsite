@@ -21,11 +21,15 @@ const scheduler = {
   loadAvailableSlots: vi.fn(),
 };
 
+vi.mock('server-only', () => ({}));
 vi.mock('@/modules/appointments/hooks/shared/use-booking-scheduler', () => ({
   useBookingScheduler: () => scheduler,
 }));
 vi.mock('@/modules/appointments/actions/clinic/get-clinic-appointments-page.action', () => ({
   getClinicAppointmentsPageAction: vi.fn(),
+}));
+vi.mock('@/modules/appointments/actions/clinic/get-staff-appointment-by-id.action', () => ({
+  getStaffAppointmentByIdAction: vi.fn().mockResolvedValue({ success: true, data: null }),
 }));
 vi.mock('@/modules/staff/actions/management/get-doctors.action', () => ({
   getDoctorsAction: vi.fn(),

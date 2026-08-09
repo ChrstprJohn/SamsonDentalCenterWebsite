@@ -247,6 +247,15 @@ export function useSecretaryPendingRequests() {
     setIsSubmitting(false);
   };
 
+  const refreshAppointment = useCallback(async (appointmentId?: string) => {
+    await fetchPending();
+    const targetId = appointmentId || selectedAppointmentDetails?.id || selectedAppointmentId;
+    if (targetId) {
+      const fresh = await getStaffAppointmentByIdAction(targetId);
+      if (fresh.success && fresh.data) setSelectedAppointmentDetails(fresh.data);
+    }
+  }, [fetchPending, selectedAppointmentDetails?.id, selectedAppointmentId]);
+
   return {
     appointments, selectedAppointment, selectedAppointmentId, patientDetails, doctorSchedule, conflictingAppointment,
     stagedStatus, stagedReason, customReason, confirmationChannel, isLoading, isSubmitting, isLoadingDetails, isEditing,
@@ -254,6 +263,6 @@ export function useSecretaryPendingRequests() {
     editStartTime, editEndTime, editNote, isLoadingEditDays,
     selectAppointment, setDecision, setReason, setCustomReason, setConfirmationChannel, toggleEditing, setEditService, setEditDoctor,
     setEditAppointmentDate, setEditCurrentMonth, setEditNote, finishAppointmentReview,
-    setEditStartTime, setEditEndTime,
+    setEditStartTime, setEditEndTime, refreshAppointment, onAppointmentUpdated: refreshAppointment, fetchPending,
   };
 }

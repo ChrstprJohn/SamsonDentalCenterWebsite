@@ -328,7 +328,7 @@ export function SecretaryAppointmentsView() {
               </Button>
             )}
           </div>
-          <AppointmentDetailPane view={view} activeTab={view.activeTab} />
+          <AppointmentDetailPane view={view} activeTab={view.activeTab} onAppointmentUpdated={view.onAppointmentUpdated} />
         </div>
       ) : (
         <div className="flex-1 flex-col items-center justify-center text-muted-foreground bg-muted/10 max-lg:hidden flex p-6 text-center">

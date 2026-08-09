@@ -329,6 +329,20 @@ export function useSecretaryCheckInOutTracker() {
     noShowCountToday: columns.noShow.length,
   };
 
+  const refreshAppointment = useCallback(async (appointmentId?: string) => {
+    suppressRealtimeUntilRef.current = Date.now() + 500;
+    await fetchData();
+    const targetId = appointmentId || viewAppt?.id;
+    if (targetId) {
+      const fresh = await getStaffAppointmentByIdAction(targetId);
+      if (fresh.success && fresh.data) {
+        clearSelection();
+        setViewAppt(fresh.data);
+        setSelectionVersion((version) => version + 1);
+      }
+    }
+  }, [fetchData, viewAppt?.id]);
+
   return {
     appointments,
     doctorsList,
@@ -369,6 +383,8 @@ export function useSecretaryCheckInOutTracker() {
     servicesList,
     loadServices,
     fetchData,
+    refreshAppointment,
+    onAppointmentUpdated: refreshAppointment,
     getCheckInStatus,
     handleCheckIn,
     handleUndoCheckIn,

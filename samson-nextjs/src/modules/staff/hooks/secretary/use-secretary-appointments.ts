@@ -521,6 +521,16 @@ export function useSecretaryAppointments() {
     });
   };
 
+  const refreshAppointment = useCallback(async (appointmentId?: string) => {
+    preserveSelectionRef.current = true;
+    await fetchData({ force: true });
+    const targetId = appointmentId || selectedAppointmentId;
+    if (targetId) {
+      const fresh = await getStaffAppointmentByIdAction(targetId);
+      if (fresh.success && fresh.data) setSelectedAppointmentDetails(fresh.data);
+    }
+  }, [fetchData, selectedAppointmentId]);
+
   return {
     appointments, filteredAppointments, visibleAppointments, doctors, tabTotals, selectedAppointment, selectedAppointmentId, setSelectedAppointmentId, selectAppointment,
     isLoading, isRefreshing, lastRefreshedAt, error, isSubmitting, activeTab, selectTab, searchTerm, setSearchTerm, doctorFilter, setDoctorFilter, dateFilter,
@@ -531,7 +541,7 @@ export function useSecretaryAppointments() {
     isLoadingDays: false, rescheduleDate, timeslots, isLoadingSlots: false,
     rescheduleTime, setRescheduleTime, rescheduleEndTime, setRescheduleEndTime, cancelReasonPreset, setCancelReasonPreset, cancelReasonCustom, setCancelReasonCustom,
     showCancelForm, setShowCancelForm, confirmationChannel, setConfirmationChannel, activeServiceId, activeDoctorId, formatPatientName, toggleChangeTreatment,
-    toggleChangeDoctor, selectRescheduleService, selectRescheduleDate, selectRescheduleSlot, submitReschedule, submitCancel, fetchData, loadServices,
+    toggleChangeDoctor, selectRescheduleService, selectRescheduleDate, selectRescheduleSlot, submitReschedule, submitCancel, fetchData, refreshAppointment, onAppointmentUpdated: refreshAppointment, loadServices,
     hasMore, isLoadingMore, loadMoreError, loadMore,
     canGoNewer: pageBackStackRef.current.length > 0,
     goNewer: useCallback(() => {
