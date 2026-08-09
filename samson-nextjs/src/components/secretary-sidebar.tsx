@@ -26,7 +26,6 @@ import {
   Briefcase,
   MessageSquare,
   UserCheck,
-  ClipboardCheck,
   Paintbrush,
 } from "lucide-react"
 
@@ -68,11 +67,6 @@ const data = {
       title: "Appointments Directory",
       url: "/secretary-v2/appointments",
       icon: <CalendarRange className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
-    },
-    {
-      title: "Unresolved Appointments",
-      url: "/secretary-v2/past-follow-ups",
-      icon: <ClipboardCheck className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
     },
     {
       title: "Email Templates",

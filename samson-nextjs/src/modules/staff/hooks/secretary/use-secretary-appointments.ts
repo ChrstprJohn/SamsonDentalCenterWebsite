@@ -1,7 +1,8 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import { updateAppointmentStatusAction } from '@/modules/appointments/actions/status/update-appointment-status.action';
+import { resolveNoShowAction } from '@/modules/appointments/actions/status/resolve-no-show.action';
 import type { AppointmentDto } from '@/modules/appointments/dtos/shared/appointment.dto';
 import type { AvailableSlotDto } from '@/modules/appointments/dtos/availability/get-available-time-slots.dto';
 import { getServicesAction } from '@/modules/services/actions/management/get-services.action';
@@ -9,8 +10,9 @@ import type { ServiceResponseDto } from '@/modules/services/dtos/management/serv
 import { getDoctorsAction } from '@/modules/staff/actions/management/get-doctors.action';
 import { getClinicAppointmentsPageAction } from '@/modules/appointments/actions/clinic/get-clinic-appointments-page.action';
 import { getStaffAppointmentByIdAction } from '@/modules/appointments/actions/clinic/get-staff-appointment-by-id.action';
+import { getTodayLocalDateStr } from '@/shared/utils/date.util';
 
-export type AppointmentDirectoryTab = 'upcoming' | 'history';
+export type AppointmentDirectoryTab = 'upcoming' | 'needs-attention' | 'history';
 export type DoctorFilterItem = { id: string; firstName: string; lastName: string };
 export type AvailableDoctorItem = { doctorId: string; doctorName: string };
 
@@ -35,10 +37,10 @@ export function useSecretaryAppointments() {
   const [rescheduleServiceId, setRescheduleServiceId] = useState('');
   const [isLoadingServices, setIsLoadingServices] = useState(false);
   const [changeDoctor, setChangeDoctor] = useState(false);
-  const [rescheduleDoctorId, setRescheduleDoctorId] = useState('');
+  const [rescheduleDoctor, setRescheduleDoctor] = useState('');
   const [rescheduleMonth, setRescheduleMonth] = useState<Date>(new Date());
   const [rescheduleDate, setRescheduleDate] = useState('');
-  const [rescheduleStartTime, setRescheduleStartTime] = useState('');
+  const [rescheduleTime, setRescheduleTime] = useState('');
   const [rescheduleEndTime, setRescheduleEndTime] = useState('');
   const [cancelReasonPreset, setCancelReasonPreset] = useState('');
   const [cancelReasonCustom, setCancelReasonCustom] = useState('');
@@ -48,7 +50,14 @@ export function useSecretaryAppointments() {
   const [hasMore, setHasMore] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [loadMoreError, setLoadMoreError] = useState<string | null>(null);
-  const [tabTotals, setTabTotals] = useState<Record<AppointmentDirectoryTab, number>>({ upcoming: 0, history: 0 });
+  const [tabTotals, setTabTotals] = useState<Record<AppointmentDirectoryTab, number>>({ upcoming: 0, 'needs-attention': 0, history: 0 });
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+  const [doctorsList, setDoctorsList] = useState<DoctorFilterItem[]>([]);
+  const [servicesList, setServicesList] = useState<ServiceResponseDto[]>([]);
+  const resourcesLoadedRef = useRef(false);
+  const resourcesLoadingRef = useRef<Promise<void> | null>(null);
+  const today = getTodayLocalDateStr();
   const latestRequestId = useRef(0);
   const doctorsLoadedRef = useRef(false);
   const servicesLoadedRef = useRef(false);
@@ -72,7 +81,7 @@ export function useSecretaryAppointments() {
     ? selectedAppointmentDetails
     : appointments.find((appointment) => appointment.id === selectedAppointmentId);
   const activeServiceId = changeTreatment ? rescheduleServiceId : (selectedAppointment?.serviceId ?? '');
-  const activeDoctorId = changeDoctor ? rescheduleDoctorId : (selectedAppointment?.doctorId ?? '');
+  const activeDoctorId = changeDoctor ? rescheduleDoctor : (selectedAppointment?.doctorId ?? '');
   const availableDates: string[] = [];
   const availableRescheduleDoctors = useMemo(() => {
     return doctors.map((d) => ({
@@ -83,9 +92,11 @@ export function useSecretaryAppointments() {
   const timeslots: AvailableSlotDto[] = [];
 
 
-  const statusesForTab = (tab: AppointmentDirectoryTab): string[] => tab === 'upcoming'
-    ? ['APPROVED', 'CHECKED_IN']
-    : ['COMPLETED', 'CANCELLED', 'REJECTED', 'DISPLACED', 'NO_SHOW'];
+  const statusesForTab = (tab: AppointmentDirectoryTab): string[] => {
+    if (tab === 'upcoming') return ['APPROVED', 'CHECKED_IN'];
+    if (tab === 'needs-attention') return ['CHECKED_IN', 'NO_SHOW'];
+    return ['COMPLETED', 'CANCELLED', 'REJECTED', 'DISPLACED', 'NO_SHOW'];
+  };
 
   const buildPageParams = (tab: AppointmentDirectoryTab, cursor: string | null, includeSearch = true, countOnly = false) => {
     const current = queryRef.current;
@@ -96,6 +107,10 @@ export function useSecretaryAppointments() {
       search: includeSearch ? current.searchTerm : undefined,
       doctorId: current.doctorFilter || undefined,
       date: current.dateFilter || undefined,
+      dateBefore: tab === 'needs-attention' ? today : undefined,
+      dateFrom: tab === 'upcoming' ? today : undefined,
+      noShowUnresolvedOnly: tab === 'needs-attention' || undefined,
+      noShowResolvedOnly: tab === 'history' || undefined,
       status: tab === 'history' && current.historyStatusFilter ? current.historyStatusFilter : undefined,
       countOnly: countOnly || undefined,
     };
@@ -135,11 +150,11 @@ export function useSecretaryAppointments() {
     try {
       const activeRequest = getClinicAppointmentsPageAction(buildPageParams(currentTab, append ? nextCursorRef.current : null));
       const doctorsRequest = append || doctorsLoadedRef.current ? Promise.resolve(null) : getDoctorsAction({ includeHidden: true });
-      const otherTab: AppointmentDirectoryTab = currentTab === 'upcoming' ? 'history' : 'upcoming';
-      const otherRequest = append
-        ? Promise.resolve(null)
-        : getClinicAppointmentsPageAction(buildPageParams(otherTab, null, true, true));
-      const [appRes, docRes, otherRes] = await Promise.all([activeRequest, doctorsRequest, otherRequest]);
+      const otherTabs = (['upcoming', 'needs-attention', 'history'] as const).filter((tab) => tab !== currentTab);
+      const otherRequests = append || otherTabs.length === 0
+        ? [Promise.resolve(null)]
+        : otherTabs.map((tab) => getClinicAppointmentsPageAction(buildPageParams(tab, null, true, true)));
+      const [appRes, docRes, ...otherResults] = await Promise.all([activeRequest, doctorsRequest, ...otherRequests]);
       if (requestId !== latestRequestId.current) return;
       if (!appRes.success || !appRes.data) throw new Error(appRes.error || 'Could not load appointments.');
 
@@ -155,9 +170,11 @@ export function useSecretaryAppointments() {
         tabCacheRef.current[currentTab] = { items: page.items, nextCursor: page.nextCursor, hasMore: page.hasMore, total: page.total ?? page.items.length };
       }
 
-      if (otherRes?.success && otherRes.data) {
-        setTabTotals((previous) => ({ ...previous, [otherTab]: otherRes.data.total ?? otherRes.data.items.length }));
-      }
+      otherResults.forEach((otherRes, index) => {
+        if (otherRes?.success && otherRes.data) {
+          setTabTotals((previous) => ({ ...previous, [otherTabs[index]]: otherRes.data.total ?? otherRes.data.items.length }));
+        }
+      });
       if (docRes?.success && docRes.data) {
         setDoctors(docRes.data as DoctorFilterItem[]);
         doctorsLoadedRef.current = true;
@@ -227,7 +244,7 @@ export function useSecretaryAppointments() {
     void loadServices();
     if (selectedAppointment) {
       setRescheduleServiceId(selectedAppointment.serviceId || '');
-      setRescheduleDoctorId(selectedAppointment.doctorId || '');
+      setRescheduleDoctor(selectedAppointment.doctorId || '');
       setRescheduleDate(selectedAppointment.date || '');
       const parseTimeToHHMM = (timeStr?: string | null) => {
         if (!timeStr) return '';
@@ -239,7 +256,7 @@ export function useSecretaryAppointments() {
         if (match) return `${match[1]}:${match[2]}`;
         return '';
       };
-      setRescheduleStartTime(parseTimeToHHMM(selectedAppointment.startTime));
+      setRescheduleTime(parseTimeToHHMM(selectedAppointment.startTime));
       setRescheduleEndTime(parseTimeToHHMM(selectedAppointment.endTime));
       setRescheduleJustification('');
     }
@@ -262,9 +279,9 @@ export function useSecretaryAppointments() {
     setChangeTreatment(false);
     setChangeDoctor(false);
     setRescheduleServiceId('');
-    setRescheduleDoctorId('');
+    setRescheduleDoctor('');
     setRescheduleDate('');
-    setRescheduleStartTime('');
+    setRescheduleTime('');
     setRescheduleEndTime('');
     setCancelReasonPreset('');
     setCancelReasonCustom('');
@@ -348,14 +365,14 @@ export function useSecretaryAppointments() {
   };
 
   const selectRescheduleSlot = (slot: AvailableSlotDto) => {
-    setRescheduleStartTime(slot.startTime);
+    setRescheduleTime(slot.startTime);
     setRescheduleEndTime(slot.endTime);
   };
 
   const submitReschedule = async () => {
     if (!selectedAppointment) return;
-    const targetDoctorId = rescheduleDoctorId || selectedAppointment.doctorId || activeDoctorId;
-    if (!rescheduleDate || !targetDoctorId || !rescheduleStartTime || !rescheduleEndTime) {
+    const targetDoctorId = rescheduleDoctor || selectedAppointment.doctorId || activeDoctorId;
+    if (!rescheduleDate || !targetDoctorId || !rescheduleTime || !rescheduleEndTime) {
       setError('Please complete all scheduling fields (date, doctor, timeslot).');
       return;
     }
@@ -381,7 +398,7 @@ export function useSecretaryAppointments() {
         status: 'APPROVED',
         statusReason: rescheduleJustification.trim(),
         newDate: rescheduleDate,
-        newStartTime: formatIso(rescheduleDate, rescheduleStartTime),
+        newStartTime: formatIso(rescheduleDate, rescheduleTime),
         newEndTime: formatIso(rescheduleDate, rescheduleEndTime),
         newDoctorId: targetDoctorId,
         newServiceId: rescheduleServiceId || selectedAppointment.serviceId || undefined,
@@ -438,18 +455,76 @@ export function useSecretaryAppointments() {
     }
   };
 
+  const loadActionResources = useCallback(async () => {
+    if (resourcesLoadedRef.current) return;
+    if (resourcesLoadingRef.current) return resourcesLoadingRef.current;
+    const request = Promise.all([getDoctorsAction({ includeHidden: true }), getServicesAction('BOOKABLE')])
+      .then(([doctorResult, serviceResult]) => {
+        if (doctorResult.success && doctorResult.data) setDoctorsList(doctorResult.data);
+        if (serviceResult.data) setServicesList(serviceResult.data);
+        resourcesLoadedRef.current = Boolean(doctorResult.data && serviceResult.data);
+      })
+      .catch((cause) => setActionError(cause instanceof Error ? cause.message : 'Failed to load reschedule resources'))
+      .finally(() => { resourcesLoadingRef.current = null; });
+    resourcesLoadingRef.current = request;
+    return request;
+  }, []);
+
+  const completeMissedCheckout = (appointmentId: string, reason?: string) => {
+    setActionError(null);
+    startTransition(async () => {
+      const result = await updateAppointmentStatusAction({
+        appointmentId,
+        status: 'COMPLETED',
+        statusReason: reason || 'Late checkout — past appointment follow-up',
+      });
+      if (!result.success) {
+        setActionError(result.error || 'Could not complete the missed checkout.');
+        return;
+      }
+      preserveSelectionRef.current = true;
+      await fetchData({ force: true });
+      const fresh = await getStaffAppointmentByIdAction(appointmentId);
+      if (fresh.success && fresh.data) setSelectedAppointmentDetails(fresh.data);
+    });
+  };
+
+  const handleResolveNoShowSubmit = (payload: {
+    appointmentId: string;
+    resolution: 'COMPLETED' | 'CONFIRMED_NO_SHOW' | 'RESCHEDULE' | 'CHECKED_IN';
+    reason: string;
+    newDate?: string;
+    newStartTime?: string;
+    newEndTime?: string;
+    newDoctorId?: string;
+  }) => {
+    startTransition(async () => {
+      const result = await resolveNoShowAction(payload);
+      if (!result.success) {
+        setActionError(result.error || 'Could not resolve the no-show.');
+        return;
+      }
+      preserveSelectionRef.current = true;
+      await fetchData({ force: true });
+      const fresh = await getStaffAppointmentByIdAction(payload.appointmentId);
+      if (fresh.success && fresh.data) setSelectedAppointmentDetails(fresh.data);
+    });
+  };
+
   return {
     appointments, filteredAppointments, visibleAppointments, doctors, tabTotals, selectedAppointment, selectedAppointmentId, setSelectedAppointmentId, selectAppointment,
     isLoading, isRefreshing, lastRefreshedAt, error, isSubmitting, activeTab, selectTab, searchTerm, setSearchTerm, doctorFilter, setDoctorFilter, dateFilter,
     setDateFilter, historyStatusFilter, setHistoryStatusFilter, showRescheduleForm, setShowRescheduleForm: handleSetShowRescheduleForm,
     rescheduleJustification, setRescheduleJustification, changeTreatment, services, rescheduleServiceId,
-    isLoadingServices, changeDoctor, rescheduleDoctorId, setRescheduleDoctorId, availableRescheduleDoctors,
+    isLoadingServices, changeDoctor, rescheduleDoctor, setRescheduleDoctor, availableRescheduleDoctors,
     isLoadingRescheduleDoctors: false, rescheduleMonth, setRescheduleMonth, availableDates: [],
     isLoadingDays: false, rescheduleDate, timeslots, isLoadingSlots: false,
-    rescheduleStartTime, setRescheduleStartTime, rescheduleEndTime, setRescheduleEndTime, cancelReasonPreset, setCancelReasonPreset, cancelReasonCustom, setCancelReasonCustom,
+    rescheduleTime, setRescheduleTime, rescheduleEndTime, setRescheduleEndTime, cancelReasonPreset, setCancelReasonPreset, cancelReasonCustom, setCancelReasonCustom,
     showCancelForm, setShowCancelForm, confirmationChannel, setConfirmationChannel, activeServiceId, activeDoctorId, formatPatientName, toggleChangeTreatment,
     toggleChangeDoctor, selectRescheduleService, selectRescheduleDate, selectRescheduleSlot, submitReschedule, submitCancel, fetchData, loadServices,
     hasMore, isLoadingMore, loadMoreError, loadMore,
+    actionError, isPending, completeMissedCheckout, handleResolveNoShowSubmit, loadActionResources,
+    doctorsList, servicesList, setRescheduleDate,
   };
 }
 

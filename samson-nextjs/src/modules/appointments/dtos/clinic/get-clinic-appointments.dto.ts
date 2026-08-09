@@ -52,7 +52,13 @@ export const getClinicAppointmentsPageSchema = z.object({
     .regex(DATE_REGEX, 'Date must be in YYYY-MM-DD format')
     .optional()
     .or(emptyStringToUndefined),
+  dateFrom: z
+    .string()
+    .regex(DATE_REGEX, 'Start date must be in YYYY-MM-DD format')
+    .optional()
+    .or(emptyStringToUndefined),
   noShowUnresolvedOnly: z.boolean().optional(),
+  noShowResolvedOnly: z.boolean().optional(),
   countOnly: z.boolean().optional(),
 });
 

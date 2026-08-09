@@ -2,6 +2,7 @@
 
 import { History } from 'lucide-react';
 import type { AppointmentDto } from '@/modules/appointments/dtos/shared/appointment.dto';
+import type { AppointmentDirectoryTab } from '@/modules/staff/hooks/secretary/use-secretary-appointments';
 
 type TimelineEntry = {
   id: string;
@@ -47,7 +48,7 @@ function formatTime(iso: string) {
     ', ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
 }
 
-export function AppointmentStatusHistory({ appointment, activeTab, compact }: { appointment: AppointmentDto; activeTab: 'upcoming' | 'history' | 'pending'; compact?: boolean }) {
+export function AppointmentStatusHistory({ appointment, activeTab, compact }: { appointment: AppointmentDto; activeTab: AppointmentDirectoryTab | 'pending'; compact?: boolean }) {
   const entries = buildTimelineEntries(appointment);
 
   return (

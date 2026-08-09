@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Calendar, User, Bell, History } from 'lucide-react';
+import { Calendar, User, Bell, History, CalendarDays } from 'lucide-react';
 import type { AppointmentDto } from '@/modules/appointments/dtos/shared/appointment.dto';
 import type { AppointmentDirectoryTab } from '@/modules/staff/hooks/secretary/use-secretary-appointments';
 import { SharedAppointmentDetail } from '@/modules/appointments/components/sub-components/shared-appointment-detail';
@@ -45,6 +46,7 @@ export function AppointmentDetailPane({ view, compact, appointment: appointmentO
 }
 
 function AppointmentDetails({ appointment, view, activeTab, compact, hideActions }: { appointment: AppointmentDto; view: any; activeTab: AppointmentDirectoryTab; compact?: boolean; hideActions?: boolean }) {
+  const router = useRouter();
   const [detailTab, setDetailTab] = useState<'overview' | 'notifications' | 'timeline'>('overview');
 
   const canModify = ['APPROVED', 'PENDING', 'RESCHEDULE_REQUESTED', 'DISPLACED'].includes(appointment.status);
@@ -75,9 +77,9 @@ function AppointmentDetails({ appointment, view, activeTab, compact, hideActions
   if (view.showRescheduleForm && (canModify || canRescheduleOnly)) {
     const isFormComplete = isRescheduleFormComplete({
       serviceId: view.rescheduleServiceId || appointment.serviceId,
-      doctorId: view.rescheduleDoctorId || appointment.doctorId,
+      doctorId: (view.rescheduleDoctor ?? view.rescheduleDoctorId) || appointment.doctorId,
       date: view.rescheduleDate,
-      startTime: view.rescheduleStartTime,
+      startTime: view.rescheduleTime ?? view.rescheduleStartTime,
       endTime: view.rescheduleEndTime,
       justification: view.rescheduleJustification,
     });
@@ -202,6 +204,28 @@ function AppointmentDetails({ appointment, view, activeTab, compact, hideActions
       {/* Sticky Bottom Actions Bar */}
       {!hideActions && (() => {
         const canCancelOnly = appointment.status === 'CHECKED_IN';
+        if (activeTab === 'history') {
+          const patientId = appointment.patientId || appointment.patient?.id || '';
+          const serviceId = appointment.serviceId || '';
+          const patientFirstName = appointment.dependent?.firstName || appointment.patient?.firstName || appointment.guestContact?.firstName || 'Patient';
+          return (
+            <div className={`shrink-0 border-t border-border ${compact ? 'p-3 bg-sidebar' : 'p-4 bg-card'}`}>
+              <Button
+                variant="outline"
+                className="w-full h-[42px] gap-2 text-xs font-semibold rounded-xl hover:bg-muted/50 transition-colors border-primary/30 text-primary hover:text-primary"
+                onClick={() => {
+                  const params = new URLSearchParams();
+                  if (patientId) params.set('patientId', patientId);
+                  if (serviceId) params.set('serviceId', serviceId);
+                  router.push(`/secretary-v2/book?${params.toString()}`);
+                }}
+              >
+                <CalendarDays className="size-4" />
+                Book New Appointment for {patientFirstName}
+              </Button>
+            </div>
+          );
+        }
         if (!canModify && !canRescheduleOnly && !canCancelOnly) return null;
 
         if (!view.showRescheduleForm && !view.showCancelForm) {
@@ -268,7 +292,7 @@ function getRescheduleProps(view: any) {
     serviceId: view.rescheduleServiceId,
     isLoadingServices: view.isLoadingServices,
     changeDoctor: view.changeDoctor,
-    doctorId: view.rescheduleDoctorId,
+    doctorId: view.rescheduleDoctor ?? view.rescheduleDoctorId,
     doctors: view.availableRescheduleDoctors,
     isLoadingDoctors: view.isLoadingRescheduleDoctors,
     month: view.rescheduleMonth,
@@ -279,7 +303,7 @@ function getRescheduleProps(view: any) {
     activeDoctorId: view.activeDoctorId,
     slots: view.timeslots,
     isLoadingSlots: view.isLoadingSlots,
-    startTime: view.rescheduleStartTime,
+    startTime: view.rescheduleTime ?? view.rescheduleStartTime,
     endTime: view.rescheduleEndTime,
     confirmationChannel: view.confirmationChannel,
     onConfirmationChannelChange: view.setConfirmationChannel,
@@ -288,10 +312,10 @@ function getRescheduleProps(view: any) {
     onToggleTreatment: view.toggleChangeTreatment,
     onServiceSelect: view.selectRescheduleService,
     onToggleDoctor: view.toggleChangeDoctor,
-    onDoctorSelect: view.setRescheduleDoctorId,
+    onDoctorSelect: view.setRescheduleDoctor ?? view.setRescheduleDoctorId,
     onMonthChange: view.setRescheduleMonth,
     onDateSelect: view.selectRescheduleDate,
-    onStartTimeChange: view.setRescheduleStartTime,
+    onStartTimeChange: view.setRescheduleTime ?? view.setRescheduleStartTime,
     onEndTimeChange: view.setRescheduleEndTime,
     onJustificationChange: view.setRescheduleJustification,
     onSubmit: view.submitReschedule,

@@ -39,8 +39,10 @@ async function findSearchIds(supabase: SupabaseClient, search: string) {
 type AppointmentFilterQuery = {
   eq: (column: string, value: unknown) => AppointmentFilterQuery;
   lt: (column: string, value: unknown) => AppointmentFilterQuery;
+  gte: (column: string, value: unknown) => AppointmentFilterQuery;
   in: (column: string, values: readonly unknown[]) => AppointmentFilterQuery;
   is: (column: string, value: null) => AppointmentFilterQuery;
+  or: (value: string) => AppointmentFilterQuery;
 };
 
 function applyAppointmentFilters(
@@ -51,10 +53,13 @@ function applyAppointmentFilters(
   let filterQuery = query as AppointmentFilterQuery;
   if (params.date) filterQuery = filterQuery.eq('date', params.date);
   if (params.dateBefore) filterQuery = filterQuery.lt('date', params.dateBefore);
+  if (params.dateFrom) filterQuery = filterQuery.gte('date', params.dateFrom);
   if (params.status) filterQuery = filterQuery.eq('status', params.status);
   if (params.statuses?.length) filterQuery = filterQuery.in('status', params.statuses);
   if (params.doctorId) filterQuery = filterQuery.eq('doctor_id', params.doctorId);
   if (params.noShowUnresolvedOnly) filterQuery = filterQuery.is('no_show_resolved_at', null);
+  // History shows no-shows only after they are resolved; other statuses always visible.
+  if (params.noShowResolvedOnly) filterQuery = filterQuery.or('status.neq.NO_SHOW,and(status.eq.NO_SHOW,no_show_resolved_at.not.is.null)');
   if (matchingAppointmentIds) filterQuery = filterQuery.in('id', matchingAppointmentIds);
   return filterQuery;
 }

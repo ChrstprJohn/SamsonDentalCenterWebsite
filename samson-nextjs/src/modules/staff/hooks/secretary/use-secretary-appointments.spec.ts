@@ -33,6 +33,9 @@ vi.mock('@/modules/staff/actions/management/get-doctors.action', () => ({
 vi.mock('@/modules/appointments/actions/status/update-appointment-status.action', () => ({
   updateAppointmentStatusAction: vi.fn(),
 }));
+vi.mock('@/modules/appointments/actions/status/resolve-no-show.action', () => ({
+  resolveNoShowAction: vi.fn(),
+}));
 vi.mock('@/modules/services/actions/management/get-services.action', () => ({
   getServicesAction: vi.fn(),
 }));

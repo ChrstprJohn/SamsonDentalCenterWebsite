@@ -1,16 +1,14 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { AlertCircle, ArrowLeft, ClipboardCheck, UserRound, X, Pencil, Check, RefreshCw } from 'lucide-react';
+import { ArrowLeft, UserRound, X, Pencil, Check } from 'lucide-react';
 import { Select } from '@/components/ui/select';
 import { updateConfirmationChannelAction } from '@/modules/appointments/actions/status/update-confirmation-channel.action';
-import { SidebarHeader, SidebarInput, SidebarTrigger } from '@/components/ui/sidebar';
-import { Button } from '@/components/ui/button';
 import { formatClinicTime, formatShortDate } from '@/shared/utils/date.util';
-import { SecretaryListSkeleton, SecretaryListSkeletonTheme, SecretaryRefreshBar } from './sub-components/secretary-list-skeleton';
 import type { AppointmentDto } from '@/modules/appointments/dtos/exports';
-import { usePastAppointmentFollowUps } from '../../hooks/secretary/use-past-appointment-follow-ups';
-import { AppointmentRescheduleForm, isRescheduleFormComplete } from './sub-components/appointment-reschedule-form';
+import type { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
+import type { DoctorFilterItem } from '@/modules/staff/hooks/secretary/use-secretary-appointments';
+import { AppointmentRescheduleForm, isRescheduleFormComplete } from './appointment-reschedule-form';
 
 function patientName(appointment: AppointmentDto) {
   if (appointment.dependent) return `${appointment.dependent.firstName} ${appointment.dependent.lastName}`;
@@ -19,182 +17,55 @@ function patientName(appointment: AppointmentDto) {
   return 'Guest Patient';
 }
 
-function daysWaiting(date: string) {
-  const start = new Date(`${date}T00:00:00`);
-  const now = new Date();
-  const days = Math.max(1, Math.floor((now.getTime() - start.getTime()) / 86_400_000));
-  return `${days} day${days === 1 ? '' : 's'} waiting`;
+interface NeedsAttentionView {
+  isPending: boolean;
+  completeMissedCheckout: (appointmentId: string, reason?: string) => void;
+  handleResolveNoShowSubmit: (payload: {
+    appointmentId: string;
+    resolution: 'COMPLETED' | 'CONFIRMED_NO_SHOW' | 'RESCHEDULE' | 'CHECKED_IN';
+    reason: string;
+    newDate?: string;
+    newStartTime?: string;
+    newEndTime?: string;
+    newDoctorId?: string;
+  }) => void;
+  loadActionResources: () => void;
+  doctorsList: DoctorFilterItem[];
+  servicesList: ServiceResponseDto[];
+  rescheduleDoctor: string;
+  setRescheduleDoctor: (value: string) => void;
+  rescheduleDate: string;
+  setRescheduleDate: (value: string) => void;
+  rescheduleTime: string;
+  setRescheduleTime: (value: string) => void;
+  rescheduleEndTime: string;
+  setRescheduleEndTime: (value: string) => void;
+  rescheduleJustification: string;
+  setRescheduleJustification: (value: string) => void;
 }
 
-export function SecretaryPastAppointmentFollowUpsView() {
-  const view = usePastAppointmentFollowUps();
-  const [mobileView, setMobileView] = useState<'list' | 'detail'>('list');
-  const visibleAppointments = view.list;
-
-  const colMobile = (mode: 'list' | 'detail') => mobileView === mode ? 'flex' : 'hidden';
-
-  const handleSearch = (value: string) => {
-    view.setSearchTerm(value);
-    view.setSelectedAppointmentId(null);
-    setMobileView('list');
-  };
-
-  return (
-    <div className="flex flex-1 min-h-0 w-full overflow-hidden">
-      <section className={`xl:w-[400px] lg:w-[380px] flex-1 lg:flex-none flex-col border-r border-card-border/40 bg-sidebar min-h-0 overflow-hidden ${colMobile('list')} lg:flex`}>
-        <SidebarHeader className="gap-3.5 border-b p-4 shrink-0">
-          <div className="flex w-full h-8 items-center justify-between">
-            <div className="flex items-center gap-2 min-w-0">
-              <SidebarTrigger className="lg:hidden -ml-1 text-muted-foreground hover:text-foreground" />
-              <div className="text-base font-medium text-foreground truncate">Unresolved Appointments</div>
-            </div>
-          </div>
-          <div className="px-1">
-            <SidebarInput
-              placeholder="Type to search..."
-              value={view.searchTerm}
-              onChange={(event) => handleSearch(event.target.value)}
-              className="rounded-md"
-            />
-          </div>
-        {(() => {
-          const activeIndex = view.activeTab === 'missed-checkouts' ? 0 : 1;
-          return (
-            <div className="relative grid grid-cols-2 gap-1 bg-muted/20 p-1 rounded-xl">
-              <div
-                className="absolute top-1 bottom-1 rounded-lg bg-primary transition-transform duration-200 ease-out shadow-xs"
-                style={{
-                  width: 'calc((100% - 0.25rem) / 2)',
-                  transform: `translateX(calc(${activeIndex} * (100% + 0.25rem)))`,
-                }}
-              />
-              <button
-                onClick={() => { view.selectTab('missed-checkouts'); setMobileView('list'); }}
-                className={`relative z-10 h-8 text-xs font-semibold rounded-lg transition-colors flex items-center justify-center ${
-                  view.activeTab === 'missed-checkouts'
-                    ? 'text-primary-foreground font-semibold'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                Checkouts ({view.tabCounts['missed-checkouts']})
-              </button>
-              <button
-                onClick={() => { view.selectTab('no-show-follow-ups'); setMobileView('list'); }}
-                className={`relative z-10 h-8 text-xs font-semibold rounded-lg transition-colors flex items-center justify-center ${
-                  view.activeTab === 'no-show-follow-ups'
-                    ? 'text-primary-foreground font-semibold'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                No-shows ({view.tabCounts['no-show-follow-ups']})
-              </button>
-            </div>
-          );
-        })()}
-        </SidebarHeader>
-
-        <div
-          data-lenis-prevent
-          style={{ scrollbarWidth: 'thin' }}
-          className="flex-1 min-h-0 !overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
-        >
-          {view.isLoading && view.list.length === 0 ? (
-            <SecretaryListSkeletonTheme>
-              <div className="flex flex-col w-full">
-                {Array.from({ length: 5 }, (_, index) => (
-                  <div key={index} className="flex flex-col items-start w-full gap-2 border-b p-4 last:border-b-0">
-                    <div className="flex w-full items-center justify-between gap-2">
-                      <SecretaryListSkeleton width={128} height={20} />
-                      <SecretaryListSkeleton width={80} height={16} borderRadius="9999px" />
-                    </div>
-                    <SecretaryListSkeleton width={160} height={16} />
-                    <div className="w-full flex items-center justify-between gap-2">
-                      <SecretaryListSkeleton width={112} height={13} />
-                      <SecretaryListSkeleton width={96} height={13} />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </SecretaryListSkeletonTheme>
-          ) : null}
-          {view.isRefreshing && <SecretaryRefreshBar />}
-          {view.error ? (
-            <div className="m-4 rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-xs text-destructive">
-              <div className="flex items-center justify-between gap-3">
-                <span>{view.error}</span>
-                <Button variant="outline" size="sm" onClick={() => void view.fetchData({ force: true })} className="h-7 shrink-0 text-xs">
-                  Retry
-                </Button>
-              </div>
-            </div>
-          ) : null}
-          {!view.isLoading && view.lastRefreshedAt ? (
-            <div className="px-4 py-2 text-[10px] text-muted-foreground border-b border-card-border/20 flex items-center justify-between">
-              <span>Last updated {view.lastRefreshedAt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</span>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => void view.fetchData({ force: true })}
-                disabled={view.isLoading || view.isRefreshing}
-                className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground transition-colors shrink-0"
-                aria-label="Refresh unresolved appointments"
-                title="Refresh unresolved appointments"
-              >
-                <RefreshCw className={`size-3 ${view.isLoading || view.isRefreshing ? 'animate-spin' : ''}`} />
-              </Button>
-            </div>
-          ) : null}
-
-          {!view.isLoading && !view.error && visibleAppointments.length === 0 ? (
-            <div className="p-8 text-center text-sm text-muted-foreground">Nothing needs follow-up in this section.</div>
-          ) : visibleAppointments.map((appointment) => (
-            <button key={appointment.id} onClick={() => { view.selectAppointment(appointment.id); setMobileView('detail'); }} className={`flex w-full flex-col gap-2 border-b border-card-border/40 p-4 text-left transition-colors last:border-b-0 hover:bg-sidebar-accent ${view.selectedAppointmentId === appointment.id ? 'bg-sidebar-accent' : ''}`}>
-              <div className="flex items-center gap-2"><span className="font-medium text-sm truncate">{patientName(appointment)}</span><span className={`ml-auto rounded px-1.5 py-0.5 text-[10px] font-semibold ${appointment.status === 'CHECKED_IN' ? 'bg-cyan-500/10 text-cyan-700' : 'bg-amber-500/10 text-amber-700'}`}>{appointment.status === 'CHECKED_IN' ? 'CHECKED IN' : 'NO SHOW'}</span></div>
-              <span className="text-xs font-medium truncate">{appointment.service?.name || 'Treatment'}</span>
-              <div className="flex justify-between gap-2 text-[11px] text-muted-foreground"><span>{formatShortDate(appointment.date)}</span><span>{daysWaiting(appointment.date)}</span></div>
-            </button>
-          ))}
-          {!view.isLoading && view.loadMoreError && (
-            <div className="m-4 rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-xs text-destructive">
-              <div className="flex items-center justify-between gap-3">
-                <span>Could not load more follow-ups. {view.loadMoreError}</span>
-                <Button variant="outline" size="sm" onClick={() => view.loadMore()} className="h-7 shrink-0 text-xs">Retry</Button>
-              </div>
-            </div>
-          )}
-          {!view.isLoading && visibleAppointments.length > 0 && view.hasMore && (
-            <Button variant="ghost" size="sm" disabled={view.isLoadingMore} onClick={() => view.loadMore()} className="w-full h-10 rounded-none border-t text-xs text-muted-foreground">
-              {view.isLoadingMore ? 'Loading…' : 'Show more'}
-            </Button>
-          )}
-        </div>
-      </section>
-
-      {view.selectedAppointment ? <FollowUpDetail appointment={view.selectedAppointment} view={view} onBack={() => { view.setSelectedAppointmentId(null); setMobileView('list'); }} className={`${colMobile('detail')} lg:flex`} /> : (
-        <div className="flex flex-1 flex-col items-center justify-center bg-muted/10 text-center max-lg:hidden"><ClipboardCheck className="size-8 text-muted-foreground/50 mb-3" /><p className="font-medium">No appointment selected</p><p className="mt-1 text-sm text-muted-foreground">Select a past appointment to finish its follow-up.</p></div>
-      )}
-      
-    </div>
-  );
-}
-
-function getPatientFirstName(app: any): string {
+function getPatientFirstName(app: AppointmentDto): string {
   return app?.guestContact?.firstName || app?.dependent?.firstName || app?.patient?.firstName || '-';
 }
-function getPatientLastName(app: any): string {
+function getPatientLastName(app: AppointmentDto): string {
   return app?.guestContact?.lastName || app?.dependent?.lastName || app?.patient?.lastName || '-';
 }
-function getPatientEmail(app: any): string {
+function getPatientEmail(app: AppointmentDto): string {
   return app?.guestContact?.email || app?.patient?.email || '-';
 }
-function getPatientPhone(app: any): string {
-  return app?.guestContact?.phone || app?.guestContact?.phone_number || app?.guestContact?.phoneNumber || app?.patient?.phoneNumber || '-';
+function getPatientPhone(app: AppointmentDto): string {
+  return app?.guestContact?.phone || app?.patient?.phone || '-';
 }
 function Field({ label, value }: { label: string; value: string }) {
   return <div className="flex flex-col gap-0.5"><span className="text-xs text-muted-foreground">{label}</span><div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{value}</div></div>;
 }
 
-function FollowUpDetail({ appointment, view, onBack, className }: { appointment: AppointmentDto; view: ReturnType<typeof usePastAppointmentFollowUps>; onBack: () => void; className: string }) {
+/**
+ * NeedsAttentionDetail - Resolve pane for the Needs attention directory tab.
+ * Handles both missed checkouts (past CHECKED_IN) and unresolved no-shows.
+ * Resolution options: Checkout (COMPLETED), Keep No-Show, or Reschedule.
+ */
+export function NeedsAttentionDetail({ appointment, view, onBack, className }: { appointment: AppointmentDto; view: NeedsAttentionView; onBack: () => void; className: string }) {
   const isMissedCheckout = appointment.status === 'CHECKED_IN';
   const [showResolveForm, setShowResolveForm] = useState(false);
   const [showRescheduleForm, setShowRescheduleForm] = useState(false);
@@ -260,8 +131,8 @@ function FollowUpDetail({ appointment, view, onBack, className }: { appointment:
       resolution: 'RESCHEDULE',
       reason: view.rescheduleJustification || 'Rescheduled from past no-show follow-up',
       newDate: view.rescheduleDate || appointment.date,
-      newStartTime: view.rescheduleTime ? fmt(appointment.date, view.rescheduleTime) : undefined,
-      newEndTime: view.rescheduleEndTime ? fmt(appointment.date, view.rescheduleEndTime) : undefined,
+      newStartTime: view.rescheduleTime ? fmt(view.rescheduleDate || appointment.date, view.rescheduleTime) : undefined,
+      newEndTime: view.rescheduleEndTime ? fmt(view.rescheduleDate || appointment.date, view.rescheduleEndTime) : undefined,
       newDoctorId: view.rescheduleDoctor || appointment.doctorId || undefined,
     });
   };
@@ -307,11 +178,11 @@ function FollowUpDetail({ appointment, view, onBack, className }: { appointment:
         {showRescheduleForm ? (
           <div className="p-4">
             <AppointmentRescheduleForm
-              appointment={appointment as any}
+              appointment={appointment}
               services={view.servicesList}
               serviceId={appointment.serviceId}
               doctorId={view.rescheduleDoctor || appointment.doctorId || ''}
-              doctors={view.doctorsList.map((d: any) => ({ doctorId: d.id, doctorName: `${d.prefix || 'Dr.'} ${d.firstName} ${d.lastName}` }))}
+              doctors={(view.doctorsList as DoctorFilterItem[]).map((d) => ({ doctorId: d.id, doctorName: `Dr. ${d.firstName} ${d.lastName}` }))}
               date={view.rescheduleDate || appointment.date}
               activeServiceId={appointment.serviceId}
               activeDoctorId={appointment.doctorId || ''}
@@ -417,7 +288,7 @@ function FollowUpDetail({ appointment, view, onBack, className }: { appointment:
                   )}
                 </div>
                 {isEditingChannel ? (
-                  <Select value={draftChannel} onChange={(e) => setDraftChannel(e.target.value as any)} className="text-sm w-full" options={[{ value: 'EMAIL', label: 'Email' }, { value: 'SMS', label: 'SMS' }, { value: 'BOTH', label: 'Email & SMS' }, { value: 'NONE', label: 'None' }]} />
+                  <Select value={draftChannel} onChange={(e) => setDraftChannel(e.target.value as 'EMAIL' | 'SMS' | 'BOTH' | 'NONE')} className="text-sm w-full" options={[{ value: 'EMAIL', label: 'Email' }, { value: 'SMS', label: 'SMS' }, { value: 'BOTH', label: 'Email & SMS' }, { value: 'NONE', label: 'None' }]} />
                 ) : (
                   <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">{channel === 'EMAIL' ? 'Email' : channel === 'SMS' ? 'SMS' : channel === 'BOTH' ? 'Email & SMS' : 'None'}</div>
                 )}

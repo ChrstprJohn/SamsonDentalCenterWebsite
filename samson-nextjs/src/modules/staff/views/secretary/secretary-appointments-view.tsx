@@ -5,6 +5,7 @@ import { useSecretaryAppointments } from '../../hooks/secretary/use-secretary-ap
 import { AppointmentDetailPane } from './sub-components/appointment-detail-pane';
 import { AppointmentsTable } from './sub-components/appointments-table';
 import { CoordinationHub } from './sub-components/coordination-hub';
+import { NeedsAttentionDetail } from './sub-components/needs-attention-detail';
 import { ArrowLeft, CalendarDays, ClipboardList, RotateCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SidebarHeader, SidebarInput, SidebarTrigger } from '@/components/ui/sidebar';
@@ -27,8 +28,11 @@ export function SecretaryAppointmentsView() {
 
   const TABS = [
     { key: 'upcoming' as const, label: 'Active', count: view.tabTotals.upcoming },
+    { key: 'needs-attention' as const, label: 'Needs Attention', count: view.tabTotals['needs-attention'] },
     { key: 'history' as const, label: 'History', count: view.tabTotals.history },
   ];
+
+  const isNeedsAttention = view.activeTab === 'needs-attention';
 
   return (
     <div className="flex flex-1 min-h-0 w-full overflow-hidden">
@@ -55,11 +59,11 @@ export function SecretaryAppointmentsView() {
           const activeIndex = TABS.findIndex((t) => t.key === view.activeTab);
           const safeIndex = activeIndex < 0 ? 0 : activeIndex;
           return (
-            <div className="relative grid grid-cols-2 gap-1 bg-muted/20 p-1 rounded-xl">
+            <div className="relative grid grid-cols-3 gap-1 bg-muted/20 p-1 rounded-xl">
               <div
                 className="absolute top-1 bottom-1 rounded-lg bg-primary transition-transform duration-200 ease-out shadow-xs"
                 style={{
-                  width: 'calc((100% - 0.25rem) / 2)',
+                  width: 'calc((100% - 0.5rem) / 3)',
                   transform: `translateX(calc(${safeIndex} * (100% + 0.25rem)))`,
                 }}
               />
@@ -113,7 +117,14 @@ export function SecretaryAppointmentsView() {
       </div>
 
       {/* Column 2: Appointment Details */}
-      {hasSelection ? (
+      {hasSelection && isNeedsAttention && view.selectedAppointment ? (
+        <NeedsAttentionDetail
+          appointment={view.selectedAppointment}
+          view={view}
+          onBack={() => { view.setSelectedAppointmentId(null); setMobileView('list'); }}
+          className={`${colMobile('detail')} lg:flex`}
+        />
+      ) : hasSelection ? (
         <div className={`flex flex-1 flex-col min-w-0 min-h-0 h-full ${colMobile('detail')} lg:flex`}>
           <div className="p-4 border-b border-card-border/40 shrink-0 flex items-center justify-between h-14">
             <div className="flex items-center gap-2 min-w-0 flex-1">
@@ -153,7 +164,7 @@ export function SecretaryAppointmentsView() {
               </Button>
             )}
           </div>
-          <AppointmentDetailPane view={view} />
+          <AppointmentDetailPane view={view} activeTab={view.activeTab} />
         </div>
       ) : (
         <div className="flex-1 flex-col items-center justify-center text-muted-foreground bg-muted/10 max-lg:hidden flex p-6 text-center">
