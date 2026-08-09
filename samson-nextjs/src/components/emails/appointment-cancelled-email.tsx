@@ -12,6 +12,7 @@ import {
 import * as React from 'react';
 
 import { getLogoUrl } from '@/shared/utils/get-base-url.util';
+import { formatRefId } from '@/shared/utils/date.util';
 
 export interface AppointmentCancelledEmailProps {
   patientName?: string;
@@ -20,6 +21,7 @@ export interface AppointmentCancelledEmailProps {
   timeRangeStr?: string;
   appointmentId?: string;
   cancellationReason?: string;
+  rebookUrl?: string;
   baseUrl?: string;
 }
 
@@ -42,15 +44,17 @@ const linkStyle: React.CSSProperties = {
 
 export const AppointmentCancelledEmail = ({
   patientName = 'Valued Patient',
-  serviceName = '',
+  serviceName = 'Dental Consultation & Cleaning',
   dateStr = 'Monday, June 22, 2026',
-  timeRangeStr = '',
-  appointmentId = '',
-  cancellationReason = 'This appointment has been cancelled as requested.',
+  timeRangeStr = '2:00 PM – 2:45 PM',
+  appointmentId = 'APT-SAMPLE',
+  cancellationReason = 'Clinic schedule conflict.',
+  rebookUrl = '',
   baseUrl = 'http://localhost:3000',
 }: AppointmentCancelledEmailProps) => {
-  const previewText = 'Your appointment cancellation has been processed. We hope to see you again soon.';
+  const previewText = 'We hope to see you again soon. Feel free to rebook whenever you are ready.';
   const logoUrl = getLogoUrl(baseUrl);
+  const effectiveRebookUrl = rebookUrl || `${baseUrl}/book`;
 
   return (
     <Html lang="en">
@@ -76,11 +80,11 @@ export const AppointmentCancelledEmail = ({
 
           {/* Intro */}
           <Text style={pStyle}>
-            We are writing to confirm that your appointment at Samson Dental Center has been cancelled as requested. We are sorry we will not be able to see you this time, and we hope to welcome you back soon.
+            Your appointment at Samson Dental Center has been cancelled. Please see the appointment details below.
           </Text>
 
-          {/* Cancelled Details */}
-          <Section style={{ margin: '0 0 20px', paddingLeft: 0 }}>
+          {/* Cancelled Details Section */}
+          <Section style={{ margin: '0 0 16px', paddingLeft: 0 }}>
             <Text style={{ ...pStyle, margin: '0 0 8px', fontWeight: 700 }}>
               Your cancelled appointment:
             </Text>
@@ -105,22 +109,38 @@ export const AppointmentCancelledEmail = ({
             )}
             {appointmentId && (
               <Text style={{ ...pStyle, margin: '0 0 4px' }}>
-                <span style={boldStyle}>Reference ID:</span> {appointmentId}
-              </Text>
-            )}
-            {cancellationReason && (
-              <Text style={{ ...pStyle, margin: '8px 0 4px' }}>
-                Cancellation reason: <span style={boldStyle}>{cancellationReason}</span>
+                <span style={boldStyle}>Reference ID:</span> {formatRefId(appointmentId)}
               </Text>
             )}
           </Section>
 
-          {/* Contact block */}
-          <Text style={pStyle}>
-            If you have any questions or would like to reschedule a future appointment, please don&apos;t hesitate to call or text us at{' '}
-            <Link href="tel:028123456" style={linkStyle}>(02) 8123-4567</Link>.{' '}
-            <span style={{ color: '#dc2626', fontWeight: 600 }}>Please note that replies to this email are not monitored.</span>
-          </Text>
+          {cancellationReason && (
+            <Text style={pStyle}>
+              Cancellation reason: <span style={boldStyle}>{cancellationReason}</span>
+            </Text>
+          )}
+
+          {/* Need Help checklist */}
+          <Section style={{ margin: '0 0 20px', paddingLeft: 0 }}>
+            <Text style={{ ...pStyle, margin: '0 0 8px', fontWeight: 700 }}>Need Help?</Text>
+            <ul style={{ margin: '0 0 16px', paddingLeft: 20, listStyle: 'disc', color: '#1a1a1a', fontSize: '14px', lineHeight: 1.75 }}>
+              <li style={{ marginBottom: 6 }}>
+                Questions? Call/text us at{' '}
+                <Link href="tel:028123456" style={linkStyle}>(02) 8123-4567</Link>.
+              </li>
+              {effectiveRebookUrl && (
+                <li style={{ marginBottom: 6 }}>
+                  Ready to book again?{' '}
+                  <Link href={effectiveRebookUrl} target="_blank" rel="noreferrer" style={linkStyle}>
+                    Click here to make a new request
+                  </Link>.
+                </li>
+              )}
+              <li>
+                <span style={{ color: '#dc2626', fontWeight: 600 }}>Note: Replies to this email are unmonitored.</span>
+              </li>
+            </ul>
+          </Section>
 
           {/* Closing */}
           <Text style={{ ...pStyle, marginBottom: '24px' }}>

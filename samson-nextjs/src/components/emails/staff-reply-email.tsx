@@ -41,7 +41,7 @@ export const StaffReplyEmail = ({
   chatToken = '',
   baseUrl = 'http://localhost:3000',
 }: StaffReplyEmailProps) => {
-  const previewText = 'A member of our clinic team has sent you a message. Click to view and reply.';
+  const previewText = 'Our clinic team just replied to your message. Click to open your chat.';
   const logoUrl = getLogoUrl(baseUrl);
   const chatUrl = `${baseUrl}/manage?token=${chatToken}&openChat=true`;
 
@@ -69,7 +69,7 @@ export const StaffReplyEmail = ({
 
           {/* Intro */}
           <Text style={pStyle}>
-            A member of our clinic staff has sent you a reply regarding your appointment or inquiry. We are standing by to help.
+            A member of our clinic staff has sent you a message about your appointment. We are standing by to help.
           </Text>
 
           {/* Action Link */}
@@ -79,13 +79,19 @@ export const StaffReplyEmail = ({
             to view the message and continue the conversation.
           </Text>
 
-          {/* Contact block */}
-          <Text style={pStyle}>
-            If you have any questions or need further assistance, please don&apos;t hesitate to reach out. You can{' '}
-            <Link href={chatUrl} style={linkStyle}>click here to open the clinic chat</Link>{' '}
-            or call or text us at <Link href="tel:028123456" style={linkStyle}>(02) 8123-4567</Link>.{' '}
-            <span style={{ color: '#dc2626', fontWeight: 600 }}>Please note that replies to this email are not monitored.</span>
-          </Text>
+          {/* Need Help checklist */}
+          <Section style={{ margin: '0 0 20px', paddingLeft: 0 }}>
+            <Text style={{ ...pStyle, margin: '0 0 8px', fontWeight: 700 }}>Need Help?</Text>
+            <ul style={{ margin: '0 0 16px', paddingLeft: 20, listStyle: 'disc', color: '#1a1a1a', fontSize: '14px', lineHeight: 1.75 }}>
+              <li style={{ marginBottom: 6 }}>
+                Questions? Call/text us at{' '}
+                <Link href="tel:028123456" style={linkStyle}>(02) 8123-4567</Link>.
+              </li>
+              <li>
+                <span style={{ color: '#dc2626', fontWeight: 600 }}>Note: Replies to this email are unmonitored.</span>
+              </li>
+            </ul>
+          </Section>
 
           {/* Closing */}
           <Text style={{ ...pStyle, marginBottom: '24px' }}>

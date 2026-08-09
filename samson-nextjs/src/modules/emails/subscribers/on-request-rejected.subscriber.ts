@@ -1,6 +1,6 @@
 import { createAdminClient } from '@/shared/database/server';
 import { ResendService } from '@/shared/services/email/resend.service';
-import { formatRefId } from '@/shared/utils/date.util';
+import { formatShortDate, formatClinicTime, formatRefId } from '@/shared/utils/date.util';
 import { getBaseUrl } from '@/shared/utils/get-base-url.util';
 
 export const onRequestRejectedSubscriber = {
@@ -13,15 +13,36 @@ export const onRequestRejectedSubscriber = {
 
     let recipientEmail = directEmail || '';
     let patientName = directName || '';
+    let serviceName = payload.serviceName || '';
+    let dateStr = payload.dateStr || (payload.preferredDate ? formatShortDate(payload.preferredDate) : '');
+    let timeRangeStr = payload.timeRangeStr || (payload.preferredStartTime ? formatClinicTime(payload.preferredStartTime) : '');
 
-    if (appointmentId && (!recipientEmail || !patientName)) {
+    if (appointmentId && (!recipientEmail || !patientName || !serviceName)) {
       const { data: appt } = await supabaseAdmin
         .from('appointments')
-        .select('patient_id, guest_contacts(first_name, last_name, email), patient:users!appointments_patient_id_fkey(first_name, last_name, email)')
+        .select(`
+          patient_id,
+          date,
+          start_time,
+          end_time,
+          service:services(name),
+          guest_contacts(first_name, last_name, email),
+          patient:users!appointments_patient_id_fkey(first_name, last_name, email)
+        `)
         .eq('id', appointmentId)
         .maybeSingle();
 
       if (appt) {
+        if (!serviceName && (appt.service as any)?.name) {
+          serviceName = (appt.service as any).name;
+        }
+        if (!dateStr && appt.date) {
+          dateStr = formatShortDate(appt.date);
+        }
+        if (!timeRangeStr && appt.start_time) {
+          timeRangeStr = formatClinicTime(appt.start_time);
+        }
+
         const gcData = Array.isArray(appt.guest_contacts) ? appt.guest_contacts[0] : (appt.guest_contacts as any);
         if (gcData && (gcData.email || gcData.first_name)) {
           recipientEmail = recipientEmail || gcData.email || '';
@@ -33,13 +54,30 @@ export const onRequestRejectedSubscriber = {
       }
     }
 
-    if (inquiryId && (!recipientEmail || !patientName)) {
+    if (inquiryId && (!recipientEmail || !patientName || !serviceName)) {
       const { data: inq } = await supabaseAdmin
         .from('appointment_inquiries')
-        .select('first_name, last_name, email')
+        .select(`
+          first_name,
+          last_name,
+          email,
+          preferred_date,
+          preferred_start_time,
+          service:services(name)
+        `)
         .eq('id', inquiryId)
         .maybeSingle();
+
       if (inq) {
+        if (!serviceName && (inq.service as any)?.name) {
+          serviceName = (inq.service as any).name;
+        }
+        if (!dateStr && inq.preferred_date) {
+          dateStr = formatShortDate(inq.preferred_date);
+        }
+        if (!timeRangeStr && inq.preferred_start_time) {
+          timeRangeStr = formatClinicTime(inq.preferred_start_time);
+        }
         recipientEmail = recipientEmail || inq.email || '';
         patientName = patientName || `${inq.first_name} ${inq.last_name}`;
       }
@@ -52,7 +90,8 @@ export const onRequestRejectedSubscriber = {
 
     const baseUrl = getBaseUrl();
     const reason = rejectionReason || payload.reason || 'Unfortunately, we are unable to accommodate your request at this time.';
-    const ref = formatRefId(appointmentId || inquiryId);
+    const idToFormat = appointmentId || inquiryId;
+    const ref = formatRefId(idToFormat);
     const subject = `Update on Your Booking Request${ref ? ` [Ref: ${ref}]` : ''}`;
 
     await ResendService.sendTemplatedEmail(
@@ -61,7 +100,12 @@ export const onRequestRejectedSubscriber = {
       'request_rejected',
       {
         patientName: patientName || 'Valued Patient',
+        serviceName,
+        dateStr,
+        timeRangeStr,
+        appointmentId: idToFormat,
         rejectionReason: reason,
+        rebookUrl: `${baseUrl}/book`,
         baseUrl,
       }
     );

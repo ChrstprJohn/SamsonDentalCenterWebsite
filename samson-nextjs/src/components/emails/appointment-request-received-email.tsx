@@ -12,6 +12,7 @@ import {
 import * as React from 'react';
 
 import { getLogoUrl } from '@/shared/utils/get-base-url.util';
+import { formatRefId } from '@/shared/utils/date.util';
 
 export interface AppointmentRequestReceivedEmailProps {
   accountHolderName?: string;
@@ -23,7 +24,9 @@ export interface AppointmentRequestReceivedEmailProps {
   doctorName?: string;
   dateStr?: string;
   timeRangeStr?: string;
+  preferredStartTimeStr?: string;
   appointmentId?: string;
+  patientNote?: string;
   dashboardUrl?: string;
   baseUrl?: string;
 }
@@ -49,14 +52,18 @@ export const AppointmentRequestReceivedEmail = ({
   accountHolderName = 'Valued Patient',
   patientName = 'Valued Patient',
   serviceName = 'Dental Consultation & Cleaning',
-  doctorName = 'Dr. Adrian Samson',
+  doctorName = '',
   dateStr = 'Monday, June 22, 2026',
   timeRangeStr = '2:00 PM – 2:45 PM',
+  preferredStartTimeStr = '',
   appointmentId = 'APT-SAMPLE',
+  patientNote = '',
   baseUrl = 'http://localhost:3000',
 }: AppointmentRequestReceivedEmailProps) => {
-  const previewText = 'Thank you for reaching out. We will review your request and be in touch shortly.';
+  const previewText = 'Our staff is reviewing your requested time. We will reach out shortly.';
   const logoUrl = getLogoUrl(baseUrl);
+  const effectiveName = patientName || accountHolderName;
+  const effectiveTime = preferredStartTimeStr || timeRangeStr;
 
   return (
     <Html lang="en">
@@ -77,15 +84,13 @@ export const AppointmentRequestReceivedEmail = ({
 
           {/* Greeting */}
           <Text style={pStyle}>
-            Dear <span style={boldStyle}>{patientName || accountHolderName}</span>,
+            Dear <span style={boldStyle}>{effectiveName}</span>,
           </Text>
 
           {/* Intro */}
           <Text style={pStyle}>
-            Thank you for reaching out to Samson Dental Center. We have successfully received your booking request and our team is currently reviewing it. We will get back to you as soon as possible to confirm your appointment details.
+            Thank you for reaching out to Samson Dental Center. Your booking request has been received, and our staff is reviewing it.
           </Text>
-
-
 
           {/* Details list */}
           <Section style={{ margin: '0 0 20px', paddingLeft: 0 }}>
@@ -101,41 +106,58 @@ export const AppointmentRequestReceivedEmail = ({
                 <span style={boldStyle}>Service:</span> {serviceName}
               </Text>
             )}
-            {doctorName && (
+            {dateStr && (
               <Text style={{ ...pStyle, margin: '0 0 4px' }}>
-                <span style={boldStyle}>Doctor:</span> {doctorName}
+                <span style={boldStyle}>Preferred date:</span> {dateStr}
+              </Text>
+            )}
+            {effectiveTime && (
+              <Text style={{ ...pStyle, margin: '0 0 4px' }}>
+                <span style={boldStyle}>Preferred time:</span> {effectiveTime}
+              </Text>
+            )}
+            {appointmentId && (
+              <Text style={{ ...pStyle, margin: '0 0 4px' }}>
+                <span style={boldStyle}>Reference ID:</span> {formatRefId(appointmentId)}
               </Text>
             )}
             <Text style={{ ...pStyle, margin: '0 0 4px' }}>
               <span style={boldStyle}>Location:</span> Samson Dental Center, Quezon City, Metro Manila
             </Text>
-            {dateStr && (
+            {patientNote && (
               <Text style={{ ...pStyle, margin: '0 0 4px' }}>
-                <span style={boldStyle}>Preferred Date:</span> {dateStr}
-              </Text>
-            )}
-            {timeRangeStr && (
-              <Text style={{ ...pStyle, margin: '0 0 4px' }}>
-                <span style={boldStyle}>Preferred Time:</span> {timeRangeStr}
-              </Text>
-            )}
-            {appointmentId && (
-              <Text style={{ ...pStyle, margin: '0 0 4px' }}>
-                <span style={boldStyle}>Reference ID:</span> {appointmentId}
+                <span style={boldStyle}>Your note:</span> {patientNote}
               </Text>
             )}
           </Section>
 
-          {/* Contact block */}
-          <Text style={pStyle}>
-            If you have any questions or would like to reschedule a future appointment, please don&apos;t hesitate to call or text us at{' '}
-            <Link href="tel:028123456" style={linkStyle}>(02) 8123-4567</Link>.{' '}
-            <span style={{ color: '#dc2626', fontWeight: 600 }}>Please note that replies to this email are not monitored.</span>
-          </Text>
+          {/* What happens next */}
+          <Section style={{ margin: '0 0 20px', paddingLeft: 0 }}>
+            <Text style={{ ...pStyle, margin: '0 0 8px', fontWeight: 700 }}>What happens next?</Text>
+            <ul style={{ margin: '0 0 16px', paddingLeft: 20, listStyle: 'disc', color: '#1a1a1a', fontSize: '14px', lineHeight: 1.75 }}>
+              <li style={{ marginBottom: 6 }}>Our staff reviews your request.</li>
+              <li style={{ marginBottom: 6 }}>Confirmation is sent by email or text.</li>
+              <li>No action needed from you — we&apos;ll be in touch.</li>
+            </ul>
+          </Section>
+
+          {/* Need Help */}
+          <Section style={{ margin: '0 0 20px', paddingLeft: 0 }}>
+            <Text style={{ ...pStyle, margin: '0 0 8px', fontWeight: 700 }}>Need Help?</Text>
+            <ul style={{ margin: '0 0 16px', paddingLeft: 20, listStyle: 'disc', color: '#1a1a1a', fontSize: '14px', lineHeight: 1.75 }}>
+              <li style={{ marginBottom: 6 }}>
+                Questions? Call/text us at{' '}
+                <Link href="tel:028123456" style={linkStyle}>(02) 8123-4567</Link>.
+              </li>
+              <li>
+                <span style={{ color: '#dc2626', fontWeight: 600 }}>Note: Replies to this email are unmonitored.</span>
+              </li>
+            </ul>
+          </Section>
 
           {/* Closing */}
           <Text style={{ ...pStyle, marginBottom: '24px' }}>
-            Thank you for choosing Samson Dental Center. We look forward to welcoming you soon.
+            Thank you for choosing Samson Dental Center.
           </Text>
 
           {/* Signature */}

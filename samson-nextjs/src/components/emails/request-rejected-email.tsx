@@ -12,13 +12,17 @@ import {
 import * as React from 'react';
 
 import { getLogoUrl } from '@/shared/utils/get-base-url.util';
+import { formatRefId } from '@/shared/utils/date.util';
 
 export interface RequestRejectedEmailProps {
   patientName?: string;
   serviceName?: string;
   dateStr?: string;
+  timeRangeStr?: string;
   preferredStartTimeStr?: string;
+  appointmentId?: string;
   rejectionReason?: string;
+  rebookUrl?: string;
   baseUrl?: string;
 }
 
@@ -43,12 +47,17 @@ export const RequestRejectedEmail = ({
   patientName = 'Valued Patient',
   serviceName = '',
   dateStr = '',
+  timeRangeStr = '',
   preferredStartTimeStr = '',
+  appointmentId = '',
   rejectionReason = 'Unfortunately, we are unable to accommodate your request at this time.',
+  rebookUrl = '',
   baseUrl = 'http://localhost:3000',
 }: RequestRejectedEmailProps) => {
-  const previewText = 'An update regarding your recent booking request at Samson Dental Center.';
+  const previewText = 'We cannot accommodate this request. Contact our clinic to explore other options.';
   const logoUrl = getLogoUrl(baseUrl);
+  const effectiveTime = preferredStartTimeStr || timeRangeStr;
+  const effectiveRebookUrl = rebookUrl || `${baseUrl}/book`;
 
   return (
     <Html lang="en">
@@ -77,44 +86,72 @@ export const RequestRejectedEmail = ({
             Thank you for your interest in Samson Dental Center. After carefully reviewing your booking request, we regret to inform you that we are unable to accommodate your request at this time.
           </Text>
 
-          {/* Rejection details section */}
-          <Section style={{ margin: '0 0 20px', paddingLeft: 0 }}>
-            <Text style={{ ...pStyle, margin: '0 0 4px' }}>
-              <span style={boldStyle}>Status:</span>{' '}
-              <span style={{ fontWeight: 700, color: '#dc2626' }}>Rejected</span>
-            </Text>
-            {serviceName && (
-              <Text style={{ ...pStyle, margin: '0 0 4px' }}>
-                <span style={boldStyle}>Service:</span> {serviceName}
-              </Text>
-            )}
-            {dateStr && (
-              <Text style={{ ...pStyle, margin: '0 0 4px' }}>
-                <span style={boldStyle}>Preferred Date:</span> {dateStr}
-              </Text>
-            )}
-            {preferredStartTimeStr && (
-              <Text style={{ ...pStyle, margin: '0 0 4px' }}>
-                <span style={boldStyle}>Preferred Time:</span> {preferredStartTimeStr}
-              </Text>
-            )}
-            {rejectionReason && (
-              <Text style={{ ...pStyle, margin: '0 0 4px' }}>
-                <span style={boldStyle}>Rejection Reason:</span> {rejectionReason}
-              </Text>
-            )}
-          </Section>
-
-          {/* Contact block */}
           <Text style={pStyle}>
-            If you have any questions or would like to reschedule a future appointment, please don&apos;t hesitate to call or text us at{' '}
-            <Link href="tel:028123456" style={linkStyle}>(02) 8123-4567</Link>.{' '}
-            <span style={{ color: '#dc2626', fontWeight: 600 }}>Please note that replies to this email are not monitored.</span>
+            We sincerely apologize for any inconvenience this may cause.
           </Text>
+
+          <Text style={pStyle}>
+            Rejection reason: <span style={boldStyle}>{rejectionReason}</span>
+          </Text>
+
+          {/* Rejection details section */}
+          {(serviceName || dateStr || effectiveTime) && (
+            <Section style={{ margin: '0 0 20px', paddingLeft: 0 }}>
+              <Text style={{ ...pStyle, margin: '0 0 8px', fontWeight: 700 }}>
+                Your request:
+              </Text>
+              <Text style={{ ...pStyle, margin: '0 0 4px' }}>
+                <span style={boldStyle}>Status:</span>{' '}
+                <span style={{ fontWeight: 700, color: '#dc2626' }}>Rejected</span>
+              </Text>
+              {serviceName && (
+                <Text style={{ ...pStyle, margin: '0 0 4px' }}>
+                  <span style={boldStyle}>Service:</span> {serviceName}
+                </Text>
+              )}
+              {dateStr && (
+                <Text style={{ ...pStyle, margin: '0 0 4px' }}>
+                  <span style={boldStyle}>Preferred date:</span> {dateStr}
+                </Text>
+              )}
+              {effectiveTime && (
+                <Text style={{ ...pStyle, margin: '0 0 4px' }}>
+                  <span style={boldStyle}>Preferred time:</span> {effectiveTime}
+                </Text>
+              )}
+              {appointmentId && (
+                <Text style={{ ...pStyle, margin: '0 0 4px' }}>
+                  <span style={boldStyle}>Reference ID:</span> {formatRefId(appointmentId)}
+                </Text>
+              )}
+            </Section>
+          )}
+
+          {/* Need Help */}
+          <Section style={{ margin: '0 0 20px', paddingLeft: 0 }}>
+            <Text style={{ ...pStyle, margin: '0 0 8px', fontWeight: 700 }}>Need Help?</Text>
+            <ul style={{ margin: '0 0 16px', paddingLeft: 20, listStyle: 'disc', color: '#1a1a1a', fontSize: '14px', lineHeight: 1.75 }}>
+              <li style={{ marginBottom: 6 }}>
+                Request a different date or time — call/text us at{' '}
+                <Link href="tel:028123456" style={linkStyle}>(02) 8123-4567</Link>.
+              </li>
+              {effectiveRebookUrl && (
+                <li style={{ marginBottom: 6 }}>
+                  Ready to book again?{' '}
+                  <Link href={effectiveRebookUrl} target="_blank" rel="noreferrer" style={linkStyle}>
+                    Click here to make a new request
+                  </Link>.
+                </li>
+              )}
+              <li>
+                <span style={{ color: '#dc2626', fontWeight: 600 }}>Note: Replies to this email are unmonitored.</span>
+              </li>
+            </ul>
+          </Section>
 
           {/* Closing */}
           <Text style={{ ...pStyle, marginBottom: '24px' }}>
-            We hope to have the opportunity to serve you in the future. Thank you for considering Samson Dental Center.
+            Thank you for choosing Samson Dental Center.
           </Text>
 
           {/* Signature */}

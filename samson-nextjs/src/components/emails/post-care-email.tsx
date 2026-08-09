@@ -12,6 +12,7 @@ import {
 import * as React from 'react';
 
 import { getLogoUrl } from '@/shared/utils/get-base-url.util';
+import { formatRefId } from '@/shared/utils/date.util';
 
 export interface PostCareEmailProps {
   patientName?: string;
@@ -47,7 +48,7 @@ export const PostCareEmail = ({
   appointmentId = 'APT-SAMPLE',
   baseUrl = 'http://localhost:3000',
 }: PostCareEmailProps) => {
-  const previewText = 'Thank you for visiting Samson Dental Center. We hope your appointment went smoothly.';
+  const previewText = 'We hope your visit went smoothly. Please share how your experience was.';
   const logoUrl = getLogoUrl(baseUrl);
   const feedbackUrl = `${baseUrl}/feedback?ref=${appointmentId}`;
 
@@ -75,11 +76,14 @@ export const PostCareEmail = ({
 
           {/* Intro */}
           <Text style={pStyle}>
-            Thank you for visiting Samson Dental Center. We hope your appointment went smoothly and that you are feeling great. Your experience is important to us, and we would love to hear how things went.
+            Thank you for visiting Samson Dental Center. We hope your visit went smoothly and that you are feeling great.
           </Text>
 
           {/* Summary Details */}
           <Section style={{ margin: '0 0 20px', paddingLeft: 0 }}>
+            <Text style={{ ...pStyle, margin: '0 0 8px', fontWeight: 700 }}>
+              Your recent visit:
+            </Text>
             <Text style={{ ...pStyle, margin: '0 0 4px' }}>
               <span style={boldStyle}>Status:</span>{' '}
               <span style={{ fontWeight: 700, color: '#0f766e' }}>Completed</span>
@@ -104,42 +108,38 @@ export const PostCareEmail = ({
             )}
             {appointmentId && (
               <Text style={{ ...pStyle, margin: '0 0 4px' }}>
-                <span style={boldStyle}>Reference ID:</span> {appointmentId}
+                <span style={boldStyle}>Reference ID:</span> {formatRefId(appointmentId)}
               </Text>
             )}
           </Section>
 
-          {/* Post care instructions */}
-          <Text style={pStyle}>
-            Please follow all post-treatment care instructions provided by your doctor.
-          </Text>
-          <Text style={pStyle}>
-            If you have any concerns or questions following your visit, please do not hesitate to reach out to our clinic anytime.
-          </Text>
-
           {/* CTA Link */}
           <Text style={pStyle}>
-            If you have a moment, we would love to hear about your experience &mdash; please{' '}
+            If you have a free moment, we would love to hear how your visit went &mdash;{' '}
             <Link href={feedbackUrl} style={linkStyle}>
               click here to share your feedback
             </Link>
-            . Your feedback helps us continue to improve.
+            . Your feedback helps us improve our service.
           </Text>
 
-          <Text style={pStyle}>
-            Your health and well-being are our top priority, and we greatly appreciate your trust in our care. If you have any specific concerns following your visit, please feel free to let us know.
-          </Text>
-
-          {/* Contact block */}
-          <Text style={pStyle}>
-            If you have any questions or would like to reschedule a future appointment, please don&apos;t hesitate to call or text us at{' '}
-            <Link href="tel:028123456" style={linkStyle}>(02) 8123-4567</Link>.{' '}
-            <span style={{ color: '#dc2626', fontWeight: 600 }}>Please note that replies to this email are not monitored.</span>
-          </Text>
+          {/* Quick Reminders checklist */}
+          <Section style={{ margin: '0 0 20px', paddingLeft: 0 }}>
+            <Text style={{ ...pStyle, margin: '0 0 8px', fontWeight: 700 }}>Quick Reminders</Text>
+            <ul style={{ margin: '0 0 16px', paddingLeft: 20, listStyle: 'disc', color: '#1a1a1a', fontSize: '14px', lineHeight: 1.75 }}>
+              <li style={{ marginBottom: 6 }}>Follow all post-treatment care instructions from your doctor.</li>
+              <li style={{ marginBottom: 6 }}>
+                Concerns or questions? Call/text us at{' '}
+                <Link href="tel:028123456" style={linkStyle}>(02) 8123-4567</Link>.
+              </li>
+              <li>
+                <span style={{ color: '#dc2626', fontWeight: 600 }}>Note: Replies to this email are unmonitored.</span>
+              </li>
+            </ul>
+          </Section>
 
           {/* Closing */}
           <Text style={{ ...pStyle, marginBottom: '24px' }}>
-            Thank you for choosing Samson Dental Center. We&apos;re dedicated to providing you with the best possible dental care experience.
+            Thank you for choosing Samson Dental Center. We hope to see you again soon.
           </Text>
 
           {/* Signature */}

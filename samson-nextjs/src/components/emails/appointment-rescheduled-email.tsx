@@ -12,6 +12,7 @@ import {
 import * as React from 'react';
 
 import { getLogoUrl } from '@/shared/utils/get-base-url.util';
+import { formatRefId } from '@/shared/utils/date.util';
 
 export interface AppointmentRescheduledEmailProps {
   patientName?: string;
@@ -22,6 +23,7 @@ export interface AppointmentRescheduledEmailProps {
   dateStr?: string;
   timeRangeStr?: string;
   appointmentId?: string;
+  rescheduleReason?: string;
   chatToken?: string;
   baseUrl?: string;
 }
@@ -52,10 +54,11 @@ export const AppointmentRescheduledEmail = ({
   dateStr = 'Monday, June 22, 2026',
   timeRangeStr = '2:00 PM – 2:45 PM',
   appointmentId = 'APT-SAMPLE',
+  rescheduleReason = '',
   chatToken = '',
   baseUrl = 'http://localhost:3000',
 }: AppointmentRescheduledEmailProps) => {
-  const previewText = 'Your appointment has been moved to a new date and time. Review your updated schedule.';
+  const previewText = 'Please review your updated clinic date, time, and location.';
   const logoUrl = getLogoUrl(baseUrl);
   const chatUrl = `${baseUrl}/manage?token=${chatToken || appointmentId}&openChat=true`;
 
@@ -83,7 +86,7 @@ export const AppointmentRescheduledEmail = ({
 
           {/* Intro */}
           <Text style={pStyle}>
-            We&apos;re writing to confirm that your appointment at Samson Dental Center has been successfully rescheduled. Here are your updated visit details:
+            Your appointment at Samson Dental Center has been rescheduled. Please see your new visit details below.
           </Text>
 
           {/* Details list */}
@@ -130,31 +133,36 @@ export const AppointmentRescheduledEmail = ({
             )}
             {appointmentId && (
               <Text style={{ ...pStyle, margin: '0 0 4px' }}>
-                <span style={boldStyle}>Reference ID:</span> {appointmentId}
+                <span style={boldStyle}>Reference ID:</span> {formatRefId(appointmentId)}
               </Text>
             )}
           </Section>
 
-          {/* Instructions */}
-          <Text style={pStyle}>
-            Please arrive 10 to 15 minutes before your scheduled time to complete check-in.
-          </Text>
+          {rescheduleReason && (
+            <Text style={pStyle}>
+              Reschedule reason: <span style={boldStyle}>{rescheduleReason}</span>
+            </Text>
+          )}
 
-          <Text style={pStyle}>
-            Your health is our top priority, and we greatly appreciate your trust in our care. If you have any specific concerns or requests for your appointment, please feel free to let us know.
-          </Text>
-
-          {/* Contact & Chat block */}
-          <Text style={pStyle}>
-            If you have any questions, need to reschedule, or need further assistance, please don&apos;t hesitate to reach out. You can{' '}
-            <Link href={chatUrl} style={linkStyle}>click here to open the clinic chat</Link>{' '}
-            or call or text us at <Link href="tel:028123456" style={linkStyle}>(02) 8123-4567</Link>.{' '}
-            <span style={{ color: '#dc2626', fontWeight: 600 }}>Please note that replies to this email are not monitored.</span>
-          </Text>
+          {/* Quick Reminders checklist */}
+          <Section style={{ margin: '0 0 20px', paddingLeft: 0 }}>
+            <Text style={{ ...pStyle, margin: '0 0 8px', fontWeight: 700 }}>Quick Reminders</Text>
+            <ul style={{ margin: '0 0 16px', paddingLeft: 20, listStyle: 'disc', color: '#1a1a1a', fontSize: '14px', lineHeight: 1.75 }}>
+              <li style={{ marginBottom: 6 }}>Please arrive 10-15 minutes early so we can get you checked in smoothly.</li>
+              <li style={{ marginBottom: 6 }}>
+                Have questions or need to reschedule?{' '}
+                <Link href={chatUrl} style={linkStyle}>Click here to open clinic chat</Link>, or call/text us at{' '}
+                <Link href="tel:028123456" style={linkStyle}>(02) 8123-4567</Link>.
+              </li>
+              <li>
+                <span style={{ color: '#dc2626', fontWeight: 600 }}>Note: Replies to this email are unmonitored.</span>
+              </li>
+            </ul>
+          </Section>
 
           {/* Closing */}
           <Text style={{ ...pStyle, marginBottom: '24px' }}>
-            Thank you for choosing Samson Dental Center. We can&apos;t wait to see you on {dateStr || 'your appointment date'} at {timeRangeStr || 'the scheduled time'}.
+            Thank you for choosing Samson Dental Center. See you soon!
           </Text>
 
           {/* Signature */}

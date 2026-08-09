@@ -26,16 +26,19 @@ type EmailTemplates = {
   'reset_password_otp': { firstName: string; otpCode: string };
   'appointment_request_received': {
     accountHolderName: string;
-    patientType: 'SELF' | 'DEPENDENT';
+    patientType?: 'SELF' | 'DEPENDENT';
     patientName: string;
     relationship?: string;
     bookedByName?: string;
     serviceName: string;
-    doctorName: string;
+    doctorName?: string;
     dateStr: string;
-    timeRangeStr: string;
+    timeRangeStr?: string;
+    preferredStartTimeStr?: string;
     appointmentId: string;
-    dashboardUrl: string;
+    patientNote?: string;
+    dashboardUrl?: string;
+    baseUrl?: string;
   };
   'appointment_confirmed': {
     patientName: string;
@@ -44,6 +47,7 @@ type EmailTemplates = {
     dateStr: string;
     timeRangeStr: string;
     appointmentId: string;
+    approvalReason?: string;
     chatToken?: string;
     baseUrl?: string;
   };
@@ -65,6 +69,7 @@ type EmailTemplates = {
     timeRangeStr?: string;
     appointmentId?: string;
     cancellationReason?: string;
+    rebookUrl?: string;
     baseUrl?: string;
   };
   'appointment_rescheduled': {
@@ -73,7 +78,10 @@ type EmailTemplates = {
     timeRangeStr: string;
     doctorName?: string;
     serviceName?: string;
+    oldDateStr?: string;
+    oldTimeRangeStr?: string;
     appointmentId?: string;
+    rescheduleReason?: string;
     chatToken?: string;
     baseUrl?: string;
   };
@@ -94,8 +102,11 @@ type EmailTemplates = {
     patientName: string;
     serviceName?: string;
     dateStr?: string;
+    timeRangeStr?: string;
     preferredStartTimeStr?: string;
+    appointmentId?: string;
     rejectionReason?: string;
+    rebookUrl?: string;
     baseUrl?: string;
   };
 };
@@ -145,11 +156,13 @@ export const ResendService = {
           relationship: reqPayload.relationship,
           bookedByName: reqPayload.bookedByName,
           serviceName: reqPayload.serviceName,
-          doctorName: reqPayload.doctorName,
           dateStr: reqPayload.dateStr,
           timeRangeStr: reqPayload.timeRangeStr,
+          preferredStartTimeStr: reqPayload.preferredStartTimeStr,
           appointmentId: reqPayload.appointmentId,
+          patientNote: reqPayload.patientNote,
           dashboardUrl: reqPayload.dashboardUrl,
+          baseUrl: reqPayload.baseUrl,
         }));
         break;
       }
@@ -162,6 +175,7 @@ export const ResendService = {
           dateStr: reqPayload.dateStr,
           timeRangeStr: reqPayload.timeRangeStr,
           appointmentId: reqPayload.appointmentId,
+          approvalReason: reqPayload.approvalReason,
           chatToken: reqPayload.chatToken,
           baseUrl: reqPayload.baseUrl,
         }));
@@ -191,6 +205,7 @@ export const ResendService = {
           timeRangeStr: reqPayload.timeRangeStr,
           appointmentId: reqPayload.appointmentId,
           cancellationReason: reqPayload.cancellationReason,
+          rebookUrl: reqPayload.rebookUrl,
           baseUrl: reqPayload.baseUrl,
         }));
         break;
@@ -199,11 +214,14 @@ export const ResendService = {
         const reqPayload = payload as EmailTemplates['appointment_rescheduled'];
         html = await render(React.createElement(AppointmentRescheduledEmail, {
           patientName: reqPayload.patientName,
+          serviceName: reqPayload.serviceName,
+          doctorName: reqPayload.doctorName,
+          oldDateStr: reqPayload.oldDateStr,
+          oldTimeRangeStr: reqPayload.oldTimeRangeStr,
           dateStr: reqPayload.dateStr,
           timeRangeStr: reqPayload.timeRangeStr,
-          doctorName: reqPayload.doctorName,
-          serviceName: reqPayload.serviceName,
           appointmentId: reqPayload.appointmentId,
+          rescheduleReason: reqPayload.rescheduleReason,
           chatToken: reqPayload.chatToken,
           baseUrl: reqPayload.baseUrl,
         }));
@@ -236,8 +254,11 @@ export const ResendService = {
           patientName: reqPayload.patientName,
           serviceName: reqPayload.serviceName,
           dateStr: reqPayload.dateStr,
+          timeRangeStr: reqPayload.timeRangeStr,
           preferredStartTimeStr: reqPayload.preferredStartTimeStr,
+          appointmentId: reqPayload.appointmentId,
           rejectionReason: reqPayload.rejectionReason,
+          rebookUrl: reqPayload.rebookUrl,
           baseUrl: reqPayload.baseUrl,
         }));
         break;

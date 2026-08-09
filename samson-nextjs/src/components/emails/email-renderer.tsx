@@ -59,6 +59,13 @@ export function RenderedEmailFrame({ eventType, payload }: RenderedEmailFramePro
   const cancellationReason = safePayload.cancellationReason || safePayload.reason;
   const rejectionReason = safePayload.rejectionReason || safePayload.reason;
 
+  const approvalReason = safePayload.approvalReason || safePayload.reason;
+  const rescheduleReason = safePayload.rescheduleReason || safePayload.reason;
+  const patientNote = safePayload.patientNote || safePayload.notes || safePayload.note;
+  const oldDateStr = safePayload.oldDateStr ? formatShortDate(safePayload.oldDateStr) : (safePayload.oldDate || '');
+  const oldTimeRangeStr = safePayload.oldTimeRangeStr || safePayload.oldTime || '';
+  const rebookUrl = safePayload.rebookUrl || `${baseUrl}/book`;
+
   let element: React.ReactElement;
 
   if (eventType === 'PATIENT_REGISTERED') {
@@ -72,8 +79,9 @@ export function RenderedEmailFrame({ eventType, payload }: RenderedEmailFramePro
           patientName={patientName}
           serviceName={serviceName}
           dateStr={dateStr}
-          preferredStartTimeStr={rawTime}
+          timeRangeStr={timeRangeStr}
           rejectionReason={rejectionReason}
+          rebookUrl={rebookUrl}
           baseUrl={baseUrl}
         />
       );
@@ -83,10 +91,10 @@ export function RenderedEmailFrame({ eventType, payload }: RenderedEmailFramePro
           accountHolderName={safePayload.accountHolderName || patientName}
           patientName={patientName}
           serviceName={serviceName}
-          doctorName={doctorName}
           dateStr={dateStr}
           timeRangeStr={timeRangeStr}
           appointmentId={appointmentId}
+          patientNote={patientNote}
           baseUrl={baseUrl}
         />
       );
@@ -100,6 +108,7 @@ export function RenderedEmailFrame({ eventType, payload }: RenderedEmailFramePro
         timeRangeStr={timeRangeStr}
         appointmentId={appointmentId}
         cancellationReason={cancellationReason}
+        rebookUrl={rebookUrl}
         baseUrl={baseUrl}
       />
     );
@@ -109,9 +118,12 @@ export function RenderedEmailFrame({ eventType, payload }: RenderedEmailFramePro
         patientName={patientName}
         serviceName={serviceName}
         doctorName={doctorName}
+        oldDateStr={oldDateStr}
+        oldTimeRangeStr={oldTimeRangeStr}
         dateStr={dateStr}
         timeRangeStr={timeRangeStr}
         appointmentId={appointmentId}
+        rescheduleReason={rescheduleReason}
         chatToken={chatToken}
         baseUrl={baseUrl}
       />
@@ -139,7 +151,11 @@ export function RenderedEmailFrame({ eventType, payload }: RenderedEmailFramePro
     element = (
       <RequestRejectedEmail
         patientName={patientName}
+        serviceName={serviceName}
+        dateStr={dateStr}
+        timeRangeStr={timeRangeStr}
         rejectionReason={rejectionReason}
+        rebookUrl={rebookUrl}
         baseUrl={baseUrl}
       />
     );
@@ -168,6 +184,7 @@ export function RenderedEmailFrame({ eventType, payload }: RenderedEmailFramePro
         timeRangeStr={timeRangeStr}
         appointmentId={appointmentId}
         chatToken={chatToken}
+        approvalReason={approvalReason}
         baseUrl={baseUrl}
       />
     );

@@ -174,7 +174,7 @@ export const PRESET_SCENARIOS: { label: string; data: SampleData }[] = [
 export const DEFAULT_COPY: Record<EmailDesignId, DraftCopy> = {
   'appointment-confirmed': {
     subject: 'Your Appointment is Confirmed',
-    preheader: 'Your appointment is confirmed.',
+    preheader: 'Please review your visit schedule and check-in reminders.',
     headerLabel: 'Appointment Confirmed',
     headline: 'Your Appointment is Confirmed',
     intro: "Your appointment at Samson Dental Center is confirmed. Please review the visit details below.",
@@ -189,7 +189,7 @@ export const DEFAULT_COPY: Record<EmailDesignId, DraftCopy> = {
   },
   'reminder-24h': {
     subject: 'Reminder: Your Appointment is Tomorrow',
-    preheader: 'Your dental appointment is scheduled for tomorrow. View your details inside.',
+    preheader: 'We look forward to seeing you. Please arrive 10-15 minutes early.',
     headerLabel: 'Appointment Reminder',
     headline: 'Your Appointment is Tomorrow',
     intro: "A friendly reminder about your dental appointment at Samson Dental Center tomorrow. Here are your visit details:",
@@ -204,7 +204,7 @@ export const DEFAULT_COPY: Record<EmailDesignId, DraftCopy> = {
   },
   'reminder-48h': {
     subject: 'Reminder: Your Appointment is in 2 Days',
-    preheader: 'Your dental appointment is coming up in 2 days. Review your visit details.',
+    preheader: 'Need to reschedule or have questions? Contact our clinic team.',
     headerLabel: 'Appointment Reminder',
     headline: 'Your Appointment is in 2 Days',
     intro: "A friendly reminder about your dental appointment at Samson Dental Center in 2 days. Here are your visit details:",
@@ -219,7 +219,7 @@ export const DEFAULT_COPY: Record<EmailDesignId, DraftCopy> = {
   },
   cancelled: {
     subject: 'Your Appointment Has Been Cancelled',
-    preheader: 'Your appointment has been cancelled. Rebook anytime — we hope to see you soon.',
+    preheader: 'We hope to see you again soon. Feel free to rebook whenever you are ready.',
     headerLabel: 'Appointment Cancelled',
     headline: 'Your Appointment Has Been Cancelled',
     intro: "Your appointment at Samson Dental Center has been cancelled. Please see the appointment details below.",
@@ -234,7 +234,7 @@ export const DEFAULT_COPY: Record<EmailDesignId, DraftCopy> = {
   },
   rescheduled: {
     subject: 'Your Appointment Has Been Rescheduled',
-    preheader: 'Your appointment has been rescheduled. See your new date and time inside.',
+    preheader: 'Please review your updated clinic date, time, and location.',
     headerLabel: 'Appointment Rescheduled',
     headline: 'Your Appointment Has Been Rescheduled',
     intro: "Your appointment at Samson Dental Center has been rescheduled. Please see your new visit details below.",
@@ -249,7 +249,7 @@ export const DEFAULT_COPY: Record<EmailDesignId, DraftCopy> = {
   },
   'staff-reply': {
     subject: 'You Have a New Message',
-    preheader: 'A member of our clinic team has sent you a message. Click to view and reply.',
+    preheader: 'Our clinic team just replied to your message. Click to open your chat.',
     headerLabel: 'New Message',
     headline: 'A Message from Our Clinic Team',
     intro: 'A member of our clinic staff has sent you a message about your appointment. We are standing by to help.',
@@ -264,7 +264,7 @@ export const DEFAULT_COPY: Record<EmailDesignId, DraftCopy> = {
   },
   'post-care': {
     subject: 'Thank You for Your Visit',
-    preheader: 'We hope your visit went well. Your feedback means a lot to us.',
+    preheader: 'We hope your visit went smoothly. Please share how your experience was.',
     headerLabel: 'Visit Complete',
     headline: 'Thank You for Your Visit',
     intro: 'Thank you for visiting Samson Dental Center. We hope your visit went smoothly and that you are feeling great.',
@@ -279,7 +279,7 @@ export const DEFAULT_COPY: Record<EmailDesignId, DraftCopy> = {
   },
   'booking-request-received': {
     subject: 'We\'ve Received Your Booking Request',
-    preheader: 'Thank you for reaching out. We will review your request and be in touch shortly.',
+    preheader: 'Our staff is reviewing your requested time. We will reach out shortly.',
     headerLabel: 'Booking Request Received',
     headline: 'We\'ve Received Your Booking Request',
     intro: 'Thank you for reaching out to Samson Dental Center. Your booking request has been received, and our staff is reviewing it.',
@@ -294,7 +294,7 @@ export const DEFAULT_COPY: Record<EmailDesignId, DraftCopy> = {
   },
   'request-rejected': {
     subject: 'Update on Your Booking Request',
-    preheader: 'An update regarding your recent booking request at Samson Dental Center.',
+    preheader: 'We cannot accommodate this request. Contact our clinic to explore other options.',
     headerLabel: 'Request Update',
     headline: 'Update on Your Booking Request',
     intro: 'Thank you for your interest in Samson Dental Center. After carefully reviewing your booking request, we regret to inform you that we are unable to accommodate your request at this time.',
