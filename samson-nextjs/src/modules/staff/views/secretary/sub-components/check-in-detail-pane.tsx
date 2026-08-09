@@ -396,7 +396,17 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
               Please finish editing or save guest information before taking action.
             </p>
           )}
-          <div className={`flex gap-2 ${isEditingGuestInfo ? 'pointer-events-none opacity-40' : ''}`}>
+          {paneType === 'checkout' && isEditingCheckoutChannel && (
+            <p className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center mb-3">
+              Please finish editing or save notification channel before completing checkout.
+            </p>
+          )}
+          {paneType === 'resolve' && isEditingResolveChannel && (
+            <p className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center mb-3">
+              Please finish editing or save notification channel before submitting resolution.
+            </p>
+          )}
+          <div className={`flex gap-2 ${(isEditingGuestInfo || (paneType === 'checkout' && isEditingCheckoutChannel) || (paneType === 'resolve' && isEditingResolveChannel)) ? 'pointer-events-none opacity-40' : ''}`}>
             {paneType === 'details' && appointment.status === 'NO_SHOW' && showRescheduleForm ? (() => {
               const isFormValid = isRescheduleFormComplete({
                 serviceId: appointment.serviceId,
@@ -610,11 +620,6 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
             )}
             {paneType === 'checkout' && (
               <>
-                {isEditingCheckoutChannel && (
-                  <p className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center mb-3 w-full">
-                    Please finish editing or save notification channel before completing checkout.
-                  </p>
-                )}
                 <button onClick={returnToDetails} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent rounded-xl">Back</button>
                 <button onClick={() => view.handleCheckoutComplete(appointment.id, checkoutReason)} disabled={view.isPending || !checkoutReason.trim() || isEditingCheckoutChannel} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl disabled:opacity-40">{view.isPending ? 'Sending...' : 'Confirm & Send'}</button>
               </>
@@ -627,11 +632,6 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
             )}
             {paneType === 'resolve' && (
               <>
-                {isEditingResolveChannel && (
-                  <p className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center mb-3 w-full">
-                    Please finish editing or save notification channel before submitting resolution.
-                  </p>
-                )}
                 <button onClick={returnToDetails} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent rounded-xl">Back</button>
                 <button onClick={() => (document.getElementById('resolve-form') as HTMLFormElement | null)?.requestSubmit()} disabled={view.isPending || isEditingResolveChannel} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground rounded-xl disabled:opacity-40">{view.isPending ? 'Submitting...' : 'Submit Resolution'}</button>
               </>
