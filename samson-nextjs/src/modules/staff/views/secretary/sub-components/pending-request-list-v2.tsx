@@ -126,19 +126,34 @@ export function PendingRequestListV2(props: PendingRequestListV2Props) {
                   transform: `translateX(calc(${safeIndex} * (100% + 0.25rem)))`,
                 }}
               />
-              {TABS.map((tab) => (
-                <button
-                  key={tab.key}
-                  onClick={() => { props.setActiveTab(tab.key); props.onSelectInquiry(null); }}
-                  className={`relative z-10 h-8 text-xs font-semibold rounded-lg transition-colors flex items-center justify-center ${
-                    props.activeTab === tab.key
-                      ? 'text-primary-foreground font-semibold'
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  {tab.label} ({props.tabCounts[tab.key] ?? 0})
-                </button>
-              ))}
+              {TABS.map((tab) => {
+                const count = props.tabCounts[tab.key] ?? 0;
+                const isSelected = props.activeTab === tab.key;
+                const showBadge = count > 0;
+
+                return (
+                  <button
+                    key={tab.key}
+                    onClick={() => { props.setActiveTab(tab.key); props.onSelectInquiry(null); }}
+                    className={`relative z-10 h-8 text-xs font-semibold rounded-lg transition-colors flex items-center justify-center gap-1.5 ${
+                      isSelected
+                        ? 'text-primary-foreground font-semibold'
+                        : 'text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    <span>{tab.label}</span>
+                    {showBadge && (
+                      <span className={`px-1.5 py-0.5 text-[10px] font-bold rounded-full transition-colors ${
+                        isSelected
+                          ? 'bg-primary-foreground/20 text-primary-foreground'
+                          : 'bg-amber-500/20 text-amber-600 dark:text-amber-400'
+                      }`}>
+                        {count}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
             </div>
           );
         })()}

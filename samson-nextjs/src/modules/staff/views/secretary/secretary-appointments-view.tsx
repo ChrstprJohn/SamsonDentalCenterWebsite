@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSecretaryAppointments } from '../../hooks/secretary/use-secretary-appointments';
 import { AppointmentDetailPane } from './sub-components/appointment-detail-pane';
 import { AppointmentsTable } from './sub-components/appointments-table';
 import { CoordinationHub } from './sub-components/coordination-hub';
 import { NeedsAttentionDetail } from './sub-components/needs-attention-detail';
-import { ArrowLeft, CalendarDays, ClipboardList, RotateCw } from 'lucide-react';
+import { ArrowLeft, CalendarDays, ClipboardList, RotateCw, SlidersHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select } from '@/components/ui/select';
 import { SidebarHeader, SidebarInput, SidebarTrigger } from '@/components/ui/sidebar';
@@ -15,7 +15,23 @@ export function SecretaryAppointmentsView() {
   const view = useSecretaryAppointments();
   const [mobileView, setMobileView] = useState<'list' | 'detail' | 'quickLogs'>('list');
   const [showNotesPanel, setShowNotesPanel] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
   const [search, setSearch] = useState('');
+  const [draftDate, setDraftDate] = useState('');
+  const [draftDoctor, setDraftDoctor] = useState('');
+  const [draftStatus, setDraftStatus] = useState('');
+  const filterBoxRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!showFilters) return;
+    const onPointerDown = (e: MouseEvent) => {
+      if (filterBoxRef.current && !filterBoxRef.current.contains(e.target as Node)) {
+        setShowFilters(false);
+      }
+    };
+    document.addEventListener('mousedown', onPointerDown);
+    return () => document.removeEventListener('mousedown', onPointerDown);
+  }, [showFilters]);
 
   const colMobile = (v: 'list' | 'detail' | 'quickLogs') =>
     mobileView === v ? 'flex' : 'hidden';
@@ -29,7 +45,7 @@ export function SecretaryAppointmentsView() {
 
   const TABS = [
     { key: 'upcoming' as const, label: 'Active', count: view.tabTotals.upcoming },
-    { key: 'needs-attention' as const, label: 'Needs Attention', count: view.tabTotals['needs-attention'] },
+    { key: 'needs-attention' as const, label: 'Unresolved', count: view.tabTotals['needs-attention'] },
     { key: 'history' as const, label: 'History', count: view.tabTotals.history },
   ];
 
@@ -40,13 +56,110 @@ export function SecretaryAppointmentsView() {
       {/* Column 1: Appointments List */}
       <div className={`xl:w-[400px] lg:w-[380px] flex-1 lg:flex-none flex-col border-r border-card-border/40 bg-sidebar min-h-0 overflow-hidden ${colMobile('list')} lg:flex`}>
         <SidebarHeader className="gap-3.5 border-b p-4 shrink-0">
-          <div className="flex w-full h-8 items-center justify-between">
+          <div ref={filterBoxRef} className="relative flex w-full h-8 items-center justify-between">
             <div className="flex items-center gap-2">
               <SidebarTrigger className="lg:hidden -ml-1 text-muted-foreground hover:text-foreground" />
               <div className="text-base font-medium text-foreground">
                 Appointments Directory
               </div>
             </div>
+            <button
+              onClick={() => {
+                if (!showFilters) {
+                  setDraftDate(view.dateFilter);
+                  setDraftDoctor(view.doctorFilter);
+                  setDraftStatus(view.historyStatusFilter);
+                }
+                setShowFilters((v) => !v);
+              }}
+              className={`flex items-center gap-1 rounded-md p-1.5 text-xs transition-colors ${
+                showFilters || view.dateFilter || view.doctorFilter || view.historyStatusFilter
+                  ? 'text-primary bg-primary/10'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/40'
+              }`}
+              aria-label="Toggle filters"
+              title="Filters"
+            >
+              <SlidersHorizontal className="size-4" />
+              <span>Filters</span>
+            </button>
+            {showFilters && (
+              <div className="absolute right-0 top-full mt-2 z-50 w-80 rounded-xl bg-popover p-3 shadow-lg ring-1 ring-foreground/10 flex flex-col gap-3">
+                <label className="flex flex-col gap-1.5">
+                  <span className="text-xs font-medium text-muted-foreground">Date</span>
+                  <input
+                    type="date"
+                    value={draftDate}
+                    onChange={(e) => setDraftDate(e.target.value)}
+                    className="h-8 w-full rounded-md border border-card-border/60 bg-transparent px-2 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                    aria-label="Filter by date"
+                  />
+                </label>
+                <label className="flex flex-col gap-1.5">
+                  <span className="text-xs font-medium text-muted-foreground">Doctor</span>
+                  <Select
+                    value={draftDoctor}
+                    onChange={(e) => setDraftDoctor(e.target.value)}
+                    className="h-8 w-full rounded-md border border-card-border/60 bg-transparent px-2! pr-8! py-0! text-xs"
+                    options={[
+                      { value: '', label: 'All doctors' },
+                      ...view.doctors.map((doctor) => ({ value: doctor.id, label: `Dr. ${doctor.firstName} ${doctor.lastName}` })),
+                    ]}
+                    aria-label="Filter by doctor"
+                  />
+                </label>
+                {view.activeTab === 'history' && (
+                  <label className="flex flex-col gap-1.5">
+                    <span className="text-xs font-medium text-muted-foreground">Status</span>
+                    <Select
+                      value={draftStatus}
+                      onChange={(e) => setDraftStatus(e.target.value)}
+                      className="h-8 w-full rounded-md border border-card-border/60 bg-transparent px-2! pr-8! py-0! text-xs"
+                      options={[
+                        { value: '', label: 'All statuses' },
+                        { value: 'COMPLETED', label: 'Completed' },
+                        { value: 'CANCELLED', label: 'Cancelled' },
+                        { value: 'REJECTED', label: 'Rejected' },
+                        { value: 'DISPLACED', label: 'Displaced' },
+                        { value: 'NO_SHOW', label: 'No Show' },
+                      ]}
+                      aria-label="Filter by status"
+                    />
+                  </label>
+                )}
+                <div className="flex gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setDraftDate('');
+                      setDraftDoctor('');
+                      setDraftStatus('');
+                      view.setDateFilter('');
+                      view.setDoctorFilter('');
+                      view.setHistoryStatusFilter('');
+                      setShowFilters(false);
+                    }}
+                    className="flex-1 h-8 text-xs"
+                  >
+                    Reset
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      view.setDateFilter(draftDate);
+                      view.setDoctorFilter(draftDoctor);
+                      view.setHistoryStatusFilter(draftStatus);
+                      setShowFilters(false);
+                    }}
+                    className="flex-1 h-8 text-xs"
+                  >
+                    Save Filters
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
           <div className="px-1">
             <SidebarInput
@@ -55,41 +168,6 @@ export function SecretaryAppointmentsView() {
               onChange={(e) => handleSearch(e.target.value)}
               className="rounded-md"
             />
-          </div>
-          <div className="px-1 grid grid-cols-2 gap-1.5">
-            <input
-              type="date"
-              value={view.dateFilter}
-              onChange={(e) => view.setDateFilter(e.target.value)}
-              className="h-8 w-full rounded-md border border-card-border/60 bg-transparent px-2 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-              aria-label="Filter by date"
-            />
-            <Select
-              value={view.doctorFilter}
-              onChange={(e) => view.setDoctorFilter(e.target.value)}
-              className="h-8 w-full rounded-md border border-card-border/60 bg-transparent px-2 py-0 text-xs"
-              options={[
-                { value: '', label: 'All doctors' },
-                ...view.doctors.map((doctor) => ({ value: doctor.id, label: `Dr. ${doctor.firstName} ${doctor.lastName}` })),
-              ]}
-              aria-label="Filter by doctor"
-            />
-            {view.activeTab === 'history' && (
-              <Select
-                value={view.historyStatusFilter}
-                onChange={(e) => view.setHistoryStatusFilter(e.target.value)}
-                className="col-span-2 h-8 w-full rounded-md border border-card-border/60 bg-transparent px-2 py-0 text-xs"
-                options={[
-                  { value: '', label: 'All statuses' },
-                  { value: 'COMPLETED', label: 'Completed' },
-                  { value: 'CANCELLED', label: 'Cancelled' },
-                  { value: 'REJECTED', label: 'Rejected' },
-                  { value: 'DISPLACED', label: 'Displaced' },
-                  { value: 'NO_SHOW', label: 'No Show' },
-                ]}
-                aria-label="Filter by status"
-              />
-            )}
           </div>
         {(() => {
           const activeIndex = TABS.findIndex((t) => t.key === view.activeTab);
@@ -103,19 +181,34 @@ export function SecretaryAppointmentsView() {
                   transform: `translateX(calc(${safeIndex} * (100% + 0.25rem)))`,
                 }}
               />
-              {TABS.map((tab) => (
-                <button
-                  key={tab.key}
-                  onClick={() => view.selectTab(tab.key)}
-                  className={`relative z-10 h-8 text-xs font-semibold rounded-lg transition-colors flex items-center justify-center ${
-                    view.activeTab === tab.key
-                      ? 'text-primary-foreground font-semibold'
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  {tab.label} ({tab.count})
-                </button>
-              ))}
+              {TABS.map((tab) => {
+                const isSelected = view.activeTab === tab.key;
+                const isActionTab = tab.key === 'needs-attention';
+                const showBadge = isActionTab && tab.count > 0;
+
+                return (
+                  <button
+                    key={tab.key}
+                    onClick={() => view.selectTab(tab.key)}
+                    className={`relative z-10 h-8 text-xs font-semibold rounded-lg transition-colors flex items-center justify-center gap-1.5 ${
+                      isSelected
+                        ? 'text-primary-foreground font-semibold'
+                        : 'text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    <span>{tab.label}</span>
+                    {showBadge && (
+                      <span className={`px-1.5 py-0.5 text-[10px] font-bold rounded-full transition-colors ${
+                        isSelected
+                          ? 'bg-primary-foreground/20 text-primary-foreground'
+                          : 'bg-amber-500/20 text-amber-600 dark:text-amber-400'
+                      }`}>
+                        {tab.count}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
             </div>
           );
         })()}
