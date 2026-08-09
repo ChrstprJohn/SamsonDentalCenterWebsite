@@ -14,6 +14,34 @@ export function formatClinicDate(date: Date | string): string {
 }
 
 /**
+ * Formats an ISO string or Date into a human-readable relative duration from now (e.g., 'just now', '5m ago', '2h ago', '3d ago').
+ */
+export function formatTimeAgo(dateStr: string | Date | null | undefined): string {
+  if (!dateStr) return '';
+  const date = typeof dateStr === 'string' ? new Date(dateStr) : dateStr;
+  if (isNaN(date.getTime())) return '';
+
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  if (diffMs < 0) return 'just now';
+
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHrs = Math.floor(diffMins / 60);
+  const diffDays = Math.floor(diffHrs / 24);
+
+  if (diffMins < 1) return 'just now';
+  if (diffMins < 60) return `${diffMins}m ago`;
+  if (diffHrs < 24) return `${diffHrs}h ago`;
+  if (diffDays < 30) return `${diffDays}d ago`;
+
+  const diffMonths = Math.floor(diffDays / 30);
+  if (diffMonths < 12) return `${diffMonths}mo ago`;
+
+  const diffYears = Math.floor(diffDays / 365);
+  return `${diffYears}y ago`;
+}
+
+/**
  * Formats a Date object or ISO string into a short standard string.
  * Example: 'Dec 1, 2026'
  */

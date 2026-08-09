@@ -1,8 +1,9 @@
 'use client';
 
 import * as React from 'react';
-import { ArrowUpDown, ClipboardList, RotateCw } from 'lucide-react';
-import { formatShortDate, formatTimeString } from '@/shared/utils/date.util';
+import { ArrowUpDown, ChevronLeft, ChevronRight, ClipboardList, Globe, GlobeOff, RotateCw, SlidersHorizontal } from 'lucide-react';
+import { Select } from '@/components/ui/select';
+import { formatShortDate, formatTimeAgo, formatTimeString } from '@/shared/utils/date.util';
 import { SecretaryListSkeleton, SecretaryListSkeletonTheme, SecretaryRefreshBar } from './secretary-list-skeleton';
 import type { InquiryTab } from '../../../hooks/secretary/use-secretary-inquiries-queue';
 import { Button } from '@/components/ui/button';
@@ -68,15 +69,25 @@ function formatCreatedAt(iso: string): string {
 }
 
 export function PendingRequestListV2(props: PendingRequestListV2Props) {
+  const [showFilters, setShowFilters] = React.useState(false);
+  const [draftSort, setDraftSort] = React.useState<'newest' | 'oldest'>('newest');
+  const [draftDate, setDraftDate] = React.useState<string>('');
   const [sortOrder, setSortOrder] = React.useState<'newest' | 'oldest'>('newest');
+  const [dateFilter, setDateFilter] = React.useState<string>('');
 
   const filteredInquiries = React.useMemo(() => {
-    return [...props.inquiries].sort((a, b) => {
-      const dateA = new Date(a.createdAt || a.preferredDate || 0).getTime();
-      const dateB = new Date(b.createdAt || b.preferredDate || 0).getTime();
-      return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
-    });
-  }, [props.inquiries, sortOrder]);
+    return props.inquiries
+      .filter((inq) => {
+        if (!dateFilter) return true;
+        if (!inq.preferredDate) return false;
+        return inq.preferredDate.startsWith(dateFilter);
+      })
+      .sort((a, b) => {
+        const dateA = new Date(a.createdAt || a.preferredDate || 0).getTime();
+        const dateB = new Date(b.createdAt || b.preferredDate || 0).getTime();
+        return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
+      });
+  }, [props.inquiries, sortOrder, dateFilter]);
 
   const isLoading = props.isLoadingInquiries && props.inquiries.length === 0;
 
@@ -93,17 +104,81 @@ export function PendingRequestListV2(props: PendingRequestListV2Props) {
               Appointment Requests
             </div>
           </div>
-          <div className="flex items-center gap-1 shrink-0">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSortOrder(sortOrder === 'newest' ? 'oldest' : 'newest')}
-              className="h-8 gap-1 px-2 text-xs text-muted-foreground hover:text-foreground transition-colors shrink-0"
-              title={`Sort by ${sortOrder === 'newest' ? 'oldest' : 'newest'} first`}
+          <div className="relative flex items-center gap-1 shrink-0">
+            <button
+              onClick={() => {
+                if (!showFilters) {
+                  setDraftSort(sortOrder);
+                  setDraftDate(dateFilter);
+                }
+                setShowFilters((v) => !v);
+              }}
+              className={`flex items-center gap-1 rounded-md p-1.5 text-xs transition-colors ${
+                showFilters || dateFilter || sortOrder !== 'newest'
+                  ? 'text-primary bg-primary/10'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/40'
+              }`}
+              aria-label="Toggle filters"
+              title="Filters"
             >
-              <ArrowUpDown className="size-3" />
-              {sortOrder === 'newest' ? 'Newest' : 'Oldest'}
-            </Button>
+              <SlidersHorizontal className="size-4" />
+              <span>Filters</span>
+            </button>
+            {showFilters && (
+              <div className="absolute right-0 top-full mt-2 z-50 w-72 rounded-xl bg-popover p-3 shadow-lg ring-1 ring-foreground/10 flex flex-col gap-3">
+                <label className="flex flex-col gap-1.5">
+                  <span className="text-xs font-medium text-muted-foreground">By Requested Date</span>
+                  <input
+                    type="date"
+                    value={draftDate}
+                    onChange={(e) => setDraftDate(e.target.value)}
+                    className="h-8 w-full rounded-md border border-card-border/60 bg-transparent px-2 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                    aria-label="Filter by requested date"
+                  />
+                </label>
+                <label className="flex flex-col gap-1.5">
+                  <span className="text-xs font-medium text-muted-foreground">Sort By</span>
+                  <Select
+                    value={draftSort}
+                    onChange={(e) => setDraftSort(e.target.value as 'newest' | 'oldest')}
+                    className="h-8 w-full rounded-md border border-card-border/60 bg-transparent px-2! pr-8! py-0! text-xs"
+                    options={[
+                      { value: 'newest', label: 'Newest First' },
+                      { value: 'oldest', label: 'Oldest First' },
+                    ]}
+                    aria-label="Sort order"
+                  />
+                </label>
+                <div className="flex gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setDraftSort('newest');
+                      setDraftDate('');
+                      setSortOrder('newest');
+                      setDateFilter('');
+                      setShowFilters(false);
+                    }}
+                    className="flex-1 h-8 text-xs"
+                  >
+                    Reset
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setSortOrder(draftSort);
+                      setDateFilter(draftDate);
+                      setShowFilters(false);
+                    }}
+                    className="flex-1 h-8 text-xs bg-foreground text-background border-foreground hover:bg-foreground/90 hover:text-background"
+                  >
+                    Save Filters
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
         <div className="px-1">
@@ -262,6 +337,9 @@ export function PendingRequestListV2(props: PendingRequestListV2Props) {
                   >
                     <div className="flex w-full items-center gap-2">
                       <span className="min-w-0 truncate">{name}</span>
+                      <span title={inq.source === 'STAFF_CREATED' ? 'Created manually by staff' : 'Booked online'} className="shrink-0 text-muted-foreground/70">
+                        {inq.source === 'STAFF_CREATED' ? <GlobeOff className="size-3.5" /> : <Globe className="size-3.5" />}
+                      </span>
                       <span className={`ml-auto text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded shrink-0 ${BADGE_STYLES[status]}`}>
                         {BADGE_LABELS[status]}
                       </span>
@@ -271,7 +349,9 @@ export function PendingRequestListV2(props: PendingRequestListV2Props) {
                     </span>
                     <div className="w-full flex items-center justify-between gap-2 text-xs">
                       <span className="truncate">{dateDisplay} • {timeDisplay}</span>
-                      <span className="text-[10px] text-muted-foreground shrink-0">Submitted {formatCreatedAt(inq.createdAt)}</span>
+                      <span className="text-[10px] text-muted-foreground shrink-0" title={inq.createdAt ? `Submitted on ${new Date(inq.createdAt).toLocaleString('en-US')}` : ''}>
+                        {inq.createdAt ? `Submitted ${formatTimeAgo(inq.createdAt)}` : ''}
+                      </span>
                     </div>
                   </button>
                 );
@@ -284,16 +364,39 @@ export function PendingRequestListV2(props: PendingRequestListV2Props) {
                     </div>
                   </div>
                 )}
-                {props.hasMore && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    disabled={props.isLoadingMore}
-                    onClick={props.onLoadMore}
-                    className="w-full h-10 rounded-none border-t text-xs text-muted-foreground hover:text-foreground"
-                  >
-                    {props.isLoadingMore ? 'Loading…' : 'Show more'}
-                  </Button>
+                {props.hasMore ? (
+                  <div className="flex items-center justify-between border-t px-3 py-2">
+                    <span className="text-[11px] text-muted-foreground">
+                      Page {Math.max(1, Math.ceil(filteredInquiries.length / 25))} of {Math.max(1, Math.ceil((props.tabCounts[props.activeTab] || filteredInquiries.length) / 25))}
+                    </span>
+                    <div className="flex items-center gap-1.5 ml-auto">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={true}
+                        className="h-7 px-2 text-xs gap-1 text-muted-foreground hover:text-foreground"
+                        title="Newer requests"
+                      >
+                        <ChevronLeft className="size-3.5" /> Newer
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={props.onLoadMore}
+                        disabled={props.isLoadingMore}
+                        className="h-7 px-2 text-xs gap-1 text-muted-foreground hover:text-foreground"
+                        title="Older requests"
+                      >
+                        {props.isLoadingMore ? 'Loading…' : 'Older'} <ChevronRight className="size-3.5" />
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  filteredInquiries.length > 0 && (
+                    <div className="border-t py-2.5 text-center text-[11px] text-muted-foreground">
+                      1–{filteredInquiries.length} of {props.tabCounts[props.activeTab] || filteredInquiries.length} · Page {Math.max(1, Math.ceil(filteredInquiries.length / 25))} of {Math.max(1, Math.ceil((props.tabCounts[props.activeTab] || filteredInquiries.length) / 25))}
+                    </div>
+                  )
                 )}
               </>
             )}

@@ -30,6 +30,7 @@ export interface ChatThreadDto {
         senderRole: 'PATIENT' | 'STAFF';
     } | null;
     unreadCount: number;
+    source?: string | null;
     // Notification tracking fields
     confirmationChannel?: string | null;
     emailConfirmationSent?: boolean;
@@ -85,6 +86,7 @@ function mapChatThreadRow(row: any): ChatThreadDto {
             ? { text: row.latest_message_text, createdAt: row.latest_message_created_at, senderRole: row.latest_message_sender_role }
             : null,
         unreadCount: Number(row.unread_count),
+        source: row.source || null,
         confirmationChannel: row.confirmation_channel || 'EMAIL',
         emailConfirmationSent: Boolean(row.email_confirmation_sent),
         smsConfirmationSent: Boolean(row.sms_confirmation_sent),

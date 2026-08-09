@@ -26,7 +26,7 @@ import { AppointmentDetailPane } from './sub-components/appointment-detail-pane'
 import { SecretaryListSkeleton, SecretaryListSkeletonTheme, SecretaryRefreshBar } from './sub-components/secretary-list-skeleton';
 import type { AppointmentDto } from '@/modules/appointments/dtos/shared/appointment.dto';
 import { formatClinicTime } from '@/shared/utils/date.util';
-import { Search, Mail, Archive, MessageSquare, Calendar, XCircle, CheckCircle, AlertCircle, ArrowLeft, UserRound, Pencil, Check, X, ChevronDown } from 'lucide-react';
+import { Search, Mail, Archive, MessageSquare, Calendar, XCircle, CheckCircle, AlertCircle, ArrowLeft, UserRound, Pencil, Check, X, ChevronDown, ChevronLeft, ChevronRight, Globe, GlobeOff } from 'lucide-react';
 import {
     Sidebar,
     SidebarHeader,
@@ -944,14 +944,16 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false,
                                 Chat Inbox
                             </div>
                         </div>
-                        <Label className="flex items-center gap-2 text-xs text-muted-foreground shrink-0">
-                            <span>Unreads</span>
-                            <Switch 
-                                checked={showOnlyUnreads} 
-                                onCheckedChange={setShowOnlyUnreads}
-                                className="shadow-none"
-                            />
-                        </Label>
+                        {activeTab === 'ACTIVE' && (
+                            <Label className="flex items-center gap-2 text-xs text-muted-foreground shrink-0">
+                                <span>Unreads</span>
+                                <Switch 
+                                    checked={showOnlyUnreads} 
+                                    onCheckedChange={setShowOnlyUnreads}
+                                    className="shadow-none"
+                                />
+                            </Label>
+                        )}
                     </div>
                     <div className="px-1">
                         <SidebarInput
@@ -965,35 +967,45 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false,
                     {/* Tabs */}
                     {(() => {
                       const activeIndex = activeTab === 'ACTIVE' ? 0 : 1;
+                      const tabs = [
+                        { key: 'ACTIVE' as const, label: 'Active', count: tabCounts.active },
+                        { key: 'ARCHIVE' as const, label: 'Archive', count: tabCounts.archive },
+                      ];
                       return (
                         <div className="relative grid grid-cols-2 gap-1 bg-muted/20 p-1 rounded-xl">
                           <div
                             className="absolute top-1 bottom-1 rounded-lg bg-primary transition-transform duration-200 ease-out shadow-xs"
                             style={{
-                              width: 'calc((100% - 0.25rem) / 2)',
+                              width: 'calc((100% - 0.5rem) / 2)',
                               transform: `translateX(calc(${activeIndex} * (100% + 0.25rem)))`,
                             }}
                           />
-                          <button
-                            onClick={() => { setActiveTab('ACTIVE'); setSelectedThreadId(null); }}
-                            className={`relative z-10 h-8 text-xs font-semibold rounded-lg transition-colors flex items-center justify-center ${
-                              activeTab === 'ACTIVE'
-                                ? 'text-primary-foreground font-semibold'
-                                : 'text-muted-foreground hover:text-foreground'
-                            }`}
-                          >
-                            Active ({tabCounts.active})
-                          </button>
-                          <button
-                            onClick={() => { setActiveTab('ARCHIVE'); setSelectedThreadId(null); }}
-                            className={`relative z-10 h-8 text-xs font-semibold rounded-lg transition-colors flex items-center justify-center ${
-                              activeTab === 'ARCHIVE'
-                                ? 'text-primary-foreground font-semibold'
-                                : 'text-muted-foreground hover:text-foreground'
-                            }`}
-                          >
-                            Archive ({tabCounts.archive})
-                          </button>
+                          {tabs.map((tab) => {
+                            const isSelected = activeTab === tab.key;
+                            const showBadge = tab.count > 0;
+                            return (
+                              <button
+                                key={tab.key}
+                                onClick={() => { setActiveTab(tab.key); setShowOnlyUnreads(false); setSelectedThreadId(null); }}
+                                className={`relative z-10 h-8 text-xs font-semibold rounded-lg transition-colors flex items-center justify-center gap-1.5 ${
+                                  isSelected
+                                    ? 'text-primary-foreground font-semibold'
+                                    : 'text-muted-foreground hover:text-foreground'
+                                }`}
+                              >
+                                <span>{tab.label}</span>
+                                {showBadge && (
+                                  <span className={`px-1.5 py-0.5 text-[10px] font-bold rounded-full transition-colors ${
+                                    isSelected
+                                      ? 'bg-primary-foreground/20 text-primary-foreground'
+                                      : 'bg-muted-foreground/15 text-muted-foreground'
+                                  }`}>
+                                    {tab.count}
+                                  </span>
+                                )}
+                              </button>
+                            );
+                          })}
                         </div>
                       );
                     })()}
@@ -1047,9 +1059,14 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false,
                                             </div>
                                             <div className="flex flex-col min-w-0 flex-1 gap-1.5">
                                                 <div className="flex w-full items-center justify-between gap-2">
-                                                    <span className={t.unreadCount > 0 ? 'font-semibold truncate' : 'truncate'}>
-                                                        {formatPatientName(t.patientFirstName, t.patientMiddleName, t.patientLastName, t.patientSuffix)}
-                                                    </span>
+                                                    <div className="flex items-center gap-1.5 min-w-0">
+                                                        <span className={t.unreadCount > 0 ? 'font-semibold truncate' : 'truncate'}>
+                                                            {formatPatientName(t.patientFirstName, t.patientMiddleName, t.patientLastName, t.patientSuffix)}
+                                                        </span>
+                                                        <span title={t.source === 'STAFF_CREATED' ? 'Created manually by staff' : 'Booked online'} className="shrink-0 text-muted-foreground/70">
+                                                            {t.source === 'STAFF_CREATED' ? <GlobeOff className="size-3.5" /> : <Globe className="size-3.5" />}
+                                                        </span>
+                                                    </div>
                                                     <span className="text-[10px] text-muted-foreground font-medium whitespace-nowrap shrink-0">
                                                         {t.latestMessage ? formatMessageTime(t.latestMessage.createdAt) : ''}
                                                     </span>
@@ -1079,16 +1096,39 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false,
                                 })}
                                 </>
                             )}
-                            {filteredThreads.length > 0 && hasMoreThreads && (
-                                <Button
-                                    onClick={loadMoreThreads}
-                                    disabled={isLoadingMore}
-                                    variant="ghost"
-                                    size="sm"
-                                    className="w-full h-10 text-xs text-muted-foreground hover:text-foreground rounded-none border-t"
-                                >
-                                    {isLoadingMore ? 'Loading…' : 'Show more'}
-                                </Button>
+                            {hasMoreThreads ? (
+                                <div className="flex items-center justify-between border-t px-3 py-2">
+                                    <span className="text-[11px] text-muted-foreground">
+                                        Page {Math.max(1, Math.ceil(filteredThreads.length / 25))} of {Math.max(1, Math.ceil(((activeTab === 'ACTIVE' ? tabCounts.active : tabCounts.archive) || filteredThreads.length) / 25))}
+                                    </span>
+                                    <div className="flex items-center gap-1.5 ml-auto">
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            disabled={true}
+                                            className="h-7 px-2 text-xs gap-1 text-muted-foreground hover:text-foreground"
+                                            title="Newer conversations"
+                                        >
+                                            <ChevronLeft className="size-3.5" /> Newer
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={loadMoreThreads}
+                                            disabled={isLoadingMore}
+                                            className="h-7 px-2 text-xs gap-1 text-muted-foreground hover:text-foreground"
+                                            title="Older conversations"
+                                        >
+                                            {isLoadingMore ? 'Loading…' : 'Older'} <ChevronRight className="size-3.5" />
+                                        </Button>
+                                    </div>
+                                </div>
+                            ) : (
+                                filteredThreads.length > 0 && (
+                                    <div className="border-t py-2.5 text-center text-[11px] text-muted-foreground">
+                                        1–{filteredThreads.length} of {(activeTab === 'ACTIVE' ? tabCounts.active : tabCounts.archive) || filteredThreads.length} · Page {Math.max(1, Math.ceil(filteredThreads.length / 25))} of {Math.max(1, Math.ceil(((activeTab === 'ACTIVE' ? tabCounts.active : tabCounts.archive) || filteredThreads.length) / 25))}
+                                    </div>
+                                )
                             )}
                             {filteredThreads.length > 0 && loadMoreError && (
                                 <div className="m-3 rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-xs text-destructive">

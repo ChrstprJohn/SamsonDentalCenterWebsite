@@ -73,6 +73,7 @@ function RequestFacts({ appointment, patientDetails }: { appointment: any; patie
       <Fact label="Requested Service" value={appointment.service?.name} />
       <Fact label="Requested Dentist" value={dentist} />
       <Fact label="Desired Date & Time" value={`${formatShortDate(appointment.date)} | ${timeDisplay}`} />
+      <Fact label="Request Source" value={appointment.source === 'STAFF_CREATED' ? 'Created manually by staff' : appointment.source === 'CONVERTED' ? 'From online request' : 'Booked online'} />
       {birthday && <Fact label="Patient Date of Birth" value={formatShortDate(birthday)} />}
     </div>
   );
