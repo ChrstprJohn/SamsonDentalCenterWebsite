@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { ChevronDown } from 'lucide-react';
+import { NativeTimePopoverPicker } from '@/shared/components/native-time-popover-picker';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import type { AppointmentDto } from '@/modules/appointments/dtos/shared/appointment.dto';
@@ -297,22 +298,18 @@ export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps)
       <div className="grid grid-cols-2 gap-3">
         <div className="flex flex-col gap-0.5">
           <span className="text-xs text-muted-foreground">Start Time <span className="text-destructive">*</span></span>
-          <input
-            type="time"
+          <NativeTimePopoverPicker
             value={props.startTime}
-            onChange={(e) => props.onStartTimeChange(e.target.value)}
-            className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
-            required
+            onChange={(val) => props.onStartTimeChange(val)}
+            placeholder="Select Start Time"
           />
         </div>
         <div className="flex flex-col gap-0.5">
           <span className="text-xs text-muted-foreground">End Time <span className="text-destructive">*</span></span>
-          <input
-            type="time"
+          <NativeTimePopoverPicker
             value={props.endTime}
-            onChange={(e) => props.onEndTimeChange(e.target.value)}
-            className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
-            required
+            onChange={(val) => props.onEndTimeChange(val)}
+            placeholder="Select End Time"
           />
         </div>
       </div>

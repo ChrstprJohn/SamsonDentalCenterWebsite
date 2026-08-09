@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { NativeTimePopoverPicker } from '@/shared/components/native-time-popover-picker';
 import { useSecretaryInquiriesQueue } from '../../hooks/secretary/use-secretary-inquiries-queue';
 import { PendingRequestListV2 } from './sub-components/pending-request-list-v2';
 import { CoordinationHub } from './sub-components/coordination-hub';
@@ -736,12 +737,20 @@ export function SecretaryPendingRequestsViewV2() {
                               <span className="text-xs text-muted-foreground">Start Time <span className="text-destructive">*</span></span>
                               {inquiriesView.stagedInquiryTime.includes(':') && <span className="text-xs text-muted-foreground/60">Prefered time {formatTime(inquiriesView.stagedInquiryTime)}</span>}
                             </div>
-                            <input type="time" value={inquiriesView.stagedInquiryTime} onChange={(e) => inquiriesView.setStagedInquiryTime(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border" />
+                            <NativeTimePopoverPicker
+                              value={inquiriesView.stagedInquiryTime}
+                              onChange={(val) => inquiriesView.setStagedInquiryTime(val)}
+                              placeholder="Select Start Time"
+                            />
                           </div>
                           <div className="flex flex-col gap-0.5">
                             <span className="text-xs text-muted-foreground">End Time <span className="text-destructive">*</span></span>
                             <div className="relative">
-                              <input type="time" value={inquiriesView.stagedInquiryEndTime} onChange={(e) => inquiriesView.setStagedInquiryEndTime(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border" />
+                              <NativeTimePopoverPicker
+                                value={inquiriesView.stagedInquiryEndTime}
+                                onChange={(val) => inquiriesView.setStagedInquiryEndTime(val)}
+                                placeholder="Select End Time"
+                              />
                               {inquiriesView.stagedInquiryEndTime && (
                                 <button type="button" onClick={() => inquiriesView.setStagedInquiryEndTime('')} className="absolute right-10 top-1/2 -translate-y-1/2 size-5 flex items-center justify-center text-muted-foreground hover:text-foreground z-10">
                                   <X className="size-4" />

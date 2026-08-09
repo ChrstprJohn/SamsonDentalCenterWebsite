@@ -1,5 +1,6 @@
 'use client';
 
+import { NativeTimePopoverPicker } from '@/shared/components/native-time-popover-picker';
 import { formatClinicTime, formatShortDate } from '@/shared/utils/date.util';
 
 interface PendingEditPanelProps {
@@ -48,20 +49,18 @@ export function PendingEditPanel(props: PendingEditPanelProps) {
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
               <span className="text-[10px] font-bold uppercase text-text-muted tracking-wider">3. Start Time</span>
-              <input
-                type="time"
+              <NativeTimePopoverPicker
                 value={props.startTime}
-                onChange={(event) => props.onStartTimeChange(event.target.value)}
-                className="text-xs border border-card-border rounded-xl px-3 py-2 bg-secondary-bg/20 text-text-primary focus:outline-none focus:border-primary-start/60"
+                onChange={(val) => props.onStartTimeChange(val)}
+                placeholder="Select Start Time"
               />
             </div>
             <div className="flex flex-col gap-1.5">
               <span className="text-[10px] font-bold uppercase text-text-muted tracking-wider">4. End Time</span>
-              <input
-                type="time"
+              <NativeTimePopoverPicker
                 value={props.endTime}
-                onChange={(event) => props.onEndTimeChange(event.target.value)}
-                className="text-xs border border-card-border rounded-xl px-3 py-2 bg-secondary-bg/20 text-text-primary focus:outline-none focus:border-primary-start/60"
+                onChange={(val) => props.onEndTimeChange(val)}
+                placeholder="Select End Time"
               />
             </div>
           </div>
@@ -98,20 +97,18 @@ export function PendingEditPanel(props: PendingEditPanelProps) {
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-1.5">
                 <span className="text-[10px] font-bold uppercase text-text-muted tracking-wider">3. Start Time</span>
-                <input
-                  type="time"
+                <NativeTimePopoverPicker
                   value={props.startTime}
-                  onChange={(event) => props.onStartTimeChange(event.target.value)}
-                  className="text-xs border border-card-border rounded-xl px-3 py-2 bg-secondary-bg/20 text-text-primary focus:outline-none focus:border-primary-start/60"
+                  onChange={(val) => props.onStartTimeChange(val)}
+                  placeholder="Select Start Time"
                 />
               </div>
               <div className="flex flex-col gap-1.5">
                 <span className="text-[10px] font-bold uppercase text-text-muted tracking-wider">4. End Time</span>
-                <input
-                  type="time"
+                <NativeTimePopoverPicker
                   value={props.endTime}
-                  onChange={(event) => props.onEndTimeChange(event.target.value)}
-                  className="text-xs border border-card-border rounded-xl px-3 py-2 bg-secondary-bg/20 text-text-primary focus:outline-none focus:border-primary-start/60"
+                  onChange={(val) => props.onEndTimeChange(val)}
+                  placeholder="Select End Time"
                 />
               </div>
             </div>

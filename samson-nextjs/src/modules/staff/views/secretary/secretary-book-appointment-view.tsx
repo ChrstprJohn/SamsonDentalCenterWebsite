@@ -4,6 +4,7 @@ import React from 'react';
 import { useSecretaryBookAppointment } from '../../hooks/secretary/use-secretary-book-appointment';
 import { DoctorTimeline, getDoctorColor } from './sub-components/doctor-timeline';
 import { AppointmentDetailPane } from './sub-components/appointment-detail-pane';
+import { NativeTimePopoverPicker } from '@/shared/components/native-time-popover-picker';
 import { Calendar } from '@/components/ui/calendar';
 import { getClinicAppointmentsAction } from '@/modules/appointments/actions/clinic/get-clinic-appointments.action';
 import { getStaffAppointmentByIdAction } from '@/modules/appointments/actions/clinic/get-staff-appointment-by-id.action';
@@ -420,9 +421,7 @@ export function SecretaryBookAppointmentView() {
                   <span className="text-[11px] text-muted-foreground truncate">
                     {isRescheduleOpen
                       ? 'Update date, time, dentist, or service details.'
-                      : view.selectedAppointmentDetails?.id
-                          ? `Ref #${view.selectedAppointmentDetails.id.slice(0, 8)}`
-                          : ''}
+                      : 'View and manage appointment details.'}
                   </span>
                 </div>
               </div>
@@ -583,20 +582,18 @@ export function SecretaryBookAppointmentView() {
                   <div className="grid grid-cols-2 gap-3">
                     <div className="flex flex-col gap-0.5">
                       <span className="text-xs text-muted-foreground">Start Time <span className="text-destructive">*</span></span>
-                      <input
-                        type="time"
+                      <NativeTimePopoverPicker
                         value={view.selectedTime}
-                        onChange={(e) => view.setSelectedTime(e.target.value)}
-                        className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
+                        onChange={(val) => view.setSelectedTime(val)}
+                        placeholder="Select Start Time"
                       />
                     </div>
                     <div className="flex flex-col gap-0.5">
                       <span className="text-xs text-muted-foreground">End Time <span className="text-destructive">*</span></span>
-                      <input
-                        type="time"
+                      <NativeTimePopoverPicker
                         value={view.selectedEndTime}
-                        onChange={(e) => view.setSelectedEndTime(e.target.value)}
-                        className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
+                        onChange={(val) => view.setSelectedEndTime(val)}
+                        placeholder="Select End Time"
                       />
                     </div>
                   </div>

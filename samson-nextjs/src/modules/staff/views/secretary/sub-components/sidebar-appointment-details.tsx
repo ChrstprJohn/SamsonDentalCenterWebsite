@@ -8,6 +8,7 @@ import { resendReminderAction } from '@/modules/appointments/actions/status/rese
 import { getDoctorsAction } from '@/modules/staff/actions/management/get-doctors.action';
 import { UserRound, Calendar, XCircle, CheckCircle, AlertCircle, Pencil, Check, X, ArrowLeft, Mail, Send } from 'lucide-react';
 import { formatClinicTime } from '@/shared/utils/date.util';
+import { NativeTimePopoverPicker } from '@/shared/components/native-time-popover-picker';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -475,11 +476,19 @@ export function SidebarAppointmentDetails({
                 <div className="grid grid-cols-2 gap-2">
                   <div className="flex flex-col gap-0.5">
                     <label className="text-xs text-muted-foreground">Start Time</label>
-                    <Input type="time" value={rescheduleStartTime} onChange={e => setRescheduleStartTime(e.target.value)} />
+                    <NativeTimePopoverPicker
+                      value={rescheduleStartTime}
+                      onChange={val => setRescheduleStartTime(val)}
+                      placeholder="Select Start Time"
+                    />
                   </div>
                   <div className="flex flex-col gap-0.5">
                     <label className="text-xs text-muted-foreground">End Time</label>
-                    <Input type="time" value={rescheduleEndTime} onChange={e => setRescheduleEndTime(e.target.value)} />
+                    <NativeTimePopoverPicker
+                      value={rescheduleEndTime}
+                      onChange={val => setRescheduleEndTime(val)}
+                      placeholder="Select End Time"
+                    />
                   </div>
                 </div>
                 <div className="flex flex-col gap-0.5">

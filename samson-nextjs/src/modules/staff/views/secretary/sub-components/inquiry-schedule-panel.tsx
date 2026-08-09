@@ -1,4 +1,5 @@
-'use client';
+import React from 'react';
+import { NativeTimePopoverPicker } from '@/shared/components/native-time-popover-picker';
 
 interface InquirySchedulePanelProps {
   services: { id: string; name: string }[];
@@ -35,24 +36,18 @@ export function InquirySchedulePanel(props: InquirySchedulePanelProps) {
         <div className="grid grid-cols-2 gap-4 mt-2">
           <div className="flex flex-col gap-1.5">
             <span className="text-[10px] font-bold uppercase text-text-muted tracking-wider">Start Time</span>
-            <input
-              type="time"
+            <NativeTimePopoverPicker
               value={props.selectedTime}
-              onChange={(event) => {
-                props.onStartTimeChange?.(event.target.value);
-              }}
-              className="text-xs border border-card-border rounded-xl px-3 py-2 bg-secondary-bg/25 text-text-primary focus:outline-none focus:border-primary-start/60"
+              onChange={(val) => props.onStartTimeChange?.(val)}
+              placeholder="Select Start Time"
             />
           </div>
           <div className="flex flex-col gap-1.5">
             <span className="text-[10px] font-bold uppercase text-text-muted tracking-wider">End Time</span>
-            <input
-              type="time"
+            <NativeTimePopoverPicker
               value={props.selectedEndTime || ''}
-              onChange={(event) => {
-                props.onEndTimeChange?.(event.target.value);
-              }}
-              className="text-xs border border-card-border rounded-xl px-3 py-2 bg-secondary-bg/25 text-text-primary focus:outline-none focus:border-primary-start/60"
+              onChange={(val) => props.onEndTimeChange?.(val)}
+              placeholder="Select End Time"
             />
           </div>
         </div>
