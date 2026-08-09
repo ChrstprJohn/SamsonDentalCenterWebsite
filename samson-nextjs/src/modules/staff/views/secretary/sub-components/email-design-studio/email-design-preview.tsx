@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import AppointmentConfirmedEmail from '@/components/emails/appointment-confirmed-email';
 import AppointmentReminderEmail from '@/components/emails/appointment-reminder-email';
@@ -26,6 +26,9 @@ export function EmailDesignPreview({
   design,
   sample,
 }: EmailDesignPreviewProps) {
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [iframeHeight, setIframeHeight] = useState<number>(650);
+
   const baseUrl = sample.baseUrl || 'http://localhost:3000';
   const patientName = sample.patientName || 'Valued Patient';
   const serviceName = sample.serviceName || 'Dental Consultation & Cleaning';
@@ -171,11 +174,43 @@ export function EmailDesignPreview({
     }
   }, [element]);
 
+  const updateIframeHeight = () => {
+    if (iframeRef.current && iframeRef.current.contentWindow) {
+      try {
+        const body = iframeRef.current.contentWindow.document.body;
+        const html = iframeRef.current.contentWindow.document.documentElement;
+        if (body) {
+          const contentHeight = Math.max(
+            body.scrollHeight,
+            body.offsetHeight,
+            html ? html.scrollHeight : 0
+          );
+          if (contentHeight > 100) {
+            setIframeHeight(contentHeight + 20);
+          }
+        }
+      } catch {
+        // Silent fallback
+      }
+    }
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      updateIframeHeight();
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [htmlString]);
+
   return (
     <iframe
+      ref={iframeRef}
       srcDoc={htmlString}
+      onLoad={updateIframeHeight}
       title="Email Design Preview"
-      className="w-full h-[650px] border-0 bg-white shadow-xs rounded-xl"
+      scrolling="no"
+      style={{ height: iframeHeight }}
+      className="w-full border-0 bg-white shadow-xs rounded-xl overflow-hidden transition-all duration-200"
     />
   );
 }
