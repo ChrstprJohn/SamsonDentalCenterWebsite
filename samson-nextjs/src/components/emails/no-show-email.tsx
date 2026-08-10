@@ -50,7 +50,7 @@ export const NoShowEmail = ({
   appointmentId = 'APT-SAMPLE',
   baseUrl = 'http://localhost:3000',
 }: NoShowEmailProps) => {
-  const previewText = 'We missed you at your appointment. Tell us what happened, and rebook whenever you are ready.';
+  const previewText = 'No worries — life happens. Tell us what happened, and rebook whenever you are ready.';
   const logoUrl = getLogoUrl(baseUrl);
   const reasonUrl = `${baseUrl}/no-show-reason?ref=${appointmentId}`;
 
@@ -78,8 +78,8 @@ export const NoShowEmail = ({
 
           {/* Intro */}
           <Text style={pStyle}>
-            We missed you at your appointment at Samson Dental Center. We understand that things come up,
-            so please review the details below and reach out whenever you are ready.
+            You missed your appointment at Samson Dental Center. No worries &mdash; life happens.
+            Review your visit details below, and rebook whenever you&apos;re ready.
           </Text>
 
           {/* Missed appointment details */}
@@ -123,9 +123,9 @@ export const NoShowEmail = ({
 
           {/* Optional reason CTA */}
           <Text style={pStyle}>
-            If something prevented you from making it, we would appreciate knowing &mdash;{' '}
+            No pressure, but if something came up, we would love to know &mdash;{' '}
             <Link href={reasonUrl} style={linkStyle}>
-              click here to let us know what happened
+              click here to tell us what happened
             </Link>
             . This is completely optional, and your answer helps us improve our scheduling.
           </Text>

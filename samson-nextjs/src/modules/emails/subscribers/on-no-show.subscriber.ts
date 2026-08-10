@@ -77,7 +77,7 @@ export const onNoShowSubscriber = {
 
     const baseUrl = getBaseUrl();
     const ref = formatRefId(appointmentId);
-    const subject = `We Missed You at Your Appointment${ref ? ` [Ref: ${ref}]` : ''}`;
+    const subject = `You Missed Your Appointment${ref ? ` [Ref: ${ref}]` : ''}`;
 
     await ResendService.sendTemplatedEmail(
       email,

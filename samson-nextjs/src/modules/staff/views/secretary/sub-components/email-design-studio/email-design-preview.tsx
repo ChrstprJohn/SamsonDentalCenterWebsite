@@ -263,6 +263,9 @@ export function EmailDesignPreview({
         {isNoShow && (
           <div style={{ margin: '0 0 16px', paddingLeft: 0 }}>
             <p style={{ ...p, margin: '0 0 8px', fontWeight: 700 }}>Your missed appointment:</p>
+            <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Status:</span>{' '}
+              <span style={{ fontWeight: 700, color: '#dc2626' }}>Missed</span>
+            </p>
             {sample.doctorName && (
               <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Doctor:</span> {sample.doctorName}</p>
             )}
@@ -284,8 +287,8 @@ export function EmailDesignPreview({
         {/* No-show — optional reason CTA */}
         {isNoShow && copy.showCta && copy.ctaLabel && (
           <p style={p}>
-            If something prevented you from making it, we would appreciate knowing —{' '}
-            <a href={noShowReasonUrl} style={link}>click here to let us know what happened</a>. This is completely optional, and your answer helps us improve our scheduling.
+            No pressure, but if something came up, we would love to know —{' '}
+            <a href={noShowReasonUrl} style={link}>click here to tell us what happened</a>. This is completely optional, and your answer helps us improve our scheduling.
           </p>
         )}
 

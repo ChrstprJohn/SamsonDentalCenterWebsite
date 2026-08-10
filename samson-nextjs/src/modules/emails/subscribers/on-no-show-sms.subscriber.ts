@@ -41,7 +41,7 @@ export const onNoShowSmsSubscriber = {
       return;
     }
 
-    const message = `Hi ${name}, we missed you at your Samson Dental Center appointment. Life happens — tell us what happened: https://samsondental.com/no-show-reason (optional), or rebook: https://samsondental.com/book`;
+    const message = `Hi ${name}, you missed your appointment at Samson Dental Center. No worries — life happens. Tell us what happened: https://samsondental.com/no-show-reason (optional), or rebook: https://samsondental.com/book`;
     console.info(`[No-Show SMS Dispatched] To: ${phone} | Message: "${message}"`);
   },
 };
