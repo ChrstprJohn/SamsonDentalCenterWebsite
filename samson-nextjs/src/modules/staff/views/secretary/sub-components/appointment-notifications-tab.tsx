@@ -376,9 +376,9 @@ export function AppointmentNotificationsTab({ appointment, view, compact, onEdit
         ? 'SENT'
         : log
         ? (log.rawStatus === 'FAILED' ? 'FAILED' : 'PENDING')
-        : appointment.status === 'CANCELLED'
-        ? 'SENT'
-        : 'NOT APPLICABLE';
+        : ch === 'SMS'
+        ? ((appointment as any).smsCancelSent ? 'SENT' : 'NOT APPLICABLE')
+        : ((appointment as any).emailCancelSent ? 'SENT' : 'NOT APPLICABLE');
       return { label: status, badgeClass: badgeClassFor(status) };
     }
 
@@ -389,9 +389,9 @@ export function AppointmentNotificationsTab({ appointment, view, compact, onEdit
         ? 'SENT'
         : log
         ? (log.rawStatus === 'FAILED' ? 'FAILED' : 'PENDING')
-        : isRescheduled
-        ? 'SENT'
-        : 'NOT APPLICABLE';
+        : ch === 'SMS'
+        ? ((appointment as any).smsRescheduleSent ? 'SENT' : 'NOT APPLICABLE')
+        : ((appointment as any).emailRescheduleSent ? 'SENT' : 'NOT APPLICABLE');
       return { label: status, badgeClass: badgeClassFor(status) };
     }
 
