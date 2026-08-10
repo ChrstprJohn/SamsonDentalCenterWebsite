@@ -272,7 +272,7 @@ function AppointmentDetails({ appointment, view, activeTab, compact, hideActions
                     <div className={`flex gap-2 ${isEditingChannel ? 'pointer-events-none opacity-40' : ''}`}>
                       {(isNoShowCandidate || (isCheckedIn && isPastEnd)) && !isResolvedNoShow && (
                         <Button className="flex-1 h-[42px] bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => router.push(resolveTarget)}>
-                          Resolve
+                          {resolveTarget.startsWith('/secretary-v2/appointments') ? 'Go to Unresolved' : 'Go to Check-in Board'}
                         </Button>
                       )}
                       {isResolvedNoShow && (
@@ -413,7 +413,7 @@ function AppointmentDetails({ appointment, view, activeTab, compact, hideActions
               <div className={`flex gap-2 ${isEditingChannel ? 'pointer-events-none opacity-40' : ''}`}>
                 {(isNoShowCandidate || (isCheckedIn && isPastEnd)) && !isResolvedNoShow && (
                   <Button className="flex-1 h-[42px] bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => router.push(resolveTarget)}>
-                    Resolve
+                    {resolveTarget.startsWith('/secretary-v2/appointments') ? 'Go to Unresolved' : 'Go to Check-in Board'}
                   </Button>
                 )}
                 {isResolvedNoShow && (
