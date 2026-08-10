@@ -11,6 +11,7 @@ import { getStaffAppointmentByIdAction } from '@/modules/appointments/actions/cl
 import { updateAppointmentStatusAction } from '@/modules/appointments/actions/status/update-appointment-status.action';
 import { Button } from '@/components/ui/button';
 import { calculateEndTime } from '@/shared/utils/date.util';
+import { getDailyScheduleBounds } from '@/shared/utils/schedule-bounds.util';
 import { InquiryToast } from './sub-components/inquiry-toast';
 import {
   Sidebar,
@@ -591,24 +592,35 @@ export function SecretaryBookAppointmentView() {
                     />
                   </div>
                   {/* Start Time + End Time */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="flex flex-col gap-0.5">
-                      <span className="text-xs text-muted-foreground">Start Time <span className="text-destructive">*</span></span>
-                      <NativeTimePopoverPicker
-                        value={view.selectedTime}
-                        onChange={(val) => view.setSelectedTime(val)}
-                        placeholder="Select Start Time"
-                      />
-                    </div>
-                    <div className="flex flex-col gap-0.5">
-                      <span className="text-xs text-muted-foreground">End Time <span className="text-destructive">*</span></span>
-                      <NativeTimePopoverPicker
-                        value={view.selectedEndTime}
-                        onChange={(val) => view.setSelectedEndTime(val)}
-                        placeholder="Select End Time"
-                      />
-                    </div>
-                  </div>
+                  {(() => {
+                    const bounds = getDailyScheduleBounds(view.selectedDate, view.operatingHours);
+                    return (
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="flex flex-col gap-0.5">
+                          <span className="text-xs text-muted-foreground">Start Time <span className="text-destructive">*</span></span>
+                          <NativeTimePopoverPicker
+                            value={view.selectedTime}
+                            onChange={(val) => view.setSelectedTime(val)}
+                            placeholder="Select Start Time"
+                            minTime={bounds.minTime}
+                            maxTime={bounds.maxTime}
+                            unavailableRanges={bounds.unavailableRanges}
+                          />
+                        </div>
+                        <div className="flex flex-col gap-0.5">
+                          <span className="text-xs text-muted-foreground">End Time <span className="text-destructive">*</span></span>
+                          <NativeTimePopoverPicker
+                            value={view.selectedEndTime}
+                            onChange={(val) => view.setSelectedEndTime(val)}
+                            placeholder="Select End Time"
+                            minTime={bounds.minTime}
+                            maxTime={bounds.maxTime}
+                            unavailableRanges={bounds.unavailableRanges}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
               </div>
 

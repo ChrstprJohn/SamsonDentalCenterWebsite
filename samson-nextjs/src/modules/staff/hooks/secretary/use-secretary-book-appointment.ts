@@ -8,6 +8,7 @@ import { getServicesAction } from '@/modules/services/actions/management/get-ser
 import { getDoctorsAction } from '@/modules/staff/actions/management/get-doctors.action';
 import { getClinicAppointmentsAction } from '@/modules/appointments/actions/clinic/get-clinic-appointments.action';
 import { getStaffAppointmentByIdAction } from '@/modules/appointments/actions/clinic/get-staff-appointment-by-id.action';
+import { getClinicConfigAction } from '@/modules/clinic-config/actions/settings/get-clinic-config.action';
 
 export type BookingFor = 'SELF' | 'EXISTING_DEP' | 'NEW_DEP';
 export type PatientMode = 'SEARCH' | 'GUEST';
@@ -104,6 +105,18 @@ export function useSecretaryBookAppointment() {
         return updated || prev;
       });
     } else if (!res.success) setInlineError(res.error || 'Failed to load appointments');
+  }, []);
+
+  const [operatingHours, setOperatingHours] = useState<any>(null);
+
+  useEffect(() => {
+    async function loadConfig() {
+      const res = await getClinicConfigAction();
+      if (res && 'data' in res && res.data) {
+        setOperatingHours(res.data.operatingHours);
+      }
+    }
+    loadConfig();
   }, []);
 
   useEffect(() => {
@@ -316,6 +329,6 @@ export function useSecretaryBookAppointment() {
     setInlineError,
     confirmationChannel, setConfirmationChannel,
     doctorsList, appointments, isLoadingAppointments, selectedAppointmentDetails, setSelectedAppointmentDetails,
-    selectAppointment, loadTimelineData, loadActionResources, timelineVersion
+    selectAppointment, loadTimelineData, loadActionResources, timelineVersion, operatingHours
   };
 }

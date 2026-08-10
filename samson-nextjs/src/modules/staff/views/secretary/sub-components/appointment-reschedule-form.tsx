@@ -9,6 +9,8 @@ import type { AppointmentDto } from '@/modules/appointments/dtos/shared/appointm
 import type { AvailableDoctorItem } from '@/modules/staff/hooks/secretary/use-secretary-appointments';
 import type { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
 import { calculateEndTime } from '@/shared/utils/date.util';
+import { getDailyScheduleBounds } from '@/shared/utils/schedule-bounds.util';
+import { getClinicConfigAction } from '@/modules/clinic-config/actions/settings/get-clinic-config.action';
 import { NotificationChannelField } from './notification-channel-field';
 
 interface AppointmentRescheduleFormProps {
@@ -107,6 +109,17 @@ export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps)
   const FormWrapper = props.noForm ? 'div' : 'form';
   const selectedService = props.serviceId || props.activeServiceId || props.appointment.serviceId || '';
   const selectedDoctor = props.doctorId || props.activeDoctorId || props.appointment.doctorId || '';
+  const [operatingHours, setOperatingHours] = useState<any>(null);
+
+  useEffect(() => {
+    async function loadConfig() {
+      const res = await getClinicConfigAction();
+      if (res && 'data' in res && res.data) {
+        setOperatingHours(res.data.operatingHours);
+      }
+    }
+    loadConfig();
+  }, []);
 
   /**
    * Helper: Retrieve service duration (in minutes) for the active treatment.
@@ -344,24 +357,35 @@ export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps)
       </div>
 
       {/* 4. Time Selection */}
-      <div className="grid grid-cols-2 gap-3">
-        <div className="flex flex-col gap-0.5">
-          <span className="text-xs text-muted-foreground">Start Time <span className="text-destructive">*</span></span>
-          <NativeTimePopoverPicker
-            value={props.startTime}
-            onChange={(val) => handleStartTimeSelect(val)}
-            placeholder="Select Start Time"
-          />
-        </div>
-        <div className="flex flex-col gap-0.5">
-          <span className="text-xs text-muted-foreground">End Time <span className="text-destructive">*</span></span>
-          <NativeTimePopoverPicker
-            value={props.endTime}
-            onChange={(val) => props.onEndTimeChange(val)}
-            placeholder="Select End Time"
-          />
-        </div>
-      </div>
+      {(() => {
+        const bounds = getDailyScheduleBounds(props.date, operatingHours);
+        return (
+          <div className="grid grid-cols-2 gap-3">
+            <div className="flex flex-col gap-0.5">
+              <span className="text-xs text-muted-foreground">Start Time <span className="text-destructive">*</span></span>
+              <NativeTimePopoverPicker
+                value={props.startTime}
+                onChange={(val) => handleStartTimeSelect(val)}
+                placeholder="Select Start Time"
+                minTime={bounds.minTime}
+                maxTime={bounds.maxTime}
+                unavailableRanges={bounds.unavailableRanges}
+              />
+            </div>
+            <div className="flex flex-col gap-0.5">
+              <span className="text-xs text-muted-foreground">End Time <span className="text-destructive">*</span></span>
+              <NativeTimePopoverPicker
+                value={props.endTime}
+                onChange={(val) => props.onEndTimeChange(val)}
+                placeholder="Select End Time"
+                minTime={bounds.minTime}
+                maxTime={bounds.maxTime}
+                unavailableRanges={bounds.unavailableRanges}
+              />
+            </div>
+          </div>
+        );
+      })()}
 
       {props.onConfirmationChannelChange && (
         <NotificationChannelField
