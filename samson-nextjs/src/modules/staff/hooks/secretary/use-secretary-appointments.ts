@@ -26,6 +26,13 @@ export function useSecretaryAppointments() {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState<AppointmentDirectoryTab>('upcoming');
+
+  // ponytail: ?tab=needs-attention lands on Unresolved when redirected from resolve actions (v2 directory)
+  useEffect(() => {
+    const tab = new URLSearchParams(window.location.search).get('tab');
+    if (tab === 'needs-attention' || tab === 'history') setActiveTab(tab);
+  }, []);
+
   const [searchTerm, setSearchTerm] = useState('');
   const [doctorFilter, setDoctorFilter] = useState('');
   const [dateFilter, setDateFilter] = useState('');

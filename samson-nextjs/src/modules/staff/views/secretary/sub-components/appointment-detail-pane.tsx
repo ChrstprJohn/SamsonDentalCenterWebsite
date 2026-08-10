@@ -48,6 +48,22 @@ export function AppointmentDetailPane({ view, compact, appointment: appointmentO
   return <AppointmentDetails appointment={appointment} view={view} activeTab={activeTabOverride || view.activeTab || 'upcoming'} compact={compact} hideActions={hideActions} onAppointmentUpdated={onAppointmentUpdated} onEditingGuestInfoChange={onEditingGuestInfoChange} />;
 }
 
+// ponytail: same slot-past semantics as check-in board, but tolerant of
+// HH:mm, HH:mm:ss, ISO, or missing endTime (falls back to startTime + duration).
+function getSlotEnd(appointment: AppointmentDto): Date | null {
+  const { date, endTime, startTime, service } = appointment;
+  if (!date) return null;
+  const toHHMM = (v: string | null) => (v ? (v.includes('T') ? v.slice(11, 16) : v.slice(0, 5)) : '');
+  const build = (t: string) => {
+    const d = new Date(`${date}T${t}:00+08:00`);
+    return isNaN(d.getTime()) ? null : d;
+  };
+  const end = build(toHHMM(endTime));
+  if (end) return end;
+  const start = build(toHHMM(startTime));
+  return start ? new Date(start.getTime() + (service?.durationMinutes || 30) * 60000) : null;
+}
+
 function AppointmentDetails({ appointment, view, activeTab, compact, hideActions, onAppointmentUpdated, onEditingGuestInfoChange }: { appointment: AppointmentDto; view: any; activeTab: AppointmentDirectoryTab; compact?: boolean; hideActions?: boolean; onAppointmentUpdated?: () => void; onEditingGuestInfoChange?: (isEditing: boolean) => void }) {
   const router = useRouter();
   const [detailTab, setDetailTab] = useState<'overview' | 'notifications' | 'timeline'>('overview');
@@ -65,12 +81,13 @@ function AppointmentDetails({ appointment, view, activeTab, compact, hideActions
   const canModify = ['APPROVED', 'PENDING', 'RESCHEDULE_REQUESTED', 'DISPLACED'].includes(appointment.status);
   const canRescheduleOnly = appointment.status === 'NO_SHOW';
   const todayStr = getTodayLocalDateStr();
-  // ponytail: same slot-past check as check-in board (endTime is HH:mm or ISO)
-  const slotEnd = appointment.endTime && appointment.date ? new Date(`${appointment.date}T${appointment.endTime.slice(0, 5)}:00+08:00`) : null;
-  const isPastEnd = !!slotEnd && !isNaN(slotEnd.getTime()) && new Date() > slotEnd;
+  // ponytail: same slot-past check as check-in board
+  const slotEnd = getSlotEnd(appointment);
+  const isPastEnd = !!slotEnd && new Date() > slotEnd;
   const isNoShowCandidate = appointment.status === 'NO_SHOW' || (appointment.status === 'APPROVED' && isPastEnd);
   const isResolvedNoShow = appointment.status === 'NO_SHOW' && !!appointment.noShowResolvedAt;
-  const resolveTarget = appointment.date === todayStr ? '/secretary-v2/check-in' : '/secretary/appointments';
+  // ponytail: past-day resolve lands on v2 directory (v1 lacks SidebarProvider and crashes), Unresolved tab preselected
+  const resolveTarget = appointment.date === todayStr ? '/secretary-v2/check-in' : '/secretary-v2/appointments?tab=needs-attention';
 
   const TABS = [
     { key: 'overview' as const, label: 'Overview' },
