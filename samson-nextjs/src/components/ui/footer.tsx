@@ -155,23 +155,28 @@ export function Footer({ config }: FooterProps) {
             </a>
           </address>
           
-          {socialLinks.length > 0 && (
-            <div className="flex items-center gap-3 mt-4">
-              {socialLinks.map((link) => (
-                <a
-                  key={`${link.platform}-${link.url}`}
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-8 h-8 rounded-full bg-white/5 hover:bg-[#D94E4E] flex items-center justify-center text-white transition-colors"
-                  title={link.platform}
-                  aria-label={link.platform}
-                >
-                  <Link2 className="w-4 h-4" />
-                </a>
-              ))}
+          <div className="mt-5 border-t border-white/5 pt-5">
+              <p className="text-xs font-semibold uppercase tracking-widest text-white">Follow us</p>
+              {socialLinks.length > 0 ? (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {socialLinks.map((link) => (
+                  <a
+                    key={`${link.platform}-${link.url}`}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-[#D94E4E]"
+                    aria-label={`Visit ${clinicName} on ${link.platform}`}
+                  >
+                    <SocialIcon platform={link.platform} />
+                    {link.platform}
+                  </a>
+                ))}
+              </div>
+              ) : (
+                <p className="mt-2 text-xs text-white/45">Our social profiles will be available soon.</p>
+              )}
             </div>
-          )}
         </div>
 
         {/* Column 5: Operating Hours */}
@@ -216,4 +221,19 @@ export function Footer({ config }: FooterProps) {
       </div>
     </footer>
   );
+}
+
+function SocialIcon({ platform }: { platform: string }) {
+  const normalizedPlatform = platform.trim().toLowerCase();
+  if (normalizedPlatform.includes('instagram')) return <InstagramIcon />;
+  if (normalizedPlatform.includes('facebook')) return <FacebookIcon />;
+  return <Link2 className="h-3.5 w-3.5" />;
+}
+
+function InstagramIcon() {
+  return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-3.5 w-3.5" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r=".75" fill="currentColor" stroke="none" /></svg>;
+}
+
+function FacebookIcon() {
+  return <svg viewBox="0 0 24 24" fill="currentColor" className="h-3.5 w-3.5" aria-hidden="true"><path d="M13.5 21v-8h2.75l.41-3.12H13.5V7.89c0-.9.25-1.51 1.56-1.51h1.67V3.59A22.4 22.4 0 0 0 14.3 3c-2.4 0-4.05 1.46-4.05 4.14v2.74H7.5V13h2.75v8h3.25Z" /></svg>;
 }

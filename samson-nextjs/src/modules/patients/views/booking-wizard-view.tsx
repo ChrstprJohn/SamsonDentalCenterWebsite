@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Check, ChevronRight, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, ChevronRight, CheckCircle2, Link2 } from 'lucide-react';
 import Link from 'next/link';
 import type { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
 import type { ClinicConfigResponseDto } from '@/modules/clinic-config/dtos/settings/get-clinic-config.dto';
@@ -17,12 +17,12 @@ import {
 
 interface BookingWizardViewProps {
   services: ServiceResponseDto[];
-  config?: ClinicConfigResponseDto;
+  config: ClinicConfigResponseDto;
   initialServiceId?: string;
 }
 
-export function BookingWizardView({ services, initialServiceId }: BookingWizardViewProps) {
-  const wizard = useBookingWizard({ services, initialServiceId });
+export function BookingWizardView({ services, config, initialServiceId }: BookingWizardViewProps) {
+  const wizard = useBookingWizard({ services, config, initialServiceId });
   const { step, contactSection, fields, isSubmitting, redirectCountdown, submittedReference, selectService } = wizard;
   const [filterType, setFilterType] = useState<'ALL' | 'GENERAL' | 'SPECIALIZED'>('ALL');
   const [formTouched, setFormTouched] = useState(false);
@@ -33,6 +33,9 @@ export function BookingWizardView({ services, initialServiceId }: BookingWizardV
     if (filterType === 'ALL') return true;
     return srv.serviceType === filterType;
   });
+
+  const clinicName = config.clinicName;
+  const clinicPhone = config.phone;
 
   // Recalculate page dimensions and scroll to top when changing steps or filter
   useEffect(() => {
@@ -55,6 +58,19 @@ export function BookingWizardView({ services, initialServiceId }: BookingWizardV
       };
     }
   }, [step, filterType, contactSection.targetDate]);
+
+  if (!config.isBookingOpen) {
+    return (
+      <main className="min-h-screen bg-[#FDFDFD] px-6 py-24 text-center text-[#1D1E1E]">
+        <div className="mx-auto max-w-xl border border-amber-200 bg-amber-50 p-8">
+          <h1 className="text-2xl font-semibold">Online Booking Is Currently Closed</h1>
+          <p className="mt-3 text-sm text-gray-700">{config.maintenanceMessage || `Please contact ${config.clinicName} directly to arrange your appointment.`}</p>
+          <p className="mt-5 text-sm font-medium">{config.phone}</p>
+          <Link href="/" className="mt-6 inline-block bg-[#1D1E1E] px-6 py-3 text-sm font-semibold tracking-wider text-white">Return to Home</Link>
+        </div>
+      </main>
+    );
+  }
 
   const handleCardClick = (serviceId: string) => {
     selectService(serviceId);
@@ -515,7 +531,7 @@ export function BookingWizardView({ services, initialServiceId }: BookingWizardV
                   </div>
                   <h2 className="font-sans text-2xl font-normal text-gray-900 text-center">Request Submitted Successfully!</h2>
                   <p className="text-sm font-light text-gray-600 leading-relaxed">
-                    Thank you for reaching out to Samson Dental Center. We've received your booking request and our team is reviewing it. We'll get back to you soon to confirm your appointment.
+                    Thank you for reaching out to {clinicName}. We've received your booking request and our team is reviewing it. We'll get back to you soon to confirm your appointment.
                   </p>
 
                   {submittedReference && (
@@ -527,7 +543,7 @@ export function BookingWizardView({ services, initialServiceId }: BookingWizardV
 
                 <div className="pt-4 border-t border-gray-200/80">
                   <span className="text-xs text-gray-500 font-sans">
-                    Need immediate help? Call us at <span className="font-semibold text-gray-800">(02) 8123-4567</span>.
+                    Need immediate help? Call us at <span className="font-semibold text-gray-800">{clinicPhone}</span>.
                   </span>
                 </div>
 
@@ -552,10 +568,42 @@ export function BookingWizardView({ services, initialServiceId }: BookingWizardV
 
       {/* Footer */}
       {!contactSection.submittedLocal && (
-        <footer className="py-4 text-center text-xs text-gray-400 font-sans border-t border-gray-200/40">
-          © {new Date().getFullYear()} Samson Dental Center. All rights reserved.
+        <footer className="border-t border-gray-200/40 py-5 text-center text-xs text-gray-400 font-sans">
+          <div>© {new Date().getFullYear()} {clinicName}. All rights reserved.</div>
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
+            {config.socialLinks.length > 0 ? config.socialLinks.map((link) => (
+              <a
+                key={`${link.platform}-${link.url}`}
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 transition-colors hover:border-[#D94E4E] hover:text-[#D94E4E]"
+                aria-label={`Visit ${clinicName} on ${link.platform}`}
+              >
+                <SocialIcon platform={link.platform} />
+                {link.platform}
+              </a>
+            )) : (
+              <span className="text-gray-400">Follow us on social media — profiles coming soon.</span>
+            )}
+          </div>
         </footer>
       )}
     </div>
   );
+}
+
+function SocialIcon({ platform }: { platform: string }) {
+  const normalizedPlatform = platform.trim().toLowerCase();
+  if (normalizedPlatform.includes('instagram')) return <InstagramIcon />;
+  if (normalizedPlatform.includes('facebook')) return <FacebookIcon />;
+  return <Link2 className="h-3.5 w-3.5" />;
+}
+
+function InstagramIcon() {
+  return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-3.5 w-3.5" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r=".75" fill="currentColor" stroke="none" /></svg>;
+}
+
+function FacebookIcon() {
+  return <svg viewBox="0 0 24 24" fill="currentColor" className="h-3.5 w-3.5" aria-hidden="true"><path d="M13.5 21v-8h2.75l.41-3.12H13.5V7.89c0-.9.25-1.51 1.56-1.51h1.67V3.59A22.4 22.4 0 0 0 14.3 3c-2.4 0-4.05 1.46-4.05 4.14v2.74H7.5V13h2.75v8h3.25Z" /></svg>;
 }

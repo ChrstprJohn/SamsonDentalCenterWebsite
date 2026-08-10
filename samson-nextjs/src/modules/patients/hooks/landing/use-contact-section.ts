@@ -3,9 +3,11 @@
 import { useEffect, useState } from 'react';
 import { getAvailableDaysAction } from '@/modules/appointments/actions/availability/get-available-days.action';
 import type { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
+import type { ClinicConfigResponseDto } from '@/modules/clinic-config/dtos/settings/get-clinic-config.dto';
 
 interface UseContactSectionProps {
   services: ServiceResponseDto[];
+  config: ClinicConfigResponseDto;
   initialPathway?: string;
   handleRealInquirySubmit: (data: {
     phone: string;
@@ -15,7 +17,7 @@ interface UseContactSectionProps {
   }) => Promise<boolean>;
 }
 
-export function useContactSection({ services, initialPathway, handleRealInquirySubmit }: UseContactSectionProps) {
+export function useContactSection({ services, config, initialPathway, handleRealInquirySubmit }: UseContactSectionProps) {
   const [phone, setPhone] = useState('');
   const [pathway, setPathway] = useState(initialPathway || '');
   const [targetDate, setTargetDate] = useState('');
@@ -33,23 +35,41 @@ export function useContactSection({ services, initialPathway, handleRealInquiryS
   }, [pathway]);
 
   useEffect(() => {
+    let active = true;
+    const selectedService = services.find((service) => service.id === pathway);
+
+    if (!selectedService) {
+      setAvailableDates([]);
+      setIsLoadingDays(false);
+      return;
+    }
+
     setIsLoadingDays(true);
     const year = currentMonth.getFullYear();
     const month = currentMonth.getMonth();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const dates: string[] = [];
-    
-    for (let day = 1; day <= daysInMonth; day++) {
-      const dateObj = new Date(year, month, day);
-      if (dateObj.getDay() !== 0) { // Exclude Sundays (0)
-        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        dates.push(dateStr);
-      }
-    }
-    
-    setAvailableDates(dates);
-    setIsLoadingDays(false);
-  }, [currentMonth, pathway]);
+    const requestedMonth = `${year}-${String(month + 1).padStart(2, '0')}`;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const firstBookableDate = new Date(today);
+    if (!config.allowSameDayBooking) firstBookableDate.setDate(firstBookableDate.getDate() + 1);
+    const lastBookableDate = new Date(today);
+    lastBookableDate.setDate(lastBookableDate.getDate() + config.calendarRenderDays);
+    const toDateString = (date: Date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+
+    getAvailableDaysAction({ serviceId: selectedService.id, month: requestedMonth })
+      .then((response) => {
+        if (!active) return;
+        const first = toDateString(firstBookableDate);
+        const last = toDateString(lastBookableDate);
+        setAvailableDates(response.success && response.data
+          ? response.data.availableDates.filter((date) => date >= first && date <= last)
+          : []);
+      })
+      .catch(() => active && setAvailableDates([]))
+      .finally(() => active && setIsLoadingDays(false));
+
+    return () => { active = false; };
+  }, [config.allowSameDayBooking, config.calendarRenderDays, currentMonth, pathway, services]);
 
 
   const submitInquiry = async () => {

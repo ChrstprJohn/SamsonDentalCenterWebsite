@@ -7,6 +7,7 @@ import { useForm, type PathValue } from 'react-hook-form';
 import { z } from 'zod';
 import { useToast } from '@/components/feedback/toast-container';
 import type { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
+import type { ClinicConfigResponseDto } from '@/modules/clinic-config/dtos/settings/get-clinic-config.dto';
 import { submitInquiryAction } from '@/modules/appointments/actions/booking/submit-inquiry.action';
 import { useContactSection } from './use-contact-section';
 
@@ -29,10 +30,11 @@ type WizardFormValues = z.infer<typeof wizardSchema>;
 
 interface UseBookingWizardProps {
   services: ServiceResponseDto[];
+  config: ClinicConfigResponseDto;
   initialServiceId?: string;
 }
 
-export function useBookingWizard({ services, initialServiceId }: UseBookingWizardProps) {
+export function useBookingWizard({ services, config, initialServiceId }: UseBookingWizardProps) {
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [maxReachedStep, setMaxReachedStep] = useState<1 | 2 | 3>(1);
   const [redirectCountdown, setRedirectCountdown] = useState<number | null>(null);
@@ -43,6 +45,7 @@ export function useBookingWizard({ services, initialServiceId }: UseBookingWizar
 
   const contactSection = useContactSection({
     services,
+    config,
     initialPathway: initialServiceId || '',
     handleRealInquirySubmit: async (data) => {
       return handleFinalSubmit(data);

@@ -5,6 +5,7 @@ import { renderHook, act } from '@testing-library/react';
 import { useBookingWizard } from './use-booking-wizard';
 import { useToast } from '@/components/feedback/toast-container';
 import { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
+import { DEFAULT_CONFIG } from '@/modules/clinic-config/use-cases/settings/get-clinic-config.use-case';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 
 const mockPush = vi.fn();
@@ -47,7 +48,7 @@ describe('useBookingWizard', () => {
 
   it('starts at step 1 (service card select) and advances to step 2 (schedule) & step 3 (patient)', () => {
     const { result } = renderHook(() =>
-      useBookingWizard({ services: mockServices })
+      useBookingWizard({ services: mockServices, config: DEFAULT_CONFIG })
     );
 
     expect(result.current.step).toBe(1);

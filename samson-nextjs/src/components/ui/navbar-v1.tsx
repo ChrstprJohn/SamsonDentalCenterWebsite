@@ -90,17 +90,11 @@ export function NavbarV1({ user }: NavbarProps) {
               isDarkNav ? 'text-white' : 'text-[#1D1E1E]'
             }`}
           >
-            <span className="w-9 h-9 rounded-[15.6px] border border-current flex items-center justify-center font-serif text-[18px] italic font-normal tracking-none transition-transform group-hover:rotate-12 duration-300">
-              S
-            </span>
-            <div className="flex flex-col text-[14px]">
-              <span className="font-serif text-[21px] lg:text-[23px] tracking-[0.2em] font-bold leading-none uppercase font-sans">
-                Samson
-              </span>
-              <span className="text-[9px] lg:text-[10px] tracking-[0.3em] uppercase opacity-75 font-sans font-bold leading-none mt-1.5">
-                Dental Center
-              </span>
-            </div>
+            <img
+              src="/images/SamsonLogo-transparent.png"
+              alt="Samson Dental Center"
+              className="h-11 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+            />
           </Link>
 
           {/* Desktop Nav */}
