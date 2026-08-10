@@ -21,7 +21,19 @@ export interface ContactFormFields {
 
 import { NativeTimePopoverPicker } from '@/shared/components/native-time-popover-picker';
 
-export function PreferenceFields({ fields }: { fields: ContactFormFields }) {
+export function PreferenceFields({
+  fields,
+  minTime,
+  maxTime,
+  unavailableRanges,
+  disabled = false,
+}: {
+  fields: ContactFormFields;
+  minTime?: string;
+  maxTime?: string;
+  unavailableRanges?: Array<{ start: string; end: string }>;
+  disabled?: boolean;
+}) {
   return (
     <div className="flex flex-col gap-2 font-sans">
       <label className="text-[clamp(11px,0.3vw+11px,13px)] font-semibold text-gray-700">
@@ -30,7 +42,11 @@ export function PreferenceFields({ fields }: { fields: ContactFormFields }) {
       <NativeTimePopoverPicker
         value={fields.preferredStartTime}
         onChange={fields.setPreferredStartTime}
-        placeholder="Select time"
+        placeholder={disabled ? 'Select a date first' : 'Select time'}
+        minTime={minTime}
+        maxTime={maxTime}
+        unavailableRanges={unavailableRanges}
+        disabled={disabled}
       />
     </div>
   );
