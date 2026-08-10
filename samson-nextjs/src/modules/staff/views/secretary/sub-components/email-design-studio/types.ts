@@ -7,7 +7,8 @@ export type EmailDesignId =
   | 'staff-reply'
   | 'post-care'
   | 'booking-request-received'
-  | 'request-rejected';
+  | 'request-rejected'
+  | 'no-show';
 
 export type PreviewMode = 'desktop' | 'mobile';
 

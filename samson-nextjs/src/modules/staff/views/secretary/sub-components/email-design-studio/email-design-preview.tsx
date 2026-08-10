@@ -31,19 +31,21 @@ export function EmailDesignPreview({
   const isReminder = design.id === 'reminder-24h' || design.id === 'reminder-48h';
   const isRescheduled = design.id === 'rescheduled';
   const isPostCare = design.id === 'post-care';
+  const isNoShow = design.id === 'no-show';
   const isStaffReply = design.id === 'staff-reply';
   const isBookingRequestReceived = design.id === 'booking-request-received';
   const isRequestRejected = design.id === 'request-rejected';
   const baseUrl = sample.baseUrl || 'http://localhost:3000';
   const chatUrl = `${baseUrl}/manage?token=${sample.appointmentId || 'APT-SAMPLE'}&openChat=true`;
   const feedbackUrl = `${baseUrl}/feedback?ref=${sample.appointmentId || 'APT-SAMPLE'}`;
-  const ctaHref = isPostCare ? feedbackUrl : chatUrl;
+  const noShowReasonUrl = `${baseUrl}/no-show-reason?ref=${sample.appointmentId || 'APT-SAMPLE'}`;
+  const ctaHref = isPostCare ? feedbackUrl : isNoShow ? noShowReasonUrl : chatUrl;
   const referenceCode = sample.referenceCode || formatRefId(sample.appointmentId);
 
-  const statusLabel = isConfirmed || isReminder || isRescheduled ? 'Confirmed / Approved' : isPostCare ? 'Completed' : isBookingRequestReceived ? 'Pending Review' : isRequestRejected ? 'Rejected' : isCancelled ? 'Cancelled' : null;
-  const statusColor = (isCancelled || isRequestRejected) ? '#dc2626' : isPostCare ? '#0f766e' : '#2563eb';
+  const statusLabel = isConfirmed || isReminder || isRescheduled ? 'Confirmed / Approved' : isPostCare ? 'Completed' : isNoShow ? 'Missed' : isBookingRequestReceived ? 'Pending Review' : isRequestRejected ? 'Rejected' : isCancelled ? 'Cancelled' : null;
+  const statusColor = (isCancelled || isRequestRejected || isNoShow) ? '#dc2626' : isPostCare ? '#0f766e' : '#2563eb';
 
-  const showDetails = copy.showSummary && !isCancelled && !isStaffReply && !isRequestRejected;
+  const showDetails = copy.showSummary && !isCancelled && !isStaffReply && !isRequestRejected && !isNoShow;
 
   return (
     <div style={{ background: '#ffffff', fontFamily: 'Arial, Helvetica, sans-serif', minHeight: '100%' }}>
@@ -257,6 +259,58 @@ export function EmailDesignPreview({
           </div>
         )}
 
+        {/* No-show — missed appointment details */}
+        {isNoShow && (
+          <div style={{ margin: '0 0 16px', paddingLeft: 0 }}>
+            <p style={{ ...p, margin: '0 0 8px', fontWeight: 700 }}>Your missed appointment:</p>
+            {sample.doctorName && (
+              <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Doctor:</span> {sample.doctorName}</p>
+            )}
+            {sample.serviceName && (
+              <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Service:</span> {sample.serviceName}</p>
+            )}
+            {sample.dateStr && (
+              <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Date:</span> {sample.dateStr}</p>
+            )}
+            {sample.timeRangeStr && (
+              <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Time:</span> {sample.timeRangeStr}</p>
+            )}
+            {referenceCode && (
+              <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Reference ID:</span> {referenceCode}</p>
+            )}
+          </div>
+        )}
+
+        {/* No-show — optional reason CTA */}
+        {isNoShow && copy.showCta && copy.ctaLabel && (
+          <p style={p}>
+            If something prevented you from making it, we would appreciate knowing —{' '}
+            <a href={noShowReasonUrl} style={link}>click here to let us know what happened</a>. This is completely optional, and your answer helps us improve our scheduling.
+          </p>
+        )}
+
+        {/* No-show — what's next checklist */}
+        {isNoShow && (
+          <div style={{ margin: '0 0 20px', paddingLeft: 0 }}>
+            <p style={{ ...p, margin: '0 0 8px', fontWeight: 700 }}>What&apos;s Next?</p>
+            <ul style={{ margin: '0 0 16px', paddingLeft: 20, listStyle: 'disc', color: '#1a1a1a', fontSize: 14, lineHeight: 1.75 }}>
+              {sample.rebookUrl && (
+                <li style={{ marginBottom: 6 }}>
+                  Ready to reschedule?{' '}
+                  <a href={sample.rebookUrl} target="_blank" rel="noreferrer" style={link}>Click here to book a new appointment</a>.
+                </li>
+              )}
+              <li style={{ marginBottom: 6 }}>
+                Questions? Call/text us at{' '}
+                <a href="tel:028123456" style={link}>(02) 8123-4567</a>.
+              </li>
+              <li>
+                <span style={{ color: '#dc2626', fontWeight: 600 }}>Note: Replies to this email are unmonitored.</span>
+              </li>
+            </ul>
+          </div>
+        )}
+
         {/* Staff reply — primary CTA paragraph */}
         {isStaffReply && copy.showCta && (
           <p style={p}>
@@ -338,7 +392,7 @@ export function EmailDesignPreview({
         )}
 
         {/* Appreciation / care paragraph — skipped for confirmed, rescheduled, reminders & post-care (kept short) */}
-        {!isConfirmed && !isRescheduled && !isReminder && !isPostCare && !isCancelled && !isStaffReply && !isRequestRejected && (
+        {!isConfirmed && !isRescheduled && !isReminder && !isPostCare && !isCancelled && !isStaffReply && !isRequestRejected && !isNoShow && (
           <p style={p}>
             {isBookingRequestReceived
               ? 'We appreciate your patience while we review your request. Our team will reach out to you shortly to confirm the details of your appointment.'
@@ -391,7 +445,7 @@ export function EmailDesignPreview({
         )}
 
         {/* Single consolidated contact block — chat link + phone if chat available, phone-only if not */}
-        {!isConfirmed && !isCancelled && !isRescheduled && !isReminder && !isPostCare && !isStaffReply && !isBookingRequestReceived && !isRequestRejected && (
+        {!isConfirmed && !isCancelled && !isRescheduled && !isReminder && !isPostCare && !isStaffReply && !isBookingRequestReceived && !isRequestRejected && !isNoShow && (
           <p style={p}>
             {copy.showCta && !isPostCare
               ? <>
@@ -421,6 +475,8 @@ export function EmailDesignPreview({
             ? "Thank you for choosing Samson Dental Center."
             : isPostCare
             ? "Thank you for choosing Samson Dental Center. We hope to see you again soon."
+            : isNoShow
+            ? "We hope to see you at Samson Dental Center soon. Please reach out if there is anything we can do."
             : isStaffReply
             ? "Thank you for choosing Samson Dental Center. We look forward to assisting you."
             : `Thank you for choosing Samson Dental Center. We can't wait to see you on ${sample.dateStr || 'your appointment date'} at ${sample.timeRangeStr || 'the scheduled time'}.`

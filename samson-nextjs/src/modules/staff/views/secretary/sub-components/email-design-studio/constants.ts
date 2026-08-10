@@ -79,6 +79,14 @@ export const EMAIL_DESIGNS: EmailDesignDefinition[] = [
     event: 'REJECT_INQUIRY',
     fields: ['patientName', 'serviceName', 'dateStr', 'preferredStartTimeStr', 'rejectionReason', 'rebookUrl'],
   },
+  {
+    id: 'no-show',
+    label: 'Missed Appointment (No-show)',
+    category: 'Follow-up',
+    description: 'Sent when a patient misses their appointment.',
+    event: 'APPOINTMENT_NO_SHOW',
+    fields: ['patientName', 'serviceName', 'doctorName', 'dateStr', 'timeRangeStr', 'appointmentId', 'baseUrl'],
+  },
 ];
 
 export const DEFAULT_TOKENS: DesignTokens = {
@@ -310,6 +318,21 @@ export const DEFAULT_COPY: Record<EmailDesignId, DraftCopy> = {
     footerText: 'Samson Dental Center • Caring for Your Smile',
     showSummary: false,
     showCta: false,
+    showInstructions: false,
+    showFooter: true,
+  },
+  'no-show': {
+    subject: 'We Missed You at Your Appointment',
+    preheader: 'Life happens. Tell us what happened, and rebook whenever you are ready.',
+    headerLabel: 'Missed Appointment',
+    headline: 'We Missed You at Your Appointment',
+    intro: "We missed you at your appointment at Samson Dental Center. We understand that things come up, so please review the details below and reach out whenever you are ready.",
+    ctaLabel: 'Tell Us What Happened',
+    primaryInstruction: '',
+    secondaryInstruction: '',
+    footerText: 'Samson Dental Center • Caring for Your Smile',
+    showSummary: true,
+    showCta: true,
     showInstructions: false,
     showFooter: true,
   },
