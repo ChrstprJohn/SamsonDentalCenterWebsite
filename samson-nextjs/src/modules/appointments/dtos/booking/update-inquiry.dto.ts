@@ -20,6 +20,7 @@ export const updateInquirySchema = z.object({
   startTime: cleanOptionalString,
   assignedDoctorId: z.string().nullable().optional(),
   assignedEndTime: z.string().nullable().optional(),
+  confirmationChannel: z.enum(['EMAIL', 'SMS', 'BOTH', 'NONE']).optional(),
 });
 
 export type UpdateInquiryDto = z.infer<typeof updateInquirySchema>;

@@ -13,11 +13,13 @@ export function NotificationChannelField({
   value,
   onChange,
   onEditingChange,
+  onSave,
 }: {
-  appointmentId: string;
+  appointmentId?: string;
   value?: NotificationChannel;
   onChange?: (value: NotificationChannel) => void;
   onEditingChange?: (isEditing: boolean) => void;
+  onSave?: (value: NotificationChannel) => Promise<{ success: boolean } | void>;
 }) {
   const current = value || 'EMAIL';
   const [channel, setChannel] = useState<NotificationChannel>(current);
@@ -35,7 +37,11 @@ export function NotificationChannelField({
   const save = async () => {
     if (draft === channel) { toggleEditing(false); return; }
     setSaving(true);
-    const result = await updateConfirmationChannelAction({ appointmentId, confirmationChannel: draft });
+    const result = onSave
+      ? (await onSave(draft)) ?? { success: true }
+      : appointmentId
+        ? await updateConfirmationChannelAction({ appointmentId, confirmationChannel: draft })
+        : { success: false };
     if (result.success) { setChannel(draft); onChange?.(draft); toggleEditing(false); }
     setSaving(false);
   };

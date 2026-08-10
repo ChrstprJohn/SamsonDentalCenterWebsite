@@ -17,6 +17,7 @@ export const updateInquiryCommand = (supabase: SupabaseClient) => {
     if (data.startTime !== undefined) dbPayload.preferred_start_time = data.startTime;
     if (data.assignedDoctorId !== undefined) dbPayload.assigned_doctor_id = data.assignedDoctorId;
     if (data.assignedEndTime !== undefined) dbPayload.assigned_end_time = data.assignedEndTime;
+    if (data.confirmationChannel !== undefined) dbPayload.confirmation_channel = data.confirmationChannel;
 
     const { error } = await supabase
       .from('appointment_inquiries')

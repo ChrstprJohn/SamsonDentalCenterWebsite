@@ -4,6 +4,7 @@ import React from 'react';
 import { NativeTimePopoverPicker } from '@/shared/components/native-time-popover-picker';
 import { useSecretaryInquiriesQueue } from '../../hooks/secretary/use-secretary-inquiries-queue';
 import { PendingRequestListV2 } from './sub-components/pending-request-list-v2';
+import { NotificationChannelField } from './sub-components/notification-channel-field';
 import { CoordinationHub } from './sub-components/coordination-hub';
 import { InquiryToast } from './sub-components/inquiry-toast';
 import { Badge } from '@/components/ui/badge';
@@ -106,6 +107,7 @@ export function SecretaryPendingRequestsViewV2() {
   const [patientSnapshot, setPatientSnapshot] = React.useState<Record<string, string>>({});
   const [isEditingSchedule, setIsEditingSchedule] = React.useState(false);
   const [scheduleSnapshot, setScheduleSnapshot] = React.useState<Record<string, string>>({});
+  const [isEditingChannel, setIsEditingChannel] = React.useState(false);
   const { addToast } = useToast();
   const [assignedDoctorName, setAssignedDoctorName] = React.useState('');
   const [resendingEventType, setResendingEventType] = React.useState<string | null>(null);
@@ -272,6 +274,10 @@ export function SecretaryPendingRequestsViewV2() {
     setIsEditingSchedule(false);
   };
 
+  React.useEffect(() => {
+    if (!inquiriesView.stagedInquiryAction) setIsEditingChannel(false);
+  }, [inquiriesView.stagedInquiryAction]);
+
   return (
     <div className="flex h-full w-full overflow-hidden">
       <div className={`xl:w-[400px] lg:w-[380px] flex-1 lg:flex-none flex-col border-r border-card-border/40 bg-sidebar h-full overflow-hidden ${colMobile('list')} lg:flex`}>
@@ -387,25 +393,15 @@ export function SecretaryPendingRequestsViewV2() {
                 className="flex flex-col gap-3"
               >
                 {inquiriesView.stagedInquiryAction === 'CONVERT' && (
-                  <div className="flex flex-col gap-1">
-                    <span className="text-sm font-medium text-foreground">Notification Channel <span className="text-destructive">*</span></span>
-                    <span className="text-xs text-muted-foreground">Which channel should be used to notify the patient?</span>
-                    <div className="relative mt-1">
-                      <select
-                        value={inquiriesView.confirmationChannel || ''}
-                        onChange={(e) => inquiriesView.setConfirmationChannel?.(e.target.value as 'EMAIL' | 'SMS' | 'BOTH' | 'NONE')}
-                        className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border appearance-none"
-                        required
-                      >
-                        <option value="">Select notification channel...</option>
-                        <option value="EMAIL">Email</option>
-                        <option value="SMS">SMS</option>
-                        <option value="BOTH">Both (Email & SMS)</option>
-                        <option value="NONE">None</option>
-                      </select>
-                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
-                    </div>
-                  </div>
+                  <NotificationChannelField
+                    value={inquiriesView.confirmationChannel as any}
+                    onChange={inquiriesView.setConfirmationChannel as any}
+                    onEditingChange={setIsEditingChannel}
+                    onSave={async (ch) => {
+                      const res = await inquiriesView.saveInquiryChannel(ch as any);
+                      return res;
+                    }}
+                  />
                 )}
 
                 <div className="flex flex-col gap-1">
@@ -456,28 +452,35 @@ export function SecretaryPendingRequestsViewV2() {
             </div>
 
             {/* Sticky footer */}
-            <div className="border-t border-card-border/40 px-5 py-4 shrink-0 flex gap-3">
-              <Button
-                type="submit"
-                form="decision-form"
-                disabled={!inquiriesView.canSubmit || inquiriesView.isSubmitting}
-                className={`flex-1 h-[44px] text-sm font-semibold rounded-xl disabled:opacity-50 ${
-                  inquiriesView.stagedInquiryAction === 'CONVERT'
-                    ? 'bg-slate-900 text-white hover:bg-slate-800'
-                    : 'bg-destructive text-white hover:bg-destructive/90'
-                }`}
-              >
-                {inquiriesView.isSubmitting
-                  ? 'Saving...'
-                  : `Confirm ${inquiriesView.stagedInquiryAction === 'CONVERT' ? 'Approval' : 'Rejection'}`}
-              </Button>
-              <Button
-                type="button"
-                onClick={() => { inquiriesView.setDecision(''); inquiriesView.setApprovalReason(''); }}
-                className="flex-1 h-[44px] text-sm font-medium border border-card-border text-foreground bg-transparent hover:bg-muted rounded-xl"
-              >
-                Cancel
-              </Button>
+            <div className="border-t border-card-border/40 px-5 py-4 shrink-0 flex flex-col gap-2">
+              {isEditingChannel && (
+                <p className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center">
+                  Please finish editing or save notification channel before confirming.
+                </p>
+              )}
+              <div className={`flex gap-3 ${isEditingChannel ? 'pointer-events-none opacity-40' : ''}`}>
+                <Button
+                  type="submit"
+                  form="decision-form"
+                  disabled={!inquiriesView.canSubmit || inquiriesView.isSubmitting}
+                  className={`flex-1 h-[44px] text-sm font-semibold rounded-xl disabled:opacity-50 ${
+                    inquiriesView.stagedInquiryAction === 'CONVERT'
+                      ? 'bg-slate-900 text-white hover:bg-slate-800'
+                      : 'bg-destructive text-white hover:bg-destructive/90'
+                  }`}
+                >
+                  {inquiriesView.isSubmitting
+                    ? 'Saving...'
+                    : `Confirm ${inquiriesView.stagedInquiryAction === 'CONVERT' ? 'Approval' : 'Rejection'}`}
+                </Button>
+                <Button
+                  type="button"
+                  onClick={() => { inquiriesView.setDecision(''); inquiriesView.setApprovalReason(''); }}
+                  className="flex-1 h-[44px] text-sm font-medium border border-card-border text-foreground bg-transparent hover:bg-muted rounded-xl"
+                >
+                  Cancel
+                </Button>
+              </div>
             </div>
           </>
         ) : (

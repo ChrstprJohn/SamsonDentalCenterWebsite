@@ -423,6 +423,30 @@ export function useSecretaryInquiriesQueue() {
     }
   };
 
+  const saveInquiryChannel = async (channel: 'EMAIL' | 'SMS' | 'BOTH' | 'NONE') => {
+    if (!selectedInquiryId) return { success: false };
+    setInlineError('');
+    setIsSubmitting(true);
+    try {
+      const res = await updateInquiryAction({ inquiryId: selectedInquiryId, confirmationChannel: channel });
+      if (res.success) {
+        setConfirmationChannel(channel);
+        showToast('Notification channel saved', 'success');
+        await loadInquiries({ force: true });
+      } else {
+        setInlineError(res.error || 'Failed to save notification channel');
+        showToast(res.error || 'Failed to save notification channel', 'error');
+      }
+      return res;
+    } catch (err: any) {
+      setInlineError(err.message || 'Failed to save notification channel');
+      showToast(err.message || 'Failed to save notification channel', 'error');
+      return { success: false };
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const submitReview = async (inquiryId: string) => {
     if (!stagedInquiryAction) {
       showToast('Please select review decision action first', 'error');
@@ -501,7 +525,7 @@ export function useSecretaryInquiriesQueue() {
     selectedPatient, selectPatient, clearPatient, services, currentMonth, setCurrentMonth, availableDates,
     availableDoctors, timeslots, isLoadingServices, isLoadingDays: scheduler.loadingKey === 'dates',
     isLoadingDoctors: scheduler.loadingKey === 'doctors', isLoadingSlots: scheduler.loadingKey === 'slots',
-    isSubmitting, inlineError, toast, isAvailabilityLoading, canSubmit, submitReview, saveInquiryChanges,
+    isSubmitting, inlineError, toast, isAvailabilityLoading, canSubmit, submitReview, saveInquiryChanges, saveInquiryChannel,
     activeTab, setActiveTab: selectTab, tabCounts, searchTerm, setSearchTerm,
     hasMore, isLoadingMore, loadMoreError, loadMore,
   };
