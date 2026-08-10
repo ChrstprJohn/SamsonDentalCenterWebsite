@@ -9,7 +9,7 @@ import type { AppointmentDto } from '@/modules/appointments/dtos/shared/appointm
 import type { AvailableDoctorItem } from '@/modules/staff/hooks/secretary/use-secretary-appointments';
 import type { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
 import { calculateEndTime } from '@/shared/utils/date.util';
-import { getDailyScheduleBounds } from '@/shared/utils/schedule-bounds.util';
+import { getDailyScheduleBounds, formatTimeRange } from '@/shared/utils/schedule-bounds.util';
 import { getClinicConfigAction } from '@/modules/clinic-config/actions/settings/get-clinic-config.action';
 import { NotificationChannelField } from './notification-channel-field';
 
@@ -360,30 +360,38 @@ export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps)
       {(() => {
         const bounds = getDailyScheduleBounds(props.date, operatingHours);
         return (
-          <div className="grid grid-cols-2 gap-3">
-            <div className="flex flex-col gap-0.5">
-              <span className="text-xs text-muted-foreground">Start Time <span className="text-destructive">*</span></span>
-              <NativeTimePopoverPicker
-                value={props.startTime}
-                onChange={(val) => handleStartTimeSelect(val)}
-                placeholder="Select Start Time"
-                minTime={bounds.minTime}
-                maxTime={bounds.maxTime}
-                unavailableRanges={bounds.unavailableRanges}
-              />
+          <>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="flex flex-col gap-0.5">
+                <span className="text-xs text-muted-foreground">Start Time <span className="text-destructive">*</span></span>
+                <NativeTimePopoverPicker
+                  value={props.startTime}
+                  onChange={(val) => handleStartTimeSelect(val)}
+                  placeholder="Select Start Time"
+                  minTime={bounds.minTime}
+                  maxTime={bounds.maxTime}
+                  unavailableRanges={bounds.unavailableRanges}
+                />
+              </div>
+              <div className="flex flex-col gap-0.5">
+                <span className="text-xs text-muted-foreground">End Time <span className="text-destructive">*</span></span>
+                <NativeTimePopoverPicker
+                  value={props.endTime}
+                  onChange={(val) => props.onEndTimeChange(val)}
+                  placeholder="Select End Time"
+                  minTime={bounds.minTime}
+                  maxTime={bounds.maxTime}
+                  unavailableRanges={bounds.unavailableRanges}
+                />
+              </div>
             </div>
-            <div className="flex flex-col gap-0.5">
-              <span className="text-xs text-muted-foreground">End Time <span className="text-destructive">*</span></span>
-              <NativeTimePopoverPicker
-                value={props.endTime}
-                onChange={(val) => props.onEndTimeChange(val)}
-                placeholder="Select End Time"
-                minTime={bounds.minTime}
-                maxTime={bounds.maxTime}
-                unavailableRanges={bounds.unavailableRanges}
-              />
-            </div>
-          </div>
+            {bounds.isOpen && bounds.minTime && bounds.maxTime && (
+              <p className="text-[11px] text-muted-foreground mt-1 font-sans">
+                Available {formatTimeRange(bounds.minTime)}–{formatTimeRange(bounds.maxTime)}
+                {bounds.unavailableRanges.length > 0 && ` (break ${formatTimeRange(bounds.unavailableRanges[0].start)}–${formatTimeRange(bounds.unavailableRanges[0].end)})`}.
+              </p>
+            )}
+          </>
         );
       })()}
 

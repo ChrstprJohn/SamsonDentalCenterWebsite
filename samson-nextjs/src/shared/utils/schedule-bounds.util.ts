@@ -7,6 +7,15 @@ export interface DailyScheduleBounds {
   isOpen: boolean;
 }
 
+export function formatTimeRange(timeStr?: string | null): string {
+  if (!timeStr) return '';
+  const [hours, minutes] = timeStr.split(':').map(Number);
+  if (isNaN(hours)) return timeStr;
+  const period = hours >= 12 ? 'PM' : 'AM';
+  const hour = hours % 12 || 12;
+  return `${hour}:${String(minutes || 0).padStart(2, '0')} ${period}`;
+}
+
 export function getDailyScheduleBounds(
   dateStr?: string | null,
   operatingHours?: ClinicConfigResponseDto['operatingHours'] | null
