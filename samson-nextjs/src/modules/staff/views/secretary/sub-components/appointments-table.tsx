@@ -3,6 +3,7 @@
 import { CalendarDays, ChevronLeft, ChevronRight, Globe, GlobeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { AppointmentDto } from '@/modules/appointments/dtos/shared/appointment.dto';
+import type { AppointmentDirectoryTab } from '@/modules/staff/hooks/secretary/use-secretary-appointments';
 import { formatClinicTime, formatRelativeDay, formatShortDate, formatTimeString } from '@/shared/utils/date.util';
 import { SecretaryListSkeleton, SecretaryListSkeletonTheme, SecretaryRefreshBar } from './secretary-list-skeleton';
 
@@ -34,6 +35,8 @@ interface AppointmentsTableProps {
   onGoNewer: () => void;
   formatPatientName: (appointment: AppointmentDto) => string;
   onSelect: (appointmentId: string) => void;
+  activeTab?: AppointmentDirectoryTab;
+  onQuickAction?: () => void;
 }
 
 export function AppointmentsTable(props: AppointmentsTableProps) {
@@ -112,6 +115,8 @@ export function AppointmentsTable(props: AppointmentsTableProps) {
             isSelected={props.selectedAppointmentId === appointment.id}
             formatPatientName={props.formatPatientName}
             onSelect={props.onSelect}
+            activeTab={props.activeTab}
+            onQuickAction={props.onQuickAction}
           />
         ))}
         {props.loadMoreError && (
@@ -164,8 +169,9 @@ export function AppointmentsTable(props: AppointmentsTableProps) {
   );
 }
 
-function AppointmentRow({ appointment, isSelected, formatPatientName, onSelect }: { appointment: AppointmentDto; isSelected: boolean; formatPatientName: (appointment: AppointmentDto) => string; onSelect: (id: string) => void }) {
+function AppointmentRow({ appointment, isSelected, formatPatientName, onSelect, activeTab, onQuickAction }: { appointment: AppointmentDto; isSelected: boolean; formatPatientName: (appointment: AppointmentDto) => string; onSelect: (id: string) => void; activeTab?: AppointmentDirectoryTab; onQuickAction?: () => void }) {
   const status = appointment.status;
+  const showQuickAction = activeTab === 'upcoming' && status === 'NO_SHOW' && !appointment.noShowResolvedAt && !!onQuickAction;
   const timeDisplay = appointment.startTime && appointment.endTime
     ? `${formatClinicTime(appointment.startTime)} - ${formatClinicTime(appointment.endTime)}`
     : appointment.preferredStartTime
@@ -192,8 +198,19 @@ function AppointmentRow({ appointment, isSelected, formatPatientName, onSelect }
           {isManual ? <GlobeOff className="size-3.5" /> : <Globe className="size-3.5" />}
         </span>
         <span className={`ml-auto text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded shrink-0 ${BADGE_STYLES[status] || 'text-muted-foreground bg-muted/20'}`}>
-          {status === 'APPROVED' ? 'Confirmed' : status}
+          {status === 'APPROVED' ? 'Confirmed' : status === 'NO_SHOW' && activeTab === 'upcoming' ? 'No-Show (Today)' : status}
         </span>
+        {showQuickAction && (
+          <span
+            role="button"
+            tabIndex={0}
+            onClick={(e) => { e.stopPropagation(); onQuickAction(); }}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); onQuickAction(); } }}
+            className="shrink-0 text-[10px] font-semibold px-2 py-1 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer"
+          >
+            Resolve
+          </span>
+        )}
       </div>
       <span className="font-medium truncate">
         {appointment.service?.name || 'Treatment'}

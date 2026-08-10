@@ -97,7 +97,7 @@ export function useSecretaryAppointments() {
 
 
   const statusesForTab = (tab: AppointmentDirectoryTab): string[] => {
-    if (tab === 'upcoming') return ['APPROVED', 'CHECKED_IN'];
+    if (tab === 'upcoming') return ['APPROVED', 'CHECKED_IN', 'NO_SHOW'];
     if (tab === 'needs-attention') return ['CHECKED_IN', 'NO_SHOW'];
     return ['COMPLETED', 'CANCELLED', 'REJECTED', 'DISPLACED', 'NO_SHOW'];
   };
@@ -114,7 +114,7 @@ export function useSecretaryAppointments() {
       date: current.dateFilter || undefined,
       dateBefore: tab === 'needs-attention' ? today : undefined,
       dateFrom: tab === 'upcoming' ? today : undefined,
-      noShowUnresolvedOnly: tab === 'needs-attention' || undefined,
+      noShowUnresolvedOnly: tab === 'needs-attention' || tab === 'upcoming' || undefined,
       noShowResolvedOnly: tab === 'history' || undefined,
       status: tab === 'history' && current.historyStatusFilter ? current.historyStatusFilter : undefined,
       countOnly: countOnly || undefined,
