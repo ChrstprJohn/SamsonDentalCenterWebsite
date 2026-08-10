@@ -77,7 +77,7 @@ export const onNoShowSubscriber = {
 
     const baseUrl = getBaseUrl();
     const ref = formatRefId(appointmentId);
-    const subject = `You Missed Your Appointment${ref ? ` [Ref: ${ref}]` : ''}`;
+    const subject = `You missed your appointment with Samson Dental Center${ref ? ` [Ref: ${ref}]` : ''}`;
 
     await ResendService.sendTemplatedEmail(
       email,

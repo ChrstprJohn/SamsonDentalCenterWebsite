@@ -262,7 +262,7 @@ export function EmailDesignPreview({
         {/* No-show — missed appointment details */}
         {isNoShow && (
           <div style={{ margin: '0 0 16px', paddingLeft: 0 }}>
-            <p style={{ ...p, margin: '0 0 8px', fontWeight: 700 }}>Your missed appointment:</p>
+            <p style={{ ...p, margin: '0 0 8px', fontWeight: 700 }}>Details of your missed visit:</p>
             <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Status:</span>{' '}
               <span style={{ fontWeight: 700, color: '#dc2626' }}>Missed</span>
             </p>
@@ -284,11 +284,12 @@ export function EmailDesignPreview({
           </div>
         )}
 
-        {/* No-show — optional reason CTA */}
+        {/* No-show — optional feedback CTA */}
         {isNoShow && copy.showCta && copy.ctaLabel && (
           <p style={p}>
-            No pressure, but if something came up, we would love to know —{' '}
-            <a href={noShowReasonUrl} style={link}>click here to tell us what happened</a>. This is completely optional, and your answer helps us improve our scheduling.
+            Have a moment?{' '}
+            <a href={noShowReasonUrl} style={link}>Share quick feedback</a>{' '}
+            to help us improve our service (optional).
           </p>
         )}
 
@@ -300,7 +301,7 @@ export function EmailDesignPreview({
               {sample.rebookUrl && (
                 <li style={{ marginBottom: 6 }}>
                   Ready to reschedule?{' '}
-                  <a href={sample.rebookUrl} target="_blank" rel="noreferrer" style={link}>Click here to book a new appointment</a>.
+                  <a href={sample.rebookUrl} target="_blank" rel="noreferrer" style={link}>Click here to request a new appointment</a>.
                 </li>
               )}
               <li style={{ marginBottom: 6 }}>

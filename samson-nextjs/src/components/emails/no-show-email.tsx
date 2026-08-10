@@ -50,7 +50,7 @@ export const NoShowEmail = ({
   appointmentId = 'APT-SAMPLE',
   baseUrl = 'http://localhost:3000',
 }: NoShowEmailProps) => {
-  const previewText = 'No worries — life happens. Tell us what happened, and rebook whenever you are ready.';
+  const previewText = 'We missed you at Samson Dental Center. Below are the details of your missed visit.';
   const logoUrl = getLogoUrl(baseUrl);
   const reasonUrl = `${baseUrl}/no-show-reason?ref=${appointmentId}`;
 
@@ -78,14 +78,13 @@ export const NoShowEmail = ({
 
           {/* Intro */}
           <Text style={pStyle}>
-            You missed your appointment at Samson Dental Center. No worries &mdash; life happens.
-            Review your visit details below, and rebook whenever you&apos;re ready.
+            You missed your appointment with Samson Dental Center. Below are the details of your missed visit:
           </Text>
 
           {/* Missed appointment details */}
           <Section style={{ margin: '0 0 20px', paddingLeft: 0 }}>
             <Text style={{ ...pStyle, margin: '0 0 8px', fontWeight: 700 }}>
-              Your missed appointment:
+              Details of your missed visit:
             </Text>
             <Text style={{ ...pStyle, margin: '0 0 4px' }}>
               <span style={boldStyle}>Status:</span>{' '}
@@ -123,11 +122,11 @@ export const NoShowEmail = ({
 
           {/* Optional reason CTA */}
           <Text style={pStyle}>
-            No pressure, but if something came up, we would love to know &mdash;{' '}
+            Have a moment?{' '}
             <Link href={reasonUrl} style={linkStyle}>
-              click here to tell us what happened
-            </Link>
-            . This is completely optional, and your answer helps us improve our scheduling.
+              Share quick feedback
+            </Link>{' '}
+            to help us improve our service (optional).
           </Text>
 
           {/* What's Next checklist */}
@@ -136,7 +135,7 @@ export const NoShowEmail = ({
             <ul style={{ margin: '0 0 16px', paddingLeft: 20, listStyle: 'disc', color: '#1a1a1a', fontSize: '14px', lineHeight: 1.75 }}>
               <li style={{ marginBottom: 6 }}>
                 Ready to reschedule?{' '}
-                <Link href={`${baseUrl}/book`} style={linkStyle}>Click here to book a new appointment</Link>.
+                <Link href={`${baseUrl}/book`} style={linkStyle}>Click here to request a new appointment</Link>.
               </li>
               <li style={{ marginBottom: 6 }}>
                 Questions? Call/text us at{' '}
