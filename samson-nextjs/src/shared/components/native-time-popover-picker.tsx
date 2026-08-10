@@ -152,6 +152,11 @@ export function NativeTimePopoverPicker({
     handleSelectTime(hour, next.minute, next.period);
   };
 
+  const handleSelectTime = (h: string, m: string, p: 'AM' | 'PM') => {
+    const time24 = to24Hour(h, m, p);
+    onChange(time24);
+  };
+
   // Toggle popover with smart top/bottom position calculation
   const togglePopover = (e: React.MouseEvent<HTMLDivElement>) => {
     if (disabled) return;
@@ -163,13 +168,26 @@ export function NativeTimePopoverPicker({
       } else {
         setPopoverPosition('bottom');
       }
+
+      // If no value is selected yet, pre-select the first available hour and default to 00 minute
+      if (!value) {
+        const firstAvailHour = allHours.find(hasAvailableHour);
+        if (firstAvailHour) {
+          const candidates = periods.flatMap((period) =>
+            fullMinuteList
+              .filter((minute) => isAvailable(to24Hour(firstAvailHour, minute, period)))
+              .map((minute) => ({ minute, period }))
+          );
+          const zeroMin = candidates.find(({ minute }) => minute === '00') ?? candidates[0];
+          if (zeroMin) {
+            setSelectedHour(firstAvailHour);
+            setSelectedMin(zeroMin.minute);
+            setSelectedPeriod(zeroMin.period);
+          }
+        }
+      }
     }
     setIsOpen(!isOpen);
-  };
-
-  const handleSelectTime = (h: string, m: string, p: 'AM' | 'PM') => {
-    const time24 = to24Hour(h, m, p);
-    onChange(time24);
   };
 
   return (
