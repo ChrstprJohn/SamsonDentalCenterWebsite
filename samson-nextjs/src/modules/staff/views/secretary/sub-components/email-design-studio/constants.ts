@@ -323,7 +323,7 @@ export const DEFAULT_COPY: Record<EmailDesignId, DraftCopy> = {
   },
   'no-show': {
     subject: 'You missed your appointment with Samson Dental Center',
-    preheader: 'We missed you at Samson Dental Center. Below are the details of your missed visit.',
+    preheader: 'You missed your appointment with Samson Dental Center. Below are the details of your missed visit.',
     headerLabel: 'Missed Appointment',
     headline: 'You missed your appointment with Samson Dental Center',
     intro: 'You missed your appointment with Samson Dental Center. Below are the details of your missed visit:',

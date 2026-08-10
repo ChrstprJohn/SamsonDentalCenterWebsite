@@ -50,7 +50,7 @@ export const NoShowEmail = ({
   appointmentId = 'APT-SAMPLE',
   baseUrl = 'http://localhost:3000',
 }: NoShowEmailProps) => {
-  const previewText = 'We missed you at Samson Dental Center. Below are the details of your missed visit.';
+  const previewText = 'You missed your appointment with Samson Dental Center. Below are the details of your missed visit.';
   const logoUrl = getLogoUrl(baseUrl);
   const reasonUrl = `${baseUrl}/no-show-reason?ref=${appointmentId}`;
 
