@@ -234,10 +234,13 @@ describe('AppointmentNotificationsTab', () => {
 
     render(<AppointmentNotificationsTab appointment={noShowAppt} view={{}} />);
 
-    const smsSentPill = await screen.findByText('SMS: SENT');
-    expect(smsSentPill).toBeDefined();
+    await waitFor(() => {
+      expect(screen.getAllByText('Notification Lifecycle').length).toBeGreaterThanOrEqual(1);
+    });
 
     const noShowLabels = screen.getAllByText('Missed Appointment (No-show)');
     expect(noShowLabels.length).toBeGreaterThanOrEqual(1);
+    const noShowRow = noShowLabels[0].closest('div');
+    expect(noShowRow?.textContent).toContain('SMS: SENT');
   });
 });
