@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, UserRound, X, Pencil, Check } from 'lucide-react';
 import { Select } from '@/components/ui/select';
 import { updateConfirmationChannelAction } from '@/modules/appointments/actions/status/update-confirmation-channel.action';
-import { formatClinicTime, formatShortDate } from '@/shared/utils/date.util';
+import { formatClinicTime, formatShortDate, calculateEndTime } from '@/shared/utils/date.util';
 import type { AppointmentDto } from '@/modules/appointments/dtos/exports';
 import type { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
 import type { DoctorFilterItem } from '@/modules/staff/hooks/secretary/use-secretary-appointments';
@@ -124,15 +124,24 @@ export function NeedsAttentionDetail({ appointment, view, onBack, className }: {
     resetResolveState();
   };
 
+  /**
+   * Behavior Note: Compute end time fallback based on appointment service duration
+   * so that backend chronological validation passes when rescheduling from Needs Attention.
+   */
   const handleRescheduleSubmit = () => {
     const fmt = (ds: string, ts: string) => `${ds}T${ts.length === 5 ? ts + ':00' : ts}Z`;
+    const duration = appointment.service?.durationMinutes || 30;
+    let computedEndTime = view.rescheduleEndTime;
+    if (!computedEndTime || (view.rescheduleTime && computedEndTime <= view.rescheduleTime)) {
+      computedEndTime = calculateEndTime(view.rescheduleTime, duration);
+    }
     view.handleResolveNoShowSubmit({
       appointmentId: appointment.id,
       resolution: 'RESCHEDULE',
       reason: view.rescheduleJustification || 'Rescheduled from past no-show follow-up',
       newDate: view.rescheduleDate || appointment.date,
       newStartTime: view.rescheduleTime ? fmt(view.rescheduleDate || appointment.date, view.rescheduleTime) : undefined,
-      newEndTime: view.rescheduleEndTime ? fmt(view.rescheduleDate || appointment.date, view.rescheduleEndTime) : undefined,
+      newEndTime: computedEndTime ? fmt(view.rescheduleDate || appointment.date, computedEndTime) : undefined,
       newDoctorId: view.rescheduleDoctor || appointment.doctorId || undefined,
     });
   };

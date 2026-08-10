@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import type { AppointmentDto } from '@/modules/appointments/dtos/shared/appointment.dto';
 import type { AvailableDoctorItem } from '@/modules/staff/hooks/secretary/use-secretary-appointments';
 import type { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
+import { calculateEndTime } from '@/shared/utils/date.util';
 import { NotificationChannelField } from './notification-channel-field';
 
 interface AppointmentRescheduleFormProps {
@@ -106,6 +107,45 @@ export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps)
   const FormWrapper = props.noForm ? 'div' : 'form';
   const selectedService = props.serviceId || props.activeServiceId || props.appointment.serviceId || '';
   const selectedDoctor = props.doctorId || props.activeDoctorId || props.appointment.doctorId || '';
+
+  /**
+   * Helper: Retrieve service duration (in minutes) for the active treatment.
+   * Defaults to 30 minutes if unspecified.
+   */
+  const getActiveDuration = (svcId: string): number => {
+    const found = props.services.find((s) => s.id === svcId);
+    if (found?.durationMinutes) return found.durationMinutes;
+    if ((found as any)?.duration_minutes) return (found as any).duration_minutes;
+    if (props.appointment.service?.durationMinutes) return props.appointment.service.durationMinutes;
+    return 30;
+  };
+
+  /**
+   * Behavior Note: When the user selects or modifies the start time, automatically
+   * recalculate the end time using the service duration. This prevents chronological
+   * validation errors (newStartTime >= newEndTime) when submitting the reschedule request.
+   */
+  const handleStartTimeSelect = (timeVal: string) => {
+    props.onStartTimeChange(timeVal);
+    if (timeVal) {
+      const duration = getActiveDuration(selectedService);
+      const calculatedEnd = calculateEndTime(timeVal, duration);
+      props.onEndTimeChange(calculatedEnd);
+    }
+  };
+
+  /**
+   * Behavior Note: When the treatment service changes, recalculate the end time
+   * based on the new service duration so that the timeslot accurately matches the procedure.
+   */
+  const handleServiceSelect = (svcId: string) => {
+    props.onServiceSelect(svcId);
+    if (props.startTime) {
+      const duration = getActiveDuration(svcId);
+      const calculatedEnd = calculateEndTime(props.startTime, duration);
+      props.onEndTimeChange(calculatedEnd);
+    }
+  };
 
   const dateParts = props.date ? props.date.split('-') : [];
   const selectedYear = dateParts[0] || '';
@@ -207,7 +247,7 @@ export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps)
         <div className="relative flex items-center">
           <select
             value={selectedService}
-            onChange={(e) => props.onServiceSelect(e.target.value)}
+            onChange={(e) => handleServiceSelect(e.target.value)}
             className="w-full px-4 pr-10 py-2.5 appearance-none rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
             required
           >
@@ -309,7 +349,7 @@ export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps)
           <span className="text-xs text-muted-foreground">Start Time <span className="text-destructive">*</span></span>
           <NativeTimePopoverPicker
             value={props.startTime}
-            onChange={(val) => props.onStartTimeChange(val)}
+            onChange={(val) => handleStartTimeSelect(val)}
             placeholder="Select Start Time"
           />
         </div>

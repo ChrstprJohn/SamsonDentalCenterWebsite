@@ -57,11 +57,12 @@ export async function updateAppointmentStatusAction(formData: StaffUpdateAppoint
       const getAppt = getAppointmentByIdQuery(supabase);
       const existingAppt = await getAppt(validData.appointmentId);
       if (existingAppt) {
+        const { formatToTimestamptz } = await import('../../utils/time.utils');
         const date = validData.newDate || existingAppt.date;
         const doctorId = validData.newDoctorId || existingAppt.doctorId;
         const serviceId = validData.newServiceId || existingAppt.serviceId;
-        const startTime = validData.newStartTime || (existingAppt.startTime ? `${date}T${existingAppt.startTime}` : undefined);
-        const endTime = validData.newEndTime || (existingAppt.endTime ? `${date}T${existingAppt.endTime}` : undefined);
+        const startTime = validData.newStartTime || (existingAppt.startTime ? formatToTimestamptz(date, existingAppt.startTime) : undefined);
+        const endTime = validData.newEndTime || (existingAppt.endTime ? formatToTimestamptz(date, existingAppt.endTime) : undefined);
 
         if (date && startTime && endTime && doctorId) {
           rescheduleMetadata = { date, startTime, endTime, doctorId, serviceId };

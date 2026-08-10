@@ -307,6 +307,39 @@ export function AppointmentNotificationsTab({ appointment, view, compact, onEdit
   const createdAt = (appointment as any).createdAt || (appointment as any).created_at || null;
   const startTime = (appointment as any).startTime || (appointment as any).start_time || appointment.date || null;
 
+  /**
+   * Behavior Note (Notification Lifecycle on Rescheduled Appointments):
+   * 1. When an appointment is rescheduled, Postgres triggers reset reminder flags (email_reminder_48h_sent = false).
+   * 2. Any reminder outbox logs created BEFORE the latest reschedule timestamp belong to the PREVIOUS appointment date/time.
+   * 3. For the new slot, we only consider reminder logs created AFTER the latest reschedule timestamp.
+   * 4. If no reminder has been sent for the new slot yet, we compute status using computeNotificationStatus() with
+   *    the new startTime and effectiveCreatedAt (latestRescheduleTimestamp), resetting the pill to PENDING or SKIPPED.
+   */
+  const latestRescheduleEntry = timelineEntries.find(
+    (e) => e.eventType === 'RESCHEDULE_BOOKING' || e.eventType === 'RESCHEDULE_BOOKING_SMS'
+  );
+
+  const rescheduleStatusHistory = appointment.statusHistory?.filter(
+    (h) => (h.reason && h.reason.toLowerCase().includes('resched')) || (h.previousStatus && h.newStatus === 'APPROVED')
+  );
+  const latestRescheduleHistory = rescheduleStatusHistory && rescheduleStatusHistory.length > 0
+    ? rescheduleStatusHistory[rescheduleStatusHistory.length - 1]
+    : null;
+
+  const isRescheduled = Boolean(
+    (appointment.rescheduleCount && appointment.rescheduleCount > 0) ||
+    latestRescheduleEntry ||
+    (appointment as any).emailRescheduleSent ||
+    (appointment as any).smsRescheduleSent ||
+    latestRescheduleHistory
+  );
+
+  const latestRescheduleTimestamp =
+    latestRescheduleEntry?.timestamp ||
+    latestRescheduleHistory?.createdAt ||
+    (isRescheduled ? ((appointment as any).updatedAt || (appointment as any).updated_at) : null) ||
+    null;
+
   const getStatus = (type: (typeof NOTIFICATION_TYPES)[number], ch: 'EMAIL' | 'SMS') => {
     if (loadingLogs) return { label: 'LOADING...', badgeClass: 'bg-muted text-muted-foreground/60 animate-pulse' };
 
@@ -336,15 +369,64 @@ export function AppointmentNotificationsTab({ appointment, view, compact, onEdit
       return { label: status, badgeClass: badgeClassFor(status) };
     }
 
-    if (type.eventType === 'CANCEL_BOOKING' || type.eventType === 'RESCHEDULE_BOOKING') {
-      const logEventType = ch === 'SMS' ? `${type.eventType}_SMS` : type.eventType;
-      const log = timelineEntries.find((e) => (e.eventType === logEventType || e.eventType === type.eventType) && e.channel === ch);
+    if (type.eventType === 'CANCEL_BOOKING') {
+      const logEventType = ch === 'SMS' ? 'CANCEL_BOOKING_SMS' : 'CANCEL_BOOKING';
+      const log = timelineEntries.find((e) => (e.eventType === logEventType || e.eventType === 'CANCEL_BOOKING') && e.channel === ch);
       const status = log?.rawStatus === 'PROCESSED'
         ? 'SENT'
         : log
         ? (log.rawStatus === 'FAILED' ? 'FAILED' : 'PENDING')
+        : appointment.status === 'CANCELLED'
+        ? 'SENT'
         : 'NOT APPLICABLE';
       return { label: status, badgeClass: badgeClassFor(status) };
+    }
+
+    if (type.eventType === 'RESCHEDULE_BOOKING') {
+      const logEventType = ch === 'SMS' ? 'RESCHEDULE_BOOKING_SMS' : 'RESCHEDULE_BOOKING';
+      const log = timelineEntries.find((e) => (e.eventType === logEventType || e.eventType === 'RESCHEDULE_BOOKING') && e.channel === ch);
+      const status = log?.rawStatus === 'PROCESSED'
+        ? 'SENT'
+        : log
+        ? (log.rawStatus === 'FAILED' ? 'FAILED' : 'PENDING')
+        : isRescheduled
+        ? 'SENT'
+        : 'NOT APPLICABLE';
+      return { label: status, badgeClass: badgeClassFor(status) };
+    }
+
+    // For 24H and 48H Reminders:
+    // If the appointment was rescheduled, any reminder log dispatched BEFORE the latest reschedule
+    // belongs to the prior appointment slot and should not mark the new schedule as SENT.
+    if (type.eventType === 'APPOINTMENT_REMINDER_48H' || type.eventType === 'APPOINTMENT_REMINDER_24H') {
+      const reminderLog = timelineEntries.find((e) => {
+        if (e.channel !== ch) return false;
+        const isMatch = type.eventType === 'APPOINTMENT_REMINDER_48H'
+          ? ['APPOINTMENT_REMINDER_48H', 'APPOINTMENT_REMINDER_48H_SMS'].includes(e.eventType)
+          : ['APPOINTMENT_REMINDER_24H', 'APPOINTMENT_REMINDER_24H_SMS'].includes(e.eventType);
+        if (!isMatch) return false;
+
+        if (latestRescheduleTimestamp) {
+          return new Date(e.timestamp).getTime() > new Date(latestRescheduleTimestamp).getTime();
+        }
+        return true;
+      });
+
+      if (reminderLog) {
+        if (reminderLog.rawStatus === 'FAILED') return { label: 'FAILED', badgeClass: badgeClassFor('FAILED') };
+        if (reminderLog.rawStatus === 'PROCESSED') return { label: 'SENT', badgeClass: badgeClassFor('SENT') };
+        if (reminderLog.rawStatus === 'PENDING') return { label: 'PENDING', badgeClass: badgeClassFor('PENDING') };
+      }
+
+      const effectiveCreatedAt = latestRescheduleTimestamp || createdAt;
+      return computeNotificationStatus({
+        eventType: type.eventType as any,
+        targetChannel: ch,
+        isSent: false,
+        currentChannel,
+        createdAt: effectiveCreatedAt,
+        startTime,
+      });
     }
 
     const log = timelineEntries.find((e) => {
@@ -354,12 +436,6 @@ export function AppointmentNotificationsTab({ appointment, view, compact, onEdit
       }
       if (type.eventType === 'APPOINTMENT_CHECKOUT') {
         return ['APPOINTMENT_CHECKOUT', 'APPOINTMENT_COMPLETED_POST_CARE', 'APPOINTMENT_COMPLETED_POST_CARE_SMS'].includes(e.eventType);
-      }
-      if (type.eventType === 'APPOINTMENT_REMINDER_48H') {
-        return ['APPOINTMENT_REMINDER_48H', 'APPOINTMENT_REMINDER_48H_SMS'].includes(e.eventType);
-      }
-      if (type.eventType === 'APPOINTMENT_REMINDER_24H') {
-        return ['APPOINTMENT_REMINDER_24H', 'APPOINTMENT_REMINDER_24H_SMS'].includes(e.eventType);
       }
       return e.eventType === type.eventType;
     });

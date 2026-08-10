@@ -10,7 +10,7 @@ import type { ServiceResponseDto } from '@/modules/services/dtos/management/serv
 import { getDoctorsAction } from '@/modules/staff/actions/management/get-doctors.action';
 import { getClinicAppointmentsPageAction } from '@/modules/appointments/actions/clinic/get-clinic-appointments-page.action';
 import { getStaffAppointmentByIdAction } from '@/modules/appointments/actions/clinic/get-staff-appointment-by-id.action';
-import { getTodayLocalDateStr } from '@/shared/utils/date.util';
+import { getTodayLocalDateStr, calculateEndTime } from '@/shared/utils/date.util';
 
 export type AppointmentDirectoryTab = 'upcoming' | 'needs-attention' | 'history';
 export type DoctorFilterItem = { id: string; firstName: string; lastName: string };
@@ -266,8 +266,14 @@ export function useSecretaryAppointments() {
         if (match) return `${match[1]}:${match[2]}`;
         return '';
       };
-      setRescheduleTime(parseTimeToHHMM(selectedAppointment.startTime));
-      setRescheduleEndTime(parseTimeToHHMM(selectedAppointment.endTime));
+      const initialStart = parseTimeToHHMM(selectedAppointment.startTime);
+      let initialEnd = parseTimeToHHMM(selectedAppointment.endTime);
+      if (initialStart && (!initialEnd || initialStart >= initialEnd)) {
+        const duration = selectedAppointment.service?.durationMinutes || 30;
+        initialEnd = calculateEndTime(initialStart, duration);
+      }
+      setRescheduleTime(initialStart);
+      setRescheduleEndTime(initialEnd);
       setRescheduleJustification('');
     }
     setShowRescheduleForm(true);
@@ -382,7 +388,16 @@ export function useSecretaryAppointments() {
   const submitReschedule = async () => {
     if (!selectedAppointment) return;
     const targetDoctorId = rescheduleDoctor || selectedAppointment.doctorId || activeDoctorId;
-    if (!rescheduleDate || !targetDoctorId || !rescheduleTime || !rescheduleEndTime) {
+    const duration = selectedAppointment.service?.durationMinutes || 30;
+
+    // Behavior Note: Fallback to calculated end time if empty or if invalid (endTime <= startTime)
+    // to guarantee that chronological validation passes and outbox notifications are dispatched.
+    let computedEndTime = rescheduleEndTime;
+    if (!computedEndTime || (rescheduleTime && computedEndTime <= rescheduleTime)) {
+      computedEndTime = calculateEndTime(rescheduleTime, duration);
+    }
+
+    if (!rescheduleDate || !targetDoctorId || !rescheduleTime || !computedEndTime) {
       setError('Please complete all scheduling fields (date, doctor, timeslot).');
       return;
     }
@@ -409,7 +424,7 @@ export function useSecretaryAppointments() {
         statusReason: rescheduleJustification.trim(),
         newDate: rescheduleDate,
         newStartTime: formatIso(rescheduleDate, rescheduleTime),
-        newEndTime: formatIso(rescheduleDate, rescheduleEndTime),
+        newEndTime: formatIso(rescheduleDate, computedEndTime),
         newDoctorId: targetDoctorId,
         newServiceId: rescheduleServiceId || selectedAppointment.serviceId || undefined,
         confirmationChannel,

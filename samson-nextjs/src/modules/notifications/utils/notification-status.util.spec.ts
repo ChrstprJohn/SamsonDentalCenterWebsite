@@ -62,4 +62,35 @@ describe('computeNotificationStatus', () => {
 
     vi.useRealTimers();
   });
+
+  it('computes PENDING for a rescheduled appointment far in the future', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-08-10T10:00:00Z'));
+
+    const status48h = computeNotificationStatus({
+      eventType: 'APPOINTMENT_REMINDER_48H',
+      targetChannel: 'EMAIL',
+      isSent: false,
+      currentChannel: 'BOTH',
+      createdAt: '2026-08-10T10:00:00Z', // Rescheduled today
+      startTime: '2026-08-20T09:00:00Z', // 10 days in future
+    });
+
+    expect(status48h.label).toBe('PENDING');
+    expect(status48h.variant).toBe('pending');
+
+    const status24h = computeNotificationStatus({
+      eventType: 'APPOINTMENT_REMINDER_24H',
+      targetChannel: 'EMAIL',
+      isSent: false,
+      currentChannel: 'BOTH',
+      createdAt: '2026-08-10T10:00:00Z',
+      startTime: '2026-08-20T09:00:00Z',
+    });
+
+    expect(status24h.label).toBe('PENDING');
+    expect(status24h.variant).toBe('pending');
+
+    vi.useRealTimers();
+  });
 });

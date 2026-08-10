@@ -41,7 +41,7 @@ vi.mock('@/modules/appointments/actions/status/resolve-no-show.action', () => ({
   resolveNoShowAction: vi.fn(),
 }));
 vi.mock('@/modules/services/actions/management/get-services.action', () => ({
-  getServicesAction: vi.fn(),
+  getServicesAction: vi.fn().mockResolvedValue({ data: [] }),
 }));
 
 const appointment = {
@@ -80,6 +80,46 @@ describe('useSecretaryAppointments', () => {
       appointmentId: 'appt-1',
       status: 'CANCELLED',
       statusReason: 'Patient requested reschedule / cancellation',
+      confirmationChannel: 'EMAIL',
+    });
+  });
+
+  it('reschedules appointment with time change and correctly computes end time', async () => {
+    vi.mocked(getClinicAppointmentsPageAction).mockResolvedValue({ success: true, data: { items: [appointment], nextCursor: null, hasMore: false, total: 1 } } as any);
+    vi.mocked(getDoctorsAction).mockResolvedValue({ success: true, data: [] } as any);
+    vi.mocked(updateAppointmentStatusAction).mockResolvedValue({ success: true } as any);
+
+    const { result } = renderHook(() => useSecretaryAppointments());
+
+    await waitFor(() => expect(result.current.filteredAppointments).toHaveLength(1));
+    act(() => {
+      result.current.setSelectedAppointmentId('appt-1');
+    });
+    act(() => {
+      result.current.setShowRescheduleForm(true);
+    });
+
+    expect(result.current.rescheduleTime).toBe('08:00');
+    expect(result.current.rescheduleEndTime).toBe('08:30');
+
+    // Change start time to 10:00 (which previously would leave endTime at 08:30 and fail)
+    act(() => {
+      result.current.setRescheduleTime('10:00');
+      result.current.setRescheduleEndTime('');
+      result.current.setRescheduleJustification('Doctor requested adjustment');
+    });
+
+    await act(async () => result.current.submitReschedule());
+
+    expect(updateAppointmentStatusAction).toHaveBeenCalledWith({
+      appointmentId: 'appt-1',
+      status: 'APPROVED',
+      statusReason: 'Doctor requested adjustment',
+      newDate: '2026-07-06',
+      newStartTime: '2026-07-06T10:00:00Z',
+      newEndTime: '2026-07-06T10:30:00Z',
+      newDoctorId: 'doctor-1',
+      newServiceId: 'service-1',
       confirmationChannel: 'EMAIL',
     });
   });
