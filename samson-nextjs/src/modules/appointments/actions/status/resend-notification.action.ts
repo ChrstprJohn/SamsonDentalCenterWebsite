@@ -9,7 +9,7 @@ import { authorizeRole } from '@/shared/auth/auth.util';
 
 export interface ResendNotificationInput {
   appointmentId: string;
-  eventType: 'APPOINTMENT_BOOKED' | 'APPOINTMENT_REMINDER_48H' | 'APPOINTMENT_REMINDER_24H' | 'APPOINTMENT_CHECKOUT' | 'APPOINTMENT_INQUIRY_RECEIVED' | 'CANCEL_BOOKING' | 'RESCHEDULE_BOOKING';
+  eventType: 'APPOINTMENT_BOOKED' | 'APPOINTMENT_REMINDER_48H' | 'APPOINTMENT_REMINDER_24H' | 'APPOINTMENT_CHECKOUT' | 'APPOINTMENT_INQUIRY_RECEIVED' | 'CANCEL_BOOKING' | 'RESCHEDULE_BOOKING' | 'APPOINTMENT_NO_SHOW';
   targetChannel?: 'EMAIL' | 'SMS' | 'BOTH';
 }
 
@@ -23,6 +23,7 @@ const resendNotificationSchema = z.object({
     'APPOINTMENT_INQUIRY_RECEIVED',
     'CANCEL_BOOKING',
     'RESCHEDULE_BOOKING',
+    'APPOINTMENT_NO_SHOW',
   ]),
   targetChannel: z.enum(['EMAIL', 'SMS', 'BOTH']).optional(),
 });
@@ -172,6 +173,9 @@ export async function resendNotificationAction(input: ResendNotificationInput) {
       } else if (parsed.eventType === 'APPOINTMENT_CHECKOUT') {
         eventType = 'APPOINTMENT_COMPLETED_POST_CARE';
         payload = { appointmentId: parsed.appointmentId, email: recipientEmail };
+      } else if (parsed.eventType === 'APPOINTMENT_NO_SHOW') {
+        eventType = 'APPOINTMENT_NO_SHOW';
+        payload = { appointmentId: parsed.appointmentId, email: recipientEmail };
       } else if (parsed.eventType === 'APPOINTMENT_REMINDER_24H' || parsed.eventType === 'APPOINTMENT_REMINDER_48H') {
         eventType = parsed.eventType === 'APPOINTMENT_REMINDER_48H' ? 'APPOINTMENT_REMINDER_48H' : 'APPOINTMENT_REMINDER_24H';
         payload = { appointmentId: parsed.appointmentId, email: recipientEmail };
@@ -228,7 +232,9 @@ export async function resendNotificationAction(input: ResendNotificationInput) {
     if (shouldSendSms && recipientPhone) {
       const smsEventType = parsed.eventType === 'APPOINTMENT_CHECKOUT'
         ? 'APPOINTMENT_COMPLETED_POST_CARE_SMS'
-        : parsed.eventType === 'CANCEL_BOOKING'
+        : parsed.eventType === 'APPOINTMENT_NO_SHOW'
+          ? 'APPOINTMENT_NO_SHOW_SMS'
+          : parsed.eventType === 'CANCEL_BOOKING'
           ? 'CANCEL_BOOKING_SMS'
           : parsed.eventType === 'RESCHEDULE_BOOKING'
             ? 'RESCHEDULE_BOOKING_SMS'

@@ -180,4 +180,64 @@ describe('AppointmentNotificationsTab', () => {
     const row = rescheduleNotices[0].closest('div');
     expect(row?.textContent).toContain('Email: SENT');
   });
+
+  it('shows Missed Appointment SMS pill as SENT when no-show SMS log is PROCESSED', async () => {
+    const noShowAppt: AppointmentDto = {
+      id: 'appt-789',
+      patientId: 'patient-1',
+      serviceId: 'service-1',
+      doctorId: 'doctor-1',
+      date: '2026-08-01',
+      startTime: '2026-08-01T08:00:00Z',
+      endTime: '2026-08-01T08:30:00Z',
+      status: 'NO_SHOW',
+      source: 'SELF_BOOKED',
+      doctorAssignmentSource: 'SYSTEM',
+      rescheduleCount: 0,
+      confirmationChannel: 'BOTH',
+      emailConfirmationSent: true,
+      smsConfirmationSent: false,
+      emailReminder48hSent: false,
+      smsReminder48hSent: false,
+      emailReminder24hSent: false,
+      smsReminder24hSent: false,
+      emailCheckoutSent: false,
+      smsCheckoutSent: false,
+      emailCancelSent: false,
+      smsCancelSent: false,
+      emailRescheduleSent: false,
+      smsRescheduleSent: false,
+      paymentReceiptSent: false,
+      createdAt: '2026-07-25T08:00:00Z',
+      updatedAt: '2026-08-01T09:00:00Z',
+      patient: { id: 'patient-1', firstName: 'Ana', lastName: 'Dela Cruz', email: 'ana@example.com', phone: '09123456789' },
+      service: { id: 'service-1', name: 'General Consultation', durationMinutes: 30 },
+      statusHistory: [],
+    } as any;
+
+    const logs = [
+      {
+        id: 'log-no-show-sms-1',
+        eventType: 'APPOINTMENT_NO_SHOW_SMS',
+        status: 'PROCESSED',
+        payload: { appointmentId: 'appt-789', phoneNumber: '09123456789' },
+        createdAt: '2026-08-01T09:00:00Z',
+        retryCount: 0,
+        errorLogs: null,
+      },
+    ];
+
+    vi.mocked(getEmailLogsByAppointmentAction).mockResolvedValue({
+      success: true,
+      data: logs as any,
+    });
+
+    render(<AppointmentNotificationsTab appointment={noShowAppt} view={{}} />);
+
+    const smsSentPill = await screen.findByText('SMS: SENT');
+    expect(smsSentPill).toBeDefined();
+
+    const noShowLabels = screen.getAllByText('Missed Appointment (No-show)');
+    expect(noShowLabels.length).toBeGreaterThanOrEqual(1);
+  });
 });

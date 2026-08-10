@@ -210,7 +210,7 @@ export function AppointmentNotificationsTab({ appointment, view, compact, onEdit
   };
 
   const handleTriggerNotification = async (
-    eventType: 'APPOINTMENT_BOOKED' | 'APPOINTMENT_REMINDER_48H' | 'APPOINTMENT_REMINDER_24H' | 'APPOINTMENT_CHECKOUT' | 'APPOINTMENT_INQUIRY_RECEIVED' | 'CANCEL_BOOKING' | 'RESCHEDULE_BOOKING',
+    eventType: 'APPOINTMENT_BOOKED' | 'APPOINTMENT_REMINDER_48H' | 'APPOINTMENT_REMINDER_24H' | 'APPOINTMENT_CHECKOUT' | 'APPOINTMENT_INQUIRY_RECEIVED' | 'CANCEL_BOOKING' | 'RESCHEDULE_BOOKING' | 'APPOINTMENT_NO_SHOW',
     targetChannel: 'EMAIL' | 'SMS'
   ) => {
     setIsTriggeringNotification(eventType);
@@ -292,7 +292,7 @@ export function AppointmentNotificationsTab({ appointment, view, compact, onEdit
   const showSms = currentChannel === 'SMS' || currentChannel === 'BOTH';
 
   const NOTIFICATION_TYPES: {
-    eventType: 'APPOINTMENT_BOOKED' | 'APPOINTMENT_REMINDER_48H' | 'APPOINTMENT_REMINDER_24H' | 'APPOINTMENT_CHECKOUT' | 'APPOINTMENT_INQUIRY_RECEIVED' | 'CANCEL_BOOKING' | 'RESCHEDULE_BOOKING';
+    eventType: 'APPOINTMENT_BOOKED' | 'APPOINTMENT_REMINDER_48H' | 'APPOINTMENT_REMINDER_24H' | 'APPOINTMENT_CHECKOUT' | 'APPOINTMENT_INQUIRY_RECEIVED' | 'CANCEL_BOOKING' | 'RESCHEDULE_BOOKING' | 'APPOINTMENT_NO_SHOW';
     label: string;
     isRose?: boolean;
     emailOnly?: boolean;
@@ -304,6 +304,7 @@ export function AppointmentNotificationsTab({ appointment, view, compact, onEdit
     { eventType: 'RESCHEDULE_BOOKING', label: 'Reschedule Notice' },
     { eventType: 'CANCEL_BOOKING', label: 'Cancellation Notice' },
     { eventType: 'APPOINTMENT_CHECKOUT', label: 'Checkout / Thank You' },
+    { eventType: 'APPOINTMENT_NO_SHOW', label: 'Missed Appointment (No-show)' },
   ];
 
   const createdAt = (appointment as any).createdAt || (appointment as any).created_at || null;
@@ -394,6 +395,17 @@ export function AppointmentNotificationsTab({ appointment, view, compact, onEdit
         : ch === 'SMS'
         ? ((appointment as any).smsRescheduleSent ? 'SENT' : 'NOT APPLICABLE')
         : ((appointment as any).emailRescheduleSent ? 'SENT' : 'NOT APPLICABLE');
+      return { label: status, badgeClass: badgeClassFor(status) };
+    }
+
+    if (type.eventType === 'APPOINTMENT_NO_SHOW') {
+      const logEventType = ch === 'SMS' ? 'APPOINTMENT_NO_SHOW_SMS' : 'APPOINTMENT_NO_SHOW';
+      const log = timelineEntries.find((e) => (e.eventType === logEventType || e.eventType === 'APPOINTMENT_NO_SHOW') && e.channel === ch);
+      const status = log?.rawStatus === 'PROCESSED'
+        ? 'SENT'
+        : log
+        ? (log.rawStatus === 'FAILED' ? 'FAILED' : 'PENDING')
+        : 'NOT APPLICABLE';
       return { label: status, badgeClass: badgeClassFor(status) };
     }
 
