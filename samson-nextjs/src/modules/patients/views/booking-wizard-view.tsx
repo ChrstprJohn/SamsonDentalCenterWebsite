@@ -37,6 +37,23 @@ export function BookingWizardView({ services, config, initialServiceId }: Bookin
   const clinicName = config.clinicName;
   const clinicPhone = config.phone;
 
+  const selectedDayHours = (() => {
+    if (!contactSection.targetDate) return null;
+    const weekday = new Date(`${contactSection.targetDate}T00:00:00`).toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase() as keyof typeof config.operatingHours;
+    return config.operatingHours[weekday];
+  })();
+  const isSelectedDayOpen = Boolean(selectedDayHours?.isOpen && selectedDayHours.openTime && selectedDayHours.closeTime);
+  const unavailableRanges = selectedDayHours?.breakStartTime && selectedDayHours.breakEndTime
+    ? [{ start: selectedDayHours.breakStartTime, end: selectedDayHours.breakEndTime }]
+    : [];
+
+  const formatTimeRange = (time: string) => {
+    const [hours, minutes] = time.split(':').map(Number);
+    const period = hours >= 12 ? 'PM' : 'AM';
+    const hour = hours % 12 || 12;
+    return `${hour}:${String(minutes).padStart(2, '0')} ${period}`;
+  };
+
   // Recalculate page dimensions and scroll to top when changing steps or filter
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -93,6 +110,8 @@ export function BookingWizardView({ services, config, initialServiceId }: Bookin
 
   const handleDateSelect = (date: string) => {
     contactSection.setTargetDate(date);
+    // A time selected on another weekday must never carry over to this day.
+    fields.setPreferredStartTime('');
     setTimeout(() => {
       if (typeof window !== 'undefined') {
         const timeElement = document.getElementById('step-2-time-picker');
@@ -387,7 +406,17 @@ export function BookingWizardView({ services, config, initialServiceId }: Bookin
                         ...fields,
                         setPreferredStartTime: handleTimeSelect,
                       }}
+                      minTime={selectedDayHours?.openTime ?? undefined}
+                      maxTime={selectedDayHours?.closeTime ?? undefined}
+                      unavailableRanges={unavailableRanges}
+                      disabled={!isSelectedDayOpen}
                     />
+                    {isSelectedDayOpen && selectedDayHours?.openTime && selectedDayHours.closeTime && (
+                      <p className="mt-2 text-xs text-gray-500">
+                        Available {formatTimeRange(selectedDayHours.openTime)}–{formatTimeRange(selectedDayHours.closeTime)}
+                        {unavailableRanges.length > 0 && ` (break ${formatTimeRange(unavailableRanges[0].start)}–${formatTimeRange(unavailableRanges[0].end)})`}.
+                      </p>
+                    )}
                   </div>
 
                   <div className="pt-6 border-t border-gray-200/60 flex items-center justify-between gap-4" id="step-2-next-btn">

@@ -134,7 +134,7 @@ export const clinicConfigDbSchema = z.object({
   operating_hours: operatingHoursDbSchema,
   allow_same_day_booking: z.boolean(),
   calendar_render_days: z.number().int().positive("Calendar render days must be positive"),
-  social_links: z.array(socialLinkSchema).default([]),
+  social_links: z.array(socialLinkSchema).nullable().optional().transform((val) => val ?? []),
 });
 
 export const clinicConfigResponseSchema = clinicConfigDbSchema.transform((record) => ({
@@ -164,7 +164,7 @@ export const clinicConfigResponseSchema = clinicConfigDbSchema.transform((record
   ) as z.infer<typeof operatingHoursSchema>,
   allowSameDayBooking: record.allow_same_day_booking,
   calendarRenderDays: record.calendar_render_days,
-  socialLinks: record.social_links,
+  socialLinks: record.social_links ?? [],
 }));
 
 export type ClinicConfigResponseDto = z.infer<typeof clinicConfigResponseSchema>;

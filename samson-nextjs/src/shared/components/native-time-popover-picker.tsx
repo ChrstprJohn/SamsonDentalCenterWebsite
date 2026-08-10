@@ -9,6 +9,12 @@ export interface NativeTimePopoverPickerProps {
   placeholder?: string;
   className?: string;
   disabled?: boolean;
+  /** Earliest selectable time in 24-hour HH:MM format (inclusive). */
+  minTime?: string;
+  /** Latest selectable time in 24-hour HH:MM format (exclusive). */
+  maxTime?: string;
+  /** Time ranges in 24-hour HH:MM format that cannot be selected. */
+  unavailableRanges?: Array<{ start: string; end: string }>;
   /**
    * List of available 2-digit hour strings (12-hour format, e.g. ['08', '09', '10', '11', '12', '01', '02', '03', '04'])
    */
@@ -21,7 +27,10 @@ export function NativeTimePopoverPicker({
   placeholder = 'Select Preferred Time...',
   className = '',
   disabled = false,
-  availableHours = ['08', '09', '10', '11', '12', '01', '02', '03', '04'],
+  availableHours,
+  minTime = '00:00',
+  maxTime = '24:00',
+  unavailableRanges = [],
 }: NativeTimePopoverPickerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [popoverPosition, setPopoverPosition] = useState<'top' | 'bottom'>('bottom');
@@ -33,6 +42,17 @@ export function NativeTimePopoverPicker({
     if (p === 'PM' && hourNum < 12) hourNum += 12;
     if (p === 'AM' && hourNum === 12) hourNum = 0;
     return `${String(hourNum).padStart(2, '0')}:${m}`;
+  };
+
+  const toMinutes = (time: string) => {
+    const [hours, minutes] = time.split(':').map(Number);
+    return hours * 60 + minutes;
+  };
+
+  const isAvailable = (time: string) => {
+    const minutes = toMinutes(time);
+    if (minutes < toMinutes(minTime) || minutes >= toMinutes(maxTime)) return false;
+    return !unavailableRanges.some(({ start, end }) => minutes >= toMinutes(start) && minutes < toMinutes(end));
   };
 
   // Convert any value (24-hour "HH:MM" or 12-hour "HH:MM AM/PM") to display 12-hour label
@@ -105,6 +125,32 @@ export function NativeTimePopoverPicker({
 
   // 1-minute interval list (00 to 59)
   const fullMinuteList = Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, '0'));
+  // Chronological 12-hour arrangement starting with early clinic morning hours (08, 09, 10, 11, 12, 01, 02, 03, 04, 05, 06, 07)
+  const defaultHourOrder = ['08', '09', '10', '11', '12', '01', '02', '03', '04', '05', '06', '07'];
+  const allHours = availableHours ?? defaultHourOrder;
+  const periods: Array<'AM' | 'PM'> = ['AM', 'PM'];
+  const hasAvailableMinute = (hour: string, period: 'AM' | 'PM', minute?: string) =>
+    minute
+      ? isAvailable(to24Hour(hour, minute, period))
+      : fullMinuteList.some((candidate) => isAvailable(to24Hour(hour, candidate, period)));
+  const hasAvailableHour = (hour: string) => periods.some((period) => hasAvailableMinute(hour, period));
+
+  const selectFirstAvailableForHour = (hour: string) => {
+    const candidates = periods.flatMap((period) =>
+      fullMinuteList
+        .filter((minute) => isAvailable(to24Hour(hour, minute, period)))
+        .map((minute) => ({ minute, period }))
+    );
+    // Default to '00' minute if available, otherwise match current minute or first valid minute candidate
+    const zeroMinCandidate = candidates.find(({ minute }) => minute === '00');
+    const matchingCurrent = candidates.find(({ minute, period }) => minute === selectedMin && period === selectedPeriod);
+    const next = zeroMinCandidate ?? matchingCurrent ?? candidates[0];
+    if (!next) return;
+    setSelectedHour(hour);
+    setSelectedMin(next.minute);
+    setSelectedPeriod(next.period);
+    handleSelectTime(hour, next.minute, next.period);
+  };
 
   // Toggle popover with smart top/bottom position calculation
   const togglePopover = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -155,20 +201,13 @@ export function NativeTimePopoverPicker({
               data-lenis-prevent="true"
               className="h-[238px] overflow-y-auto flex flex-col gap-1 pr-0 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
             >
-              {availableHours.map((h) => {
+              {allHours.filter(hasAvailableHour).map((h) => {
                 const isSelected = selectedHour === h;
                 return (
                   <button
                     key={h}
                     type="button"
-                    onClick={() => {
-                      setSelectedHour(h);
-                      let newP = selectedPeriod;
-                      if (['08', '09', '10', '11'].includes(h)) newP = 'AM';
-                      else newP = 'PM';
-                      setSelectedPeriod(newP);
-                      handleSelectTime(h, selectedMin, newP);
-                    }}
+                    onClick={() => selectFirstAvailableForHour(h)}
                     className={`w-full h-8 shrink-0 flex items-center justify-center text-sm font-semibold rounded-xs transition-colors ${
                       isSelected
                         ? 'bg-[#0075FF] text-white font-bold'
@@ -186,7 +225,7 @@ export function NativeTimePopoverPicker({
               data-lenis-prevent="true"
               className="h-[238px] overflow-y-auto flex flex-col gap-1 pr-0 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
             >
-              {fullMinuteList.map((m) => {
+              {fullMinuteList.filter((m) => hasAvailableMinute(selectedHour, selectedPeriod, m)).map((m) => {
                 const isSelected = selectedMin === m;
 
                 return (
@@ -214,11 +253,9 @@ export function NativeTimePopoverPicker({
               data-lenis-prevent="true"
               className="h-[238px] overflow-y-auto flex flex-col gap-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
             >
-              {['AM', 'PM'].map((p) => {
+              {periods.map((p) => {
                 const isSelected = selectedPeriod === p;
-                const isDisabled =
-                  (p === 'AM' && ['12', '01', '02', '03', '04'].includes(selectedHour)) ||
-                  (p === 'PM' && ['08', '09', '10', '11'].includes(selectedHour));
+                const isDisabled = !hasAvailableMinute(selectedHour, p);
 
                 return (
                   <button
@@ -227,8 +264,13 @@ export function NativeTimePopoverPicker({
                     disabled={isDisabled}
                     onClick={() => {
                       const newP = p as 'AM' | 'PM';
+                      const minute = hasAvailableMinute(selectedHour, newP, selectedMin)
+                        ? selectedMin
+                        : fullMinuteList.find((candidate) => hasAvailableMinute(selectedHour, newP, candidate));
+                      if (!minute) return;
+                      setSelectedMin(minute);
                       setSelectedPeriod(newP);
-                      handleSelectTime(selectedHour, selectedMin, newP);
+                      handleSelectTime(selectedHour, minute, newP);
                     }}
                     className={`w-full h-8 shrink-0 flex items-center justify-center text-sm font-semibold lowercase rounded-xs transition-colors ${
                       isSelected
