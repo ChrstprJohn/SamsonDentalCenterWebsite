@@ -43,22 +43,32 @@ export function ClinicSettingsPage({ initialConfig, initialTimeBlocks = [] }: Cl
     setConfig((current) => ({ ...current, [field]: value }));
   };
 
-  const handleConfigSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleConfigSubmit = (section: 'profile' | 'booking') => (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     startConfigSave(async () => {
-      const payload = {
-        ...config,
-        logoUrl: emptyToNull(config.logoUrl || ''),
-        mapUrl: emptyToNull(config.mapUrl || ''),
-        landline: emptyToNull(config.landline || ''),
-        websiteUrl: emptyToNull(config.websiteUrl || ''),
-        // WhatsApp is now managed together with every other public profile in Social links.
-        whatsappUrl: null,
-        socialLinks: config.socialLinks
-          .map((link) => ({ platform: link.platform.trim(), url: link.url.trim() }))
-          .filter((link) => link.platform && link.url),
-      };
+      const payload = section === 'profile'
+        ? {
+            clinicName: config.clinicName,
+            logoUrl: emptyToNull(config.logoUrl || ''),
+            address: config.address,
+            mapUrl: emptyToNull(config.mapUrl || ''),
+            phone: config.phone,
+            landline: emptyToNull(config.landline || ''),
+            email: config.email,
+            websiteUrl: emptyToNull(config.websiteUrl || ''),
+            // WhatsApp is now managed together with every other public profile in Social links.
+            whatsappUrl: null,
+            socialLinks: config.socialLinks
+              .map((link) => ({ platform: link.platform.trim(), url: link.url.trim() }))
+              .filter((link) => link.platform && link.url),
+          }
+        : {
+            isBookingOpen: config.isBookingOpen,
+            maintenanceMessage: config.isBookingOpen ? null : config.maintenanceMessage,
+            allowSameDayBooking: config.allowSameDayBooking,
+            calendarRenderDays: config.calendarRenderDays,
+          };
 
       const result = await updateClinicConfigAction(payload);
       if ('error' in result && result.error) {
@@ -98,8 +108,9 @@ export function ClinicSettingsPage({ initialConfig, initialTimeBlocks = [] }: Cl
         ))}
       </div>
 
-      <form onSubmit={handleConfigSubmit} className="flex flex-col gap-6">
-        {activeTab === 'profile' && <section className="bg-card border border-card-border rounded-3xl p-6 md:p-8 shadow-lg flex flex-col gap-6">
+      {activeTab === 'profile' && (
+      <form onSubmit={handleConfigSubmit('profile')} className="flex flex-col gap-6">
+        <section className="bg-card border border-card-border rounded-3xl p-6 md:p-8 shadow-lg flex flex-col gap-6">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-primary-start/10 text-primary-start flex items-center justify-center">
               <ImageIcon className="w-5 h-5" />
@@ -156,9 +167,13 @@ export function ClinicSettingsPage({ initialConfig, initialTimeBlocks = [] }: Cl
               {isConfigSaving ? 'Saving...' : 'Save public profile'}
             </Button>
           </div>
-        </section>}
+        </section>
+      </form>
+      )}
 
-        {activeTab === 'booking' && <section className="bg-card border border-card-border rounded-3xl p-6 md:p-8 shadow-lg flex flex-col gap-6">
+      {activeTab === 'booking' && (
+      <form onSubmit={handleConfigSubmit('booking')} className="flex flex-col gap-6">
+        <section className="bg-card border border-card-border rounded-3xl p-6 md:p-8 shadow-lg flex flex-col gap-6">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-amber-500/10 text-amber-600 flex items-center justify-center">
               <Globe2 className="w-5 h-5" />
@@ -190,8 +205,9 @@ export function ClinicSettingsPage({ initialConfig, initialTimeBlocks = [] }: Cl
               {isConfigSaving ? 'Saving...' : 'Save booking settings'}
             </Button>
           </div>
-        </section>}
+        </section>
       </form>
+      )}
 
       {activeTab === 'availability' && <section className="bg-card border border-card-border rounded-3xl p-6 md:p-8 shadow-md flex flex-col gap-6">
         <div className="flex items-center gap-3">
