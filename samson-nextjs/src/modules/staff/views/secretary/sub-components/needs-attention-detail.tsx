@@ -306,12 +306,14 @@ export function NeedsAttentionDetail({ appointment, view, onBack, className }: {
               </>
             ) : (
               <div className="space-y-4">
-                {resolveMode === 'COMPLETED' && (
+                {(resolveMode === 'COMPLETED' || resolveMode === 'CONFIRMED_NO_SHOW') && (
                   <>
-                    <div className="p-3 border bg-amber-500/5 border-amber-500/20 rounded-2xl">
-                      <span className="text-[10px] font-semibold uppercase tracking-wider text-amber-600">Completion Notice</span>
-                      <div className="text-[11px] text-muted-foreground mt-1 leading-relaxed">This will complete the visit and send the selected post-care message.</div>
-                    </div>
+                    {resolveMode === 'COMPLETED' && (
+                      <div className="p-3 border bg-amber-500/5 border-amber-500/20 rounded-2xl">
+                        <span className="text-[10px] font-semibold uppercase tracking-wider text-amber-600">Completion Notice</span>
+                        <div className="text-[11px] text-muted-foreground mt-1 leading-relaxed">This will complete the visit and send the selected post-care message.</div>
+                      </div>
+                    )}
                     <div>
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-sm font-medium text-foreground">Notification Channel</span>
@@ -336,7 +338,7 @@ export function NeedsAttentionDetail({ appointment, view, onBack, className }: {
                 {resolveMode === 'CONFIRMED_NO_SHOW' && (
                   <div className="p-3 border bg-red-500/5 border-red-500/20 rounded-2xl">
                     <span className="text-[10px] font-semibold uppercase tracking-wider text-red-500">No-Show Notice</span>
-                    <div className="text-[11px] text-muted-foreground mt-1 leading-relaxed">Clicking Confirm Resolution will keep this appointment marked as <strong>Confirmed No-Show</strong> in system audit logs.</div>
+                    <div className="text-[11px] text-muted-foreground mt-1 leading-relaxed">Clicking Confirm Resolution will keep this appointment marked as <strong>Confirmed No-Show</strong> in system audit logs and send the missed-appointment notification via the selected channel.</div>
                   </div>
                 )}
 

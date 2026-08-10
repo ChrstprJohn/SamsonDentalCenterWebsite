@@ -12,6 +12,7 @@ import StaffReplyEmail from '@/components/emails/staff-reply-email';
 import AppointmentReminderEmail from '@/components/emails/appointment-reminder-email';
 import PostCareEmail from '@/components/emails/post-care-email';
 import RequestRejectedEmail from '@/components/emails/request-rejected-email';
+import NoShowEmail from '@/components/emails/no-show-email';
 
 if (!process.env.RESEND_API_KEY) {
   // We don't throw an error at boot, but we will throw when attempting to send if missing.
@@ -109,6 +110,15 @@ type EmailTemplates = {
     appointmentId?: string;
     rejectionReason?: string;
     rebookUrl?: string;
+    baseUrl?: string;
+  };
+  'appointment_no_show': {
+    patientName: string;
+    serviceName?: string;
+    doctorName?: string;
+    dateStr?: string;
+    timeRangeStr?: string;
+    appointmentId?: string;
     baseUrl?: string;
   };
 };
@@ -263,6 +273,19 @@ export const ResendService = {
           appointmentId: reqPayload.appointmentId,
           rejectionReason: reqPayload.rejectionReason,
           rebookUrl: reqPayload.rebookUrl,
+          baseUrl: reqPayload.baseUrl,
+        }));
+        break;
+      }
+      case 'appointment_no_show': {
+        const reqPayload = payload as EmailTemplates['appointment_no_show'];
+        html = await render(React.createElement(NoShowEmail, {
+          patientName: reqPayload.patientName,
+          serviceName: reqPayload.serviceName,
+          doctorName: reqPayload.doctorName,
+          dateStr: reqPayload.dateStr,
+          timeRangeStr: reqPayload.timeRangeStr,
+          appointmentId: reqPayload.appointmentId,
           baseUrl: reqPayload.baseUrl,
         }));
         break;

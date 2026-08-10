@@ -8,6 +8,7 @@ import AppointmentConfirmedEmail from './appointment-confirmed-email';
 
 import PostCareEmail from './post-care-email';
 import RequestRejectedEmail from './request-rejected-email';
+import NoShowEmail from './no-show-email';
 
 describe('Email Templates Rendering', () => {
   it('renders SignupOtpEmail without crashing', async () => {
@@ -111,5 +112,22 @@ describe('Email Templates Rendering', () => {
     );
     expect(html).toContain('Alice Guest');
     expect(html).toContain('Fully booked on requested date');
+  });
+
+  it('renders NoShowEmail without crashing', async () => {
+    const html = await render(
+      React.createElement(NoShowEmail, {
+        patientName: 'Alice Guest',
+        serviceName: 'Dental Cleaning',
+        doctorName: 'Dr. Adrian Samson',
+        dateStr: 'Monday, June 22, 2026',
+        timeRangeStr: '2:00 PM - 2:45 PM',
+        appointmentId: 'APT-SAMPLE-456',
+      })
+    );
+    expect(html).toContain('Alice Guest');
+    expect(html).toContain('Dental Cleaning');
+    expect(html).toContain('Missed');
+    expect(html).toContain('APT-SAMPLE-456');
   });
 });

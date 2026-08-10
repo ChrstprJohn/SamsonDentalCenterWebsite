@@ -70,6 +70,40 @@ export async function resolveNoShowAction(formData: ResolveNoShowDto) {
       }
     }
 
+    if (validData.resolution === 'CONFIRMED_NO_SHOW') {
+      try {
+        const { outboxCommands } = await import('@/shared/outbox/outbox.commands');
+        const { createAdminClient } = await import('@/shared/database/server');
+        const adminDb = await createAdminClient();
+        const { data: appointment } = await adminDb
+          .from('appointments')
+          .select('patient_id, confirmation_channel, guest_contacts(email, phone_number)')
+          .eq('id', validData.appointmentId)
+          .single();
+        const aptData = appointment as any;
+        const patientId = aptData?.patient_id || null;
+        const guestEmail = aptData?.guest_contacts?.[0]?.email || null;
+        const guestPhone = aptData?.guest_contacts?.[0]?.phone_number || null;
+        const noShowChannel = aptData?.confirmation_channel || 'EMAIL';
+        if (noShowChannel === 'EMAIL' || noShowChannel === 'BOTH') {
+          await outboxCommands(adminDb).emitEvent('APPOINTMENT_NO_SHOW', {
+            appointmentId: validData.appointmentId,
+            patientId,
+            email: guestEmail,
+          });
+        }
+        if (noShowChannel === 'SMS' || noShowChannel === 'BOTH') {
+          await outboxCommands(adminDb).emitEvent('APPOINTMENT_NO_SHOW_SMS', {
+            appointmentId: validData.appointmentId,
+            patientId,
+            phoneNumber: guestPhone,
+          });
+        }
+      } catch (err) {
+        console.warn('Failed to emit no-show notification events:', err);
+      }
+    }
+
     if (validData.resolution === 'COMPLETED') {
       try {
         const { outboxCommands } = await import('@/shared/outbox/outbox.commands');

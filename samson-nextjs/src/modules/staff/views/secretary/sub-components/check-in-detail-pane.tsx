@@ -502,56 +502,38 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
                           This will complete the visit and send the selected post-care message.
                         </div>
                       </div>
-                      <div className="flex flex-col gap-1.5">
-                        <div className="flex items-center justify-between mb-1">
-                          <div className="flex flex-col gap-0.5">
-                            <span className="text-sm font-medium text-foreground">Notification Channel <span className="text-destructive">*</span></span>
-                            <span className="text-xs text-muted-foreground">Which channel should be used to notify the patient?</span>
-                          </div>
-                          {!isEditingInlineChannel ? (
-                            <Button variant="outline" size="sm" onClick={() => setIsEditingInlineChannel(true)} className="h-7 px-2.5 text-xs gap-1">
-                              <Pencil className="size-3.5" /> Edit
-                            </Button>
-                          ) : (
-                            <div className="flex items-center gap-2">
-                              <Button variant="outline" size="sm" onClick={() => { setDraftInlineChannel(inlineChannel); setIsEditingInlineChannel(false); }} className="h-7 px-2.5 text-xs gap-1">
-                                <X className="size-3.5" /> Cancel
-                              </Button>
-                              <Button size="sm" onClick={handleSaveInlineChannel} disabled={isSavingInlineChannel || draftInlineChannel === inlineChannel} className="h-7 px-2.5 text-xs gap-1 bg-slate-900 text-white rounded-md disabled:cursor-not-allowed">
-                                <Check className="size-3.5" /> {isSavingInlineChannel ? 'Saving...' : 'Save'}
-                              </Button>
-                            </div>
-                          )}
-                        </div>
-
-                        {isEditingInlineChannel ? (
-                          <Select
-                            value={draftInlineChannel}
-                            onChange={(e) => setDraftInlineChannel(e.target.value as any)}
-                            className="text-sm w-full"
-                            options={[
-                              { value: 'EMAIL', label: 'Email' },
-                              { value: 'SMS', label: 'SMS' },
-                              { value: 'BOTH', label: 'Email & SMS' },
-                              { value: 'NONE', label: 'None' },
-                            ]}
-                          />
-                        ) : (
-                          <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">
-                            {inlineChannel === 'EMAIL' ? 'Email' : inlineChannel === 'SMS' ? 'SMS' : inlineChannel === 'BOTH' ? 'Email & SMS' : 'None'}
-                          </div>
-                        )}
-                      </div>
+                      <ChannelPickerInline
+                        channel={inlineChannel}
+                        draftChannel={draftInlineChannel}
+                        isEditing={isEditingInlineChannel}
+                        isSaving={isSavingInlineChannel}
+                        onEdit={() => setIsEditingInlineChannel(true)}
+                        onCancel={() => { setDraftInlineChannel(inlineChannel); setIsEditingInlineChannel(false); }}
+                        onDraftChange={setDraftInlineChannel}
+                        onSave={handleSaveInlineChannel}
+                      />
                     </>
                   )}
 
                   {resolveMode === 'CONFIRMED_NO_SHOW' && (
-                    <div className="p-3 border bg-red-500/5 border-red-500/20 rounded-2xl">
-                      <span className="text-[10px] font-semibold uppercase tracking-wider text-red-500">No-Show Notice</span>
-                      <div className="text-[11px] text-muted-foreground mt-1 leading-relaxed">
-                        Clicking <strong>Confirm</strong> will keep this appointment marked as <strong>Confirmed No-Show</strong> in system audit logs.
+                    <>
+                      <div className="p-3 border bg-red-500/5 border-red-500/20 rounded-2xl">
+                        <span className="text-[10px] font-semibold uppercase tracking-wider text-red-500">No-Show Notice</span>
+                        <div className="text-[11px] text-muted-foreground mt-1 leading-relaxed">
+                          Clicking <strong>Confirm</strong> will keep this appointment marked as <strong>Confirmed No-Show</strong> in system audit logs and send the missed-appointment notification via the selected channel.
+                        </div>
                       </div>
-                    </div>
+                      <ChannelPickerInline
+                        channel={inlineChannel}
+                        draftChannel={draftInlineChannel}
+                        isEditing={isEditingInlineChannel}
+                        isSaving={isSavingInlineChannel}
+                        onEdit={() => setIsEditingInlineChannel(true)}
+                        onCancel={() => { setDraftInlineChannel(inlineChannel); setIsEditingInlineChannel(false); }}
+                        onDraftChange={setDraftInlineChannel}
+                        onSave={handleSaveInlineChannel}
+                      />
+                    </>
                   )}
 
                   <div className="flex flex-col gap-1.5">
@@ -766,6 +748,69 @@ function InfoBox({ variant, title, children }: { variant: 'cyan' | 'amber' | 'em
   );
 }
 
+function ChannelPickerInline({
+  channel,
+  draftChannel,
+  isEditing,
+  isSaving,
+  onEdit,
+  onCancel,
+  onDraftChange,
+  onSave,
+}: {
+  channel: 'EMAIL' | 'SMS' | 'BOTH' | 'NONE';
+  draftChannel: 'EMAIL' | 'SMS' | 'BOTH' | 'NONE';
+  isEditing: boolean;
+  isSaving: boolean;
+  onEdit: () => void;
+  onCancel: () => void;
+  onDraftChange: (val: 'EMAIL' | 'SMS' | 'BOTH' | 'NONE') => void;
+  onSave: () => void;
+}) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <div className="flex items-center justify-between mb-1">
+        <div className="flex flex-col gap-0.5">
+          <span className="text-sm font-medium text-foreground">Notification Channel <span className="text-destructive">*</span></span>
+          <span className="text-xs text-muted-foreground">Which channel should be used to notify the patient?</span>
+        </div>
+        {!isEditing ? (
+          <Button variant="outline" size="sm" onClick={onEdit} className="h-7 px-2.5 text-xs gap-1">
+            <Pencil className="size-3.5" /> Edit
+          </Button>
+        ) : (
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={onCancel} className="h-7 px-2.5 text-xs gap-1">
+              <X className="size-3.5" /> Cancel
+            </Button>
+            <Button size="sm" onClick={onSave} disabled={isSaving || draftChannel === channel} className="h-7 px-2.5 text-xs gap-1 bg-slate-900 text-white rounded-md disabled:cursor-not-allowed">
+              <Check className="size-3.5" /> {isSaving ? 'Saving...' : 'Save'}
+            </Button>
+          </div>
+        )}
+      </div>
+
+      {isEditing ? (
+        <Select
+          value={draftChannel}
+          onChange={(e) => onDraftChange(e.target.value as any)}
+          className="text-sm w-full"
+          options={[
+            { value: 'EMAIL', label: 'Email' },
+            { value: 'SMS', label: 'SMS' },
+            { value: 'BOTH', label: 'Email & SMS' },
+            { value: 'NONE', label: 'None' },
+          ]}
+        />
+      ) : (
+        <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">
+          {channel === 'EMAIL' ? 'Email' : channel === 'SMS' ? 'SMS' : channel === 'BOTH' ? 'Email & SMS' : 'None'}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function CheckoutContent({
   appointment,
   view,
@@ -952,7 +997,7 @@ function ResolveContent({ view, onClose, channel, draftChannel, isEditingChannel
     : resolution === 'COMPLETED'
       ? { variant: 'emerald' as const, title: 'Completion Notice', text: 'This will complete the visit and send the selected post-care message.' }
       : resolution === 'CONFIRMED_NO_SHOW'
-        ? { variant: 'red' as const, title: 'No-Show Notice', text: 'This will keep the appointment marked as a confirmed no-show in the audit history.' }
+        ? { variant: 'red' as const, title: 'No-Show Notice', text: 'This will keep the appointment marked as a confirmed no-show in the audit history and send the missed-appointment notification via the selected channel.' }
         : { variant: 'cyan' as const, title: 'Reschedule Notice', text: 'This will open the reschedule details and move the appointment into the rescheduling workflow.' };
 
   const handleReasonSelect = (value: string) => {
@@ -1035,52 +1080,23 @@ function ResolveContent({ view, onClose, channel, draftChannel, isEditingChannel
         {resolutionWarning.text}
       </InfoBox>
 
-      {/* Notification Channel Block - Only visible on Checkout */}
-      {resolution === 'COMPLETED' && (
+      {/* Notification Channel Block - visible on Checkout and Keep No-Show */}
+      {(resolution === 'COMPLETED' || resolution === 'CONFIRMED_NO_SHOW') && (
         <div className="flex flex-col gap-1.5">
-          <div className="flex items-center justify-between mb-1">
-            <div className="flex flex-col gap-0.5">
-              <span className="text-sm font-medium text-foreground">Notification Channel <span className="text-destructive">*</span></span>
-              <span className="text-xs text-muted-foreground">Which channel should be used to notify the patient?</span>
-            </div>
-            {!isEditingChannel ? (
-              <Button variant="outline" size="sm" onClick={() => onEditingChannelChange(true)} className="h-7 px-2.5 text-xs gap-1">
-                <Pencil className="size-3.5" /> Edit
-              </Button>
-            ) : (
-              <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" onClick={onCancelChannelEdit} className="h-7 px-2.5 text-xs gap-1">
-                  <X className="size-3.5" /> Cancel
-                </Button>
-                <Button size="sm" onClick={onSaveChannel} disabled={isSavingChannel || draftChannel === channel} className="h-7 px-2.5 text-xs gap-1 bg-slate-900 text-white rounded-md disabled:cursor-not-allowed">
-                  <Check className="size-3.5" /> {isSavingChannel ? 'Saving...' : 'Save'}
-                </Button>
-              </div>
-            )}
-          </div>
-
+          <ChannelPickerInline
+            channel={channel}
+            draftChannel={draftChannel}
+            isEditing={isEditingChannel}
+            isSaving={isSavingChannel}
+            onEdit={() => onEditingChannelChange(true)}
+            onCancel={onCancelChannelEdit}
+            onDraftChange={onDraftChannelChange}
+            onSave={onSaveChannel}
+          />
           {isEditingChannel && (
             <p className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center">
               Please finish editing or save notification channel before submitting resolution.
             </p>
-          )}
-
-          {isEditingChannel ? (
-            <Select
-              value={draftChannel}
-              onChange={(e) => onDraftChannelChange(e.target.value as any)}
-              className="text-sm w-full"
-              options={[
-                { value: 'EMAIL', label: 'Email' },
-                { value: 'SMS', label: 'SMS' },
-                { value: 'BOTH', label: 'Email & SMS' },
-                { value: 'NONE', label: 'None' },
-              ]}
-            />
-          ) : (
-            <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-muted-foreground border-card-border cursor-default">
-              {channel === 'EMAIL' ? 'Email' : channel === 'SMS' ? 'SMS' : channel === 'BOTH' ? 'Email & SMS' : 'None'}
-            </div>
           )}
         </div>
       )}

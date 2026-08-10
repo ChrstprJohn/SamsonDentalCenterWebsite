@@ -27,6 +27,7 @@ const SMS_EVENT_NAME_MAP: Record<string, string> = {
   'RESCHEDULE_BOOKING_SMS': 'Rescheduled SMS',
   'CANCEL_BOOKING_SMS': 'Cancelled SMS',
   'APPOINTMENT_COMPLETED_POST_CARE_SMS': 'Post-Care SMS',
+  'APPOINTMENT_NO_SHOW_SMS': 'Missed Appointment SMS',
 };
 
 function getStatusVariant(status: string): 'success' | 'error' | 'warning' | 'default' {

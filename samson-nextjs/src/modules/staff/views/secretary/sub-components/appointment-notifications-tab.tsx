@@ -55,6 +55,8 @@ const EVENT_NAME_MAP: Record<string, string> = {
   'APPOINTMENT_CHECKOUT': 'Checkout / Thank You',
   'APPOINTMENT_COMPLETED_POST_CARE': 'Checkout / Thank You',
   'APPOINTMENT_COMPLETED_POST_CARE_SMS': 'Checkout / Thank You',
+  'APPOINTMENT_NO_SHOW': 'Missed Appointment (No-show)',
+  'APPOINTMENT_NO_SHOW_SMS': 'Missed Appointment (No-show)',
   'PATIENT_REGISTERED': 'Registration OTP',
   'PASSWORD_RESET_REQUESTED': 'Password Reset OTP',
 };

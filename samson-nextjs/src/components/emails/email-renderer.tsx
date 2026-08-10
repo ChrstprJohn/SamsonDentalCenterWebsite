@@ -8,6 +8,7 @@ import AppointmentCancelledEmail from './appointment-cancelled-email';
 import AppointmentRescheduledEmail from './appointment-rescheduled-email';
 import StaffReplyEmail from './staff-reply-email';
 import PostCareEmail from './post-care-email';
+import NoShowEmail from './no-show-email';
 import AppointmentRequestReceivedEmail from './appointment-request-received-email';
 import RequestRejectedEmail from './request-rejected-email';
 import SignupOtpEmail from './signup-otp-email';
@@ -145,6 +146,18 @@ export function RenderedEmailFrame({ eventType, payload }: RenderedEmailFramePro
         serviceName={serviceName}
         doctorName={doctorName}
         dateStr={dateStr}
+        appointmentId={appointmentId}
+        baseUrl={baseUrl}
+      />
+    );
+  } else if (eventType === 'APPOINTMENT_NO_SHOW' || eventType === 'APPOINTMENT_NO_SHOW_SMS') {
+    element = (
+      <NoShowEmail
+        patientName={patientName}
+        serviceName={serviceName}
+        doctorName={doctorName}
+        dateStr={dateStr}
+        timeRangeStr={timeRangeStr}
         appointmentId={appointmentId}
         baseUrl={baseUrl}
       />
