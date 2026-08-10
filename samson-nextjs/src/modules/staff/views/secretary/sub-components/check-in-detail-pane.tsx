@@ -433,11 +433,17 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
             )}
             {paneType === 'details' && appointment.status === 'APPROVED' && showCheckInForm && null}
             {paneType === 'details' && appointment.status === 'NO_SHOW' && !showResolveForm && (
-              <>
-                <button onClick={() => { resetActionDrafts(); view.openResolve(appointment); }} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl">
-                  Resolve
-                </button>
-              </>
+              appointment.noShowResolvedAt ? (
+                <div className="w-full flex items-center justify-center text-[11px] text-muted-foreground py-2">
+                  No-show resolved — audit record in History
+                </div>
+              ) : (
+                <>
+                  <button onClick={() => { resetActionDrafts(); view.openResolve(appointment); }} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl">
+                    Resolve
+                  </button>
+                </>
+              )
             )}
             {paneType === 'details' && appointment.status === 'NO_SHOW' && showResolveForm && (
               <div className="w-full flex flex-col gap-3">

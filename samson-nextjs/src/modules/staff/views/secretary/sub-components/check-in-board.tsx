@@ -115,12 +115,13 @@ function VisitCard({ appointment, columnKey, view }: { appointment: AppointmentD
   const dateDisplay = formatShortDate(appointment.date);
   const statusBadge = BADGE_STYLES[appointment.status] || 'text-muted-foreground bg-muted/20';
   const anySelected = !!(view.checkInAppt || view.checkoutAppt || view.viewAppt || view.resolveAppt || view.rescheduleAppt);
+  const isResolvedNoShow = appointment.status === 'NO_SHOW' && !!appointment.noShowResolvedAt;
 
   return (
     <div
       className={`flex flex-row items-stretch text-left transition-all cursor-pointer select-none overflow-hidden border-b border-border shrink-0 ${
         isSelected ? `${doctorColor.bg} ${doctorColor.selected}` : doctorColor.bg
-      } ${doctorColor.text}`}
+      } ${doctorColor.text} ${isResolvedNoShow ? 'opacity-60' : ''}`}
       onClick={() => view.handleViewApptDetails(appointment)}
     >
       <div className={`w-1 shrink-0 ${isSelected ? 'bg-slate-900' : doctorColor.accent}`} />
@@ -133,6 +134,11 @@ function VisitCard({ appointment, columnKey, view }: { appointment: AppointmentD
             <span className={`ml-auto text-[8px] sm:text-[8.5px] xl:text-[10px] font-semibold uppercase tracking-tight xl:tracking-wider px-1 py-0.5 rounded-xs shrink-0 ${statusBadge} ${anySelected ? 'hidden xl:inline-block' : ''}`}>
               {appointment.status === 'CHECKED_IN' ? 'CHECKED IN' : appointment.status}
             </span>
+            {isResolvedNoShow && (
+              <span className="text-[8px] sm:text-[8.5px] xl:text-[10px] font-semibold uppercase tracking-tight xl:tracking-wider px-1 py-0.5 rounded-xs shrink-0 bg-emerald-500/15 text-emerald-600">
+                Resolved
+              </span>
+            )}
           </div>
           <span className="font-medium text-[11px] xl:text-xs leading-tight truncate">
             {appointment.service?.name || 'Treatment'}

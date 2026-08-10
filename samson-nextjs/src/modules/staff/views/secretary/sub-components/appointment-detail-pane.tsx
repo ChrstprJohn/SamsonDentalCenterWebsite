@@ -11,6 +11,7 @@ import { AppointmentCancelForm, isCancelFormComplete } from './appointment-cance
 import { AppointmentRescheduleForm, isRescheduleFormComplete } from './appointment-reschedule-form';
 import { AppointmentStatusHistory } from './appointment-status-history';
 import { AppointmentNotificationsTab } from './appointment-notifications-tab';
+import { getTodayLocalDateStr } from '@/shared/utils/date.util';
 
 /**
  * AppointmentDetailPane - Shared appointment details panel.
@@ -63,6 +64,13 @@ function AppointmentDetails({ appointment, view, activeTab, compact, hideActions
 
   const canModify = ['APPROVED', 'PENDING', 'RESCHEDULE_REQUESTED', 'DISPLACED'].includes(appointment.status);
   const canRescheduleOnly = appointment.status === 'NO_SHOW';
+  const todayStr = getTodayLocalDateStr();
+  // ponytail: same slot-past check as check-in board (endTime is HH:mm or ISO)
+  const slotEnd = appointment.endTime && appointment.date ? new Date(`${appointment.date}T${appointment.endTime.slice(0, 5)}:00+08:00`) : null;
+  const isPastEnd = !!slotEnd && !isNaN(slotEnd.getTime()) && new Date() > slotEnd;
+  const isNoShowCandidate = appointment.status === 'NO_SHOW' || (appointment.status === 'APPROVED' && isPastEnd);
+  const isResolvedNoShow = appointment.status === 'NO_SHOW' && !!appointment.noShowResolvedAt;
+  const resolveTarget = appointment.date === todayStr ? '/secretary-v2/check-in' : '/secretary/appointments';
 
   const TABS = [
     { key: 'overview' as const, label: 'Overview' },
@@ -213,7 +221,7 @@ function AppointmentDetails({ appointment, view, activeTab, compact, hideActions
             compact={compact}
             onEditingGuestInfoChange={handleEditChange}
             actionsBar={!hideActions && (() => {
-              const canCancelOnly = appointment.status === 'CHECKED_IN';
+              const isCheckedIn = appointment.status === 'CHECKED_IN';
               if (activeTab === 'history') {
                 const patientId = appointment.patientId || appointment.patient?.id || '';
                 const serviceId = appointment.serviceId || '';
@@ -234,7 +242,7 @@ function AppointmentDetails({ appointment, view, activeTab, compact, hideActions
                   </Button>
                 );
               }
-              if (!canModify && !canRescheduleOnly && !canCancelOnly) return null;
+              if (!canModify && !canRescheduleOnly && !isCheckedIn && !isNoShowCandidate) return null;
 
               if (!view.showRescheduleForm && !view.showCancelForm) {
                 return (
@@ -245,14 +253,29 @@ function AppointmentDetails({ appointment, view, activeTab, compact, hideActions
                       </p>
                     )}
                     <div className={`flex gap-2 ${isEditingChannel ? 'pointer-events-none opacity-40' : ''}`}>
-                      {(canModify || canRescheduleOnly) && (
-                        <Button variant="outline" className={`${canModify ? 'flex-1' : 'w-full'} h-[42px]`} onClick={() => view.setShowRescheduleForm(true)}>
+                      {isNoShowCandidate && !isResolvedNoShow && (
+                        <Button className="flex-1 h-[42px] bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => router.push(resolveTarget)}>
+                          Resolve
+                        </Button>
+                      )}
+                      {isResolvedNoShow && (
+                        <div className="w-full flex items-center justify-center text-[11px] text-muted-foreground py-2">
+                          No-show resolved — audit record in History
+                        </div>
+                      )}
+                      {canModify && !isPastEnd && (
+                        <Button variant="outline" className="flex-1 h-[42px]" onClick={() => view.setShowRescheduleForm(true)}>
                           Reschedule
                         </Button>
                       )}
-                      {(canModify || canCancelOnly) && (
-                        <Button variant="outline" className={`${canModify ? 'flex-1' : 'w-full'} h-[42px] border-destructive/50 text-destructive hover:bg-destructive/10`} onClick={() => view.setShowCancelForm(true)}>
+                      {canModify && !isPastEnd && (
+                        <Button variant="outline" className="flex-1 h-[42px] border-destructive/50 text-destructive hover:bg-destructive/10" onClick={() => view.setShowCancelForm(true)}>
                           Cancel
+                        </Button>
+                      )}
+                      {isCheckedIn && (
+                        <Button className="flex-1 h-[42px] bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => router.push('/secretary-v2/check-in')}>
+                          Go to Check-in &amp; Checkout
                         </Button>
                       )}
                     </div>
@@ -275,7 +298,7 @@ function AppointmentDetails({ appointment, view, activeTab, compact, hideActions
                       </div>
                     </>
                   )}
-                  {view.showCancelForm && (canModify || canCancelOnly) && (
+                  {view.showCancelForm && (canModify || isCheckedIn) && (
                     <>
                       <AppointmentCancelForm
                         reasonPreset={view.cancelReasonPreset}
@@ -337,7 +360,7 @@ function AppointmentDetails({ appointment, view, activeTab, compact, hideActions
 
       {/* Sticky Bottom Actions Bar for non-overview tabs */}
       {detailTab !== 'overview' && !hideActions && (() => {
-        const canCancelOnly = appointment.status === 'CHECKED_IN';
+        const isCheckedIn = appointment.status === 'CHECKED_IN';
         if (activeTab === 'history') {
           const patientId = appointment.patientId || appointment.patient?.id || '';
           const serviceId = appointment.serviceId || '';
@@ -360,7 +383,7 @@ function AppointmentDetails({ appointment, view, activeTab, compact, hideActions
             </div>
           );
         }
-        if (!canModify && !canRescheduleOnly && !canCancelOnly) return null;
+        if (!canModify && !canRescheduleOnly && !isCheckedIn && !isNoShowCandidate) return null;
 
         if (!view.showRescheduleForm && !view.showCancelForm) {
           return (
@@ -371,14 +394,29 @@ function AppointmentDetails({ appointment, view, activeTab, compact, hideActions
                 </p>
               )}
               <div className={`flex gap-2 ${isEditingChannel ? 'pointer-events-none opacity-40' : ''}`}>
-                {(canModify || canRescheduleOnly) && (
-                  <Button variant="outline" className={`${canModify ? 'flex-1' : 'w-full'} h-[42px]`} onClick={() => view.setShowRescheduleForm(true)}>
+                {isNoShowCandidate && !isResolvedNoShow && (
+                  <Button className="flex-1 h-[42px] bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => router.push(resolveTarget)}>
+                    Resolve
+                  </Button>
+                )}
+                {isResolvedNoShow && (
+                  <div className="w-full flex items-center justify-center text-[11px] text-muted-foreground py-2">
+                    No-show resolved — audit record in History
+                  </div>
+                )}
+                {canModify && !isPastEnd && (
+                  <Button variant="outline" className="flex-1 h-[42px]" onClick={() => view.setShowRescheduleForm(true)}>
                     Reschedule
                   </Button>
                 )}
-                {(canModify || canCancelOnly) && (
-                  <Button variant="outline" className={`${canModify ? 'flex-1' : 'w-full'} h-[42px] border-destructive/50 text-destructive hover:bg-destructive/10`} onClick={() => view.setShowCancelForm(true)}>
+                {canModify && !isPastEnd && (
+                  <Button variant="outline" className="flex-1 h-[42px] border-destructive/50 text-destructive hover:bg-destructive/10" onClick={() => view.setShowCancelForm(true)}>
                     Cancel
+                  </Button>
+                )}
+                {isCheckedIn && (
+                  <Button className="flex-1 h-[42px] bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => router.push('/secretary-v2/check-in')}>
+                    Go to Check-in &amp; Checkout
                   </Button>
                 )}
               </div>
@@ -402,7 +440,7 @@ function AppointmentDetails({ appointment, view, activeTab, compact, hideActions
                   </div>
                 </>
               )}
-              {view.showCancelForm && (canModify || canCancelOnly) && (
+              {view.showCancelForm && (canModify || isCheckedIn) && (
                 <AppointmentCancelForm
                   reasonPreset={view.cancelReasonPreset}
                   appointmentId={appointment.id}
