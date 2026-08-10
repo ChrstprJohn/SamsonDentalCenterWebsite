@@ -27,6 +27,8 @@ export type SampleDataField =
   | 'rescheduleReason'
   | 'checkoutNote'
   | 'referenceCode'
+  | 'oldDoctorName'
+  | 'oldServiceName'
   | 'oldDateStr'
   | 'oldTimeRangeStr'
   | 'calendarAddUrl'
@@ -49,6 +51,8 @@ export interface SampleData {
   rescheduleReason: string;
   checkoutNote: string;
   referenceCode: string;
+  oldDoctorName: string;
+  oldServiceName: string;
   oldDateStr: string;
   oldTimeRangeStr: string;
   calendarAddUrl: string;

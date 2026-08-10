@@ -78,15 +78,36 @@ export function EmailDesignPreview({
         {/* Appointment details block — label: value format */}
         {showDetails && (
           <div style={{ margin: '0 0 20px', paddingLeft: 0 }}>
-            {isRescheduled && (sample.oldDateStr || sample.oldTimeRangeStr) && (
-              <p style={{ ...p, margin: '0 0 8px' }}>
-                <span style={bold}>Previously scheduled:</span>{' '}
-                <span style={{ color: '#64748b', textDecoration: 'line-through' }}>
-                  {sample.oldDateStr && sample.oldTimeRangeStr
-                    ? `${sample.oldDateStr} (${sample.oldTimeRangeStr})`
-                    : sample.oldDateStr || sample.oldTimeRangeStr}
-                </span>
-              </p>
+            {isRescheduled && (sample.oldDoctorName || sample.oldServiceName || sample.oldDateStr || sample.oldTimeRangeStr) && (
+              <div style={{ margin: '0 0 16px', padding: '12px 16px', backgroundColor: '#f8fafc', borderRadius: 8, border: '1px solid #e2e8f0' }}>
+                <p style={{ ...p, margin: '0 0 6px', fontWeight: 700, color: '#64748b', fontSize: 13 }}>
+                  Previously scheduled:
+                </p>
+                {sample.oldDoctorName && (
+                  <p style={{ ...p, margin: '0 0 3px', fontSize: 13, color: '#64748b' }}>
+                    <span style={bold}>Doctor:</span>{' '}
+                    <span style={{ textDecoration: 'line-through' }}>{sample.oldDoctorName}</span>
+                  </p>
+                )}
+                {sample.oldServiceName && (
+                  <p style={{ ...p, margin: '0 0 3px', fontSize: 13, color: '#64748b' }}>
+                    <span style={bold}>Service:</span>{' '}
+                    <span style={{ textDecoration: 'line-through' }}>{sample.oldServiceName}</span>
+                  </p>
+                )}
+                {sample.oldDateStr && (
+                  <p style={{ ...p, margin: '0 0 3px', fontSize: 13, color: '#64748b' }}>
+                    <span style={bold}>Date:</span>{' '}
+                    <span style={{ textDecoration: 'line-through' }}>{sample.oldDateStr}</span>
+                  </p>
+                )}
+                {sample.oldTimeRangeStr && (
+                  <p style={{ ...p, margin: '0 0 3px', fontSize: 13, color: '#64748b' }}>
+                    <span style={bold}>Time:</span>{' '}
+                    <span style={{ textDecoration: 'line-through' }}>{sample.oldTimeRangeStr}</span>
+                  </p>
+                )}
+              </div>
             )}
             {isRescheduled && (
               <p style={{ ...p, margin: '0 0 8px', fontWeight: 700 }}>Your new appointment details:</p>

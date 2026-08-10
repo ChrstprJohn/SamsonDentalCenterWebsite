@@ -38,15 +38,11 @@ export async function dispatchAppointmentOutbox(appointmentId: string) {
   }
 }
 
-/** Schedule the targeted dispatch after the Server Action response is ready. */
+/** Run targeted dispatch for the appointment outbox events immediately. */
 export async function scheduleAppointmentOutboxDispatch(appointmentId: string) {
-  const work = () => dispatchAppointmentOutbox(appointmentId).catch((error: unknown) => {
-    console.warn('Failed to dispatch appointment outbox events:', error);
-  });
   try {
-    const { after } = await import('next/server');
-    after(work);
-  } catch {
-    void work();
+    await dispatchAppointmentOutbox(appointmentId);
+  } catch (error: unknown) {
+    console.warn('Failed to dispatch appointment outbox events:', error);
   }
 }

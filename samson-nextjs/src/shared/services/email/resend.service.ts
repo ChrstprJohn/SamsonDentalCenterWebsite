@@ -78,6 +78,8 @@ type EmailTemplates = {
     timeRangeStr: string;
     doctorName?: string;
     serviceName?: string;
+    oldDoctorName?: string;
+    oldServiceName?: string;
     oldDateStr?: string;
     oldTimeRangeStr?: string;
     appointmentId?: string;
@@ -216,6 +218,8 @@ export const ResendService = {
           patientName: reqPayload.patientName,
           serviceName: reqPayload.serviceName,
           doctorName: reqPayload.doctorName,
+          oldDoctorName: reqPayload.oldDoctorName,
+          oldServiceName: reqPayload.oldServiceName,
           oldDateStr: reqPayload.oldDateStr,
           oldTimeRangeStr: reqPayload.oldTimeRangeStr,
           dateStr: reqPayload.dateStr,

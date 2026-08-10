@@ -272,6 +272,8 @@ export function useSecretaryAppointments() {
         const duration = selectedAppointment.service?.durationMinutes || 30;
         initialEnd = calculateEndTime(initialStart, duration);
       }
+      const initialChannel = (selectedAppointment.confirmationChannel as any) || (selectedAppointment as any).confirmation_channel || 'EMAIL';
+      setConfirmationChannel(initialChannel);
       setRescheduleTime(initialStart);
       setRescheduleEndTime(initialEnd);
       setRescheduleJustification('');
@@ -301,6 +303,7 @@ export function useSecretaryAppointments() {
     setRescheduleEndTime('');
     setCancelReasonPreset('');
     setCancelReasonCustom('');
+    setConfirmationChannel('EMAIL');
   }, []);
 
   useEffect(() => { resetActionForms(); }, [selectedAppointmentId, resetActionForms]);

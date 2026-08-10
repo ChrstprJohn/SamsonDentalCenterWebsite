@@ -87,6 +87,56 @@ export const onRescheduleBookingSubscriber = {
       const endFmt = formatClinicTime(end);
       timeRangeStr = startFmt && endFmt ? `${startFmt} - ${endFmt}` : startFmt || 'To be scheduled';
     }
+    let oldDateStr = payload.oldDate ? formatShortDate(payload.oldDate) : (payload.oldDateStr || undefined);
+    let oldTimeRangeStr: string | undefined = payload.oldTimeRangeStr || undefined;
+    if (!oldTimeRangeStr && payload.oldStartTime) {
+      const oldStartFmt = formatClinicTime(payload.oldStartTime);
+      const oldEndFmt = payload.oldEndTime ? formatClinicTime(payload.oldEndTime) : undefined;
+      oldTimeRangeStr = oldStartFmt && oldEndFmt ? `${oldStartFmt} – ${oldEndFmt}` : oldStartFmt || undefined;
+    }
+    let oldDoctorName = payload.oldDoctorName || undefined;
+    let oldServiceName = payload.oldServiceName || undefined;
+    let rescheduleReason = payload.rescheduleReason || (appt as any)?.status_reason || undefined;
+
+    // Fallback: If previous details are not directly in payload (e.g. manual resend), look up the original reschedule event payload
+    if (!oldDateStr && !oldDoctorName && !oldServiceName) {
+      const { data: previousEvents } = await supabaseAdmin
+        .from('outbox')
+        .select('payload')
+        .eq('event_type', 'RESCHEDULE_BOOKING')
+        .contains('payload', { appointmentId })
+        .order('created_at', { ascending: false })
+        .limit(5);
+
+      const foundWithOld = (previousEvents || []).find(
+        (ev: any) => ev.payload?.oldDate || ev.payload?.oldDoctorName || ev.payload?.oldServiceName || ev.payload?.oldDateStr
+      );
+
+      if (foundWithOld?.payload) {
+        if (!oldDateStr && foundWithOld.payload.oldDate) {
+          oldDateStr = formatShortDate(foundWithOld.payload.oldDate);
+        } else if (!oldDateStr && foundWithOld.payload.oldDateStr) {
+          oldDateStr = foundWithOld.payload.oldDateStr;
+        }
+        if (!oldTimeRangeStr && foundWithOld.payload.oldStartTime) {
+          const oldStartFmt = formatClinicTime(foundWithOld.payload.oldStartTime);
+          const oldEndFmt = foundWithOld.payload.oldEndTime ? formatClinicTime(foundWithOld.payload.oldEndTime) : undefined;
+          oldTimeRangeStr = oldStartFmt && oldEndFmt ? `${oldStartFmt} – ${oldEndFmt}` : oldStartFmt || undefined;
+        } else if (!oldTimeRangeStr && foundWithOld.payload.oldTimeRangeStr) {
+          oldTimeRangeStr = foundWithOld.payload.oldTimeRangeStr;
+        }
+        if (!oldDoctorName && foundWithOld.payload.oldDoctorName) {
+          oldDoctorName = foundWithOld.payload.oldDoctorName;
+        }
+        if (!oldServiceName && foundWithOld.payload.oldServiceName) {
+          oldServiceName = foundWithOld.payload.oldServiceName;
+        }
+        if (!rescheduleReason && foundWithOld.payload.rescheduleReason) {
+          rescheduleReason = foundWithOld.payload.rescheduleReason;
+        }
+      }
+    }
+
     const baseUrl = getBaseUrl();
     const chatToken = appt.chat_token;
     const ref = formatRefId(appointmentId);
@@ -100,9 +150,14 @@ export const onRescheduleBookingSubscriber = {
         patientName: patientName || 'Valued Patient',
         serviceName,
         doctorName,
+        oldDoctorName,
+        oldServiceName,
+        oldDateStr,
+        oldTimeRangeStr,
         dateStr,
         timeRangeStr,
         appointmentId,
+        rescheduleReason,
         chatToken,
         baseUrl,
       }

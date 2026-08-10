@@ -18,6 +18,8 @@ export interface AppointmentRescheduledEmailProps {
   patientName?: string;
   serviceName?: string;
   doctorName?: string;
+  oldDoctorName?: string;
+  oldServiceName?: string;
   oldDateStr?: string;
   oldTimeRangeStr?: string;
   dateStr?: string;
@@ -49,6 +51,8 @@ export const AppointmentRescheduledEmail = ({
   patientName = 'Valued Patient',
   serviceName = 'Dental Consultation & Cleaning',
   doctorName = 'Dr. Adrian Samson',
+  oldDoctorName = '',
+  oldServiceName = '',
   oldDateStr = '',
   oldTimeRangeStr = '',
   dateStr = 'Monday, June 22, 2026',
@@ -91,15 +95,36 @@ export const AppointmentRescheduledEmail = ({
 
           {/* Details list */}
           <Section style={{ margin: '0 0 20px', paddingLeft: 0 }}>
-            {(oldDateStr || oldTimeRangeStr) && (
-              <Text style={{ ...pStyle, margin: '0 0 8px' }}>
-                <span style={boldStyle}>Previously scheduled:</span>{' '}
-                <span style={{ color: '#64748b', textDecoration: 'line-through' }}>
-                  {oldDateStr && oldTimeRangeStr
-                    ? `${oldDateStr} (${oldTimeRangeStr})`
-                    : oldDateStr || oldTimeRangeStr}
-                </span>
-              </Text>
+            {(oldDoctorName || oldServiceName || oldDateStr || oldTimeRangeStr) && (
+              <div style={{ margin: '0 0 16px', padding: '12px 16px', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                <Text style={{ ...pStyle, margin: '0 0 6px', fontWeight: 700, color: '#64748b', fontSize: '13px' }}>
+                  Previously scheduled:
+                </Text>
+                {oldDoctorName && (
+                  <Text style={{ ...pStyle, margin: '0 0 3px', fontSize: '13px', color: '#64748b' }}>
+                    <span style={boldStyle}>Doctor:</span>{' '}
+                    <span style={{ textDecoration: 'line-through' }}>{oldDoctorName}</span>
+                  </Text>
+                )}
+                {oldServiceName && (
+                  <Text style={{ ...pStyle, margin: '0 0 3px', fontSize: '13px', color: '#64748b' }}>
+                    <span style={boldStyle}>Service:</span>{' '}
+                    <span style={{ textDecoration: 'line-through' }}>{oldServiceName}</span>
+                  </Text>
+                )}
+                {oldDateStr && (
+                  <Text style={{ ...pStyle, margin: '0 0 3px', fontSize: '13px', color: '#64748b' }}>
+                    <span style={boldStyle}>Date:</span>{' '}
+                    <span style={{ textDecoration: 'line-through' }}>{oldDateStr}</span>
+                  </Text>
+                )}
+                {oldTimeRangeStr && (
+                  <Text style={{ ...pStyle, margin: '0 0 3px', fontSize: '13px', color: '#64748b' }}>
+                    <span style={boldStyle}>Time:</span>{' '}
+                    <span style={{ textDecoration: 'line-through' }}>{oldTimeRangeStr}</span>
+                  </Text>
+                )}
+              </div>
             )}
             <Text style={{ ...pStyle, margin: '0 0 8px', fontWeight: 700 }}>
               Your new appointment details:

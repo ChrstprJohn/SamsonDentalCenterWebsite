@@ -64,6 +64,8 @@ export function SecretaryEmailDesignStudioView() {
       preferredStartTimeStr: '',
       patientNote: '',
       referenceCode: '',
+      oldDoctorName: '',
+      oldServiceName: '',
       oldDateStr: '',
       oldTimeRangeStr: '',
       calendarAddUrl: '',

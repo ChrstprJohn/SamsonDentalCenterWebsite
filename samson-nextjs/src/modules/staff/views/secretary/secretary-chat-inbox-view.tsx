@@ -264,6 +264,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false,
     const [actionLoading, setActionLoading] = useState(false);
     const [actionError, setActionError] = useState<string | null>(null);
     const [actionSuccess, setActionSuccess] = useState<string | null>(null);
+    const [actionConfirmationChannel, setActionConfirmationChannel] = useState<'EMAIL' | 'SMS' | 'BOTH' | 'NONE'>('EMAIL');
 
     const [isEditingGuestInfo, setIsEditingGuestInfo] = useState(false);
     const [guestInfoDraft, setGuestInfoDraft] = useState({ firstName: '', middleName: '', lastName: '', suffix: '', email: '', phone: '' });
@@ -622,7 +623,8 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false,
                     newStartTime: startUtc,
                     newEndTime: endUtc,
                     newDoctorId: rescheduleDoctorId,
-                    newServiceId: selectedThread.serviceId || undefined
+                    newServiceId: selectedThread.serviceId || undefined,
+                    confirmationChannel: actionConfirmationChannel,
                 });
             } else if (activeAction === 'CANCEL') {
                 const finalReason = (actionReasonPreset === 'CUSTOM' ? actionReason.trim() : actionReasonPreset) || actionReason.trim();
@@ -799,8 +801,9 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false,
         if (!appointmentAdapter) return null;
         return {
             selectedAppointment: appointmentAdapter,
-            confirmationChannel: appointmentAdapter.confirmationChannel,
+            confirmationChannel: actionConfirmationChannel,
             setConfirmationChannel: (channel: 'EMAIL' | 'SMS' | 'BOTH' | 'NONE') => {
+                setActionConfirmationChannel(channel);
                 setThreads(prev => prev.map(t => t.appointmentId === selectedThreadId
                     ? { ...t, confirmationChannel: channel, confirmation_channel: channel }
                     : t));
@@ -818,6 +821,8 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false,
                     setRescheduleServiceId(selectedThread?.serviceId || '');
                     setRescheduleDate(selectedThread?.date || '');
                     setRescheduleDoctorId(selectedThread?.doctorId || '');
+                    const initialChannel = (fullAppointment?.confirmationChannel as any) || (selectedThread as any)?.confirmationChannel || 'EMAIL';
+                    setActionConfirmationChannel(initialChannel);
                     const parseTimeToHHMM = (timeStr?: string | null) => {
                         if (!timeStr) return '';
                         if (timeStr.includes('T')) {

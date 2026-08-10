@@ -10,6 +10,7 @@ import { getClinicAppointmentsAction } from '@/modules/appointments/actions/clin
 import { getStaffAppointmentByIdAction } from '@/modules/appointments/actions/clinic/get-staff-appointment-by-id.action';
 import { updateAppointmentStatusAction } from '@/modules/appointments/actions/status/update-appointment-status.action';
 import { Button } from '@/components/ui/button';
+import { calculateEndTime } from '@/shared/utils/date.util';
 import { InquiryToast } from './sub-components/inquiry-toast';
 import {
   Sidebar,
@@ -78,6 +79,7 @@ export function SecretaryBookAppointmentView() {
   const [cancelReasonPreset, setCancelReasonPreset] = React.useState('');
   const [cancelReasonCustom, setCancelReasonCustom] = React.useState('');
   const [isActionSubmitting, setIsActionSubmitting] = React.useState(false);
+  const [actionConfirmationChannel, setActionConfirmationChannel] = React.useState<'EMAIL' | 'SMS' | 'BOTH' | 'NONE'>('EMAIL');
 
   const handleCalendarReschedule = async () => {
     if (!view.selectedAppointmentDetails) return;
@@ -98,6 +100,7 @@ export function SecretaryBookAppointmentView() {
         newEndTime: formatIso(rescheduleDate, rescheduleEndTime),
         newDoctorId: rescheduleDoctorId,
         newServiceId: rescheduleServiceId,
+        confirmationChannel: actionConfirmationChannel,
       });
       if (res.success) {
         setIsRescheduleOpen(false);
@@ -431,23 +434,20 @@ export function SecretaryBookAppointmentView() {
                 compact
                 view={{
                   selectedAppointment: view.selectedAppointmentDetails,
-                  confirmationChannel: (view.selectedAppointmentDetails.confirmationChannel || (view.selectedAppointmentDetails as any).confirmation_channel || 'EMAIL'),
-                  setConfirmationChannel: (channel: 'EMAIL' | 'SMS' | 'BOTH' | 'NONE') => {
-                    if (view.selectedAppointmentDetails) {
-                      view.selectedAppointmentDetails.confirmationChannel = channel;
-                      (view.selectedAppointmentDetails as any).confirmation_channel = channel;
-                    }
-                  },
+                  confirmationChannel: actionConfirmationChannel,
+                  setConfirmationChannel: setActionConfirmationChannel,
                   activeTab: 'upcoming',
                   showRescheduleForm: isRescheduleOpen,
                   setShowRescheduleForm: (show: boolean) => {
                     if (show) {
-                      void view.loadActionResources();
                       setIsRescheduleOpen(true);
                       setIsCancelOpen(false);
                       setRescheduleServiceId(view.selectedAppointmentDetails?.serviceId || '');
-                      setRescheduleDate(view.selectedAppointmentDetails?.date || '');
                       setRescheduleDoctorId(view.selectedAppointmentDetails?.doctorId || '');
+                      setRescheduleDate(view.selectedAppointmentDetails?.date || '');
+                      setRescheduleJustification('');
+                      const apptChannel = (view.selectedAppointmentDetails?.confirmationChannel as any) || (view.selectedAppointmentDetails as any)?.confirmation_channel || 'EMAIL';
+                      setActionConfirmationChannel(apptChannel);
                       const parseTimeToHHMM = (timeStr?: string | null) => {
                         if (!timeStr) return '';
                         if (timeStr.includes('T')) {
@@ -458,9 +458,14 @@ export function SecretaryBookAppointmentView() {
                         if (match) return `${match[1]}:${match[2]}`;
                         return '';
                       };
-                      setRescheduleStartTime(parseTimeToHHMM(view.selectedAppointmentDetails?.startTime));
-                      setRescheduleEndTime(parseTimeToHHMM(view.selectedAppointmentDetails?.endTime));
-                      setRescheduleJustification('');
+                      const initialStart = parseTimeToHHMM(view.selectedAppointmentDetails?.startTime);
+                      let initialEnd = parseTimeToHHMM(view.selectedAppointmentDetails?.endTime);
+                      if (initialStart && (!initialEnd || initialStart >= initialEnd)) {
+                        const duration = (view.selectedAppointmentDetails as any)?.service?.durationMinutes || 30;
+                        initialEnd = calculateEndTime(initialStart, duration);
+                      }
+                      setRescheduleStartTime(initialStart);
+                      setRescheduleEndTime(initialEnd);
                     } else {
                       setIsRescheduleOpen(false);
                     }

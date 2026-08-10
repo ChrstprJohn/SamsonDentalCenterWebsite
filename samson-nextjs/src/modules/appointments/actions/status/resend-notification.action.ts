@@ -93,7 +93,7 @@ export async function resendNotificationAction(input: ResendNotificationInput) {
     const reuseOrEmit = async (eventType: string, payload: Record<string, any>) => {
       const { data: existing } = await supabaseAdmin
         .from('outbox')
-        .select('id')
+        .select('id, payload')
         .eq('event_type', eventType)
         .contains('payload', { appointmentId: parsed.appointmentId })
         .in('status', ['FAILED', 'PENDING'])
@@ -101,9 +101,10 @@ export async function resendNotificationAction(input: ResendNotificationInput) {
         .limit(1);
 
       if (existing && existing.length > 0) {
+        const mergedPayload = { ...(existing[0].payload || {}), ...payload };
         await supabaseAdmin
           .from('outbox')
-          .update({ status: 'PENDING', retry_count: 0, error_logs: null, payload })
+          .update({ status: 'PENDING', retry_count: 0, error_logs: null, payload: mergedPayload })
           .eq('id', existing[0].id);
         return existing[0].id;
       }

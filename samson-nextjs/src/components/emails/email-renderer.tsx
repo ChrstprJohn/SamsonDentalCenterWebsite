@@ -118,6 +118,8 @@ export function RenderedEmailFrame({ eventType, payload }: RenderedEmailFramePro
         patientName={patientName}
         serviceName={serviceName}
         doctorName={doctorName}
+        oldDoctorName={safePayload.oldDoctorName || undefined}
+        oldServiceName={safePayload.oldServiceName || undefined}
         oldDateStr={oldDateStr}
         oldTimeRangeStr={oldTimeRangeStr}
         dateStr={dateStr}

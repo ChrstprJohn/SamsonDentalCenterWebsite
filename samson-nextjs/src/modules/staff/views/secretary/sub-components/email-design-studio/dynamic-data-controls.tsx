@@ -118,6 +118,30 @@ export function DynamicDataControls({
             </div>
           )}
 
+          {visibleFields.has('oldDoctorName') && (
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Previous Doctor</label>
+              <Input
+                value={sample.oldDoctorName}
+                onChange={(event) => onUpdateField('oldDoctorName', event.target.value)}
+                placeholder="e.g. Dr. Adrian Samson"
+                className="h-9 text-xs rounded-lg bg-background"
+              />
+            </div>
+          )}
+
+          {visibleFields.has('oldServiceName') && (
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Previous Service</label>
+              <Input
+                value={sample.oldServiceName}
+                onChange={(event) => onUpdateField('oldServiceName', event.target.value)}
+                placeholder="e.g. General Consultation"
+                className="h-9 text-xs rounded-lg bg-background"
+              />
+            </div>
+          )}
+
           {visibleFields.has('oldDateStr') && (
             <div>
               <label className="block text-xs font-medium text-muted-foreground mb-1">Previous Appointment Date</label>
