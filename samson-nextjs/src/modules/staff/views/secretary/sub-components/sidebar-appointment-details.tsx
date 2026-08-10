@@ -9,6 +9,8 @@ import { getDoctorsAction } from '@/modules/staff/actions/management/get-doctors
 import { UserRound, Calendar, XCircle, CheckCircle, AlertCircle, Pencil, Check, X, ArrowLeft, Mail, Send } from 'lucide-react';
 import { formatClinicTime } from '@/shared/utils/date.util';
 import { NativeTimePopoverPicker } from '@/shared/components/native-time-popover-picker';
+import { getDailyScheduleBounds, formatTimeRange } from '@/shared/utils/schedule-bounds.util';
+import { getClinicConfigAction } from '@/modules/clinic-config/actions/settings/get-clinic-config.action';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -31,6 +33,17 @@ export function SidebarAppointmentDetails({
 }: SidebarAppointmentDetailsProps) {
   const [localAppointment, setLocalAppointment] = useState(appointment);
   const [doctors, setDoctors] = useState<{ id: string; firstName: string; lastName: string }[]>([]);
+  const [operatingHours, setOperatingHours] = useState<any>(null);
+
+  useEffect(() => {
+    async function loadConfig() {
+      const res = await getClinicConfigAction();
+      if (res && 'data' in res && res.data) {
+        setOperatingHours(res.data.operatingHours);
+      }
+    }
+    loadConfig();
+  }, []);
   const [activeAction, setActiveAction] = useState<'NONE' | 'RESCHEDULE' | 'CANCEL'>('NONE');
   const [actionReason, setActionReason] = useState('');
   const [rescheduleDate, setRescheduleDate] = useState(appointment.date || '');
@@ -479,24 +492,43 @@ export function SidebarAppointmentDetails({
                   <label className="text-xs text-muted-foreground">New Date</label>
                   <Input type="date" value={rescheduleDate} onChange={e => setRescheduleDate(e.target.value)} />
                 </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="flex flex-col gap-0.5">
-                    <label className="text-xs text-muted-foreground">Start Time</label>
-                    <NativeTimePopoverPicker
-                      value={rescheduleStartTime}
-                      onChange={val => setRescheduleStartTime(val)}
-                      placeholder="Select Start Time"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-0.5">
-                    <label className="text-xs text-muted-foreground">End Time</label>
-                    <NativeTimePopoverPicker
-                      value={rescheduleEndTime}
-                      onChange={val => setRescheduleEndTime(val)}
-                      placeholder="Select End Time"
-                    />
-                  </div>
-                </div>
+                {(() => {
+                  const bounds = getDailyScheduleBounds(rescheduleDate, operatingHours);
+                  return (
+                    <>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="flex flex-col gap-0.5">
+                          <label className="text-xs text-muted-foreground">Start Time</label>
+                          <NativeTimePopoverPicker
+                            value={rescheduleStartTime}
+                            onChange={val => setRescheduleStartTime(val)}
+                            placeholder="Select Start Time"
+                            minTime={bounds.minTime}
+                            maxTime={bounds.maxTime}
+                            unavailableRanges={bounds.unavailableRanges}
+                          />
+                        </div>
+                        <div className="flex flex-col gap-0.5">
+                          <label className="text-xs text-muted-foreground">End Time</label>
+                          <NativeTimePopoverPicker
+                            value={rescheduleEndTime}
+                            onChange={val => setRescheduleEndTime(val)}
+                            placeholder="Select End Time"
+                            minTime={bounds.minTime}
+                            maxTime={bounds.maxTime}
+                            unavailableRanges={bounds.unavailableRanges}
+                          />
+                        </div>
+                      </div>
+                      {bounds.isOpen && bounds.minTime && bounds.maxTime && (
+                        <p className="text-[11px] text-muted-foreground mt-0.5 font-sans">
+                          Available {formatTimeRange(bounds.minTime)}–{formatTimeRange(bounds.maxTime)}
+                          {bounds.unavailableRanges.length > 0 && ` (break ${formatTimeRange(bounds.unavailableRanges[0].start)}–${formatTimeRange(bounds.unavailableRanges[0].end)})`}.
+                        </p>
+                      )}
+                    </>
+                  );
+                })()}
                 <div className="flex flex-col gap-0.5">
                   <label className="text-xs text-muted-foreground">Assign Doctor</label>
                   <Select value={rescheduleDoctorId} onChange={e => setRescheduleDoctorId(e.target.value)} options={[{ value: '', label: 'Select Doctor...' }, ...doctors.map(d => ({ value: d.id, label: `Dr. ${d.firstName} ${d.lastName}` }))]} />

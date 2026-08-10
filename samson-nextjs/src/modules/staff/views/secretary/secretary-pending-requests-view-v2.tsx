@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { NativeTimePopoverPicker } from '@/shared/components/native-time-popover-picker';
+import { getDailyScheduleBounds, formatTimeRange } from '@/shared/utils/schedule-bounds.util';
 import { useSecretaryInquiriesQueue } from '../../hooks/secretary/use-secretary-inquiries-queue';
 import { PendingRequestListV2 } from './sub-components/pending-request-list-v2';
 import { NotificationChannelField } from './sub-components/notification-channel-field';
@@ -736,34 +737,53 @@ export function SecretaryPendingRequestsViewV2() {
                             <DatePicker value={inquiriesView.stagedInquiryDate} onChange={(v) => inquiriesView.selectDate(v)} />
                           </div>
                         </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          <div className="flex flex-col gap-0.5">
-                            <div className="flex items-center gap-2">
-                              <span className="text-xs text-muted-foreground">Start Time <span className="text-destructive">*</span></span>
-                              {inquiriesView.stagedInquiryTime.includes(':') && <span className="text-xs text-muted-foreground/60">Prefered time {formatTime(inquiriesView.stagedInquiryTime)}</span>}
-                            </div>
-                            <NativeTimePopoverPicker
-                              value={inquiriesView.stagedInquiryTime}
-                              onChange={(val) => inquiriesView.setStagedInquiryTime(val)}
-                              placeholder="Select Start Time"
-                            />
-                          </div>
-                          <div className="flex flex-col gap-0.5">
-                            <span className="text-xs text-muted-foreground">End Time <span className="text-destructive">*</span></span>
-                            <div className="relative">
-                              <NativeTimePopoverPicker
-                                value={inquiriesView.stagedInquiryEndTime}
-                                onChange={(val) => inquiriesView.setStagedInquiryEndTime(val)}
-                                placeholder="Select End Time"
-                              />
-                              {inquiriesView.stagedInquiryEndTime && (
-                                <button type="button" onClick={() => inquiriesView.setStagedInquiryEndTime('')} className="absolute right-10 top-1/2 -translate-y-1/2 size-5 flex items-center justify-center text-muted-foreground hover:text-foreground z-10">
-                                  <X className="size-4" />
-                                </button>
+                        {(() => {
+                          const bounds = getDailyScheduleBounds(inquiriesView.stagedInquiryDate, inquiriesView.operatingHours);
+                          return (
+                            <>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div className="flex flex-col gap-0.5">
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-xs text-muted-foreground">Start Time <span className="text-destructive">*</span></span>
+                                    {inquiriesView.stagedInquiryTime.includes(':') && <span className="text-xs text-muted-foreground/60">Prefered time {formatTime(inquiriesView.stagedInquiryTime)}</span>}
+                                  </div>
+                                  <NativeTimePopoverPicker
+                                    value={inquiriesView.stagedInquiryTime}
+                                    onChange={(val) => inquiriesView.setStagedInquiryTime(val)}
+                                    placeholder="Select Start Time"
+                                    minTime={bounds.minTime}
+                                    maxTime={bounds.maxTime}
+                                    unavailableRanges={bounds.unavailableRanges}
+                                  />
+                                </div>
+                                <div className="flex flex-col gap-0.5">
+                                  <span className="text-xs text-muted-foreground">End Time <span className="text-destructive">*</span></span>
+                                  <div className="relative">
+                                    <NativeTimePopoverPicker
+                                      value={inquiriesView.stagedInquiryEndTime}
+                                      onChange={(val) => inquiriesView.setStagedInquiryEndTime(val)}
+                                      placeholder="Select End Time"
+                                      minTime={bounds.minTime}
+                                      maxTime={bounds.maxTime}
+                                      unavailableRanges={bounds.unavailableRanges}
+                                    />
+                                    {inquiriesView.stagedInquiryEndTime && (
+                                      <button type="button" onClick={() => inquiriesView.setStagedInquiryEndTime('')} className="absolute right-10 top-1/2 -translate-y-1/2 size-5 flex items-center justify-center text-muted-foreground hover:text-foreground z-10">
+                                        <X className="size-4" />
+                                      </button>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                              {bounds.isOpen && bounds.minTime && bounds.maxTime && (
+                                <p className="text-[11px] text-muted-foreground mt-0.5 font-sans">
+                                  Available {formatTimeRange(bounds.minTime)}–{formatTimeRange(bounds.maxTime)}
+                                  {bounds.unavailableRanges.length > 0 && ` (break ${formatTimeRange(bounds.unavailableRanges[0].start)}–${formatTimeRange(bounds.unavailableRanges[0].end)})`}.
+                                </p>
                               )}
-                            </div>
-                          </div>
-                        </div>
+                            </>
+                          );
+                        })()}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                           <div className="flex flex-col gap-0.5">
                             <span className="text-xs text-muted-foreground">Assign Dentist <span className="text-destructive">*</span></span>

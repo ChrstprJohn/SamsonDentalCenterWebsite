@@ -9,6 +9,7 @@ import { useBookingScheduler } from '@/modules/appointments/hooks/shared/use-boo
 import { searchPatientsAction } from '@/modules/patients/actions/profile/search-patients.action';
 import { getServicesAction } from '@/modules/services/actions/management/get-services.action';
 import { getDoctorsAction } from '@/modules/staff/actions/management/get-doctors.action';
+import { getClinicConfigAction } from '@/modules/clinic-config/actions/settings/get-clinic-config.action';
 import type { UserProfileResponseDto } from '@/modules/staff/dtos/exports';
 
 
@@ -83,6 +84,18 @@ export function useSecretaryInquiriesQueue() {
   const availableDates = stagedInquiryService ? scheduler.availableDates : [];
   // Full doctor list, no service/date filter — secretary picks any doctor (like Book Appointment).
   const [allDoctors, setAllDoctors] = useState<{ doctorId: string; doctorName: string }[]>([]);
+  const [operatingHours, setOperatingHours] = useState<any>(null);
+
+  useEffect(() => {
+    async function loadConfig() {
+      const res = await getClinicConfigAction();
+      if (res && 'data' in res && res.data) {
+        setOperatingHours(res.data.operatingHours);
+      }
+    }
+    loadConfig();
+  }, []);
+
   useEffect(() => {
     getDoctorsAction({ includeHidden: true }).then((res) => {
       if (res.success && res.data) {
@@ -527,6 +540,6 @@ export function useSecretaryInquiriesQueue() {
     isLoadingDoctors: scheduler.loadingKey === 'doctors', isLoadingSlots: scheduler.loadingKey === 'slots',
     isSubmitting, inlineError, toast, isAvailabilityLoading, canSubmit, submitReview, saveInquiryChanges, saveInquiryChannel,
     activeTab, setActiveTab: selectTab, tabCounts, searchTerm, setSearchTerm,
-    hasMore, isLoadingMore, loadMoreError, loadMore,
+    hasMore, isLoadingMore, loadMoreError, loadMore, operatingHours
   };
 }
