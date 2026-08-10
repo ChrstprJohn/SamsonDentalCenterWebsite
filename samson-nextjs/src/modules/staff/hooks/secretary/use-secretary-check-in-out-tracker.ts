@@ -18,6 +18,7 @@ export function useSecretaryCheckInOutTracker() {
   const [currentTime, setCurrentTime] = useState<Date | null>(null);
   const [bypassWindow, setBypassWindow] = useState(false); // Dev/Test toggle for anytime check-in
   const [checkInAppt, setCheckInAppt] = useState<AppointmentDto | null>(null);
+  const [noShowAppt, setNoShowAppt] = useState<AppointmentDto | null>(null);
   const [checkoutAppt, setCheckoutAppt] = useState<AppointmentDto | null>(null);
   const [viewAppt, setViewAppt] = useState<AppointmentDto | null>(null);
   const [resolveAppt, setResolveAppt] = useState<AppointmentDto | null>(null);
@@ -111,6 +112,7 @@ export function useSecretaryCheckInOutTracker() {
 
   const clearSelection = () => {
     setCheckInAppt(null);
+    setNoShowAppt(null);
     setCheckoutAppt(null);
     setViewAppt(null);
     setResolveAppt(null);
@@ -193,6 +195,18 @@ export function useSecretaryCheckInOutTracker() {
   const handleUndoCheckIn = (appointmentId: string, reason?: string) => {
     runStatusAction(appointmentId, () => undoCheckInAction({ appointmentId, reason }), 'Failed to undo check-in');
   };
+
+  const handleMarkNoShow = (appointmentId: string, reason?: string) =>
+    runStatusAction(
+      appointmentId,
+      () =>
+        updateAppointmentStatusAction({
+          appointmentId,
+          status: 'NO_SHOW',
+          statusReason: reason || 'Marked as no-show by secretary during check-in',
+        }),
+      'Failed to mark as no-show'
+    );
 
   const handleCheckoutComplete = (appointmentId: string, reason?: string) => {
     startTransition(async () => {
@@ -298,6 +312,11 @@ export function useSecretaryCheckInOutTracker() {
     setCheckInAppt(appointment);
   };
 
+  const openNoShow = (appointment: AppointmentDto) => {
+    clearSelection();
+    setNoShowAppt(appointment);
+  };
+
   const openCheckout = (appointment: AppointmentDto) => {
     clearSelection();
     setCheckoutAppt(appointment);
@@ -360,6 +379,8 @@ export function useSecretaryCheckInOutTracker() {
     resetRescheduleDraft,
     checkInAppt,
     setCheckInAppt,
+    noShowAppt,
+    setNoShowAppt,
     checkoutAppt,
     setCheckoutAppt,
     viewAppt,
@@ -388,11 +409,13 @@ export function useSecretaryCheckInOutTracker() {
     getCheckInStatus,
     handleCheckIn,
     handleUndoCheckIn,
+    handleMarkNoShow,
     handleCheckoutComplete,
     handleResolveNoShowSubmit,
     handleRescheduleSubmit,
     handleViewApptDetails,
     openCheckIn,
+    openNoShow,
     openCheckout,
     openResolve,
     openReschedule,

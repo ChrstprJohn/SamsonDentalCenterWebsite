@@ -36,7 +36,6 @@ interface AppointmentsTableProps {
   formatPatientName: (appointment: AppointmentDto) => string;
   onSelect: (appointmentId: string) => void;
   activeTab?: AppointmentDirectoryTab;
-  onQuickAction?: () => void;
 }
 
 export function AppointmentsTable(props: AppointmentsTableProps) {
@@ -116,7 +115,6 @@ export function AppointmentsTable(props: AppointmentsTableProps) {
             formatPatientName={props.formatPatientName}
             onSelect={props.onSelect}
             activeTab={props.activeTab}
-            onQuickAction={props.onQuickAction}
           />
         ))}
         {props.loadMoreError && (
@@ -169,9 +167,8 @@ export function AppointmentsTable(props: AppointmentsTableProps) {
   );
 }
 
-function AppointmentRow({ appointment, isSelected, formatPatientName, onSelect, activeTab, onQuickAction }: { appointment: AppointmentDto; isSelected: boolean; formatPatientName: (appointment: AppointmentDto) => string; onSelect: (id: string) => void; activeTab?: AppointmentDirectoryTab; onQuickAction?: () => void }) {
+function AppointmentRow({ appointment, isSelected, formatPatientName, onSelect, activeTab }: { appointment: AppointmentDto; isSelected: boolean; formatPatientName: (appointment: AppointmentDto) => string; onSelect: (id: string) => void; activeTab?: AppointmentDirectoryTab }) {
   const status = appointment.status;
-  const showQuickAction = activeTab === 'upcoming' && status === 'NO_SHOW' && !appointment.noShowResolvedAt && !!onQuickAction;
   const timeDisplay = appointment.startTime && appointment.endTime
     ? `${formatClinicTime(appointment.startTime)} - ${formatClinicTime(appointment.endTime)}`
     : appointment.preferredStartTime
@@ -200,17 +197,6 @@ function AppointmentRow({ appointment, isSelected, formatPatientName, onSelect, 
         <span className={`ml-auto text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded shrink-0 ${BADGE_STYLES[status] || 'text-muted-foreground bg-muted/20'}`}>
           {status === 'APPROVED' ? 'Confirmed' : status === 'NO_SHOW' && activeTab === 'upcoming' ? 'No-Show (Today)' : status}
         </span>
-        {showQuickAction && (
-          <span
-            role="button"
-            tabIndex={0}
-            onClick={(e) => { e.stopPropagation(); onQuickAction(); }}
-            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); onQuickAction(); } }}
-            className="shrink-0 text-[10px] font-semibold px-2 py-1 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer"
-          >
-            Resolve
-          </span>
-        )}
       </div>
       <span className="font-medium truncate">
         {appointment.service?.name || 'Treatment'}

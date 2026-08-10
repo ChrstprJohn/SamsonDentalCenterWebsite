@@ -15,7 +15,7 @@ export function SecretaryCheckInOutTrackerView() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterDoctorId, setFilterDoctorId] = useState('');
 
-  const hasSelection = !!(view.checkInAppt || view.checkoutAppt || view.viewAppt || view.resolveAppt || view.rescheduleAppt);
+  const hasSelection = !!(view.checkInAppt || view.noShowAppt || view.checkoutAppt || view.viewAppt || view.resolveAppt || view.rescheduleAppt);
 
   const colMobile = (v: 'board' | 'detail') => (mobileView === v ? 'flex' : 'hidden');
 

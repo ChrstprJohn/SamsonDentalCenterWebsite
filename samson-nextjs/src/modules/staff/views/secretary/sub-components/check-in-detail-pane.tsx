@@ -40,6 +40,9 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
   const [checkInReason, setCheckInReason] = useState('');
   const [checkInReasonMode, setCheckInReasonMode] = useState('');
   const [checkInCustomReason, setCheckInCustomReason] = useState('');
+  const [noShowReason, setNoShowReason] = useState('');
+  const [noShowReasonMode, setNoShowReasonMode] = useState('');
+  const [noShowCustomReason, setNoShowCustomReason] = useState('');
   const [checkoutReason, setCheckoutReason] = useState('');
   const [checkoutReasonMode, setCheckoutReasonMode] = useState('');
   const [checkoutCustomReason, setCheckoutCustomReason] = useState('');
@@ -56,7 +59,7 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
     CONFIRMED_NO_SHOW: ['Patient failed to arrive for appointment', 'Patient arrived after closing', 'Patient refused treatment'],
   };
   const [selectedPreset, setSelectedPreset] = useState('');
-  const appointment = view.checkInAppt || view.checkoutAppt || view.viewAppt || view.resolveAppt || view.rescheduleAppt;
+  const appointment = view.checkInAppt || view.noShowAppt || view.checkoutAppt || view.viewAppt || view.resolveAppt || view.rescheduleAppt;
 
   const ch = (appointment?.confirmationChannel || appointment?.confirmation_channel) as 'EMAIL' | 'SMS' | 'BOTH' | 'NONE' || 'EMAIL';
   const [inlineChannel, setInlineChannel] = useState(ch);
@@ -71,7 +74,7 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
   const [draftResolveChannel, setDraftResolveChannel] = useState(ch);
   const [isEditingResolveChannel, setIsEditingResolveChannel] = useState(false);
   const [isSavingResolveChannel, setIsSavingResolveChannel] = useState(false);
-  const selectionMode = view.checkInAppt ? 'checkin' : view.checkoutAppt ? 'checkout' : view.viewAppt ? 'details' : view.resolveAppt ? 'resolve' : view.rescheduleAppt ? 'reschedule' : null;
+  const selectionMode = view.checkInAppt ? 'checkin' : view.noShowAppt ? 'noshow' : view.checkoutAppt ? 'checkout' : view.viewAppt ? 'details' : view.resolveAppt ? 'resolve' : view.rescheduleAppt ? 'reschedule' : null;
 
   const resetActionDrafts = useCallback((channel = ch) => {
     setShowCheckInForm(false);
@@ -83,6 +86,9 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
     setCheckInReason('');
     setCheckInReasonMode('');
     setCheckInCustomReason('');
+    setNoShowReason('');
+    setNoShowReasonMode('');
+    setNoShowCustomReason('');
     setCheckoutReason('');
     setCheckoutReasonMode('');
     setCheckoutCustomReason('');
@@ -195,7 +201,9 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
         ? 'Appointment Details'
         : paneType === 'checkin'
           ? 'Check In Patient'
-          : paneType === 'checkout'
+          : paneType === 'noshow'
+            ? 'Mark No-Show'
+            : paneType === 'checkout'
             ? 'Checkout Patient'
             : paneType === 'resolve'
               ? resolveMode === 'COMPLETED'
@@ -224,7 +232,7 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
       returnToDetails();
       return;
     }
-    if (paneType === 'checkin' || paneType === 'checkout' || paneType === 'resolve' || paneType === 'reschedule') {
+    if (paneType === 'checkin' || paneType === 'noshow' || paneType === 'checkout' || paneType === 'resolve' || paneType === 'reschedule') {
       returnToDetails();
       return;
     }
@@ -246,7 +254,9 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
               ? 'Update date, time, dentist, or service details.'
               : paneType === 'checkin'
                 ? 'Confirm the patient has arrived for their appointment.'
-                : paneType === 'checkout'
+                : paneType === 'noshow'
+                  ? 'Confirm the patient did not arrive.'
+                  : paneType === 'checkout'
                   ? 'Review the visit and finalize checkout.'
                   : paneType === 'resolve'
                     ? resolveMode === 'COMPLETED'
@@ -292,6 +302,23 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
                 onCustomReasonChange={(value) => {
                   setCheckInCustomReason(value);
                   if (checkInReasonMode === 'CUSTOM') setCheckInReason(value);
+                }}
+              />
+            )}
+            {paneType === 'noshow' && (
+              <NoShowContent
+                appointment={appointment}
+                view={view}
+                onClose={onClose}
+                reasonMode={noShowReasonMode}
+                customReason={noShowCustomReason}
+                onReasonSelect={(value) => {
+                  setNoShowReasonMode(value);
+                  setNoShowReason(value === 'CUSTOM' ? noShowCustomReason : value);
+                }}
+                onCustomReasonChange={(value) => {
+                  setNoShowCustomReason(value);
+                  if (noShowReasonMode === 'CUSTOM') setNoShowReason(value);
                 }}
               />
             )}
@@ -427,9 +454,14 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
                 </>
               );
             })() : paneType === 'details' && appointment.status === 'APPROVED' && !showCheckInForm && (
+                <>
+                <button onClick={() => { resetActionDrafts(); view.openNoShow(appointment); }} className="flex-1 h-[42px] text-sm font-semibold border border-red-500/40 bg-red-500/5 text-red-600 dark:text-red-400 hover:bg-red-500/10 transition-colors rounded-xl">
+                  No Show
+                </button>
                 <button onClick={() => { resetActionDrafts(); view.openCheckIn(appointment); }} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl">
                 Check In
               </button>
+              </>
             )}
             {paneType === 'details' && appointment.status === 'APPROVED' && showCheckInForm && null}
             {paneType === 'details' && appointment.status === 'NO_SHOW' && !showResolveForm && (
@@ -606,6 +638,12 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
                 <button onClick={() => view.handleCheckIn(appointment.id, checkInReason)} disabled={view.isPending || !checkInReason.trim()} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl disabled:opacity-40">{view.isPending ? 'Checking In...' : 'Confirm Check-In'}</button>
               </>
             )}
+            {paneType === 'noshow' && (
+              <>
+                <button onClick={returnToDetails} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent rounded-xl">Back</button>
+                <button onClick={() => view.handleMarkNoShow(appointment.id, noShowReason)} disabled={view.isPending || !noShowReason.trim()} className="flex-1 h-[42px] text-sm font-semibold bg-red-500 text-white hover:bg-red-600 rounded-xl disabled:opacity-40">{view.isPending ? 'Marking...' : 'Confirm No-Show'}</button>
+              </>
+            )}
             {paneType === 'checkout' && (
               <>
                 <button onClick={returnToDetails} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent rounded-xl">Back</button>
@@ -676,6 +714,59 @@ function CheckInContent({
             value={customReason}
             onChange={(event) => onCustomReasonChange(event.target.value)}
             placeholder="Enter check-in reason..."
+            className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border min-h-[60px] resize-none"
+            required
+          />
+        )}
+      </div>
+    </div>
+  );
+}
+
+function NoShowContent({
+  reasonMode,
+  customReason,
+  onReasonSelect,
+  onCustomReasonChange,
+}: {
+  appointment: any;
+  view: any;
+  onClose: () => void;
+  reasonMode: string;
+  customReason: string;
+  onReasonSelect: (value: string) => void;
+  onCustomReasonChange: (value: string) => void;
+}) {
+  const reasonOptions = ['Patient did not arrive for appointment', 'Patient arrived after closing', 'Patient refused treatment'];
+
+  return (
+    <div className="flex flex-col gap-4">
+      <InfoBox variant="red" title="No-Show Notice">
+        Confirming will move the appointment to the No-Show queue, log it in the audit trail, and send the missed-appointment notification.
+      </InfoBox>
+      <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-0.5">
+          <span className="text-sm font-medium text-foreground">Reason for No-Show <span className="text-destructive">*</span></span>
+          <span className="text-xs text-muted-foreground">Add a reason for marking this appointment as no-show.</span>
+        </div>
+        <div className="relative flex items-center">
+          <select
+            value={reasonMode}
+            onChange={(event) => onReasonSelect(event.target.value)}
+            className="w-full px-4 pr-10 py-2.5 appearance-none rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
+            required
+          >
+            <option value="" disabled>Select a Reason</option>
+            {reasonOptions.map((option) => <option key={option} value={option}>{option}</option>)}
+            <option value="CUSTOM">Other / Custom Reason...</option>
+          </select>
+          <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+        </div>
+        {reasonMode === 'CUSTOM' && (
+          <Textarea
+            value={customReason}
+            onChange={(event) => onCustomReasonChange(event.target.value)}
+            placeholder="Enter no-show reason..."
             className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border min-h-[60px] resize-none"
             required
           />

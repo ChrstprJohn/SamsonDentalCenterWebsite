@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { useSecretaryAppointments } from '../../hooks/secretary/use-secretary-appointments';
 import { AppointmentDetailPane } from './sub-components/appointment-detail-pane';
 import { AppointmentsTable } from './sub-components/appointments-table';
@@ -15,7 +14,6 @@ import { SidebarHeader, SidebarInput, SidebarTrigger } from '@/components/ui/sid
 
 export function SecretaryAppointmentsView() {
   const view = useSecretaryAppointments();
-  const router = useRouter();
   const [mobileView, setMobileView] = useState<'list' | 'detail' | 'quickLogs'>('list');
   const [showNotesPanel, setShowNotesPanel] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
@@ -280,7 +278,6 @@ export function SecretaryAppointmentsView() {
           formatPatientName={view.formatPatientName}
             onSelect={(id) => { view.selectAppointment(id); setMobileView('detail'); }}
             activeTab={view.activeTab}
-            onQuickAction={view.activeTab === 'upcoming' ? () => router.push('/secretary-v2/check-in') : undefined}
         />
       </div>
 

@@ -106,6 +106,7 @@ function VisitCard({ appointment, columnKey, view }: { appointment: AppointmentD
   const doctorColor = useMemo(() => getDoctorColor(appointment.doctorId), [appointment.doctorId]);
   const isSelected =
     view.checkInAppt?.id === appointment.id ||
+    view.noShowAppt?.id === appointment.id ||
     view.checkoutAppt?.id === appointment.id ||
     view.viewAppt?.id === appointment.id ||
     view.resolveAppt?.id === appointment.id ||
@@ -114,7 +115,7 @@ function VisitCard({ appointment, columnKey, view }: { appointment: AppointmentD
   const timeDisplay = `${formatClinicTime(appointment.startTime)} - ${formatClinicTime(appointment.endTime)}`;
   const dateDisplay = formatShortDate(appointment.date);
   const statusBadge = BADGE_STYLES[appointment.status] || 'text-muted-foreground bg-muted/20';
-  const anySelected = !!(view.checkInAppt || view.checkoutAppt || view.viewAppt || view.resolveAppt || view.rescheduleAppt);
+  const anySelected = !!(view.checkInAppt || view.noShowAppt || view.checkoutAppt || view.viewAppt || view.resolveAppt || view.rescheduleAppt);
   const isResolvedNoShow = appointment.status === 'NO_SHOW' && !!appointment.noShowResolvedAt;
 
   return (
