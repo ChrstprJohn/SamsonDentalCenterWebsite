@@ -19,7 +19,7 @@ export function ClinicConfigForm({
     <form onSubmit={handleConfigSave} className="bg-card border border-card-border rounded-3xl p-6 md:p-8 shadow-lg flex flex-col gap-6">
       <h3 className="text-sm font-bold uppercase tracking-wider text-text-muted">Clinic Operation Rules</h3>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4">
         <div className="flex flex-col gap-1.5">
           <label className="text-xs font-semibold text-text-secondary">Clinic Name</label>
           <input
@@ -53,18 +53,6 @@ export function ClinicConfigForm({
             />
             <span className="text-xs text-text-secondary">Allow same-day slot bookings</span>
           </div>
-        </div>
-
-        <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-semibold text-text-secondary">Max Reschedules Allowed Per Appointment</label>
-          <input
-            type="number"
-            min="0"
-            required
-            value={config.maxReschedules}
-            onChange={(e) => setConfig({ ...config, maxReschedules: parseInt(e.target.value) || 0 })}
-            className="px-3.5 py-2 rounded-xl border border-card-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary-ring text-text-primary"
-          />
         </div>
       </div>
 

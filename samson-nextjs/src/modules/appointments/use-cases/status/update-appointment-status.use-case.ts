@@ -57,12 +57,6 @@ export const updateAppointmentStatusUseCase = (deps: {
 
     const isRescheduling = !!rescheduleMetadata;
     if (isRescheduling) {
-      if (actorRole !== 'STAFF' && rescheduleCount >= 1) {
-        throw new ValidationError(
-          'Maximum reschedule limit of 1 has been reached.',
-          'RESCHEDULE_LIMIT_EXCEEDED'
-        );
-      }
       nextRescheduleCount = rescheduleCount + 1;
     }
 

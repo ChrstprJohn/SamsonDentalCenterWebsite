@@ -65,14 +65,12 @@ describe('requestRescheduleUseCase', () => {
     }
   });
 
-  it('throws RESCHEDULE_LIMIT_EXCEEDED when rescheduleCount >= 1', async () => {
+  it('allows another reschedule request when the appointment was previously rescheduled', async () => {
     const { useCase, mockTransaction } = makeUseCase({ rescheduleCount: 1 });
 
-    await expect(
-      useCase('appt-uuid-001', null, 'PATIENT', 'reason', PROPOSED)
-    ).rejects.toThrow('Maximum reschedule limit of 1 has been reached.');
+    await useCase('appt-uuid-001', null, 'PATIENT', 'reason', PROPOSED);
 
-    expect(mockTransaction).not.toHaveBeenCalled();
+    expect(mockTransaction).toHaveBeenCalledWith('appt-uuid-001', null, 'PATIENT', 'reason', PROPOSED);
   });
 
   it('does not call transaction when getAppointmentById throws', async () => {

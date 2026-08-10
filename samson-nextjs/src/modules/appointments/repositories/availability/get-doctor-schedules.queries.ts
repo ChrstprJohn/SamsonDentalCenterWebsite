@@ -69,21 +69,7 @@ export const getDoctorSchedulesQuery = (supabase: SupabaseClient) => {
     }
     const clinicHours = (configData.operating_hours as any) || {};
 
-    // 3. Fetch doctor custom overrides (Layer 2)
-    let schedulesQuery = supabase
-      .from('doctor_schedules')
-      .select('id, day_of_week, doctor_id, start_time, end_time, break_start_time, break_end_time, is_custom, is_open')
-      .eq('day_of_week', dayOfWeek);
-
-    if (doctorId) {
-      schedulesQuery = schedulesQuery.eq('doctor_id', doctorId);
-    }
-
-    const { data: customSchedules, error: schedError } = await schedulesQuery;
-    if (schedError) {
-      throw new DomainError(`Failed to fetch custom schedules: ${schedError.message}`, 'DATABASE_ERROR');
-    }
-
+    // 3. Resolve each doctor's schedule from clinic hours (single availability source)
     const weekdayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
     const weekdayName = weekdayNames[dayOfWeek];
     const rawDayConfig = clinicHours[weekdayName] || {};
@@ -98,46 +84,23 @@ export const getDoctorSchedulesQuery = (supabase: SupabaseClient) => {
     const resolvedSchedules: any[] = [];
 
     for (const doc of doctors) {
-      const customShift = customSchedules?.find((s) => s.doctor_id === doc.id);
-
-      if (customShift && customShift.is_custom) {
-        if (customShift.is_open) {
-          resolvedSchedules.push({
-            id: customShift.id,
-            doctor_id: doc.id,
-            day_of_week: dayOfWeek,
-            start_time: customShift.start_time,
-            end_time: customShift.end_time,
-            break_start_time: customShift.break_start_time,
-            break_end_time: customShift.break_end_time,
-            is_custom: true,
-            is_open: true,
-            doctor: {
-              first_name: doc.first_name,
-              last_name: doc.last_name,
-              status: doc.status,
-            },
-          });
-        }
-      } else {
-        if (clinicDayConfig.is_open) {
-          resolvedSchedules.push({
-            id: `${doc.id}-${dayOfWeek}-inherited`,
-            doctor_id: doc.id,
-            day_of_week: dayOfWeek,
-            start_time: clinicDayConfig.open_time,
-            end_time: clinicDayConfig.close_time,
-            break_start_time: clinicDayConfig.break_start_time || null,
-            break_end_time: clinicDayConfig.break_end_time || null,
-            is_custom: false,
-            is_open: true,
-            doctor: {
-              first_name: doc.first_name,
-              last_name: doc.last_name,
-              status: doc.status,
-            },
-          });
-        }
+      if (clinicDayConfig.is_open) {
+        resolvedSchedules.push({
+          id: `${doc.id}-${dayOfWeek}-inherited`,
+          doctor_id: doc.id,
+          day_of_week: dayOfWeek,
+          start_time: clinicDayConfig.open_time,
+          end_time: clinicDayConfig.close_time,
+          break_start_time: clinicDayConfig.break_start_time || null,
+          break_end_time: clinicDayConfig.break_end_time || null,
+          is_custom: false,
+          is_open: true,
+          doctor: {
+            first_name: doc.first_name,
+            last_name: doc.last_name,
+            status: doc.status,
+          },
+        });
       }
     }
 

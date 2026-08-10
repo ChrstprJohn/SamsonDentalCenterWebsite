@@ -20,9 +20,14 @@ const validConfig = {
   maintenanceMessage: null,
   maxReschedules: 1,
   clinicName: "Samson Dental",
+  logoUrl: null,
   address: "123 Dental Way",
+  mapUrl: null,
   phone: "555-0101",
+  landline: null,
   email: "contact@samsondental.com",
+  websiteUrl: null,
+  whatsappUrl: null,
   operatingHours: validOperatingHours,
   allowSameDayBooking: true,
   calendarRenderDays: 30,
@@ -41,6 +46,7 @@ describe("clinicConfigResponseSchema (DTO Validation)", () => {
       clinic_name: "Samson Dental",
       address: "123 Dental Way",
       phone: "555-0101",
+      landline: "(074) 123 4567",
       email: "contact@samsondental.com",
       operating_hours: {
         monday: { is_open: true, open_time: "09:00", close_time: "17:00" },
@@ -59,6 +65,7 @@ describe("clinicConfigResponseSchema (DTO Validation)", () => {
     });
 
     expect(result.clinicName).toBe("Samson Dental");
+    expect(result.landline).toBe("(074) 123 4567");
     expect(result.operatingHours.monday.isOpen).toBe(true);
     expect(result.allowSameDayBooking).toBe(true);
   });

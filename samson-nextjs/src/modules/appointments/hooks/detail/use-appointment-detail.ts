@@ -30,10 +30,6 @@ export function useAppointmentDetail({ appt, maxReschedules }: UseAppointmentDet
   };
 
   const handleRescheduleClick = () => {
-    if (appt.rescheduleCount >= maxReschedules) {
-      setIsRescheduleBlockedModalOpen(true);
-      return;
-    }
     addToast('Online rescheduling is temporarily under maintenance. Please contact clinic staff to move your slot.', 'info');
   };
 

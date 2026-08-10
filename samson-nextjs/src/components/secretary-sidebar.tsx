@@ -79,6 +79,10 @@ const data = {
       icon: <Users className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
       items: [
         {
+          title: "Clinic Settings",
+          url: "/secretary-v2/clinic-settings",
+        },
+        {
           title: "Dentists",
           url: "/secretary-v2/doctors",
         },

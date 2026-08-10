@@ -89,12 +89,6 @@ export function useUserDashboard(
   const router = useRouter();
 
   const handleRescheduleClick = (appt: AppointmentDto) => {
-    const currentReschedules = appt.rescheduleCount ?? 0;
-    if (currentReschedules >= maxReschedules) {
-      setBlockedRescheduleAppt(appt);
-      return;
-    }
-
     addToast('Online rescheduling is temporarily under maintenance. Please contact clinic staff to move your slot.', 'info');
   };
 

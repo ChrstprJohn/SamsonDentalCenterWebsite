@@ -70,65 +70,33 @@ export const getWorkingSchedulesForMonthQuery = (supabase: SupabaseClient) => {
     }
     const clinicHours = (configData.operating_hours as any) || {};
 
-    // 3. Fetch doctor custom overrides (all weekdays)
-    let schedulesQuery = supabase
-      .from('doctor_schedules')
-      .select('id, day_of_week, doctor_id, start_time, end_time, break_start_time, break_end_time, is_custom, is_open');
-
-    if (doctorId) {
-      schedulesQuery = schedulesQuery.eq('doctor_id', doctorId);
-    }
-
-    const { data: customSchedules, error: schedError } = await schedulesQuery;
-    if (schedError) {
-      throw new DomainError(`Failed to fetch custom schedules: ${schedError.message}`, 'DATABASE_ERROR');
-    }
-
-    // Create a helper mapping of resolved day-of-week schedules for each doctor
+    // 3. Resolve weekly schedule for each doctor from clinic hours (single availability source)
     const weekdayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
     const resolvedSchedules: any[] = [];
 
     for (const doc of doctors) {
       for (let dow = 0; dow <= 6; dow++) {
-        const customShift = customSchedules?.find((s) => s.doctor_id === doc.id && s.day_of_week === dow);
-
-        if (customShift && customShift.is_custom) {
-          if (customShift.is_open) {
-            resolvedSchedules.push({
-              id: customShift.id,
-              doctorId: doc.id,
-              dayOfWeek: dow,
-              startTime: customShift.start_time,
-              endTime: customShift.end_time,
-              breakStartTime: customShift.break_start_time,
-              breakEndTime: customShift.break_end_time,
-              isCustom: true,
-              isOpen: true,
-            });
-          }
-        } else {
-          const weekdayName = weekdayNames[dow];
-          const rawDayConfig = clinicHours[weekdayName] || {};
-          const clinicDayConfig = {
-            is_open: rawDayConfig.is_open ?? rawDayConfig.isOpen ?? false,
-            open_time: rawDayConfig.open_time ?? rawDayConfig.openTime ?? null,
-            close_time: rawDayConfig.close_time ?? rawDayConfig.closeTime ?? null,
-            break_start_time: rawDayConfig.break_start_time ?? rawDayConfig.breakStartTime ?? null,
-            break_end_time: rawDayConfig.break_end_time ?? rawDayConfig.breakEndTime ?? null,
-          };
-          if (clinicDayConfig.is_open) {
-            resolvedSchedules.push({
-              id: `${doc.id}-${dow}-inherited`,
-              doctorId: doc.id,
-              dayOfWeek: dow,
-              startTime: clinicDayConfig.open_time,
-              endTime: clinicDayConfig.close_time,
-              breakStartTime: clinicDayConfig.break_start_time || null,
-              breakEndTime: clinicDayConfig.break_end_time || null,
-              isCustom: false,
-              isOpen: true,
-            });
-          }
+        const weekdayName = weekdayNames[dow];
+        const rawDayConfig = clinicHours[weekdayName] || {};
+        const clinicDayConfig = {
+          is_open: rawDayConfig.is_open ?? rawDayConfig.isOpen ?? false,
+          open_time: rawDayConfig.open_time ?? rawDayConfig.openTime ?? null,
+          close_time: rawDayConfig.close_time ?? rawDayConfig.closeTime ?? null,
+          break_start_time: rawDayConfig.break_start_time ?? rawDayConfig.breakStartTime ?? null,
+          break_end_time: rawDayConfig.break_end_time ?? rawDayConfig.breakEndTime ?? null,
+        };
+        if (clinicDayConfig.is_open) {
+          resolvedSchedules.push({
+            id: `${doc.id}-${dow}-inherited`,
+            doctorId: doc.id,
+            dayOfWeek: dow,
+            startTime: clinicDayConfig.open_time,
+            endTime: clinicDayConfig.close_time,
+            breakStartTime: clinicDayConfig.break_start_time || null,
+            breakEndTime: clinicDayConfig.break_end_time || null,
+            isCustom: false,
+            isOpen: true,
+          });
         }
       }
     }

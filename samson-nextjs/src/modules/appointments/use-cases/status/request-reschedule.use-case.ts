@@ -42,14 +42,6 @@ export const requestRescheduleUseCase = (deps: {
       );
     }
 
-    const rescheduleCount = appointment.rescheduleCount ?? 0;
-    if (rescheduleCount >= 1) {
-      throw new ValidationError(
-        'Maximum reschedule limit of 1 has been reached.',
-        'RESCHEDULE_LIMIT_EXCEEDED'
-      );
-    }
-
     // Single ACID transaction — status update + ledger + credibility metric
     return await deps.requestRescheduleTransaction(
       appointmentId,

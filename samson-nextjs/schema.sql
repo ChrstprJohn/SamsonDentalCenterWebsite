@@ -97,9 +97,14 @@ CREATE TABLE clinic_config (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     is_singleton BOOLEAN DEFAULT true UNIQUE NOT NULL CHECK (is_singleton = true),
     clinic_name TEXT NOT NULL DEFAULT 'Samson Dental',
+    logo_url TEXT,
     address TEXT NOT NULL,
+    map_url TEXT,
     phone TEXT NOT NULL,
+    landline TEXT,
     email TEXT NOT NULL,
+    website_url TEXT,
+    whatsapp_url TEXT,
     operating_hours JSONB NOT NULL,
     is_booking_open BOOLEAN DEFAULT true NOT NULL,
     maintenance_message TEXT,
@@ -352,7 +357,6 @@ USING (
 WITH CHECK (
   ((auth.jwt() -> 'user_metadata'::text) ->> 'role'::text) = 'ADMIN'
 );
-
 
 -- Enable RLS on dependents table
 ALTER TABLE public.dependents ENABLE ROW LEVEL SECURITY;

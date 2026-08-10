@@ -103,9 +103,14 @@ export const clinicConfigAppSchema = z.object({
   maintenanceMessage: z.string().nullable(),
   maxReschedules: z.number().int().min(0),
   clinicName: z.string().min(1, "Clinic name is required"),
+  logoUrl: z.string().url("Logo must be a valid URL").nullable(),
   address: z.string().min(1, "Address is required"),
+  mapUrl: z.string().url("Map link must be a valid URL").nullable(),
   phone: z.string().min(1, "Phone is required"),
+  landline: z.string().min(1, "Landline is required").nullable(),
   email: z.string().email("Invalid email"),
+  websiteUrl: z.string().url("Website must be a valid URL").nullable(),
+  whatsappUrl: z.string().url("WhatsApp link must be a valid URL").nullable(),
   operatingHours: operatingHoursSchema,
   allowSameDayBooking: z.boolean(),
   calendarRenderDays: z.number().int().positive("Calendar render days must be positive"),
@@ -118,9 +123,14 @@ export const clinicConfigDbSchema = z.object({
   maintenance_message: z.string().nullable(),
   max_reschedules: z.number().int().min(0),
   clinic_name: z.string().min(1, "Clinic name is required"),
+  logo_url: z.string().url("Logo must be a valid URL").nullable().optional(),
   address: z.string().min(1, "Address is required"),
+  map_url: z.string().url("Map link must be a valid URL").nullable().optional(),
   phone: z.string().min(1, "Phone is required"),
+  landline: z.string().min(1, "Landline is required").nullable().optional(),
   email: z.string().email("Invalid email"),
+  website_url: z.string().url("Website must be a valid URL").nullable().optional(),
+  whatsapp_url: z.string().url("WhatsApp link must be a valid URL").nullable().optional(),
   operating_hours: operatingHoursDbSchema,
   allow_same_day_booking: z.boolean(),
   calendar_render_days: z.number().int().positive("Calendar render days must be positive"),
@@ -132,9 +142,14 @@ export const clinicConfigResponseSchema = clinicConfigDbSchema.transform((record
   maintenanceMessage: record.maintenance_message,
   maxReschedules: record.max_reschedules,
   clinicName: record.clinic_name,
+  logoUrl: record.logo_url ?? null,
   address: record.address,
+  mapUrl: record.map_url ?? null,
   phone: record.phone,
+  landline: record.landline ?? null,
   email: record.email,
+  websiteUrl: record.website_url ?? null,
+  whatsappUrl: record.whatsapp_url ?? null,
   operatingHours: Object.fromEntries(
     WEEK_DAYS.map((day) => [
       day,
@@ -153,5 +168,3 @@ export const clinicConfigResponseSchema = clinicConfigDbSchema.transform((record
 }));
 
 export type ClinicConfigResponseDto = z.infer<typeof clinicConfigResponseSchema>;
-
-

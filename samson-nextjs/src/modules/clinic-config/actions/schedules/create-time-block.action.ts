@@ -12,9 +12,13 @@ export interface CreateTimeBlockInput {
   reason: string;
 }
 
+export interface CreatedTimeBlock {
+  id: string;
+}
+
 export async function createTimeBlockAction(
   input: CreateTimeBlockInput
-): Promise<ActionResponse<void>> {
+): Promise<ActionResponse<CreatedTimeBlock>> {
   try {
     if (!input.reason || input.reason.trim().length < 3) {
       return { success: false, error: 'Reason must be at least 3 characters' };
@@ -29,7 +33,7 @@ export async function createTimeBlockAction(
     // Get current user for tracking who created the block
     const { data: { user } } = await supabase.auth.getUser();
 
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('time_blocks')
       .insert({
         doctor_id: input.doctorId,
@@ -38,12 +42,15 @@ export async function createTimeBlockAction(
         end_time: input.endTime,
         reason: input.reason.trim(),
         created_by: user?.id || null,
-      });
+      })
+      .select('id')
+      .single();
 
     if (error) throw new Error(error.message);
 
-    revalidatePath('/secretary/schedules');
-    return { success: true, data: undefined };
+    revalidatePath('/secretary/clinic-settings');
+    revalidatePath('/secretary-v2/clinic-settings');
+    return { success: true, data: { id: data.id } };
   } catch (error: any) {
     return { success: false, error: error.message || 'Failed to create time block exception' };
   }

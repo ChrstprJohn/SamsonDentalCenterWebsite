@@ -91,17 +91,17 @@ describe('updateAppointmentStatusUseCase', () => {
     );
   });
 
-  it('throws RESCHEDULE_LIMIT_EXCEEDED when rescheduleCount >= 1 and rescheduling', async () => {
+  it('allows a patient reschedule when the appointment was previously rescheduled', async () => {
     const { useCase, mockTransaction } = makeUseCase({ rescheduleCount: 1 });
 
-    await expect(
-      useCase('appt-uuid-001', null, 'PATIENT', 'APPROVED', 'reason', RESCHEDULE_META)
-    ).rejects.toThrow('Maximum reschedule limit of 1 has been reached.');
+    await useCase('appt-uuid-001', null, 'PATIENT', 'APPROVED', 'reason', RESCHEDULE_META);
 
-    expect(mockTransaction).not.toHaveBeenCalled();
+    expect(mockTransaction).toHaveBeenCalledWith(
+      'appt-uuid-001', null, 'PATIENT', 'APPROVED', 'reason', RESCHEDULE_META, false, 2
+    );
   });
 
-  it('allows STAFF to bypass reschedule count limit and increments rescheduleCount', async () => {
+  it('increments rescheduleCount for staff reschedules', async () => {
     const { useCase, mockTransaction } = makeUseCase({ rescheduleCount: 2 });
 
     await useCase('appt-uuid-001', 'staff-id', 'STAFF', 'APPROVED', 'reason', RESCHEDULE_META);

@@ -17,7 +17,8 @@ export async function revokeTimeBlockAction(
 
     if (error) throw new Error(error.message);
 
-    revalidatePath('/secretary/schedules');
+    revalidatePath('/secretary/clinic-settings');
+    revalidatePath('/secretary-v2/clinic-settings');
     return { success: true, data: undefined };
   } catch (error: any) {
     return { success: false, error: error.message || 'Failed to revoke time block exception' };

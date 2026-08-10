@@ -249,12 +249,17 @@ export type Database = {
           id: string
           is_booking_open: boolean
           is_singleton: boolean
+          landline: string | null
+          logo_url: string | null
+          map_url: string | null
           maintenance_message: string | null
           max_reschedules: number
           operating_hours: Json
           phone: string
           social_links: Json
+          website_url: string | null
           updated_at: string
+          whatsapp_url: string | null
         }
         Insert: {
           address: string
@@ -265,12 +270,17 @@ export type Database = {
           id?: string
           is_booking_open?: boolean
           is_singleton?: boolean
+          landline?: string | null
+          logo_url?: string | null
+          map_url?: string | null
           maintenance_message?: string | null
           max_reschedules?: number
           operating_hours: Json
           phone: string
           social_links?: Json
+          website_url?: string | null
           updated_at?: string
+          whatsapp_url?: string | null
         }
         Update: {
           address?: string
@@ -281,12 +291,17 @@ export type Database = {
           id?: string
           is_booking_open?: boolean
           is_singleton?: boolean
+          landline?: string | null
+          logo_url?: string | null
+          map_url?: string | null
           maintenance_message?: string | null
           max_reschedules?: number
           operating_hours?: Json
           phone?: string
           social_links?: Json
+          website_url?: string | null
           updated_at?: string
+          whatsapp_url?: string | null
         }
         Relationships: []
       }

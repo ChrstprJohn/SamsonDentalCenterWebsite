@@ -52,7 +52,7 @@ export function AppointmentDetailView({ appt, maxReschedules }: AppointmentDetai
 
         <div className="flex flex-col gap-6">
           <AppointmentPatientCard appt={currentAppt} />
-          <AppointmentSystemCard appt={currentAppt} maxReschedules={maxReschedules} />
+          <AppointmentSystemCard appt={currentAppt} />
         </div>
       </div>
 

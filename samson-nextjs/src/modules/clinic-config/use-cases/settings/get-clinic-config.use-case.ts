@@ -1,13 +1,18 @@
 import { ClinicConfigResponseDto } from '../../dtos/settings/get-clinic-config.dto';
 
-const DEFAULT_CONFIG: ClinicConfigResponseDto = {
+export const DEFAULT_CONFIG: ClinicConfigResponseDto = {
   isBookingOpen: true,
   maintenanceMessage: null,
   maxReschedules: 1,
   clinicName: "Samson Dental",
+  logoUrl: null,
   address: "123 Dental Way",
+  mapUrl: null,
   phone: "555-0101",
+  landline: null,
   email: "contact@samsondental.com",
+  websiteUrl: null,
+  whatsappUrl: null,
   operatingHours: {
     monday: { isOpen: true, openTime: "09:00", closeTime: "17:00" },
     tuesday: { isOpen: true, openTime: "09:00", closeTime: "17:00" },

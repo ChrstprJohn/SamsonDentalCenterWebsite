@@ -36,8 +36,10 @@ export async function updateClinicConfigAction(data: UpdateClinicConfigDto) {
     // 4. Execution
     const result = await useCase(parsed);
     
-    // Invalidate schedules cache
-    revalidatePath('/secretary/schedules');
+    // Settings affect public pages and both secretary portals.
+    revalidatePath('/');
+    revalidatePath('/secretary/clinic-settings');
+    revalidatePath('/secretary-v2/clinic-settings');
     
     return { data: result };
   } catch (error: any) {

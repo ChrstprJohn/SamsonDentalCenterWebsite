@@ -185,13 +185,13 @@ export default async function SecretaryPortalLayout({
             Doctors Directory
           </Link>
           <Link
-            href="/secretary/schedules"
+            href="/secretary/clinic-settings"
             className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-slate-700/60 transition-colors text-slate-300 hover:text-white"
           >
-            <span>⏰</span>
-            Doctor Schedules
+            <span>⚙️</span>
+            Clinic Settings
           </Link>
-          
+
           <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-4 mt-4 mb-2">
             System & Logs
           </div>

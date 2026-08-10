@@ -3,7 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { updateClinicConfigAction } from '@/modules/clinic-config/actions/settings/update-clinic-config.action';
-import { ClinicConfigItem } from '../../views/schedule-view';
+
+interface ClinicConfigItem {
+  id: string;
+  operatingHours: Record<string, any>;
+}
 
 const DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as const;
 
@@ -76,7 +80,7 @@ export function GlobalHoursTab({ clinicConfig }: GlobalHoursTabProps) {
 
   const handleSave = async () => {
     const confirmSave = window.confirm(
-      'This will update the fallback baseline and break times for all doctors who do not have custom weekly shifts configured. Do you wish to proceed?'
+      'This will update the clinic weekly hours and default break time used for online booking. Do you wish to proceed?'
     );
     if (!confirmSave) return;
 
@@ -105,9 +109,9 @@ export function GlobalHoursTab({ clinicConfig }: GlobalHoursTabProps) {
     <div className="bg-card-bg border border-card-border/60 rounded-xl p-6 shadow-sm flex flex-col gap-6">
       <div className="flex justify-between items-center flex-wrap gap-4">
         <div>
-          <h2 className="text-lg font-semibold text-text-primary">Baseline Clinic Operating Hours</h2>
+          <h2 className="text-lg font-semibold text-text-primary">Clinic Weekly Hours</h2>
           <p className="text-xs text-text-muted mt-1">
-            Configure fallback operating hours and break times. Doctors without custom overrides inherit these baseline configurations automatically.
+            Recurring weekly hours used for online booking. Break time is excluded from booking automatically.
           </p>
         </div>
         <button
@@ -218,7 +222,7 @@ export function GlobalHoursTab({ clinicConfig }: GlobalHoursTabProps) {
           onClick={handleSave}
           className="px-5 py-2.5 bg-primary text-primary-foreground hover:bg-primary-hover font-semibold rounded-xl text-sm cursor-pointer disabled:opacity-50 transition-colors"
         >
-          {isSubmitting ? 'Saving Global Hours...' : 'Save Global Hours'}
+          {isSubmitting ? 'Saving...' : 'Save Clinic Hours'}
         </button>
       </div>
     </div>

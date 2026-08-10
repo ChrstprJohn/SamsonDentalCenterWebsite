@@ -3,8 +3,24 @@
 import { Clock, MapPin, Phone } from 'lucide-react';
 import type React from 'react';
 import type { ClinicConfigResponseDto } from '@/modules/clinic-config/dtos/settings/get-clinic-config.dto';
+import { formatTimeString } from '@/shared/utils/date.util';
 
 export function ContactInfoPanel({ config }: { config: ClinicConfigResponseDto }) {
+  const dayLabels: Record<string, string> = {
+    monday: 'Mon',
+    tuesday: 'Tue',
+    wednesday: 'Wed',
+    thursday: 'Thu',
+    friday: 'Fri',
+    saturday: 'Sat',
+    sunday: 'Sun',
+  };
+  const openDays = Object.entries(config.operatingHours).filter(([, hours]) => hours.isOpen);
+  const firstOpenDay = openDays[0]?.[1];
+  const consultationHours = firstOpenDay?.openTime && firstOpenDay.closeTime
+    ? `${openDays.map(([day]) => dayLabels[day]).join(' - ')}: ${formatTimeString(firstOpenDay.openTime)} - ${formatTimeString(firstOpenDay.closeTime)}`
+    : 'Currently closed';
+
   return (
     <div className="flex flex-col justify-between">
       <div>
@@ -19,8 +35,9 @@ export function ContactInfoPanel({ config }: { config: ClinicConfigResponseDto }
         </p>
         <div className="mt-10 space-y-6">
           <ContactLine icon={<Phone className="w-4 h-4" />} label="Direct Desk" value={config.phone} />
+          {config.landline && <ContactLine icon={<Phone className="w-4 h-4" />} label="Landline" value={config.landline} />}
           <ContactLine icon={<MapPin className="w-4 h-4" />} label="Oasis Address" value={config.address} />
-          <ContactLine icon={<Clock className="w-4 h-4" />} label="Consultation Hours" value="Mon - Fri: 8:00 AM - 5:00 PM" />
+          <ContactLine icon={<Clock className="w-4 h-4" />} label="Consultation Hours" value={consultationHours} />
         </div>
       </div>
       <div className="mt-12 lg:mt-0 pt-8 border-t border-gray-100 flex items-center gap-6">
