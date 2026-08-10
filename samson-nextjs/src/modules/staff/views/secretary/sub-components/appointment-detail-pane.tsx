@@ -253,7 +253,7 @@ function AppointmentDetails({ appointment, view, activeTab, compact, hideActions
                       </p>
                     )}
                     <div className={`flex gap-2 ${isEditingChannel ? 'pointer-events-none opacity-40' : ''}`}>
-                      {isNoShowCandidate && !isResolvedNoShow && (
+                      {(isNoShowCandidate || (isCheckedIn && isPastEnd)) && !isResolvedNoShow && (
                         <Button className="flex-1 h-[42px] bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => router.push(resolveTarget)}>
                           Resolve
                         </Button>
@@ -273,7 +273,7 @@ function AppointmentDetails({ appointment, view, activeTab, compact, hideActions
                           Cancel
                         </Button>
                       )}
-                      {isCheckedIn && (
+                      {isCheckedIn && !isPastEnd && (
                         <Button className="flex-1 h-[42px] bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => router.push('/secretary-v2/check-in')}>
                           Go to Check-in &amp; Checkout
                         </Button>
@@ -394,7 +394,7 @@ function AppointmentDetails({ appointment, view, activeTab, compact, hideActions
                 </p>
               )}
               <div className={`flex gap-2 ${isEditingChannel ? 'pointer-events-none opacity-40' : ''}`}>
-                {isNoShowCandidate && !isResolvedNoShow && (
+                {(isNoShowCandidate || (isCheckedIn && isPastEnd)) && !isResolvedNoShow && (
                   <Button className="flex-1 h-[42px] bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => router.push(resolveTarget)}>
                     Resolve
                   </Button>
@@ -414,7 +414,7 @@ function AppointmentDetails({ appointment, view, activeTab, compact, hideActions
                     Cancel
                   </Button>
                 )}
-                {isCheckedIn && (
+                {isCheckedIn && !isPastEnd && (
                   <Button className="flex-1 h-[42px] bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => router.push('/secretary-v2/check-in')}>
                     Go to Check-in &amp; Checkout
                   </Button>
