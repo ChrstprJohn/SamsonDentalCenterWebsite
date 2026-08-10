@@ -8,6 +8,8 @@ export interface NativeTimePopoverPickerProps {
   onChange: (timeString: string) => void;
   placeholder?: string;
   className?: string;
+  /** Additional custom class for the input trigger box (e.g. rounded-xl, border-card-border). */
+  triggerClassName?: string;
   disabled?: boolean;
   /** Earliest selectable time in 24-hour HH:MM format (inclusive). */
   minTime?: string;
@@ -26,6 +28,7 @@ export function NativeTimePopoverPicker({
   onChange,
   placeholder = 'Select Preferred Time...',
   className = '',
+  triggerClassName = '',
   disabled = false,
   availableHours,
   minTime = '00:00',
@@ -195,14 +198,14 @@ export function NativeTimePopoverPicker({
       {/* Trigger Input Field */}
       <div
         onClick={togglePopover}
-        className={`w-full bg-white border border-[#E4E4DC] px-4 py-3 text-xs sm:text-sm font-normal flex items-center justify-between cursor-pointer hover:border-[#D94E4E] transition-colors ${
+        className={`w-full bg-card border border-card-border px-4 py-2.5 rounded-xl text-xs sm:text-sm font-normal flex items-center justify-between cursor-pointer hover:border-primary-ring transition-colors ${
           disabled ? 'opacity-50 cursor-not-allowed bg-gray-50' : ''
-        }`}
+        } ${triggerClassName}`}
       >
-        <span className={value ? 'text-gray-700' : 'text-gray-400 font-medium'}>
+        <span className={value ? 'text-foreground' : 'text-muted-foreground font-medium'}>
           {getDisplayLabel(value)}
         </span>
-        <Clock className="w-4 h-4 text-gray-400" />
+        <Clock className="w-4 h-4 text-muted-foreground" />
       </div>
 
       {/* 3-Column Native Popover Dropdown (No header, clean look) */}
