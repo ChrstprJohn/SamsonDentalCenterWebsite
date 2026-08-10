@@ -41,6 +41,7 @@ import {
   Calendar as CalendarIcon,
   Users,
   ArrowLeft,
+  Clock,
 } from 'lucide-react';
 
 function getDaysOfWeek(dateStr: string) {
@@ -621,10 +622,15 @@ export function SecretaryBookAppointmentView() {
                           </div>
                         </div>
                         {bounds.isOpen && bounds.minTime && bounds.maxTime && (
-                          <p className="text-[11px] text-muted-foreground mt-1 font-sans">
-                            Available {formatTimeRange(bounds.minTime)}–{formatTimeRange(bounds.maxTime)}
-                            {bounds.unavailableRanges.length > 0 && ` (break ${formatTimeRange(bounds.unavailableRanges[0].start)}–${formatTimeRange(bounds.unavailableRanges[0].end)})`}.
-                          </p>
+                          <div className="mt-2.5 p-2.5 rounded-xl border border-sky-500/20 bg-sky-500/10 text-sky-700 dark:text-sky-300 text-xs flex items-center gap-2 font-medium">
+                            <Clock className="w-3.5 h-3.5 shrink-0 text-sky-600 dark:text-sky-400" />
+                            <span>
+                              Available <strong className="font-semibold">{formatTimeRange(bounds.minTime)}–{formatTimeRange(bounds.maxTime)}</strong>
+                              {bounds.unavailableRanges.length > 0 && (
+                                <span className="opacity-90 font-normal"> (break {formatTimeRange(bounds.unavailableRanges[0].start)}–{formatTimeRange(bounds.unavailableRanges[0].end)})</span>
+                              )}.
+                            </span>
+                          </div>
                         )}
                       </>
                     );
