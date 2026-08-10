@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { updateClinicConfigAction } from '@/modules/clinic-config/actions/settings/update-clinic-config.action';
+import type { ClinicConfigResponseDto } from '@/modules/clinic-config/dtos/settings/get-clinic-config.dto';
 
 interface ClinicConfigItem {
   id: string;
@@ -13,10 +13,10 @@ const DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'
 
 interface GlobalHoursTabProps {
   clinicConfig: ClinicConfigItem;
+  onSaved: (operatingHours: ClinicConfigResponseDto['operatingHours']) => void;
 }
 
-export function GlobalHoursTab({ clinicConfig }: GlobalHoursTabProps) {
-  const router = useRouter();
+export function GlobalHoursTab({ clinicConfig, onSaved }: GlobalHoursTabProps) {
   const [operatingHours, setOperatingHours] = useState<any>(() => {
     const hours: any = {};
     DAYS.forEach((day) => {
@@ -92,11 +92,15 @@ export function GlobalHoursTab({ clinicConfig }: GlobalHoursTabProps) {
         operatingHours: operatingHours,
       });
 
-      if (res.error) {
+      if ('error' in res && res.error) {
         throw new Error(res.error);
       }
 
-      router.refresh();
+      if (!('data' in res) || !res.data) {
+        throw new Error('Clinic hours could not be saved.');
+      }
+
+      onSaved(res.data.operatingHours);
       setMessage({ type: 'success', text: 'Clinic global baseline hours updated successfully!' });
     } catch (err: any) {
       setMessage({ type: 'error', text: err.message || 'Failed to save operating hours' });

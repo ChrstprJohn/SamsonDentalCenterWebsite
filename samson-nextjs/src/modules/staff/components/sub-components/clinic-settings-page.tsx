@@ -204,7 +204,10 @@ export function ClinicSettingsPage({ initialConfig, initialTimeBlocks = [] }: Cl
           </div>
         </div>
 
-        <GlobalHoursTab clinicConfig={{ id: '1', operatingHours: config.operatingHours }} />
+        <GlobalHoursTab
+          clinicConfig={{ id: '1', operatingHours: config.operatingHours }}
+          onSaved={(operatingHours) => updateConfigField('operatingHours', operatingHours)}
+        />
 
         <div className="border-t border-card-border pt-6">
           <BlockedDatesPanel initialTimeBlocks={initialTimeBlocks} />
