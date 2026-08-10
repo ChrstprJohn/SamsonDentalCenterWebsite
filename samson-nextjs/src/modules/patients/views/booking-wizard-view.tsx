@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Check, ChevronRight, CheckCircle2, Link2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, ChevronRight, CheckCircle2, Link2, Clock } from 'lucide-react';
 import Link from 'next/link';
 import type { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
 import type { ClinicConfigResponseDto } from '@/modules/clinic-config/dtos/settings/get-clinic-config.dto';
@@ -412,10 +412,20 @@ export function BookingWizardView({ services, config, initialServiceId }: Bookin
                       disabled={!isSelectedDayOpen}
                     />
                     {isSelectedDayOpen && selectedDayHours?.openTime && selectedDayHours.closeTime && (
-                      <p className="mt-2 text-xs text-gray-500">
-                        Available {formatTimeRange(selectedDayHours.openTime)}–{formatTimeRange(selectedDayHours.closeTime)}
-                        {unavailableRanges.length > 0 && ` (break ${formatTimeRange(unavailableRanges[0].start)}–${formatTimeRange(unavailableRanges[0].end)})`}.
-                      </p>
+                      <div className="mt-2.5 p-2.5 rounded-xl border border-sky-500/20 bg-sky-500/10 text-sky-700 dark:text-sky-300 text-xs flex items-start gap-2 font-medium">
+                        <Clock className="w-3.5 h-3.5 shrink-0 text-sky-600 dark:text-sky-400 mt-0.5" />
+                        <div className="flex flex-col gap-1">
+                          <span className="font-semibold">Clinic Hours</span>
+                          {unavailableRanges.length > 0 ? (
+                            <>
+                              <span className="font-normal">Morning: <strong className="font-semibold">{formatTimeRange(selectedDayHours.openTime)} – {formatTimeRange(unavailableRanges[0].start)}</strong></span>
+                              <span className="font-normal">Afternoon: <strong className="font-semibold">{formatTimeRange(unavailableRanges[0].end)} – {formatTimeRange(selectedDayHours.closeTime)}</strong></span>
+                            </>
+                          ) : (
+                            <span className="font-normal"><strong className="font-semibold">{formatTimeRange(selectedDayHours.openTime)} – {formatTimeRange(selectedDayHours.closeTime)}</strong></span>
+                          )}
+                        </div>
+                      </div>
                     )}
                   </div>
 
