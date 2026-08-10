@@ -559,10 +559,14 @@ export function AppointmentNotificationsTab({ appointment, view, compact, onEdit
               (!showEmail || isEmailSkippedOrNA) &&
               (!showSms || type.emailOnly || isSmsSkippedOrNA);
 
-            const isEmailAllowed = !loadingLogs && isTriggeringNotification === null && showEmail && allowOverrideResend;
-            const isSmsAllowed = !loadingLogs && isTriggeringNotification === null && showSms && !type.emailOnly && allowOverrideResend;
+            const isRescheduleType = type.eventType === 'RESCHEDULE_BOOKING';
+            const hasFailure = emailStatus.label === 'FAILED' || smsStatus.label === 'FAILED';
+            const showRescheduleRetry = isRescheduleType && hasFailure;
 
-            const disabled = currentChannel === 'NONE' || isTriggeringNotification !== null || (!hasSmsItem && !hasEmailItem) || !allowOverrideResend;
+            const isEmailAllowed = !loadingLogs && isTriggeringNotification === null && showEmail && (allowOverrideResend || showRescheduleRetry);
+            const isSmsAllowed = !loadingLogs && isTriggeringNotification === null && showSms && !type.emailOnly && (allowOverrideResend || showRescheduleRetry);
+
+            const disabled = currentChannel === 'NONE' || isTriggeringNotification !== null || (!hasSmsItem && !hasEmailItem) || (!allowOverrideResend && !showRescheduleRetry);
 
             const configuredChannels: ('EMAIL' | 'SMS')[] = type.emailOnly
               ? ['EMAIL']
@@ -621,6 +625,7 @@ export function AppointmentNotificationsTab({ appointment, view, compact, onEdit
                   </div>
                 </div>
 
+                {(showRescheduleRetry || !isRescheduleType) && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
@@ -670,6 +675,7 @@ export function AppointmentNotificationsTab({ appointment, view, compact, onEdit
                     )}
                   </DropdownMenuContent>
                 </DropdownMenu>
+                )}
               </div>
             );
           })}
