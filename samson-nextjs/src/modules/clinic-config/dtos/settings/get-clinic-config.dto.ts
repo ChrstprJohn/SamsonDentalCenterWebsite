@@ -114,7 +114,7 @@ export const clinicConfigAppSchema = z.object({
   operatingHours: operatingHoursSchema,
   allowSameDayBooking: z.boolean(),
   calendarRenderDays: z.number().int().positive("Calendar render days must be positive"),
-  socialLinks: z.array(socialLinkSchema).default([]),
+  socialLinks: z.array(socialLinkSchema),
 });
 
 export const clinicConfigDbSchema = z.object({
