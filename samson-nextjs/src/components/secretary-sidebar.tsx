@@ -110,6 +110,10 @@ const data = {
           url: "/secretary-v2/sms-logs",
         },
         {
+          title: "Delivery Logs",
+          url: "/secretary-v2/delivery-logs",
+        },
+        {
           title: "Audit Logs",
           url: "/secretary-v2/audits",
         },

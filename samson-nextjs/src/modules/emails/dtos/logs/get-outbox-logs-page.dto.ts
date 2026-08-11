@@ -8,6 +8,8 @@ export const getOutboxLogsPageSchema = z.object({
   channel: z.enum(['ALL', 'EMAIL', 'SMS']).default('ALL'),
   category: z.enum(['ALL', 'APPOINTMENTS', 'INQUIRIES']).optional().default('ALL'),
   onlyAppointments: z.boolean().default(false),
+  dateFrom: z.string().max(64).optional().nullable(),
+  dateTo: z.string().max(64).optional().nullable(),
 });
 
 export type GetOutboxLogsPageDto = z.input<typeof getOutboxLogsPageSchema>;
