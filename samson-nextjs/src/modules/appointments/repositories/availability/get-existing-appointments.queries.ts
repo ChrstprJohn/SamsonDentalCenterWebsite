@@ -1,13 +1,15 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { DomainError } from '@/shared/errors';
 import { appointmentResponseSchema } from '../../dtos/exports';
+import { createAdminClient } from '@/shared/database/server';
 
 async function fetchTimeBlocksAsAppointments(
   supabase: SupabaseClient,
+  adminDb: SupabaseClient,
   date: string,
   doctorId?: string
 ): Promise<any[]> {
-  let query = supabase
+  let query = adminDb
     .from('time_blocks')
     .select('id, doctor_id, date, start_time, end_time')
     .eq('date', date);
@@ -21,7 +23,7 @@ async function fetchTimeBlocksAsAppointments(
 
   let activeDoctorIds: string[] = [];
   if (!doctorId) {
-    const { data: doctors } = await supabase
+    const { data: doctors } = await adminDb
       .from('users')
       .select('id')
       .eq('role', 'DOCTOR')
@@ -52,31 +54,33 @@ async function fetchTimeBlocksAsAppointments(
 
 export const getExistingAppointmentsQuery = (supabase: SupabaseClient) => {
   return async (date: string, doctorId?: string) => {
-    let query = supabase
+    const isMockClient = !!(supabase as any).from?.mock;
+    const dbClient = isMockClient ? supabase : await createAdminClient();
+
+    const appointmentsQuery = dbClient
       .from('appointments')
       .select('id, start_time, end_time, doctor_id, status, date')
       .eq('date', date)
       .not('status', 'in', '(CANCELLED,REJECTED,DISPLACED)');
 
     if (doctorId) {
-      query = query.eq('doctor_id', doctorId);
+      appointmentsQuery.eq('doctor_id', doctorId);
     }
 
-    const isMockClient = !!(supabase as any).from?.mock;
     if (isMockClient) {
-      const { data: appointments, error } = await query;
+      const { data, error } = await appointmentsQuery;
       if (error) {
         throw new DomainError(
           `Failed to fetch existing appointments: ${error.message}`,
           'DATABASE_ERROR'
         );
       }
-      return appointments?.map(a => appointmentResponseSchema.parse(a)) || [];
+      return data?.map((a: any) => appointmentResponseSchema.parse(a)) || [];
     }
 
     const [appointmentsResult, virtualBlocks] = await Promise.all([
-      query,
-      fetchTimeBlocksAsAppointments(supabase, date, doctorId),
+      appointmentsQuery,
+      fetchTimeBlocksAsAppointments(supabase, dbClient, date, doctorId),
     ]);
 
     if (appointmentsResult.error) {
@@ -86,7 +90,7 @@ export const getExistingAppointmentsQuery = (supabase: SupabaseClient) => {
       );
     }
 
-    const mappedAppts = appointmentsResult.data?.map(a => appointmentResponseSchema.parse(a)) || [];
+    const mappedAppts = appointmentsResult.data?.map((a: any) => appointmentResponseSchema.parse(a)) || [];
     return [...mappedAppts, ...virtualBlocks];
   };
 };

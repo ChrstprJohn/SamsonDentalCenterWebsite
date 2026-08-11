@@ -33,7 +33,8 @@ export const getDoctorSchedulesQuery = (supabase: SupabaseClient) => {
     }
 
     // 1. Fetch doctors matching active/hidden filters
-    let doctorsQuery = supabase
+    const adminDb = await createAdminClient();
+    let doctorsQuery = adminDb
       .from('users')
       .select('id, first_name, last_name, status, doctor_services(service_id)')
       .eq('role', 'DOCTOR');
@@ -57,7 +58,6 @@ export const getDoctorSchedulesQuery = (supabase: SupabaseClient) => {
       );
     }
 
-    const adminDb = isMockClient ? supabase : await createAdminClient();
     const { data: configData, error: configError } = await adminDb
       .from('clinic_config')
       .select('operating_hours')
