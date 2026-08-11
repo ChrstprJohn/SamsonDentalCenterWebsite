@@ -1,6 +1,7 @@
 'use client';
 
 import { CalendarDays, ChevronLeft, ChevronRight, Globe, GlobeOff } from 'lucide-react';
+import { useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import type { AppointmentDto } from '@/modules/appointments/dtos/shared/appointment.dto';
 import type { AppointmentDirectoryTab } from '@/modules/staff/hooks/secretary/use-secretary-appointments';
@@ -36,6 +37,7 @@ interface AppointmentsTableProps {
   formatPatientName: (appointment: AppointmentDto) => string;
   onSelect: (appointmentId: string) => void;
   activeTab?: AppointmentDirectoryTab;
+  pinnedAppointment?: AppointmentDto | null;
 }
 
 export function AppointmentsTable(props: AppointmentsTableProps) {
@@ -107,6 +109,15 @@ export function AppointmentsTable(props: AppointmentsTableProps) {
             </div>
           </div>
         )}
+        {props.pinnedAppointment && !props.appointments.some((appointment) => appointment.id === props.pinnedAppointment?.id) && (
+          <AppointmentRow
+            appointment={props.pinnedAppointment}
+            isSelected
+            formatPatientName={props.formatPatientName}
+            onSelect={props.onSelect}
+            activeTab={props.activeTab}
+          />
+        )}
         {props.appointments.map((appointment) => (
           <AppointmentRow
             key={appointment.id}
@@ -168,6 +179,11 @@ export function AppointmentsTable(props: AppointmentsTableProps) {
 }
 
 function AppointmentRow({ appointment, isSelected, formatPatientName, onSelect, activeTab }: { appointment: AppointmentDto; isSelected: boolean; formatPatientName: (appointment: AppointmentDto) => string; onSelect: (id: string) => void; activeTab?: AppointmentDirectoryTab }) {
+  const rowRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (isSelected) rowRef.current?.scrollIntoView({ block: 'nearest' });
+  }, [isSelected]);
+
   const status = appointment.status;
   const timeDisplay = appointment.startTime && appointment.endTime
     ? `${formatClinicTime(appointment.startTime)} - ${formatClinicTime(appointment.endTime)}`
@@ -182,6 +198,7 @@ function AppointmentRow({ appointment, isSelected, formatPatientName, onSelect, 
 
   return (
     <button
+      ref={rowRef}
       onClick={() => onSelect(appointment.id)}
       className={`flex flex-col items-start w-full gap-2 border-b border-card-border/40 p-4 text-sm leading-tight text-left transition-colors last:border-b-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${
         isSelected

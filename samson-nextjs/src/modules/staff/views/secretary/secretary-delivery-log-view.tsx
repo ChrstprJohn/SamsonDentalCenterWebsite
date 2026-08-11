@@ -2,6 +2,7 @@
 'use client';
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
@@ -14,7 +15,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Mail, MessageSquare, Search, ChevronLeft, ChevronRight, ChevronDown, RotateCw, Inbox, MoreHorizontal, AlertCircle, X } from 'lucide-react';
+import { Mail, MessageSquare, Search, ChevronLeft, ChevronRight, ChevronDown, RotateCw, Inbox, MoreHorizontal, AlertCircle, X, Info } from 'lucide-react';
 import { getOutboxLogsPageAction } from '@/modules/emails/actions/logs/get-outbox-logs-page.action';
 import { resendEmailAction } from '@/modules/emails/actions/logs/resend-email.action';
 import { useToast } from '@/components/feedback/toast-container';
@@ -73,6 +74,7 @@ interface DeliveryEntry {
   recipient: string;
   retryCount: number;
   errorLogs: string | null;
+  appointmentId: string | null;
   timestamp: string;
 }
 
@@ -82,6 +84,7 @@ function toEntry(log: OutboxLogResponseDto): DeliveryEntry {
   const recipient = isSms
     ? payload.phone || payload.mobileNumber || payload.phoneNumber || payload.recipientPhone || payload.guestPhone || payload.to || payload.email || 'System Automated Dispatch'
     : payload.email || payload.guestEmail || payload.recipientEmail || payload.to || payload.recipient || payload.phoneNumber || payload.phone || payload.mobileNumber || payload.guestPhone || 'System Automated Dispatch';
+  const rawAppointmentId = (payload.appointmentId || payload.appointment_id || null) as string | null;
   return {
     id: log.id,
     channel: isSms ? 'SMS' : 'EMAIL',
@@ -90,6 +93,8 @@ function toEntry(log: OutboxLogResponseDto): DeliveryEntry {
     recipient,
     retryCount: log.retryCount,
     errorLogs: log.errorLogs,
+    // Inquiry events carry an inquiry id, not an appointment id — don't deep-link those.
+    appointmentId: rawAppointmentId && !log.eventType.includes('INQUIRY') ? rawAppointmentId : null,
     timestamp: log.processedAt ?? log.createdAt,
   };
 }
@@ -185,6 +190,7 @@ const STATUS_OPTIONS = [
 ];
 
 export function SecretaryDeliveryLogView() {
+  const router = useRouter();
   const { addToast } = useToast();
   const [entries, setEntries] = useState<DeliveryEntry[]>([]);
   const [total, setTotal] = useState(0);
@@ -265,14 +271,15 @@ export function SecretaryDeliveryLogView() {
     >
       {/* Header */}
       <div className="flex flex-col gap-4 shrink-0">
-        <div className="flex flex-col gap-1">
-          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-text-primary">Delivery Logs</h1>
-          <p className="text-xs text-text-muted">
-            Email and SMS dispatch records across the clinic.
-          </p>
-        </div>
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          <div className="flex flex-col gap-1">
+            <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-text-primary">Delivery Logs</h1>
+            <p className="text-xs text-text-muted">
+              Email and SMS dispatch records across the clinic.
+            </p>
+          </div>
 
-        {/* Channel Switch */}
+          {/* Channel Switch */}
         <div className="relative grid grid-cols-2 w-fit bg-muted/20 p-1 rounded-xl border border-card-border/60">
           <span
             aria-hidden
@@ -292,6 +299,7 @@ export function SecretaryDeliveryLogView() {
               {tab === 'EMAIL' ? 'Email Logs' : 'SMS Logs'}
             </button>
           ))}
+        </div>
         </div>
       </div>
 
@@ -479,24 +487,33 @@ export function SecretaryDeliveryLogView() {
                               )}
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-44">
-                            {entry.errorLogs && (
-                              <DropdownMenuItem
-                                onClick={() => setViewingError(entry)}
-                                className="text-xs flex items-center gap-2 cursor-pointer"
-                              >
-                                <AlertCircle className="size-3 text-muted-foreground" />
-                                Failure Error Log
-                              </DropdownMenuItem>
-                            )}
+                          <DropdownMenuContent align="end" className="w-48">
                             <DropdownMenuItem
                               disabled={entry.status === 'PROCESSING'}
                               onClick={() => void handleResend(entry.id)}
-                              className="text-xs flex items-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                              className="text-sm flex items-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                              <RotateCw className="size-3 text-muted-foreground" />
-                              Retry
+                              <RotateCw className="size-3.5 text-muted-foreground" />
+                              {entry.channel === 'SMS' ? 'Retry via SMS' : 'Retry via Email'}
                             </DropdownMenuItem>
+                            {entry.errorLogs && (
+                              <DropdownMenuItem
+                                onClick={() => setViewingError(entry)}
+                                className="text-sm flex items-center gap-2 cursor-pointer"
+                              >
+                                <AlertCircle className="size-3.5 text-muted-foreground" />
+                                View Error Log
+                              </DropdownMenuItem>
+                            )}
+                            {entry.appointmentId && (
+                              <DropdownMenuItem
+                                onClick={() => router.push(`/secretary-v2/appointments?appointmentId=${entry.appointmentId}`)}
+                                className="text-sm flex items-center gap-2 cursor-pointer"
+                              >
+                                <Info className="size-3.5 text-muted-foreground" />
+                                Appointment Detail
+                              </DropdownMenuItem>
+                            )}
                           </DropdownMenuContent>
                         </DropdownMenu>
                       )}

@@ -338,6 +338,7 @@ export function useSecretaryAppointments() {
   const visibleAppointments = filteredAppointments;
 
   useEffect(() => {
+    if (isLoading || isRefreshing) return;
     if (selectedAppointmentId && !appointments.some((appointment) => appointment.id === selectedAppointmentId)) {
       // Keep the detail panel open right after an in-panel action (reschedule/cancel).
       // Ref is set during submit*; fall through next time so normal list filtering still clears.
@@ -348,7 +349,7 @@ export function useSecretaryAppointments() {
       const timeout = window.setTimeout(() => setSelectedAppointmentId(null), 0);
       return () => window.clearTimeout(timeout);
     }
-  }, [appointments, selectedAppointmentId]);
+  }, [appointments, selectedAppointmentId, isLoading, isRefreshing]);
 
   const loadMore = useCallback(() => { void fetchData({ append: true }); }, [fetchData]);
 
@@ -358,8 +359,7 @@ export function useSecretaryAppointments() {
     setSelectedAppointmentDetails(null);
   };
 
-  const selectAppointment = useCallback((appointmentId: string | null) => {
-    setSelectedAppointmentId(appointmentId);
+  const selectAppointment = useCallback((appointmentId: string | null) => {    setSelectedAppointmentId(appointmentId);
     if (!appointmentId) {
       setSelectedAppointmentDetails(null);
       return;
@@ -373,6 +373,10 @@ export function useSecretaryAppointments() {
       else if (!result.success) setError(result.error || 'Failed to load appointment details');
     });
   }, [appointments]);
+
+  const preserveSelection = useCallback(() => {
+    preserveSelectionRef.current = true;
+  }, []);
 
   const toggleChangeTreatment = () => {
     setChangeTreatment((current) => !current);
@@ -557,7 +561,7 @@ export function useSecretaryAppointments() {
   }, [fetchData, selectedAppointmentId]);
 
   return {
-    appointments, filteredAppointments, visibleAppointments, doctors, tabTotals, selectedAppointment, selectedAppointmentId, setSelectedAppointmentId, selectAppointment,
+    appointments, filteredAppointments, visibleAppointments, doctors, tabTotals, selectedAppointment, selectedAppointmentId, setSelectedAppointmentId, selectAppointment, preserveSelection,
     isLoading, isRefreshing, lastRefreshedAt, error, isSubmitting, activeTab, selectTab, searchTerm, setSearchTerm, doctorFilter, setDoctorFilter, dateFilter,
     setDateFilter, historyStatusFilter, setHistoryStatusFilter, sourceFilter, setSourceFilter, showRescheduleForm, setShowRescheduleForm: handleSetShowRescheduleForm,
     rescheduleJustification, setRescheduleJustification, changeTreatment, services, rescheduleServiceId,

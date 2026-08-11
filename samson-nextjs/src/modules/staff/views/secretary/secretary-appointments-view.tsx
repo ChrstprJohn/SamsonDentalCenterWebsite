@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useSecretaryAppointments } from '../../hooks/secretary/use-secretary-appointments';
+import { useSecretaryAppointments, type AppointmentDirectoryTab } from '../../hooks/secretary/use-secretary-appointments';
+import { getStaffAppointmentByIdAction } from '@/modules/appointments/actions/clinic/get-staff-appointment-by-id.action';
 import { AppointmentDetailPane } from './sub-components/appointment-detail-pane';
 import { AppointmentsTable } from './sub-components/appointments-table';
 import { CoordinationHub } from './sub-components/coordination-hub';
@@ -12,18 +13,53 @@ import { Modal } from '@/components/ui/modal';
 import { Select } from '@/components/ui/select';
 import { SidebarHeader, SidebarInput, SidebarTrigger } from '@/components/ui/sidebar';
 
+// Directory tab for an appointment status — matches hook statusesForTab.
+const tabForStatus = (status?: string): AppointmentDirectoryTab => {
+  if (status === 'APPROVED' || status === 'CHECKED_IN') return 'upcoming';
+  return 'history'; // COMPLETED | CANCELLED | REJECTED | DISPLACED | NO_SHOW
+};
+
 export function SecretaryAppointmentsView() {
   const view = useSecretaryAppointments();
   const [mobileView, setMobileView] = useState<'list' | 'detail' | 'quickLogs'>('list');
   const [showNotesPanel, setShowNotesPanel] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [showGuideModal, setShowGuideModal] = useState(false);
+  const [isDeepLinking, setIsDeepLinking] = useState(false);
   const [search, setSearch] = useState('');
   const [draftDate, setDraftDate] = useState('');
   const [draftDoctor, setDraftDoctor] = useState('');
   const [draftStatus, setDraftStatus] = useState('');
   const [draftSource, setDraftSource] = useState('');
   const filterBoxRef = useRef<HTMLDivElement>(null);
+
+  // Deep link: /secretary-v2/appointments?appointmentId=... auto-opens that appointment on its tab.
+  // Selection waits ~700ms so the list settles first (tab fetch is debounced 600ms) — detail pane
+  // then opens after the list, instead of ahead of it.
+  const deepLinkHandledRef = useRef(false);
+  const deepLinkTimerRef = useRef<number | null>(null);
+  useEffect(() => {
+    if (deepLinkHandledRef.current) return;
+    const id = new URLSearchParams(window.location.search).get('appointmentId');
+    if (!id) return;
+    deepLinkHandledRef.current = true;
+    setIsDeepLinking(true);
+    window.history.replaceState({}, '', window.location.pathname);
+    void getStaffAppointmentByIdAction(id).then((result) => {
+      const status = result.success ? result.data?.status : undefined;
+      const tab = tabForStatus(status);
+      if (view.activeTab !== tab) view.selectTab(tab);
+      deepLinkTimerRef.current = window.setTimeout(() => {
+        setIsDeepLinking(false);
+        view.preserveSelection();
+        view.selectAppointment(id);
+      }, 700);
+    });
+    return () => {
+      if (deepLinkTimerRef.current !== null) window.clearTimeout(deepLinkTimerRef.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (!showFilters) return;
@@ -278,6 +314,7 @@ export function SecretaryAppointmentsView() {
           formatPatientName={view.formatPatientName}
             onSelect={(id) => { view.selectAppointment(id); setMobileView('detail'); }}
             activeTab={view.activeTab}
+            pinnedAppointment={view.selectedAppointment}
         />
       </div>
 
@@ -330,6 +367,18 @@ export function SecretaryAppointmentsView() {
             )}
           </div>
           <AppointmentDetailPane view={view} activeTab={view.activeTab} onAppointmentUpdated={view.onAppointmentUpdated} />
+        </div>
+      ) : isDeepLinking || view.isLoading ? (
+        <div className="flex-1 flex-col items-center justify-center text-muted-foreground bg-muted/10 max-lg:hidden flex p-6 text-center">
+          <div className="size-14 rounded-full bg-muted/30 flex items-center justify-center mb-3">
+            <RotateCw className="size-6 text-muted-foreground/50 animate-spin" />
+          </div>
+          <p className="text-sm font-medium text-foreground">
+            {isDeepLinking ? 'Loading appointment...' : 'Loading appointments...'}
+          </p>
+          <p className="text-xs text-muted-foreground max-w-xs mt-1">
+            {isDeepLinking ? 'Fetching the linked appointment from the delivery log.' : 'Fetching the appointment list.'}
+          </p>
         </div>
       ) : (
         <div className="flex-1 flex-col items-center justify-center text-muted-foreground bg-muted/10 max-lg:hidden flex p-6 text-center">
