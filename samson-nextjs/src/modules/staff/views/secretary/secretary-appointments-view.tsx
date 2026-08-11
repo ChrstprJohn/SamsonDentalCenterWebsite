@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useSecretaryAppointments, type AppointmentDirectoryTab } from '../../hooks/secretary/use-secretary-appointments';
+import { useSecretaryAppointments } from '../../hooks/secretary/use-secretary-appointments';
 import { getStaffAppointmentByIdAction } from '@/modules/appointments/actions/clinic/get-staff-appointment-by-id.action';
 import { AppointmentDetailPane } from './sub-components/appointment-detail-pane';
 import { AppointmentsTable } from './sub-components/appointments-table';
@@ -14,11 +14,6 @@ import { Select } from '@/components/ui/select';
 import { SidebarHeader, SidebarInput, SidebarTrigger } from '@/components/ui/sidebar';
 
 // Directory tab for an appointment status — matches hook statusesForTab.
-const tabForStatus = (status?: string): AppointmentDirectoryTab => {
-  if (status === 'APPROVED' || status === 'CHECKED_IN') return 'upcoming';
-  return 'history'; // COMPLETED | CANCELLED | REJECTED | DISPLACED | NO_SHOW
-};
-
 export function SecretaryAppointmentsView() {
   const view = useSecretaryAppointments();
   const [mobileView, setMobileView] = useState<'list' | 'detail' | 'quickLogs'>('list');
@@ -26,6 +21,7 @@ export function SecretaryAppointmentsView() {
   const [showFilters, setShowFilters] = useState(false);
   const [showGuideModal, setShowGuideModal] = useState(false);
   const [isDeepLinking, setIsDeepLinking] = useState(false);
+  const [isDeepLinkDetailReady, setIsDeepLinkDetailReady] = useState(false);
   const [search, setSearch] = useState('');
   const [draftDate, setDraftDate] = useState('');
   const [draftDoctor, setDraftDoctor] = useState('');
@@ -34,10 +30,9 @@ export function SecretaryAppointmentsView() {
   const filterBoxRef = useRef<HTMLDivElement>(null);
 
   // Deep link: /secretary-v2/appointments?appointmentId=... auto-opens that appointment on its tab.
-  // Selection waits ~700ms so the list settles first (tab fetch is debounced 600ms) — detail pane
-  // then opens after the list, instead of ahead of it.
+  // Resolve the linked appointment's tab first, then load that tab's list before
+  // opening the detail pane. This prevents the default Active list from racing it.
   const deepLinkHandledRef = useRef(false);
-  const deepLinkTimerRef = useRef<number | null>(null);
   useEffect(() => {
     if (deepLinkHandledRef.current) return;
     const id = new URLSearchParams(window.location.search).get('appointmentId');
@@ -46,20 +41,24 @@ export function SecretaryAppointmentsView() {
     setIsDeepLinking(true);
     window.history.replaceState({}, '', window.location.pathname);
     void getStaffAppointmentByIdAction(id).then((result) => {
-      const status = result.success ? result.data?.status : undefined;
-      const tab = tabForStatus(status);
-      if (view.activeTab !== tab) view.selectTab(tab);
-      deepLinkTimerRef.current = window.setTimeout(() => {
+      if (!result.success || !result.data) {
         setIsDeepLinking(false);
-        view.preserveSelection();
-        view.selectAppointment(id);
-      }, 700);
+        return;
+      }
+      view.preserveSelection();
+      view.selectAppointment(id, result.data);
+      setIsDeepLinkDetailReady(true);
     });
-    return () => {
-      if (deepLinkTimerRef.current !== null) window.clearTimeout(deepLinkTimerRef.current);
-    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Keep the directory in its loading state until the selected appointment's full
+  // detail record has arrived, not merely until the correct list page is available.
+  useEffect(() => {
+    if (isDeepLinking && !view.isLoading && isDeepLinkDetailReady) {
+      setIsDeepLinking(false);
+    }
+  }, [isDeepLinking, view.isLoading, isDeepLinkDetailReady]);
 
   useEffect(() => {
     if (!showFilters) return;
@@ -319,14 +318,14 @@ export function SecretaryAppointmentsView() {
       </div>
 
       {/* Column 2: Appointment Details */}
-      {hasSelection && isNeedsAttention && view.selectedAppointment ? (
+      {!isDeepLinking && hasSelection && isNeedsAttention && view.selectedAppointment ? (
         <NeedsAttentionDetail
           appointment={view.selectedAppointment}
           view={view}
           onBack={() => { view.setSelectedAppointmentId(null); setMobileView('list'); }}
           className={`${colMobile('detail')} lg:flex`}
         />
-      ) : hasSelection ? (
+      ) : !isDeepLinking && hasSelection ? (
         <div className={`flex flex-1 flex-col min-w-0 min-h-0 h-full ${colMobile('detail')} lg:flex`}>
           <div className="p-4 border-b border-card-border/40 shrink-0 flex items-center justify-between h-14">
             <div className="flex items-center gap-2 min-w-0 flex-1">

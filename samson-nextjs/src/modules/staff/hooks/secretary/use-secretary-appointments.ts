@@ -20,6 +20,7 @@ export function useSecretaryAppointments() {
   const [appointments, setAppointments] = useState<AppointmentDto[]>([]);
   const [doctors, setDoctors] = useState<DoctorFilterItem[]>([]);
   const [selectedAppointmentId, setSelectedAppointmentId] = useState<string | null>(null);
+  const [isLoadingAppointmentDetails, setIsLoadingAppointmentDetails] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastRefreshedAt, setLastRefreshedAt] = useState<Date | null>(null);
@@ -169,6 +170,9 @@ export function useSecretaryAppointments() {
         : otherTabs.map((tab) => getClinicAppointmentsPageAction(buildPageParams(tab, null, true, true)));
       const [appRes, docRes, ...otherResults] = await Promise.all([activeRequest, doctorsRequest, ...otherRequests]);
       if (requestId !== latestRequestId.current) return;
+      // Tab switched while this fetch was in flight — discard, or its rows/loading flags
+      // would land out of order and flash the detail pane ahead of the real tab's list.
+      if (queryRef.current.activeTab !== currentTab) return;
       if (!appRes.success || !appRes.data) throw new Error(appRes.error || 'Could not load appointments.');
 
       const page = appRes.data;
@@ -198,12 +202,12 @@ export function useSecretaryAppointments() {
       hasLoadedRef.current = true;
       if (!append) setLastRefreshedAt(new Date());
     } catch (err) {
-      if (requestId === latestRequestId.current) {
+      if (requestId === latestRequestId.current && queryRef.current.activeTab === currentTab) {
         if (append) setLoadMoreError(err instanceof Error ? err.message : 'Could not load more appointments.');
         else setError(err instanceof Error ? err.message : 'Could not load appointments.');
       }
     } finally {
-      if (requestId === latestRequestId.current) {
+      if (requestId === latestRequestId.current && queryRef.current.activeTab === currentTab) {
         setIsLoading(false);
         setIsRefreshing(false);
         setIsLoadingMore(false);
@@ -359,18 +363,29 @@ export function useSecretaryAppointments() {
     setSelectedAppointmentDetails(null);
   };
 
-  const selectAppointment = useCallback((appointmentId: string | null) => {    setSelectedAppointmentId(appointmentId);
+  const selectAppointment = useCallback((appointmentId: string | null, initialDetails?: AppointmentDto) => {    setSelectedAppointmentId(appointmentId);
     if (!appointmentId) {
       setSelectedAppointmentDetails(null);
+      setIsLoadingAppointmentDetails(false);
+      return;
+    }
+    if (initialDetails?.id === appointmentId) {
+      // Deep links already fetched the complete detail record. Reuse it instead of
+      // issuing a second request that would reveal the detail after the list.
+      ++detailRequestIdRef.current;
+      setSelectedAppointmentDetails(initialDetails);
+      setIsLoadingAppointmentDetails(false);
       return;
     }
     const summary = appointments.find((appointment) => appointment.id === appointmentId) || null;
     setSelectedAppointmentDetails(summary);
+    setIsLoadingAppointmentDetails(true);
     const requestId = ++detailRequestIdRef.current;
     void getStaffAppointmentByIdAction(appointmentId).then((result) => {
       if (requestId !== detailRequestIdRef.current) return;
       if (result.success && result.data) setSelectedAppointmentDetails(result.data);
       else if (!result.success) setError(result.error || 'Failed to load appointment details');
+      setIsLoadingAppointmentDetails(false);
     });
   }, [appointments]);
 
@@ -561,7 +576,7 @@ export function useSecretaryAppointments() {
   }, [fetchData, selectedAppointmentId]);
 
   return {
-    appointments, filteredAppointments, visibleAppointments, doctors, tabTotals, selectedAppointment, selectedAppointmentId, setSelectedAppointmentId, selectAppointment, preserveSelection,
+    appointments, filteredAppointments, visibleAppointments, doctors, tabTotals, selectedAppointment, selectedAppointmentId, setSelectedAppointmentId, selectAppointment, preserveSelection, isLoadingAppointmentDetails,
     isLoading, isRefreshing, lastRefreshedAt, error, isSubmitting, activeTab, selectTab, searchTerm, setSearchTerm, doctorFilter, setDoctorFilter, dateFilter,
     setDateFilter, historyStatusFilter, setHistoryStatusFilter, sourceFilter, setSourceFilter, showRescheduleForm, setShowRescheduleForm: handleSetShowRescheduleForm,
     rescheduleJustification, setRescheduleJustification, changeTreatment, services, rescheduleServiceId,
