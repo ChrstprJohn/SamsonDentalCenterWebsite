@@ -212,6 +212,7 @@ export function SecretaryDeliveryLogView() {
 
   const fetchLogs = useCallback(async (mode: 'reset' | 'next' | 'prev') => {
     const id = ++requestId.current;
+    if (mode === 'reset') setEntries([]); // show skeleton instead of stale rows
     setLoading(true);
     setError(null);
 
