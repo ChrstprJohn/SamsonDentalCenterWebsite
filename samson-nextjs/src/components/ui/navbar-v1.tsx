@@ -20,7 +20,7 @@ export const NAV_ITEMS = [
   { label: 'Contact', href: '#contact' },
 ] as const;
 
-export function NavbarV1({ user }: NavbarProps) {
+export function NavbarV1({}: NavbarProps) {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
@@ -131,20 +131,18 @@ export function NavbarV1({ user }: NavbarProps) {
           {/* Actions Block */}
           <div className="flex items-center gap-4 sm:gap-6">
             <div className="hidden md:flex items-center gap-5">
-              {user && (
-                <Link href="/book" onClick={() => setIsMobileOpen(false)}>
-                  <button
-                    className={`px-4 py-2 rounded-full text-[11px] font-semibold uppercase tracking-widest transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] shadow-xs cursor-pointer flex items-center gap-1.5 ${
-                      isDarkNav
-                        ? 'bg-white text-[#141515] hover:bg-[#D94E4E] hover:text-white'
-                        : 'bg-[#141515] text-white hover:bg-[#D94E4E]'
-                    }`}
-                  >
-                    Request Appointment
-                    <ArrowRight className="w-3 h-3" />
-                  </button>
-                </Link>
-              )}
+              <Link href="/book" onClick={() => setIsMobileOpen(false)}>
+                <button
+                  className={`px-4 py-2 rounded-full text-[11px] font-semibold uppercase tracking-widest transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] shadow-xs cursor-pointer flex items-center gap-1.5 ${
+                    isDarkNav
+                      ? 'bg-white text-[#141515] hover:bg-[#D94E4E] hover:text-white'
+                      : 'bg-[#141515] text-white hover:bg-[#D94E4E]'
+                  }`}
+                >
+                  Request Appointment
+                  <ArrowRight className="w-3 h-3" />
+                </button>
+              </Link>
             </div>
 
             {/* Mobile Menu Icon */}
@@ -165,7 +163,6 @@ export function NavbarV1({ user }: NavbarProps) {
       <AnimatePresence>
         {isMobileOpen && (
           <NavbarMobileDrawer
-            user={user}
             isMainPage={isMainPage}
             activeSection={activeSection}
             onClose={() => setIsMobileOpen(false)}

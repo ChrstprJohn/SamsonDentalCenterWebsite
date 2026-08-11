@@ -8,7 +8,7 @@ import { NAV_ITEMS } from './navbar';
 import type { AuthHeaderUser } from '@/modules/patients/hooks/auth/header/use-auth-header';
 
 interface NavbarMobileDrawerProps {
-  user: AuthHeaderUser | null;
+  user?: AuthHeaderUser | null;
   isMainPage: boolean;
   activeSection: string;
   onClose: () => void;
@@ -16,7 +16,6 @@ interface NavbarMobileDrawerProps {
 }
 
 export function NavbarMobileDrawer({
-  user,
   isMainPage,
   activeSection,
   onClose,
@@ -50,16 +49,14 @@ export function NavbarMobileDrawer({
             );
           })}
         <div className="flex flex-col gap-4 pt-6 mt-4">
-          {user && (
-            <div className="flex flex-col gap-4 items-center">
-              <Link href="/book" onClick={onClose} className="w-full">
-                <button className="w-full px-6 py-3.5 bg-[#141515] text-white rounded-full text-[14px] font-semibold hover:bg-[#D94E4E] tracking-[0.2em] transition-all cursor-pointer flex items-center justify-center gap-2">
-                  Request Appointment
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-              </Link>
-            </div>
-          )}
+          <div className="flex flex-col gap-4 items-center">
+            <Link href="/book" onClick={onClose} className="w-full">
+              <button className="w-full px-6 py-3.5 bg-[#141515] text-white rounded-full text-[14px] font-semibold hover:bg-[#D94E4E] tracking-[0.2em] transition-all cursor-pointer flex items-center justify-center gap-2">
+                Request Appointment
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </Link>
+          </div>
         </div>
       </div>
     </motion.div>
