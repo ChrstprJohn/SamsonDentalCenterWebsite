@@ -102,14 +102,6 @@ const data = {
           url: "/secretary-v2/notifications",
         },
         {
-          title: "Email Log List",
-          url: "/secretary-v2/emails",
-        },
-        {
-          title: "SMS Logs List",
-          url: "/secretary-v2/sms-logs",
-        },
-        {
           title: "Delivery Logs",
           url: "/secretary-v2/delivery-logs",
         },

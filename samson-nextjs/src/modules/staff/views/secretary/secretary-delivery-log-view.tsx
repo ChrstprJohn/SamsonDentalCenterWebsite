@@ -14,11 +14,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Mail, MessageSquare, Search, ChevronLeft, ChevronRight, ChevronDown, RotateCw, Inbox, MoreHorizontal } from 'lucide-react';
+import { Mail, MessageSquare, Search, ChevronLeft, ChevronRight, ChevronDown, RotateCw, Inbox, MoreHorizontal, AlertCircle, X } from 'lucide-react';
 import { getOutboxLogsPageAction } from '@/modules/emails/actions/logs/get-outbox-logs-page.action';
 import { resendEmailAction } from '@/modules/emails/actions/logs/resend-email.action';
 import { useToast } from '@/components/feedback/toast-container';
 import { formatTimeAgo } from '@/shared/utils/date.util';
+import { SecretaryListSkeleton, SecretaryListSkeletonTheme } from './sub-components/secretary-list-skeleton';
 import type { OutboxLogResponseDto } from '@/modules/emails/dtos/logs/outbox-log-response.dto';
 
 // UI Label Mappings for Event Types (Matching Notification Status Overview)
@@ -70,6 +71,8 @@ interface DeliveryEntry {
   type: string;
   status: string;
   recipient: string;
+  retryCount: number;
+  errorLogs: string | null;
   timestamp: string;
 }
 
@@ -85,6 +88,8 @@ function toEntry(log: OutboxLogResponseDto): DeliveryEntry {
     type: EVENT_NAME_MAP[log.eventType] || log.eventType,
     status: log.status === 'PROCESSED' ? 'SENT' : log.status,
     recipient,
+    retryCount: log.retryCount,
+    errorLogs: log.errorLogs,
     timestamp: log.processedAt ?? log.createdAt,
   };
 }
@@ -191,6 +196,7 @@ export function SecretaryDeliveryLogView() {
   const [dateRange, setDateRange] = useState<DateRange>(() => rangeForPreset('last7'));
   const [dateMenuOpen, setDateMenuOpen] = useState(false);
   const [resendingId, setResendingId] = useState<string | null>(null);
+  const [viewingError, setViewingError] = useState<DeliveryEntry | null>(null);
   const [hasMore, setHasMore] = useState(false);
   const [prevPageCount, setPrevPageCount] = useState(0);
 
@@ -266,14 +272,20 @@ export function SecretaryDeliveryLogView() {
           </p>
         </div>
 
-        {/* Channel Tabs */}
-        <div className="flex w-fit gap-1 bg-muted/20 p-1 rounded-xl">
+        {/* Channel Switch */}
+        <div className="relative grid grid-cols-2 w-fit bg-muted/20 p-1 rounded-xl border border-card-border/60">
+          <span
+            aria-hidden
+            className={`absolute top-1 bottom-1 left-1 w-[calc(50%-0.25rem)] rounded-lg bg-primary shadow-sm transition-transform duration-200 ease-out ${channel === 'SMS' ? 'translate-x-full' : ''}`}
+          />
           {(['EMAIL', 'SMS'] as const).map((tab) => (
             <button
               key={tab}
-              onClick={() => setChannel(tab)}
-              className={`flex items-center gap-1.5 h-9 px-6 text-xs font-semibold rounded-lg transition-colors ${
-                channel === tab ? 'bg-primary text-primary-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground'
+              onClick={() => { setChannel(tab); setEntries([]); }}
+              aria-pressed={channel === tab}
+              title={`Show ${tab === 'EMAIL' ? 'Email Logs' : 'SMS Logs'}`}
+              className={`relative z-10 flex items-center justify-center gap-1.5 h-8 px-6 text-xs font-semibold rounded-lg transition-colors ${
+                channel === tab ? 'text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               {tab === 'EMAIL' ? <Mail className="size-3.5" /> : <MessageSquare className="size-3.5" />}
@@ -285,13 +297,13 @@ export function SecretaryDeliveryLogView() {
 
       {/* Filters */}
       <div className="flex flex-col sm:grid sm:grid-cols-2 gap-2 shrink-0">
-        <div className="relative">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+        <div className="relative flex items-center">
+          <Search className="pointer-events-none absolute left-2.5 size-4 text-muted-foreground" />
           <Input
             placeholder="Search recipient or type..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-8 h-9 text-sm bg-card w-full"
+            className="pl-9 h-9 text-sm bg-card w-full"
           />
         </div>
 
@@ -354,13 +366,13 @@ export function SecretaryDeliveryLogView() {
 
         <Button
           size="sm"
-          variant="ghost"
+          variant="outline"
           onClick={() => void fetchLogs('reset')}
           disabled={loading}
-          className="h-9 w-9 p-0 text-muted-foreground hover:text-foreground self-center shrink-0"
+          className="h-10 w-10 p-0 bg-card text-muted-foreground hover:text-foreground self-center shrink-0"
           title="Refresh logs"
         >
-          <RotateCw className={`size-3.5 ${loading ? 'animate-spin' : ''}`} />
+          <RotateCw className={`size-4 ${loading ? 'animate-spin' : ''}`} />
         </Button>
         </div>
       </div>
@@ -368,17 +380,32 @@ export function SecretaryDeliveryLogView() {
       {/* Table */}
       <div className="flex flex-col gap-3 min-h-0">
         {loading && entries.length === 0 ? (
-          <div className="space-y-3">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="rounded-xl bg-muted/30 border border-card-border p-3 flex gap-3 animate-pulse">
-                <div className="size-8 rounded-lg bg-muted/30 shrink-0" />
-                <div className="flex-1 space-y-2">
-                  <div className="h-3.5 w-40 rounded bg-muted/40" />
-                  <div className="h-3 w-60 rounded bg-muted/30" />
-                </div>
-              </div>
-            ))}
-          </div>
+          <SecretaryListSkeletonTheme>
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left text-sm font-bold text-foreground border-b border-card-border/40">
+                  <th className="py-2 pr-3 font-semibold">Type</th>
+                  <th className="py-2 pr-3 font-semibold">To</th>
+                  <th className="py-2 pr-3 font-semibold">Status</th>
+                  <th className="py-2 pr-3 font-semibold">Auto-Retry</th>
+                  <th className="py-2 pl-2 text-right font-semibold">Sent</th>
+                  <th className="py-2 pl-2 w-10"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {Array.from({ length: 7 }, (_, i) => (
+                  <tr key={i} className="border-b border-card-border/40 last:border-b-0">
+                    <td className="py-2.5 pr-3 max-w-[130px]"><SecretaryListSkeleton width={120} height={16} /></td>
+                    <td className="py-2.5 pr-3 max-w-[160px]"><SecretaryListSkeleton width={140} height={16} /></td>
+                    <td className="py-2.5 pr-3"><SecretaryListSkeleton width={56} height={16} borderRadius="9999px" /></td>
+                    <td className="py-2.5 pr-3"><SecretaryListSkeleton width={32} height={16} /></td>
+                    <td className="py-2.5 pl-2 text-right"><div className="flex justify-end"><SecretaryListSkeleton width={64} height={16} /></div></td>
+                    <td className="py-2.5 pl-2 w-10"></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </SecretaryListSkeletonTheme>
         ) : error && entries.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-10 text-center border border-dashed border-card-border/60 rounded-xl">
             <div className="size-10 rounded-full bg-destructive/10 flex items-center justify-center mb-2">
@@ -389,12 +416,12 @@ export function SecretaryDeliveryLogView() {
             <Button variant="outline" size="sm" onClick={() => void fetchLogs('reset')} className="mt-3 h-8 text-xs">Retry</Button>
           </div>
         ) : entries.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-10 text-center border border-dashed border-card-border/60 rounded-xl">
+          <div className="flex flex-col items-center justify-center py-10 text-center">
             <div className="size-10 rounded-full bg-muted/20 flex items-center justify-center mb-2">
               <Inbox className="size-5 text-muted-foreground/50" />
             </div>
-            <p className="text-xs font-medium text-foreground">No delivery logs found</p>
-            <p className="text-[11px] text-muted-foreground mt-0.5 max-w-[220px]">
+            <p className="text-sm font-medium text-foreground">No delivery logs found</p>
+            <p className="text-xs text-muted-foreground mt-0.5 max-w-[220px]">
               Try adjusting your filters.
             </p>
           </div>
@@ -406,6 +433,7 @@ export function SecretaryDeliveryLogView() {
                   <th className="py-2 pr-3 font-semibold">Type</th>
                   <th className="py-2 pr-3 font-semibold">To</th>
                   <th className="py-2 pr-3 font-semibold">Status</th>
+                  <th className="py-2 pr-3 font-semibold">Auto-Retry</th>
                   <th className="py-2 pl-2 text-right font-semibold">Sent</th>
                   <th className="py-2 pl-2 w-10"></th>
                 </tr>
@@ -423,6 +451,9 @@ export function SecretaryDeliveryLogView() {
                       <span className={`inline-flex items-center text-[10px] font-semibold px-2 py-0.5 rounded-full ${badgeClassFor(entry.status)}`}>
                         {entry.status}
                       </span>
+                    </td>
+                    <td className="py-2.5 pr-3 whitespace-nowrap text-sm text-muted-foreground font-mono">
+                      {entry.retryCount} / 3
                     </td>
                     <td className="py-2.5 pl-2 text-right text-sm text-muted-foreground font-mono whitespace-nowrap">
                       {formatTimeAgo(entry.timestamp)}
@@ -449,6 +480,15 @@ export function SecretaryDeliveryLogView() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="w-44">
+                            {entry.errorLogs && (
+                              <DropdownMenuItem
+                                onClick={() => setViewingError(entry)}
+                                className="text-xs flex items-center gap-2 cursor-pointer"
+                              >
+                                <AlertCircle className="size-3 text-muted-foreground" />
+                                Failure Error Log
+                              </DropdownMenuItem>
+                            )}
                             <DropdownMenuItem
                               disabled={entry.status === 'PROCESSING'}
                               onClick={() => void handleResend(entry.id)}
@@ -468,8 +508,8 @@ export function SecretaryDeliveryLogView() {
 
             {(prevPageCount > 0 || hasMore) && (
               <div className="flex items-center justify-between pt-3 pb-4 mb-2 border-t border-card-border/40 shrink-0">
-                <span className="text-[11px] text-muted-foreground">
-                  Page {prevPageCount + 1} of {Math.max(1, Math.ceil(total / 25))}
+                <span className="text-sm text-muted-foreground">
+                  Page {prevPageCount + 1} of {Math.max(1, Math.ceil(total / 25))} · Showing {entries.length} of {total}
                 </span>
                 <div className="flex items-center gap-1.5 ml-auto">
                   <Button
@@ -477,20 +517,20 @@ export function SecretaryDeliveryLogView() {
                     size="sm"
                     onClick={() => void fetchLogs('prev')}
                     disabled={prevPageCount === 0 || loading}
-                    className="h-7 px-2 text-xs gap-1 text-muted-foreground hover:text-foreground"
+                    className="h-8 px-2.5 text-sm gap-1 text-muted-foreground hover:text-foreground"
                     title="Newer logs"
                   >
-                    <ChevronLeft className="size-3.5" /> Newer
+                    <ChevronLeft className="size-4" /> Newer
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => void fetchLogs('next')}
                     disabled={!hasMore || loading}
-                    className="h-7 px-2 text-xs gap-1 text-muted-foreground hover:text-foreground"
+                    className="h-8 px-2.5 text-sm gap-1 text-muted-foreground hover:text-foreground"
                     title="Older logs"
                   >
-                    Older <ChevronRight className="size-3.5" />
+                    Older <ChevronRight className="size-4" />
                   </Button>
                 </div>
               </div>
@@ -498,6 +538,48 @@ export function SecretaryDeliveryLogView() {
           </>
         )}
       </div>
+
+      {viewingError && (
+        <div
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Failure Error Log"
+          onClick={() => setViewingError(null)}
+          onKeyDown={(e) => { if (e.key === 'Escape') setViewingError(null); }}
+        >
+          <div
+            className="bg-card border border-card-border rounded-2xl p-6 max-w-lg w-full flex flex-col gap-4 shadow-2xl relative"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setViewingError(null)}
+              className="absolute top-4 right-4 p-1.5 text-muted-foreground hover:text-foreground rounded-full"
+              aria-label="Close"
+            >
+              <X className="size-4" />
+            </button>
+            <div className="flex items-center gap-2">
+              <AlertCircle className="size-4 text-destructive" />
+              <h2 className="text-sm font-bold text-foreground">Failure Error Log</h2>
+            </div>
+            <div className="flex flex-col gap-1 text-xs">
+              <span className="text-muted-foreground">To: <span className="text-foreground font-medium">{viewingError.recipient}</span></span>
+              <span className="text-muted-foreground">{viewingError.type} · {viewingError.retryCount} of 3 attempts</span>
+            </div>
+            <pre className="text-[11px] font-mono text-rose-600 dark:text-rose-400 bg-destructive/5 border border-destructive/20 rounded-xl p-4 whitespace-pre-wrap break-words max-h-64 overflow-y-auto">
+              {viewingError.errorLogs}
+            </pre>
+            <Button
+              onClick={() => setViewingError(null)}
+              variant="outline"
+              className="w-full text-xs h-9"
+            >
+              Close
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
