@@ -89,8 +89,8 @@ function toEntry(log: OutboxLogResponseDto): DeliveryEntry {
   const isSms = log.eventType.endsWith('_SMS') || log.eventType.includes('SMS');
   const payload = (log.payload || {}) as Record<string, any>;
   const recipient = isSms
-    ? payload.phone || payload.mobileNumber || payload.phoneNumber || payload.recipientPhone || payload.to || 'System Automated Dispatch'
-    : payload.email || payload.guestEmail || payload.to || payload.recipient || 'System Automated Dispatch';
+    ? payload.phone || payload.mobileNumber || payload.phoneNumber || payload.recipientPhone || payload.guestPhone || payload.to || payload.email || 'System Automated Dispatch'
+    : payload.email || payload.guestEmail || payload.recipientEmail || payload.to || payload.recipient || payload.phoneNumber || payload.phone || payload.mobileNumber || payload.guestPhone || 'System Automated Dispatch';
   return {
     id: log.id,
     channel: isSms ? 'SMS' : 'EMAIL',

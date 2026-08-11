@@ -16,17 +16,24 @@ async function addPatientEmails(supabase: SupabaseClient, records: Record<string
     .filter((id): id is string => typeof id === 'string' && id.length > 0);
 
   if (patientIds.length === 0) return;
-  const { data: usersData } = await supabase.from('users').select('id, email').in('id', patientIds);
+  const { data: usersData } = await supabase.from('users').select('id, email, phone_number').in('id', patientIds);
   if (!usersData) return;
 
-  const patientEmailMap = usersData.reduce((acc: Record<string, string>, user: { id: string; email: string }) => {
-    acc[user.id] = user.email;
+  const patientMap = usersData.reduce((acc: Record<string, { email: string; phone_number: string | null }>, user: { id: string; email: string; phone_number: string | null }) => {
+    acc[user.id] = { email: user.email, phone_number: user.phone_number };
     return acc;
   }, {});
   for (const record of records) {
     const payload = (record.payload || {}) as Record<string, any>;
-    if (!payload.email && !payload.guestEmail && payload.patientId && patientEmailMap[payload.patientId]) {
-      payload.email = patientEmailMap[payload.patientId];
+    const user = payload.patientId ? patientMap[payload.patientId] : null;
+    if (!user) continue;
+    // Email backfill (existing behaviour) + phone backfill for SMS payloads written
+    // with a null guest phone (e.g. no-show / completed dispatch).
+    if (!payload.email && !payload.guestEmail && user.email) {
+      payload.email = user.email;
+    }
+    if (!payload.phone && !payload.mobileNumber && !payload.phoneNumber && !payload.recipientPhone && !payload.guestPhone && user.phone_number) {
+      payload.phoneNumber = user.phone_number;
     }
   }
 }
@@ -35,7 +42,16 @@ function applyFilters(query: any, params: GetOutboxLogsPageDto) {
   let filtered = query;
   if (params.status) filtered = filtered.eq('status', params.status);
   if (params.channel === 'SMS') {
-    filtered = filtered.or('event_type.like.%_SMS,payload->>phone.not.is.null,payload->>mobileNumber.not.is.null,payload->>recipientPhone.not.is.null,payload->>phoneNumber.not.is.null');
+    // SMS = _SMS event types, or non-_SMS records that carry a phone but no email
+    // (email+phone payloads belong to the EMAIL channel and must not leak in here).
+    filtered = filtered.or(
+      'event_type.like.%_SMS,' +
+      'and(event_type.not.like.%_SMS,payload->>phone.not.is.null,payload->>email.is.null,payload->>guestEmail.is.null),' +
+      'and(event_type.not.like.%_SMS,payload->>mobileNumber.not.is.null,payload->>email.is.null,payload->>guestEmail.is.null),' +
+      'and(event_type.not.like.%_SMS,payload->>recipientPhone.not.is.null,payload->>email.is.null,payload->>guestEmail.is.null),' +
+      'and(event_type.not.like.%_SMS,payload->>phoneNumber.not.is.null,payload->>email.is.null,payload->>guestEmail.is.null),' +
+      'and(event_type.not.like.%_SMS,payload->>guestPhone.not.is.null,payload->>email.is.null,payload->>guestEmail.is.null)'
+    );
   }
   if (params.channel === 'EMAIL') filtered = filtered.not('event_type', 'like', '%_SMS');
   if (params.category === 'APPOINTMENTS') {
@@ -47,7 +63,7 @@ function applyFilters(query: any, params: GetOutboxLogsPageDto) {
   }
   if (params.search) {
     const pattern = `%${escapeIlike(params.search)}%`;
-    filtered = filtered.or(`event_type.ilike.${pattern},payload->>email.ilike.${pattern},payload->>guestEmail.ilike.${pattern},payload->>phone.ilike.${pattern},payload->>mobileNumber.ilike.${pattern},payload->>recipientPhone.ilike.${pattern},payload->>phoneNumber.ilike.${pattern}`);
+    filtered = filtered.or(`event_type.ilike.${pattern},payload->>email.ilike.${pattern},payload->>guestEmail.ilike.${pattern},payload->>phone.ilike.${pattern},payload->>mobileNumber.ilike.${pattern},payload->>recipientPhone.ilike.${pattern},payload->>phoneNumber.ilike.${pattern},payload->>guestPhone.ilike.${pattern}`);
   }
   if (params.dateFrom) filtered = filtered.gte('created_at', params.dateFrom);
   if (params.dateTo) filtered = filtered.lte('created_at', params.dateTo);
