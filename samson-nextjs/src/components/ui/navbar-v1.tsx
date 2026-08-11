@@ -131,7 +131,7 @@ export function NavbarV1({ user }: NavbarProps) {
           {/* Actions Block */}
           <div className="flex items-center gap-4 sm:gap-6">
             <div className="hidden md:flex items-center gap-5">
-              {user ? (
+              {user && (
                 <Link href="/book" onClick={() => setIsMobileOpen(false)}>
                   <button
                     className={`px-4 py-2 rounded-full text-[11px] font-semibold uppercase tracking-widest transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] shadow-xs cursor-pointer flex items-center gap-1.5 ${
@@ -144,28 +144,6 @@ export function NavbarV1({ user }: NavbarProps) {
                     <ArrowRight className="w-3 h-3" />
                   </button>
                 </Link>
-              ) : (
-                <>
-                  <Link
-                    href="/auth/login"
-                    className={`text-xs font-semibold uppercase tracking-widest transition-colors duration-300 cursor-pointer ${
-                      isDarkNav ? 'text-white/80 hover:text-[#D94E4E]' : 'text-gray-600 hover:text-[#D94E4E]'
-                    }`}
-                  >
-                    Log In
-                  </Link>
-                  <Link href="/auth/signup">
-                    <button
-                      className={`px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-widest transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] shadow-xs cursor-pointer ${
-                        isDarkNav
-                          ? 'bg-white text-[#141515] hover:bg-[#D94E4E] hover:text-white'
-                          : 'bg-[#141515] text-white hover:bg-[#D94E4E]'
-                      }`}
-                    >
-                      Sign Up
-                    </button>
-                  </Link>
-                </>
               )}
             </div>
 

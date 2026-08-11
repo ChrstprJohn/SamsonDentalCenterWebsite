@@ -50,7 +50,7 @@ export function NavbarMobileDrawer({
             );
           })}
         <div className="flex flex-col gap-4 pt-6 mt-4">
-          {user ? (
+          {user && (
             <div className="flex flex-col gap-4 items-center">
               <Link href="/book" onClick={onClose} className="w-full">
                 <button className="w-full px-6 py-3.5 bg-[#141515] text-white rounded-full text-[14px] font-semibold hover:bg-[#D94E4E] tracking-[0.2em] transition-all cursor-pointer flex items-center justify-center gap-2">
@@ -59,19 +59,6 @@ export function NavbarMobileDrawer({
                 </button>
               </Link>
             </div>
-          ) : (
-            <>
-              <Link href="/auth/login" onClick={onClose} className="w-full">
-                <button className="w-full py-2.5 text-[14px] font-semibold uppercase tracking-[0.2em] text-[#1D1E1E] hover:text-[#D94E4E] transition-colors cursor-pointer border border-gray-300 rounded-full">
-                  Log In
-                </button>
-              </Link>
-              <Link href="/auth/signup" onClick={onClose} className="w-full">
-                <button className="w-full px-6 py-3.5 bg-[#141515] text-white rounded-full text-[14px] font-semibold hover:bg-[#D94E4E] tracking-[0.2em] transition-all cursor-pointer">
-                  Sign Up
-                </button>
-              </Link>
-            </>
           )}
         </div>
       </div>
