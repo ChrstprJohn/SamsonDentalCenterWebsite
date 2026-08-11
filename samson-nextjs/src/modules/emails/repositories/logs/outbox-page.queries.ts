@@ -74,7 +74,7 @@ function applyFilters(query: any, params: GetOutboxLogsPageDto) {
 export const getOutboxLogsPageQuery = (supabase: SupabaseClient) => {
   return async (params: GetOutboxLogsPageDto): Promise<PageResult<OutboxLogResponseDto>> => {
     let query = applyFilters(
-      supabase.from('outbox').select('*', { count: 'exact' }).order('created_at', { ascending: false }).order('id', { ascending: false }),
+      supabase.from('outbox').select('*', { count: 'exact' }).order('processed_at', { ascending: false, nullsFirst: false }).order('id', { ascending: false }),
       params,
     );
     let countQuery = applyFilters(supabase.from('outbox').select('id', { count: 'exact', head: true }), params);
@@ -82,7 +82,7 @@ export const getOutboxLogsPageQuery = (supabase: SupabaseClient) => {
     const cursor = decodeCursor(params.cursor);
     if (params.cursor && !cursor) throw new Error('Invalid outbox cursor.');
     if (cursor) {
-      const cursorFilter = `created_at.lt.${cursor.sortValue},and(created_at.eq.${cursor.sortValue},id.lt.${cursor.id})`;
+      const cursorFilter = `processed_at.lt.${cursor.sortValue},and(processed_at.eq.${cursor.sortValue},id.lt.${cursor.id})`;
       query = query.or(cursorFilter);
     }
 
@@ -92,13 +92,15 @@ export const getOutboxLogsPageQuery = (supabase: SupabaseClient) => {
     if (countResult.error) throw new Error(`Failed to count outbox logs: ${countResult.error.message}`);
 
     const records = (pageResult.data || []) as Record<string, unknown>[];
-    const hasMore = records.length > limit;
-    const pageRecords = hasMore ? records.slice(0, limit) : records;
+    const pageRecords = records.length > limit ? records.slice(0, limit) : records;
     await addPatientEmails(supabase, pageRecords);
     const items = mapOutboxRecords(pageRecords);
     const lastRecord = pageRecords.at(-1);
+    // Nulls-last ordering: once the page tail hits a row with no processed_at
+    // (never sent), every remaining row is also null — nothing left to page.
+    const hasMore = records.length > limit && !!lastRecord?.processed_at;
     const nextCursor = hasMore && lastRecord
-      ? encodeCursor({ sortValue: String(lastRecord.created_at), id: String(lastRecord.id) })
+      ? encodeCursor({ sortValue: String(lastRecord.processed_at), id: String(lastRecord.id) })
       : null;
 
     return { items, nextCursor, hasMore, total: countResult.count ?? items.length };

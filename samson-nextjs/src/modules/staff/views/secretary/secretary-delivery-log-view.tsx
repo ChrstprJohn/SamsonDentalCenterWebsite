@@ -6,16 +6,19 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { Calendar } from '@/components/ui/calendar';
+import { cn } from '@/shared/utils';
+import { buttonVariants } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Mail, MessageSquare, Search, ChevronLeft, ChevronRight, RotateCw, Inbox, MoreHorizontal } from 'lucide-react';
+import { Mail, MessageSquare, Search, ChevronLeft, ChevronRight, ChevronDown, RotateCw, Inbox, MoreHorizontal } from 'lucide-react';
 import { getOutboxLogsPageAction } from '@/modules/emails/actions/logs/get-outbox-logs-page.action';
 import { resendEmailAction } from '@/modules/emails/actions/logs/resend-email.action';
 import { useToast } from '@/components/feedback/toast-container';
+import { formatTimeAgo } from '@/shared/utils/date.util';
 import type { OutboxLogResponseDto } from '@/modules/emails/dtos/logs/outbox-log-response.dto';
 
 // UI Label Mappings for Event Types (Matching Notification Status Overview)
@@ -46,21 +49,6 @@ const EVENT_NAME_MAP: Record<string, string> = {
   'PATIENT_REGISTERED': 'Registration OTP',
   'PASSWORD_RESET_REQUESTED': 'Password Reset OTP',
 };
-
-function formatTimeFull(dateStr: string) {
-  try {
-    const d = new Date(dateStr);
-    return d.toLocaleDateString([], {
-      weekday: 'short',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  } catch {
-    return '';
-  }
-}
 
 const badgeClassFor = (status: string) =>
   status === 'SENT' || status === 'PROCESSED'
@@ -200,7 +188,7 @@ export function SecretaryDeliveryLogView() {
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
   const [channel, setChannel] = useState<'EMAIL' | 'SMS'>('EMAIL');
   const [searchTerm, setSearchTerm] = useState('');
-  const [dateRange, setDateRange] = useState<DateRange>({ label: 'All time', preset: 'all' });
+  const [dateRange, setDateRange] = useState<DateRange>(() => rangeForPreset('last7'));
   const [dateMenuOpen, setDateMenuOpen] = useState(false);
   const [resendingId, setResendingId] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(false);
@@ -322,12 +310,13 @@ export function SecretaryDeliveryLogView() {
                 size="sm"
                 className="h-9 justify-start w-full min-w-0 text-foreground text-sm"
               >
-                <span className="truncate">{dateRange.label}</span>
+                <span className="flex-1 min-w-0 truncate text-left">{dateRange.label}</span>
+                <ChevronDown className="size-3.5 text-muted-foreground shrink-0" />
               </Button>
             </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-[27rem] max-w-[calc(100vw-2rem)] p-2" data-lenis-prevent>
+          <DropdownMenuContent align="start" className="w-[21rem] max-w-[calc(100vw-2rem)] p-2" data-lenis-prevent>
             <div className="flex gap-2">
-              <div className="flex flex-col gap-0.5 w-36 shrink-0">
+              <div className="flex flex-col gap-0.5 w-28 shrink-0">
                 {DATE_PRESETS.map((preset) => (
                   <button
                     key={preset.key}
@@ -347,7 +336,16 @@ export function SecretaryDeliveryLogView() {
                   onSelect={(range) => {
                     if (range?.from) setDateRange(rangeForPreset('custom', range.from, range.to ?? range.from));
                   }}
-                  className="rounded-xl border border-card-border/60"
+                  classNames={{
+                    head_cell: 'text-muted-foreground rounded-md w-7 font-normal text-[0.7rem]',
+                    cell: 'h-7 w-7 text-center text-xs p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-transparent [&:has([aria-selected])]:bg-transparent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20',
+                    day: cn(buttonVariants({ variant: 'ghost' }), 'h-7 w-7 p-0 font-normal aria-selected:opacity-100'),
+                    day_range_start: '!bg-slate-900 !text-white hover:!bg-slate-900 hover:!text-white rounded-md',
+                    day_range_end: '!bg-emerald-600 !text-white hover:!bg-emerald-600 hover:!text-white rounded-md',
+                    day_range_middle: 'aria-selected:bg-transparent aria-selected:text-foreground',
+                    day_today: 'border border-slate-900 text-slate-900 font-semibold bg-transparent [&.day-selected]:!bg-slate-900 [&.day-selected]:!text-white [&.day-selected]:ring-2 [&.day-selected]:ring-offset-1 [&.day-selected]:ring-white',
+                    caption_label: 'text-xs font-medium',
+                  }}
                 />
               </div>
             </div>
@@ -408,7 +406,7 @@ export function SecretaryDeliveryLogView() {
                   <th className="py-2 pr-3 font-semibold">Type</th>
                   <th className="py-2 pr-3 font-semibold">To</th>
                   <th className="py-2 pr-3 font-semibold">Status</th>
-                  <th className="py-2 pl-2 text-right font-semibold">Time</th>
+                  <th className="py-2 pl-2 text-right font-semibold">Sent</th>
                   <th className="py-2 pl-2 w-10"></th>
                 </tr>
               </thead>
@@ -427,36 +425,41 @@ export function SecretaryDeliveryLogView() {
                       </span>
                     </td>
                     <td className="py-2.5 pl-2 text-right text-sm text-muted-foreground font-mono whitespace-nowrap">
-                      {formatTimeFull(entry.timestamp)}
+                      {formatTimeAgo(entry.timestamp)}
                     </td>
                     <td className="py-2.5 pl-2 text-right whitespace-nowrap">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            disabled={resendingId !== null}
-                            className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
-                            title="Actions"
-                          >
-                            {resendingId === entry.id ? (
-                              <RotateCw className="size-3.5 animate-spin" />
-                            ) : (
-                              <MoreHorizontal className="size-4" />
-                            )}
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-44">
-                          <DropdownMenuItem
-                            disabled={entry.status === 'PROCESSING'}
-                            onClick={() => void handleResend(entry.id)}
-                            className="text-xs flex items-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            <RotateCw className="size-3 text-muted-foreground" />
-                            {entry.status === 'FAILED' ? 'Retry' : entry.status === 'SENT' ? 'Resend' : 'Send Again'}
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      {entry.status === 'SENT' ? (
+                        // Already delivered — no resend; avoids duplicate outbox rows.
+                        <span className="inline-block w-7" />
+                      ) : (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              disabled={resendingId !== null}
+                              className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
+                              title="Actions"
+                            >
+                              {resendingId === entry.id ? (
+                                <RotateCw className="size-3.5 animate-spin" />
+                              ) : (
+                                <MoreHorizontal className="size-4" />
+                              )}
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-44">
+                            <DropdownMenuItem
+                              disabled={entry.status === 'PROCESSING'}
+                              onClick={() => void handleResend(entry.id)}
+                              className="text-xs flex items-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              <RotateCw className="size-3 text-muted-foreground" />
+                              Retry
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      )}
                     </td>
                   </tr>
                 ))}
