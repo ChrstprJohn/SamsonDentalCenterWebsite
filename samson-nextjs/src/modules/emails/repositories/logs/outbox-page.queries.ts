@@ -65,8 +65,9 @@ function applyFilters(query: any, params: GetOutboxLogsPageDto) {
     const pattern = `%${escapeIlike(params.search)}%`;
     filtered = filtered.or(`event_type.ilike.${pattern},payload->>email.ilike.${pattern},payload->>guestEmail.ilike.${pattern},payload->>phone.ilike.${pattern},payload->>mobileNumber.ilike.${pattern},payload->>recipientPhone.ilike.${pattern},payload->>phoneNumber.ilike.${pattern},payload->>guestPhone.ilike.${pattern}`);
   }
-  if (params.dateFrom) filtered = filtered.gte('created_at', params.dateFrom);
-  if (params.dateTo) filtered = filtered.lte('created_at', params.dateTo);
+  // Filter on send time (processed_at), not queue time (created_at).
+  if (params.dateFrom) filtered = filtered.gte('processed_at', params.dateFrom);
+  if (params.dateTo) filtered = filtered.lte('processed_at', params.dateTo);
   return filtered;
 }
 

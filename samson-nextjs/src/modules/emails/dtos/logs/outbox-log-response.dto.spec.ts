@@ -11,6 +11,7 @@ describe('outboxLogResponseSchema', () => {
       error_logs: 'Something went wrong',
       retry_count: 2,
       created_at: '2026-06-29T08:00:00.000Z',
+      processed_at: '2026-06-29T09:00:00.000Z',
     };
 
     const parsed = outboxLogResponseSchema.parse(raw);
@@ -18,5 +19,6 @@ describe('outboxLogResponseSchema', () => {
     expect(parsed.eventType).toBe(raw.event_type);
     expect(parsed.errorLogs).toBe(raw.error_logs);
     expect(parsed.retryCount).toBe(2);
+    expect(parsed.processedAt).toBe('2026-06-29T09:00:00.000Z');
   });
 });

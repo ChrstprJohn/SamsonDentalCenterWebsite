@@ -48,7 +48,7 @@ export const outboxCommands = (supabase: SupabaseClient) => {
     async markAsProcessed(id: string): Promise<void> {
       const { error } = await supabase
         .from('outbox')
-        .update({ status: 'PROCESSED' })
+        .update({ status: 'PROCESSED', processed_at: new Date().toISOString() })
         .eq('id', id);
 
       if (error) {

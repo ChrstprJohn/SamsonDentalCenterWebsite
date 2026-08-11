@@ -97,7 +97,7 @@ function toEntry(log: OutboxLogResponseDto): DeliveryEntry {
     type: EVENT_NAME_MAP[log.eventType] || log.eventType,
     status: log.status === 'PROCESSED' ? 'SENT' : log.status,
     recipient,
-    timestamp: log.createdAt,
+    timestamp: log.processedAt ?? log.createdAt,
   };
 }
 
@@ -303,7 +303,7 @@ export function SecretaryDeliveryLogView() {
             placeholder="Search recipient or type..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-8 h-9 text-xs bg-card w-full"
+            className="pl-8 h-9 text-sm bg-card w-full"
           />
         </div>
 
@@ -320,7 +320,7 @@ export function SecretaryDeliveryLogView() {
               <Button
                 variant="outline"
                 size="sm"
-                className="h-9 justify-start w-full min-w-0 text-foreground"
+                className="h-9 justify-start w-full min-w-0 text-foreground text-sm"
               >
                 <span className="truncate">{dateRange.label}</span>
               </Button>

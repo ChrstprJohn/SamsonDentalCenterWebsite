@@ -100,6 +100,7 @@ export const getAppointmentCommunicationPageQuery = (supabase: SupabaseClient) =
         errorLogs: (record.error_logs as string | null | undefined) ?? null,
         retryCount: Math.min(Number(record.retry_count || 0), 3),
         createdAt: String(record.created_at || new Date().toISOString()),
+        processedAt: (record.processed_at as string | null | undefined) ?? null,
         channel,
         recipient: recipient || 'system',
         payload,

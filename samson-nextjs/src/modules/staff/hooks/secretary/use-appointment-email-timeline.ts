@@ -288,6 +288,7 @@ export function useAppointmentEmailTimeline() {
           status: res.data.status === 'PROCESSED' ? 'PROCESSED' : res.data.status,
           recipient: (res.data.payload as any)?.email || (res.data.payload as any)?.guestEmail || (res.data.payload as any)?.recipientEmail || 'guest',
           createdAt: res.data.createdAt,
+          processedAt: res.data.processedAt ?? null,
           retryCount: res.data.retryCount || 0,
           errorLogs: res.data.errorLogs || null,
           payload: res.data.payload,

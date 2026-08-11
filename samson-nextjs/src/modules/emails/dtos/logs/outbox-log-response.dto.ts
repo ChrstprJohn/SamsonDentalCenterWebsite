@@ -8,6 +8,7 @@ const outboxDbRecordSchema = z.object({
   error_logs: z.string().nullable().optional(),
   retry_count: z.number().int().nonnegative().default(0),
   created_at: z.string().optional(),
+  processed_at: z.string().nullable().optional(),
 });
 
 export const outboxLogResponseSchema = outboxDbRecordSchema.transform((data) => ({
@@ -18,6 +19,7 @@ export const outboxLogResponseSchema = outboxDbRecordSchema.transform((data) => 
   errorLogs: data.error_logs ?? null,
   retryCount: Math.min(data.retry_count, 3),
   createdAt: data.created_at ?? new Date().toISOString(),
+  processedAt: data.processed_at ?? null,
 }));
 
 export type OutboxLogResponseDto = z.infer<typeof outboxLogResponseSchema>;

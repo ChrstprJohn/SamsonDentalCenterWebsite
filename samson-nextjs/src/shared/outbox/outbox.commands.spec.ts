@@ -68,7 +68,7 @@ describe('outboxCommands', () => {
       await commands.markAsProcessed('event-uuid');
 
       expect(mockSupabase.from).toHaveBeenCalledWith('outbox');
-      expect(mockUpdate).toHaveBeenCalledWith({ status: 'PROCESSED' });
+      expect(mockUpdate).toHaveBeenCalledWith({ status: 'PROCESSED', processed_at: expect.any(String) });
       expect(mockEq).toHaveBeenCalledWith('id', 'event-uuid');
     });
 
