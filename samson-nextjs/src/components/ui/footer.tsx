@@ -34,7 +34,7 @@ const DAY_NAMES: Record<string, string> = {
 export function Footer({ config }: FooterProps) {
   const operatingHours = config?.operatingHours ?? DEFAULT_HOURS;
   const clinicName = config?.clinicName ?? 'Samson Dental Center';
-  const logoUrl = config?.logoUrl ?? null;
+  const logoUrl = config?.websiteLogoUrl ?? null;
   const address = config?.address ?? "lot 9 Upper Session Rd, Engineers' Hill, ext, Baguio, 2600 Benguet, Philippines";
   const configuredMapUrl = config?.mapUrl ?? null;
   const phone = config?.phone ?? '+1 (555) 234-8890';

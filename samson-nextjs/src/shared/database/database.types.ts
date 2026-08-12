@@ -250,7 +250,8 @@ export type Database = {
           is_booking_open: boolean
           is_singleton: boolean
           landline: string | null
-          logo_url: string | null
+          website_logo_url: string | null
+          email_logo_url: string | null
           map_url: string | null
           maintenance_message: string | null
           max_reschedules: number
@@ -271,7 +272,8 @@ export type Database = {
           is_booking_open?: boolean
           is_singleton?: boolean
           landline?: string | null
-          logo_url?: string | null
+          website_logo_url?: string | null
+          email_logo_url?: string | null
           map_url?: string | null
           maintenance_message?: string | null
           max_reschedules?: number
@@ -292,7 +294,8 @@ export type Database = {
           is_booking_open?: boolean
           is_singleton?: boolean
           landline?: string | null
-          logo_url?: string | null
+          website_logo_url?: string | null
+          email_logo_url?: string | null
           map_url?: string | null
           maintenance_message?: string | null
           max_reschedules?: number

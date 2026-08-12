@@ -50,7 +50,8 @@ export function ClinicSettingsPage({ initialConfig, initialTimeBlocks = [] }: Cl
       const payload = section === 'profile'
         ? {
             clinicName: config.clinicName,
-            logoUrl: emptyToNull(config.logoUrl || ''),
+            websiteLogoUrl: emptyToNull(config.websiteLogoUrl || ''),
+            emailLogoUrl: emptyToNull(config.emailLogoUrl || ''),
             address: config.address,
             mapUrl: emptyToNull(config.mapUrl || ''),
             phone: config.phone,
@@ -123,7 +124,8 @@ export function ClinicSettingsPage({ initialConfig, initialTimeBlocks = [] }: Cl
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input label="Clinic name" required value={config.clinicName} className={inputClass} onChange={(event) => updateConfigField('clinicName', event.target.value)} />
-            <Input label="Logo URL" type="url" placeholder="https://.../logo.png" value={config.logoUrl || ''} className={inputClass} onChange={(event) => updateConfigField('logoUrl', event.target.value)} />
+            <Input label="Website logo URL" type="url" placeholder="https://.../logo.png" value={config.websiteLogoUrl || ''} className={inputClass} onChange={(event) => updateConfigField('websiteLogoUrl', event.target.value)} />
+            <Input label="Email logo URL" type="url" placeholder="https://.../email-logo.png" value={config.emailLogoUrl || ''} className={inputClass} onChange={(event) => updateConfigField('emailLogoUrl', event.target.value)} />
             <Input label="Phone number" required type="tel" value={config.phone} className={inputClass} onChange={(event) => updateConfigField('phone', event.target.value)} />
             <Input label="Landline" type="tel" placeholder="(074) 123 4567" value={config.landline || ''} className={inputClass} onChange={(event) => updateConfigField('landline', event.target.value)} />
             <Input label="Public email" required type="email" value={config.email} className={inputClass} onChange={(event) => updateConfigField('email', event.target.value)} />
