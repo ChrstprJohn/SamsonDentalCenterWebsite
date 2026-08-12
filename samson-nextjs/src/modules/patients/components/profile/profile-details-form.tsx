@@ -96,7 +96,7 @@ export function ProfileDetailsForm({ profileDetails, isSubmitting, onSubmit }: P
           />
         </div>
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="settings-phone" className="text-xs font-semibold text-slate-500">Mobile Phone (E.164)</label>
+          <label htmlFor="settings-phone" className="text-xs font-semibold text-slate-500">Mobile Phone (09XX XXX XXXX)</label>
           <input
             type="tel"
             id="settings-phone"

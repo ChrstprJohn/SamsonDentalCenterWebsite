@@ -24,7 +24,7 @@ async function submitMultipleGuestInquiries() {
       const firstName = `Jane${guestNum}`;
       const lastName = 'Smith';
       const email = `janesmith${guestNum}@example.com`;
-      const phone = `+63917765432${guestNum}`;
+      const phone = `0917765432${guestNum}`;
 
       console.log(`\n--- Booking Inquiry ${guestNum}/5 at ${preferredTime} ---`);
       console.log(`Navigating to public homepage: ${BASE_URL}`);

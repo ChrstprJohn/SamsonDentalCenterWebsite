@@ -15,7 +15,8 @@ export const submitInquirySchema = z.object({
   phoneNumber: z
     .string()
     .trim()
-    .regex(/^\+?[1-9]\d{1,14}$/, 'Invalid phone number format (E.164 expected)'),
+    .transform((val) => val.replace(/\D/g, ''))
+    .refine((val) => /^09\d{9}$/.test(val), 'Invalid phone number format (09XX XXX XXXX expected)'),
   email: z.string().trim().email('Invalid email address'),
   preferredServiceId: z.string().uuid('Invalid service format'),
   preferredDate: z

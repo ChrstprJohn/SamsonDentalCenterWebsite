@@ -65,7 +65,7 @@ describe('useSecretaryBookAppointment', () => {
       result.current.setMiddleName('Mae');
       result.current.setLastName('Santos');
       result.current.setSuffix('Jr.');
-      result.current.setPhoneNumber('+639171234567');
+      result.current.setPhoneNumber('09171234567');
       result.current.setEmail('lia@example.com');
       result.current.selectService('service-1');
       result.current.selectDate('2026-07-04');
@@ -87,7 +87,7 @@ describe('useSecretaryBookAppointment', () => {
       middleName: 'Mae',
       lastName: 'Santos',
       suffix: 'Jr.',
-      phoneNumber: '+639171234567',
+      phoneNumber: '09171234567',
       email: 'lia@example.com',
       confirmationChannel: 'NONE',
     });

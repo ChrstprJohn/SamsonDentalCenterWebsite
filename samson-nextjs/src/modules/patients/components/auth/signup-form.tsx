@@ -61,11 +61,11 @@ export function SignUpForm({ register, onSubmit, errors, isLoading }: SignUpForm
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Input
-          label="Phone Number (E.164) *"
+          label="Phone Number (09XX XXX XXXX) *"
           type="tel"
           error={errors.phoneNumber?.message}
           {...register('phoneNumber')}
-          placeholder="+1234567890"
+          placeholder="09XX XXX XXXX"
           disabled={isLoading}
         />
         <Input

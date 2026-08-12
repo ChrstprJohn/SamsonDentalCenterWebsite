@@ -25,7 +25,7 @@ describe('createManualBookingSchema Validation', () => {
       ...basePayload,
       firstName: 'John',
       lastName: 'Doe',
-      phoneNumber: '+1234567890',
+      phoneNumber: '09171234567',
     };
     expect(createManualBookingSchema.safeParse(payload).success).toBe(true);
   });
@@ -35,7 +35,7 @@ describe('createManualBookingSchema Validation', () => {
       ...basePayload,
       firstName: 'John',
       lastName: 'Doe',
-      phoneNumber: '+1234567890',
+      phoneNumber: '09171234567',
       email: 'john.doe@example.com',
     };
     expect(createManualBookingSchema.safeParse(payload).success).toBe(true);
@@ -57,7 +57,7 @@ describe('createManualBookingSchema Validation', () => {
       ...basePayload,
       firstName: 'John',
       lastName: 'Doe',
-      phoneNumber: '+1234567890',
+      phoneNumber: '09171234567',
       email: 'not-an-email',
     };
     const result = createManualBookingSchema.safeParse(payload);

@@ -19,7 +19,11 @@ const wizardSchema = z.object({
   lastName: z.string().trim().min(1, 'Last name is required'),
   suffix: z.string().trim().optional(),
   contactEmail: z.string().trim().email('A valid email is required'),
-  phone: z.string().trim().min(1, 'Phone number is required'),
+  phone: z
+    .string()
+    .trim()
+    .transform((val) => val.replace(/\D/g, ''))
+    .refine((val) => /^09\d{9}$/.test(val), 'Enter a valid 09XX XXX XXXX phone number'),
   pathway: z.string().trim().min(1, 'Treatment service is required'),
   targetDate: z.string().trim().min(1, 'Target date is required'),
   notes: z.string().trim().optional(),
@@ -189,7 +193,7 @@ export function useBookingWizard({ services, config, initialServiceId }: UseBook
 
     try {
       const validData = parsed.data;
-      const cleanedPhone = validData.phone.replace(/[^\d+]/g, '');
+      const cleanedPhone = validData.phone.replace(/\D/g, '');
       let serviceId = validData.pathway;
 
       if (!uuidSchema.safeParse(serviceId).success) {

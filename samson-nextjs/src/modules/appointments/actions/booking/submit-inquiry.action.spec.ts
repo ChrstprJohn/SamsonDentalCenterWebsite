@@ -12,7 +12,7 @@ describe('submitInquiryAction', () => {
       id: 'd3b07384-d113-4ec2-a5e6-ec083b0f5cc5',
       first_name: 'Jane',
       last_name: 'Doe',
-      phone_number: '+639171234567',
+      phone_number: '09171234567',
       email: 'jane@example.com',
       preferred_service_id: 'b3b07384-d113-4ec2-a5e6-ec083b0f5cc1',
       preferred_date: '2026-06-25',
@@ -33,7 +33,7 @@ describe('submitInquiryAction', () => {
     const payload = {
       firstName: 'Jane',
       lastName: 'Doe',
-      phoneNumber: '+639171234567',
+      phoneNumber: '09171234567',
       email: 'jane@example.com',
       preferredServiceId: 'b3b07384-d113-4ec2-a5e6-ec083b0f5cc1',
       preferredDate: '2026-06-25',
@@ -49,7 +49,7 @@ describe('submitInquiryAction', () => {
     const invalidPayload = {
       firstName: 'Jane',
       lastName: 'Doe',
-      phoneNumber: '+639171234567',
+      phoneNumber: '09171234567',
       email: 'jane@example.com',
       preferredServiceId: 'b3b07384-d113-4ec2-a5e6-ec083b0f5cc1',
       preferredDate: '2026-06-25',
@@ -72,7 +72,7 @@ describe('submitInquiryAction', () => {
     const payload = {
       firstName: 'Jane',
       lastName: 'Doe',
-      phoneNumber: '+639171234567',
+      phoneNumber: '09171234567',
       email: 'jane@example.com',
       preferredServiceId: 'b3b07384-d113-4ec2-a5e6-ec083b0f5cc1',
       preferredDate: '2026-06-25',

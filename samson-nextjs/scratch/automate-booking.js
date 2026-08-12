@@ -49,7 +49,7 @@ async function bookAppointment() {
     console.log('Filling guest details...');
     await page.fill('input[placeholder*="First Name"]', 'John');
     await page.fill('input[placeholder*="Last Name"]', 'Doe');
-    await page.fill('input[placeholder*="Phone"]', '+639171234567');
+    await page.fill('input[placeholder*="Phone"]', '09171234567');
     await page.fill('input[placeholder*="Email"]', 'johndoe@example.com');
 
     // 5. Select Service

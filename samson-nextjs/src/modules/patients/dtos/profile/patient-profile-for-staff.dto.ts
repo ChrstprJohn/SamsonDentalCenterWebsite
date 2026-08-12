@@ -32,7 +32,7 @@ export const patientProfileForStaffSchema = z.preprocess(
     middleName: z.string().nullable().optional(),
     lastName: z.string(),
     suffix: z.string().nullable().optional(),
-    phoneNumber: z.string().regex(/^\+?[1-9]\d{1,14}$/, "Must be a valid E.164 phone number"),
+    phoneNumber: z.string().regex(/^(?:\+?[1-9]\d{1,14}|09\d{9})$/, "Must be a valid phone number"),
     dateOfBirth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Must be in YYYY-MM-DD format"),
     avatarUrl: z.string().url().nullable().optional(),
     cancelCount: z.number().int().nonnegative(),

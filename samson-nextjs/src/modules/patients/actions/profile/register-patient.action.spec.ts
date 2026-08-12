@@ -46,7 +46,7 @@ describe('registerPatientAction', () => {
             firstName: 'John',
             lastName: 'Doe',
             email: 'john@example.com',
-            phoneNumber: '+1234567890',
+            phoneNumber: '09171234567',
             dateOfBirth: '1990-01-01',
             password: 'Password123!',
             confirmPassword: 'Password123!',

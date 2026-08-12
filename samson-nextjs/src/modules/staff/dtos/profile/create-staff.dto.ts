@@ -9,7 +9,11 @@ export const createStaffSchema = z.object({
     suffix: z.string().trim().optional().nullable(),
     email: z.string().trim().toLowerCase().email('Invalid email address'),
     role: StaffRoleEnum,
-    phoneNumber: z.string().regex(/^\+?[1-9]\d{9,14}$/, 'Invalid phone number format'),
+    phoneNumber: z
+      .string()
+      .trim()
+      .transform((val) => val.replace(/\D/g, ''))
+      .refine((val) => /^09\d{9}$/.test(val), 'Invalid phone number format (09XX XXX XXXX expected)'),
     // specializations removed - handled by a separate update action well focus on account creation here
 });
 

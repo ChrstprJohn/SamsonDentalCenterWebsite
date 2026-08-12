@@ -148,7 +148,7 @@ export function DoctorEditForm({ doctor, allServices, onSuccess, onCancel }: Doc
               <span className="text-xs text-muted-foreground">Phone Number</span>
               <input
                 type="text"
-                placeholder="+12345678901"
+                placeholder="09XX XXX XXXX"
                 {...register('phoneNumber')}
                 className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
               />

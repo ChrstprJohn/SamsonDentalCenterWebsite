@@ -4,7 +4,7 @@ import { ProfileSettingsView } from '@/modules/patients/views/profile-settings-v
 
 export const metadata = {
   title: 'Profile Settings | Patient Portal',
-  description: 'Manage your contact fields, E.164 phone formats, birthday records, and SMS/Email preference thresholds.',
+  description: 'Manage your contact fields, PH mobile (09XX XXX XXXX) phone formats, birthday records, and SMS/Email preference thresholds.',
 };
 
 export default async function UserSettingsPage() {

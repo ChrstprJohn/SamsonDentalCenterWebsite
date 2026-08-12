@@ -98,7 +98,7 @@ describe('useLandingView', () => {
       middleName: undefined,
       lastName: 'Doe',
       suffix: undefined,
-      phoneNumber: '+1234567890',
+      phoneNumber: '09171234567',
       email: 'john@example.com',
       preferredServiceId: 'd9b233a0-7f2a-43c2-bf72-881c00222a00',
       preferredServiceName: 'General Dentistry',
@@ -130,7 +130,7 @@ describe('useLandingView', () => {
     let success: boolean | undefined;
     await act(async () => {
       success = await result.current.contactForm.handleRealInquirySubmit({
-        phone: '+1234567890',
+        phone: '09171234567',
         pathway: 'd9b233a0-7f2a-43c2-bf72-881c00222a00',
         targetDate: '2026-06-30',
         notes: 'Some notes',
@@ -143,7 +143,7 @@ describe('useLandingView', () => {
       lastName: 'Doe',
       suffix: undefined,
       email: 'john@example.com',
-      phoneNumber: '+1234567890',
+      phoneNumber: '09171234567',
       preferredServiceId: 'd9b233a0-7f2a-43c2-bf72-881c00222a00',
       preferredDate: '2026-06-30',
       patientNote: 'Some notes',

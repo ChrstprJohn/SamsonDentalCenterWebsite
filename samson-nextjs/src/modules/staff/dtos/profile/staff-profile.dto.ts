@@ -28,7 +28,7 @@ export const staffProfileSchema = z.preprocess(
     middleName: z.string().nullable().optional(),
     lastName: z.string(),
     suffix: z.string().nullable().optional(),
-    phoneNumber: z.string().regex(/^\+?[1-9]\d{1,14}$/, "Must be a valid E.164 phone number").nullable().optional(),
+    phoneNumber: z.string().regex(/^(?:\+?[1-9]\d{1,14}|09\d{9})$/, "Must be a valid phone number").nullable().optional(),
     role: StaffRoleEnum,
     createdAt: z.string().datetime({ offset: true }).optional(),
     updatedAt: z.string().datetime({ offset: true }).optional(),

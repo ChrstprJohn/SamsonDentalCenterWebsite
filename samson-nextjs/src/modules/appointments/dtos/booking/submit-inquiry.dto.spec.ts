@@ -6,7 +6,7 @@ describe('submitInquirySchema Validation', () => {
     const payload = {
       firstName: 'John',
       lastName: 'Doe',
-      phoneNumber: '+639171234567',
+      phoneNumber: '09171234567',
       email: 'john.doe@example.com',
       preferredServiceId: 'b3b07384-d113-4ec2-a5e6-ec083b0f5cc1',
       preferredDate: '2026-06-25',
@@ -21,7 +21,7 @@ describe('submitInquirySchema Validation', () => {
     const payload = {
       firstName: 'John',
       lastName: 'Doe',
-      phoneNumber: '+639171234567',
+      phoneNumber: '09171234567',
       email: 'john.doe@example.com',
       preferredServiceId: 'b3b07384-d113-4ec2-a5e6-ec083b0f5cc1',
       preferredDate: '2026-06-25',
@@ -39,7 +39,7 @@ describe('submitInquirySchema Validation', () => {
     const payload = {
       firstName: 'John',
       lastName: 'Doe',
-      phoneNumber: '+639171234567',
+      phoneNumber: '09171234567',
       email: 'john.doe@example.com',
       preferredServiceId: 'b3b07384-d113-4ec2-a5e6-ec083b0f5cc1',
       preferredDate: '2026-06-25',
@@ -52,7 +52,7 @@ describe('submitInquirySchema Validation', () => {
     const payload = {
       firstName: 'John',
       lastName: 'Doe',
-      phoneNumber: '+639171234567',
+      phoneNumber: '09171234567',
       email: 'john.doe@example.com',
       preferredServiceId: 'b3b07384-d113-4ec2-a5e6-ec083b0f5cc1',
       preferredDate: '2026-06-25',
@@ -80,7 +80,7 @@ describe('submitInquirySchema Validation', () => {
     const payload = {
       firstName: 'John',
       lastName: 'Doe',
-      phoneNumber: '+639171234567',
+      phoneNumber: '09171234567',
       email: 'john.doe@example.com',
       preferredServiceId: 'b3b07384-d113-4ec2-a5e6-ec083b0f5cc1',
       preferredDate: '2026-06-25',
@@ -99,7 +99,7 @@ describe('submitInquirySchema Validation', () => {
   it('should reject when firstName is missing', () => {
     const payload = {
       lastName: 'Doe',
-      phoneNumber: '+639171234567',
+      phoneNumber: '09171234567',
       email: 'john.doe@example.com',
       preferredServiceId: 'b3b07384-d113-4ec2-a5e6-ec083b0f5cc1',
       preferredDate: '2026-06-25',
@@ -116,7 +116,7 @@ describe('inquiryResponseSchema Transform', () => {
       id: 'd3b07384-d113-4ec2-a5e6-ec083b0f5cc5',
       first_name: 'John',
       last_name: 'Doe',
-      phone_number: '+639171234567',
+      phone_number: '09171234567',
       email: 'john.doe@example.com',
       preferred_service_id: 'b3b07384-d113-4ec2-a5e6-ec083b0f5cc1',
       preferred_date: '2026-06-25',
@@ -129,7 +129,7 @@ describe('inquiryResponseSchema Transform', () => {
 
     const transformed = inquiryResponseSchema.parse(rawDbData);
     expect(transformed.firstName).toBe('John');
-    expect(transformed.phoneNumber).toBe('+639171234567');
+    expect(transformed.phoneNumber).toBe('09171234567');
     expect(transformed.preferredServiceId).toBe('b3b07384-d113-4ec2-a5e6-ec083b0f5cc1');
     expect(transformed.dateOfBirth).toBe('1990-01-01');
     expect(transformed.preferredStartTime).toBe('09:00');

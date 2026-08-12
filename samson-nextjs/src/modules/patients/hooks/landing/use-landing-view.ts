@@ -22,7 +22,11 @@ const contactInquirySchema = z.object({
   suffix: z.string().trim().optional(),
   contactEmail: z.string().trim().email('A valid email is required'),
   contactMessage: z.string().trim().optional(),
-  phone: z.string().trim().min(1, 'Phone number is required'),
+  phone: z
+    .string()
+    .trim()
+    .transform((val) => val.replace(/\D/g, ''))
+    .refine((val) => /^09\d{9}$/.test(val), 'Enter a valid 09XX XXX XXXX phone number'),
   pathway: z.string().trim().min(1, 'Treatment service is required'),
   targetDate: z.string().trim().min(1, 'Target date is required'),
   notes: z.string().trim().optional(),
@@ -114,7 +118,7 @@ export function useLandingView({ services }: UseLandingViewProps) {
 
     try {
       const values = parsed.data;
-      const cleanedPhone = values.phone.replace(/[^\d+]/g, '');
+      const cleanedPhone = values.phone.replace(/\D/g, '');
       let serviceId = values.pathway;
 
       if (!uuidSchema.safeParse(serviceId).success) {

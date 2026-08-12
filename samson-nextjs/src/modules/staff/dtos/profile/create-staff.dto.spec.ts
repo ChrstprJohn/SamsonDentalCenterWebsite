@@ -8,7 +8,7 @@ describe('createStaffSchema (Unit Test)', () => {
       lastName: 'Smith',
       email: 'jane.smith@samson.com',
       role: 'DOCTOR',
-      phoneNumber: '+19876543210',
+      phoneNumber: '09171234567',
     };
 
     const result = createStaffSchema.safeParse(validData);
@@ -25,7 +25,7 @@ it('should fail if an invalid role is provided', () => {
       lastName: 'Smith',
       email: 'jane.smith@samson.com',
       role: 'JANITOR', 
-      phoneNumber: '+19876543210'
+      phoneNumber: '09171234567'
     };
 
     const result = createStaffSchema.safeParse(invalidData);

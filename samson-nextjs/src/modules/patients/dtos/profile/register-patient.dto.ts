@@ -6,8 +6,12 @@ export const registerPatientSchema = z.object({
   lastName: z.string().min(1, 'Last name is required').trim(),
   suffix: z.string().trim().optional(),
   email: z.string().email('Invalid email address').toLowerCase().trim(),
-  // E.164-like validation: optional '+' followed by 10-15 digits
-  phoneNumber: z.string().regex(/^\+?[1-9]\d{9,14}$/, 'Invalid phone number format'),
+  // PH local mobile format: 09XX XXX XXXX
+  phoneNumber: z
+    .string()
+    .trim()
+    .transform((val) => val.replace(/\D/g, ''))
+    .refine((val) => /^09\d{9}$/.test(val), 'Invalid phone number format (09XX XXX XXXX expected)'),
   dateOfBirth: z.preprocess((val) => {
     if (typeof val !== 'string') return val;
     // Check if format is MM/DD/YY, MM/DD/YYYY, MM-DD-YY, or MM-DD-YYYY

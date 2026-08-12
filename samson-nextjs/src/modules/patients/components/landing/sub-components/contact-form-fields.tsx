@@ -97,7 +97,7 @@ export function ContactFields({
   touched?: boolean;
 }) {
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.contactEmail.trim());
-  const isPhoneValid = phone.trim().length >= 7;
+  const isPhoneValid = /^09\d{9}$/.test(phone.trim().replace(/\D/g, ''));
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -118,7 +118,7 @@ export function ContactFields({
         value={phone}
         onChange={setPhone}
         required
-        placeholder="+1 (555) 000-0000"
+        placeholder="09XX XXX XXXX"
         touched={touched}
         isValid={isPhoneValid}
         errorMessage="Please enter a valid phone number."

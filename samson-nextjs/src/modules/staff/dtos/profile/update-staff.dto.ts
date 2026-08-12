@@ -10,7 +10,9 @@ export const updateStaffSchema = z.object({
     suffix: z.string().trim().optional().nullable(),
     phoneNumber: z
         .string()
-        .regex(/^\+?[1-9]\d{9,14}$/, 'Invalid phone number format')
+        .trim()
+        .transform((val) => val.replace(/\D/g, ''))
+        .refine((val) => /^09\d{9}$/.test(val), 'Invalid phone number format (09XX XXX XXXX expected)')
         .optional(),
     role: StaffRoleEnum.optional(),
 });

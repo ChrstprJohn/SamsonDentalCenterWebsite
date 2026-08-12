@@ -25,9 +25,10 @@ export const createManualBookingSchema = z
     phoneNumber: z
       .string()
       .trim()
+      .transform((val) => (val ? val.replace(/\D/g, '') : val))
       .optional()
-      .refine((val) => !val || /^\+?[1-9]\d{1,14}$/.test(val), {
-        message: 'Invalid phone number format (E.164 expected)',
+      .refine((val) => !val || /^09\d{9}$/.test(val), {
+        message: 'Invalid phone number format (09XX XXX XXXX expected)',
       }),
     email: emailOrEmpty,
     serviceId: z.string().uuid('Invalid service ID format'),
