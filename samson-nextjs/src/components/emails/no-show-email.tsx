@@ -11,7 +11,7 @@ import {
 } from '@react-email/components';
 import * as React from 'react';
 
-import { getLogoUrl } from '@/shared/utils/get-base-url.util';
+import { EmailBranding, EmailLegalFooter, EmailSignature, resolveEmailBranding } from './email-branding';
 import { formatRefId } from '@/shared/utils/date.util';
 
 export interface NoShowEmailProps {
@@ -22,6 +22,7 @@ export interface NoShowEmailProps {
   timeRangeStr?: string;
   appointmentId?: string;
   baseUrl?: string;
+  branding?: EmailBranding;
 }
 
 const pStyle: React.CSSProperties = {
@@ -49,9 +50,10 @@ export const NoShowEmail = ({
   timeRangeStr = '2:00 PM – 2:45 PM',
   appointmentId = 'APT-SAMPLE',
   baseUrl = 'http://localhost:3000',
+branding,
 }: NoShowEmailProps) => {
-  const previewText = 'You missed your appointment with Samson Dental Center. Below are the details of your missed visit.';
-  const logoUrl = getLogoUrl(baseUrl);
+  const b = branding ?? resolveEmailBranding(undefined, baseUrl);
+  const previewText = `You missed your appointment with ${b.clinicName}. Below are the details of your missed visit.`;
   const reasonUrl = `${baseUrl}/no-show-reason?ref=${appointmentId}`;
 
   return (
@@ -64,8 +66,8 @@ export const NoShowEmail = ({
           {/* Logo */}
           <Section style={{ marginBottom: '28px', textAlign: 'center' }}>
             <Img
-              src={logoUrl}
-              alt="Samson Dental Center"
+              src={b.logoUrl}
+              alt={b.clinicName}
               width="130"
               style={{ height: 'auto', objectFit: 'contain', margin: '0 auto', display: 'block' }}
             />
@@ -78,7 +80,7 @@ export const NoShowEmail = ({
 
           {/* Intro */}
           <Text style={pStyle}>
-            You missed your appointment with Samson Dental Center. Below are the details of your missed visit:
+            {`You missed your appointment with ${b.clinicName}. Below are the details of your missed visit:`}
           </Text>
 
           {/* Missed appointment details */}
@@ -101,7 +103,7 @@ export const NoShowEmail = ({
               </Text>
             )}
             <Text style={{ ...pStyle, margin: '0 0 4px' }}>
-              <span style={boldStyle}>Location:</span> Samson Dental Center, Quezon City, Metro Manila
+              <span style={boldStyle}>Location:</span> {b.locationLine}{b.mapUrl ? <> (<Link href={b.mapUrl} style={linkStyle}>View on Google Maps</Link>)</> : null}
             </Text>
             {dateStr && (
               <Text style={{ ...pStyle, margin: '0 0 4px' }}>
@@ -139,7 +141,7 @@ export const NoShowEmail = ({
               </li>
               <li style={{ marginBottom: 6 }}>
                 Questions? Call/text us at{' '}
-                <Link href="tel:028123456" style={linkStyle}>(02) 8123-4567</Link>.
+                <Link href={b.phoneHref} style={linkStyle}>{b.phone}</Link>.
               </li>
               <li>
                 <span style={{ color: '#dc2626', fontWeight: 600 }}>Note: Replies to this email are unmonitored.</span>
@@ -149,33 +151,18 @@ export const NoShowEmail = ({
 
           {/* Closing */}
           <Text style={{ ...pStyle, marginBottom: '24px' }}>
-            We hope to see you at Samson Dental Center soon. Please reach out if there is anything we can do.
+            {`We hope to see you at ${b.clinicName} soon. Please reach out if there is anything we can do.`}
           </Text>
 
           {/* Signature */}
           <Text style={{ ...pStyle, marginBottom: '4px' }}>Warm regards,</Text>
-          <Text style={{ ...pStyle, marginBottom: '2px', ...boldStyle }}>Samson Dental Center</Text>
-          <Text style={{ ...pStyle, color: '#64748b', marginBottom: 0 }}>
-            (02) 8123-4567 &nbsp;&middot;&nbsp;{' '}
-            <Link href={baseUrl} target="_blank" rel="noreferrer" style={{ color: '#2563eb' }}>
-              samsondentalcenter.com.ph
-            </Link>
-          </Text>
+                    <EmailSignature branding={b} />
 
           {/* Divider */}
           <hr style={{ border: 'none', borderTop: '1px solid #e2e8f0', margin: '32px 0 20px' }} />
 
           {/* Footer */}
-          <Text style={{ color: '#64748b', fontSize: '12px', lineHeight: 1.6, margin: 0 }}>
-            You received this email because you have an appointment with Samson Dental Center. If you believe this was sent in error, please contact our office.{' '}
-            <Link href={`${baseUrl}/terms`} target="_blank" rel="noreferrer" style={{ color: '#94a3b8' }}>
-              Terms of Service
-            </Link>{' '}
-            &middot;{' '}
-            <Link href={`${baseUrl}/privacy`} target="_blank" rel="noreferrer" style={{ color: '#94a3b8' }}>
-              Privacy Policy
-            </Link>
-          </Text>
+                    <EmailLegalFooter branding={b} baseUrl={baseUrl} variant="appointment" />
 
         </Container>
       </Body>

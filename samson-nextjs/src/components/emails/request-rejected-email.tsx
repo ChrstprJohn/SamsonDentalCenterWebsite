@@ -11,7 +11,7 @@ import {
 } from '@react-email/components';
 import * as React from 'react';
 
-import { getLogoUrl } from '@/shared/utils/get-base-url.util';
+import { EmailBranding, EmailLegalFooter, EmailSignature, resolveEmailBranding } from './email-branding';
 import { formatRefId } from '@/shared/utils/date.util';
 
 export interface RequestRejectedEmailProps {
@@ -24,6 +24,7 @@ export interface RequestRejectedEmailProps {
   rejectionReason?: string;
   rebookUrl?: string;
   baseUrl?: string;
+  branding?: EmailBranding;
 }
 
 const pStyle: React.CSSProperties = {
@@ -53,9 +54,10 @@ export const RequestRejectedEmail = ({
   rejectionReason = 'Unfortunately, we are unable to accommodate your request at this time.',
   rebookUrl = '',
   baseUrl = 'http://localhost:3000',
+branding,
 }: RequestRejectedEmailProps) => {
   const previewText = 'We cannot accommodate this request. Contact our clinic to explore other options.';
-  const logoUrl = getLogoUrl(baseUrl);
+  const b = branding ?? resolveEmailBranding(undefined, baseUrl);
   const effectiveTime = preferredStartTimeStr || timeRangeStr;
   const effectiveRebookUrl = rebookUrl || `${baseUrl}/book`;
 
@@ -69,8 +71,8 @@ export const RequestRejectedEmail = ({
           {/* Logo */}
           <Section style={{ marginBottom: '28px', textAlign: 'center' }}>
             <Img
-              src={logoUrl}
-              alt="Samson Dental Center"
+              src={b.logoUrl}
+              alt={b.clinicName}
               width="130"
               style={{ height: 'auto', objectFit: 'contain', margin: '0 auto', display: 'block' }}
             />
@@ -83,7 +85,7 @@ export const RequestRejectedEmail = ({
 
           {/* Intro */}
           <Text style={pStyle}>
-            Thank you for your interest in Samson Dental Center. After carefully reviewing your booking request, we regret to inform you that we are unable to accommodate your request at this time.
+            {`Thank you for your interest in ${b.clinicName}. After carefully reviewing your booking request, we regret to inform you that we are unable to accommodate your request at this time.`}
           </Text>
 
           <Text style={pStyle}>
@@ -133,7 +135,7 @@ export const RequestRejectedEmail = ({
             <ul style={{ margin: '0 0 16px', paddingLeft: 20, listStyle: 'disc', color: '#1a1a1a', fontSize: '14px', lineHeight: 1.75 }}>
               <li style={{ marginBottom: 6 }}>
                 Request a different date or time — call/text us at{' '}
-                <Link href="tel:028123456" style={linkStyle}>(02) 8123-4567</Link>.
+                <Link href={b.phoneHref} style={linkStyle}>{b.phone}</Link>.
               </li>
               {effectiveRebookUrl && (
                 <li style={{ marginBottom: 6 }}>
@@ -151,33 +153,18 @@ export const RequestRejectedEmail = ({
 
           {/* Closing */}
           <Text style={{ ...pStyle, marginBottom: '24px' }}>
-            Thank you for choosing Samson Dental Center.
+            {`Thank you for choosing ${b.clinicName}.`}
           </Text>
 
           {/* Signature */}
           <Text style={{ ...pStyle, marginBottom: '4px' }}>Warm regards,</Text>
-          <Text style={{ ...pStyle, marginBottom: '2px', ...boldStyle }}>Samson Dental Center</Text>
-          <Text style={{ ...pStyle, color: '#64748b', marginBottom: 0 }}>
-            (02) 8123-4567 &nbsp;&middot;&nbsp;{' '}
-            <Link href={baseUrl} target="_blank" rel="noreferrer" style={{ color: '#2563eb' }}>
-              samsondentalcenter.com.ph
-            </Link>
-          </Text>
+                    <EmailSignature branding={b} />
 
           {/* Divider */}
           <hr style={{ border: 'none', borderTop: '1px solid #e2e8f0', margin: '32px 0 20px' }} />
 
           {/* Footer */}
-          <Text style={{ color: '#64748b', fontSize: '12px', lineHeight: 1.6, margin: 0 }}>
-            You received this email because you submitted a booking inquiry with Samson Dental Center. If you believe this was sent in error, please contact our office.{' '}
-            <Link href={`${baseUrl}/terms`} target="_blank" rel="noreferrer" style={{ color: '#94a3b8' }}>
-              Terms of Service
-            </Link>{' '}
-            &middot;{' '}
-            <Link href={`${baseUrl}/privacy`} target="_blank" rel="noreferrer" style={{ color: '#94a3b8' }}>
-              Privacy Policy
-            </Link>
-          </Text>
+                    <EmailLegalFooter branding={b} baseUrl={baseUrl} variant="inquiry" />
 
         </Container>
       </Body>

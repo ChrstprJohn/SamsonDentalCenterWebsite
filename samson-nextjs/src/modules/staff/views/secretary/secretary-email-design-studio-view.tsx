@@ -3,6 +3,8 @@
 import React, { useMemo, useState } from 'react';
 import { Select } from '@/components/ui/select';
 import { formatRefId } from '@/shared/utils/date.util';
+import type { ClinicConfigResponseDto } from '@/modules/clinic-config/dtos/settings/get-clinic-config.dto';
+import { resolveEmailBranding } from '@/components/emails/email-branding';
 import {
   DEFAULT_COPY,
   DEFAULT_SAMPLE_DATA,
@@ -18,10 +20,15 @@ import {
   SampleData,
 } from './sub-components/email-design-studio';
 
-export function SecretaryEmailDesignStudioView() {
+export function SecretaryEmailDesignStudioView({ initialConfig }: { initialConfig?: ClinicConfigResponseDto | null }) {
   const [activeId, setActiveId] = useState<EmailDesignId>('appointment-confirmed');
   const [previewMode, setPreviewMode] = useState<PreviewMode>('desktop');
   const [sample, setSample] = useState<SampleData>(DEFAULT_SAMPLE_DATA);
+
+  const branding = useMemo(
+    () => resolveEmailBranding(initialConfig, sample.baseUrl || 'http://localhost:3000'),
+    [initialConfig, sample.baseUrl]
+  );
 
   const activeDesign = EMAIL_DESIGNS.find((design) => design.id === activeId) || EMAIL_DESIGNS[0];
   const activeCopy = DEFAULT_COPY[activeId];
@@ -111,7 +118,7 @@ export function SecretaryEmailDesignStudioView() {
             className="mx-auto transition-all duration-300 bg-white"
             style={{ width: previewMode === 'mobile' ? 410 : '100%', maxWidth: previewMode === 'mobile' ? 410 : 800 }}
           >
-            <EmailDesignPreview design={activeDesign} tokens={DEFAULT_TOKENS} copy={activeCopy} sample={sample} />
+            <EmailDesignPreview design={activeDesign} tokens={DEFAULT_TOKENS} copy={activeCopy} sample={sample} branding={branding} />
           </div>
         </div>
       </main>

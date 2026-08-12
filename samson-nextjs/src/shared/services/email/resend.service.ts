@@ -13,6 +13,11 @@ import AppointmentReminderEmail from '@/components/emails/appointment-reminder-e
 import PostCareEmail from '@/components/emails/post-care-email';
 import RequestRejectedEmail from '@/components/emails/request-rejected-email';
 import NoShowEmail from '@/components/emails/no-show-email';
+import { EmailBranding, resolveEmailBranding } from '@/components/emails/email-branding';
+import { createAdminClient } from '@/shared/database/server';
+import { getClinicConfigQuery } from '@/modules/clinic-config/repositories/settings/clinic-config.queries';
+import { getClinicConfigUseCase } from '@/modules/clinic-config/use-cases/settings/get-clinic-config.use-case';
+import { getBaseUrl } from '@/shared/utils/get-base-url.util';
 
 if (!process.env.RESEND_API_KEY) {
   // We don't throw an error at boot, but we will throw when attempting to send if missing.
@@ -139,6 +144,19 @@ export const ResendService = {
 
     let html = '';
 
+    // Resolve clinic branding (name, logo, phone, address, website) from Clinic Settings.
+    // Falls back to the previous hardcoded values when config is missing.
+    let branding: EmailBranding | null = null;
+    try {
+      if (templateName !== 'signup_otp' && templateName !== 'reset_password_otp') {
+        const supabase = await createAdminClient();
+        const config = await getClinicConfigUseCase(getClinicConfigQuery(supabase))();
+        branding = resolveEmailBranding(config, getBaseUrl());
+      }
+    } catch (err) {
+      console.warn('Failed to load clinic branding for email, using defaults:', err);
+    }
+
     // Render the appropriate React Email component to an HTML string
     switch (templateName) {
       case 'signup_otp': {
@@ -175,6 +193,7 @@ export const ResendService = {
           patientNote: reqPayload.patientNote,
           dashboardUrl: reqPayload.dashboardUrl,
           baseUrl: reqPayload.baseUrl,
+          branding: branding || undefined,
         }));
         break;
       }
@@ -190,6 +209,7 @@ export const ResendService = {
           approvalReason: reqPayload.approvalReason,
           chatToken: reqPayload.chatToken,
           baseUrl: reqPayload.baseUrl,
+          branding: branding || undefined,
         }));
         break;
       }
@@ -205,6 +225,7 @@ export const ResendService = {
           appointmentId: reqPayload.appointmentId,
           chatToken: reqPayload.chatToken,
           baseUrl: reqPayload.baseUrl,
+          branding: branding || undefined,
         }));
         break;
       }
@@ -219,6 +240,7 @@ export const ResendService = {
           cancellationReason: reqPayload.cancellationReason,
           rebookUrl: reqPayload.rebookUrl,
           baseUrl: reqPayload.baseUrl,
+          branding: branding || undefined,
         }));
         break;
       }
@@ -238,6 +260,7 @@ export const ResendService = {
           rescheduleReason: reqPayload.rescheduleReason,
           chatToken: reqPayload.chatToken,
           baseUrl: reqPayload.baseUrl,
+          branding: branding || undefined,
         }));
         break;
       }
@@ -247,6 +270,7 @@ export const ResendService = {
           patientName: reqPayload.patientName,
           chatToken: reqPayload.chatToken,
           baseUrl: reqPayload.baseUrl,
+          branding: branding || undefined,
         }));
         break;
       }
@@ -259,6 +283,7 @@ export const ResendService = {
           dateStr: reqPayload.dateStr,
           appointmentId: reqPayload.appointmentId,
           baseUrl: reqPayload.baseUrl,
+          branding: branding || undefined,
         }));
         break;
       }
@@ -274,6 +299,7 @@ export const ResendService = {
           rejectionReason: reqPayload.rejectionReason,
           rebookUrl: reqPayload.rebookUrl,
           baseUrl: reqPayload.baseUrl,
+          branding: branding || undefined,
         }));
         break;
       }
@@ -287,6 +313,7 @@ export const ResendService = {
           timeRangeStr: reqPayload.timeRangeStr,
           appointmentId: reqPayload.appointmentId,
           baseUrl: reqPayload.baseUrl,
+          branding: branding || undefined,
         }));
         break;
       }
@@ -298,7 +325,7 @@ export const ResendService = {
     // For Resend testing without a domain, you can only send to yourself, 
     // or use onboarding@resend.dev (which Resend only allows sending to the registered account email)
     const fromAddress = process.env.RESEND_SENDER_EMAIL || 'onboarding@resend.dev';
-    const senderName = process.env.RESEND_SENDER_NAME || 'Samson Dental Center';
+    const senderName = branding?.clinicName || process.env.RESEND_SENDER_NAME || 'Samson Dental Center';
 
     const { data, error } = await resend.emails.send({
       from: `${senderName} <${fromAddress}>`,

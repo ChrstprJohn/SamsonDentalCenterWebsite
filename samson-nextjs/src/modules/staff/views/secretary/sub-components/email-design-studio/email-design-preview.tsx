@@ -1,5 +1,5 @@
 import React from 'react';
-import { DEFAULT_LOGO_URL } from '@/shared/utils/get-base-url.util';
+import { EmailBranding, resolveEmailBranding } from '@/components/emails/email-branding';
 import { formatRefId } from '@/shared/utils/date.util';
 import {
   DesignTokens,
@@ -18,6 +18,7 @@ export interface EmailDesignPreviewProps {
   tokens: DesignTokens;
   copy: DraftCopy;
   sample: SampleData;
+  branding?: EmailBranding;
 }
 
 export function EmailDesignPreview({
@@ -25,6 +26,7 @@ export function EmailDesignPreview({
   tokens,
   copy,
   sample,
+  branding,
 }: EmailDesignPreviewProps) {
   const isCancelled = design.id === 'cancelled';
   const isConfirmed = design.id === 'appointment-confirmed';
@@ -36,6 +38,7 @@ export function EmailDesignPreview({
   const isBookingRequestReceived = design.id === 'booking-request-received';
   const isRequestRejected = design.id === 'request-rejected';
   const baseUrl = sample.baseUrl || 'http://localhost:3000';
+  const b = branding ?? resolveEmailBranding(undefined, baseUrl);
   const chatUrl = `${baseUrl}/manage?token=${sample.appointmentId || 'APT-SAMPLE'}&openChat=true`;
   const feedbackUrl = `${baseUrl}/feedback?ref=${sample.appointmentId || 'APT-SAMPLE'}`;
   const noShowReasonUrl = `${baseUrl}/no-show-reason?ref=${sample.appointmentId || 'APT-SAMPLE'}`;
@@ -64,8 +67,8 @@ export function EmailDesignPreview({
         {/* Logo */}
         <div style={{ marginBottom: 28 }}>
           <img
-            src={DEFAULT_LOGO_URL}
-            alt="Samson Dental Center"
+            src={b.logoUrl}
+            alt={b.clinicName}
             className="eml-logo"
             style={{ height: 'auto', objectFit: 'contain', display: 'block', margin: '0 auto' }}
           />
@@ -131,9 +134,9 @@ export function EmailDesignPreview({
             {sample.serviceName && (
               <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Service:</span> {sample.serviceName}</p>
             )}
-            <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Location:</span> Samson Dental Center, Quezon City, Metro Manila
-              {!isConfirmed && !isRescheduled && !isReminder && !isPostCare && sample.googleMapsUrl && (
-                <> (<a href={sample.googleMapsUrl} target="_blank" rel="noreferrer" style={link}>View on Google Maps</a>)</>
+            <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Location:</span> {b.locationLine}
+              {!isConfirmed && !isRescheduled && !isReminder && !isPostCare && (b.mapUrl || sample.googleMapsUrl) && (
+                <> (<a href={(b.mapUrl || sample.googleMapsUrl)} target="_blank" rel="noreferrer" style={link}>View on Google Maps</a>)</>
               )}
             </p>
             {sample.dateStr && (
@@ -161,7 +164,7 @@ export function EmailDesignPreview({
               <li style={{ marginBottom: 6 }}>
                 Have questions or need to reschedule?{' '}
                 <a href={ctaHref} style={link}>Click here to open clinic chat</a>, or call/text us at{' '}
-                <a href="tel:028123456" style={link}>(02) 8123-4567</a>.
+                <a href={b.phoneHref} style={link}>{b.phone}</a>.
               </li>
               <li>
                 <span style={{ color: '#dc2626', fontWeight: 600 }}>Note: Replies to this email are unmonitored.</span>
@@ -180,7 +183,7 @@ export function EmailDesignPreview({
             {sample.dateStr && <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Preferred date:</span> {sample.dateStr}</p>}
             {sample.preferredStartTimeStr && <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Preferred time:</span> {sample.preferredStartTimeStr}</p>}
             {sample.appointmentId && <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Reference ID:</span> {sample.appointmentId}</p>}
-            <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Location:</span> Samson Dental Center, Quezon City, Metro Manila</p>
+            <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Location:</span> {b.locationLine}</p>
             {sample.patientNote && <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Your note:</span> {sample.patientNote}</p>}
           </div>
         )}
@@ -204,7 +207,7 @@ export function EmailDesignPreview({
             <ul style={{ margin: '0 0 16px', paddingLeft: 20, listStyle: 'disc', color: '#1a1a1a', fontSize: 14, lineHeight: 1.75 }}>
               <li style={{ marginBottom: 6 }}>
                 Questions? Call/text us at{' '}
-                <a href="tel:028123456" style={link}>(02) 8123-4567</a>.
+                <a href={b.phoneHref} style={link}>{b.phone}</a>.
               </li>
               <li>
                 <span style={{ color: '#dc2626', fontWeight: 600 }}>Note: Replies to this email are unmonitored.</span>
@@ -244,7 +247,7 @@ export function EmailDesignPreview({
             <ul style={{ margin: '0 0 16px', paddingLeft: 20, listStyle: 'disc', color: '#1a1a1a', fontSize: 14, lineHeight: 1.75 }}>
               <li style={{ marginBottom: 6 }}>
                 Questions? Call/text us at{' '}
-                <a href="tel:028123456" style={link}>(02) 8123-4567</a>.
+                <a href={b.phoneHref} style={link}>{b.phone}</a>.
               </li>
               {sample.rebookUrl && (
                 <li style={{ marginBottom: 6 }}>
@@ -306,7 +309,7 @@ export function EmailDesignPreview({
               )}
               <li style={{ marginBottom: 6 }}>
                 Questions? Call/text us at{' '}
-                <a href="tel:028123456" style={link}>(02) 8123-4567</a>.
+                <a href={b.phoneHref} style={link}>{b.phone}</a>.
               </li>
               <li>
                 <span style={{ color: '#dc2626', fontWeight: 600 }}>Note: Replies to this email are unmonitored.</span>
@@ -331,7 +334,7 @@ export function EmailDesignPreview({
             <ul style={{ margin: '0 0 16px', paddingLeft: 20, listStyle: 'disc', color: '#1a1a1a', fontSize: 14, lineHeight: 1.75 }}>
               <li style={{ marginBottom: 6 }}>
                 Questions? Call/text us at{' '}
-                <a href="tel:028123456" style={link}>(02) 8123-4567</a>.
+                <a href={b.phoneHref} style={link}>{b.phone}</a>.
               </li>
               <li>
                 <span style={{ color: '#dc2626', fontWeight: 600 }}>Note: Replies to this email are unmonitored.</span>
@@ -354,7 +357,7 @@ export function EmailDesignPreview({
               <li style={{ marginBottom: 6 }}>
                 Have questions or need to reschedule?{' '}
                 <a href={ctaHref} style={link}>Click here to open clinic chat</a>, or call/text us at{' '}
-                <a href="tel:028123456" style={link}>(02) 8123-4567</a>.
+                <a href={b.phoneHref} style={link}>{b.phone}</a>.
               </li>
               <li>
                 <span style={{ color: '#dc2626', fontWeight: 600 }}>Note: Replies to this email are unmonitored.</span>
@@ -386,7 +389,7 @@ export function EmailDesignPreview({
             <ul style={{ margin: '0 0 16px', paddingLeft: 20, listStyle: 'disc', color: '#1a1a1a', fontSize: 14, lineHeight: 1.75 }}>
               <li style={{ marginBottom: 6 }}>Follow all post-treatment care instructions from your doctor.</li>
               <li style={{ marginBottom: 6 }}>Concerns or questions? Call/text us at{' '}
-                <a href="tel:028123456" style={link}>(02) 8123-4567</a>.
+                <a href={b.phoneHref} style={link}>{b.phone}</a>.
               </li>
               <li>
                 <span style={{ color: '#dc2626', fontWeight: 600 }}>Note: Replies to this email are unmonitored.</span>
@@ -433,7 +436,7 @@ export function EmailDesignPreview({
             <ul style={{ margin: '0 0 16px', paddingLeft: 20, listStyle: 'disc', color: '#1a1a1a', fontSize: 14, lineHeight: 1.75 }}>
               <li style={{ marginBottom: 6 }}>
                 Request a different date or time — call/text us at{' '}
-                <a href="tel:028123456" style={link}>(02) 8123-4567</a>.
+                <a href={b.phoneHref} style={link}>{b.phone}</a>.
               </li>
               {sample.rebookUrl && (
                 <li style={{ marginBottom: 6 }}>
@@ -455,10 +458,10 @@ export function EmailDesignPreview({
               ? <>
                   If you have any questions{!isStaffReply && !isPostCare ? ', need to reschedule,' : ''} or need further assistance, please don&apos;t hesitate to reach out. You can{' '}
                   <a href={ctaHref} style={link}>click here to open the clinic chat</a>{' '}
-                  or call or text us at <a href="tel:028123456" style={link}>(02) 8123-4567</a>.{' '}
+                  or call or text us at <a href={b.phoneHref} style={link}>{b.phone}</a>.{' '}
                   <span style={{ color: '#dc2626', fontWeight: 600 }}>Please note that replies to this email are not monitored.</span>
                 </>
-              : <>If you have any questions or would like to reschedule a future appointment, please don&apos;t hesitate to call or text us at{' '}<a href="tel:028123456" style={link}>(02) 8123-4567</a>.{' '}<span style={{ color: '#dc2626', fontWeight: 600 }}>Please note that replies to this email are not monitored.</span></>
+              : <>If you have any questions or would like to reschedule a future appointment, please don&apos;t hesitate to call or text us at{' '}<a href={b.phoneHref} style={link}>{b.phone}</a>.{' '}<span style={{ color: '#dc2626', fontWeight: 600 }}>Please note that replies to this email are not monitored.</span></>
             }
           </p>
         )}
@@ -466,33 +469,33 @@ export function EmailDesignPreview({
         {/* Closing */}
         <p style={{ ...p, marginBottom: 24 }}>
           {isCancelled
-            ? "Thank you for letting us know, and we hope to welcome you back at Samson Dental Center soon."
+            ? `Thank you for letting us know, and we hope to welcome you back at ${b.clinicName} soon.`
             : isConfirmed
-            ? "Thank you for choosing Samson Dental Center. See you soon!"
+            ? `Thank you for choosing ${b.clinicName}. See you soon!`
             : isRescheduled
-            ? "Thank you for choosing Samson Dental Center. See you soon!"
+            ? `Thank you for choosing ${b.clinicName}. See you soon!`
             : isReminder
-            ? "Thank you for choosing Samson Dental Center. See you soon!"
+            ? `Thank you for choosing ${b.clinicName}. See you soon!`
             : isRequestRejected
-            ? "Thank you for choosing Samson Dental Center."
+            ? `Thank you for choosing ${b.clinicName}.`
             : isBookingRequestReceived
-            ? "Thank you for choosing Samson Dental Center."
+            ? `Thank you for choosing ${b.clinicName}.`
             : isPostCare
-            ? "Thank you for choosing Samson Dental Center. We hope to see you again soon."
+            ? `Thank you for choosing ${b.clinicName}. We hope to see you again soon.`
             : isNoShow
-            ? "We hope to see you at Samson Dental Center soon. Please reach out if there is anything we can do."
+            ? `We hope to see you at ${b.clinicName} soon. Please reach out if there is anything we can do.`
             : isStaffReply
-            ? "Thank you for choosing Samson Dental Center. We look forward to assisting you."
-            : `Thank you for choosing Samson Dental Center. We can't wait to see you on ${sample.dateStr || 'your appointment date'} at ${sample.timeRangeStr || 'the scheduled time'}.`
+            ? `Thank you for choosing ${b.clinicName}. We look forward to assisting you.`
+            : `Thank you for choosing ${b.clinicName}. We can't wait to see you on ${sample.dateStr || 'your appointment date'} at ${sample.timeRangeStr || 'the scheduled time'}.`
           }
         </p>
 
         {/* Signature */}
         <p style={{ ...p, marginBottom: 4 }}>Warm regards,</p>
-        <p style={{ ...p, marginBottom: 2, ...bold }}>Samson Dental Center</p>
+        <p style={{ ...p, marginBottom: 2, ...bold }}>{b.clinicName}</p>
         <p style={{ ...p, color: '#64748b', marginBottom: 0 }}>
-          (02) 8123-4567 &nbsp;·&nbsp;{' '}
-          <a href={baseUrl} target="_blank" rel="noreferrer" style={{ color: '#2563eb' }}>samsondentalcenter.com.ph</a>
+          {b.phone}{b.landline ? ` · ${b.landline}` : ''} &nbsp;·&nbsp;{' '}
+          <a href={b.websiteUrl} target="_blank" rel="noreferrer" style={{ color: '#2563eb' }}>{b.websiteLabel}</a>{b.whatsappUrl ? <> &nbsp;·&nbsp; <a href={b.whatsappUrl} target="_blank" rel="noreferrer" style={{ color: '#2563eb' }}>WhatsApp</a></> : null}
         </p>
 
         {/* Divider */}
@@ -502,8 +505,8 @@ export function EmailDesignPreview({
         {copy.showFooter && (
           <p style={{ ...muted, margin: 0 }}>
             {isBookingRequestReceived || isRequestRejected
-              ? 'You received this email because you submitted a booking inquiry with Samson Dental Center.'
-              : 'You received this email because you have an appointment with Samson Dental Center.'}
+              ? `You received this email because you submitted a booking inquiry with ${b.clinicName}.`
+              : `You received this email because you have an appointment with ${b.clinicName}.`}
             {' '}
             <a href={`${baseUrl}/terms`} target="_blank" rel="noreferrer" style={{ color: '#94a3b8' }}>Terms of Service</a>
             {' '}·{' '}
