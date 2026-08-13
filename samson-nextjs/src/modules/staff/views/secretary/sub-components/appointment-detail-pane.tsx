@@ -747,6 +747,21 @@ function NeedsAttentionResolvePane({
   const [isEditingChannel, setIsEditingChannel] = useState(false);
   const [isSavingChannel, setIsSavingChannel] = useState(false);
 
+  const handleSaveChannel = async () => {
+    setIsSavingChannel(true);
+    const res = await updateConfirmationChannelAction({
+      appointmentId: appointment.id,
+      confirmationChannel: draftChannel,
+    });
+    if (res.success) {
+      setChannel(draftChannel);
+      appointment.confirmationChannel = draftChannel;
+      setIsEditingChannel(false);
+      if (view?.fetchData) view.fetchData();
+    }
+    setIsSavingChannel(false);
+  };
+
   const reset = () => {
     setResolveMode(null);
     setResolveReason('');
@@ -886,11 +901,7 @@ function NeedsAttentionResolvePane({
       <div className={`flex flex-col flex-1 min-h-0 h-full`}>
         <div className="flex-1 min-h-0 overflow-y-auto" style={{ scrollbarWidth: 'thin' }} data-lenis-prevent>
           <div className="px-4 py-4 space-y-4">
-            <div className="flex flex-col gap-0.5">
-              <span className="text-sm font-semibold text-foreground">Select Resolution Action <span className="text-destructive">*</span></span>
-              <span className="text-xs text-muted-foreground">{isMissedCheckout ? 'Choose an action to resolve this missed checkout.' : 'Choose an action to resolve this no-show appointment.'}</span>
-            </div>
-            <div className="flex flex-col gap-3 pt-1">
+            <div className="flex flex-col gap-3">
               {!isMissedCheckout && (
                 <button
                   type="button"

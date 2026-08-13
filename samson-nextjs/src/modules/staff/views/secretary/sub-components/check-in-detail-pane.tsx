@@ -49,7 +49,7 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
   const [undoReason, setUndoReason] = useState('');
   const [undoReasonMode, setUndoReasonMode] = useState('');
   const [undoCustomReason, setUndoCustomReason] = useState('');
-  const [resolveMode, setResolveMode] = useState<'COMPLETED' | 'CONFIRMED_NO_SHOW' | 'CHECKED_IN' | null>(null);
+  const [resolveMode, setResolveMode] = useState<'COMPLETED' | 'CONFIRMED_NO_SHOW' | 'CHECKED_IN' | 'RESCHEDULE' | null>(null);
   const [resolveReason, setResolveReason] = useState('');
   const [showCustomReason, setShowCustomReason] = useState(false);
 
@@ -161,6 +161,26 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
     setIsSavingResolveChannel(false);
   };
 
+  const handleResolveSubmit = async () => {
+    if (!appointment || !resolveMode) return;
+    if (resolveMode === 'RESCHEDULE') {
+      view.handleRescheduleSubmit();
+      return;
+    }
+    if ((resolveMode === 'COMPLETED' || resolveMode === 'CONFIRMED_NO_SHOW') && isEditingResolveChannel) {
+      return;
+    }
+    if (draftResolveChannel !== resolveChannel && (resolveMode === 'COMPLETED' || resolveMode === 'CONFIRMED_NO_SHOW')) {
+      await handleSaveResolveChannel();
+    }
+    view.handleResolveNoShowSubmit({
+      appointmentId: appointment.id,
+      resolution: resolveMode,
+      reason: resolveReason.trim() || (resolveMode === 'CHECKED_IN' ? 'Secretary forgot to check-in patient during active window' : ''),
+      confirmationChannel: resolveChannel,
+    });
+  };
+
   const prevApptId = useRef(appointment?.id);
   const prevSelectionMode = useRef(selectionMode);
   const prevSelectionVersion = useRef(view.selectionVersion);
@@ -212,7 +232,9 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
                   ? 'Late Check-In Patient'
                   : resolveMode === 'CONFIRMED_NO_SHOW'
                     ? 'Keep Confirmed No-Show'
-                    : 'Resolve No-Show'
+                    : resolveMode === 'RESCHEDULE'
+                      ? 'Reschedule Appointment'
+                      : 'Select Resolution Action'
               : paneType === 'reschedule'
                 ? 'Reschedule Appointment'
                 : '';
@@ -232,7 +254,15 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
       returnToDetails();
       return;
     }
-    if (paneType === 'checkin' || paneType === 'noshow' || paneType === 'checkout' || paneType === 'resolve' || paneType === 'reschedule') {
+    if (paneType === 'resolve') {
+      if (resolveMode) {
+        setResolveMode(null);
+        return;
+      }
+      returnToDetails();
+      return;
+    }
+    if (paneType === 'checkin' || paneType === 'noshow' || paneType === 'checkout' || paneType === 'reschedule') {
       returnToDetails();
       return;
     }
@@ -265,7 +295,9 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
                         ? 'Confirm late check-in for this patient visit.'
                         : resolveMode === 'CONFIRMED_NO_SHOW'
                           ? 'Confirm keeping appointment marked as no-show.'
-                          : 'Select an action for resolving this no-show appointment.'
+                          : resolveMode === 'RESCHEDULE'
+                            ? 'Update date, time, dentist, or service details.'
+                            : 'Choose an action to resolve this missed visit.'
                     : paneType === 'details' && showUndoForm
                       ? 'Return the patient to the upcoming queue.'
                       : paneType === 'details'
@@ -350,16 +382,24 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
             {paneType === 'resolve' && (
               <ResolveContent
                 view={view}
-                onClose={onClose}
+                appointment={appointment}
+                resolveMode={resolveMode}
+                setResolveMode={setResolveMode}
+                resolveReason={resolveReason}
+                setResolveReason={setResolveReason}
+                selectedPreset={selectedPreset}
+                setSelectedPreset={setSelectedPreset}
+                showCustomReason={showCustomReason}
+                setShowCustomReason={setShowCustomReason}
                 channel={resolveChannel}
                 draftChannel={draftResolveChannel}
                 isEditingChannel={isEditingResolveChannel}
                 isSavingChannel={isSavingResolveChannel}
-                onChannelChange={setResolveChannel}
                 onDraftChannelChange={setDraftResolveChannel}
                 onEditingChannelChange={setIsEditingResolveChannel}
                 onSaveChannel={handleSaveResolveChannel}
                 onCancelChannelEdit={() => { setDraftResolveChannel(resolveChannel); setIsEditingResolveChannel(false); }}
+                onSubmit={handleResolveSubmit}
               />
             )}
             {paneType === 'details' && appointment.status === 'CHECKED_IN' && showUndoForm && (
@@ -477,150 +517,6 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
                 </>
               )
             )}
-            {paneType === 'details' && appointment.status === 'NO_SHOW' && showResolveForm && (
-              <div className="w-full flex flex-col gap-3">
-                {!resolveMode ? (
-                <>
-                  <div className="flex flex-col gap-0.5">
-                    <span className="text-sm font-semibold text-foreground">Select Resolution Action <span className="text-destructive">*</span></span>
-                    <span className="text-xs text-muted-foreground">Choose an action for resolving this no-show appointment.</span>
-                  </div>
-                  <div className="flex flex-col gap-3 pt-1">
-                    {/* Keep No-Show */}
-                    <button type="button" onClick={() => { setResolveMode('CONFIRMED_NO_SHOW'); setSelectedPreset(''); setResolveReason(''); setShowCustomReason(false); }}
-                      className="w-full p-4 rounded-2xl border border-red-500/20 bg-red-500/5 hover:bg-red-500/10 hover:border-red-500/40 text-left flex items-start gap-3.5 transition-all cursor-pointer group shadow-sm">
-                      <div className="size-10 rounded-xl bg-red-500/15 border border-red-500/30 flex items-center justify-center text-red-600 shrink-0 group-hover:scale-105 transition-transform">
-                        <X className="size-5" />
-                      </div>
-                      <div className="flex flex-col gap-0.5 flex-1 min-w-0">
-                        <span className="text-sm font-semibold text-red-600 dark:text-red-400">Keep No-Show</span>
-                        <span className="text-xs text-muted-foreground leading-relaxed">Confirm patient failed to show up. Logs appointment as no-show.</span>
-                      </div>
-                    </button>
-                    {/* Check In */}
-                    <button type="button" onClick={() => { setResolveMode('CHECKED_IN'); setSelectedPreset(''); setResolveReason('Secretary forgot to check-in patient during active window'); setShowCustomReason(false); }}
-                      className="w-full p-4 rounded-2xl border border-blue-500/20 bg-blue-500/5 hover:bg-blue-500/10 hover:border-blue-500/40 text-left flex items-start gap-3.5 transition-all cursor-pointer group shadow-sm">
-                      <div className="size-10 rounded-xl bg-blue-500/15 border border-blue-500/30 flex items-center justify-center text-blue-600 shrink-0 group-hover:scale-105 transition-transform">
-                        <Check className="size-5" />
-                      </div>
-                      <div className="flex flex-col gap-0.5 flex-1 min-w-0">
-                        <span className="text-sm font-semibold text-blue-600 dark:text-blue-400">Check In</span>
-                        <span className="text-xs text-muted-foreground leading-relaxed">Mark patient as checked in for active clinic visit.</span>
-                      </div>
-                    </button>
-                    {/* Checkout (Mark Completed) */}
-                    <button type="button" onClick={() => { setResolveMode('COMPLETED'); setSelectedPreset(''); setResolveReason(''); setShowCustomReason(false); }}
-                      className="w-full p-4 rounded-2xl border border-emerald-500/20 bg-emerald-500/5 hover:bg-emerald-500/10 hover:border-emerald-500/40 text-left flex items-start gap-3.5 transition-all cursor-pointer group shadow-sm">
-                      <div className="size-10 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-600 shrink-0 group-hover:scale-105 transition-transform">
-                        <Check className="size-5" />
-                      </div>
-                      <div className="flex flex-col gap-0.5 flex-1 min-w-0">
-                        <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">Checkout (Mark Completed)</span>
-                        <span className="text-xs text-muted-foreground leading-relaxed">Mark visit as completed and dispatch post-care notification.</span>
-                      </div>
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <div className="space-y-4">
-                  {resolveMode === 'CHECKED_IN' && (
-                    <div className="p-3 border bg-blue-500/5 border-blue-500/20 rounded-2xl">
-                      <span className="text-[10px] font-semibold uppercase tracking-wider text-blue-500">Late Check-In Notice</span>
-                      <div className="text-[11px] text-muted-foreground mt-1 leading-relaxed">
-                        Clicking <strong>Confirm</strong> will mark this patient as <strong>Checked In</strong> so staff and doctors know they are currently in the clinic.
-                      </div>
-                    </div>
-                  )}
-
-                  {resolveMode === 'COMPLETED' && (
-                    <>
-                      <div className="p-3 border bg-amber-500/5 border-amber-500/20 rounded-2xl">
-                        <span className="text-[10px] font-semibold uppercase tracking-wider text-amber-500">Completion Notice</span>
-                        <div className="text-[11px] text-muted-foreground mt-1 leading-relaxed">
-                          This will complete the visit and send the selected post-care message.
-                        </div>
-                      </div>
-                      <ChannelPickerInline
-                        channel={inlineChannel}
-                        draftChannel={draftInlineChannel}
-                        isEditing={isEditingInlineChannel}
-                        isSaving={isSavingInlineChannel}
-                        onEdit={() => setIsEditingInlineChannel(true)}
-                        onCancel={() => { setDraftInlineChannel(inlineChannel); setIsEditingInlineChannel(false); }}
-                        onDraftChange={setDraftInlineChannel}
-                        onSave={handleSaveInlineChannel}
-                      />
-                    </>
-                  )}
-
-                  {resolveMode === 'CONFIRMED_NO_SHOW' && (
-                    <>
-                      <div className="p-3 border bg-red-500/5 border-red-500/20 rounded-2xl">
-                        <span className="text-[10px] font-semibold uppercase tracking-wider text-red-500">No-Show Notice</span>
-                        <div className="text-[11px] text-muted-foreground mt-1 leading-relaxed">
-                          Clicking <strong>Confirm</strong> will keep this appointment marked as <strong>Confirmed No-Show</strong> in system audit logs and send the missed-appointment notification via the selected channel.
-                        </div>
-                      </div>
-                      <ChannelPickerInline
-                        channel={inlineChannel}
-                        draftChannel={draftInlineChannel}
-                        isEditing={isEditingInlineChannel}
-                        isSaving={isSavingInlineChannel}
-                        onEdit={() => setIsEditingInlineChannel(true)}
-                        onCancel={() => { setDraftInlineChannel(inlineChannel); setIsEditingInlineChannel(false); }}
-                        onDraftChange={setDraftInlineChannel}
-                        onSave={handleSaveInlineChannel}
-                      />
-                    </>
-                  )}
-
-                  <div className="flex flex-col gap-1.5">
-                    <div className="flex flex-col gap-0.5">
-                      <span className="text-sm font-medium text-foreground">Reason for Resolution <span className="text-destructive">*</span></span>
-                      <span className="text-xs text-muted-foreground">Add a reason for resolving this no-show before confirming.</span>
-                    </div>
-                    <select value={selectedPreset} onChange={(e) => { const v = e.target.value; if (v === '__custom__') { setShowCustomReason(true); setResolveReason(''); } else { setShowCustomReason(false); setSelectedPreset(v); setResolveReason(v); } }} className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border">
-                      <option value="" disabled>Select a Reason</option>
-                      {resolveReasonOptions[resolveMode]?.map((opt) => (<option key={opt} value={opt}>{opt}</option>))}
-                      <option value="__custom__">Custom</option>
-                    </select>
-                    {showCustomReason && (
-                      <textarea value={resolveReason} onChange={(e) => setResolveReason(e.target.value)} rows={2} placeholder="Type custom reason..." className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border resize-none" />
-                    )}
-                  </div>
-                </div>
-              )}
-
-              <div className="flex flex-col gap-2 pt-2">
-                {isEditingInlineChannel && (
-                  <p className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center">
-                    Please finish editing or save notification channel before submitting resolution.
-                  </p>
-                )}
-                <div className={`flex gap-2 ${isEditingInlineChannel ? 'pointer-events-none opacity-40' : ''}`}>
-                  {resolveMode ? (
-                    <>
-                      <button onClick={async () => {
-                        if (draftInlineChannel !== inlineChannel) {
-                          await handleSaveInlineChannel();
-                        }
-                        view.handleResolveNoShowSubmit({ appointmentId: appointment.id, resolution: resolveMode, reason: resolveReason, confirmationChannel: inlineChannel });
-                      }} disabled={view.isPending || !resolveReason.trim() || isEditingInlineChannel} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl disabled:opacity-40">
-                        {view.isPending ? 'Submitting...' : 'Confirm'}
-                      </button>
-                      <button onClick={() => setResolveMode(null)} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent transition-colors rounded-xl">
-                        Back
-                      </button>
-                    </>
-                  ) : (
-                    <button onClick={returnToDetails} className="w-full h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent transition-colors rounded-xl">
-                      Back
-                    </button>
-                  )}
-                </div>
-              </div>
-            </div>
-            )}
             {paneType === 'details' && appointment.status === 'CHECKED_IN' && !showUndoForm && !showCheckoutForm && (
               <>
                 <button onClick={() => { resetActionDrafts(); setShowUndoForm(true); }} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent transition-colors rounded-xl">
@@ -657,10 +553,56 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
               </>
             )}
             {paneType === 'resolve' && (
-              <>
-                <button onClick={returnToDetails} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent rounded-xl">Back</button>
-                <button onClick={() => (document.getElementById('resolve-form') as HTMLFormElement | null)?.requestSubmit()} disabled={view.isPending || isEditingResolveChannel} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground rounded-xl disabled:opacity-40">{view.isPending ? 'Submitting...' : 'Submit Resolution'}</button>
-              </>
+              !resolveMode ? (
+                <button
+                  onClick={returnToDetails}
+                  className="w-full h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent transition-colors rounded-xl"
+                >
+                  Back
+                </button>
+              ) : resolveMode === 'RESCHEDULE' ? (() => {
+                const isFormValid = isRescheduleFormComplete({
+                  serviceId: appointment.serviceId,
+                  doctorId: view.rescheduleDoctor || appointment.doctorId,
+                  date: view.rescheduleDate,
+                  startTime: view.rescheduleTime,
+                  endTime: view.rescheduleEndTime,
+                  justification: view.rescheduleJustification,
+                });
+                return (
+                  <div className="w-full flex gap-2">
+                    <button
+                      onClick={handleResolveSubmit}
+                      disabled={view.isPending || !isFormValid || isEditingResolveChannel}
+                      className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl disabled:opacity-40"
+                    >
+                      {view.isPending ? 'Saving...' : 'Confirm'}
+                    </button>
+                    <button
+                      onClick={() => setResolveMode(null)}
+                      className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent transition-colors rounded-xl"
+                    >
+                      Back
+                    </button>
+                  </div>
+                );
+              })() : (
+                <div className="w-full flex gap-2">
+                  <button
+                    onClick={handleResolveSubmit}
+                    disabled={view.isPending || isEditingResolveChannel || !resolveReason.trim()}
+                    className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl disabled:opacity-40"
+                  >
+                    {view.isPending ? 'Submitting...' : 'Confirm'}
+                  </button>
+                  <button
+                    onClick={() => setResolveMode(null)}
+                    className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent transition-colors rounded-xl"
+                  >
+                    Back
+                  </button>
+                </div>
+              )
             )}
           </div>
         </div>
@@ -1026,179 +968,156 @@ function CheckoutContent({
   );
 }
 
-function ResolveContent({ view, onClose, channel, draftChannel, isEditingChannel, isSavingChannel, onChannelChange, onDraftChannelChange, onEditingChannelChange, onSaveChannel, onCancelChannelEdit }: { view: any; onClose: () => void; channel: 'EMAIL' | 'SMS' | 'BOTH' | 'NONE'; draftChannel: 'EMAIL' | 'SMS' | 'BOTH' | 'NONE'; isEditingChannel: boolean; isSavingChannel: boolean; onChannelChange: (val: 'EMAIL' | 'SMS' | 'BOTH' | 'NONE') => void; onDraftChannelChange: (val: 'EMAIL' | 'SMS' | 'BOTH' | 'NONE') => void; onEditingChannelChange: (val: boolean) => void; onSaveChannel: () => void; onCancelChannelEdit: () => void }) {
-  const appointment = view.resolveAppt;
-  const [resolution, setResolution] = useState<'COMPLETED' | 'CONFIRMED_NO_SHOW' | 'RESCHEDULE' | 'CHECKED_IN'>('CONFIRMED_NO_SHOW');
-  const [reason, setReason] = useState('');
-  const [reasonMode, setReasonMode] = useState('');
-  const [customReason, setCustomReason] = useState('');
-
-  const handleSubmit = async () => {
-    if (!reason.trim()) return;
-    if (isEditingChannel) return;
-    if (draftChannel !== channel) {
-      await onSaveChannel();
-    }
-    const payload: {
-      appointmentId: string;
-      resolution: 'COMPLETED' | 'CONFIRMED_NO_SHOW' | 'RESCHEDULE' | 'CHECKED_IN';
-      reason: string;
-      newDate?: string;
-      newStartTime?: string;
-      newEndTime?: string;
-      newDoctorId?: string;
-      confirmationChannel?: 'EMAIL' | 'SMS' | 'BOTH' | 'NONE';
-    } = { appointmentId: appointment.id, resolution, reason: reason.trim(), confirmationChannel: channel };
-    if (resolution === 'RESCHEDULE') {
-      const fmt = (ds: string, ts: string) => `${ds}T${ts.length === 5 ? ts + ':00' : ts}Z`;
-      const date = view.rescheduleDate || appointment.date;
-      payload.newDate = date;
-      payload.newStartTime = view.rescheduleTime ? fmt(date, view.rescheduleTime) : undefined;
-      payload.newEndTime = view.rescheduleEndTime ? fmt(date, view.rescheduleEndTime) : undefined;
-      payload.newDoctorId = view.rescheduleDoctor || appointment.doctorId || undefined;
-    }
-    view.handleResolveNoShowSubmit(payload);
+function ResolveContent({
+  view,
+  appointment,
+  resolveMode,
+  setResolveMode,
+  resolveReason,
+  setResolveReason,
+  selectedPreset,
+  setSelectedPreset,
+  showCustomReason,
+  setShowCustomReason,
+  channel,
+  draftChannel,
+  isEditingChannel,
+  isSavingChannel,
+  onDraftChannelChange,
+  onEditingChannelChange,
+  onSaveChannel,
+  onCancelChannelEdit,
+  onSubmit,
+}: {
+  view: any;
+  appointment: any;
+  resolveMode: 'COMPLETED' | 'CONFIRMED_NO_SHOW' | 'CHECKED_IN' | 'RESCHEDULE' | null;
+  setResolveMode: (mode: 'COMPLETED' | 'CONFIRMED_NO_SHOW' | 'CHECKED_IN' | 'RESCHEDULE' | null) => void;
+  resolveReason: string;
+  setResolveReason: (reason: string) => void;
+  selectedPreset: string;
+  setSelectedPreset: (preset: string) => void;
+  showCustomReason: boolean;
+  setShowCustomReason: (show: boolean) => void;
+  channel: 'EMAIL' | 'SMS' | 'BOTH' | 'NONE';
+  draftChannel: 'EMAIL' | 'SMS' | 'BOTH' | 'NONE';
+  isEditingChannel: boolean;
+  isSavingChannel: boolean;
+  onDraftChannelChange: (val: 'EMAIL' | 'SMS' | 'BOTH' | 'NONE') => void;
+  onEditingChannelChange: (val: boolean) => void;
+  onSaveChannel: () => void;
+  onCancelChannelEdit: () => void;
+  onSubmit: () => void;
+}) {
+  const resolveReasonOptions: Record<string, string[]> = {
+    CHECKED_IN: ['Patient arrived late - checked in directly', 'Check-in window passed before secretary clicked check-in', 'Patient is currently in waiting room / clinic'],
+    COMPLETED: ['Visit completed but status updated late', 'Patient was seen but not checked in', 'Status corrected after visit'],
+    CONFIRMED_NO_SHOW: ['Patient failed to arrive for appointment', 'Patient arrived after closing', 'Patient refused treatment'],
   };
 
-  const selectResolution = (val: 'COMPLETED' | 'CONFIRMED_NO_SHOW' | 'RESCHEDULE' | 'CHECKED_IN') => {
-    setResolution(val);
-    setReason('');
-    setReasonMode('');
-    setCustomReason('');
-    if (val === 'RESCHEDULE') {
-      const toHHMM = (t?: string) => {
-        if (!t) return '';
-        if (t.includes('T')) {
-          const p = t.split('T')[1];
-          if (p) return p.slice(0, 5);
-        }
-        const m = t.match(/^(\d{2}):(\d{2})/);
-        return m ? `${m[1]}:${m[2]}` : '';
-      };
-      view.setRescheduleDoctor?.(appointment.doctorId || '');
-      view.setRescheduleDate?.(appointment.date || '');
-      view.setRescheduleTime?.(toHHMM(appointment.startTime ?? undefined));
-      view.setRescheduleEndTime?.(toHHMM(appointment.endTime ?? undefined));
-      view.setRescheduleJustification?.('');
-      void view.loadServices?.();
-    }
-  };
-
-  const reasonOptions = resolution === 'CHECKED_IN'
-    ? ['Patient arrived late - checked in directly', 'Check-in window passed before secretary clicked check-in', 'Patient is currently in waiting room / clinic', 'CUSTOM']
-    : resolution === 'COMPLETED'
-      ? ['Visit completed but status updated late', 'Visit completed but status was not updated', 'System issue prevented status update', 'CUSTOM']
-      : ['Patient failed to arrive for appointment', 'Patient confirmed they would not attend', 'Patient left before check-in was completed', 'CUSTOM'];
-
-  const resolutionWarning = resolution === 'CHECKED_IN'
-    ? { variant: 'blue' as const, title: 'Late Check-In Notice', text: 'This will set the appointment status to Checked In so staff and doctors know the patient is in the clinic.' }
-    : resolution === 'COMPLETED'
-      ? { variant: 'emerald' as const, title: 'Completion Notice', text: 'This will complete the visit and send the selected post-care message.' }
-      : resolution === 'CONFIRMED_NO_SHOW'
-        ? { variant: 'red' as const, title: 'No-Show Notice', text: 'This will keep the appointment marked as a confirmed no-show in the audit history and send the missed-appointment notification via the selected channel.' }
-        : { variant: 'cyan' as const, title: 'Reschedule Notice', text: 'This will open the reschedule details and move the appointment into the rescheduling workflow.' };
-
-  const handleReasonSelect = (value: string) => {
-    setReasonMode(value);
-    setReason(value === 'CUSTOM' ? customReason : value);
-  };
-
-  const handleCustomReasonChange = (value: string) => {
-    setCustomReason(value);
-    if (reasonMode === 'CUSTOM') setReason(value);
-  };
-
-  return (
-    <form id="resolve-form" className="flex flex-col gap-4" onSubmit={(event) => { event.preventDefault(); void handleSubmit(); }}>
-      <div className="flex flex-col gap-2.5">
-        <div className="flex flex-col gap-0.5">
-          <span className="text-sm font-medium text-foreground">Resolution Action <span className="text-destructive">*</span></span>
-          <span className="text-xs text-muted-foreground">Select an action for resolving this no-show appointment.</span>
-        </div>
-        <div className="flex flex-col gap-2">
+  if (!resolveMode) {
+    return (
+      <div className="space-y-3">
+        <div className="flex flex-col gap-3">
           {/* Keep No-Show */}
           <button
             type="button"
-            onClick={() => selectResolution('CONFIRMED_NO_SHOW')}
-            className={`w-full p-2.5 rounded-xl border text-left flex items-center gap-2.5 transition-all cursor-pointer ${
-              resolution === 'CONFIRMED_NO_SHOW' ? 'border-red-500 bg-red-500/10 ring-1 ring-red-500/50' : 'border-card-border bg-card text-muted-foreground hover:border-foreground/30'
-            }`}
+            onClick={() => {
+              setResolveMode('CONFIRMED_NO_SHOW');
+              setSelectedPreset('');
+              setResolveReason('');
+              setShowCustomReason(false);
+            }}
+            className="w-full p-4 rounded-2xl border border-red-500/20 bg-red-500/5 hover:bg-red-500/10 hover:border-red-500/40 text-left flex items-start gap-3.5 transition-all cursor-pointer group shadow-sm"
           >
-            <div className={`size-3.5 rounded-full border-2 flex items-center justify-center shrink-0 ${resolution === 'CONFIRMED_NO_SHOW' ? 'border-red-500 bg-red-500' : 'border-muted-foreground/40'}`}>
-              {resolution === 'CONFIRMED_NO_SHOW' && <div className="size-1 rounded-full bg-white" />}
+            <div className="size-10 rounded-xl bg-red-500/15 border border-red-500/30 flex items-center justify-center text-red-600 shrink-0 group-hover:scale-105 transition-transform">
+              <X className="size-5" />
             </div>
-            <span className={`text-xs font-semibold ${resolution === 'CONFIRMED_NO_SHOW' ? 'text-red-500' : 'text-foreground'}`}>Keep No-Show</span>
+            <div className="flex flex-col gap-0.5 flex-1 min-w-0">
+              <span className="text-sm font-semibold text-red-600 dark:text-red-400">Keep No-Show</span>
+              <span className="text-xs text-muted-foreground leading-relaxed">Confirm patient failed to show up. Logs appointment as no-show.</span>
+            </div>
           </button>
 
-          {/* Check In */}
+          {/* Late Check-In */}
           <button
             type="button"
-            onClick={() => selectResolution('CHECKED_IN')}
-            className={`w-full p-2.5 rounded-xl border text-left flex items-center gap-2.5 transition-all cursor-pointer ${
-              resolution === 'CHECKED_IN' ? 'border-blue-500 bg-blue-500/10 ring-1 ring-blue-500/50' : 'border-card-border bg-card text-muted-foreground hover:border-foreground/30'
-            }`}
+            onClick={() => {
+              setResolveMode('CHECKED_IN');
+              setSelectedPreset('');
+              setResolveReason('Secretary forgot to check-in patient during active window');
+              setShowCustomReason(false);
+            }}
+            className="w-full p-4 rounded-2xl border border-blue-500/20 bg-blue-500/5 hover:bg-blue-500/10 hover:border-blue-500/40 text-left flex items-start gap-3.5 transition-all cursor-pointer group shadow-sm"
           >
-            <div className={`size-3.5 rounded-full border-2 flex items-center justify-center shrink-0 ${resolution === 'CHECKED_IN' ? 'border-blue-500 bg-blue-500' : 'border-muted-foreground/40'}`}>
-              {resolution === 'CHECKED_IN' && <div className="size-1 rounded-full bg-white" />}
+            <div className="size-10 rounded-xl bg-blue-500/15 border border-blue-500/30 flex items-center justify-center text-blue-600 shrink-0 group-hover:scale-105 transition-transform">
+              <Check className="size-5" />
             </div>
-            <span className={`text-xs font-semibold ${resolution === 'CHECKED_IN' ? 'text-blue-600' : 'text-foreground'}`}>Check In</span>
+            <div className="flex flex-col gap-0.5 flex-1 min-w-0">
+              <span className="text-sm font-semibold text-blue-600 dark:text-blue-400">Late Check-In</span>
+              <span className="text-xs text-muted-foreground leading-relaxed">Mark patient as checked in for active clinic visit.</span>
+            </div>
           </button>
 
-          {/* Checkout */}
+          {/* Checkout (Mark Completed) */}
           <button
             type="button"
-            onClick={() => selectResolution('COMPLETED')}
-            className={`w-full p-2.5 rounded-xl border text-left flex items-center gap-2.5 transition-all cursor-pointer ${
-              resolution === 'COMPLETED' ? 'border-emerald-500 bg-emerald-500/10 ring-1 ring-emerald-500/50' : 'border-card-border bg-card text-muted-foreground hover:border-foreground/30'
-            }`}
+            onClick={() => {
+              setResolveMode('COMPLETED');
+              setSelectedPreset('');
+              setResolveReason('');
+              setShowCustomReason(false);
+            }}
+            className="w-full p-4 rounded-2xl border border-emerald-500/20 bg-emerald-500/5 hover:bg-emerald-500/10 hover:border-emerald-500/40 text-left flex items-start gap-3.5 transition-all cursor-pointer group shadow-sm"
           >
-            <div className={`size-3.5 rounded-full border-2 flex items-center justify-center shrink-0 ${resolution === 'COMPLETED' ? 'border-emerald-500 bg-emerald-500' : 'border-muted-foreground/40'}`}>
-              {resolution === 'COMPLETED' && <div className="size-1 rounded-full bg-white" />}
+            <div className="size-10 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-600 shrink-0 group-hover:scale-105 transition-transform">
+              <Check className="size-5" />
             </div>
-            <span className={`text-xs font-semibold ${resolution === 'COMPLETED' ? 'text-emerald-600' : 'text-foreground'}`}>Checkout (Mark Completed)</span>
+            <div className="flex flex-col gap-0.5 flex-1 min-w-0">
+              <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">Checkout (Mark Completed)</span>
+              <span className="text-xs text-muted-foreground leading-relaxed">Mark visit as completed and dispatch post-care notification.</span>
+            </div>
           </button>
 
           {/* Reschedule */}
           <button
             type="button"
-            onClick={() => selectResolution('RESCHEDULE')}
-            className={`w-full p-2.5 rounded-xl border text-left flex items-center gap-2.5 transition-all cursor-pointer ${
-              resolution === 'RESCHEDULE' ? 'border-cyan-500 bg-cyan-500/10 ring-1 ring-cyan-500/50' : 'border-card-border bg-card text-muted-foreground hover:border-foreground/30'
-            }`}
+            onClick={() => {
+              const toHHMM = (t?: string) => {
+                if (!t) return '';
+                if (t.includes('T')) {
+                  const p = t.split('T')[1];
+                  if (p) return p.slice(0, 5);
+                }
+                const m = t.match(/^(\d{2}):(\d{2})/);
+                return m ? `${m[1]}:${m[2]}` : '';
+              };
+              view.setRescheduleDoctor?.(appointment.doctorId || '');
+              view.setRescheduleDate?.(appointment.date || '');
+              view.setRescheduleTime?.(toHHMM(appointment.startTime ?? undefined));
+              view.setRescheduleEndTime?.(toHHMM(appointment.endTime ?? undefined));
+              view.setRescheduleJustification?.('');
+              void view.loadServices?.();
+              setResolveMode('RESCHEDULE');
+            }}
+            className="w-full p-4 rounded-2xl border border-cyan-500/20 bg-cyan-500/5 hover:bg-cyan-500/10 hover:border-cyan-500/40 text-left flex items-start gap-3.5 transition-all cursor-pointer group shadow-sm"
           >
-            <div className={`size-3.5 rounded-full border-2 flex items-center justify-center shrink-0 ${resolution === 'RESCHEDULE' ? 'border-cyan-500 bg-cyan-500' : 'border-muted-foreground/40'}`}>
-              {resolution === 'RESCHEDULE' && <div className="size-1 rounded-full bg-white" />}
+            <div className="size-10 rounded-xl bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center text-cyan-600 shrink-0 group-hover:scale-105 transition-transform">
+              <Pencil className="size-5" />
             </div>
-            <span className={`text-xs font-semibold ${resolution === 'RESCHEDULE' ? 'text-cyan-600' : 'text-foreground'}`}>Reschedule</span>
+            <div className="flex flex-col gap-0.5 flex-1 min-w-0">
+              <span className="text-sm font-semibold text-cyan-600 dark:text-cyan-400">Reschedule</span>
+              <span className="text-xs text-muted-foreground leading-relaxed">Pick a new date, slot, doctor, or treatment service.</span>
+            </div>
           </button>
         </div>
       </div>
+    );
+  }
 
-      <InfoBox variant={resolutionWarning.variant} title={resolutionWarning.title}>
-        {resolutionWarning.text}
-      </InfoBox>
-
-      {/* Notification Channel Block - visible on Checkout and Keep No-Show */}
-      {(resolution === 'COMPLETED' || resolution === 'CONFIRMED_NO_SHOW') && (
-        <div className="flex flex-col gap-1.5">
-          <ChannelPickerInline
-            channel={channel}
-            draftChannel={draftChannel}
-            isEditing={isEditingChannel}
-            isSaving={isSavingChannel}
-            onEdit={() => onEditingChannelChange(true)}
-            onCancel={onCancelChannelEdit}
-            onDraftChange={onDraftChannelChange}
-            onSave={onSaveChannel}
-          />
-          {isEditingChannel && (
-            <p className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center">
-              Please finish editing or save notification channel before submitting resolution.
-            </p>
-          )}
-        </div>
-      )}
-      {resolution === 'RESCHEDULE' ? (
+  if (resolveMode === 'RESCHEDULE') {
+    return (
+      <div className="[&_form]:!border-t-0 [&_form]:!pt-0">
         <AppointmentRescheduleForm
           appointment={appointment}
           services={view.servicesList || []}
@@ -1213,58 +1132,117 @@ function ResolveContent({ view, onClose, channel, draftChannel, isEditingChannel
           activeDoctorId={appointment.doctorId}
           startTime={view.rescheduleTime || ''}
           endTime={view.rescheduleEndTime || ''}
-          justification={reason}
-          confirmationChannel={appointment.confirmationChannel || (appointment as any).confirmation_channel || 'EMAIL'}
+          justification={view.rescheduleJustification || ''}
+          confirmationChannel={channel}
           onConfirmationChannelChange={(nextChannel) => {
-            appointment.confirmationChannel = nextChannel;
-            (appointment as any).confirmation_channel = nextChannel;
+            onDraftChannelChange(nextChannel);
           }}
+          onEditingChannelChange={onEditingChannelChange}
           isSubmitting={view.isPending}
           noFooter
-          noForm
           onServiceSelect={() => {}}
-          onDoctorSelect={(doctorId) => view.setRescheduleDoctor(doctorId)}
-          onDateSelect={(date) => view.setRescheduleDate(date)}
-          onStartTimeChange={(time) => view.setRescheduleTime(time)}
-          onEndTimeChange={(time) => view.setRescheduleEndTime?.(time)}
-          onJustificationChange={(nextReason) => setReason(nextReason)}
-          onSubmit={handleSubmit}
-          onBack={onClose}
+          onDoctorSelect={(docId) => view.setRescheduleDoctor(docId)}
+          onDateSelect={(d) => view.setRescheduleDate(d)}
+          onStartTimeChange={(t) => view.setRescheduleTime(t)}
+          onEndTimeChange={(t) => view.setRescheduleEndTime?.(t)}
+          onJustificationChange={(j) => view.setRescheduleJustification(j)}
+          onSubmit={onSubmit}
+          onBack={() => setResolveMode(null)}
         />
-      ) : (
-        <div className="flex flex-col gap-1.5">
-            <div className="flex flex-col gap-0.5">
-              <span className="text-sm font-medium text-foreground">Reason for Resolution <span className="text-destructive">*</span></span>
-              <span className="text-xs text-muted-foreground">Add a reason for resolving this no-show before confirming.</span>
-            </div>
-            <div className="relative flex items-center">
-              <select
-                value={reasonMode}
-                onChange={(e) => handleReasonSelect(e.target.value)}
-                className="w-full px-4 pr-10 py-2.5 appearance-none rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
-                required
-              >
-                <option value="" disabled>Select a Reason</option>
-                {reasonOptions.map((option) => (
-                  <option key={option} value={option}>
-                    {option === 'CUSTOM' ? 'Other / Custom Reason...' : option}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
-            </div>
-            {reasonMode === 'CUSTOM' && (
-              <Textarea
-                placeholder="Enter resolution reason..."
-                value={customReason}
-                onChange={(event) => handleCustomReasonChange(event.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border min-h-[60px] resize-none"
-                required
-              />
-            )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      {resolveMode === 'CHECKED_IN' && (
+        <div className="p-3 border bg-blue-500/5 border-blue-500/20 rounded-2xl">
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-blue-500">Late Check-In Notice</span>
+          <div className="text-[11px] text-muted-foreground mt-1 leading-relaxed">
+            Clicking <strong>Confirm</strong> will mark this patient as <strong>Checked In</strong> so staff and doctors know they are currently in the clinic.
+          </div>
         </div>
       )}
-    </form>
+
+      {resolveMode === 'COMPLETED' && (
+        <>
+          <div className="p-3 border bg-amber-500/5 border-amber-500/20 rounded-2xl">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-amber-500">Completion Notice</span>
+            <div className="text-[11px] text-muted-foreground mt-1 leading-relaxed">
+              This will complete the visit and send the selected post-care message.
+            </div>
+          </div>
+          <ChannelPickerInline
+            channel={channel}
+            draftChannel={draftChannel}
+            isEditing={isEditingChannel}
+            isSaving={isSavingChannel}
+            onEdit={() => onEditingChannelChange(true)}
+            onCancel={onCancelChannelEdit}
+            onDraftChange={onDraftChannelChange}
+            onSave={onSaveChannel}
+          />
+        </>
+      )}
+
+      {resolveMode === 'CONFIRMED_NO_SHOW' && (
+        <>
+          <div className="p-3 border bg-red-500/5 border-red-500/20 rounded-2xl">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-red-500">No-Show Notice</span>
+            <div className="text-[11px] text-muted-foreground mt-1 leading-relaxed">
+              Clicking <strong>Confirm</strong> will keep this appointment marked as <strong>Confirmed No-Show</strong> in system audit logs and send the missed-appointment notification via the selected channel.
+            </div>
+          </div>
+          <ChannelPickerInline
+            channel={channel}
+            draftChannel={draftChannel}
+            isEditing={isEditingChannel}
+            isSaving={isSavingChannel}
+            onEdit={() => onEditingChannelChange(true)}
+            onCancel={onCancelChannelEdit}
+            onDraftChange={onDraftChannelChange}
+            onSave={onSaveChannel}
+          />
+        </>
+      )}
+
+      <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-0.5">
+          <span className="text-sm font-medium text-foreground">Reason for Resolution <span className="text-destructive">*</span></span>
+          <span className="text-xs text-muted-foreground">Add a reason for resolving this no-show before confirming.</span>
+        </div>
+        <select
+          value={selectedPreset}
+          onChange={(e) => {
+            const v = e.target.value;
+            if (v === '__custom__') {
+              setShowCustomReason(true);
+              setResolveReason('');
+            } else {
+              setShowCustomReason(false);
+              setSelectedPreset(v);
+              setResolveReason(v);
+            }
+          }}
+          className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
+        >
+          <option value="" disabled>Select a Reason</option>
+          {resolveReasonOptions[resolveMode]?.map((opt) => (
+            <option key={opt} value={opt}>{opt}</option>
+          ))}
+          <option value="__custom__">Custom</option>
+        </select>
+        {showCustomReason && (
+          <textarea
+            value={resolveReason}
+            onChange={(e) => setResolveReason(e.target.value)}
+            rows={2}
+            placeholder="Type custom reason..."
+            className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border resize-none"
+          />
+        )}
+      </div>
+    </div>
   );
 }
 

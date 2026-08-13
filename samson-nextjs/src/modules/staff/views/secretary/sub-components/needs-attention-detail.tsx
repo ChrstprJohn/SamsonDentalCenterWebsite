@@ -138,7 +138,7 @@ export function NeedsAttentionDetail({ appointment, view, onBack, className }: {
     if (!computedEndTime || (view.rescheduleTime && computedEndTime <= view.rescheduleTime)) {
       computedEndTime = calculateEndTime(view.rescheduleTime, duration);
     }
-    const ok = await view.handleResolveNoShowSubmit({
+    await view.handleResolveNoShowSubmit({
       appointmentId: appointment.id,
       resolution: 'RESCHEDULE',
       reason: view.rescheduleJustification || 'Rescheduled from past no-show follow-up',
@@ -147,9 +147,7 @@ export function NeedsAttentionDetail({ appointment, view, onBack, className }: {
       newEndTime: computedEndTime ? fmt(view.rescheduleDate || appointment.date, computedEndTime) : undefined,
       newDoctorId: view.rescheduleDoctor || appointment.doctorId || undefined,
     });
-    if (ok !== false) {
-      resetResolveState();
-    }
+    resetResolveState();
   };
 
   const displayName = patientName(appointment);
@@ -178,8 +176,8 @@ export function NeedsAttentionDetail({ appointment, view, onBack, className }: {
           : resolveMode === 'RESCHEDULE'
             ? 'Update date, time, dentist, or service details.'
             : isMissedCheckout
-              ? 'Select an action to resolve this missed checkout.'
-              : 'Select an action to resolve this no-show appointment.'
+              ? 'Choose action to resolve missed checkout.'
+              : 'Choose action to resolve missed visit.'
       : `Ref #${appointment.id.slice(0, 8)}`;
   const statusStr = isMissedCheckout ? 'CHECKED IN' : 'NO SHOW';
   const statusColor = isMissedCheckout ? 'text-cyan-600 bg-cyan-500/10' : 'text-amber-600 bg-amber-500/10';
@@ -247,13 +245,8 @@ export function NeedsAttentionDetail({ appointment, view, onBack, className }: {
         ) : showResolveForm ? (
           <div className="px-4 py-4 space-y-4">
             {!resolveMode ? (
-              <>
-                <div className="flex flex-col gap-0.5">
-                  <span className="text-sm font-semibold text-foreground">Select Resolution Action <span className="text-destructive">*</span></span>
-                  <span className="text-xs text-muted-foreground">{isMissedCheckout ? 'Choose an action to resolve this missed checkout.' : 'Choose an action to resolve this no-show appointment.'}</span>
-                </div>
-                <div className="flex flex-col gap-3 pt-1">
-                  {!isMissedCheckout && (
+              <div className="flex flex-col gap-3">
+                {!isMissedCheckout && (
                     <button
                       type="button"
                       onClick={() => { setResolveMode('CONFIRMED_NO_SHOW'); setSelectedPreset(''); setResolveReason(''); setShowCustomReason(false); }}
@@ -309,7 +302,6 @@ export function NeedsAttentionDetail({ appointment, view, onBack, className }: {
                     </button>
                   )}
                 </div>
-              </>
             ) : (
               <div className="space-y-4">
                 {(resolveMode === 'COMPLETED' || resolveMode === 'CONFIRMED_NO_SHOW') && (
