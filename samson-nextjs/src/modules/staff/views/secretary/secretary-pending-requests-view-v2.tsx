@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import { NativeTimePopoverPicker } from '@/shared/components/native-time-popover-picker';
 import { getDailyScheduleBounds, formatTimeRange } from '@/shared/utils/schedule-bounds.util';
 import { useSecretaryInquiriesQueue } from '../../hooks/secretary/use-secretary-inquiries-queue';
@@ -103,6 +104,8 @@ const DROP_REASONS = [
 ];
 
 export function SecretaryPendingRequestsViewV2({ deepLinkId }: { deepLinkId?: string | null }) {
+  const router = useRouter();
+  const pathname = usePathname();
   const inquiriesView = useSecretaryInquiriesQueue();
   const [detailTab, setDetailTab] = React.useState<'overview' | 'notifications' | 'timeline'>('overview');
   const [mobileView, setMobileView] = React.useState<'list' | 'detail' | 'quickLogs'>('list');
@@ -932,6 +935,25 @@ export function SecretaryPendingRequestsViewV2({ deepLinkId }: { deepLinkId?: st
                           Reject/Drop
                         </Button>
                       </div>
+                    </div>
+                  </div>
+                )}
+
+                {inquiriesView.selectedInquiry?.status === 'CONVERTED' && (
+                  <div className="border-t border-card-border/40 px-5 py-4 shrink-0 bg-card">
+                    <div className="flex gap-3">
+                      <Button
+                        variant="default"
+                        size="default"
+                        className="flex-1 py-3 text-sm font-semibold shadow-sm !from-slate-900 !to-slate-900 !text-white hover:!from-slate-800 hover:!to-slate-800 disabled:opacity-50"
+                        onClick={() => {
+                          const targetPath = pathname.replace(/\/pending$/, '/appointments');
+                          router.push(`${targetPath}?appointmentId=${inquiriesView.selectedInquiry?.linkedAppointmentId}`);
+                        }}
+                        disabled={!inquiriesView.selectedInquiry?.linkedAppointmentId}
+                      >
+                        View in Appointments Directory
+                      </Button>
                     </div>
                   </div>
                 )}

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Calendar, User, Bell, History, CalendarDays } from 'lucide-react';
 import type { AppointmentDto } from '@/modules/appointments/dtos/shared/appointment.dto';
@@ -66,6 +66,8 @@ function getSlotEnd(appointment: AppointmentDto): Date | null {
 
 function AppointmentDetails({ appointment, view, activeTab, compact, hideActions, onAppointmentUpdated, onEditingGuestInfoChange }: { appointment: AppointmentDto; view: any; activeTab: AppointmentDirectoryTab; compact?: boolean; hideActions?: boolean; onAppointmentUpdated?: () => void; onEditingGuestInfoChange?: (isEditing: boolean) => void }) {
   const router = useRouter();
+  const pathname = usePathname();
+  const prefix = pathname.startsWith('/secretary-v2') ? '/secretary-v2' : '/secretary';
   const [detailTab, setDetailTab] = useState<'overview' | 'notifications' | 'timeline'>('overview');
   const [isEditingChannel, setIsEditingChannel] = useState(false);
 
@@ -89,7 +91,7 @@ function AppointmentDetails({ appointment, view, activeTab, compact, hideActions
   const isNoShowCandidate = appointment.status === 'NO_SHOW' || (appointment.status === 'APPROVED' && isPastEnd);
   const isResolvedNoShow = appointment.status === 'NO_SHOW' && !!appointment.noShowResolvedAt;
   // ponytail: past-day resolve lands on v2 directory (v1 lacks SidebarProvider and crashes), Unresolved tab preselected
-  const resolveTarget = appointment.date === todayStr ? '/secretary-v2/check-in' : '/secretary-v2/appointments?tab=needs-attention';
+  const resolveTarget = appointment.date === todayStr ? `${prefix}/check-in` : `${prefix}/appointments?tab=needs-attention&appointmentId=${appointment.id}`;
 
   const TABS = [
     { key: 'overview' as const, label: 'Overview' },
@@ -292,7 +294,7 @@ function AppointmentDetails({ appointment, view, activeTab, compact, hideActions
                         </Button>
                       )}
                       {isCheckedIn && !isPastEnd && (
-                        <Button className="flex-1 h-[42px] bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => router.push('/secretary-v2/check-in')}>
+                        <Button className="flex-1 h-[42px] bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => router.push(`${prefix}/check-in`)}>
                           Open Check-In &amp; Out
                         </Button>
                       )}
@@ -432,7 +434,7 @@ function AppointmentDetails({ appointment, view, activeTab, compact, hideActions
                   </Button>
                 )}
                 {isCheckedIn && !isPastEnd && (
-                  <Button className="flex-1 h-[42px] bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => router.push('/secretary-v2/check-in')}>
+                  <Button className="flex-1 h-[42px] bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => router.push(`${prefix}/check-in`)}>
                     Open Check-In &amp; Out
                   </Button>
                 )}
