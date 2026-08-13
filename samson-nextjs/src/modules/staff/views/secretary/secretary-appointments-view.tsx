@@ -29,15 +29,28 @@ export function SecretaryAppointmentsView() {
   const [draftSource, setDraftSource] = useState('');
   const filterBoxRef = useRef<HTMLDivElement>(null);
 
-  // Deep link: /secretary-v2/appointments?appointmentId=... auto-opens that appointment on its tab.
-  // Resolve the linked appointment's tab first, then load that tab's list before
-  // opening the detail pane. This prevents the default Active list from racing it.
+  // Deep link: /secretary-v2/appointments?appointmentId=... auto-opens that appointment on its tab
+  // (delivery log + notification links; `id` accepted for legacy cancel links). Also applies optional
+  // ?status=CANCELLED (History tab) and ?date=/?doctorId= list filters. Resolve the linked
+  // appointment's tab first, then load that tab's list before opening the detail pane.
+  // This prevents the default Active list from racing it.
   const deepLinkHandledRef = useRef(false);
   useEffect(() => {
     if (deepLinkHandledRef.current) return;
-    const id = new URLSearchParams(window.location.search).get('appointmentId');
-    if (!id) return;
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('appointmentId') ?? params.get('id');
+    const status = params.get('status');
+    const date = params.get('date');
+    const doctorId = params.get('doctorId');
+    if (!id && !status && !date && !doctorId) return;
     deepLinkHandledRef.current = true;
+    if (date) view.setDateFilter(date);
+    if (doctorId) view.setDoctorFilter(doctorId);
+    if (status === 'CANCELLED') view.selectTab('history');
+    if (!id) {
+      window.history.replaceState({}, '', window.location.pathname);
+      return;
+    }
     setIsDeepLinking(true);
     window.history.replaceState({}, '', window.location.pathname);
     void getStaffAppointmentByIdAction(id).then((result) => {
@@ -45,6 +58,16 @@ export function SecretaryAppointmentsView() {
         setIsDeepLinking(false);
         return;
       }
+      // Land on the tab this appointment belongs to, not whatever tab is active —
+      // deep links come from the delivery log / notifications 3-dot menus.
+      const tab =
+        result.data.status === 'COMPLETED' || result.data.status === 'CANCELLED' ||
+        result.data.status === 'REJECTED' || result.data.status === 'DISPLACED'
+          ? 'history'
+          : result.data.status === 'NO_SHOW' && !result.data.noShowResolvedAt
+            ? 'needs-attention'
+            : 'upcoming';
+      view.selectTab(tab);
       view.preserveSelection();
       view.selectAppointment(id, result.data);
       setIsDeepLinkDetailReady(true);
@@ -376,7 +399,7 @@ export function SecretaryAppointmentsView() {
             {isDeepLinking ? 'Loading appointment...' : 'Loading appointments...'}
           </p>
           <p className="text-xs text-muted-foreground max-w-xs mt-1">
-            {isDeepLinking ? 'Fetching the linked appointment from the delivery log.' : 'Fetching the appointment list.'}
+            {isDeepLinking ? 'Fetching the linked appointment.' : 'Fetching the appointment list.'}
           </p>
         </div>
       ) : (

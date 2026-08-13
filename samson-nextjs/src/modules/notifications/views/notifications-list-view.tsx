@@ -71,13 +71,17 @@ export function NotificationsListView({ initialPage, initialUnreadCount }: Notif
     setError(null);
 
     let cursor: string | null = null;
+    let restoredCursor: string | null = null;
     if (mode === 'next') cursor = nextCursorRef.current;
-    if (mode === 'prev') cursor = prevCursorsRef.current[prevCursorsRef.current.length - 1] ?? null;
+    if (mode === 'prev') {
+      restoredCursor = prevCursorsRef.current.pop() ?? null;
+      cursor = prevCursorsRef.current[prevCursorsRef.current.length - 1] ?? null;
+    }
 
     try {
       const res = await getNotificationsPageAction({
         limit: PAGE_SIZE,
-        cursor,
+        cursor: cursor ?? undefined,
         status: activeTab === 'ALL' ? undefined : activeTab,
         search: searchTerm.trim() || undefined,
       });
@@ -86,10 +90,10 @@ export function NotificationsListView({ initialPage, initialUnreadCount }: Notif
 
       setNotifications(res.data.items);
       setTotal(res.data.total);
-      nextCursorRef.current = res.data.nextCursor;
+      nextCursorRef.current = mode === 'prev' ? restoredCursor : res.data.nextCursor;
       setHasMore(res.data.hasMore);
       prevCursorsRef.current =
-        mode === 'reset' ? [] : mode === 'next' ? [...prevCursorsRef.current, cursor].filter((c): c is string => Boolean(c)) : prevCursorsRef.current.slice(0, -1);
+        mode === 'reset' ? [] : mode === 'next' ? [...prevCursorsRef.current, cursor].filter((c): c is string => Boolean(c)) : prevCursorsRef.current;
       setPrevPageCount(prevCursorsRef.current.length);
     } catch (cause) {
       if (id === requestId.current) setError(cause instanceof Error ? cause.message : 'Could not load notifications.');
@@ -104,11 +108,14 @@ export function NotificationsListView({ initialPage, initialUnreadCount }: Notif
     return () => window.clearTimeout(timer);
   }, [fetchNotifications]);
 
-  const getTargetUrl = (url: string) => (
-    isV2 && url.startsWith('/secretary') && !url.startsWith('/secretary-v2')
-      ? url.replace(/^\/secretary(\/|$)/, '/secretary-v2$1')
-      : url
-  );
+  const getTargetUrl = (url: string) => {
+    if (isV2) {
+      if (url.startsWith('/secretary/emails')) return url.replace(/^\/secretary\/emails/, '/secretary-v2/delivery-logs');
+      if (url.startsWith('/secretary/inquiries')) return url.replace(/^\/secretary\/inquiries/, '/secretary-v2/pending');
+      if (url.startsWith('/secretary') && !url.startsWith('/secretary-v2')) return url.replace(/^\/secretary(\/|$)/, '/secretary-v2$1');
+    }
+    return url;
+  };
 
   const handleMarkRead = async (id: string) => {
     const notification = notifications.find((item) => item.id === id);
@@ -261,7 +268,7 @@ export function NotificationsListView({ initialPage, initialUnreadCount }: Notif
             {(prevPageCount > 0 || hasMore) && (
               <div className="flex items-center justify-between pt-3 pb-4 mb-2 border-t border-card-border/40 shrink-0">
                 <span className="text-sm text-muted-foreground">
-                  Page {prevPageCount + 1} of {Math.max(1, Math.ceil(total / PAGE_SIZE))} · Showing {notifications.length} of {total}
+                  Page {prevPageCount + 1} of {Math.max(1, Math.ceil((total ?? 0) / PAGE_SIZE))} · Showing {notifications.length} of {total}
                 </span>
                 <div className="flex items-center gap-1.5 ml-auto">
                   <Button

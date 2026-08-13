@@ -302,7 +302,7 @@ BEGIN
     'STANDARD',
     'New Inquiry Queue',
     CONCAT('New inquiry from ', NEW.first_name, ' ', NEW.last_name, ' regarding ', COALESCE(v_service_name, 'Dental Service'), '.'),
-    CONCAT('/secretary/inquiries?id=', NEW.id),
+    CONCAT('/secretary-v2/pending?id=', NEW.id),
     NEW.id::text
   );
   RETURN NEW;

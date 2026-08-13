@@ -13,7 +13,7 @@ export function NotificationItem({ notification, onMarkRead }: NotificationItemP
   const isV2 = pathname?.startsWith('/secretary-v2');
 
   const targetUrl = (notification.linkUrl && isV2 && notification.linkUrl.startsWith('/secretary') && !notification.linkUrl.startsWith('/secretary-v2'))
-    ? notification.linkUrl.replace(/^\/secretary(\/|$)/, '/secretary-v2$1')
+    ? notification.linkUrl.replace(/^\/secretary\/inquiries/, '/secretary-v2/pending').replace(/^\/secretary(\/|$)/, '/secretary-v2$1')
     : (notification.linkUrl || '#');
 
   const getIcon = (type: string) => {

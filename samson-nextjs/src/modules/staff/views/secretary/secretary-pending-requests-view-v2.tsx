@@ -29,6 +29,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/components/feedback/toast-container';
 import { resendInquiryNotificationAction } from '@/modules/appointments/actions/booking/resend-inquiry-notification.action';
+import { getInquiryByIdAction } from '@/modules/appointments/actions/booking/get-inquiry-by-id.action';
 import { getEmailLogsByInquiryAction } from '@/modules/emails/actions/logs/get-email-logs-by-inquiry.action';
 import type { OutboxLogResponseDto } from '@/modules/emails/dtos/logs/outbox-log-response.dto';
 import {
@@ -101,7 +102,7 @@ const DROP_REASONS = [
   'Others',
 ];
 
-export function SecretaryPendingRequestsViewV2() {
+export function SecretaryPendingRequestsViewV2({ deepLinkId }: { deepLinkId?: string | null }) {
   const inquiriesView = useSecretaryInquiriesQueue();
   const [detailTab, setDetailTab] = React.useState<'overview' | 'notifications' | 'timeline'>('overview');
   const [mobileView, setMobileView] = React.useState<'list' | 'detail' | 'quickLogs'>('list');
@@ -142,6 +143,55 @@ export function SecretaryPendingRequestsViewV2() {
       });
     }
   }, [detailTab, activeIndex, tabRefs]);
+
+  // Deep link: /secretary-v2/pending?id=... (NEW_INQUIRY notification carries the appointment_inquiries
+  // row id) — same as the appointment detail deep link from the delivery log: fetch by id, switch to
+  // the request's tab and WAIT for that tab's list to load while both sides hold a loading state,
+  // then pin the request on top of the list and open the details — not before.
+  // Keyed on the prop so it also fires when navigating to a new ?id= while already mounted.
+  const [pinnedInquiry, setPinnedInquiry] = React.useState<any>(null);
+  const [isDeepLinking, setIsDeepLinking] = React.useState(false);
+  const [isDeepLinkDetailReady, setIsDeepLinkDetailReady] = React.useState(false);
+  React.useEffect(() => {
+    if (!deepLinkId) return;
+    let cancelled = false;
+    window.history.replaceState({}, '', window.location.pathname);
+    void (async () => {
+      setIsDeepLinking(true);
+      const result = await getInquiryByIdAction(deepLinkId);
+      if (cancelled || !result.success || !result.data) {
+        if (!cancelled) setIsDeepLinking(false);
+        return;
+      }
+      setPinnedInquiry(result.data);
+      // Land on the tab the inquiry actually belongs to (NEW/CONVERTED/DROPPED),
+      // like the appointment deep link switches to the matching directory tab.
+      const statusTab = result.data.status as 'NEW' | 'CONVERTED' | 'DROPPED';
+      if (statusTab !== inquiriesView.activeTab) {
+        inquiriesView.setActiveTab(statusTab);
+      }
+      // Always wait for the deep-linked tab's list — same-tab case (NEW → NEW) included —
+      // so list and details reveal together instead of the detail winning the race.
+      await inquiriesView.loadInquiries();
+      inquiriesView.selectInquiry(result.data);
+      setIsEditingPatient(false);
+      setIsEditingSchedule(false);
+      setAssignedDoctorName('');
+      if (!cancelled) setIsDeepLinkDetailReady(true);
+    })();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deepLinkId]);
+
+  // Hold the whole view in its loading state until the deep-linked tab's list has
+  // actually finished loading (the awaited list fetch can be superseded by the
+  // queue's debounced fetch) — then reveal list and details together.
+  React.useEffect(() => {
+    if (isDeepLinking && !inquiriesView.isLoadingInquiries && isDeepLinkDetailReady) {
+      setIsDeepLinking(false);
+      setMobileView('detail');
+    }
+  }, [isDeepLinking, inquiriesView.isLoadingInquiries, isDeepLinkDetailReady]);
 
   const fetchInquiryLogs = React.useCallback(async (inquiryId: string, showLoading = true) => {
     if (showLoading) setLoadingInquiryLogs(true);
@@ -302,10 +352,12 @@ export function SecretaryPendingRequestsViewV2() {
           tabCounts={inquiriesView.tabCounts}
           onRefresh={() => void inquiriesView.loadInquiries({ force: true })}
           lastRefreshedAt={inquiriesView.lastRefreshedAt}
+          pinnedInquiry={pinnedInquiry}
+          isDeepLinking={isDeepLinking}
         />
       </div>
 
-      {hasSelection ? (
+      {!isDeepLinking && hasSelection ? (
         <>
       <div className={`flex-1 flex-col min-w-0 border-r border-card-border/40 ${colMobile('detail')} xl:flex`}>
 
@@ -1131,6 +1183,14 @@ export function SecretaryPendingRequestsViewV2() {
           </div>
         )}
       </>
+    ) : isDeepLinking ? (
+      <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground bg-muted/10 max-lg:hidden p-6 text-center">
+        <div className="size-14 rounded-full bg-muted/30 flex items-center justify-center mb-3">
+          <RotateCw className="size-6 text-muted-foreground/50 animate-spin" />
+        </div>
+        <p className="text-sm font-medium text-foreground">Loading request...</p>
+        <p className="text-xs text-muted-foreground max-w-xs mt-1">Fetching the linked request and its list.</p>
+      </div>
     ) : (
       <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground bg-muted/10 max-lg:hidden p-6 text-center">
         <div className="size-14 rounded-full bg-muted/30 flex items-center justify-center mb-3">

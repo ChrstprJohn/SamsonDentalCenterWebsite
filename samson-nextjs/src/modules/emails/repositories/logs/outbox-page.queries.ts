@@ -65,9 +65,11 @@ function applyFilters(query: any, params: GetOutboxLogsPageDto) {
     const pattern = `%${escapeIlike(params.search)}%`;
     filtered = filtered.or(`event_type.ilike.${pattern},payload->>email.ilike.${pattern},payload->>guestEmail.ilike.${pattern},payload->>phone.ilike.${pattern},payload->>mobileNumber.ilike.${pattern},payload->>recipientPhone.ilike.${pattern},payload->>phoneNumber.ilike.${pattern},payload->>guestPhone.ilike.${pattern}`);
   }
-  // Filter on send time (processed_at), not queue time (created_at).
-  if (params.dateFrom) filtered = filtered.gte('processed_at', params.dateFrom);
-  if (params.dateTo) filtered = filtered.lte('processed_at', params.dateTo);
+  // Filter on send time (processed_at), falling back to queue time (created_at):
+  // FAILED/PENDING rows never get processed_at (NULL), so a processed_at-only
+  // filter would drop them from every date-filtered view.
+  if (params.dateFrom) filtered = filtered.or(`processed_at.gte.${params.dateFrom},created_at.gte.${params.dateFrom}`);
+  if (params.dateTo) filtered = filtered.or(`processed_at.lte.${params.dateTo},created_at.lte.${params.dateTo}`);
   return filtered;
 }
 

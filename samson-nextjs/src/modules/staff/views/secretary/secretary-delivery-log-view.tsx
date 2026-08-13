@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Mail, MessageSquare, Search, ChevronLeft, ChevronRight, ChevronDown, RotateCw, Inbox, MoreHorizontal, AlertCircle, X, Info } from 'lucide-react';
 import { getOutboxLogsPageAction } from '@/modules/emails/actions/logs/get-outbox-logs-page.action';
+import { getOutboxLogByIdAction } from '@/modules/emails/actions/logs/get-outbox-log-by-id.action';
 import { resendEmailAction } from '@/modules/emails/actions/logs/resend-email.action';
 import { useToast } from '@/components/feedback/toast-container';
 import { formatTimeAgo } from '@/shared/utils/date.util';
@@ -97,6 +98,99 @@ function toEntry(log: OutboxLogResponseDto): DeliveryEntry {
     appointmentId: rawAppointmentId && !log.eventType.includes('INQUIRY') ? rawAppointmentId : null,
     timestamp: log.processedAt ?? log.createdAt,
   };
+}
+
+function DeliveryLogRow({
+  entry,
+  isPinned,
+  resendingId,
+  onResend,
+  onViewError,
+}: {
+  entry: DeliveryEntry;
+  isPinned?: boolean;
+  resendingId: string | null;
+  onResend: (id: string) => void;
+  onViewError: (entry: DeliveryEntry) => void;
+}) {
+  const router = useRouter();
+  return (
+    <tr
+      className={`border-b border-card-border/40 last:border-b-0 transition-colors ${
+        isPinned ? 'bg-primary/5 hover:bg-primary/10' : 'hover:bg-muted/20'
+      }`}
+    >
+      <td className="py-2.5 pr-3 text-sm font-medium text-foreground max-w-[130px] truncate" title={entry.type}>
+        <span className="truncate block">{entry.type}</span>
+      </td>
+      <td className="py-2.5 pr-3 text-sm text-muted-foreground max-w-[160px] truncate" title={entry.recipient}>
+        <span className="truncate block">{entry.recipient}</span>
+      </td>
+      <td className="py-2.5 pr-3 whitespace-nowrap">
+        <span className={`inline-flex items-center text-[10px] font-semibold px-2 py-0.5 rounded-full ${badgeClassFor(entry.status)}`}>
+          {entry.status}
+        </span>
+      </td>
+      <td className="py-2.5 pr-3 whitespace-nowrap text-sm text-muted-foreground font-mono">
+        {entry.retryCount} / 3
+      </td>
+      <td className="py-2.5 pl-2 text-right text-sm text-muted-foreground font-mono whitespace-nowrap">
+        {formatTimeAgo(entry.timestamp)}
+      </td>
+      <td className="py-2.5 pl-2 text-right whitespace-nowrap">
+        {entry.status === 'SENT' ? (
+          // Already delivered — no resend; avoids duplicate outbox rows.
+          <span className="inline-block w-7" />
+        ) : (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                disabled={resendingId !== null}
+                className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
+                title="Actions"
+              >
+                {resendingId === entry.id ? (
+                  <RotateCw className="size-3.5 animate-spin" />
+                ) : (
+                  <MoreHorizontal className="size-4" />
+                )}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem
+                disabled={entry.status === 'PROCESSING'}
+                onClick={() => void onResend(entry.id)}
+                className="text-sm flex items-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <RotateCw className="size-3.5 text-muted-foreground" />
+                {entry.channel === 'SMS' ? 'Retry via SMS' : 'Retry via Email'}
+              </DropdownMenuItem>
+              {entry.errorLogs && (
+                <DropdownMenuItem
+                  onClick={() => onViewError(entry)}
+                  className="text-sm flex items-center gap-2 cursor-pointer"
+                >
+                  <AlertCircle className="size-3.5 text-muted-foreground" />
+                  View Error Log
+                </DropdownMenuItem>
+              )}
+              {entry.appointmentId && (
+                <DropdownMenuItem
+                  onClick={() => router.push(`/secretary-v2/appointments?appointmentId=${entry.appointmentId}`)}
+                  className="text-sm flex items-center gap-2 cursor-pointer"
+                >
+                  <Info className="size-3.5 text-muted-foreground" />
+                  Appointment Detail
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+      </td>
+    </tr>
+  );
 }
 
 // ---- Date range filtering ----
@@ -190,7 +284,6 @@ const STATUS_OPTIONS = [
 ];
 
 export function SecretaryDeliveryLogView() {
-  const router = useRouter();
   const { addToast } = useToast();
   const [entries, setEntries] = useState<DeliveryEntry[]>([]);
   const [total, setTotal] = useState(0);
@@ -205,10 +298,48 @@ export function SecretaryDeliveryLogView() {
   const [viewingError, setViewingError] = useState<DeliveryEntry | null>(null);
   const [hasMore, setHasMore] = useState(false);
   const [prevPageCount, setPrevPageCount] = useState(0);
+  const [pinnedEntry, setPinnedEntry] = useState<DeliveryEntry | null>(null);
 
   const nextCursorRef = useRef<string | null>(null);
   const prevCursorsRef = useRef<string[]>([]);
   const requestId = useRef(0);
+  const deepLinkHandledRef = useRef(false);
+
+  useEffect(() => {
+    if (deepLinkHandledRef.current) return;
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+    const status = params.get('status');
+    if (!id && !status) return;
+    deepLinkHandledRef.current = true;
+    // FAILED_EMAIL_ALERT links carry ?status=Failed — apply it so the status
+    // filter matches the pinned entry instead of staying "All statuses".
+    if (status && STATUS_OPTIONS.some((opt) => opt.value === status.toUpperCase())) {
+      setStatusFilter(status.toUpperCase());
+    }
+    if (!id) return;
+    void (async () => {
+      const res = await getOutboxLogByIdAction(id);
+      if (!res.success || !res.data) return;
+      const entry = toEntry(res.data);
+      setPinnedEntry(entry);
+      if (entry.channel === 'SMS') setChannel('SMS');
+      // Narrow the date filter to the notification's age — tightest preset whose
+      // window contains the entry's timestamp, instead of an "All time" dump.
+      const ts = new Date(entry.timestamp);
+      const preset: DatePresetKey = Number.isNaN(ts.getTime())
+        ? 'all'
+        : ts.getTime() >= startOfDay(new Date()).getTime() ? 'today'
+        : ts.getTime() >= startOfDay(new Date(Date.now() - 86400000)).getTime() ? 'yesterday'
+        : ts.getTime() >= startOfDay(new Date(Date.now() - 2 * 86400000)).getTime() ? 'last3'
+        : ts.getTime() >= startOfDay(new Date(Date.now() - 6 * 86400000)).getTime() ? 'last7'
+        : ts.getTime() >= startOfDay(new Date(Date.now() - 14 * 86400000)).getTime() ? 'last15'
+        : ts.getTime() >= startOfDay(new Date(Date.now() - 29 * 86400000)).getTime() ? 'last30'
+        : 'all';
+      setDateRange(rangeForPreset(preset));
+      window.history.replaceState(null, '', window.location.pathname);
+    })();
+  }, []);
 
   const fetchLogs = useCallback(async (mode: 'reset' | 'next' | 'prev') => {
     const id = ++requestId.current;
@@ -448,79 +579,26 @@ export function SecretaryDeliveryLogView() {
                 </tr>
               </thead>
               <tbody>
-                {entries.map((entry) => (
-                  <tr key={entry.id} className="border-b border-card-border/40 last:border-b-0 hover:bg-muted/20 transition-colors">
-                    <td className="py-2.5 pr-3 text-sm font-medium text-foreground max-w-[130px] truncate" title={entry.type}>
-                      <span className="truncate block">{entry.type}</span>
-                    </td>
-                    <td className="py-2.5 pr-3 text-sm text-muted-foreground max-w-[160px] truncate" title={entry.recipient}>
-                      <span className="truncate block">{entry.recipient}</span>
-                    </td>
-                    <td className="py-2.5 pr-3 whitespace-nowrap">
-                      <span className={`inline-flex items-center text-[10px] font-semibold px-2 py-0.5 rounded-full ${badgeClassFor(entry.status)}`}>
-                        {entry.status}
-                      </span>
-                    </td>
-                    <td className="py-2.5 pr-3 whitespace-nowrap text-sm text-muted-foreground font-mono">
-                      {entry.retryCount} / 3
-                    </td>
-                    <td className="py-2.5 pl-2 text-right text-sm text-muted-foreground font-mono whitespace-nowrap">
-                      {formatTimeAgo(entry.timestamp)}
-                    </td>
-                    <td className="py-2.5 pl-2 text-right whitespace-nowrap">
-                      {entry.status === 'SENT' ? (
-                        // Already delivered — no resend; avoids duplicate outbox rows.
-                        <span className="inline-block w-7" />
-                      ) : (
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              disabled={resendingId !== null}
-                              className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
-                              title="Actions"
-                            >
-                              {resendingId === entry.id ? (
-                                <RotateCw className="size-3.5 animate-spin" />
-                              ) : (
-                                <MoreHorizontal className="size-4" />
-                              )}
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-48">
-                            <DropdownMenuItem
-                              disabled={entry.status === 'PROCESSING'}
-                              onClick={() => void handleResend(entry.id)}
-                              className="text-sm flex items-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                              <RotateCw className="size-3.5 text-muted-foreground" />
-                              {entry.channel === 'SMS' ? 'Retry via SMS' : 'Retry via Email'}
-                            </DropdownMenuItem>
-                            {entry.errorLogs && (
-                              <DropdownMenuItem
-                                onClick={() => setViewingError(entry)}
-                                className="text-sm flex items-center gap-2 cursor-pointer"
-                              >
-                                <AlertCircle className="size-3.5 text-muted-foreground" />
-                                View Error Log
-                              </DropdownMenuItem>
-                            )}
-                            {entry.appointmentId && (
-                              <DropdownMenuItem
-                                onClick={() => router.push(`/secretary-v2/appointments?appointmentId=${entry.appointmentId}`)}
-                                className="text-sm flex items-center gap-2 cursor-pointer"
-                              >
-                                <Info className="size-3.5 text-muted-foreground" />
-                                Appointment Detail
-                              </DropdownMenuItem>
-                            )}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      )}
-                    </td>
-                  </tr>
-                ))}
+                {pinnedEntry && (
+                  <DeliveryLogRow
+                    entry={pinnedEntry}
+                    isPinned
+                    resendingId={resendingId}
+                    onResend={(entryId) => void handleResend(entryId)}
+                    onViewError={setViewingError}
+                  />
+                )}
+                {entries
+                  .filter((entry) => !pinnedEntry || entry.id !== pinnedEntry.id)
+                  .map((entry) => (
+                    <DeliveryLogRow
+                      key={entry.id}
+                      entry={entry}
+                      resendingId={resendingId}
+                      onResend={(entryId) => void handleResend(entryId)}
+                      onViewError={setViewingError}
+                    />
+                  ))}
               </tbody>
             </table>
 

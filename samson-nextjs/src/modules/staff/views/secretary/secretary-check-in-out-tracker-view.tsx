@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { AlertCircle } from 'lucide-react';
 import { useSecretaryCheckInOutTracker } from '../../hooks/secretary/use-secretary-check-in-out-tracker';
@@ -46,6 +46,24 @@ export function SecretaryCheckInOutTrackerView() {
       completed: cols.completed.filter(match),
     };
   }, [view.columns, searchTerm, filterDoctorId]);
+
+  // Deep link: /secretary-v2/check-in?openCheckout=... (treatment rendered notification) opens the
+  // checkout pane for that appointment once today's board loads.
+  // ponytail: only matches appointments on today's board; otherwise the board just shows.
+  const deepLinkCheckoutRef = useRef(false);
+  useEffect(() => {
+    if (deepLinkCheckoutRef.current || view.isLoading) return;
+    const id = new URLSearchParams(window.location.search).get('openCheckout');
+    if (!id) return;
+    deepLinkCheckoutRef.current = true;
+    window.history.replaceState({}, '', window.location.pathname);
+    const appointment = view.appointments.find((item) => item.id === id);
+    if (appointment) {
+      view.openCheckout(appointment);
+      setMobileView('detail');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [view.isLoading, view.appointments]);
 
   if (view.isLoading) return <CheckInLoading />;
 

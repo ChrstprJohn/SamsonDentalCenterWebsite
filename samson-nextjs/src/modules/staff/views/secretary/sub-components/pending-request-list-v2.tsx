@@ -36,10 +36,15 @@ interface PendingRequestListV2Props {
   activeTab: InquiryTab;
   setActiveTab: (tab: InquiryTab) => void;
   tabCounts: Record<InquiryTab, number>;
+  /** Deep-linked inquiry fetched by id — rendered at top of the list even when not on the loaded page. */
+  pinnedInquiry?: any;
+  /** True while a deep link waits for its tab's list — hold the skeleton. */
+  isDeepLinking?: boolean;
 }
 
 const TABS: { key: InquiryTab; label: string }[] = [
   { key: 'NEW', label: 'New' },
+  { key: 'CONVERTED', label: 'Converted' },
   { key: 'DROPPED', label: 'Dropped' },
 ];
 
@@ -68,6 +73,50 @@ function formatCreatedAt(iso: string): string {
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
+function InquiryRow({ inquiry, isSelected, onSelect }: { inquiry: any; isSelected: boolean; onSelect: (inq: any) => void }) {
+  const initial = inquiry.middleName ? ` ${inquiry.middleName.charAt(0).toUpperCase()}.` : '';
+  const name = `${inquiry.firstName || ''}${initial} ${inquiry.lastName || ''}`.trim() + (inquiry.suffix ? `, ${inquiry.suffix}` : '') || 'Guest';
+  const status = (inquiry.status as InquiryTab) || 'NEW';
+
+  const timeDisplay = inquiry.preferredStartTime
+    ? formatTimeString(inquiry.preferredStartTime)
+    : 'Time Pending';
+
+  const dateDisplay = inquiry.preferredDate
+    ? (isNaN(Date.parse(inquiry.preferredDate)) ? inquiry.preferredDate : formatShortDate(inquiry.preferredDate))
+    : 'Date Pending';
+
+  return (
+    <button
+      onClick={() => onSelect(inquiry)}
+      className={`flex flex-col items-start w-full gap-2 border-b p-4 text-sm leading-tight text-left transition-colors last:border-b-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${
+        isSelected
+          ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+          : 'text-foreground'
+      }`}
+    >
+      <div className="flex w-full items-center gap-2">
+        <span className="min-w-0 truncate">{name}</span>
+        <span title={inquiry.source === 'STAFF_CREATED' ? 'Created manually by staff' : 'Booked online'} className="shrink-0 text-muted-foreground/70">
+          {inquiry.source === 'STAFF_CREATED' ? <GlobeOff className="size-3.5" /> : <Globe className="size-3.5" />}
+        </span>
+        <span className={`ml-auto text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded shrink-0 ${BADGE_STYLES[status]}`}>
+          {BADGE_LABELS[status]}
+        </span>
+      </div>
+      <span className="font-medium truncate">
+        {inquiry.preferredServiceName || 'Treatment'}
+      </span>
+      <div className="w-full flex items-center justify-between gap-2 text-xs">
+        <span className="truncate">{dateDisplay} • {timeDisplay}</span>
+        <span className="text-[10px] text-muted-foreground shrink-0" title={inquiry.createdAt ? `Submitted on ${new Date(inquiry.createdAt).toLocaleString('en-US')}` : ''}>
+          {inquiry.createdAt ? `Submitted ${formatTimeAgo(inquiry.createdAt)}` : ''}
+        </span>
+      </div>
+    </button>
+  );
+}
+
 export function PendingRequestListV2(props: PendingRequestListV2Props) {
   const [showFilters, setShowFilters] = React.useState(false);
   const [draftSort, setDraftSort] = React.useState<'newest' | 'oldest'>('newest');
@@ -89,7 +138,7 @@ export function PendingRequestListV2(props: PendingRequestListV2Props) {
       });
   }, [props.inquiries, sortOrder, dateFilter]);
 
-  const isLoading = props.isLoadingInquiries && props.inquiries.length === 0;
+  const isLoading = (props.isLoadingInquiries && props.inquiries.length === 0) || props.isDeepLinking;
 
   return (
     <Sidebar
@@ -193,11 +242,11 @@ export function PendingRequestListV2(props: PendingRequestListV2Props) {
           const activeIndex = TABS.findIndex((t) => t.key === props.activeTab);
           const safeIndex = activeIndex < 0 ? 0 : activeIndex;
           return (
-            <div className="relative grid grid-cols-2 gap-1 bg-muted/20 p-1 rounded-xl">
+            <div className="relative grid grid-cols-3 gap-1 bg-muted/20 p-1 rounded-xl">
               <div
                 className="absolute top-1 bottom-1 rounded-lg bg-primary transition-transform duration-200 ease-out shadow-xs"
                 style={{
-                  width: 'calc((100% - 0.5rem) / 2)',
+                  width: 'calc((100% - 0.5rem) / 3)',
                   transform: `translateX(calc(${safeIndex} * (100% + 0.25rem)))`,
                 }}
               />
@@ -233,7 +282,7 @@ export function PendingRequestListV2(props: PendingRequestListV2Props) {
           );
         })()}
       </SidebarHeader>
-      {props.isRefreshingInquiries && <SecretaryRefreshBar />}
+      {props.isRefreshingInquiries && !props.isDeepLinking && <SecretaryRefreshBar />}
       <SidebarContent 
         data-lenis-prevent 
         style={{ scrollbarWidth: 'thin' }}
@@ -311,7 +360,16 @@ export function PendingRequestListV2(props: PendingRequestListV2Props) {
                     </div>
                   </div>
                 )}
-                {filteredInquiries.map((inq) => {
+                {props.pinnedInquiry && (
+                  <InquiryRow
+                    inquiry={props.pinnedInquiry}
+                    isSelected={props.selectedInquiryId === props.pinnedInquiry.id}
+                    onSelect={props.onSelectInquiry}
+                  />
+                )}
+                {filteredInquiries
+                  .filter((inq) => !props.pinnedInquiry || inq.id !== props.pinnedInquiry.id)
+                  .map((inq) => {
                 const isSelected = props.selectedInquiryId === inq.id;
                 const initial = inq.middleName ? ` ${inq.middleName.charAt(0).toUpperCase()}.` : '';
                 const name = `${inq.firstName || ''}${initial} ${inq.lastName || ''}`.trim() + (inq.suffix ? `, ${inq.suffix}` : '') || 'Guest';
@@ -326,34 +384,12 @@ export function PendingRequestListV2(props: PendingRequestListV2Props) {
                   : 'Date Pending';
 
                 return (
-                  <button
+                  <InquiryRow
                     key={inq.id}
-                    onClick={() => props.onSelectInquiry(inq)}
-                    className={`flex flex-col items-start w-full gap-2 border-b p-4 text-sm leading-tight text-left transition-colors last:border-b-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${
-                      isSelected
-                        ? 'bg-sidebar-accent text-sidebar-accent-foreground'
-                        : 'text-foreground'
-                    }`}
-                  >
-                    <div className="flex w-full items-center gap-2">
-                      <span className="min-w-0 truncate">{name}</span>
-                      <span title={inq.source === 'STAFF_CREATED' ? 'Created manually by staff' : 'Booked online'} className="shrink-0 text-muted-foreground/70">
-                        {inq.source === 'STAFF_CREATED' ? <GlobeOff className="size-3.5" /> : <Globe className="size-3.5" />}
-                      </span>
-                      <span className={`ml-auto text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded shrink-0 ${BADGE_STYLES[status]}`}>
-                        {BADGE_LABELS[status]}
-                      </span>
-                    </div>
-                    <span className="font-medium truncate">
-                      {inq.preferredServiceName || 'Treatment'}
-                    </span>
-                    <div className="w-full flex items-center justify-between gap-2 text-xs">
-                      <span className="truncate">{dateDisplay} • {timeDisplay}</span>
-                      <span className="text-[10px] text-muted-foreground shrink-0" title={inq.createdAt ? `Submitted on ${new Date(inq.createdAt).toLocaleString('en-US')}` : ''}>
-                        {inq.createdAt ? `Submitted ${formatTimeAgo(inq.createdAt)}` : ''}
-                      </span>
-                    </div>
-                  </button>
+                    inquiry={inq}
+                    isSelected={isSelected}
+                    onSelect={props.onSelectInquiry}
+                  />
                 );
                 })}
                 {props.loadMoreError && (

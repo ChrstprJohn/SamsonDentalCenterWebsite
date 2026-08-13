@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { createClient } from '@/shared/database/client';
 import { getChatThreadsPageAction } from '@/modules/appointments/actions/chat/get-chat-threads-page.action';
+import { getChatThreadByAppointmentIdAction } from '@/modules/appointments/actions/chat/get-chat-thread-by-appointment.action';
 import { getStaffAppointmentByIdAction } from '@/modules/appointments/actions/clinic/get-staff-appointment-by-id.action';
 import { getMessagesAction } from '@/modules/appointments/actions/chat/get-messages.action';
 import { ChatThreadDto } from '@/modules/appointments/repositories/chat/chat.queries';
@@ -201,6 +202,73 @@ interface SecretaryChatInboxViewProps {
     initialThreads: ChatThreadDto[];
     initialHasMore?: boolean;
     initialTabCounts?: { active: number; archive: number };
+    /** Inquiry/appointment id from the URL (?id=) — handled on mount AND on same-route navigation. */
+    deepLinkId?: string | null;
+}
+
+function ThreadRow({
+    thread,
+    isSelected,
+    onSelect,
+    formatPatientName,
+    formatMessageTime,
+}: {
+    thread: ChatThreadDto;
+    isSelected: boolean;
+    onSelect: (thread: ChatThreadDto) => void;
+    formatPatientName: (firstName?: string | null, middleName?: string | null, lastName?: string | null, suffix?: string | null) => string;
+    formatMessageTime: (dateStr: string) => string;
+}) {
+    const t = thread;
+    return (
+        <button
+            key={t.appointmentId}
+            onClick={() => onSelect(t)}
+            className={`flex items-start w-full gap-3 border-b p-4 text-sm leading-tight text-left transition-colors last:border-b-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${
+                isSelected
+                    ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+                    : 'text-foreground'
+            }`}
+        >
+            <div className="size-10 shrink-0 rounded-full bg-muted-foreground/10 flex items-center justify-center border-2 border-border/60 overflow-hidden">
+                <UserRound className="size-8 text-muted-foreground/70 translate-y-0.5" />
+            </div>
+            <div className="flex flex-col min-w-0 flex-1 gap-1.5">
+                <div className="flex w-full items-center justify-between gap-2">
+                    <div className="flex items-center gap-1.5 min-w-0">
+                        <span className={t.unreadCount > 0 ? 'font-semibold truncate' : 'truncate'}>
+                            {formatPatientName(t.patientFirstName, t.patientMiddleName, t.patientLastName, t.patientSuffix)}
+                        </span>
+                        <span title={t.source === 'STAFF_CREATED' ? 'Created manually by staff' : 'Booked online'} className="shrink-0 text-muted-foreground/70">
+                            {t.source === 'STAFF_CREATED' ? <GlobeOff className="size-3.5" /> : <Globe className="size-3.5" />}
+                        </span>
+                    </div>
+                    <span className="text-[10px] text-muted-foreground font-medium whitespace-nowrap shrink-0">
+                        {t.latestMessage ? formatMessageTime(t.latestMessage.createdAt) : ''}
+                    </span>
+                </div>
+                <span className="font-medium text-xs text-text-secondary truncate">
+                    {t.serviceName || 'Treatment'}
+                </span>
+                <div className="flex w-full items-end justify-between gap-4 min-w-0">
+                    {t.latestMessage ? (
+                        <span className={`truncate text-xs ${
+                            t.unreadCount > 0 ? 'font-medium text-foreground' : 'text-muted-foreground'
+                        }`}>
+                            {t.latestMessage.text}
+                        </span>
+                    ) : (
+                        <span className="text-xs text-muted-foreground italic flex-1">
+                            No messages yet
+                        </span>
+                    )}
+                    {t.unreadCount > 0 && (
+                        <span className="min-w-5 h-5 bg-primary rounded-full shrink-0 flex items-center justify-center text-[10px] font-bold text-primary-foreground mt-0.5 ml-auto px-1">{t.unreadCount > 99 ? '99+' : t.unreadCount}</span>
+                    )}
+                </div>
+            </div>
+        </button>
+    );
 }
 
 function getBadgeVariant(status: string) {
@@ -211,7 +279,7 @@ function getBadgeVariant(status: string) {
   return 'default';
 }
 
-export function SecretaryChatInboxView({ initialThreads, initialHasMore = false, initialTabCounts = { active: 0, archive: 0 } }: SecretaryChatInboxViewProps) {
+export function SecretaryChatInboxView({ initialThreads, initialHasMore = false, initialTabCounts = { active: 0, archive: 0 }, deepLinkId }: SecretaryChatInboxViewProps) {
     const [threads, setThreads] = useState<ChatThreadDto[]>(initialThreads);
     const [searchQuery, setSearchQuery] = useState('');
     const [searchInput, setSearchInput] = useState('');
@@ -235,16 +303,22 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false,
     const [loadingMessages, setLoadingMessages] = useState(false);
     const [fetchingThreads, setFetchingThreads] = useState(false);
     const [isInitialLoad, setIsInitialLoad] = useState(false);
+    const [isDeepLinking, setIsDeepLinking] = useState(false);
     const [messagesLoadKey, setMessagesLoadKey] = useState(0);
     const [hasMoreThreads, setHasMoreThreads] = useState(initialHasMore);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const [loadMoreError, setLoadMoreError] = useState<string | null>(null);
     const [threadError, setThreadError] = useState<string | null>(null);
+    const [pinnedThread, setPinnedThread] = useState<ChatThreadDto | null>(null);
     const [tabCounts, setTabCounts] = useState(initialTabCounts);
     const nextThreadCursorRef = useRef<string | null>(null);
     const loadingMoreThreadsRef = useRef(false);
     const threadRequestId = useRef(0);
     const skipInitialFetch = useRef(true);
+    // Single source of truth for the tab so deferred refreshes (realtime timers,
+    // visibility) never fetch with a stale tab closure after a deep link switches tabs.
+    const activeTabRef = useRef(activeTab);
+    activeTabRef.current = activeTab;
 
     const [doctors, setDoctors] = useState<{ id: string; firstName: string; lastName: string }[]>([]);
     const [services, setServices] = useState<ServiceResponseDto[]>([]);
@@ -316,10 +390,11 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false,
 
         const requestId = ++threadRequestId.current;
         try {
+            const tab = activeTabRef.current;
             const params = {
                 limit: 20,
                 cursor: append ? nextThreadCursorRef.current : null,
-                tab: activeTab,
+                tab,
                 search: searchQuery || undefined,
                 unreadOnly: showOnlyUnreads,
             } as const;
@@ -330,7 +405,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false,
                     getChatThreadsPageAction({
                         limit: 1,
                         cursor: null,
-                        tab: activeTab === 'ACTIVE' ? 'ARCHIVE' : 'ACTIVE',
+                        tab: tab === 'ACTIVE' ? 'ARCHIVE' : 'ACTIVE',
                         search: searchQuery || undefined,
                         unreadOnly: showOnlyUnreads,
                     }),
@@ -355,8 +430,8 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false,
             nextThreadCursorRef.current = result.data.nextCursor;
             setHasMoreThreads(result.data.hasMore);
             if (!append) {
-                const activeTotal = activeTab === 'ACTIVE' ? result.data.total ?? 0 : otherResult?.data?.total ?? 0;
-                const archiveTotal = activeTab === 'ARCHIVE' ? result.data.total ?? 0 : otherResult?.data?.total ?? 0;
+                const activeTotal = tab === 'ACTIVE' ? result.data.total ?? 0 : otherResult?.data?.total ?? 0;
+                const archiveTotal = tab === 'ARCHIVE' ? result.data.total ?? 0 : otherResult?.data?.total ?? 0;
                 setTabCounts({ active: activeTotal, archive: archiveTotal });
             }
         } catch (error) {
@@ -371,7 +446,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false,
                 loadingMoreThreadsRef.current = false;
             }
         }
-    }, [activeTab, searchQuery, showOnlyUnreads]);
+    }, [searchQuery, showOnlyUnreads]);
 
     useEffect(() => {
         if (skipInitialFetch.current) {
@@ -380,6 +455,46 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false,
         }
         void fetchThreads();
     }, [fetchThreads]);
+
+    // Deep link: /secretary-v2/chat?id=<appointmentId> — fetch the thread by id
+    // (ignores search/unread filters), land on its tab, open it, pin it to the list.
+    // Keyed on the prop so it also fires when navigating to a new ?id= while already mounted.
+    // Same timing as the appointment detail deep link: hold BOTH sides in a loading state
+    // until the deep-linked tab's real list has loaded, then reveal list + details together —
+    // the initial server list never flashes/overrides, and details never beat the list.
+    useEffect(() => {
+        if (!deepLinkId) return;
+        let cancelled = false;
+        void (async () => {
+            setIsDeepLinking(true);
+            setIsInitialLoad(true);
+            const res = await getChatThreadByAppointmentIdAction(deepLinkId);
+            if (cancelled || !res.success || !res.data?.thread) {
+                if (!cancelled) {
+                    setIsDeepLinking(false);
+                    setIsInitialLoad(false);
+                }
+                return;
+            }
+            const { thread, tab } = res.data;
+            setActiveTab(tab);
+            activeTabRef.current = tab;
+            setPinnedThread({ ...thread, unreadCount: 0 });
+            setSelectedThreadId(thread.appointmentId);
+            setSelectedThreadMessages([]);
+            setMessagesLoadKey((k) => k + 1);
+            setMobileView('chat');
+            setIsDetailPaneOpen(true);
+            await fetchThreads();
+            if (!cancelled) {
+                setIsDeepLinking(false);
+                setIsInitialLoad(false);
+            }
+            window.history.replaceState(null, '', window.location.pathname);
+        })();
+        return () => { cancelled = true; };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [deepLinkId]);
 
     const loadMoreThreads = useCallback(() => {
         void fetchThreads({ append: true });
@@ -518,13 +633,15 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false,
     const filteredThreads = useMemo(() => threads, [threads]);
 
     useEffect(() => {
+        // Keep the deep-linked thread selected even though it is not (yet) in the list.
+        if (pinnedThread && selectedThreadId === pinnedThread.appointmentId) return;
         if (selectedThreadId && !filteredThreads.some((thread) => thread.appointmentId === selectedThreadId)) {
             const timeout = window.setTimeout(() => setSelectedThreadId(null), 0);
             return () => window.clearTimeout(timeout);
         }
-    }, [filteredThreads, selectedThreadId]);
+    }, [filteredThreads, selectedThreadId, pinnedThread]);
 
-    const selectedThread = threads.find((t) => t.appointmentId === selectedThreadId);
+    const selectedThread = threads.find((t) => t.appointmentId === selectedThreadId) ?? pinnedThread;
     const hasGuestInfoChanges = isEditingGuestInfo && (
         guestInfoDraft.firstName !== (selectedThread?.patientFirstName || '') ||
         guestInfoDraft.middleName !== (selectedThread?.patientMiddleName || '') ||
@@ -977,19 +1094,17 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false,
 
                     {/* Tabs */}
                     {(() => {
-                      const activeIndex = activeTab === 'ACTIVE' ? 0 : 1;
                       const tabs = [
                         { key: 'ACTIVE' as const, label: 'Active', count: tabCounts.active },
                         { key: 'ARCHIVE' as const, label: 'Archive', count: tabCounts.archive },
                       ];
                       return (
                         <div className="relative grid grid-cols-2 gap-1 bg-muted/20 p-1 rounded-xl">
-                          <div
-                            className="absolute top-1 bottom-1 rounded-lg bg-primary transition-transform duration-200 ease-out shadow-xs"
-                            style={{
-                              width: 'calc((100% - 0.5rem) / 2)',
-                              transform: `translateX(calc(${activeIndex} * (100% + 0.25rem)))`,
-                            }}
+                          <span
+                            aria-hidden
+                            className={`absolute top-1 bottom-1 left-1 w-[calc(50%-0.25rem)] rounded-lg bg-primary shadow-sm transition-transform duration-200 ease-out ${
+                              activeTab === 'ARCHIVE' ? 'translate-x-full' : ''
+                            }`}
                           />
                           {tabs.map((tab) => {
                             const isSelected = activeTab === tab.key;
@@ -997,7 +1112,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false,
                             return (
                               <button
                                 key={tab.key}
-                                onClick={() => { setActiveTab(tab.key); setShowOnlyUnreads(false); setSelectedThreadId(null); }}
+                                onClick={() => { setActiveTab(tab.key); activeTabRef.current = tab.key; setShowOnlyUnreads(false); setSelectedThreadId(null); void fetchThreads(); }}
                                 className={`relative z-10 h-8 text-xs font-semibold rounded-lg transition-colors flex items-center justify-center gap-1.5 ${
                                   isSelected
                                     ? 'text-primary-foreground font-semibold'
@@ -1053,56 +1168,28 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false,
                                         </div>
                                     </div>
                                 )}
-                                {filteredThreads.map((t) => {
+                                {pinnedThread && (
+                                    <ThreadRow
+                                        thread={pinnedThread}
+                                        isSelected={selectedThreadId === pinnedThread.appointmentId}
+                                        onSelect={handleThreadSelect}
+                                        formatPatientName={formatPatientName}
+                                        formatMessageTime={formatMessageTime}
+                                    />
+                                )}
+                                {filteredThreads
+                                    .filter((t) => !pinnedThread || t.appointmentId !== pinnedThread.appointmentId)
+                                    .map((t) => {
                                     const isSelected = t.appointmentId === selectedThreadId;
                                     return (
-                                        <button
+                                        <ThreadRow
                                             key={t.appointmentId}
-                                            onClick={() => handleThreadSelect(t)}
-                                            className={`flex items-start w-full gap-3 border-b p-4 text-sm leading-tight text-left transition-colors last:border-b-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${
-                                                isSelected
-                                                    ? 'bg-sidebar-accent text-sidebar-accent-foreground'
-                                                    : 'text-foreground'
-                                            }`}
-                                        >
-                                            <div className="size-10 shrink-0 rounded-full bg-muted-foreground/10 flex items-center justify-center border-2 border-border/60 overflow-hidden">
-                                                <UserRound className="size-8 text-muted-foreground/70 translate-y-0.5" />
-                                            </div>
-                                            <div className="flex flex-col min-w-0 flex-1 gap-1.5">
-                                                <div className="flex w-full items-center justify-between gap-2">
-                                                    <div className="flex items-center gap-1.5 min-w-0">
-                                                        <span className={t.unreadCount > 0 ? 'font-semibold truncate' : 'truncate'}>
-                                                            {formatPatientName(t.patientFirstName, t.patientMiddleName, t.patientLastName, t.patientSuffix)}
-                                                        </span>
-                                                        <span title={t.source === 'STAFF_CREATED' ? 'Created manually by staff' : 'Booked online'} className="shrink-0 text-muted-foreground/70">
-                                                            {t.source === 'STAFF_CREATED' ? <GlobeOff className="size-3.5" /> : <Globe className="size-3.5" />}
-                                                        </span>
-                                                    </div>
-                                                    <span className="text-[10px] text-muted-foreground font-medium whitespace-nowrap shrink-0">
-                                                        {t.latestMessage ? formatMessageTime(t.latestMessage.createdAt) : ''}
-                                                    </span>
-                                                </div>
-                                                <span className="font-medium text-xs text-text-secondary truncate">
-                                                    {t.serviceName || 'Treatment'}
-                                                </span>
-                                                <div className="flex w-full items-end justify-between gap-4 min-w-0">
-                                                    {t.latestMessage ? (
-                                                        <span className={`truncate text-xs ${
-                                                            t.unreadCount > 0 ? 'font-medium text-foreground' : 'text-muted-foreground'
-                                                        }`}>
-                                                            {t.latestMessage.text}
-                                                        </span>
-                                                    ) : (
-                                                        <span className="text-xs text-muted-foreground italic flex-1">
-                                                            No messages yet
-                                                        </span>
-                                                    )}
-                                                    {t.unreadCount > 0 && (
-                                                        <span className="min-w-5 h-5 bg-primary rounded-full shrink-0 flex items-center justify-center text-[10px] font-bold text-primary-foreground mt-0.5 ml-auto px-1">{t.unreadCount > 99 ? '99+' : t.unreadCount}</span>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </button>
+                                            thread={t}
+                                            isSelected={isSelected}
+                                            onSelect={handleThreadSelect}
+                                            formatPatientName={formatPatientName}
+                                            formatMessageTime={formatMessageTime}
+                                        />
                                     );
                                 })}
                                 </>
@@ -1155,7 +1242,15 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false,
             </Sidebar>
 
             {/* Columns 2 & 3 */}
-            {selectedThreadId && selectedThread ? (
+            {isDeepLinking ? (
+                <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground bg-muted/10 p-6 text-center hidden lg:flex">
+                    <div className="size-14 rounded-full bg-muted/30 flex items-center justify-center mb-3">
+                        <MessageSquare className="size-7 text-muted-foreground/50" />
+                    </div>
+                    <p className="text-sm font-medium text-foreground">Loading conversation...</p>
+                    <p className="text-xs text-muted-foreground max-w-xs mt-1">Fetching the linked conversation and its list.</p>
+                </div>
+            ) : selectedThreadId && selectedThread ? (
                 <>
                     {/* Column 2: Dialogue Stream */}
                     <div className={`flex-1 flex-col bg-muted/20 border-r border-border relative ${colMobile('chat')} xl:flex`}>

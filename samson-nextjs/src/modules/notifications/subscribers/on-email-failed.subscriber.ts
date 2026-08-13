@@ -13,7 +13,7 @@ export const onEmailFailedSubscriber = {
       priority: 'HIGH',
       title: 'Email Delivery Failed',
       message: `Failed sending email receipt to ${recipientEmail || 'recipient'}. Error: ${error || 'Unknown error'}`,
-      linkUrl: `/secretary-v2/delivery-logs`,
+      linkUrl: `/secretary-v2/delivery-logs?id=${emailLogId}`,
       entityId: emailLogId,
     });
   },

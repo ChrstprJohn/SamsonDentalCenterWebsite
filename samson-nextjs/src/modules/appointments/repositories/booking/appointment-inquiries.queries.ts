@@ -25,3 +25,23 @@ export const getInquiriesQuery = (supabase: SupabaseClient) => {
     return (data || []).map((row) => inquiryResponseSchema.parse(row));
   };
 };
+
+/**
+ * Fetches a single appointment inquiry by id — used by the pending queue deep link
+ * (delivery-log style: fetch by id, then select, even when the row is not on the loaded page).
+ */
+export const getInquiryByIdQuery = (supabase: SupabaseClient) => {
+  return async (id: string): Promise<InquiryResponseDto | null> => {
+    const { data, error } = await supabase
+      .from('appointment_inquiries')
+      .select('*, services:preferred_service_id(name)')
+      .eq('id', id)
+      .maybeSingle();
+
+    if (error) {
+      throw new DomainError(`Failed to fetch appointment inquiry: ${error.message}`, 'DATABASE_ERROR');
+    }
+
+    return data ? inquiryResponseSchema.parse(data) : null;
+  };
+};

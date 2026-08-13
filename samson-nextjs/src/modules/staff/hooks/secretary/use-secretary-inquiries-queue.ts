@@ -77,9 +77,14 @@ export function useSecretaryInquiriesQueue() {
     [allInquiries]
   );
 
+  // Snapshot of the last explicitly selected inquiry (incl. deep-linked ones fetched by id).
+  // The loaded page list can drop the selected row (tab switch, refresh, pagination) — the
+  // detail pane keeps rendering the snapshot instead of going blank.
+  const [selectedInquirySnapshot, setSelectedInquirySnapshot] = useState<any | null>(null);
+
   const selectedInquiry = useMemo(
-    () => inquiries.find((inquiry) => inquiry.id === selectedInquiryId),
-    [inquiries, selectedInquiryId]
+    () => inquiries.find((inquiry) => inquiry.id === selectedInquiryId) ?? selectedInquirySnapshot,
+    [inquiries, selectedInquiryId, selectedInquirySnapshot]
   );
   const availableDates = stagedInquiryService ? scheduler.availableDates : [];
   // Full doctor list, no service/date filter — secretary picks any doctor (like Book Appointment).
@@ -296,6 +301,7 @@ export function useSecretaryInquiriesQueue() {
       return;
     }
     setSelectedInquiryId(inquiry.id);
+    setSelectedInquirySnapshot(inquiry);
     void loadServices();
     setStagedInquiryAction('');
     setStagedInquiryService(inquiry.preferredServiceId);
@@ -335,6 +341,9 @@ export function useSecretaryInquiriesQueue() {
   };
 
   const selectTab = (tab: InquiryTab) => {
+    // Sync the query ref synchronously so a deep link's immediate loadInquiries()
+    // fetches the newly selected tab, not the pre-render stale one.
+    queryRef.current = { ...queryRef.current, activeTab: tab };
     setActiveTab(tab);
     setSelectedInquiryId(null);
     setStagedInquiryAction('');

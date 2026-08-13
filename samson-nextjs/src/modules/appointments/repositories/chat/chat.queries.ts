@@ -191,6 +191,45 @@ export const getChatThreadsPageQuery = (supabase: SupabaseClient) => {
     };
 };
 
+export interface ChatThreadByAppointmentResult {
+    thread: ChatThreadDto | null;
+    tab: 'ACTIVE' | 'ARCHIVE';
+}
+
+/**
+ * Fetches a single chat thread by appointment id, ignoring search/unread filters —
+ * used by the chat deep link (/secretary-v2/chat?id=...) to pin the conversation to
+ * the list and land on the tab (ACTIVE/ARCHIVE) the thread actually belongs to.
+ */
+export const getChatThreadByAppointmentIdQuery = (supabase: SupabaseClient) => {
+    return async (appointmentId: string): Promise<ChatThreadByAppointmentResult> => {
+        // Try both tabs: a deep-linked thread may be archived (e.g. COMPLETED with a
+        // follow-up message) and the ACTIVE tab filter would exclude it.
+        const [activeRes, archiveRes] = await Promise.all([
+            supabase.rpc('get_secretary_chat_threads_page_staff', {
+                p_limit: 1,
+                p_tab: 'ACTIVE',
+                p_appointment_id: appointmentId,
+            }),
+            supabase.rpc('get_secretary_chat_threads_page_staff', {
+                p_limit: 1,
+                p_tab: 'ARCHIVE',
+                p_appointment_id: appointmentId,
+            }),
+        ]);
+        const tabs = [
+            { result: activeRes, tab: 'ACTIVE' as const },
+            { result: archiveRes, tab: 'ARCHIVE' as const },
+        ];
+        for (const { result, tab } of tabs) {
+            if (result.error) throw new DomainError(`Failed to fetch chat thread: ${result.error.message}`, 'DATABASE_ERROR');
+            const rows = (result.data || []) as any[];
+            if (rows.length > 0) return { thread: mapChatThreadRow(rows[0]), tab };
+        }
+        return { thread: null, tab: 'ACTIVE' };
+    };
+};
+
 export const validateChatTokenQuery = (supabase: SupabaseClient) => {
     return async (appointmentId: string, token: string): Promise<any | null> => {
         const { data, error } = await supabase
