@@ -1,17 +1,15 @@
 import React from 'react';
-import { SecretaryDashboardView } from '@/modules/staff/views/secretary-dashboard-view';
+import { SecretaryOverviewView } from '@/modules/staff/views/secretary/secretary-overview-view';
 
 export const metadata = {
-  title: 'Secretary Dashboard | Samson Dental Center',
-  description: 'Manage booking queues, batched family groups, arrivals check-in, dynamic checkout invoice receipts, and audits.',
+  title: 'Overview | Samson Dental Center',
+  description: 'Secretary command center — live stats, today\'s schedule, and quick navigation to every module.',
 };
 
 export default function SecretaryDashboardPage() {
   return (
-    <div className="flex-1 min-h-0 overflow-y-auto p-6 md:p-8">
-      <div className="max-w-7xl w-full mx-auto flex flex-col gap-8">
-        <SecretaryDashboardView basePath="/secretary-v2" />
-      </div>
+    <div className="flex flex-col h-full min-h-0 overflow-hidden">
+      <SecretaryOverviewView />
     </div>
   );
 }

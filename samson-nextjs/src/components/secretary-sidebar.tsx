@@ -39,7 +39,7 @@ const data = {
   ],
   navMain: [
     {
-      title: "Dashboard",
+      title: "Overview",
       url: "/secretary-v2",
       icon: <LayoutDashboard className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
     },
