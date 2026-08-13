@@ -115,27 +115,30 @@ export function NeedsAttentionDetail({ appointment, view, onBack, className }: {
 
   const handleResolveSubmit = async () => {
     if (draftChannel !== channel) await handleSaveChannel();
+    let ok: any = false;
     if (isMissedCheckout) {
-      view.completeMissedCheckout(appointment.id, resolveReason.trim() || 'Late checkout — past appointment follow-up');
+      ok = await view.completeMissedCheckout(appointment.id, resolveReason.trim() || 'Late checkout — past appointment follow-up');
     } else {
       if (!resolveMode || !resolveReason.trim()) return;
-      view.handleResolveNoShowSubmit({ appointmentId: appointment.id, resolution: resolveMode, reason: resolveReason.trim() });
+      ok = await view.handleResolveNoShowSubmit({ appointmentId: appointment.id, resolution: resolveMode, reason: resolveReason.trim() });
     }
-    resetResolveState();
+    if (ok !== false) {
+      resetResolveState();
+    }
   };
 
   /**
    * Behavior Note: Compute end time fallback based on appointment service duration
    * so that backend chronological validation passes when rescheduling from Needs Attention.
    */
-  const handleRescheduleSubmit = () => {
+  const handleRescheduleSubmit = async () => {
     const fmt = (ds: string, ts: string) => `${ds}T${ts.length === 5 ? ts + ':00' : ts}Z`;
     const duration = appointment.service?.durationMinutes || 30;
     let computedEndTime = view.rescheduleEndTime;
     if (!computedEndTime || (view.rescheduleTime && computedEndTime <= view.rescheduleTime)) {
       computedEndTime = calculateEndTime(view.rescheduleTime, duration);
     }
-    view.handleResolveNoShowSubmit({
+    const ok = await view.handleResolveNoShowSubmit({
       appointmentId: appointment.id,
       resolution: 'RESCHEDULE',
       reason: view.rescheduleJustification || 'Rescheduled from past no-show follow-up',
@@ -144,6 +147,9 @@ export function NeedsAttentionDetail({ appointment, view, onBack, className }: {
       newEndTime: computedEndTime ? fmt(view.rescheduleDate || appointment.date, computedEndTime) : undefined,
       newDoctorId: view.rescheduleDoctor || appointment.doctorId || undefined,
     });
+    if (ok !== false) {
+      resetResolveState();
+    }
   };
 
   const displayName = patientName(appointment);

@@ -151,4 +151,29 @@ describe('useSecretaryAppointments', () => {
       reason: 'Patient confirmed did not attend',
     });
   });
+
+  it('completes missed checkout and refreshes appointment details', async () => {
+    vi.mocked(getClinicAppointmentsPageAction).mockResolvedValue({ success: true, data: { items: [{ ...appointment, status: 'CHECKED_IN' }], nextCursor: null, hasMore: false, total: 1 } } as any);
+    vi.mocked(getDoctorsAction).mockResolvedValue({ success: true, data: [] } as any);
+    vi.mocked(updateAppointmentStatusAction).mockResolvedValue({ success: true } as any);
+
+    const { result } = renderHook(() => useSecretaryAppointments());
+
+    await waitFor(() => expect(result.current.filteredAppointments).toHaveLength(1));
+    act(() => {
+      result.current.setSelectedAppointmentId('appt-1');
+    });
+
+    let success = false;
+    await act(async () => {
+      success = await result.current.completeMissedCheckout('appt-1', 'Patient checkout completed');
+    });
+
+    expect(success).toBe(true);
+    expect(updateAppointmentStatusAction).toHaveBeenCalledWith({
+      appointmentId: 'appt-1',
+      status: 'COMPLETED',
+      statusReason: 'Patient checkout completed',
+    });
+  });
 });

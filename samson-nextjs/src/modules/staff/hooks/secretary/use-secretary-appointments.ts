@@ -467,13 +467,13 @@ export function useSecretaryAppointments() {
       });
       if (res.success) {
         setError(null);
-        setShowRescheduleForm(false);
         tabCacheRef.current = {};
         preserveSelectionRef.current = true;
         await fetchData({ force: true });
         // Keep panel open: refresh selected appointment details so the pane re-renders with new schedule.
         const detail = await getStaffAppointmentByIdAction(selectedAppointment.id);
         if (detail.success && detail.data) setSelectedAppointmentDetails(detail.data);
+        setShowRescheduleForm(false);
       } else {
         setError(res.error || 'Failed to reschedule.');
       }
@@ -501,13 +501,13 @@ export function useSecretaryAppointments() {
       });
       if (res.success) {
         setError(null);
-        setShowCancelForm(false);
         tabCacheRef.current = {};
         preserveSelectionRef.current = true;
         await fetchData({ force: true });
         // Keep panel open with cancelled status instead of clearing selection.
         const detail = await getStaffAppointmentByIdAction(selectedAppointment.id);
         if (detail.success && detail.data) setSelectedAppointmentDetails(detail.data);
+        setShowCancelForm(false);
       } else {
         setError(res.error || 'Failed to cancel.');
       }
@@ -533,9 +533,10 @@ export function useSecretaryAppointments() {
     return request;
   }, []);
 
-  const completeMissedCheckout = (appointmentId: string, reason?: string) => {
+  const completeMissedCheckout = useCallback(async (appointmentId: string, reason?: string): Promise<boolean> => {
     setActionError(null);
-    startTransition(async () => {
+    setIsSubmitting(true);
+    try {
       const result = await updateAppointmentStatusAction({
         appointmentId,
         status: 'COMPLETED',
@@ -543,17 +544,23 @@ export function useSecretaryAppointments() {
       });
       if (!result.success) {
         setActionError(result.error || 'Could not complete the missed checkout.');
-        return;
+        return false;
       }
       tabCacheRef.current = {};
       preserveSelectionRef.current = true;
       await fetchData({ force: true });
       const fresh = await getStaffAppointmentByIdAction(appointmentId);
       if (fresh.success && fresh.data) setSelectedAppointmentDetails(fresh.data);
-    });
-  };
+      return true;
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : 'Could not complete the missed checkout.');
+      return false;
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [fetchData]);
 
-  const handleResolveNoShowSubmit = (payload: {
+  const handleResolveNoShowSubmit = useCallback(async (payload: {
     appointmentId: string;
     resolution: 'COMPLETED' | 'CONFIRMED_NO_SHOW' | 'RESCHEDULE' | 'CHECKED_IN';
     reason: string;
@@ -562,20 +569,28 @@ export function useSecretaryAppointments() {
     newEndTime?: string;
     newDoctorId?: string;
     confirmationChannel?: 'EMAIL' | 'SMS' | 'BOTH' | 'NONE';
-  }) => {
-    startTransition(async () => {
+  }): Promise<boolean> => {
+    setActionError(null);
+    setIsSubmitting(true);
+    try {
       const result = await resolveNoShowAction(payload);
       if (!result.success) {
         setActionError(result.error || 'Could not resolve the no-show.');
-        return;
+        return false;
       }
       tabCacheRef.current = {};
       preserveSelectionRef.current = true;
       await fetchData({ force: true });
       const fresh = await getStaffAppointmentByIdAction(payload.appointmentId);
       if (fresh.success && fresh.data) setSelectedAppointmentDetails(fresh.data);
-    });
-  };
+      return true;
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : 'Could not resolve the no-show.');
+      return false;
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [fetchData]);
 
   const refreshAppointment = useCallback(async (appointmentId?: string) => {
     tabCacheRef.current = {};

@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Calendar, X, Check, Pencil, CalendarDays } from 'lucide-react';
+import { Calendar, X, Check, Pencil, CalendarDays, RotateCw } from 'lucide-react';
 import type { AppointmentDto } from '@/modules/appointments/dtos/shared/appointment.dto';
 import type { AppointmentDirectoryTab } from '@/modules/staff/hooks/secretary/use-secretary-appointments';
 import { SharedAppointmentDetail } from '@/modules/appointments/components/sub-components/shared-appointment-detail';
@@ -324,6 +324,8 @@ function AppointmentDetails({
             compact={compact}
             onEditingGuestInfoChange={handleEditChange}
             actionsBar={!hideActions && (() => {
+              const isActionBusy = Boolean(view.isSubmitting || view.isPending || view.isLoadingAppointmentDetails);
+
               if (activeTab === 'needs-attention') {
                 // Show inline Resolve button for Unresolved tab
                 if (isResolvedNoShow) {
@@ -337,8 +339,16 @@ function AppointmentDetails({
                   <Button
                     className="w-full h-[42px] bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl text-sm font-semibold"
                     onClick={() => setShowResolvePane(true)}
+                    disabled={isActionBusy}
                   >
-                    Resolve
+                    {isActionBusy ? (
+                      <span className="flex items-center gap-2">
+                        <RotateCw className="size-4 animate-spin" />
+                        <span>Updating...</span>
+                      </span>
+                    ) : (
+                      'Resolve'
+                    )}
                   </Button>
                 );
               }
@@ -350,6 +360,7 @@ function AppointmentDetails({
                   <Button
                     variant="outline"
                     className="w-full h-[42px] gap-2 text-xs font-semibold rounded-xl hover:bg-muted/50 transition-colors border-primary/30 text-primary hover:text-primary"
+                    disabled={isActionBusy}
                     onClick={() => {
                       const params = new URLSearchParams();
                       if (patientId) params.set('patientId', patientId);
@@ -374,7 +385,11 @@ function AppointmentDetails({
                     )}
                     <div className={`flex gap-2 ${isEditingChannel ? 'pointer-events-none opacity-40' : ''}`}>
                       {(isNoShowCandidate || (isCheckedIn && isPastEnd)) && !isResolvedNoShow && (
-                        <Button className="flex-1 h-[42px] bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => router.push(resolveTarget)}>
+                        <Button
+                          className="flex-1 h-[42px] bg-primary text-primary-foreground hover:bg-primary/90"
+                          disabled={isActionBusy}
+                          onClick={() => router.push(resolveTarget)}
+                        >
                           {resolveTarget.startsWith(`${prefix}/appointments`) ? 'Open Unresolved' : 'Open Check-In & Out'}
                         </Button>
                       )}
@@ -384,17 +399,30 @@ function AppointmentDetails({
                         </div>
                       )}
                       {canModify && !isPastEnd && (
-                        <Button variant="outline" className="flex-1 h-[42px]" onClick={() => view.setShowRescheduleForm(true)}>
+                        <Button
+                          variant="outline"
+                          className="flex-1 h-[42px]"
+                          disabled={isActionBusy}
+                          onClick={() => view.setShowRescheduleForm(true)}
+                        >
                           Reschedule
                         </Button>
                       )}
                       {canCancel && (
-                        <Button variant="outline" className="flex-1 h-[42px] border-destructive/50 text-destructive hover:bg-destructive/10" onClick={() => view.setShowCancelForm(true)}>
+                        <Button
+                          variant="outline"
+                          className="flex-1 h-[42px] border-destructive/50 text-destructive hover:bg-destructive/10"
+                          disabled={isActionBusy}
+                          onClick={() => view.setShowCancelForm(true)}
+                        >
                           Cancel
                         </Button>
                       )}
                       {isCheckedIn && !isPastEnd && (
-                        <Button className="flex-1 h-[42px] bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => router.push(`${prefix}/check-in`)}>
+                        <Button
+                          className="flex-1 h-[42px] bg-primary text-primary-foreground hover:bg-primary/90"
+                          disabled={isActionBusy}
+                          onClick={() => router.push(`${prefix}/check-in`)}>
                           Open Check-In &amp; Out
                         </Button>
                       )}
@@ -727,33 +755,36 @@ function NeedsAttentionResolvePane({
     setShowRescheduleForm(false);
   };
 
-  const handleSaveChannel = async () => {
-    setIsSavingChannel(true);
-    const res = await updateConfirmationChannelAction({ appointmentId: appointment.id, confirmationChannel: draftChannel });
-    if (res.success) { setChannel(draftChannel); setIsEditingChannel(false); }
-    setIsSavingChannel(false);
-  };
+  const isBusy = Boolean(view.isSubmitting || view.isPending);
 
   const handleResolveSubmit = async () => {
     if (draftChannel !== channel) await handleSaveChannel();
+    let ok = false;
     if (isMissedCheckout) {
-      view.completeMissedCheckout?.(appointment.id, resolveReason.trim() || 'Late checkout — past appointment follow-up');
+      ok = await view.completeMissedCheckout?.(appointment.id, resolveReason.trim() || 'Late checkout — past appointment follow-up');
     } else {
       if (!resolveMode || !resolveReason.trim()) return;
-      view.handleResolveNoShowSubmit?.({ appointmentId: appointment.id, resolution: resolveMode, reason: resolveReason.trim(), confirmationChannel: channel });
+      ok = await view.handleResolveNoShowSubmit?.({
+        appointmentId: appointment.id,
+        resolution: resolveMode,
+        reason: resolveReason.trim(),
+        confirmationChannel: channel,
+      });
     }
-    reset();
-    onDone?.();
+    if (ok !== false) {
+      reset();
+      onDone?.();
+    }
   };
 
-  const handleRescheduleSubmit = () => {
+  const handleRescheduleSubmit = async () => {
     const fmt = (ds: string, ts: string) => `${ds}T${ts.length === 5 ? ts + ':00' : ts}Z`;
     const duration = appointment.service?.durationMinutes || 30;
     let computedEndTime = view.rescheduleEndTime;
     if (!computedEndTime || (view.rescheduleTime && computedEndTime <= view.rescheduleTime)) {
       computedEndTime = calculateEndTime(view.rescheduleTime, duration);
     }
-    view.handleResolveNoShowSubmit?.({
+    const ok = await view.handleResolveNoShowSubmit?.({
       appointmentId: appointment.id,
       resolution: 'RESCHEDULE',
       reason: view.rescheduleJustification || 'Rescheduled from past no-show follow-up',
@@ -761,9 +792,12 @@ function NeedsAttentionResolvePane({
       newStartTime: view.rescheduleTime ? fmt(view.rescheduleDate || appointment.date, view.rescheduleTime) : undefined,
       newEndTime: computedEndTime ? fmt(view.rescheduleDate || appointment.date, computedEndTime) : undefined,
       newDoctorId: view.rescheduleDoctor || appointment.doctorId || undefined,
+      confirmationChannel: channel,
     });
-    reset();
-    onDone?.();
+    if (ok !== false) {
+      reset();
+      onDone?.();
+    }
   };
 
   const bg = compact ? 'bg-sidebar' : 'bg-card';
@@ -796,7 +830,7 @@ function NeedsAttentionResolvePane({
             confirmationChannel={channel}
             onConfirmationChannelChange={(ch) => { setChannel(ch as any); setDraftChannel(ch as any); }}
             onEditingChannelChange={setIsEditingRescheduleChannel}
-            isSubmitting={view.isPending}
+            isSubmitting={isBusy}
             noFooter
             onServiceSelect={() => {}}
             onDoctorSelect={(docId: string) => view.setRescheduleDoctor?.(docId)}
@@ -818,12 +852,24 @@ function NeedsAttentionResolvePane({
             <div className={`flex gap-2 ${isEditingRescheduleChannel ? 'pointer-events-none opacity-40' : ''}`}>
               <Button
                 onClick={handleRescheduleSubmit}
-                disabled={view.isPending || !isFormComplete || isEditingRescheduleChannel}
+                disabled={isBusy || !isFormComplete || isEditingRescheduleChannel}
                 className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl disabled:opacity-40"
               >
-                {view.isPending ? 'Saving...' : 'Confirm'}
+                {isBusy ? (
+                  <span className="flex items-center gap-1.5">
+                    <RotateCw className="size-3.5 animate-spin" />
+                    <span>Saving...</span>
+                  </span>
+                ) : (
+                  'Confirm'
+                )}
               </Button>
-              <Button variant="outline" onClick={() => setShowRescheduleForm(false)} className="flex-1 h-[42px] text-sm font-medium rounded-xl">
+              <Button
+                variant="outline"
+                disabled={isBusy}
+                onClick={() => setShowRescheduleForm(false)}
+                className="flex-1 h-[42px] text-sm font-medium rounded-xl"
+              >
                 Back
               </Button>
             </div>
@@ -980,12 +1026,24 @@ function NeedsAttentionResolvePane({
           <div className={`flex gap-2 ${isEditingChannel ? 'pointer-events-none opacity-40' : ''}`}>
             <Button
               onClick={handleResolveSubmit}
-              disabled={view.isPending || isEditingChannel || !isReady}
+              disabled={isBusy || isEditingChannel || !isReady}
               className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl disabled:opacity-40"
             >
-              {view.isPending ? 'Submitting...' : 'Confirm'}
+              {isBusy ? (
+                <span className="flex items-center gap-1.5">
+                  <RotateCw className="size-3.5 animate-spin" />
+                  <span>Submitting...</span>
+                </span>
+              ) : (
+                'Confirm'
+              )}
             </Button>
-            <Button variant="outline" onClick={() => setResolveMode(null)} className="flex-1 h-[42px] text-sm font-medium rounded-xl">
+            <Button
+              variant="outline"
+              disabled={isBusy}
+              onClick={() => setResolveMode(null)}
+              className="flex-1 h-[42px] text-sm font-medium rounded-xl"
+            >
               Back
             </Button>
           </div>
