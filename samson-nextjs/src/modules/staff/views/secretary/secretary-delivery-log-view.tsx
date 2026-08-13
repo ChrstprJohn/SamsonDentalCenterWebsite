@@ -76,6 +76,7 @@ interface DeliveryEntry {
   retryCount: number;
   errorLogs: string | null;
   appointmentId: string | null;
+  inquiryId: string | null;
   timestamp: string;
 }
 
@@ -86,6 +87,8 @@ function toEntry(log: OutboxLogResponseDto): DeliveryEntry {
     ? payload.phone || payload.mobileNumber || payload.phoneNumber || payload.recipientPhone || payload.guestPhone || payload.to || payload.email || 'System Automated Dispatch'
     : payload.email || payload.guestEmail || payload.recipientEmail || payload.to || payload.recipient || payload.phoneNumber || payload.phone || payload.mobileNumber || payload.guestPhone || 'System Automated Dispatch';
   const rawAppointmentId = (payload.appointmentId || payload.appointment_id || null) as string | null;
+  const rawInquiryId = (payload.inquiryId || payload.inquiry_id || null) as string | null;
+  const finalInquiryId = rawInquiryId || (log.eventType.includes('INQUIRY') && rawAppointmentId && rawAppointmentId !== 'INQUIRY' ? rawAppointmentId : null);
   return {
     id: log.id,
     channel: isSms ? 'SMS' : 'EMAIL',
@@ -96,6 +99,7 @@ function toEntry(log: OutboxLogResponseDto): DeliveryEntry {
     errorLogs: log.errorLogs,
     // Inquiry events carry an inquiry id, not an appointment id — don't deep-link those.
     appointmentId: rawAppointmentId && !log.eventType.includes('INQUIRY') ? rawAppointmentId : null,
+    inquiryId: finalInquiryId,
     timestamp: log.processedAt ?? log.createdAt,
   };
 }
@@ -185,6 +189,15 @@ function DeliveryLogRow({
                 >
                   <Info className="size-3.5 text-muted-foreground" />
                   Appointment Detail
+                </DropdownMenuItem>
+              )}
+              {entry.inquiryId && (
+                <DropdownMenuItem
+                  onClick={() => router.push(`${prefix}/pending?id=${entry.inquiryId}`)}
+                  className="text-sm flex items-center gap-2 cursor-pointer"
+                >
+                  <Info className="size-3.5 text-muted-foreground" />
+                  Request Detail
                 </DropdownMenuItem>
               )}
             </DropdownMenuContent>
