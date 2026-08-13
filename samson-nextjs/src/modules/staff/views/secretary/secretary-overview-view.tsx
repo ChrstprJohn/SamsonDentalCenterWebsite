@@ -64,6 +64,13 @@ function fmtShortDate(dateStr: string | null | undefined) {
   }
 }
 
+function getInitials(name: string) {
+  if (!name) return 'P';
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
 function fmtClock(d: Date) {
   return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
 }
@@ -447,29 +454,22 @@ export function SecretaryOverviewView() {
                     <div className="py-2.5 h-[228px] flex flex-col justify-center">
                       {isLoading ? (
                         <div className="space-y-2 w-full">
-                          <div className="h-[46px] p-2.5 rounded-lg border border-border/40 bg-muted/20 animate-pulse flex flex-col justify-center space-y-1.5">
-                            <div className="h-3 w-1/3 bg-muted rounded" />
-                            <div className="h-2.5 w-1/2 bg-muted/70 rounded" />
-                          </div>
-                          <div className="h-[46px] p-2.5 rounded-lg border border-border/40 bg-muted/20 animate-pulse flex flex-col justify-center space-y-1.5">
-                            <div className="h-3 w-2/5 bg-muted rounded" />
-                            <div className="h-2.5 w-3/5 bg-muted/70 rounded" />
-                          </div>
-                          <div className="h-[46px] p-2.5 rounded-lg border border-border/40 bg-muted/20 animate-pulse flex flex-col justify-center space-y-1.5">
-                            <div className="h-3 w-1/4 bg-muted rounded" />
-                            <div className="h-2.5 w-1/3 bg-muted/70 rounded" />
-                          </div>
-                          <div className="h-[46px] p-2.5 rounded-lg border border-border/40 bg-muted/20 animate-pulse flex flex-col justify-center space-y-1.5">
-                            <div className="h-3 w-1/3 bg-muted rounded" />
-                            <div className="h-2.5 w-2/5 bg-muted/70 rounded" />
-                          </div>
+                          {[...Array(4)].map((_, i) => (
+                            <div key={i} className="h-[46px] px-1 py-1.5 flex items-center justify-between gap-3 animate-pulse">
+                              <div className="flex-1 space-y-1.5 min-w-0">
+                                <div className="h-3 w-1/3 bg-muted rounded" />
+                                <div className="h-2.5 w-1/2 bg-muted/70 rounded" />
+                              </div>
+                              <div className="h-4 w-10 bg-muted/60 rounded shrink-0 mr-1" />
+                            </div>
+                          ))}
                         </div>
                       ) : recentInquiries.length > 0 ? (
                         <div className="space-y-2 w-full h-full flex flex-col justify-start">
                           {recentInquiries.map((inq) => (
                             <div
                               key={inq.id}
-                              className="h-[46px] p-2.5 rounded-lg bg-muted/30 border border-border/40 flex items-center justify-between gap-3 text-left shrink-0"
+                              className="h-[46px] px-1 py-1.5 flex items-center justify-between gap-3 text-left shrink-0 rounded-lg hover:bg-muted/30 transition-colors"
                             >
                               <div className="min-w-0 flex-1">
                                 <p className="text-xs font-semibold text-foreground truncate leading-tight">
@@ -480,7 +480,7 @@ export function SecretaryOverviewView() {
                                 </p>
                               </div>
                               {inq.preferredDate && (
-                                <span className="shrink-0 text-[10px] font-medium text-muted-foreground bg-muted/60 border border-border/60 px-1.5 py-0.5 rounded leading-none">
+                                <span className="shrink-0 text-[10px] font-medium text-muted-foreground bg-muted/60 border border-border/60 px-1.5 py-0.5 rounded leading-none mr-1">
                                   {fmtShortDate(inq.preferredDate)}
                                 </span>
                               )}
@@ -520,39 +520,37 @@ export function SecretaryOverviewView() {
                     <div className="py-2.5 h-[228px] flex flex-col justify-center">
                       {isLoading ? (
                         <div className="space-y-2 w-full">
-                          <div className="h-[46px] p-2.5 rounded-lg border border-border/40 bg-muted/20 animate-pulse flex flex-col justify-center space-y-1.5">
-                            <div className="h-3 w-1/3 bg-muted rounded" />
-                            <div className="h-2.5 w-1/2 bg-muted/70 rounded" />
-                          </div>
-                          <div className="h-[46px] p-2.5 rounded-lg border border-border/40 bg-muted/20 animate-pulse flex flex-col justify-center space-y-1.5">
-                            <div className="h-3 w-2/5 bg-muted rounded" />
-                            <div className="h-2.5 w-3/5 bg-muted/70 rounded" />
-                          </div>
-                          <div className="h-[46px] p-2.5 rounded-lg border border-border/40 bg-muted/20 animate-pulse flex flex-col justify-center space-y-1.5">
-                            <div className="h-3 w-1/4 bg-muted rounded" />
-                            <div className="h-2.5 w-1/3 bg-muted/70 rounded" />
-                          </div>
-                          <div className="h-[46px] p-2.5 rounded-lg border border-border/40 bg-muted/20 animate-pulse flex flex-col justify-center space-y-1.5">
-                            <div className="h-3 w-1/3 bg-muted rounded" />
-                            <div className="h-2.5 w-2/5 bg-muted/70 rounded" />
-                          </div>
+                          {[...Array(4)].map((_, i) => (
+                            <div key={i} className="h-[46px] px-1 py-1.5 flex items-center gap-2.5 animate-pulse">
+                              <div className="size-7 rounded-full bg-muted shrink-0" />
+                              <div className="flex-1 space-y-1.5 min-w-0">
+                                <div className="h-3 w-1/3 bg-muted rounded" />
+                                <div className="h-2.5 w-1/2 bg-muted/70 rounded" />
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       ) : recentChats.length > 0 ? (
                         <div className="space-y-2 w-full h-full flex flex-col justify-start">
                           {recentChats.map((chat) => (
                             <div
                               key={chat.appointmentId}
-                              className="h-[46px] p-2.5 rounded-lg bg-muted/30 border border-border/40 flex items-center justify-between gap-3 text-left shrink-0"
+                              className="h-[46px] px-1 py-1.5 flex items-center justify-between gap-3 text-left shrink-0 rounded-lg hover:bg-muted/30 transition-colors"
                             >
-                              <div className="min-w-0 flex-1">
-                                <p className="text-xs font-semibold text-foreground truncate leading-tight">
-                                  {chat.patientName}
-                                </p>
-                                <p className="text-[11px] text-muted-foreground truncate mt-0.5 leading-tight">
-                                  {chat.latestMessage?.text || chat.serviceName}
-                                </p>
+                              <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                                <div className="size-7 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-700 dark:text-violet-300 flex items-center justify-center text-[10px] font-semibold shrink-0 select-none">
+                                  {getInitials(chat.patientName)}
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <p className="text-xs font-semibold text-foreground truncate leading-tight">
+                                    {chat.patientName}
+                                  </p>
+                                  <p className="text-[11px] text-muted-foreground truncate mt-0.5 leading-tight">
+                                    {chat.latestMessage?.text || chat.serviceName}
+                                  </p>
+                                </div>
                               </div>
-                              <span className="shrink-0 size-2 rounded-full bg-violet-500" />
+                              <span className="shrink-0 size-2 rounded-full bg-violet-500 mr-1" />
                             </div>
                           ))}
                         </div>
