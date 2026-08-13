@@ -56,8 +56,8 @@ export function useSecretaryPendingRequests() {
   useEffect(() => { fetchPending(); }, [fetchPending]);
 
   const selectedAppointment = useMemo(
-    () => appointments.find((appointment) => appointment.id === selectedAppointmentId)
-      || (selectedAppointmentDetails?.id === selectedAppointmentId ? selectedAppointmentDetails : null),
+    () => (selectedAppointmentDetails?.id === selectedAppointmentId ? selectedAppointmentDetails : null)
+      || appointments.find((appointment) => appointment.id === selectedAppointmentId),
     [appointments, selectedAppointmentId, selectedAppointmentDetails]
   );
 
@@ -237,7 +237,7 @@ export function useSecretaryPendingRequests() {
       setStagedStatus('');
       setStagedReason('');
       setCustomReason('');
-      fetchPending();
+      await fetchPending();
       // Keep panel open: refresh the reviewed appointment's own details.
       const fresh = await getStaffAppointmentByIdAction(appointmentId);
       if (fresh.success && fresh.data) setSelectedAppointmentDetails(fresh.data);

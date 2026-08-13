@@ -34,6 +34,9 @@ vi.mock('@/modules/appointments/actions/booking/get-inquiries-page.action', () =
 vi.mock('@/modules/appointments/actions/booking/convert-inquiry.action', () => ({
   convertInquiryAction: vi.fn(),
 }));
+vi.mock('@/modules/appointments/actions/booking/get-inquiry-by-id.action', () => ({
+  getInquiryByIdAction: vi.fn().mockResolvedValue({ success: false }),
+}));
 vi.mock('@/modules/appointments/actions/booking/drop-inquiry.action', () => ({
   dropInquiryAction: vi.fn(),
 }));
@@ -105,5 +108,31 @@ describe('useSecretaryInquiriesQueue', () => {
       doctorAssignmentSource: 'USER',
       confirmationChannel: 'EMAIL',
     });
+  });
+
+  it('refreshes inquiry details and status to CONVERTED after successful review', async () => {
+    const convertedInquiry = { ...inquiry, status: 'CONVERTED', assignedDoctorId: 'doctor-1', assignedEndTime: '08:30' };
+    const { getInquiryByIdAction } = await import('@/modules/appointments/actions/booking/get-inquiry-by-id.action');
+    vi.mocked(getInquiriesPageAction).mockResolvedValue({ success: true, data: { items: [], nextCursor: null, hasMore: false, total: 0 } } as any);
+    vi.mocked(getServicesAction).mockResolvedValue({ success: true, data: [{ id: 'service-1', name: 'Cleaning' }] } as any);
+    vi.mocked(getDoctorsAction).mockResolvedValue({ success: true, data: [{ id: 'doctor-1', firstName: 'Santos', lastName: '' }] } as any);
+    vi.mocked(convertInquiryAction).mockResolvedValue({ success: true, data: { appointmentId: 'appt-1' } } as any);
+    vi.mocked(getInquiryByIdAction).mockResolvedValue({ success: true, data: convertedInquiry } as any);
+
+    const { result } = renderHook(() => useSecretaryInquiriesQueue());
+
+    act(() => {
+      result.current.selectInquiry(inquiry);
+      result.current.setDecision('CONVERT');
+      result.current.selectDate('2026-07-09');
+      result.current.selectDoctor('doctor-1');
+      result.current.selectSlot({ startTime: '08:00', endTime: '08:30' });
+      result.current.setSecretaryNotes('Confirmed');
+    });
+
+    await act(async () => result.current.submitReview('inq-1'));
+
+    expect(getInquiryByIdAction).toHaveBeenCalledWith('inq-1');
+    expect(result.current.selectedInquiry?.status).toBe('CONVERTED');
   });
 });

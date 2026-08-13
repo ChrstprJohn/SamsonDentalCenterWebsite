@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { convertInquiryAction } from '@/modules/appointments/actions/booking/convert-inquiry.action';
 import { dropInquiryAction } from '@/modules/appointments/actions/booking/drop-inquiry.action';
 import { getInquiriesPageAction } from '@/modules/appointments/actions/booking/get-inquiries-page.action';
+import { getInquiryByIdAction } from '@/modules/appointments/actions/booking/get-inquiry-by-id.action';
 import { updateInquiryAction } from '@/modules/appointments/actions/booking/update-inquiry.action';
 import { useBookingScheduler } from '@/modules/appointments/hooks/shared/use-booking-scheduler';
 import { searchPatientsAction } from '@/modules/patients/actions/profile/search-patients.action';
@@ -500,9 +501,21 @@ export function useSecretaryInquiriesQueue() {
         const res = await convertInquiryAction(payload);
         if (res.success) {
           showToast('Inquiry converted to appointment successfully', 'success');
-          setSelectedInquiryId(null);
           setStagedInquiryAction('');
+          tabCacheRef.current = {};
           await loadInquiries({ force: true });
+          const fresh = await getInquiryByIdAction(inquiryId);
+          if (fresh.success && fresh.data) {
+            selectInquiry(fresh.data);
+          } else {
+            setSelectedInquirySnapshot((prev: any) => prev ? {
+              ...prev,
+              status: 'CONVERTED',
+              assignedDoctorId: stagedInquiryDoctor,
+              assignedEndTime: stagedInquiryEndTime,
+              linkedAppointmentId: res.data?.appointmentId,
+            } : null);
+          }
         } else {
           setInlineError(res.error || 'Conversion failed');
           showToast(res.error || 'Failed to convert inquiry', 'error');
@@ -511,9 +524,19 @@ export function useSecretaryInquiriesQueue() {
         const res = await dropInquiryAction({ inquiryId, secretaryNotes: stagedInquiryNote || undefined });
         if (res.success) {
           showToast('Inquiry dropped successfully', 'success');
-          setSelectedInquiryId(null);
           setStagedInquiryAction('');
+          tabCacheRef.current = {};
           await loadInquiries({ force: true });
+          const fresh = await getInquiryByIdAction(inquiryId);
+          if (fresh.success && fresh.data) {
+            selectInquiry(fresh.data);
+          } else {
+            setSelectedInquirySnapshot((prev: any) => prev ? {
+              ...prev,
+              status: 'DROPPED',
+              secretaryNotes: stagedInquiryNote || undefined,
+            } : null);
+          }
         } else {
           setInlineError(res.error || 'Failed to drop inquiry');
           showToast(res.error || 'Failed to drop inquiry', 'error');
