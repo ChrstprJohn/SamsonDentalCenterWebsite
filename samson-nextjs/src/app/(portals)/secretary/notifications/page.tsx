@@ -1,6 +1,6 @@
 import React from 'react';
 import { createClient } from '@/shared/database/server';
-import { getUnreadNotifications } from '@/modules/notifications/exports';
+import { getNotificationsPage, getUnreadCount } from '@/modules/notifications/exports';
 import { authorizeRole } from '@/shared/auth/auth.util';
 import { redirect } from 'next/navigation';
 import { NotificationsListView } from '@/modules/notifications/views/notifications-list-view';
@@ -22,7 +22,10 @@ export default async function NotificationsPage() {
   }
 
   const supabase = await createClient();
-  const initialNotifications = await getUnreadNotifications(supabase)(userId, 'SECRETARY', 50);
+  const [initialPage, unreadCount] = await Promise.all([
+    getNotificationsPage(supabase)(userId, 'SECRETARY', { limit: 25 }),
+    getUnreadCount(supabase)(userId, 'SECRETARY'),
+  ]);
 
-  return <NotificationsListView initialNotifications={initialNotifications} />;
+  return <NotificationsListView initialPage={initialPage} initialUnreadCount={unreadCount} />;
 }
