@@ -132,6 +132,9 @@ export function useSecretaryAppointments() {
   const fetchData = useCallback(async (options?: { append?: boolean; force?: boolean }) => {
     const append = options?.append === true;
     const force = options?.force === true;
+    if (force) {
+      tabCacheRef.current = {};
+    }
     if (!append && !force && isPristineQuery()) {
       const cached = tabCacheRef.current[queryRef.current.activeTab];
       if (cached) {
@@ -344,8 +347,11 @@ export function useSecretaryAppointments() {
   useEffect(() => {
     if (isLoading || isRefreshing) return;
     if (selectedAppointmentId && !appointments.some((appointment) => appointment.id === selectedAppointmentId)) {
-      // Keep the detail panel open right after an in-panel action (reschedule/cancel).
-      // Ref is set during submit*; fall through next time so normal list filtering still clears.
+      // Keep the detail panel open right after an in-panel action (reschedule/cancel/resolve)
+      // or when the explicit appointment details are already loaded.
+      if (selectedAppointmentDetails?.id === selectedAppointmentId) {
+        return;
+      }
       if (preserveSelectionRef.current) {
         preserveSelectionRef.current = false;
         return;
@@ -353,7 +359,7 @@ export function useSecretaryAppointments() {
       const timeout = window.setTimeout(() => setSelectedAppointmentId(null), 0);
       return () => window.clearTimeout(timeout);
     }
-  }, [appointments, selectedAppointmentId, isLoading, isRefreshing]);
+  }, [appointments, selectedAppointmentId, selectedAppointmentDetails, isLoading, isRefreshing]);
 
   const loadMore = useCallback(() => { void fetchData({ append: true }); }, [fetchData]);
 
@@ -363,7 +369,8 @@ export function useSecretaryAppointments() {
     setSelectedAppointmentDetails(null);
   };
 
-  const selectAppointment = useCallback((appointmentId: string | null, initialDetails?: AppointmentDto) => {    setSelectedAppointmentId(appointmentId);
+  const selectAppointment = useCallback((appointmentId: string | null, initialDetails?: AppointmentDto) => {
+    setSelectedAppointmentId(appointmentId);
     if (!appointmentId) {
       setSelectedAppointmentDetails(null);
       setIsLoadingAppointmentDetails(false);
@@ -461,6 +468,7 @@ export function useSecretaryAppointments() {
       if (res.success) {
         setError(null);
         setShowRescheduleForm(false);
+        tabCacheRef.current = {};
         preserveSelectionRef.current = true;
         await fetchData({ force: true });
         // Keep panel open: refresh selected appointment details so the pane re-renders with new schedule.
@@ -494,6 +502,7 @@ export function useSecretaryAppointments() {
       if (res.success) {
         setError(null);
         setShowCancelForm(false);
+        tabCacheRef.current = {};
         preserveSelectionRef.current = true;
         await fetchData({ force: true });
         // Keep panel open with cancelled status instead of clearing selection.
@@ -536,6 +545,7 @@ export function useSecretaryAppointments() {
         setActionError(result.error || 'Could not complete the missed checkout.');
         return;
       }
+      tabCacheRef.current = {};
       preserveSelectionRef.current = true;
       await fetchData({ force: true });
       const fresh = await getStaffAppointmentByIdAction(appointmentId);
@@ -558,6 +568,7 @@ export function useSecretaryAppointments() {
         setActionError(result.error || 'Could not resolve the no-show.');
         return;
       }
+      tabCacheRef.current = {};
       preserveSelectionRef.current = true;
       await fetchData({ force: true });
       const fresh = await getStaffAppointmentByIdAction(payload.appointmentId);
@@ -566,6 +577,7 @@ export function useSecretaryAppointments() {
   };
 
   const refreshAppointment = useCallback(async (appointmentId?: string) => {
+    tabCacheRef.current = {};
     preserveSelectionRef.current = true;
     await fetchData({ force: true });
     const targetId = appointmentId || selectedAppointmentId;

@@ -333,7 +333,17 @@ export function SecretaryAppointmentsView() {
           formatPatientName={view.formatPatientName}
             onSelect={(id) => { view.selectAppointment(id); setMobileView('detail'); }}
             activeTab={view.activeTab}
-            pinnedAppointment={view.selectedAppointment}
+            pinnedAppointment={
+              view.selectedAppointment &&
+              (view.activeTab === 'needs-attention'
+                ? (view.selectedAppointment.status === 'NO_SHOW' && !view.selectedAppointment.noShowResolvedAt) ||
+                  (view.selectedAppointment.status === 'CHECKED_IN' && (!view.selectedAppointment.date || view.selectedAppointment.date < new Date().toISOString().slice(0, 10)))
+                : view.activeTab === 'upcoming'
+                  ? view.selectedAppointment.status === 'APPROVED' || view.selectedAppointment.status === 'CHECKED_IN' || (view.selectedAppointment.status === 'NO_SHOW' && !view.selectedAppointment.noShowResolvedAt)
+                  : ['COMPLETED', 'CANCELLED', 'REJECTED', 'DISPLACED'].includes(view.selectedAppointment.status) || (view.selectedAppointment.status === 'NO_SHOW' && Boolean(view.selectedAppointment.noShowResolvedAt)))
+                ? view.selectedAppointment
+                : null
+            }
         />
       </div>
 

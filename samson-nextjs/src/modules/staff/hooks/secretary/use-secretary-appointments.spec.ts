@@ -123,4 +123,32 @@ describe('useSecretaryAppointments', () => {
       confirmationChannel: 'EMAIL',
     });
   });
+
+  it('resolves no-show, refreshes details and fetches fresh data', async () => {
+    vi.mocked(getClinicAppointmentsPageAction).mockResolvedValue({ success: true, data: { items: [appointment], nextCursor: null, hasMore: false, total: 1 } } as any);
+    vi.mocked(getDoctorsAction).mockResolvedValue({ success: true, data: [] } as any);
+    const { resolveNoShowAction } = await import('@/modules/appointments/actions/status/resolve-no-show.action');
+    vi.mocked(resolveNoShowAction).mockResolvedValue({ success: true } as any);
+
+    const { result } = renderHook(() => useSecretaryAppointments());
+
+    await waitFor(() => expect(result.current.filteredAppointments).toHaveLength(1));
+    act(() => {
+      result.current.setSelectedAppointmentId('appt-1');
+    });
+
+    await act(async () => {
+      result.current.handleResolveNoShowSubmit({
+        appointmentId: 'appt-1',
+        resolution: 'CONFIRMED_NO_SHOW',
+        reason: 'Patient confirmed did not attend',
+      });
+    });
+
+    expect(resolveNoShowAction).toHaveBeenCalledWith({
+      appointmentId: 'appt-1',
+      resolution: 'CONFIRMED_NO_SHOW',
+      reason: 'Patient confirmed did not attend',
+    });
+  });
 });

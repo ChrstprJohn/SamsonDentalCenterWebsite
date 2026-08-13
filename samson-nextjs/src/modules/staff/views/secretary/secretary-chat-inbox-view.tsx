@@ -775,6 +775,7 @@ export function SecretaryChatInboxView({ initialThreads, initialHasMore = false,
                 if (selectedThreadId) {
                     await refreshFullAppointment(selectedThreadId);
                 }
+                await fetchThreads({ preserveExisting: true });
                 const msgRes = await getMessagesAction(selectedThreadId);
                 if (msgRes && msgRes.data) {
                     setSelectedThreadMessages(msgRes.data);
