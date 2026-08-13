@@ -121,6 +121,7 @@ export function SecretaryPendingRequestsViewV2({ deepLinkId }: { deepLinkId?: st
   const [loadingInquiryLogs, setLoadingInquiryLogs] = React.useState(false);
   const [allowOverrideResend, setAllowOverrideResend] = React.useState(false);
   const [logPage, setLogPage] = React.useState(1);
+  const [showNotesPanel, setShowNotesPanel] = React.useState(false);
 
   const TABS = [
     { key: 'overview' as const, label: 'Overview' },
@@ -349,7 +350,7 @@ export function SecretaryPendingRequestsViewV2({ deepLinkId }: { deepLinkId?: st
           isLoadingMore={inquiriesView.isLoadingMore}
           loadMoreError={inquiriesView.loadMoreError}
           onLoadMore={inquiriesView.loadMore}
-          onSelectInquiry={(inq) => { inquiriesView.selectInquiry(inq); setIsEditingPatient(false); setIsEditingSchedule(false); setAssignedDoctorName(''); setMobileView(inq ? 'detail' : 'list'); }}
+          onSelectInquiry={(inq) => { inquiriesView.selectInquiry(inq); setIsEditingPatient(false); setIsEditingSchedule(false); setAssignedDoctorName(''); setMobileView(inq ? 'detail' : 'list'); setShowNotesPanel(false); }}
           activeTab={inquiriesView.activeTab}
           setActiveTab={inquiriesView.setActiveTab}
           tabCounts={inquiriesView.tabCounts}
@@ -362,7 +363,7 @@ export function SecretaryPendingRequestsViewV2({ deepLinkId }: { deepLinkId?: st
 
       {!isDeepLinking && hasSelection ? (
         <>
-      <div className={`flex-1 flex-col min-w-0 border-r border-card-border/40 ${colMobile('detail')} xl:flex`}>
+      <div className={`flex-1 flex-col min-w-0 ${showNotesPanel ? 'border-r border-card-border/40' : ''} ${colMobile('detail')} xl:flex`}>
 
         {/* ── FULL-PANEL TAKEOVER: Decision Mode ── */}
         {inquiriesView.stagedInquiryAction ? (
@@ -558,10 +559,21 @@ export function SecretaryPendingRequestsViewV2({ deepLinkId }: { deepLinkId?: st
                   Request Details
                 </div>
               </div>
-              <button onClick={() => setMobileView('quickLogs')} className="xl:hidden p-1 -mr-1 text-muted-foreground hover:text-foreground shrink-0 flex flex-col items-center gap-0.5">
-                <ClipboardList className="size-5" />
-                <span className="text-[10px] leading-none">Notes</span>
-              </button>
+              {!showNotesPanel && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setShowNotesPanel(true);
+                    setMobileView('quickLogs');
+                  }}
+                  className="gap-1.5 text-xs h-8"
+                  title="Open Staff Notes & Logs"
+                >
+                  <ClipboardList className="size-3.5" />
+                  <span>Notes & Logs</span>
+                </Button>
+              )}
             </div>
 
             {/* Sub-Header Tabs matching AppointmentDetailPane */}
@@ -1199,9 +1211,16 @@ export function SecretaryPendingRequestsViewV2({ deepLinkId }: { deepLinkId?: st
           </>
         )}
         </div>
-        {hasSelection && (
+        {hasSelection && showNotesPanel && (
           <div className={`flex-1 xl:w-[320px] xl:flex-none flex-col h-full overflow-hidden ${colMobile('quickLogs')} xl:flex`}>
-            <CoordinationHub inquiryId={inquiriesView.selectedInquiryId} hideActions={!inquiriesView.selectedInquiry || inquiriesView.selectedInquiry.status !== 'NEW'} onBack={() => setMobileView('detail')} />
+            <CoordinationHub
+              inquiryId={inquiriesView.selectedInquiryId}
+              hideActions={!inquiriesView.selectedInquiry || inquiriesView.selectedInquiry.status !== 'NEW'}
+              onBack={() => {
+                setShowNotesPanel(false);
+                setMobileView('detail');
+              }}
+            />
           </div>
         )}
       </>

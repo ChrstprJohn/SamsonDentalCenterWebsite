@@ -6,8 +6,7 @@ import { getStaffAppointmentByIdAction } from '@/modules/appointments/actions/cl
 import { AppointmentDetailPane } from './sub-components/appointment-detail-pane';
 import { AppointmentsTable } from './sub-components/appointments-table';
 import { CoordinationHub } from './sub-components/coordination-hub';
-import { NeedsAttentionDetail } from './sub-components/needs-attention-detail';
-import { ArrowLeft, CalendarDays, CheckCircle2, AlertCircle, Clock, Search, Filter, ClipboardList, HelpCircle, RotateCw, SlidersHorizontal, X } from 'lucide-react';
+import { ArrowLeft, CalendarDays, CheckCircle2, AlertCircle, Clock, ClipboardList, HelpCircle, RotateCw, SlidersHorizontal, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Modal } from '@/components/ui/modal';
 import { Select } from '@/components/ui/select';
@@ -109,8 +108,6 @@ export function SecretaryAppointmentsView() {
     { key: 'needs-attention' as const, label: 'Unresolved', count: view.tabTotals['needs-attention'] },
     { key: 'history' as const, label: 'History', count: view.tabTotals.history },
   ];
-
-  const isNeedsAttention = view.activeTab === 'needs-attention';
 
   return (
     <div className="flex flex-1 min-h-0 w-full overflow-hidden">
@@ -341,14 +338,7 @@ export function SecretaryAppointmentsView() {
       </div>
 
       {/* Column 2: Appointment Details */}
-      {!isDeepLinking && hasSelection && isNeedsAttention && view.selectedAppointment ? (
-        <NeedsAttentionDetail
-          appointment={view.selectedAppointment}
-          view={view}
-          onBack={() => { view.setSelectedAppointmentId(null); setMobileView('list'); }}
-          className={`${colMobile('detail')} lg:flex`}
-        />
-      ) : !isDeepLinking && hasSelection ? (
+      {!isDeepLinking && hasSelection ? (
         <div className={`flex flex-1 flex-col min-w-0 min-h-0 h-full ${colMobile('detail')} lg:flex`}>
           <div className="p-4 border-b border-card-border/40 shrink-0 flex items-center justify-between h-14">
             <div className="flex items-center gap-2 min-w-0 flex-1">
