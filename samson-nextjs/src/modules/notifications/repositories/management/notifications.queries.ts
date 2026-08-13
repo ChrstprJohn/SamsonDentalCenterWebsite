@@ -53,8 +53,15 @@ export const getUnreadCount = (supabase: SupabaseClient) => async (
   return count || 0;
 };
 
+const TYPE_FILTER_MAP: Record<'INQUIRY' | 'EMAIL' | 'CHAT', string> = {
+  INQUIRY: 'NEW_INQUIRY',
+  EMAIL: 'FAILED_EMAIL_ALERT',
+  CHAT: 'NEW_MESSAGE',
+};
+
 export interface NotificationsPageParams {
   status?: 'UNREAD' | 'READ';
+  type?: 'INQUIRY' | 'EMAIL' | 'CHAT';
   cursor?: string;
   search?: string;
   limit?: number;
@@ -86,6 +93,7 @@ export const getNotificationsPage = (supabase: SupabaseClient) => async (
   }
   if (params.status === 'READ') query = query.eq('is_read', true);
   if (params.status === 'UNREAD') query = query.eq('is_read', false);
+  if (params.type) query = query.eq('type', TYPE_FILTER_MAP[params.type]);
   if (params.search) {
     const pattern = `%${escapeIlike(params.search)}%`;
     query = query.or(`title.ilike.${pattern},message.ilike.${pattern}`);
@@ -103,6 +111,7 @@ export const getNotificationsPage = (supabase: SupabaseClient) => async (
   }
   if (params.status === 'READ') countQuery = countQuery.eq('is_read', true);
   if (params.status === 'UNREAD') countQuery = countQuery.eq('is_read', false);
+  if (params.type) countQuery = countQuery.eq('type', TYPE_FILTER_MAP[params.type]);
   if (params.search) {
     const pattern = `%${escapeIlike(params.search)}%`;
     countQuery = countQuery.or(`title.ilike.${pattern},message.ilike.${pattern}`);

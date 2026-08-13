@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { Bell, Check, CheckCheck, ChevronLeft, ChevronRight, CircleAlert, ExternalLink, MailWarning, MessageSquare, RefreshCw, Search } from 'lucide-react';
+import { Bell, CheckCheck, ChevronLeft, ChevronRight, CircleAlert, ExternalLink, MailWarning, MessageSquare, RefreshCw, Search } from 'lucide-react';
 import { NotificationResponseDto } from '../dtos/management/notification-response.dto';
 import { markAllReadAction } from '../actions/management/mark-all-read.action';
 import { markReadAction } from '../actions/management/mark-read.action';
@@ -48,6 +48,7 @@ export function NotificationsListView({ initialPage, initialUnreadCount }: Notif
   const [unreadCount, setUnreadCount] = useState(initialUnreadCount);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState<TabType>('ALL');
+  const [typeFilter, setTypeFilter] = useState<'ALL' | 'INQUIRY' | 'EMAIL' | 'CHAT'>('ALL');
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -83,6 +84,7 @@ export function NotificationsListView({ initialPage, initialUnreadCount }: Notif
         limit: PAGE_SIZE,
         cursor: cursor ?? undefined,
         status: activeTab === 'ALL' ? undefined : activeTab,
+        type: typeFilter === 'ALL' ? undefined : typeFilter,
         search: searchTerm.trim() || undefined,
       });
       if (id !== requestId.current) return;
@@ -100,7 +102,7 @@ export function NotificationsListView({ initialPage, initialUnreadCount }: Notif
     } finally {
       if (id === requestId.current) setLoading(false);
     }
-  }, [activeTab, searchTerm]);
+  }, [activeTab, searchTerm, typeFilter]);
 
   // Debounced refetch on filter/search/status change — same as Delivery Logs.
   useEffect(() => {
@@ -174,11 +176,21 @@ export function NotificationsListView({ initialPage, initialUnreadCount }: Notif
           <select
             value={activeTab}
             onChange={(event) => setActiveTab(event.target.value as TabType)}
-            className="h-9 min-w-32 cursor-pointer rounded-xl border border-card-border/60 bg-card px-3 text-xs font-semibold text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="h-9 min-w-32 cursor-pointer rounded-xl border border-card-border/60 bg-card px-3 text-sm font-semibold text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             {TABS.map((tab) => (
               <option key={tab} value={tab}>{tab.charAt(0) + tab.slice(1).toLowerCase()}</option>
             ))}
+          </select>
+          <select
+            value={typeFilter}
+            onChange={(event) => setTypeFilter(event.target.value as 'ALL' | 'INQUIRY' | 'EMAIL' | 'CHAT')}
+            className="h-9 min-w-32 cursor-pointer rounded-xl border border-card-border/60 bg-card px-3 text-sm font-semibold text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <option value="ALL">All types</option>
+            <option value="INQUIRY">Inquiry</option>
+            <option value="EMAIL">Email</option>
+            <option value="CHAT">Chat</option>
           </select>
           <div className="flex items-center gap-2 sm:ml-auto">
             <Button variant="outline" size="sm" onClick={() => router.refresh()} className="h-9 gap-1.5 text-xs" title="Refresh notifications">
@@ -192,14 +204,14 @@ export function NotificationsListView({ initialPage, initialUnreadCount }: Notif
       </div>
 
       <div className="flex flex-col gap-3 min-h-0">
-        <div className="hidden border-b border-card-border/50 px-4 py-2.5 text-[11px] font-bold uppercase tracking-wide text-text-muted md:block">
+        <div className="hidden border-b border-card-border/40 py-2 pr-4 text-sm font-bold text-foreground md:block">
           Notification
         </div>
 
         {loading && notifications.length === 0 ? (
           <SecretaryListSkeletonTheme>
             {Array.from({ length: 7 }, (_, i) => (
-              <div key={i} className="flex items-center gap-3 border-b border-card-border/40 px-4 py-3.5">
+              <div key={i} className="flex items-center gap-3 border-b border-card-border/40 pr-4 py-3.5">
                 <SecretaryListSkeleton circle width={36} height={36} />
                 <div className="flex min-w-0 flex-1 flex-col gap-1.5">
                   <SecretaryListSkeleton width={160} height={14} />
@@ -237,7 +249,7 @@ export function NotificationsListView({ initialPage, initialUnreadCount }: Notif
                       handleRowClick(notification);
                     }
                   }}
-                  className={`grid cursor-pointer gap-3 border-b border-card-border/40 px-4 py-3.5 transition-colors hover:bg-muted/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:gap-4 ${!notification.isRead ? 'bg-primary/[0.025]' : ''} group`}
+                  className={`grid cursor-pointer gap-3 border-b border-card-border/40 pr-4 py-3.5 transition-colors hover:bg-muted/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:gap-4 ${!notification.isRead ? 'bg-primary/[0.025]' : ''} group`}
                 >
                   <div className="flex min-w-0 items-start gap-3">
                     <div className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-full border border-border/60 bg-muted/30">{getNotificationIcon(notification.type)}</div>
@@ -247,19 +259,12 @@ export function NotificationsListView({ initialPage, initialUnreadCount }: Notif
                     </div>
                   </div>
                   <div className="flex items-center justify-end gap-1.5">
-                    <div className="hidden items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100 md:flex">
-                      {!notification.isRead && (
-                        <Button variant="ghost" size="sm" onClick={(event) => { event.stopPropagation(); void handleMarkRead(notification.id); }} disabled={updatingId === notification.id} className="h-7 gap-1 px-2 text-[11px] text-muted-foreground hover:text-foreground">
-                          <Check className="size-3.5" /> Mark as read
-                        </Button>
-                      )}
-                      {notification.linkUrl && (
-                        <Button variant="ghost" size="sm" onClick={(event) => { event.stopPropagation(); void handleMarkRead(notification.id); router.push(getTargetUrl(notification.linkUrl)); }} className="h-7 gap-1 px-2 text-[11px] text-muted-foreground hover:text-foreground">
-                          <ExternalLink className="size-3.5" /> Open
-                        </Button>
-                      )}
-                    </div>
-                    <span className="shrink-0 text-xs text-muted-foreground md:text-right" suppressHydrationWarning>{formatRelativeTime(notification.createdAt)}</span>
+                    <span className="shrink-0 text-sm text-muted-foreground font-mono group-hover:hidden md:text-right" suppressHydrationWarning>{formatRelativeTime(notification.createdAt)}</span>
+                    {notification.linkUrl && (
+                      <Button variant="ghost" size="sm" onClick={(event) => { event.stopPropagation(); void handleMarkRead(notification.id); router.push(getTargetUrl(notification.linkUrl)); }} disabled={updatingId === notification.id} className="h-7 gap-1 px-2 text-sm text-muted-foreground hidden group-hover:inline-flex hover:text-foreground">
+                        <ExternalLink className="size-4" /> Open
+                      </Button>
+                    )}
                   </div>
                 </div>
               ))}
