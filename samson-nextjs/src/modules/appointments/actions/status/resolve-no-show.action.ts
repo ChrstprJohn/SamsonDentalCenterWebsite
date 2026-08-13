@@ -77,14 +77,16 @@ export async function resolveNoShowAction(formData: ResolveNoShowDto) {
         const adminDb = await createAdminClient();
         const { data: appointment } = await adminDb
           .from('appointments')
-          .select('patient_id, confirmation_channel, guest_contacts(email, phone_number)')
+          .select('patient_id, guest_contacts(email, phone_number)')
           .eq('id', validData.appointmentId)
           .single();
         const aptData = appointment as any;
         const patientId = aptData?.patient_id || null;
         const guestEmail = aptData?.guest_contacts?.[0]?.email || null;
         const guestPhone = aptData?.guest_contacts?.[0]?.phone_number || null;
-        const noShowChannel = aptData?.confirmation_channel || 'EMAIL';
+        // Use the channel passed from the UI to avoid a race condition where
+        // the channel may not yet have been persisted when this action runs.
+        const noShowChannel = validData.confirmationChannel || 'EMAIL';
         if (noShowChannel === 'EMAIL' || noShowChannel === 'BOTH') {
           await outboxCommands(adminDb).emitEvent('APPOINTMENT_NO_SHOW', {
             appointmentId: validData.appointmentId,
@@ -111,14 +113,16 @@ export async function resolveNoShowAction(formData: ResolveNoShowDto) {
         const adminDb = await createAdminClient();
         const { data: appointment } = await adminDb
           .from('appointments')
-          .select('patient_id, confirmation_channel, guest_contacts(email, phone_number)')
+          .select('patient_id, guest_contacts(email, phone_number)')
           .eq('id', validData.appointmentId)
           .single();
         const aptData = appointment as any;
         const patientId = aptData?.patient_id || null;
         const guestEmail = aptData?.guest_contacts?.[0]?.email || null;
         const guestPhone = aptData?.guest_contacts?.[0]?.phone_number || null;
-        const completionChannel = aptData?.confirmation_channel || 'EMAIL';
+        // Use the channel passed from the UI to avoid a race condition where
+        // the channel may not yet have been persisted when this action runs.
+        const completionChannel = validData.confirmationChannel || 'EMAIL';
         if (completionChannel === 'EMAIL' || completionChannel === 'BOTH') {
           await outboxCommands(adminDb).emitEvent('APPOINTMENT_COMPLETED_POST_CARE', {
             appointmentId: validData.appointmentId,

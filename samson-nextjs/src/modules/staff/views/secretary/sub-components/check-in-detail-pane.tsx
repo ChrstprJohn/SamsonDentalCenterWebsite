@@ -604,7 +604,7 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
                         if (draftInlineChannel !== inlineChannel) {
                           await handleSaveInlineChannel();
                         }
-                        view.handleResolveNoShowSubmit({ appointmentId: appointment.id, resolution: resolveMode, reason: resolveReason });
+                        view.handleResolveNoShowSubmit({ appointmentId: appointment.id, resolution: resolveMode, reason: resolveReason, confirmationChannel: inlineChannel });
                       }} disabled={view.isPending || !resolveReason.trim() || isEditingInlineChannel} className="flex-1 h-[42px] text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-xl disabled:opacity-40">
                         {view.isPending ? 'Submitting...' : 'Confirm'}
                       </button>
@@ -1047,7 +1047,8 @@ function ResolveContent({ view, onClose, channel, draftChannel, isEditingChannel
       newStartTime?: string;
       newEndTime?: string;
       newDoctorId?: string;
-    } = { appointmentId: appointment.id, resolution, reason: reason.trim() };
+      confirmationChannel?: 'EMAIL' | 'SMS' | 'BOTH' | 'NONE';
+    } = { appointmentId: appointment.id, resolution, reason: reason.trim(), confirmationChannel: channel };
     if (resolution === 'RESCHEDULE') {
       const fmt = (ds: string, ts: string) => `${ds}T${ts.length === 5 ? ts + ':00' : ts}Z`;
       const date = view.rescheduleDate || appointment.date;

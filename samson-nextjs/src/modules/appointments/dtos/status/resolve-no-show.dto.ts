@@ -8,6 +8,8 @@ export const resolveNoShowSchema = z.object({
   newStartTime: z.string().optional(),
   newEndTime: z.string().optional(),
   newDoctorId: z.string().uuid().optional(),
+  /** Notification channel resolved by the UI before submitting — avoids DB re-fetch race condition. */
+  confirmationChannel: z.enum(['EMAIL', 'SMS', 'BOTH', 'NONE']).optional(),
 });
 
 export type ResolveNoShowDto = z.infer<typeof resolveNoShowSchema>;

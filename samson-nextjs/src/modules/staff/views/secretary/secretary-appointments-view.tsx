@@ -1,14 +1,13 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSecretaryAppointments } from '../../hooks/secretary/use-secretary-appointments';
 import { getStaffAppointmentByIdAction } from '@/modules/appointments/actions/clinic/get-staff-appointment-by-id.action';
 import { AppointmentDetailPane } from './sub-components/appointment-detail-pane';
 import { AppointmentsTable } from './sub-components/appointments-table';
 import { CoordinationHub } from './sub-components/coordination-hub';
-import { ArrowLeft, CalendarDays, CheckCircle2, AlertCircle, Clock, ClipboardList, HelpCircle, RotateCw, SlidersHorizontal, X } from 'lucide-react';
+import { ArrowLeft, CalendarDays, CheckCircle2, AlertCircle, Clock, ClipboardList, RotateCw, SlidersHorizontal, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Modal } from '@/components/ui/modal';
 import { Select } from '@/components/ui/select';
 import { SidebarHeader, SidebarInput, SidebarTrigger } from '@/components/ui/sidebar';
 
@@ -18,7 +17,11 @@ export function SecretaryAppointmentsView() {
   const [mobileView, setMobileView] = useState<'list' | 'detail' | 'quickLogs'>('list');
   const [showNotesPanel, setShowNotesPanel] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
-  const [showGuideModal, setShowGuideModal] = useState(false);
+  const [detailHeaderTitle, setDetailHeaderTitle] = useState<string | null>(null);
+  const customBackRef = useRef<(() => boolean) | null>(null);
+  const handleCustomBack = useCallback((fn: (() => boolean) | null) => {
+    customBackRef.current = fn;
+  }, []);
   const [isDeepLinking, setIsDeepLinking] = useState(false);
   const [isDeepLinkDetailReady, setIsDeepLinkDetailReady] = useState(false);
   const [search, setSearch] = useState('');
@@ -117,20 +120,9 @@ export function SecretaryAppointmentsView() {
           <div ref={filterBoxRef} className="relative flex w-full h-8 items-center justify-between">
             <div className="flex items-center gap-2">
               <SidebarTrigger className="lg:hidden -ml-1 text-muted-foreground hover:text-foreground" />
-              <div className="flex items-center gap-1.5">
-                <span className="text-base font-medium text-foreground">
-                  Appointments Directory
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setShowGuideModal(true)}
-                  className="inline-flex items-center justify-center text-muted-foreground hover:text-primary transition-colors p-0.5 rounded-full hover:bg-muted/60"
-                  aria-label="How to use Appointments Directory"
-                  title="How to use this page"
-                >
-                  <HelpCircle className="size-4" />
-                </button>
-              </div>
+              <span className="text-base font-medium text-foreground">
+                Appointments Directory
+              </span>
             </div>
             <button
               onClick={() => {
@@ -354,6 +346,9 @@ export function SecretaryAppointmentsView() {
             <div className="flex items-center gap-2 min-w-0 flex-1">
               <button
                 onClick={() => {
+                  if (customBackRef.current && customBackRef.current()) {
+                    return;
+                  }
                   if (view.showRescheduleForm) {
                     view.setShowRescheduleForm(false);
                   } else if (view.showCancelForm) {
@@ -368,7 +363,7 @@ export function SecretaryAppointmentsView() {
                 <ArrowLeft className="size-5" />
               </button>
               <div className="text-base font-medium text-foreground text-left truncate">
-                {view.showRescheduleForm ? 'Reschedule Appointment' : view.showCancelForm ? 'Cancel Appointment' : 'Appointment Details'}
+                {detailHeaderTitle || (view.showRescheduleForm ? 'Reschedule Appointment' : view.showCancelForm ? 'Cancel Appointment' : 'Appointment Details')}
               </div>
             </div>
             {/* Top Right Toggle Button for Staff Notes (Visible when panel is closed) */}
@@ -388,7 +383,13 @@ export function SecretaryAppointmentsView() {
               </Button>
             )}
           </div>
-          <AppointmentDetailPane view={view} activeTab={view.activeTab} onAppointmentUpdated={view.onAppointmentUpdated} />
+          <AppointmentDetailPane
+            view={view}
+            activeTab={view.activeTab}
+            onAppointmentUpdated={view.onAppointmentUpdated}
+            onHeaderTitleChange={setDetailHeaderTitle}
+            onCustomBack={handleCustomBack}
+          />
         </div>
       ) : isDeepLinking || view.isLoading ? (
         <div className="flex-1 flex-col items-center justify-center text-muted-foreground bg-muted/10 max-lg:hidden flex p-6 text-center">
@@ -424,61 +425,6 @@ export function SecretaryAppointmentsView() {
           />
         </div>
       )}
-
-      {/* Help Guide Modal */}
-      <Modal
-        isOpen={showGuideModal}
-        onClose={() => setShowGuideModal(false)}
-        title="Appointments Directory Guide"
-        size="lg"
-      >
-        <div className="space-y-4 text-sm">
-          <p className="text-muted-foreground">
-            Welcome to the Appointments Directory! Here is a quick guide on how to navigate and manage patient appointments effectively.
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
-            <div className="rounded-xl border border-card-border/60 p-3 bg-muted/20 flex flex-col gap-2">
-              <div className="flex items-center gap-2 font-medium text-foreground">
-                <CheckCircle2 className="size-4 text-emerald-500" />
-                <span>Active Tab</span>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                View all scheduled and confirmed upcoming appointments. Click any row to review details or manage status.
-              </p>
-            </div>
-
-            <div className="rounded-xl border border-amber-500/30 p-3 bg-amber-500/5 flex flex-col gap-2">
-              <div className="flex items-center gap-2 font-medium text-amber-700 dark:text-amber-400">
-                <AlertCircle className="size-4 text-amber-500" />
-                <span>Unresolved Tab</span>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Requires secretary action! Manage pending web bookings, reschedule requests, or unconfirmed cancellations.
-              </p>
-            </div>
-
-            <div className="rounded-xl border border-card-border/60 p-3 bg-muted/20 flex flex-col gap-2">
-              <div className="flex items-center gap-2 font-medium text-foreground">
-                <Clock className="size-4 text-muted-foreground" />
-                <span>History Tab</span>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Access past completed, cancelled, or archived appointments for historical record lookup.
-              </p>
-            </div>
-          </div>
-
-          <div className="rounded-xl bg-primary/5 border border-primary/20 p-3 flex flex-col gap-1.5 text-xs">
-            <span className="font-semibold text-primary">Pro Tips & Shortcuts</span>
-            <ul className="list-disc list-inside text-muted-foreground space-y-1">
-              <li>Use the <strong>Filters button</strong> next to the title to narrow down by date range, specific doctor, or booking source.</li>
-              <li>Toggle <strong>Notes & Logs</strong> in the top right of the detail pane to record internal notes or review automated notifications.</li>
-              <li>In the <strong>Unresolved tab</strong>, quick action buttons allow one-click confirmation or rescheduling.</li>
-            </ul>
-          </div>
-        </div>
-      </Modal>
     </div>
   );
 }

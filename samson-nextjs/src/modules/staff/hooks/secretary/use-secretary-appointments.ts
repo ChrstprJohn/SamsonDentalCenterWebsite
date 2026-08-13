@@ -561,6 +561,7 @@ export function useSecretaryAppointments() {
     newStartTime?: string;
     newEndTime?: string;
     newDoctorId?: string;
+    confirmationChannel?: 'EMAIL' | 'SMS' | 'BOTH' | 'NONE';
   }) => {
     startTransition(async () => {
       const result = await resolveNoShowAction(payload);

@@ -238,6 +238,7 @@ export function useSecretaryCheckInOutTracker() {
     newStartTime?: string;
     newEndTime?: string;
     newDoctorId?: string;
+    confirmationChannel?: 'EMAIL' | 'SMS' | 'BOTH' | 'NONE';
   }) => {
     startTransition(async () => {
       const res = await resolveNoShowAction(payload);

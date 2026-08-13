@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Calendar, X, Check, Pencil, CalendarDays } from 'lucide-react';
@@ -30,9 +30,21 @@ interface AppointmentDetailPaneProps {
   hideActions?: boolean;
   onAppointmentUpdated?: () => void;
   onEditingGuestInfoChange?: (isEditing: boolean) => void;
+  onHeaderTitleChange?: (title: string | null) => void;
+  onCustomBack?: (backFn: (() => boolean) | null) => void;
 }
 
-export function AppointmentDetailPane({ view, compact, appointment: appointmentOverride, activeTab: activeTabOverride, hideActions, onAppointmentUpdated, onEditingGuestInfoChange }: AppointmentDetailPaneProps) {
+export function AppointmentDetailPane({
+  view,
+  compact,
+  appointment: appointmentOverride,
+  activeTab: activeTabOverride,
+  hideActions,
+  onAppointmentUpdated,
+  onEditingGuestInfoChange,
+  onHeaderTitleChange,
+  onCustomBack,
+}: AppointmentDetailPaneProps) {
   const appointment = appointmentOverride || (view.selectedAppointment as AppointmentDto | undefined);
   if (!appointment) {
     return (
@@ -47,7 +59,19 @@ export function AppointmentDetailPane({ view, compact, appointment: appointmentO
       </div>
     );
   }
-  return <AppointmentDetails appointment={appointment} view={view} activeTab={activeTabOverride || view.activeTab || 'upcoming'} compact={compact} hideActions={hideActions} onAppointmentUpdated={onAppointmentUpdated} onEditingGuestInfoChange={onEditingGuestInfoChange} />;
+  return (
+    <AppointmentDetails
+      appointment={appointment}
+      view={view}
+      activeTab={activeTabOverride || view.activeTab || 'upcoming'}
+      compact={compact}
+      hideActions={hideActions}
+      onAppointmentUpdated={onAppointmentUpdated}
+      onEditingGuestInfoChange={onEditingGuestInfoChange}
+      onHeaderTitleChange={onHeaderTitleChange}
+      onCustomBack={onCustomBack}
+    />
+  );
 }
 
 // ponytail: same slot-past semantics as check-in board, but tolerant of
@@ -66,13 +90,50 @@ function getSlotEnd(appointment: AppointmentDto): Date | null {
   return start ? new Date(start.getTime() + (service?.durationMinutes || 30) * 60000) : null;
 }
 
-function AppointmentDetails({ appointment, view, activeTab, compact, hideActions, onAppointmentUpdated, onEditingGuestInfoChange }: { appointment: AppointmentDto; view: any; activeTab: AppointmentDirectoryTab; compact?: boolean; hideActions?: boolean; onAppointmentUpdated?: () => void; onEditingGuestInfoChange?: (isEditing: boolean) => void }) {
+function AppointmentDetails({
+  appointment,
+  view,
+  activeTab,
+  compact,
+  hideActions,
+  onAppointmentUpdated,
+  onEditingGuestInfoChange,
+  onHeaderTitleChange,
+  onCustomBack,
+}: {
+  appointment: AppointmentDto;
+  view: any;
+  activeTab: AppointmentDirectoryTab;
+  compact?: boolean;
+  hideActions?: boolean;
+  onAppointmentUpdated?: () => void;
+  onEditingGuestInfoChange?: (isEditing: boolean) => void;
+  onHeaderTitleChange?: (title: string | null) => void;
+  onCustomBack?: (backFn: (() => boolean) | null) => void;
+}) {
   const router = useRouter();
   const pathname = usePathname();
   const prefix = pathname.startsWith('/secretary-v2') ? '/secretary-v2' : '/secretary';
   const [detailTab, setDetailTab] = useState<'overview' | 'notifications' | 'timeline'>('overview');
   const [isEditingChannel, setIsEditingChannel] = useState(false);
   const [showResolvePane, setShowResolvePane] = useState(false);
+  const prevIdRef = useRef(appointment.id);
+  const prevTabRef = useRef(activeTab);
+  const onHeaderTitleChangeRef = useRef(onHeaderTitleChange);
+  onHeaderTitleChangeRef.current = onHeaderTitleChange;
+  const onCustomBackRef = useRef(onCustomBack);
+  onCustomBackRef.current = onCustomBack;
+
+  // Reset resolve pane only when appointment or directory tab actually changes
+  useEffect(() => {
+    if (prevIdRef.current !== appointment.id || prevTabRef.current !== activeTab) {
+      prevIdRef.current = appointment.id;
+      prevTabRef.current = activeTab;
+      setShowResolvePane(false);
+      onHeaderTitleChangeRef.current?.(null);
+      onCustomBackRef.current?.(null);
+    }
+  }, [appointment.id, activeTab]);
 
   const handleEditChange = (isEditing: boolean) => {
     onEditingGuestInfoChange?.(isEditing);
@@ -125,7 +186,13 @@ function AppointmentDetails({ appointment, view, activeTab, compact, hideActions
         appointment={appointment}
         view={view}
         compact={compact}
-        onDone={() => setShowResolvePane(false)}
+        onDone={() => {
+          setShowResolvePane(false);
+          onHeaderTitleChange?.(null);
+          onCustomBack?.(null);
+        }}
+        onHeaderTitleChange={onHeaderTitleChange}
+        onCustomBack={onCustomBack}
       />
     );
   }
@@ -588,11 +655,15 @@ function NeedsAttentionResolvePane({
   view,
   compact,
   onDone,
+  onHeaderTitleChange,
+  onCustomBack,
 }: {
   appointment: AppointmentDto;
   view: any;
   compact?: boolean;
   onDone?: () => void;
+  onHeaderTitleChange?: (title: string | null) => void;
+  onCustomBack?: (backFn: (() => boolean) | null) => void;
 }) {
   const isMissedCheckout = appointment.status === 'CHECKED_IN';
   const [resolveMode, setResolveMode] = useState<'COMPLETED' | 'CONFIRMED_NO_SHOW' | 'RESCHEDULE' | null>(null);
@@ -601,6 +672,46 @@ function NeedsAttentionResolvePane({
   const [showCustomReason, setShowCustomReason] = useState(false);
   const [showRescheduleForm, setShowRescheduleForm] = useState(false);
   const [isEditingRescheduleChannel, setIsEditingRescheduleChannel] = useState(false);
+
+  const onHeaderTitleChangeRef = useRef(onHeaderTitleChange);
+  onHeaderTitleChangeRef.current = onHeaderTitleChange;
+  const onCustomBackRef = useRef(onCustomBack);
+  onCustomBackRef.current = onCustomBack;
+  const onDoneRef = useRef(onDone);
+  onDoneRef.current = onDone;
+
+  // Sync header title with active resolve mode / form
+  useEffect(() => {
+    let title = isMissedCheckout ? 'Resolve Missed Checkout' : 'Resolve No-Show';
+    if (showRescheduleForm) {
+      title = 'Reschedule Appointment';
+    } else if (resolveMode === 'COMPLETED') {
+      title = isMissedCheckout ? 'Checkout Missed Visit' : 'Checkout Patient';
+    } else if (resolveMode === 'CONFIRMED_NO_SHOW') {
+      title = 'Keep Confirmed No-Show';
+    }
+    onHeaderTitleChangeRef.current?.(title);
+  }, [showRescheduleForm, resolveMode, isMissedCheckout]);
+
+  // Handle header ArrowLeft button click to step back within resolve flow
+  useEffect(() => {
+    const handleBack = () => {
+      if (showRescheduleForm) {
+        setShowRescheduleForm(false);
+        return true;
+      }
+      if (resolveMode) {
+        setResolveMode(null);
+        return true;
+      }
+      onDoneRef.current?.();
+      return true;
+    };
+    onCustomBackRef.current?.(handleBack);
+    return () => {
+      onCustomBackRef.current?.(null);
+    };
+  }, [showRescheduleForm, resolveMode]);
 
   const initialChannel = (appointment.confirmationChannel || 'EMAIL') as 'EMAIL' | 'SMS' | 'BOTH' | 'NONE';
   const [channel, setChannel] = useState(initialChannel);
@@ -629,7 +740,7 @@ function NeedsAttentionResolvePane({
       view.completeMissedCheckout?.(appointment.id, resolveReason.trim() || 'Late checkout — past appointment follow-up');
     } else {
       if (!resolveMode || !resolveReason.trim()) return;
-      view.handleResolveNoShowSubmit?.({ appointmentId: appointment.id, resolution: resolveMode, reason: resolveReason.trim() });
+      view.handleResolveNoShowSubmit?.({ appointmentId: appointment.id, resolution: resolveMode, reason: resolveReason.trim(), confirmationChannel: channel });
     }
     reset();
     onDone?.();
