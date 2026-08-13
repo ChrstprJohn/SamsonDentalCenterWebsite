@@ -79,21 +79,21 @@ const data = {
       icon: <Users className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
       items: [
         {
-          title: "Clinic Settings",
+          title: "General Settings",
           url: "/secretary-v2/clinic-settings",
         },
         {
-          title: "Dentists",
+          title: "Dentist Roster",
           url: "/secretary-v2/doctors",
         },
         {
-          title: "Services",
+          title: "Service Catalog",
           url: "/secretary-v2/services",
         },
       ],
     },
     {
-      title: "System & Logs",
+      title: "System & Reports",
       url: "#",
       icon: <Settings className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
       items: [
@@ -106,11 +106,11 @@ const data = {
           url: "/secretary-v2/delivery-logs",
         },
         {
-          title: "Audit Logs",
+          title: "Audit Trail",
           url: "/secretary-v2/audits",
         },
         {
-          title: "Profile Settings",
+          title: "My Profile",
           url: "/secretary-v2/profile",
         },
       ],

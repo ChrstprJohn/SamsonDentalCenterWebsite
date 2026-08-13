@@ -219,7 +219,7 @@ export function DoctorTimeline({
   const columnsCount = viewMode === 'week' ? 5 : doctors.length;
 
   return (
-    <div className="flex flex-col flex-1 min-h-0 bg-card overflow-hidden">
+    <div className="flex flex-col flex-1 min-h-0 bg-card overflow-hidden relative">
       {/* Scrollable Container wrapper */}
       <div className="flex-1 overflow-auto relative [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent" data-lenis-prevent style={{ scrollbarWidth: 'thin' }}>
         <div

@@ -85,9 +85,9 @@ export function ClinicSettingsPage({ initialConfig, initialTimeBlocks = [] }: Cl
   };
 
   return (
-    <div className="flex flex-col gap-8 flex-1 min-h-0 p-6 md:p-8 overflow-y-auto">
+    <div className="flex flex-col gap-8 flex-1 min-h-0 p-6 md:p-8 overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent" style={{ scrollbarWidth: 'thin' }} data-lenis-prevent>
       <div className="flex flex-col gap-1">
-        <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-text-primary">Clinic Settings</h1>
+        <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-text-primary">General Settings</h1>
         <p className="text-xs text-text-muted">
           Manage the public clinic information and booking rules used across the website.
         </p>

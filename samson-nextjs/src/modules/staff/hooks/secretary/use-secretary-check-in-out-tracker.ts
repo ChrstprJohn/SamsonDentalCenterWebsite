@@ -47,9 +47,9 @@ export function useSecretaryCheckInOutTracker() {
 
   const [doctorsList, setDoctorsList] = useState<any[]>([]);
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (silent = false) => {
     const requestId = ++requestIdRef.current;
-    setIsLoading(true);
+    if (!silent) setIsLoading(true);
     setErrorMessage(null);
     try {
       const [apptRes, docRes] = await Promise.all([
@@ -97,7 +97,7 @@ export function useSecretaryCheckInOutTracker() {
     if (realtimeTimerRef.current) clearTimeout(realtimeTimerRef.current);
     realtimeTimerRef.current = setTimeout(() => {
       realtimeTimerRef.current = null;
-      void fetchData();
+      void fetchData(true); // silent — don't flash full-screen loader
     }, 250);
   }, [fetchData]);
 
@@ -177,7 +177,7 @@ export function useSecretaryCheckInOutTracker() {
       if (!res.success) setErrorMessage(res.error || fallback);
       else {
         suppressRealtimeUntilRef.current = Date.now() + 500;
-        await fetchData();
+        await fetchData(true); // silent — don't flash full-screen loader
         // Keep panel open, re-open in details view with the refreshed appointment.
         const fresh = await getStaffAppointmentByIdAction(appointmentId);
         if (fresh.success && fresh.data) {
@@ -218,7 +218,7 @@ export function useSecretaryCheckInOutTracker() {
       if (!res.success) setErrorMessage(res.error || 'Failed to complete checkout');
       else {
         suppressRealtimeUntilRef.current = Date.now() + 500;
-        await fetchData();
+        await fetchData(true); // silent — don't flash full-screen loader
         // Keep panel open, re-open in details view with the refreshed appointment.
         const fresh = await getStaffAppointmentByIdAction(appointmentId);
         if (fresh.success && fresh.data) {
@@ -245,7 +245,7 @@ export function useSecretaryCheckInOutTracker() {
       if (!res.success) setErrorMessage(res.error || 'Failed to resolve no-show');
       else {
         suppressRealtimeUntilRef.current = Date.now() + 500;
-        await fetchData();
+        await fetchData(true); // silent — don't flash full-screen loader
         // Keep panel open, re-open in details view with the refreshed appointment.
         const fresh = await getStaffAppointmentByIdAction(payload.appointmentId);
         if (fresh.success && fresh.data) {
@@ -284,7 +284,7 @@ export function useSecretaryCheckInOutTracker() {
       if (!res.success) setErrorMessage(res.error || 'Failed to reschedule');
       else {
         suppressRealtimeUntilRef.current = Date.now() + 500;
-        await fetchData();
+        await fetchData(true); // silent — don't flash full-screen loader
         // Keep panel open, re-open in details view with the refreshed appointment.
         const fresh = await getStaffAppointmentByIdAction(appointmentId);
         if (fresh.success && fresh.data) {
@@ -351,7 +351,7 @@ export function useSecretaryCheckInOutTracker() {
 
   const refreshAppointment = useCallback(async (appointmentId?: string) => {
     suppressRealtimeUntilRef.current = Date.now() + 500;
-    await fetchData();
+    await fetchData(true); // silent — don't flash full-screen loader
     const targetId = appointmentId || viewAppt?.id;
     if (targetId) {
       const fresh = await getStaffAppointmentByIdAction(targetId);

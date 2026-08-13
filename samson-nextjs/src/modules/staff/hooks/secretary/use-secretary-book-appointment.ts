@@ -89,10 +89,10 @@ export function useSecretaryBookAppointment() {
     return request;
   }, []);
 
-  const loadTimelineData = useCallback(async (date: string) => {
+  const loadTimelineData = useCallback(async (date: string, silent = false) => {
     if (!date) return;
     const requestId = ++timelineRequestIdRef.current;
-    setIsLoadingAppointments(true);
+    if (!silent) setIsLoadingAppointments(true);
     const res = await getClinicAppointmentsAction({ date });
     if (requestId !== timelineRequestIdRef.current) return;
     setIsLoadingAppointments(false);
@@ -302,7 +302,7 @@ export function useSecretaryBookAppointment() {
       if (res.success) {
         setBooked(true);
         setToast({ message: 'Appointment booked successfully!', type: 'success' });
-        await loadTimelineData(selectedDate);
+        await loadTimelineData(selectedDate, true); // silent — don't flash overlay
       } else {
         setInlineError(res.error || 'Booking failed');
         setToast({ message: res.error || 'Booking failed', type: 'error' });

@@ -109,7 +109,7 @@ export function SecretaryBookAppointmentView() {
         // Keep panel open and refresh the selected appointment even if it moved off the visible day.
         const fresh = await getStaffAppointmentByIdAction(view.selectedAppointmentDetails.id);
         if (fresh.success && fresh.data) view.setSelectedAppointmentDetails(fresh.data);
-        await view.loadTimelineData(view.selectedDate);
+        await view.loadTimelineData(view.selectedDate, true); // silent — don't flash overlay
       } else {
         view.setInlineError(res.error || 'Failed to reschedule appointment');
       }
@@ -139,7 +139,7 @@ export function SecretaryBookAppointmentView() {
         // Keep panel open with cancelled status.
         const fresh = await getStaffAppointmentByIdAction(view.selectedAppointmentDetails.id);
         if (fresh.success && fresh.data) view.setSelectedAppointmentDetails(fresh.data);
-        await view.loadTimelineData(view.selectedDate);
+        await view.loadTimelineData(view.selectedDate, true); // silent — don't flash overlay
       } else {
         view.setInlineError(res.error || 'Failed to cancel appointment');
       }
@@ -523,7 +523,7 @@ export function SecretaryBookAppointmentView() {
                       const fresh = await getStaffAppointmentByIdAction(view.selectedAppointmentDetails.id);
                       if (fresh.success && fresh.data) view.setSelectedAppointmentDetails(fresh.data);
                     }
-                    await view.loadTimelineData(view.selectedDate);
+                    await view.loadTimelineData(view.selectedDate, true); // silent — don't flash overlay
                   },
                 }}
               />
