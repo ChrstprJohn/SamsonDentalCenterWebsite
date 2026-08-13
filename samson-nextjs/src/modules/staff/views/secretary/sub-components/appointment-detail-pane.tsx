@@ -254,7 +254,7 @@ function AppointmentDetails({ appointment, view, activeTab, compact, hideActions
                       const params = new URLSearchParams();
                       if (patientId) params.set('patientId', patientId);
                       if (serviceId) params.set('serviceId', serviceId);
-                      router.push(`/secretary-v2/book?${params.toString()}`);
+                      router.push(`${prefix}/book?${params.toString()}`);
                     }}
                   >
                     <CalendarDays className="size-4" />
@@ -275,7 +275,7 @@ function AppointmentDetails({ appointment, view, activeTab, compact, hideActions
                     <div className={`flex gap-2 ${isEditingChannel ? 'pointer-events-none opacity-40' : ''}`}>
                       {(isNoShowCandidate || (isCheckedIn && isPastEnd)) && !isResolvedNoShow && (
                         <Button className="flex-1 h-[42px] bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => router.push(resolveTarget)}>
-                          {resolveTarget.startsWith('/secretary-v2/appointments') ? 'Open Unresolved' : 'Open Check-In & Out'}
+                          {resolveTarget.startsWith(`${prefix}/appointments`) ? 'Open Unresolved' : 'Open Check-In & Out'}
                         </Button>
                       )}
                       {isResolvedNoShow && (
@@ -393,7 +393,7 @@ function AppointmentDetails({ appointment, view, activeTab, compact, hideActions
                   const params = new URLSearchParams();
                   if (patientId) params.set('patientId', patientId);
                   if (serviceId) params.set('serviceId', serviceId);
-                  router.push(`/secretary-v2/book?${params.toString()}`);
+                  router.push(`${prefix}/book?${params.toString()}`);
                 }}
               >
                 <CalendarDays className="size-4" />
@@ -415,7 +415,7 @@ function AppointmentDetails({ appointment, view, activeTab, compact, hideActions
               <div className={`flex gap-2 ${isEditingChannel ? 'pointer-events-none opacity-40' : ''}`}>
                 {(isNoShowCandidate || (isCheckedIn && isPastEnd)) && !isResolvedNoShow && (
                   <Button className="flex-1 h-[42px] bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => router.push(resolveTarget)}>
-                    {resolveTarget.startsWith('/secretary-v2/appointments') ? 'Open Unresolved' : 'Open Check-In & Out'}
+                    {resolveTarget.startsWith(`${prefix}/appointments`) ? 'Open Unresolved' : 'Open Check-In & Out'}
                   </Button>
                 )}
                 {isResolvedNoShow && (

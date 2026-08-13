@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
@@ -114,6 +114,8 @@ function DeliveryLogRow({
   onViewError: (entry: DeliveryEntry) => void;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
+  const prefix = pathname.startsWith('/secretary-v2') ? '/secretary-v2' : '/secretary';
   return (
     <tr
       className={`border-b border-card-border/40 last:border-b-0 transition-colors ${
@@ -178,7 +180,7 @@ function DeliveryLogRow({
               )}
               {entry.appointmentId && (
                 <DropdownMenuItem
-                  onClick={() => router.push(`/secretary-v2/appointments?appointmentId=${entry.appointmentId}`)}
+                  onClick={() => router.push(`${prefix}/appointments?appointmentId=${entry.appointmentId}`)}
                   className="text-sm flex items-center gap-2 cursor-pointer"
                 >
                   <Info className="size-3.5 text-muted-foreground" />
