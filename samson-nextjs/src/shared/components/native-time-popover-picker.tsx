@@ -37,6 +37,7 @@ export function NativeTimePopoverPicker({
 }: NativeTimePopoverPickerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [popoverPosition, setPopoverPosition] = useState<'top' | 'bottom'>('bottom');
+  const [popoverLeft, setPopoverLeft] = useState<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Convert 12-hour (h, m, p) to 24-hour HH:MM format
@@ -171,6 +172,12 @@ export function NativeTimePopoverPicker({
       } else {
         setPopoverPosition('bottom');
       }
+      // Clamp popover within viewport horizontally (container-relative for absolute positioning)
+      const containerRect = containerRef.current?.getBoundingClientRect();
+      if (containerRect) {
+        const viewportLeft = Math.min(Math.max(rect.left, 8), document.documentElement.clientWidth - 176 - 16);
+        setPopoverLeft(viewportLeft - containerRect.left);
+      }
 
       // If no value is selected yet, pre-select the first available hour and default to 00 minute
       if (!value) {
@@ -211,7 +218,8 @@ export function NativeTimePopoverPicker({
       {/* 3-Column Native Popover Dropdown (No header, clean look) */}
       {isOpen && (
         <div
-          className={`absolute left-0 w-44 bg-white border border-gray-300 shadow-xl z-30 p-2 font-sans rounded-none ${
+          style={{ left: popoverLeft ?? 0 }}
+          className={`absolute w-44 bg-white border border-gray-300 shadow-xl z-30 p-2 font-sans rounded-none ${
             popoverPosition === 'top' ? 'bottom-full mb-1' : 'top-full mt-1'
           }`}
         >
