@@ -429,10 +429,10 @@ export function DoctorTimeline({
             return (
               <div
                 key={range.start}
-                className="pointer-events-none z-0 flex items-center justify-center border-y border-amber-300/50 bg-amber-50/80"
+                className="pointer-events-none z-0 flex items-center justify-center border-y border-gray-300/70 bg-gray-100/85"
                 style={{ gridColumn: `2 / ${columnsCount + 2}`, gridRow: `${startRow} / ${endRow}` }}
               >
-                <span className="text-sm font-bold uppercase tracking-[0.2em] text-amber-700">Break Time</span>
+                <span className="text-sm font-bold uppercase tracking-[0.2em] text-gray-500">Break Time</span>
               </div>
             );
           })}
@@ -529,8 +529,12 @@ export function DoctorTimeline({
         </div>
       </div>
       {isLoading && (
-        <div className="absolute inset-0 bg-card/60 backdrop-blur-[1px] flex items-center justify-center z-50">
-          <div className="text-xs text-text-muted animate-pulse">Updating timeline...</div>
+        <div className="absolute inset-0 bg-card flex flex-col items-center justify-center gap-3 z-50">
+          <div className="relative w-9 h-9">
+            <div className="absolute inset-0 rounded-full border-4 border-primary/20" />
+            <div className="absolute inset-0 rounded-full border-4 border-t-primary animate-spin" />
+          </div>
+          <div className="text-sm font-semibold text-text-primary">Updating timeline...</div>
         </div>
       )}
     </div>

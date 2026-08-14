@@ -28,6 +28,7 @@ import {
   SidebarGroupLabel,
   SidebarTrigger,
 } from '@/components/ui/sidebar';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 import {
   Collapsible,
@@ -70,6 +71,7 @@ export function SecretaryBookAppointmentView() {
   const [mobileView, setMobileView] = React.useState<'timeline' | 'detail'>('timeline');
   const [isBookingOpen, setIsBookingOpen] = React.useState(false);
   const [isDentistsOpen, setIsDentistsOpen] = React.useState(true);
+  const [isCalendarCollapsed, setIsCalendarCollapsed] = React.useState(false);
 
   const [isRescheduleOpen, setIsRescheduleOpen] = React.useState(false);
   const [isCancelOpen, setIsCancelOpen] = React.useState(false);
@@ -424,7 +426,7 @@ export function SecretaryBookAppointmentView() {
       </div>
 
       {/* Right Column: Booking Console Sidebar */}
-      <Sidebar collapsible="none" side="right" className={`flex-1 lg:flex-none lg:w-80 border-l border-border shrink-0 flex-col h-full bg-sidebar ${mobileView === 'timeline' ? 'max-lg:hidden' : ''}`}>
+      <Sidebar collapsible="none" side="right" className={`flex-1 lg:flex-none ${view.selectedAppointmentDetails || isBookingOpen || !isCalendarCollapsed ? 'lg:w-80' : 'lg:w-11'} border-l border-border shrink-0 flex-col h-full bg-sidebar ${mobileView === 'timeline' ? 'max-lg:hidden' : ''}`}>
         {view.selectedAppointmentDetails ? (
           <div className="flex flex-col h-full overflow-hidden">
             <div className="p-4 border-b border-card-border/40 shrink-0 flex items-center justify-between min-h-[61px]">
@@ -802,11 +804,52 @@ export function SecretaryBookAppointmentView() {
               </div>
             </SidebarFooter>
           </>
+        ) : isCalendarCollapsed ? (
+          <div className="flex flex-col h-full">
+            <div className="flex justify-end p-1.5">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => setIsCalendarCollapsed(false)}
+                    className="p-2 text-muted-foreground hover:text-foreground hover:bg-sidebar-accent rounded-md"
+                  >
+                    <CalendarIcon className="size-4" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="right">Expand calendar</TooltipContent>
+              </Tooltip>
+            </div>
+            <div className="flex-1 flex items-center justify-center">
+              <span className="[writing-mode:vertical-rl] rotate-180 text-xs font-semibold tracking-[0.2em] text-muted-foreground uppercase select-none">Calendar</span>
+            </div>
+            <div className="flex justify-center pb-3">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => { view.resetForm(); void view.loadActionResources(); setIsBookingOpen(true); }}
+                    className="p-2 text-muted-foreground hover:text-foreground hover:bg-sidebar-accent rounded-md"
+                  >
+                    <Plus className="size-4" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="right">Book New Appointment</TooltipContent>
+              </Tooltip>
+            </div>
+          </div>
         ) : (
           <>
-            <div className="p-4 border-b border-border shrink-0 flex flex-col gap-0.5">
-              <h1 className="text-base font-medium text-foreground">Calendar</h1>
-              <p className="text-xs text-muted-foreground">Select a date to view schedules.</p>
+            <div className="p-4 border-b border-border shrink-0 flex items-center gap-2">
+              <button
+                onClick={() => setIsCalendarCollapsed(true)}
+                className="p-1 -ml-1 text-muted-foreground hover:text-foreground shrink-0"
+                title="Collapse calendar"
+              >
+                <ArrowLeft className="size-5" />
+              </button>
+              <div className="flex flex-col min-w-0 gap-0.5">
+                <h1 className="text-base font-medium text-foreground">Calendar</h1>
+                <p className="text-xs text-muted-foreground">Select a date to view schedules.</p>
+              </div>
             </div>
             <SidebarContent data-lenis-prevent className="overflow-y-auto pr-1 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent" style={{ scrollbarWidth: 'thin' }}>
               <DatePicker
