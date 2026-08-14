@@ -410,8 +410,7 @@ export function SecretaryBookAppointmentView() {
             selectedDate={view.selectedDate}
             operatingHours={view.operatingHours}
             onSlotClick={({ doctorId, date, startTime }) => {
-              // Week view columns are days (multiple dentists) — no doctor to prefill, ignore
-              if (!doctorId) return;
+              // Week view columns are days (multiple dentists) — doctor chosen in booking form
               // Pre-fill form from clicked slot
               if (date) view.selectDate(date);
               if (doctorId) view.selectDoctor(doctorId);

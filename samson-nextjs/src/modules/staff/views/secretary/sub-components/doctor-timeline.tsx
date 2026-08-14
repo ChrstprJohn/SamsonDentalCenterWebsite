@@ -209,7 +209,43 @@ export function DoctorTimeline({
     );
   }, [daysOfWeek, perDayDoctorIds, viewMode]);
 
-  // Pre-calculate positions of appointments
+  // Per-day break ranges for week view (each day can have its own break)
+  const dayUnavailableRanges = useMemo(() => {
+    if (viewMode !== 'week') return {} as Record<string, Array<{ start: string; end: string }>>;
+    const map: Record<string, Array<{ start: string; end: string }>> = {};
+    for (const day of daysOfWeek) {
+      map[day.dateStr] = getDailyScheduleBounds(day.dateStr, operatingHours).unavailableRanges || [];
+    }
+    return map;
+  }, [viewMode, daysOfWeek, operatingHours]);
+
+  // Per-day open state + hours for week view (closed days show disabled column, out-of-hours blocked)
+  const dayBounds = useMemo(() => {
+    if (viewMode !== 'week') return {} as Record<string, { isOpen: boolean; minMins: number | null; maxMins: number | null }>;
+    const map: Record<string, { isOpen: boolean; minMins: number | null; maxMins: number | null }> = {};
+    for (const day of daysOfWeek) {
+      const b = getDailyScheduleBounds(day.dateStr, operatingHours);
+      map[day.dateStr] = {
+        isOpen: b.isOpen,
+        minMins: b.minTime ? parseTimeToMinutes(b.minTime) : null,
+        maxMins: b.maxTime ? parseTimeToMinutes(b.maxTime) : null,
+      };
+    }
+    return map;
+  }, [viewMode, daysOfWeek, operatingHours]);
+
+  // Earliest open / latest close across open days — the grid-defining extremes get no out-of-hours strip
+  const weekExtremes = useMemo(() => {
+    let earliest: number | null = null;
+    let latest: number | null = null;
+    for (const day of daysOfWeek) {
+      const b = dayBounds[day.dateStr];
+      if (!b?.isOpen || b.minMins === null || b.maxMins === null) continue;
+      if (earliest === null || b.minMins < earliest) earliest = b.minMins;
+      if (latest === null || b.maxMins > latest) latest = b.maxMins;
+    }
+    return { earliest, latest };
+  }, [dayBounds, daysOfWeek]);
   const placedAppointments = useMemo(() => {
     const activeStatuses = ['APPROVED', 'CHECKED_IN', 'COMPLETED', 'NO_SHOW'];
     const relevant = appointments.filter((app) => activeStatuses.includes(app.status) && app.doctorId && doctors.some(d => d.id === app.doctorId));
@@ -305,13 +341,15 @@ export function DoctorTimeline({
           {viewMode === 'week' ? (
             daysOfWeek.map((day, index) => {
               const count = appointments.filter((app) => app.date === day.dateStr && doctors.some(d => d.id === app.doctorId) && ['APPROVED', 'CHECKED_IN', 'COMPLETED', 'NO_SHOW'].includes(app.status)).length;
+              const b = dayBounds[day.dateStr];
+              const closed = !b?.isOpen;
               return (
                 <div
                   key={day.dateStr}
-                  className="sticky top-0 bg-card border-r border-r-slate-300 border-b border-border px-4 py-2 text-center text-sm font-normal text-sidebar-foreground truncate z-20"
+                  className={`sticky top-0 border-r border-r-slate-300 border-b border-border px-4 py-2 text-center text-sm font-normal truncate z-20 ${closed ? 'bg-muted/40 text-muted-foreground' : 'bg-card text-sidebar-foreground'}`}
                   style={{ gridColumn: index + 2, gridRow: 1 }}
                 >
-                  {day.shortLabel} ({count})
+                  {closed ? `${day.shortLabel} · Closed` : `${day.shortLabel} (${count})`}
                 </div>
               );
             })
@@ -348,13 +386,6 @@ export function DoctorTimeline({
             const isHourMark = minutes % 60 === 0;
             const isTenMinMark = minutes % 10 === 0;
             const isLineRow = (minutes + slotDuration) % 10 === 0;
-            const isBreakTime = unavailableRanges.some(
-              (r) => {
-                const s = parseTimeToMinutes(r.start);
-                const e = parseTimeToMinutes(r.end);
-                return s !== null && e !== null && minutes >= s && minutes < e;
-              }
-            );
 
             return (
               <React.Fragment key={rowIndex}>
@@ -374,17 +405,29 @@ export function DoctorTimeline({
                 {(viewMode === 'week' ? daysOfWeek : doctors).map((item, colIndex) => {
                   const doctorId = viewMode === 'day' ? (item as any).id : '';
                   const date = viewMode === 'week' ? (item as any).dateStr : selectedDate;
+                  const b = viewMode === 'week' ? dayBounds[date] : null;
+                  const closed = viewMode === 'week' && !b?.isOpen;
+                  // Real out-of-hours only — skip the 10-min filler padding rows at grid edges
+                  const outOfHours = viewMode === 'week' && !!b?.isOpen && b.minMins !== null && b.maxMins !== null && ((minutes >= startTimeMins + 10 && minutes < b.minMins) || (minutes >= b.maxMins && minutes < endTimeMins - 10));
+                  const ranges = viewMode === 'week' ? (dayUnavailableRanges[date] || []) : unavailableRanges;
+                  const cellIsBreakTime = ranges.some(
+                    (r) => {
+                      const s = parseTimeToMinutes(r.start);
+                      const e = parseTimeToMinutes(r.end);
+                      return s !== null && e !== null && minutes >= s && minutes < e;
+                    }
+                  );
                   return (
                     <div
                       key={viewMode === 'week' ? (item as any).dateStr : (item as any).id}
                       className={`border-r border-r-slate-300 transition-colors ${
                         isLineRow ? 'border-b border-border' : 'border-b border-border/25'
-                      } ${isBreakTime ? 'bg-muted/40' : (isHourMark ? 'bg-muted/10' : 'bg-transparent')} ${onSlotClick ? 'cursor-crosshair' : ''}`}
+                      } ${closed ? 'bg-muted/30' : (outOfHours ? 'bg-muted/20' : (cellIsBreakTime ? 'bg-muted/40' : (isHourMark ? 'bg-muted/10' : 'bg-transparent')))} ${onSlotClick && !closed && !outOfHours ? 'cursor-crosshair' : ''}`}
                       style={{ gridColumn: colIndex + 2, gridRow: rowIndex + 2 }}
                       onClick={(e) => {
                         if (!onSlotClick) return;
                         // Non-bookable blocks: break time, closed days, pre-open padding
-                        if (isBreakTime) return;
+                        if (cellIsBreakTime) return;
                         const bounds = getDailyScheduleBounds(date, operatingHours);
                         if (!bounds.isOpen || !bounds.minTime || !bounds.maxTime) return;
                         const openMins = parseTimeToMinutes(bounds.minTime);
@@ -418,23 +461,102 @@ export function DoctorTimeline({
             );
           })}
 
-          {/* Break time overlay card — spans all doctor columns */}
-          {unavailableRanges.map((range) => {
-            const s = parseTimeToMinutes(range.start);
-            const e = parseTimeToMinutes(range.end);
-            if (s === null || e === null) return null;
-            const startRow = Math.max(2, Math.round((s - startTimeMins) / slotDuration) + 2);
-            const endRow = Math.min(totalSlots + 2, Math.round((e - startTimeMins) / slotDuration) + 2);
-            if (endRow <= startRow) return null;
-            return (
+          {/* Break time overlay card — spans all doctor columns in day view, per-day column in week view */}
+          {viewMode === 'week' ? (
+            daysOfWeek.map((day, dayIdx) => {
+              const dayRanges = dayUnavailableRanges[day.dateStr] || [];
+              return dayRanges.map((range) => {
+                const s = parseTimeToMinutes(range.start);
+                const e = parseTimeToMinutes(range.end);
+                if (s === null || e === null) return null;
+                const startRow = Math.max(2, Math.round((s - startTimeMins) / slotDuration) + 2);
+                const endRow = Math.min(totalSlots + 2, Math.round((e - startTimeMins) / slotDuration) + 2);
+                if (endRow <= startRow) return null;
+                return (
+                  <div
+                    key={`${day.dateStr}-${range.start}`}
+                    className="pointer-events-none z-0 flex flex-col items-center justify-center gap-0.5 border-2 border-dashed border-gray-400/80"
+                    style={{
+                      gridColumn: dayIdx + 2,
+                      gridRow: `${startRow} / ${endRow}`,
+                      backgroundImage: 'repeating-linear-gradient(45deg, #f3f4f6 0 10px, #e5e7eb 10px 20px)',
+                    }}
+                  >
+                    <span className="text-sm font-bold uppercase tracking-[0.2em] text-gray-500">Break Time</span>
+                    <span className="text-xs font-semibold text-gray-500">{formatMinutesToTime(s)}–{formatMinutesToTime(e)}</span>
+                  </div>
+                );
+              });
+            })
+          ) : (
+            unavailableRanges.map((range) => {
+              const s = parseTimeToMinutes(range.start);
+              const e = parseTimeToMinutes(range.end);
+              if (s === null || e === null) return null;
+              const startRow = Math.max(2, Math.round((s - startTimeMins) / slotDuration) + 2);
+              const endRow = Math.min(totalSlots + 2, Math.round((e - startTimeMins) / slotDuration) + 2);
+              if (endRow <= startRow) return null;
+              return (
+                <div
+                  key={range.start}
+                  className="pointer-events-none z-0 flex flex-col items-center justify-center gap-0.5 border-2 border-dashed border-gray-400/80"
+                  style={{
+                    gridColumn: `2 / ${columnsCount + 2}`,
+                    gridRow: `${startRow} / ${endRow}`,
+                    backgroundImage: 'repeating-linear-gradient(45deg, #f3f4f6 0 10px, #e5e7eb 10px 20px)',
+                  }}
+                >
+                  <span className="text-sm font-bold uppercase tracking-[0.2em] text-gray-500">Break Time</span>
+                  <span className="text-xs font-semibold text-gray-500">{formatMinutesToTime(s)}–{formatMinutesToTime(e)}</span>
+                </div>
+              );
+            })
+          )}
+
+          {/* Closed / outside-hours overlay — same styling as break time for consistency */}
+          {viewMode === 'week' && daysOfWeek.map((day, dayIdx) => {
+            const b = dayBounds[day.dateStr];
+            if (!b) return null;
+            if (!b.isOpen) {
+              const closedDays = daysOfWeek.filter((d) => !dayBounds[d.dateStr]?.isOpen).map((d) => d.label.substring(0, 3).toUpperCase());
+              return (
+                <div
+                  key={`closed-${day.dateStr}`}
+                  className="pointer-events-none z-0 flex flex-col items-center justify-center gap-0.5 border-2 border-dashed border-gray-400/80"
+                  style={{
+                    gridColumn: dayIdx + 2,
+                    gridRow: `2 / ${totalSlots + 2}`,
+                    backgroundImage: 'repeating-linear-gradient(45deg, #f3f4f6 0 10px, #e5e7eb 10px 20px)',
+                  }}
+                >
+                  <span className="text-sm font-bold uppercase tracking-[0.2em] text-gray-500">Closed</span>
+                  <span className="text-xs font-semibold text-gray-500">{closedDays.join(', ')}</span>
+                </div>
+              );
+            }
+            const strips: { label: string; time: string; startRow: number; endRow: number }[] = [];
+            // Skip the grid-defining day(s) — longest hours, no out-of-hours region of their own
+            // Time line shows the day's operating hours — the reason the rest is gray
+            if (b.minMins !== null && b.maxMins !== null && b.minMins !== weekExtremes.earliest) {
+              strips.push({ label: 'Before Opening', time: `${formatMinutesToTime(b.minMins)}–${formatMinutesToTime(b.maxMins)}`, startRow: 2, endRow: Math.min(totalSlots + 2, Math.round((b.minMins - startTimeMins) / slotDuration) + 2) });
+            }
+            if (b.minMins !== null && b.maxMins !== null && b.maxMins !== weekExtremes.latest) {
+              strips.push({ label: 'After Closing', time: `${formatMinutesToTime(b.minMins)}–${formatMinutesToTime(b.maxMins)}`, startRow: Math.max(2, Math.round((b.maxMins - startTimeMins) / slotDuration) + 2), endRow: totalSlots + 2 });
+            }
+            return strips.map((s) => (
               <div
-                key={range.start}
-                className="pointer-events-none z-0 flex items-center justify-center border-y border-gray-300/70 bg-gray-100/85"
-                style={{ gridColumn: `2 / ${columnsCount + 2}`, gridRow: `${startRow} / ${endRow}` }}
+                key={`${day.dateStr}-${s.label}`}
+                className="pointer-events-none z-0 flex flex-col items-center justify-center gap-0.5 border-2 border-dashed border-gray-400/80"
+                style={{
+                  gridColumn: dayIdx + 2,
+                  gridRow: `${s.startRow} / ${s.endRow}`,
+                  backgroundImage: 'repeating-linear-gradient(45deg, #f3f4f6 0 10px, #e5e7eb 10px 20px)',
+                }}
               >
-                <span className="text-sm font-bold uppercase tracking-[0.2em] text-gray-500">Break Time</span>
+                <span className="text-sm font-bold uppercase tracking-[0.2em] text-gray-500">{s.label}</span>
+                <span className="text-xs font-semibold text-gray-500">{s.time}</span>
               </div>
-            );
+            ));
           })}
 
           {/* Card overlay per column — absolute positioned at exact minute */}
