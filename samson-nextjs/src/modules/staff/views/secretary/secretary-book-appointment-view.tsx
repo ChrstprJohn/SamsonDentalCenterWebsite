@@ -224,6 +224,13 @@ export function SecretaryBookAppointmentView() {
     return view.doctorsList.filter(d => checkedDoctorIds[d.id]);
   }, [view.doctorsList, checkedDoctorIds]);
 
+  // Stable color per doctor from full list order, so timeline matches filter checkboxes regardless of selection.
+  const doctorColorIndex = React.useMemo(() => {
+    const map: Record<string, number> = {};
+    view.doctorsList.forEach((doc, index) => { map[doc.id] = index; });
+    return map;
+  }, [view.doctorsList]);
+
   const getHeaderDateString = () => {
     const todayDate = new Date();
     const ty = todayDate.getFullYear();
@@ -237,7 +244,11 @@ export function SecretaryBookAppointmentView() {
 
     if (viewMode === 'day') {
       const isToday = view.selectedDate === todayFormatted;
-      return `${dateFormatted}${isToday ? ' (Today)' : ''}`;
+      const bounds = getDailyScheduleBounds(view.selectedDate, view.operatingHours);
+      const hours = bounds.isOpen && bounds.minTime && bounds.maxTime
+        ? `${formatTimeRange(bounds.minTime)} - ${formatTimeRange(bounds.maxTime)}`
+        : 'Closed';
+      return `${dateFormatted}${isToday ? ' (Today)' : ''} • ${hours}`;
     } else {
       if (daysOfWeek.length === 5) {
         const startObj = new Date(daysOfWeek[0] + 'T00:00:00');
@@ -388,6 +399,7 @@ export function SecretaryBookAppointmentView() {
         <div className="flex-1 min-h-0 flex flex-col">
           <DoctorTimeline
             doctors={filteredDoctors}
+            doctorColorIndex={doctorColorIndex}
             appointments={viewMode === 'week' ? weekAppointments : view.appointments}
             isLoading={viewMode === 'week' ? (view.isLoadingAppointments || isWeekLoading) : view.isLoadingAppointments}
             selectedAppointmentId={view.selectedAppointmentDetails?.id}

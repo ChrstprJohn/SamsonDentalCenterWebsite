@@ -14,6 +14,9 @@ const COLORS_LIST = [
   { bg: 'bg-violet-50/80', border: 'border-violet-200/80', hover: 'hover:bg-violet-100/90', accent: 'bg-violet-500', text: 'text-violet-950', subtext: 'text-violet-700/90', hex: '#8b5cf6' },
   { bg: 'bg-amber-50/80', border: 'border-amber-200/80', hover: 'hover:bg-amber-100/90', accent: 'bg-amber-500', text: 'text-amber-950', subtext: 'text-amber-700/90', hex: '#f59e0b' },
   { bg: 'bg-rose-50/80', border: 'border-rose-200/80', hover: 'hover:bg-rose-100/90', accent: 'bg-rose-500', text: 'text-rose-950', subtext: 'text-rose-700/90', hex: '#f43f5e' },
+  { bg: 'bg-cyan-50/80', border: 'border-cyan-200/80', hover: 'hover:bg-cyan-100/90', accent: 'bg-cyan-500', text: 'text-cyan-950', subtext: 'text-cyan-700/90', hex: '#06b6d4' },
+  { bg: 'bg-orange-50/80', border: 'border-orange-200/80', hover: 'hover:bg-orange-100/90', accent: 'bg-orange-500', text: 'text-orange-950', subtext: 'text-orange-700/90', hex: '#f97316' },
+  { bg: 'bg-fuchsia-50/80', border: 'border-fuchsia-200/80', hover: 'hover:bg-fuchsia-100/90', accent: 'bg-fuchsia-500', text: 'text-fuchsia-950', subtext: 'text-fuchsia-700/90', hex: '#d946ef' },
 ];
 
 
@@ -38,6 +41,8 @@ interface DoctorTimelineProps {
   viewMode: 'day' | 'week';
   selectedDate: string;
   operatingHours?: ClinicConfigResponseDto['operatingHours'] | null;
+  /** Stable color index per doctor id, from the full (unfiltered) doctor list. */
+  doctorColorIndex?: Record<string, number>;
 }
 
 export function DoctorTimeline({
@@ -50,6 +55,7 @@ export function DoctorTimeline({
   viewMode = 'day',
   selectedDate,
   operatingHours,
+  doctorColorIndex,
 }: DoctorTimelineProps) {
   const isMobile = useIsMobile();
   const rightColWidth = isMobile ? '0px' : '35px';
@@ -209,7 +215,8 @@ export function DoctorTimeline({
     const relevant = appointments.filter((app) => activeStatuses.includes(app.status) && app.doctorId && doctors.some(d => d.id === app.doctorId));
 
     return relevant.map((app) => {
-      const docIndex = doctors.findIndex((d) => d.id === app.doctorId);
+      const docIndex = doctors.findIndex((d) => d.id === app.doctorId); // grid column position (filtered order)
+      const colorIndex = doctorColorIndex?.[app.doctorId ?? ''] ?? docIndex; // stable color from full list order
 
       const startMin = parseTimeToMinutes(app.startTime);
       const endMin = parseTimeToMinutes(app.endTime);
@@ -248,6 +255,8 @@ export function DoctorTimeline({
         return {
           appointment: app,
           col,
+          docIndex,
+          colorIndex,
           topPercent,
           heightPercent,
           isSmallCard,
@@ -258,7 +267,7 @@ export function DoctorTimeline({
         };
     })
       .filter((x): x is NonNullable<typeof x> => x !== null);
-  }, [appointments, doctors, viewMode, daysOfWeek]);
+  }, [appointments, doctors, doctorColorIndex, viewMode, daysOfWeek]);
 
   if (doctors.length === 0) {
     return (
@@ -309,7 +318,7 @@ export function DoctorTimeline({
           ) : (
             doctors.map((doctor, index) => {
               const count = appointments.filter((app) => app.doctorId === doctor.id && ['APPROVED', 'CHECKED_IN', 'COMPLETED', 'NO_SHOW'].includes(app.status)).length;
-              const color = getDoctorColor(doctor.id, index);
+              const color = getDoctorColor(doctor.id, doctorColorIndex?.[doctor.id] ?? index);
               return (
                 <div
                   key={doctor.id}
@@ -318,7 +327,7 @@ export function DoctorTimeline({
                 >
                   <span className="inline-flex items-center justify-center gap-1.5 truncate">
                     <span className={`size-2 rounded-full shrink-0 ${color.accent}`} />
-                    Dr. {doctor.firstName} {doctor.lastName} ({count})
+                    Dr. {doctor.lastName} ({count})
                   </span>
                 </div>
               );
@@ -409,6 +418,25 @@ export function DoctorTimeline({
             );
           })}
 
+          {/* Break time overlay card — spans all doctor columns */}
+          {unavailableRanges.map((range) => {
+            const s = parseTimeToMinutes(range.start);
+            const e = parseTimeToMinutes(range.end);
+            if (s === null || e === null) return null;
+            const startRow = Math.max(2, Math.round((s - startTimeMins) / slotDuration) + 2);
+            const endRow = Math.min(totalSlots + 2, Math.round((e - startTimeMins) / slotDuration) + 2);
+            if (endRow <= startRow) return null;
+            return (
+              <div
+                key={range.start}
+                className="pointer-events-none z-0 flex items-center justify-center border-y border-amber-300/50 bg-amber-50/80"
+                style={{ gridColumn: `2 / ${columnsCount + 2}`, gridRow: `${startRow} / ${endRow}` }}
+              >
+                <span className="text-sm font-bold uppercase tracking-[0.2em] text-amber-700">Break Time</span>
+              </div>
+            );
+          })}
+
           {/* Card overlay per column — absolute positioned at exact minute */}
           {(viewMode === 'week' ? daysOfWeek : doctors).map((item, colIndex) => {
             const col = colIndex + 2;
@@ -426,7 +454,7 @@ export function DoctorTimeline({
                   pointerEvents: 'none',
                 }}
               >
-                {colCards.map(({ appointment, topPercent, heightPercent, isSmallCard, left, width, activeDoctorCount, durationMins }) => {
+                {colCards.map(({ appointment, colorIndex, topPercent, heightPercent, isSmallCard, left, width, activeDoctorCount, durationMins }) => {
                   const isSelected = selectedAppointmentId === appointment.id;
                   const patientName = formatPatientName(appointment);
                   const serviceName = appointment.service?.name || 'Treatment';
@@ -437,7 +465,7 @@ export function DoctorTimeline({
                     ? ` | Dr. ${appointment.doctor?.lastName || ''}`
                     : '';
 
-                  const color = getDoctorColor(appointment.doctorId || '');
+                  const color = getDoctorColor(appointment.doctorId || '', colorIndex);
                   const showTime = viewMode === 'day' || activeDoctorCount <= 1;
 
                   return (

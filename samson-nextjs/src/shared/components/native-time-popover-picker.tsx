@@ -13,7 +13,7 @@ export interface NativeTimePopoverPickerProps {
   disabled?: boolean;
   /** Earliest selectable time in 24-hour HH:MM format (inclusive). */
   minTime?: string;
-  /** Latest selectable time in 24-hour HH:MM format (exclusive). */
+  /** Latest selectable time in 24-hour HH:MM format (inclusive). */
   maxTime?: string;
   /** Time ranges in 24-hour HH:MM format that cannot be selected. */
   unavailableRanges?: Array<{ start: string; end: string }>;
@@ -53,9 +53,17 @@ export function NativeTimePopoverPicker({
     return hours * 60 + minutes;
   };
 
+  // Boundary times (open, close, break start/end) stay pickable at :00 even when
+  // the hour sits in a break or on the exclusive close edge (e.g. 12:00 during lunch, 17:00 at close)
+  const boundaryMinutes = new Set<number>();
+  [minTime, maxTime, ...unavailableRanges.flatMap((r) => [r.start, r.end])].forEach((t) => {
+    if (t) boundaryMinutes.add(toMinutes(t));
+  });
+
   const isAvailable = (time: string) => {
     const minutes = toMinutes(time);
-    if (minutes < toMinutes(minTime) || minutes >= toMinutes(maxTime)) return false;
+    if (minutes < toMinutes(minTime) || minutes > toMinutes(maxTime)) return false;
+    if (boundaryMinutes.has(minutes)) return true;
     return !unavailableRanges.some(({ start, end }) => minutes >= toMinutes(start) && minutes < toMinutes(end));
   };
 
