@@ -3,7 +3,9 @@
 import React, { useMemo } from 'react';
 import { Stethoscope } from 'lucide-react';
 import type { AppointmentDto } from '@/modules/appointments/dtos/shared/appointment.dto';
+import type { ClinicConfigResponseDto } from '@/modules/clinic-config/dtos/settings/get-clinic-config.dto';
 import { formatClinicTime } from '@/shared/utils/date.util';
+import { getDailyScheduleBounds } from '@/shared/utils/schedule-bounds.util';
 import { useIsMobile } from '@/shared/hooks/use-mobile';
 
 const COLORS_LIST = [
@@ -35,6 +37,7 @@ interface DoctorTimelineProps {
   onSlotClick?: (slot: { doctorId: string; date: string; startTime: string }) => void;
   viewMode: 'day' | 'week';
   selectedDate: string;
+  operatingHours?: ClinicConfigResponseDto['operatingHours'] | null;
 }
 
 export function DoctorTimeline({
@@ -46,15 +49,10 @@ export function DoctorTimeline({
   onSlotClick,
   viewMode = 'day',
   selectedDate,
+  operatingHours,
 }: DoctorTimelineProps) {
   const isMobile = useIsMobile();
   const rightColWidth = isMobile ? '0px' : '35px';
-
-  // 5-minute intervals from 07:50 AM (470 mins) to 05:00 PM (1020 mins)
-  const startTimeMins = 470;
-  const endTimeMins = 1020;
-  const slotDuration = 5;
-  const totalSlots = (endTimeMins - startTimeMins) / slotDuration; // 110 slots
 
   const parseTimeToMinutes = (timeStr: string | null): number | null => {
     if (!timeStr) return null;
@@ -64,6 +62,87 @@ export function DoctorTimeline({
     const minutes = parseInt(match[2], 10);
     return hours * 60 + minutes;
   };
+
+  // Calculate 5 days from selectedDate
+  const daysOfWeek = useMemo(() => {
+    if (!selectedDate) return [];
+    const date = new Date(selectedDate + 'T00:00:00');
+
+    const days = [];
+    const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    for (let i = 0; i < 5; i++) {
+      const nextDay = new Date(date);
+      nextDay.setDate(date.getDate() + i);
+      const y = nextDay.getFullYear();
+      const m = String(nextDay.getMonth() + 1).padStart(2, '0');
+      const d = String(nextDay.getDate()).padStart(2, '0');
+      const dayOfWeekName = weekdays[nextDay.getDay()];
+      days.push({
+        dateStr: `${y}-${m}-${d}`,
+        label: dayOfWeekName,
+        shortLabel: `${dayOfWeekName.substring(0, 3)} ${m}/${d}`,
+      });
+    }
+    return days;
+  }, [selectedDate]);
+
+  // Dynamic bounds calculation with fallback to 07:50 AM (470m) - 05:00 PM (1020m)
+  const { startTimeMins, endTimeMins, unavailableRanges } = useMemo(() => {
+    const DEFAULT_START = 470; // 07:50 AM
+    const DEFAULT_END = 1020;  // 05:00 PM
+
+    if (!operatingHours) {
+      return { startTimeMins: DEFAULT_START, endTimeMins: DEFAULT_END, unavailableRanges: [] };
+    }
+
+    if (viewMode === 'day') {
+      const bounds = getDailyScheduleBounds(selectedDate, operatingHours);
+      if (!bounds.isOpen || !bounds.minTime || !bounds.maxTime) {
+        return { startTimeMins: DEFAULT_START, endTimeMins: DEFAULT_END, unavailableRanges: [] };
+      }
+      const minMins = parseTimeToMinutes(bounds.minTime) ?? 480;
+      const maxMins = parseTimeToMinutes(bounds.maxTime) ?? 1020;
+      // Start 10 minutes prior to open time for padding (matching standard 07:50 for 08:00 open)
+      const calculatedStart = Math.max(0, minMins - 10);
+      // End 10 minutes after close so the closing hour label stays visible at the bottom edge
+      const calculatedEnd = Math.max(calculatedStart + 60, maxMins + 10);
+      return {
+        startTimeMins: calculatedStart,
+        endTimeMins: calculatedEnd,
+        unavailableRanges: bounds.unavailableRanges || [],
+      };
+    } else {
+      // For week view: take earliest minTime and latest maxTime across open days
+      let earliestMin: number | null = null;
+      let latestMax: number | null = null;
+
+      for (const day of daysOfWeek) {
+        const bounds = getDailyScheduleBounds(day.dateStr, operatingHours);
+        if (bounds.isOpen && bounds.minTime && bounds.maxTime) {
+          const min = parseTimeToMinutes(bounds.minTime);
+          const max = parseTimeToMinutes(bounds.maxTime);
+          if (min !== null) earliestMin = earliestMin === null ? min : Math.min(earliestMin, min);
+          if (max !== null) latestMax = latestMax === null ? max : Math.max(latestMax, max);
+        }
+      }
+
+      if (earliestMin === null || latestMax === null) {
+        return { startTimeMins: DEFAULT_START, endTimeMins: DEFAULT_END, unavailableRanges: [] };
+      }
+
+      const calculatedStart = Math.max(0, earliestMin - 10);
+      const calculatedEnd = Math.max(calculatedStart + 60, latestMax + 10);
+      return {
+        startTimeMins: calculatedStart,
+        endTimeMins: calculatedEnd,
+        unavailableRanges: [],
+      };
+    }
+  }, [operatingHours, selectedDate, viewMode, daysOfWeek]);
+
+  const slotDuration = 5;
+  const totalSlots = Math.max(1, Math.round((endTimeMins - startTimeMins) / slotDuration));
+  const totalMinutes = endTimeMins - startTimeMins;
 
   const formatMinutesToTime = (totalMinutes: number): string => {
     const hours = Math.floor(totalMinutes / 60);
@@ -100,31 +179,6 @@ export function DoctorTimeline({
     }
     return appointment.patient ? `${appointment.patient.firstName} ${appointment.patient.lastName}` : 'Guest Patient';
   };
-
-  const totalMinutes = endTimeMins - startTimeMins; // 540
-
-  // Calculate 5 days from selectedDate
-  const daysOfWeek = useMemo(() => {
-    if (!selectedDate) return [];
-    const date = new Date(selectedDate + 'T00:00:00');
-
-    const days = [];
-    const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    for (let i = 0; i < 5; i++) {
-      const nextDay = new Date(date);
-      nextDay.setDate(date.getDate() + i);
-      const y = nextDay.getFullYear();
-      const m = String(nextDay.getMonth() + 1).padStart(2, '0');
-      const d = String(nextDay.getDate()).padStart(2, '0');
-      const dayOfWeekName = weekdays[nextDay.getDay()];
-      days.push({
-        dateStr: `${y}-${m}-${d}`,
-        label: dayOfWeekName,
-        shortLabel: `${dayOfWeekName.substring(0, 3)} ${m}/${d}`,
-      });
-    }
-    return days;
-  }, [selectedDate]);
 
   // Per-day active doctors for week view
   const perDayDoctorIds = useMemo(() => {
@@ -285,6 +339,13 @@ export function DoctorTimeline({
             const isHourMark = minutes % 60 === 0;
             const isTenMinMark = minutes % 10 === 0;
             const isLineRow = (minutes + slotDuration) % 10 === 0;
+            const isBreakTime = unavailableRanges.some(
+              (r) => {
+                const s = parseTimeToMinutes(r.start);
+                const e = parseTimeToMinutes(r.end);
+                return s !== null && e !== null && minutes >= s && minutes < e;
+              }
+            );
 
             return (
               <React.Fragment key={rowIndex}>
@@ -293,7 +354,7 @@ export function DoctorTimeline({
                   className={"sticky left-0 bg-card border-r border-r-slate-300 z-20 transition-colors flex items-start justify-end px-0.5 text-right h-full " + (isHourMark ? 'text-foreground text-[11px]' : 'text-text-secondary font-normal text-[10px]') + " " + (isLineRow ? 'border-b border-border' : 'border-b border-border/25')}
                    style={{ gridColumn: 1, gridRow: rowIndex + 2 }}
                 >
-                  {isTenMinMark && minutes >= 480 ? (
+                  {isTenMinMark && minutes >= (startTimeMins + 10) ? (
                     <span style={{ transform: 'translateY(-50%)', display: 'inline-block', lineHeight: 1 }}>
                       {isHourMark ? timeStr : minutes % 60}
                     </span>
@@ -309,10 +370,19 @@ export function DoctorTimeline({
                       key={viewMode === 'week' ? (item as any).dateStr : (item as any).id}
                       className={`border-r border-r-slate-300 transition-colors ${
                         isLineRow ? 'border-b border-border' : 'border-b border-border/25'
-                      } ${isHourMark ? 'bg-muted/10' : 'bg-transparent'} ${onSlotClick ? 'cursor-crosshair' : ''}`}
+                      } ${isBreakTime ? 'bg-muted/40' : (isHourMark ? 'bg-muted/10' : 'bg-transparent')} ${onSlotClick ? 'cursor-crosshair' : ''}`}
                       style={{ gridColumn: colIndex + 2, gridRow: rowIndex + 2 }}
                       onClick={(e) => {
                         if (!onSlotClick) return;
+                        // Non-bookable blocks: break time, closed days, pre-open padding
+                        if (isBreakTime) return;
+                        const bounds = getDailyScheduleBounds(date, operatingHours);
+                        if (!bounds.isOpen || !bounds.minTime || !bounds.maxTime) return;
+                        const openMins = parseTimeToMinutes(bounds.minTime);
+                        if (openMins !== null && minutes < openMins) return;
+                        // Post-close padding rows are dead, same as pre-open padding
+                        const closeMins = parseTimeToMinutes(bounds.maxTime);
+                        if (closeMins !== null && minutes >= closeMins) return;
                         // Snap to the 5-min slot this row represents
                         const snappedMins = startTimeMins + rowIndex * slotDuration;
                         const h = Math.floor(snappedMins / 60);
@@ -329,7 +399,7 @@ export function DoctorTimeline({
                   className={"sticky right-0 bg-card border-l border-l-slate-300 z-20 transition-colors flex items-start justify-start px-0.5 text-left h-full max-md:hidden " + (isHourMark ? 'text-foreground text-[11px]' : 'text-text-secondary font-normal text-[10px]') + " " + (isLineRow ? 'border-b border-border' : 'border-b border-border/25')}
                    style={{ gridColumn: columnsCount + 2, gridRow: rowIndex + 2 }}
                 >
-                  {isTenMinMark && minutes >= 480 ? (
+                  {isTenMinMark && minutes >= (startTimeMins + 10) ? (
                     <span style={{ transform: 'translateY(-50%)', display: 'inline-block', lineHeight: 1 }}>
                       {isHourMark ? timeStr : minutes % 60}
                     </span>

@@ -12,6 +12,7 @@ import { updateAppointmentStatusAction } from '@/modules/appointments/actions/st
 import { Button } from '@/components/ui/button';
 import { calculateEndTime } from '@/shared/utils/date.util';
 import { getDailyScheduleBounds, formatTimeRange } from '@/shared/utils/schedule-bounds.util';
+import type { ClinicConfigResponseDto } from '@/modules/clinic-config/dtos/settings/get-clinic-config.dto';
 import { InquiryToast } from './sub-components/inquiry-toast';
 import {
   Sidebar,
@@ -393,7 +394,10 @@ export function SecretaryBookAppointmentView() {
             onSelectAppointment={view.selectAppointment}
             viewMode={viewMode}
             selectedDate={view.selectedDate}
+            operatingHours={view.operatingHours}
             onSlotClick={({ doctorId, date, startTime }) => {
+              // Week view columns are days (multiple dentists) — no doctor to prefill, ignore
+              if (!doctorId) return;
               // Pre-fill form from clicked slot
               if (date) view.selectDate(date);
               if (doctorId) view.selectDoctor(doctorId);
@@ -796,6 +800,7 @@ export function SecretaryBookAppointmentView() {
               <DatePicker
                 selectedDate={view.selectedDate}
                 onSelectDate={view.selectDate}
+                operatingHours={view.operatingHours}
                 weekDates={viewMode === 'week' ? daysOfWeek.map(d => ({ dateStr: d })) : undefined}
               />
               <SidebarSeparator className="mx-0" />
@@ -896,13 +901,26 @@ export function SecretaryBookAppointmentView() {
 function DatePicker({
   selectedDate,
   onSelectDate,
+  operatingHours,
   weekDates,
 }: {
   selectedDate: string;
   onSelectDate: (date: string) => void;
+  operatingHours?: ClinicConfigResponseDto['operatingHours'] | null;
   weekDates?: { dateStr: string }[];
 }) {
   const date = selectedDate ? new Date(selectedDate + 'T00:00:00') : undefined;
+
+  // Block weekdays the clinic is closed
+  const disabledDays = React.useMemo(() => {
+    if (!operatingHours) return [];
+    return [
+      (day: Date) => {
+        const key = day.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase() as keyof NonNullable<ClinicConfigResponseDto['operatingHours']>;
+        return !operatingHours[key]?.isOpen;
+      },
+    ];
+  }, [operatingHours]);
 
   const rangeStart = weekDates?.[0] ? new Date(weekDates[0].dateStr + 'T00:00:00') : undefined;
   const rangeEnd = weekDates?.[weekDates.length - 1] ? new Date(weekDates[weekDates.length - 1].dateStr + 'T00:00:00') : undefined;
@@ -921,6 +939,7 @@ function DatePicker({
           <Calendar
             mode="range"
             selected={{ from: rangeStart, to: rangeEnd }}
+            disabled={disabledDays}
             onSelect={(_range, day) => {
               if (day) onSelectDate(toDateString(day));
             }}
@@ -941,6 +960,7 @@ function DatePicker({
         <Calendar
           mode="single"
           selected={date}
+          disabled={disabledDays}
           onSelect={(d) => {
             if (d) onSelectDate(toDateString(d));
           }}

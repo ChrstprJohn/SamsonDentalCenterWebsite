@@ -27,6 +27,7 @@ import {
   MessageSquare,
   UserCheck,
   Paintbrush,
+  Bell,
 } from "lucide-react"
 
 const data = {
@@ -39,9 +40,9 @@ const data = {
   ],
   navMain: [
     {
-      title: "Overview",
-      url: "/secretary-v2",
-      icon: <LayoutDashboard className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
+      title: "Calendar",
+      url: "/secretary-v2/book",
+      icon: <CalendarDays className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
     },
     {
       title: "Check-In / Out",
@@ -54,11 +55,6 @@ const data = {
       icon: <ClipboardList className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
     },
     {
-      title: "Calendar",
-      url: "/secretary-v2/book",
-      icon: <CalendarDays className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
-    },
-    {
       title: "Chat Inbox",
       url: "/secretary-v2/chat",
       icon: <MessageSquare className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
@@ -69,9 +65,9 @@ const data = {
       icon: <CalendarRange className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
     },
     {
-      title: "Email Templates",
-      url: "/secretary-v2/email-designs",
-      icon: <Paintbrush className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
+      title: "Notifications",
+      url: "/secretary-v2/notifications",
+      icon: <Bell className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
     },
     {
       title: "Clinic Management",
@@ -90,6 +86,10 @@ const data = {
           title: "Service Catalog",
           url: "/secretary-v2/services",
         },
+        {
+          title: "Email Templates",
+          url: "/secretary-v2/email-designs",
+        },
       ],
     },
     {
@@ -97,10 +97,6 @@ const data = {
       url: "#",
       icon: <Settings className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
       items: [
-        {
-          title: "Notifications",
-          url: "/secretary-v2/notifications",
-        },
         {
           title: "Delivery Logs",
           url: "/secretary-v2/delivery-logs",
