@@ -9,7 +9,6 @@ import {
   DEFAULT_COPY,
   DEFAULT_SAMPLE_DATA,
   DEFAULT_TOKENS,
-  DynamicDataControls,
   EMAIL_DESIGNS,
   EmailDesignDefinition,
   EmailDesignId,
@@ -32,7 +31,6 @@ export function SecretaryEmailDesignStudioView({ initialConfig }: { initialConfi
 
   const activeDesign = EMAIL_DESIGNS.find((design) => design.id === activeId) || EMAIL_DESIGNS[0];
   const activeCopy = DEFAULT_COPY[activeId];
-  const visibleFields = useMemo(() => new Set(activeDesign.fields), [activeDesign]);
 
   const shortRef = sample.referenceCode || formatRefId(sample.appointmentId) || 'SDC-8921';
   const displaySubject = `${activeCopy.subject}${shortRef ? ` [Ref: ${shortRef}]` : ''}`;
@@ -46,43 +44,8 @@ export function SecretaryEmailDesignStudioView({ initialConfig }: { initialConfi
     []
   );
 
-  const updateSampleField = <K extends keyof SampleData>(key: K, value: SampleData[K]) => {
-    setSample((current) => ({ ...current, [key]: value }));
-  };
-
-  const applyPreset = (presetData: SampleData) => {
-    setSample(presetData);
-  };
-
-  const clearAllFields = () => {
-    setSample({
-      patientName: '',
-      serviceName: '',
-      doctorName: '',
-      dateStr: '',
-      timeRangeStr: '',
-      appointmentId: '',
-      baseUrl: 'http://localhost:3000',
-      rejectionReason: '',
-      cancellationReason: '',
-      approvalReason: '',
-      rescheduleReason: '',
-      checkoutNote: '',
-      preferredStartTimeStr: '',
-      patientNote: '',
-      referenceCode: '',
-      oldDoctorName: '',
-      oldServiceName: '',
-      oldDateStr: '',
-      oldTimeRangeStr: '',
-      calendarAddUrl: '',
-      googleMapsUrl: '',
-      rebookUrl: '',
-    });
-  };
-
   return (
-    <div className="grid h-full min-h-0 flex-1 grid-cols-1 overflow-hidden bg-background xl:grid-cols-[400px_minmax(0,1fr)_320px]">
+    <div className="grid h-full min-h-0 flex-1 grid-cols-1 overflow-hidden bg-background xl:grid-cols-[400px_minmax(0,1fr)]">
       {/* Left Sidebar: Email Template Selector */}
       <EmailTemplateSelector
         groupedDesigns={groupedDesigns}
@@ -122,15 +85,6 @@ export function SecretaryEmailDesignStudioView({ initialConfig }: { initialConfi
           </div>
         </div>
       </main>
-
-      {/* Right Sidebar: Dynamic Data Controls */}
-      <DynamicDataControls
-        sample={sample}
-        visibleFields={visibleFields}
-        onUpdateField={updateSampleField}
-        onApplyPreset={applyPreset}
-        onClearAll={clearAllFields}
-      />
     </div>
   );
 }
