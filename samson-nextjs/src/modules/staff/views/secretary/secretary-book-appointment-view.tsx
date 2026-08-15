@@ -598,6 +598,10 @@ export function SecretaryBookAppointmentView() {
               setSelectedNote(null);
               setIsAddNoteOpen(false);
               setIsBookingOpen(false);
+              setIsRescheduleOpen(false);
+              setIsCancelOpen(false);
+              setCancelReasonPreset('');
+              setCancelReasonCustom('');
               view.selectAppointment(app);
             }}
             onSelectNote={(note) => {
