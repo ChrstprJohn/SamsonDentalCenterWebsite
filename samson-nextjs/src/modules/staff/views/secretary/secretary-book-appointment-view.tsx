@@ -7,6 +7,7 @@ import { AppointmentDetailPane } from './sub-components/appointment-detail-pane'
 import { NativeTimePopoverPicker } from '@/shared/components/native-time-popover-picker';
 import { Calendar } from '@/components/ui/calendar';
 import { getClinicAppointmentsAction } from '@/modules/appointments/actions/clinic/get-clinic-appointments.action';
+import { getCalendarNotesAction } from '@/modules/appointments/actions/calendar-notes/get-calendar-notes.action';
 import { getStaffAppointmentByIdAction } from '@/modules/appointments/actions/clinic/get-staff-appointment-by-id.action';
 import { updateAppointmentStatusAction } from '@/modules/appointments/actions/status/update-appointment-status.action';
 import { Button } from '@/components/ui/button';
@@ -44,14 +45,17 @@ import {
   Users,
   ArrowLeft,
   Clock,
+  FileText,
+  Pencil,
+  X,
 } from 'lucide-react';
 
 function getDaysOfWeek(dateStr: string) {
-  const date = new Date(dateStr + 'T00:00:00');
-  const days = [];
+  if (!dateStr) return [];
+  const [year, month, day] = dateStr.split('-').map(Number);
+  const days: string[] = [];
   for (let i = 0; i < 5; i++) {
-    const nextDay = new Date(date);
-    nextDay.setDate(date.getDate() + i);
+    const nextDay = new Date(year, month - 1, day + i);
     const y = nextDay.getFullYear();
     const m = String(nextDay.getMonth() + 1).padStart(2, '0');
     const d = String(nextDay.getDate()).padStart(2, '0');
@@ -59,6 +63,7 @@ function getDaysOfWeek(dateStr: string) {
   }
   return days;
 }
+
 
 export function SecretaryBookAppointmentView() {
   const view = useSecretaryBookAppointment();
@@ -85,6 +90,127 @@ export function SecretaryBookAppointmentView() {
   const [cancelReasonCustom, setCancelReasonCustom] = React.useState('');
   const [isActionSubmitting, setIsActionSubmitting] = React.useState(false);
   const [actionConfirmationChannel, setActionConfirmationChannel] = React.useState<'EMAIL' | 'SMS' | 'BOTH' | 'NONE'>('EMAIL');
+
+  // Calendar Scratch Note state
+  const [isAddNoteOpen, setIsAddNoteOpen] = React.useState(false);
+  const [selectedNote, setSelectedNote] = React.useState<any | null>(null);
+  const [isEditingNote, setIsEditingNote] = React.useState(false);
+  const [editNoteDraft, setEditNoteDraft] = React.useState({ title: '', date: '', content: '' });
+  const [isUpdatingNote, setIsUpdatingNote] = React.useState(false);
+  const [noteTitle, setNoteTitle] = React.useState('');
+  const [noteContent, setNoteContent] = React.useState('');
+  const [noteDate, setNoteDate] = React.useState(view.selectedDate || '');
+  const [isSavingNote, setIsSavingNote] = React.useState(false);
+  const [weekNotes, setWeekNotes] = React.useState<any[]>([]);
+
+  React.useEffect(() => {
+    setNoteDate(view.selectedDate);
+  }, [view.selectedDate]);
+
+  // Reset editing mode when selected note changes
+  React.useEffect(() => {
+    setIsEditingNote(false);
+  }, [selectedNote?.id]);
+
+  const parseNoteParts = (rawNote: string) => {
+    let title = '';
+    let body = '';
+    if (rawNote.includes('\n\n')) {
+      const parts = rawNote.split(/\n\n([\s\S]*)/);
+      title = parts[0]?.trim() || '';
+      body = parts[1]?.trim() || '';
+    } else if (rawNote.includes('\n')) {
+      const parts = rawNote.split(/\n([\s\S]*)/);
+      title = parts[0]?.trim() || '';
+      body = parts[1]?.trim() || '';
+    } else {
+      body = rawNote || '';
+    }
+    return { title, body };
+  };
+
+  const startEditNote = () => {
+    if (!selectedNote) return;
+    const { title, body } = parseNoteParts(selectedNote.note || '');
+    setEditNoteDraft({
+      title,
+      date: selectedNote.date || view.selectedDate,
+      content: body,
+    });
+    setIsEditingNote(true);
+  };
+
+  const cancelEditNote = () => {
+    setIsEditingNote(false);
+  };
+
+  const hasNoteDraftChanges = isEditingNote && (() => {
+    if (!selectedNote) return false;
+    const { title, body } = parseNoteParts(selectedNote.note || '');
+    return (
+      editNoteDraft.title.trim() !== title.trim() ||
+      editNoteDraft.date !== selectedNote.date ||
+      editNoteDraft.content.trim() !== body.trim()
+    );
+  })();
+
+  const handleUpdateNote = async () => {
+    if (!selectedNote?.id) return;
+    if (!editNoteDraft.content.trim() && !editNoteDraft.title.trim()) return;
+    setIsUpdatingNote(true);
+    try {
+      const updated = await view.updateNote({
+        id: selectedNote.id,
+        title: editNoteDraft.title.trim() || null,
+        date: editNoteDraft.date || selectedNote.date || view.selectedDate,
+        startTime: selectedNote.startTime || null,
+        doctorId: selectedNote.doctorId || null,
+        note: editNoteDraft.content.trim(),
+      });
+      if (updated) {
+        setSelectedNote((prev: any) => ({
+          ...prev,
+          date: editNoteDraft.date || prev.date,
+          note: editNoteDraft.title.trim()
+            ? (editNoteDraft.content.trim() ? `${editNoteDraft.title.trim()}\n\n${editNoteDraft.content.trim()}` : `${editNoteDraft.title.trim()}\n\n`)
+            : editNoteDraft.content.trim(),
+        }));
+        setIsEditingNote(false);
+        if (viewMode === 'week') {
+          const nRes = await getCalendarNotesAction({ dateFrom: daysOfWeek[0], dateTo: daysOfWeek.at(-1)! });
+          if (nRes.success && nRes.data) setWeekNotes(nRes.data);
+        }
+      }
+    } finally {
+      setIsUpdatingNote(false);
+    }
+  };
+
+  const handleSaveNote = async () => {
+    if (!noteContent.trim() && !noteTitle.trim()) return;
+    setIsSavingNote(true);
+    try {
+      const ok = await view.addNote({
+        title: noteTitle.trim() || null,
+        date: noteDate || view.selectedDate,
+        startTime: null,
+        doctorId: null,
+        note: noteContent.trim(),
+      });
+      if (ok) {
+        setNoteTitle('');
+        setNoteContent('');
+        setIsAddNoteOpen(false);
+        if (viewMode === 'week') {
+          // reload week notes
+          const nRes = await getCalendarNotesAction({ dateFrom: daysOfWeek[0], dateTo: daysOfWeek.at(-1)! });
+          if (nRes.success && nRes.data) setWeekNotes(nRes.data);
+        }
+      }
+    } finally {
+      setIsSavingNote(false);
+    }
+  };
 
   const handleCalendarReschedule = async () => {
     if (!view.selectedAppointmentDetails) return;
@@ -162,12 +288,12 @@ export function SecretaryBookAppointmentView() {
   }, [view.email]);
 
   React.useEffect(() => {
-    if (view.selectedAppointmentDetails) {
+    if (view.selectedAppointmentDetails || selectedNote || isAddNoteOpen || isBookingOpen) {
       setMobileView('detail');
     } else {
       setMobileView('timeline');
     }
-  }, [view.selectedAppointmentDetails]);
+  }, [view.selectedAppointmentDetails, selectedNote, isAddNoteOpen, isBookingOpen]);
 
   React.useEffect(() => {
     if (view.doctorsList.length > 0) {
@@ -196,10 +322,14 @@ export function SecretaryBookAppointmentView() {
         setIsWeekLoading(true);
         view.setInlineError('');
         try {
-          const result = await getClinicAppointmentsAction({ dateFrom: daysOfWeek[0], dateTo: daysOfWeek.at(-1) });
+          const [result, notesResult] = await Promise.all([
+            getClinicAppointmentsAction({ dateFrom: daysOfWeek[0], dateTo: daysOfWeek.at(-1) }),
+            getCalendarNotesAction({ dateFrom: daysOfWeek[0], dateTo: daysOfWeek.at(-1)! }),
+          ]);
           if (requestId !== weekRequestIdRef.current) return;
           if (result.success && result.data) setWeekAppointments(result.data);
           else if (!result.success) view.setInlineError(result.error || 'Failed to load the selected week.');
+          if (notesResult.success && notesResult.data) setWeekNotes(notesResult.data);
         } catch (e) {
           if (requestId === weekRequestIdRef.current) {
             view.setInlineError(e instanceof Error ? e.message : 'Failed to load the selected week.');
@@ -240,7 +370,9 @@ export function SecretaryBookAppointmentView() {
     const td = String(todayDate.getDate()).padStart(2, '0');
     const todayFormatted = `${ty}-${tm}-${td}`;
 
-    const dateObj = new Date(view.selectedDate + 'T00:00:00');
+    if (!view.selectedDate) return '';
+    const [sy, sm, sd] = view.selectedDate.split('-').map(Number);
+    const dateObj = new Date(sy, sm - 1, sd);
     const options: Intl.DateTimeFormatOptions = { month: 'long', day: 'numeric', year: 'numeric' };
     const dateFormatted = dateObj.toLocaleDateString('en-US', options);
 
@@ -253,8 +385,10 @@ export function SecretaryBookAppointmentView() {
       return `${dateFormatted}${isToday ? ' (Today)' : ''} • ${hours}`;
     } else {
       if (daysOfWeek.length === 5) {
-        const startObj = new Date(daysOfWeek[0] + 'T00:00:00');
-        const endObj = new Date(daysOfWeek[4] + 'T00:00:00');
+        const [startYear, startMonth, startDay] = daysOfWeek[0].split('-').map(Number);
+        const [endYear, endMonth, endDay] = daysOfWeek[4].split('-').map(Number);
+        const startObj = new Date(startYear, startMonth - 1, startDay);
+        const endObj = new Date(endYear, endMonth - 1, endDay);
         const startStr = startObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
         const endStr = endObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
         
@@ -403,20 +537,38 @@ export function SecretaryBookAppointmentView() {
             doctors={filteredDoctors}
             doctorColorIndex={doctorColorIndex}
             appointments={viewMode === 'week' ? weekAppointments : view.appointments}
+            notes={viewMode === 'week' ? weekNotes : view.notes}
             isLoading={viewMode === 'week' ? (view.isLoadingAppointments || isWeekLoading) : view.isLoadingAppointments}
             selectedAppointmentId={view.selectedAppointmentDetails?.id}
-            onSelectAppointment={view.selectAppointment}
+            selectedNoteId={selectedNote?.id}
+            onSelectAppointment={(app) => {
+              setSelectedNote(null);
+              setIsAddNoteOpen(false);
+              setIsBookingOpen(false);
+              view.selectAppointment(app);
+            }}
+            onSelectNote={(note) => {
+              view.setSelectedAppointmentDetails(null);
+              setIsAddNoteOpen(false);
+              setIsBookingOpen(false);
+              setSelectedNote(note);
+              setMobileView('detail');
+            }}
             viewMode={viewMode}
             selectedDate={view.selectedDate}
             operatingHours={view.operatingHours}
+            onAddNote={view.addNote}
+            onDeleteNote={view.deleteNote}
             onSlotClick={({ doctorId, date, startTime }) => {
               // Week view columns are days (multiple dentists) — doctor chosen in booking form
               // Pre-fill form from clicked slot
               if (date) view.selectDate(date);
               if (doctorId) view.selectDoctor(doctorId);
               if (startTime) view.setSelectedTime(startTime);
-              // Close appointment detail if open, open booking panel
+              // Close appointment detail and note panel if open, open booking panel
               view.setSelectedAppointmentDetails(null);
+              setSelectedNote(null);
+              setIsAddNoteOpen(false);
               void view.loadActionResources();
               setIsBookingOpen(true);
             }}
@@ -425,7 +577,7 @@ export function SecretaryBookAppointmentView() {
       </div>
 
       {/* Right Column: Booking Console Sidebar */}
-      <Sidebar collapsible="none" side="right" className={`flex-1 lg:flex-none ${view.selectedAppointmentDetails || isBookingOpen || !isCalendarCollapsed ? 'lg:w-80' : 'lg:w-11'} border-l border-border shrink-0 flex-col h-full bg-sidebar ${mobileView === 'timeline' ? 'max-lg:hidden' : ''}`}>
+      <Sidebar collapsible="none" side="right" className={`flex-1 lg:flex-none ${view.selectedAppointmentDetails || selectedNote || isAddNoteOpen || isBookingOpen || !isCalendarCollapsed ? 'lg:w-80' : 'lg:w-11'} border-l border-border shrink-0 flex-col h-full bg-sidebar ${mobileView === 'timeline' ? 'max-lg:hidden' : ''}`}>
         {view.selectedAppointmentDetails ? (
           <div className="flex flex-col h-full overflow-hidden">
             <div className="p-4 border-b border-card-border/40 shrink-0 flex items-center justify-between min-h-[61px]">
@@ -546,6 +698,234 @@ export function SecretaryBookAppointmentView() {
               />
             </div>
           </div>
+        ) : selectedNote ? (
+          <>
+            {/* ── Header: back button + title only ── */}
+            <div className="p-4 border-b border-border shrink-0 flex items-center gap-2">
+              <button
+                onClick={() => { if (!isEditingNote) { setSelectedNote(null); setMobileView('timeline'); } }}
+                className="p-1 -ml-1 text-muted-foreground hover:text-foreground shrink-0"
+                disabled={isEditingNote}
+              >
+                <ArrowLeft className="size-5" />
+              </button>
+              <div className="flex flex-col gap-0.5 flex-1 min-w-0">
+                <h1 className="text-base font-medium text-foreground">Calendar Scratch Note</h1>
+                <p className="text-xs text-muted-foreground">{isEditingNote ? 'Editing note...' : 'View and manage note details.'}</p>
+              </div>
+            </div>
+
+            {/* ── Body: unified fields, same shape in view & edit ── */}
+            <SidebarContent data-lenis-prevent className="overflow-y-auto px-4 py-4 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent" style={{ scrollbarWidth: 'thin' }}>
+              {(() => {
+                const { title: parsedTitle, body: parsedBody } = parseNoteParts(selectedNote.note || '');
+                return (
+                  <div className="flex flex-col gap-4">
+
+                    {/* Title row — Edit button lives to the right of this label */}
+                    <div className="flex flex-col gap-1.5">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-medium text-muted-foreground">
+                          Title <span className="text-muted-foreground/60">(optional)</span>
+                        </span>
+                        {/* Edit / Cancel / Save — same style as Guest Information section */}
+                        {!isEditingNote ? (
+                          <Button variant="outline" size="sm" onClick={startEditNote} className="h-7 px-2.5 text-xs gap-1">
+                            <Pencil className="size-3.5" /> Edit
+                          </Button>
+                        ) : (
+                          <div className="flex items-center gap-2">
+                            <Button variant="outline" size="sm" onClick={cancelEditNote} className="h-7 px-2.5 text-xs gap-1">
+                              <X className="size-3.5" /> Cancel
+                            </Button>
+                            <Button size="sm" onClick={handleUpdateNote} disabled={isUpdatingNote || !hasNoteDraftChanges} className="h-7 px-2.5 text-xs gap-1 bg-slate-900 text-white rounded-md disabled:cursor-not-allowed">
+                              <Check className="size-3.5" /> {isUpdatingNote ? 'Saving...' : 'Save'}
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                      {/* Title field — same box shape in both modes */}
+                      {isEditingNote ? (
+                        <input
+                          type="text"
+                          value={editNoteDraft.title}
+                          onChange={(e) => setEditNoteDraft(p => ({ ...p, title: e.target.value }))}
+                          placeholder="e.g. VIP Walk-in / Call Back"
+                          className="w-full min-w-0 px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
+                        />
+                      ) : (
+                        <div className="w-full min-w-0 px-4 py-2.5 rounded-xl border border-card-border bg-muted/50 text-sm text-foreground/80 min-h-[42px] leading-5 break-words [overflow-wrap:anywhere]">
+                          {parsedTitle || <span className="text-muted-foreground/50 italic">No title</span>}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Date field */}
+                    <div className="flex flex-col gap-1.5">
+                      <span className="text-xs font-medium text-muted-foreground">Date</span>
+                      {isEditingNote ? (
+                        <input
+                          type="date"
+                          value={editNoteDraft.date}
+                          onChange={(e) => setEditNoteDraft(p => ({ ...p, date: e.target.value }))}
+                          className="w-full min-w-0 px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
+                        />
+                      ) : (
+                        <div className="w-full min-w-0 px-4 py-2.5 rounded-xl border border-card-border bg-muted/50 text-sm text-foreground/80 min-h-[42px] leading-5 break-words [overflow-wrap:anywhere]">
+                          {selectedNote.date}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Created At field (non-editable) */}
+                    {selectedNote.createdAt && (
+                      <div className="flex flex-col gap-1.5">
+                        <span className="text-xs font-medium text-muted-foreground">Created At</span>
+                        <div className="w-full min-w-0 px-4 py-2.5 rounded-xl border border-card-border bg-muted/50 text-sm text-foreground/80 min-h-[42px] leading-5 flex items-center break-words [overflow-wrap:anywhere]">
+                          {(() => {
+                            try {
+                              const d = new Date(selectedNote.createdAt);
+                              const datePart = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                              const timePart = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+                              return `${datePart} at ${timePart}`;
+                            } catch {
+                              return selectedNote.createdAt;
+                            }
+                          })()}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Note content field */}
+                    <div className="flex flex-col gap-1.5">
+                      <span className="text-xs font-medium text-muted-foreground">Note Content</span>
+                      {isEditingNote ? (
+                        <>
+                          <textarea
+                            value={editNoteDraft.content}
+                            onChange={(e) => setEditNoteDraft(p => ({ ...p, content: e.target.value }))}
+                            placeholder="e.g. Possible walk-in for extraction, call back pending..."
+                            rows={6}
+                            className="w-full min-w-0 px-4 py-3 rounded-xl border bg-card text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border resize-none break-words [overflow-wrap:anywhere]"
+                          />
+                          <span className="text-[11px] text-muted-foreground text-right">{editNoteDraft.content.length}/1000</span>
+                        </>
+                      ) : (
+                        <div className="w-full min-w-0 px-4 py-3 rounded-xl border border-card-border bg-muted/50 text-sm text-foreground/80 whitespace-pre-wrap leading-relaxed min-h-[120px] break-words [overflow-wrap:anywhere]">
+                          {parsedBody ? parsedBody : <span className="text-muted-foreground/50 italic">No description added</span>}
+                        </div>
+                      )}
+                    </div>
+
+                  </div>
+                );
+              })()}
+            </SidebarContent>
+
+            {/* ── Footer ── */}
+            <SidebarFooter>
+              {isEditingNote && (
+                <p className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center mb-2">
+                  Please finish editing or save note before taking action.
+                </p>
+              )}
+              <div className={`flex gap-2 ${isEditingNote ? 'pointer-events-none opacity-40' : ''}`}>
+                <Button
+                  variant="outline"
+                  type="button"
+                  onClick={() => setSelectedNote(null)}
+                  className="flex-1 text-xs"
+                >
+                  Close
+                </Button>
+                <Button
+                  variant="destructive"
+                  type="button"
+                  onClick={async () => {
+                    if (selectedNote?.id) {
+                      await view.deleteNote(selectedNote.id);
+                      setSelectedNote(null);
+                      if (viewMode === 'week') {
+                        const nRes = await getCalendarNotesAction({ dateFrom: daysOfWeek[0], dateTo: daysOfWeek.at(-1)! });
+                        if (nRes.success && nRes.data) setWeekNotes(nRes.data);
+                      }
+                    }
+                  }}
+                  className="flex-1 text-xs font-semibold"
+                >
+                  Delete Note
+                </Button>
+              </div>
+            </SidebarFooter>
+          </>
+        ) : isAddNoteOpen ? (
+          <>
+            <div className="p-4 border-b border-border shrink-0 flex items-center gap-2">
+              <button
+                onClick={() => { setIsAddNoteOpen(false); setNoteTitle(''); setNoteContent(''); setMobileView('timeline'); }}
+                className="p-1 -ml-1 text-muted-foreground hover:text-foreground shrink-0"
+              >
+                <ArrowLeft className="size-5" />
+              </button>
+              <div className="flex flex-col gap-0.5">
+                <h1 className="text-base font-medium text-foreground">Add Scratch Note</h1>
+                <p className="text-xs text-muted-foreground">Add a quick scratch note to the calendar.</p>
+              </div>
+            </div>
+            <SidebarContent data-lenis-prevent className="overflow-y-auto px-4 py-4 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent" style={{ scrollbarWidth: 'thin' }}>
+              <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <span className="text-xs font-medium text-muted-foreground">Title <span className="text-muted-foreground/60">(optional)</span></span>
+                  <input
+                    type="text"
+                    value={noteTitle}
+                    onChange={(e) => setNoteTitle(e.target.value)}
+                    placeholder="e.g. VIP Walk-in / Call Back"
+                    className="w-full min-w-0 px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <span className="text-xs font-medium text-muted-foreground">Date <span className="text-destructive">*</span></span>
+                  <input
+                    type="date"
+                    value={noteDate}
+                    onChange={(e) => setNoteDate(e.target.value)}
+                    className="w-full min-w-0 px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <span className="text-xs font-medium text-muted-foreground">Note Description <span className="text-muted-foreground/60">(optional)</span></span>
+                  <textarea
+                    value={noteContent}
+                    onChange={(e) => setNoteContent(e.target.value)}
+                    placeholder="e.g. Possible walk-in for extraction, call back pending..."
+                    rows={6}
+                    className="w-full min-w-0 px-4 py-3 rounded-xl border bg-card text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border resize-none break-words [overflow-wrap:anywhere]"
+                  />
+                  <span className="text-[11px] text-muted-foreground text-right">{noteContent.length}/500</span>
+                </div>
+              </div>
+            </SidebarContent>
+            <SidebarFooter>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  type="button"
+                  onClick={() => { setIsAddNoteOpen(false); setNoteTitle(''); setNoteContent(''); }}
+                  className="flex-1 text-xs"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleSaveNote}
+                  disabled={(!noteContent.trim() && !noteTitle.trim()) || isSavingNote}
+                  className="flex-1 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold h-auto"
+                >
+                  {isSavingNote ? 'Saving...' : 'Save Note'}
+                </Button>
+              </div>
+            </SidebarFooter>
+          </>
         ) : isBookingOpen ? (
           <>
             <div className="p-4 border-b border-border shrink-0 flex items-center gap-2">
@@ -821,7 +1201,7 @@ export function SecretaryBookAppointmentView() {
             <div className="flex-1 flex items-center justify-center">
               <span className="[writing-mode:vertical-rl] rotate-180 text-xs font-semibold tracking-[0.2em] text-muted-foreground uppercase select-none">Calendar</span>
             </div>
-            <div className="flex justify-center pb-3">
+            <div className="flex flex-col items-center gap-2 pb-3">
               <Tooltip>
                 <TooltipTrigger asChild>
                   <button
@@ -832,6 +1212,22 @@ export function SecretaryBookAppointmentView() {
                   </button>
                 </TooltipTrigger>
                 <TooltipContent side="right">Book New Appointment</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => {
+                      view.setSelectedAppointmentDetails(null);
+                      setSelectedNote(null);
+                      setIsBookingOpen(false);
+                      setIsAddNoteOpen(true);
+                    }}
+                    className="p-2 text-muted-foreground hover:text-amber-600 hover:bg-amber-500/10 rounded-md"
+                  >
+                    <FileText className="size-4" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="right">Add Scratch Note</TooltipContent>
               </Tooltip>
             </div>
           </div>
@@ -936,9 +1332,20 @@ export function SecretaryBookAppointmentView() {
             <SidebarFooter>
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <SidebarMenuButton onClick={() => { view.resetForm(); void view.loadActionResources(); setIsBookingOpen(true); }}>
+                  <SidebarMenuButton onClick={() => { view.resetForm(); setSelectedNote(null); setIsAddNoteOpen(false); void view.loadActionResources(); setIsBookingOpen(true); }}>
                     <Plus className="size-4 mr-2" />
                     <span>Book New Appointment</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton onClick={() => {
+                    view.setSelectedAppointmentDetails(null);
+                    setSelectedNote(null);
+                    setIsBookingOpen(false);
+                    setIsAddNoteOpen(true);
+                  }}>
+                    <FileText className="size-4 mr-2" />
+                    <span>Add Scratch Note</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               </SidebarMenu>
@@ -963,7 +1370,13 @@ function DatePicker({
   operatingHours?: ClinicConfigResponseDto['operatingHours'] | null;
   weekDates?: { dateStr: string }[];
 }) {
-  const date = selectedDate ? new Date(selectedDate + 'T00:00:00') : undefined;
+  const parseLocalDate = (str?: string) => {
+    if (!str) return undefined;
+    const [y, m, d] = str.split('-').map(Number);
+    return new Date(y, m - 1, d);
+  };
+
+  const date = parseLocalDate(selectedDate);
 
   // Block weekdays the clinic is closed
   const disabledDays = React.useMemo(() => {
@@ -976,8 +1389,8 @@ function DatePicker({
     ];
   }, [operatingHours]);
 
-  const rangeStart = weekDates?.[0] ? new Date(weekDates[0].dateStr + 'T00:00:00') : undefined;
-  const rangeEnd = weekDates?.[weekDates.length - 1] ? new Date(weekDates[weekDates.length - 1].dateStr + 'T00:00:00') : undefined;
+  const rangeStart = parseLocalDate(weekDates?.[0]?.dateStr);
+  const rangeEnd = parseLocalDate(weekDates?.[weekDates.length - 1]?.dateStr);
 
   const toDateString = (d: Date) => {
     const y = d.getFullYear();

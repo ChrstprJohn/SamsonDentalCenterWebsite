@@ -164,6 +164,21 @@ CREATE TABLE appointments (
     CONSTRAINT valid_appointment_time CHECK (start_time < end_time)
 );
 
+-- CALENDAR_NOTES (Secretary filler/tentative notes — NOT real appointments)
+-- Free-text scratchpad on the calendar. No overlap constraints, notifications,
+-- status ledger, or outbox. Convertible to a real appointment later.
+CREATE TABLE calendar_notes (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    date DATE NOT NULL,
+    start_time TIME,
+    note TEXT NOT NULL,
+    doctor_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_calendar_notes_date ON calendar_notes(date, start_time);
+
 -- APPOINTMENT_MESSAGES
 CREATE TABLE appointment_messages (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -431,6 +446,36 @@ FOR DELETE
 TO authenticated
 USING (
   auth.uid() = patient_id OR
+  ((auth.jwt() -> 'user_metadata'::text) ->> 'role'::text) IN ('SECRETARY', 'ADMIN')
+);
+
+-- Enable RLS on calendar_notes table
+ALTER TABLE public.calendar_notes ENABLE ROW LEVEL SECURITY;
+
+-- Staff can read calendar notes (DOCTOR is read-only)
+CREATE POLICY "Allow select calendar_notes for staff"
+ON public.calendar_notes
+FOR SELECT
+TO authenticated
+USING (
+  ((auth.jwt() -> 'user_metadata'::text) ->> 'role'::text) IN ('SECRETARY', 'ADMIN', 'DOCTOR')
+);
+
+-- Only SECRETARY and ADMIN can create notes
+CREATE POLICY "Allow insert calendar_notes for staff"
+ON public.calendar_notes
+FOR INSERT
+TO authenticated
+WITH CHECK (
+  ((auth.jwt() -> 'user_metadata'::text) ->> 'role'::text) IN ('SECRETARY', 'ADMIN')
+);
+
+-- Only SECRETARY and ADMIN can delete notes
+CREATE POLICY "Allow delete calendar_notes for staff"
+ON public.calendar_notes
+FOR DELETE
+TO authenticated
+USING (
   ((auth.jwt() -> 'user_metadata'::text) ->> 'role'::text) IN ('SECRETARY', 'ADMIN')
 );
 

@@ -9,6 +9,12 @@ import { getDoctorsAction } from '@/modules/staff/actions/management/get-doctors
 import { getClinicAppointmentsAction } from '@/modules/appointments/actions/clinic/get-clinic-appointments.action';
 import { getStaffAppointmentByIdAction } from '@/modules/appointments/actions/clinic/get-staff-appointment-by-id.action';
 import { getClinicConfigAction } from '@/modules/clinic-config/actions/settings/get-clinic-config.action';
+import { getCalendarNotesAction } from '@/modules/appointments/actions/calendar-notes/get-calendar-notes.action';
+import { createCalendarNoteAction } from '@/modules/appointments/actions/calendar-notes/create-calendar-note.action';
+import { updateCalendarNoteAction } from '@/modules/appointments/actions/calendar-notes/update-calendar-note.action';
+import { deleteCalendarNoteAction } from '@/modules/appointments/actions/calendar-notes/delete-calendar-note.action';
+import type { CalendarNoteResponseDto } from '@/modules/appointments/dtos/calendar-notes/calendar-note-response.dto';
+import type { UpdateCalendarNoteDto } from '@/modules/appointments/dtos/calendar-notes/update-calendar-note.dto';
 
 export type BookingFor = 'SELF' | 'EXISTING_DEP' | 'NEW_DEP';
 export type PatientMode = 'SEARCH' | 'GUEST';
@@ -48,6 +54,8 @@ export function useSecretaryBookAppointment() {
   const [doctorsList, setDoctorsList] = useState<any[]>([]);
   const [appointments, setAppointments] = useState<any[]>([]);
   const [isLoadingAppointments, setIsLoadingAppointments] = useState(false);
+  const [notes, setNotes] = useState<CalendarNoteResponseDto[]>([]);
+  const [isLoadingNotes, setIsLoadingNotes] = useState(false);
   const [selectedAppointmentDetails, setSelectedAppointmentDetails] = useState<any | null>(null);
   const [selectedDoctor, setSelectedDoctor] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
@@ -93,9 +101,14 @@ export function useSecretaryBookAppointment() {
     if (!date) return;
     const requestId = ++timelineRequestIdRef.current;
     if (!silent) setIsLoadingAppointments(true);
-    const res = await getClinicAppointmentsAction({ date });
+    setIsLoadingNotes(true);
+    const [res, notesRes] = await Promise.all([
+      getClinicAppointmentsAction({ date }),
+      getCalendarNotesAction({ dateFrom: date, dateTo: date }),
+    ]);
     if (requestId !== timelineRequestIdRef.current) return;
     setIsLoadingAppointments(false);
+    setIsLoadingNotes(false);
     if (res.success && res.data) {
       setAppointments(res.data);
       setTimelineVersion((version) => version + 1);
@@ -105,6 +118,8 @@ export function useSecretaryBookAppointment() {
         return updated || prev;
       });
     } else if (!res.success) setInlineError(res.error || 'Failed to load appointments');
+    if (notesRes.success && notesRes.data) setNotes(notesRes.data);
+    else if (!notesRes.success) setInlineError(notesRes.error || 'Failed to load calendar notes');
   }, []);
 
   const [operatingHours, setOperatingHours] = useState<any>(null);
@@ -142,6 +157,36 @@ export function useSecretaryBookAppointment() {
       else if (!result.success) setInlineError(result.error || 'Failed to load appointment details');
     });
   }, []);
+
+  const addNote = useCallback(async (data: { title?: string | null; date: string; startTime?: string | null; doctorId?: string | null; note: string }) => {
+    const res = await createCalendarNoteAction(data);
+    if (res.success) {
+      await loadTimelineData(selectedDate, true); // silent — don't flash overlay
+      return true;
+    }
+    setInlineError(res.error || 'Failed to add calendar note');
+    return false;
+  }, [selectedDate, loadTimelineData]);
+
+  const updateNote = useCallback(async (data: UpdateCalendarNoteDto) => {
+    const res = await updateCalendarNoteAction(data);
+    if (res.success) {
+      await loadTimelineData(selectedDate, true); // silent — don't flash overlay
+      return res.data || true;
+    }
+    setInlineError(res.error || 'Failed to update calendar note');
+    return false;
+  }, [selectedDate, loadTimelineData]);
+
+  const deleteNote = useCallback(async (id: string) => {
+    const res = await deleteCalendarNoteAction({ id });
+    if (res.success) {
+      await loadTimelineData(selectedDate, true); // silent — don't flash overlay
+      return true;
+    }
+    setInlineError(res.error || 'Failed to delete calendar note');
+    return false;
+  }, [selectedDate, loadTimelineData]);
 
   useEffect(() => {
     loadTimelineData(selectedDate);
@@ -329,6 +374,7 @@ export function useSecretaryBookAppointment() {
     setInlineError,
     confirmationChannel, setConfirmationChannel,
     doctorsList, appointments, isLoadingAppointments, selectedAppointmentDetails, setSelectedAppointmentDetails,
-    selectAppointment, loadTimelineData, loadActionResources, timelineVersion, operatingHours
+    selectAppointment, loadTimelineData, loadActionResources, timelineVersion, operatingHours,
+    notes, isLoadingNotes, addNote, updateNote, deleteNote
   };
 }
