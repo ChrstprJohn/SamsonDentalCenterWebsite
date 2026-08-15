@@ -78,7 +78,11 @@ export function NavbarV1({
 
   const isDarkNav = !isMobileOpen;
 
-  const logoUrl = propLogoUrl ?? config?.websiteLogoUrl ?? '/images/SamsonLogo-transparent.png';
+  // Light mode logo is for white/light backgrounds (e.g., inside mobile drawer overlay).
+  // Dark mode logo (or fallback light) is for dark backgrounds (e.g., default dark header bar).
+  const lightLogoUrl = propLogoUrl ?? config?.websiteLogoUrl ?? '/images/SAMSONLOGO.png';
+  const darkLogoUrl = config?.websiteLogoDarkUrl ?? config?.websiteLogoUrl ?? propLogoUrl ?? '/images/SAMSONLOGO.png';
+  const logoUrl = isMobileOpen ? lightLogoUrl : darkLogoUrl;
   const clinicName = propClinicName ?? config?.clinicName ?? 'Samson Dental Center';
 
   return (

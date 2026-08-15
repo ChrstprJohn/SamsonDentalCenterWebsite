@@ -16,24 +16,20 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // Clear out any previously stuck 'dark' theme in localStorage 
-    // since we don't have a toggle button yet
+    // Keep application styling consistently on light mode
     localStorage.removeItem('theme');
-    
-    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      setTheme('dark');
-    } else {
-      setTheme('light');
-    }
+    setTheme('light');
+    const root = window.document.documentElement;
+    root.classList.remove('dark');
+    root.classList.add('light');
     setMounted(true);
   }, []);
 
   useEffect(() => {
     if (!mounted) return;
     const root = window.document.documentElement;
-    root.classList.remove('light', 'dark');
-    root.classList.add(theme);
-    localStorage.setItem('theme', theme);
+    root.classList.remove('dark');
+    root.classList.add('light');
   }, [theme, mounted]);
 
   const toggleTheme = () => {

@@ -71,7 +71,9 @@ export function NavbarV2({ user, config, logoUrl: propLogoUrl, clinicName: propC
 
   const isDarkNav = !scrolled && !isMobileOpen;
 
-  const logoUrl = propLogoUrl ?? config?.websiteLogoUrl ?? null;
+  const lightLogoUrl = propLogoUrl ?? config?.websiteLogoUrl ?? null;
+  const darkLogoUrl = config?.websiteLogoDarkUrl ?? config?.websiteLogoUrl ?? propLogoUrl ?? null;
+  const logoUrl = isDarkNav ? darkLogoUrl : lightLogoUrl;
   const clinicName = propClinicName ?? config?.clinicName ?? 'Samson Dental Center';
 
   return (
