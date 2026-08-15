@@ -55,7 +55,7 @@ export default async function UserV2PortalLayout({
   }
 
   if (!user) {
-    redirect('/auth/login?redirect=/user-v2');
+    redirect('/auth/staff-login?redirect=/user-v2');
   }
 
   // Load appointments and config

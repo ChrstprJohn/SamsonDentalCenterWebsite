@@ -30,6 +30,6 @@ describe('SignUpView', () => {
     expect(screen.getByText('Create Patient Account')).toBeDefined();
     expect(screen.getByText(/Sign up to schedule and manage your dental appointments/i)).toBeDefined();
     expect(screen.getByTestId('signup-form')).toBeDefined();
-    expect(screen.getByRole('link', { name: 'Log In' })).toHaveProperty('href', expect.stringContaining('/auth/login'));
+    expect(screen.getByRole('link', { name: 'Log In' })).toHaveProperty('href', expect.stringContaining('/auth/staff-login'));
   });
 });

@@ -3,7 +3,7 @@ import { updateSession } from '@/shared/database/middleware'
 
 const ROLE_PERMISSIONS: Record<string, string[]> = {
   ADMIN: ['/admin'],
-  SECRETARY: ['/secretary'],
+  SECRETARY: ['/secretary-v2'],
   DOCTOR: ['/doctor'],
   PATIENT: ['/user', '/user-v2'],
 };
@@ -19,15 +19,7 @@ export async function proxy(request: NextRequest) {
     host.includes('staff-samsondental.com') || 
     request.nextUrl.searchParams.has('staff')
 
-  // 1. Separate login pages routing under the hood
-  if (pathname === '/login') {
-    if (isStaffDomain) {
-      return NextResponse.rewrite(new URL('/auth/staff-login', request.url))
-    }
-    return NextResponse.rewrite(new URL('/auth/login', request.url))
-  }
-
-  // Skip other checks if public/marketing routes
+  // 1. Skip other checks if public/marketing routes
   if (!pathname.match(/\/(admin|secretary|user|user-v2|doctor)/)) {
     return supabaseResponse
   }
@@ -36,7 +28,7 @@ export async function proxy(request: NextRequest) {
 
   // 2. Unauthenticated check
   if (!user) {
-    redirectUrl = new URL('/login', request.url)
+    redirectUrl = new URL('/auth/staff-login', request.url)
   } else if (
     user.user_metadata?.status === 'FORCE_PASSWORD_CHANGE' &&
     pathname !== '/auth/force-password-change'
@@ -68,7 +60,7 @@ export async function proxy(request: NextRequest) {
         } else if (userRole === 'PATIENT' && isStaffDomain) {
           // Patient on staff domain -> redirect to apex domain
           const targetHost = host.replace(/^staff-/, '')
-          redirectUrl = new URL('/auth/login', `${request.nextUrl.protocol}//${targetHost}`)
+          redirectUrl = new URL('/auth/staff-login', `${request.nextUrl.protocol}//${targetHost}`)
         }
       }
     }

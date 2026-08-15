@@ -11,7 +11,7 @@ export async function markAllReadAction() {
     const supabase = await createClient();
 
     await markAllReadUseCase(supabase)(user.id, 'SECRETARY');
-    revalidatePath('/secretary');
+    revalidatePath('/secretary-v2');
     return { success: true };
   } catch (err: any) {
     return { success: false, error: err.message || 'Failed to mark all read' };

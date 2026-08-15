@@ -20,7 +20,7 @@ export async function toggleServiceVisibilityAction(id: string, currentIsActive:
     const result = await useCase(id, currentIsActive);
 
     // 4. Revalidate cache
-    revalidatePath('/secretary/services');
+    revalidatePath('/secretary-v2/services');
 
     return { data: result };
   } catch (error: any) {

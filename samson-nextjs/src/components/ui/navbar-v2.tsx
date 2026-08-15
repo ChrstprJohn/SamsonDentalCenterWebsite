@@ -141,7 +141,7 @@ export function NavbarV2({ user }: NavbarProps) {
               ) : (
                 <>
                   <Link
-                    href="/auth/login"
+                    href="/auth/staff-login"
                     className={`text-[11px] font-semibold uppercase tracking-widest transition-colors duration-300 cursor-pointer ${
                       isDarkNav ? 'text-white/80 hover:text-[#0070F3]' : 'text-gray-600 hover:text-[#0070F3]'
                     }`}

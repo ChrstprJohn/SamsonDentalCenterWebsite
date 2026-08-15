@@ -13,7 +13,7 @@ export async function markReadAction(data: { id: string }) {
     const supabase = await createClient();
 
     const result = await markReadUseCase(supabase)(validated);
-    revalidatePath('/secretary');
+    revalidatePath('/secretary-v2');
     return { success: true, data: result };
   } catch (err: any) {
     return { success: false, error: err.message || 'Failed to mark read' };

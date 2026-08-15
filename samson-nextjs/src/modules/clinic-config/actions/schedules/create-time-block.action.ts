@@ -48,7 +48,6 @@ export async function createTimeBlockAction(
 
     if (error) throw new Error(error.message);
 
-    revalidatePath('/secretary/clinic-settings');
     revalidatePath('/secretary-v2/clinic-settings');
     return { success: true, data: { id: data.id } };
   } catch (error: any) {

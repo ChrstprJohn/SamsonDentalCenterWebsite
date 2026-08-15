@@ -13,7 +13,7 @@ describe('proxy Route Guards (Unit Test)', () => {
     vi.clearAllMocks()
   })
 
-  it('redirects unauthenticated users to /login when accessing portals and retains tokens', async () => {
+  it('redirects unauthenticated users to /auth/staff-login when accessing portals and retains tokens', async () => {
     // 1. Setup a dummy auth cookie to ensure the transfer loop is explicitly tested
     const mockResponse = new NextResponse()
     mockResponse.cookies.set('sb-access-token', 'fake-token-123', { httpOnly: true })
@@ -29,7 +29,7 @@ describe('proxy Route Guards (Unit Test)', () => {
 
     // 3. Assert: Verify it redirected to /login with a 307 status
     expect(result?.status).toBe(307)
-    expect(result?.headers.get('location')).toBe('http://localhost:3000/login')
+    expect(result?.headers.get('location')).toBe('http://localhost:3000/auth/staff-login')
 
     // 4. Assert: Critical check ensuring refreshed auth cookies were not lost on redirect
     const redirectedCookie = result?.cookies.get('sb-access-token')
@@ -65,7 +65,7 @@ describe('proxy Route Guards (Unit Test)', () => {
     expect(result?.headers.get('location')).toBeNull()
   })
 
-  it('allows Secretary to access /secretary but blocks them from /admin', async () => {
+  it('allows Secretary to access /secretary-v2 but blocks them from /admin', async () => {
     const mockResponse = new NextResponse()
     vi.mocked(updateSession).mockResolvedValue({
       supabaseResponse: mockResponse,
@@ -73,7 +73,7 @@ describe('proxy Route Guards (Unit Test)', () => {
     })
 
     // 1. Check valid route access for Secretary
-    const validRequest = new NextRequest(new URL('http://localhost:3000/secretary/appointments'))
+    const validRequest = new NextRequest(new URL('http://localhost:3000/secretary-v2/appointments'))
     const validResult = await proxy(validRequest)
     expect(validResult?.status).toBe(200)
 
@@ -91,7 +91,7 @@ describe('proxy Route Guards (Unit Test)', () => {
       user: null, // No user, but should be allowed since it's the login page
     })
 
-    const request = new NextRequest(new URL('http://localhost:3000/login'))
+    const request = new NextRequest(new URL('http://localhost:3000/auth/staff-login'))
     const result = await proxy(request)
 
     expect(result?.status).toBe(200)
@@ -115,8 +115,8 @@ describe('proxy Route Guards (Unit Test)', () => {
     }
   })
 
-  it('blocks PATIENT from accessing /doctor/dashboard or /secretary/appointments', async () => {
-    const paths = ['/doctor/dashboard', '/secretary/appointments', '/admin/dashboard']
+  it('blocks PATIENT from accessing /doctor/dashboard or /secretary-v2/appointments', async () => {
+    const paths = ['/doctor/dashboard', '/secretary-v2/appointments', '/admin/dashboard']
     for (const path of paths) {
       const mockResponse = new NextResponse()
       vi.mocked(updateSession).mockResolvedValue({

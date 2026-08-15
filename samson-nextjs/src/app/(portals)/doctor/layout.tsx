@@ -29,7 +29,7 @@ export default async function DoctorPortalLayout({
   }
 
   if (!user) {
-    redirect('/auth/login?redirect=/doctor');
+    redirect('/auth/staff-login?redirect=/doctor');
   }
 
   const role = user.user_metadata?.role as string;

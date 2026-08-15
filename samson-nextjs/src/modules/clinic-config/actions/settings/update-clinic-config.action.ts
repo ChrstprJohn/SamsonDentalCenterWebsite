@@ -38,7 +38,6 @@ export async function updateClinicConfigAction(data: UpdateClinicConfigDto) {
     
     // Settings affect public pages and both secretary portals.
     revalidatePath('/');
-    revalidatePath('/secretary/clinic-settings');
     revalidatePath('/secretary-v2/clinic-settings');
     
     return { data: result };

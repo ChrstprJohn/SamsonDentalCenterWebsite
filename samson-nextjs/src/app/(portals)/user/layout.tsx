@@ -27,7 +27,7 @@ export default async function UserPortalLayout({
   }
 
   if (!user) {
-    redirect('/auth/login?redirect=/user');
+    redirect('/auth/staff-login?redirect=/user');
   }
 
   headerUser = {

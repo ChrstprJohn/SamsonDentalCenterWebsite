@@ -18,7 +18,7 @@ export default async function NotificationsPage() {
   }
 
   if (hasError || !userId) {
-    redirect('/auth/login');
+    redirect('/auth/staff-login');
   }
 
   const supabase = await createClient();

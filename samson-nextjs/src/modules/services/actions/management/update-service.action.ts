@@ -20,7 +20,7 @@ export async function updateServiceAction(data: UpdateServiceDto) {
     const result = await useCase(parsed);
 
     // 4. Revalidate
-    revalidatePath('/secretary/services');
+    revalidatePath('/secretary-v2/services');
 
     return { data: result };
   } catch (error: any) {

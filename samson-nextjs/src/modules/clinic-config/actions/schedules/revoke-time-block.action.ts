@@ -17,7 +17,6 @@ export async function revokeTimeBlockAction(
 
     if (error) throw new Error(error.message);
 
-    revalidatePath('/secretary/clinic-settings');
     revalidatePath('/secretary-v2/clinic-settings');
     return { success: true, data: undefined };
   } catch (error: any) {

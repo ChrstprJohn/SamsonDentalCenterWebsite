@@ -46,7 +46,7 @@ export function useStaffLoginView(): UseStaffLoginViewReturn {
 
     // Determine redirect path based on staff role metadata
     const userRole = response.data?.user?.user_metadata?.role || 'SECRETARY';
-    let defaultRedirect = '/secretary';
+    let defaultRedirect = '/secretary-v2';
     if (userRole === 'ADMIN') {
       defaultRedirect = '/admin';
     } else if (userRole === 'DOCTOR') {

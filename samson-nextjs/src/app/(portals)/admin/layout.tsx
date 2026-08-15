@@ -29,7 +29,7 @@ export default async function AdminPortalLayout({
   }
 
   if (!user) {
-    redirect('/auth/login?redirect=/admin');
+    redirect('/auth/staff-login?redirect=/admin');
   }
 
   const role = user.user_metadata?.role as string;

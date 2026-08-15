@@ -113,7 +113,7 @@ function AppointmentDetails({
 }) {
   const router = useRouter();
   const pathname = usePathname();
-  const prefix = pathname.startsWith('/secretary-v2') ? '/secretary-v2' : '/secretary';
+  const prefix = '/secretary-v2';
   const [detailTab, setDetailTab] = useState<'overview' | 'notifications' | 'timeline'>('overview');
   const [isEditingChannel, setIsEditingChannel] = useState(false);
   const [showResolvePane, setShowResolvePane] = useState(false);

@@ -27,7 +27,7 @@ export function ForgotPasswordView() {
 
       <p className="text-xs text-center text-slate-500 dark:text-slate-400 mt-6">
         Remember your password?{' '}
-        <a href="/auth/login" className="text-blue-500 font-semibold hover:underline">
+        <a href="/auth/staff-login" className="text-blue-500 font-semibold hover:underline">
           Log In
         </a>
       </p>

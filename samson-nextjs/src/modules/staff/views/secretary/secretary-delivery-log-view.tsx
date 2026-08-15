@@ -119,7 +119,7 @@ function DeliveryLogRow({
 }) {
   const router = useRouter();
   const pathname = usePathname();
-  const prefix = pathname.startsWith('/secretary-v2') ? '/secretary-v2' : '/secretary';
+  const prefix = '/secretary-v2';
   return (
     <tr
       className={`border-b border-card-border/40 last:border-b-0 transition-colors ${

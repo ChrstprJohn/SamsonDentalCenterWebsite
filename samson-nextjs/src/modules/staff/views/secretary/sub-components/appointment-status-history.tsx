@@ -96,7 +96,7 @@ export function AppointmentStatusHistory({ appointment, activeTab, compact }: { 
           <span className="text-xs font-bold text-text-secondary">Invoice Receipt</span>
           <div className="border border-green-500/25 bg-green-500/5 rounded-xl p-3 text-xs flex flex-col gap-1">
             <div className="flex justify-between"><span className="text-text-muted">Payment status:</span><span className="font-bold text-green-500 uppercase">Paid & Finalized</span></div>
-            <a href="/secretary/invoices" className="text-primary hover:underline font-semibold mt-1 inline-block text-[11px]">View Invoice Directory</a>
+            <a href="/secretary-v2/invoices" className="text-primary hover:underline font-semibold mt-1 inline-block text-[11px]">View Invoice Directory</a>
           </div>
         </div>
       )}

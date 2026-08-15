@@ -24,7 +24,7 @@ export default async function BookingLayout({
   }
 
   if (!user) {
-    redirect('/auth/login?redirect=/booking');
+    redirect('/auth/staff-login?redirect=/booking');
   }
 
   headerUser = {

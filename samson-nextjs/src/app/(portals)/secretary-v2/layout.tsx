@@ -30,7 +30,7 @@ export default async function SecretaryPortalV2Layout({
   }
 
   if (!user) {
-    redirect('/auth/login?redirect=/secretary-v2');
+    redirect('/auth/staff-login?redirect=/secretary-v2');
   }
 
   userId = user.id;

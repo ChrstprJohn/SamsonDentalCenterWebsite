@@ -29,6 +29,6 @@ describe('ForgotPasswordView', () => {
     expect(screen.getByText('Reset Password')).toBeDefined();
     expect(screen.getByText(/Enter your email and we'll send you a verification code/i)).toBeDefined();
     expect(screen.getByTestId('forgot-password-form')).toBeDefined();
-    expect(screen.getByRole('link', { name: 'Log In' })).toHaveProperty('href', expect.stringContaining('/auth/login'));
+    expect(screen.getByRole('link', { name: 'Log In' })).toHaveProperty('href', expect.stringContaining('/auth/staff-login'));
   });
 });
