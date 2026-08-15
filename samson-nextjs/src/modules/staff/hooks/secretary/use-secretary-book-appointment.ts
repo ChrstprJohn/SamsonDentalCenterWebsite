@@ -319,7 +319,7 @@ export function useSecretaryBookAppointment() {
         : `${selectedPatient.firstName} ${selectedPatient.lastName}`
     : `${firstName} ${middleName ? middleName + ' ' : ''}${lastName}${suffix ? ' ' + suffix : ''}`;
 
-  const submit = async () => {
+  const submit = async (): Promise<boolean> => {
     setInlineError('');
     setIsSubmitting(true);
     try {
@@ -344,13 +344,16 @@ export function useSecretaryBookAppointment() {
         setBooked(true);
         addToast('Appointment booked successfully!', 'success');
         await loadTimelineData(selectedDate, true); // silent — don't flash overlay
+        return true;
       } else {
         setInlineError(res.error || 'Booking failed');
         addToast(res.error || 'Booking failed', 'error');
+        return false;
       }
     } catch (err: any) {
       setInlineError(err.message || 'Unexpected error');
       addToast(err.message || 'Unexpected error', 'error');
+      return false;
     } finally {
       setIsSubmitting(false);
     }

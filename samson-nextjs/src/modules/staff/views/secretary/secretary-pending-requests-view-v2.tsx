@@ -21,6 +21,7 @@ import {
   ChevronRight,
   ClipboardList,
   FileText,
+  Info,
   Mail,
   MoreHorizontal,
   Pencil,
@@ -461,6 +462,13 @@ export function SecretaryPendingRequestsViewV2({ deepLinkId }: { deepLinkId?: st
                       return res;
                     }}
                   />
+                )}
+
+                {inquiriesView.stagedInquiryAction === 'DROP' && (
+                  <div className="flex items-start gap-2 rounded-lg border border-sky-500/25 bg-sky-500/10 p-2.5 text-xs font-medium leading-relaxed text-sky-700 dark:text-sky-300">
+                    <Info className="mt-0.5 size-3.5 shrink-0" />
+                    <span>The patient will be notified by email when this request is rejected or dropped.</span>
+                  </div>
                 )}
 
                 <div className="flex flex-col gap-1">

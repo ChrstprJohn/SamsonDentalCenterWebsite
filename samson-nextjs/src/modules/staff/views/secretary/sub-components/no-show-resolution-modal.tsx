@@ -8,6 +8,7 @@ import { Select } from '@/components/ui/select';
 import { AppointmentRescheduleForm, isRescheduleFormComplete } from './appointment-reschedule-form';
 import { updateConfirmationChannelAction } from '@/modules/appointments/actions/status/update-confirmation-channel.action';
 import { useToast } from '@/components/feedback/toast-container';
+import { NotificationChannelMessage } from './notification-channel-field';
 
 function getPatientDisplayName(app: any): string {
   if (!app) return 'Patient';
@@ -319,6 +320,7 @@ export function NoShowResolutionModal({ view }: { view: any }) {
                 </div>
               )}
             </div>
+            <NotificationChannelMessage channel={channel} purpose="completion" />
           )}
 
           {resolution !== 'RESCHEDULE' && (

@@ -243,14 +243,6 @@ export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps)
       }}
       className="flex flex-col gap-4"
     >
-      {/* Reschedule Warning Notice */}
-      <div className="p-3 border bg-amber-500/5 border-amber-500/20 rounded-2xl text-left">
-        <span className="text-[10px] font-semibold uppercase tracking-wider text-amber-500">Reschedule Notice</span>
-        <div className="text-[11px] text-muted-foreground mt-1 leading-relaxed">
-          Rescheduling will update the appointment date and time, notify the patient, and update doctor availability.
-        </div>
-      </div>
-
       {/* 1. Service & Schedule */}
       <span className="text-sm font-medium text-foreground">Service &amp; Schedule</span>
 
@@ -411,6 +403,7 @@ export function AppointmentRescheduleForm(props: AppointmentRescheduleFormProps)
           value={props.confirmationChannel}
           onChange={props.onConfirmationChannelChange}
           onEditingChange={handleEditingChannelChange}
+          purpose="reschedule"
         />
       )}
 

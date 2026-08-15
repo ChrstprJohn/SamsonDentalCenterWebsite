@@ -10,6 +10,7 @@ import { AppointmentDetailPane } from './appointment-detail-pane';
 import { updateConfirmationChannelAction } from '@/modules/appointments/actions/status/update-confirmation-channel.action';
 import { resendNotificationAction } from '@/modules/appointments/actions/status/resend-notification.action';
 import { useToast } from '@/components/feedback/toast-container';
+import { NotificationChannelMessage } from './notification-channel-field';
 
 function getPatientDisplayName(app: any): string {
   if (!app) return 'Guest Patient';
@@ -891,7 +892,7 @@ function CheckoutContent({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-1.5">
+      <div className="order-2 flex flex-col gap-1.5">
         <div className="flex flex-col gap-0.5">
           <span className="text-sm font-medium text-foreground">Checkout Reason <span className="text-destructive">*</span></span>
           <span className="text-xs text-muted-foreground">Add a reason for this checkout before confirming.</span>
@@ -920,7 +921,7 @@ function CheckoutContent({
         )}
       </div>
 
-      <div className="flex flex-col gap-1.5">
+      <div className="order-1 flex flex-col gap-1.5">
         <div className="flex items-center justify-between mb-1">
           <div className="flex flex-col gap-0.5">
             <span className="text-sm font-medium text-foreground">Notification Channel <span className="text-destructive">*</span></span>
@@ -961,9 +962,7 @@ function CheckoutContent({
         )}
       </div>
 
-      <InfoBox variant="amber" title="Completion Notice">
-        This will complete the visit and send the selected post-care message.
-      </InfoBox>
+      <NotificationChannelMessage channel={channel} purpose="completion" className="order-1" />
     </div>
   );
 }
@@ -1166,12 +1165,6 @@ function ResolveContent({
 
       {resolveMode === 'COMPLETED' && (
         <>
-          <div className="p-3 border bg-amber-500/5 border-amber-500/20 rounded-2xl">
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-amber-500">Completion Notice</span>
-            <div className="text-[11px] text-muted-foreground mt-1 leading-relaxed">
-              This will complete the visit and send the selected post-care message.
-            </div>
-          </div>
           <ChannelPickerInline
             channel={channel}
             draftChannel={draftChannel}
@@ -1182,17 +1175,12 @@ function ResolveContent({
             onDraftChange={onDraftChannelChange}
             onSave={onSaveChannel}
           />
+          <NotificationChannelMessage channel={channel} purpose="completion" />
         </>
       )}
 
       {resolveMode === 'CONFIRMED_NO_SHOW' && (
         <>
-          <div className="p-3 border bg-red-500/5 border-red-500/20 rounded-2xl">
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-red-500">No-Show Notice</span>
-            <div className="text-[11px] text-muted-foreground mt-1 leading-relaxed">
-              Clicking <strong>Confirm</strong> will keep this appointment marked as <strong>Confirmed No-Show</strong> in system audit logs and send the missed-appointment notification via the selected channel.
-            </div>
-          </div>
           <ChannelPickerInline
             channel={channel}
             draftChannel={draftChannel}
@@ -1203,6 +1191,7 @@ function ResolveContent({
             onDraftChange={onDraftChannelChange}
             onSave={onSaveChannel}
           />
+          <NotificationChannelMessage channel={channel} purpose="no-show" />
         </>
       )}
 
@@ -1623,18 +1612,13 @@ function InlineCheckoutForm({ appointment, view, onCancel }: { appointment: any;
         )}
       </div>
 
+      <NotificationChannelMessage channel={channel} purpose="completion" />
+
       {isEditingChannel && (
         <p className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center">
           Please finish editing or save your channel changes before completing checkout.
         </p>
       )}
-
-      <div className="p-4 border bg-amber-500/5 border-amber-500/20 rounded-2xl">
-        <span className="text-[10px] font-semibold uppercase tracking-wider text-amber-600">Completion Notice</span>
-        <div className="text-[11px] text-muted-foreground mt-1 leading-relaxed">
-          Confirming will complete the visit and send a Thank You & Review Request message via the selected channel.
-        </div>
-      </div>
 
       <div className="flex gap-2">
         <button onClick={onCancel} className="flex-1 h-[42px] text-sm font-medium border border-input bg-background text-foreground hover:bg-accent transition-colors rounded-xl">

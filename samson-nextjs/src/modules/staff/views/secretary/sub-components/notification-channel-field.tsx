@@ -1,12 +1,51 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Check, Pencil, X } from 'lucide-react';
+import { AlertTriangle, Check, Info, Pencil, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select } from '@/components/ui/select';
 import { updateConfirmationChannelAction } from '@/modules/appointments/actions/status/update-confirmation-channel.action';
 
 export type NotificationChannel = 'EMAIL' | 'SMS' | 'BOTH' | 'NONE';
+
+const BOOKING_CHANNEL_MESSAGES: Record<NotificationChannel, string> = {
+  NONE: 'No confirmation message or reminders will be sent to the patient.',
+  SMS: 'The patient will receive appointment confirmations and reminders via SMS only.',
+  EMAIL: 'The patient will receive appointment confirmations and reminders via email only.',
+  BOTH: 'The patient will receive appointment confirmations and reminders via both SMS and email.',
+};
+
+const CANCELLATION_CHANNEL_MESSAGES: Record<NotificationChannel, string> = {
+  NONE: 'No cancellation notification will be sent to the patient.',
+  SMS: 'The patient will receive the cancellation notification via SMS only.',
+  EMAIL: 'The patient will receive the cancellation notification via email only.',
+  BOTH: 'The patient will receive the cancellation notification via both SMS and email.',
+};
+
+const RESCHEDULE_CHANNEL_MESSAGES: Record<NotificationChannel, string> = {
+  NONE: 'No reschedule notification will be sent to the patient.',
+  SMS: 'The patient will receive the reschedule notification via SMS only.',
+  EMAIL: 'The patient will receive the reschedule notification via email only.',
+  BOTH: 'The patient will receive the reschedule notification via both SMS and email.',
+};
+
+const COMPLETION_CHANNEL_MESSAGES: Record<NotificationChannel, string> = {
+  NONE: 'No checkout or thank-you-for-your-visit message will be sent to the patient.',
+  SMS: 'The patient will receive the checkout thank-you message by SMS only.',
+  EMAIL: 'The patient will receive the checkout thank-you message by email only.',
+  BOTH: 'The patient will receive the checkout thank-you message by SMS and email.',
+};
+const NO_SHOW_CHANNEL_MESSAGES: Record<NotificationChannel, string> = {
+  NONE: 'No no-show notification or warning will be sent to the patient.',
+  SMS: 'A no-show notification will be sent to the patient via SMS.',
+  EMAIL: 'A no-show notification will be sent to the patient via email.',
+  BOTH: 'A no-show notification will be sent to the patient via SMS and email.',
+};
+
+export function NotificationChannelMessage({ channel, purpose = 'booking', className = '' }: { channel: NotificationChannel; purpose?: 'booking' | 'cancellation' | 'reschedule' | 'completion' | 'no-show'; className?: string }) {
+  const messages = purpose === 'cancellation' ? CANCELLATION_CHANNEL_MESSAGES : purpose === 'reschedule' ? RESCHEDULE_CHANNEL_MESSAGES : purpose === 'completion' ? COMPLETION_CHANNEL_MESSAGES : purpose === 'no-show' ? NO_SHOW_CHANNEL_MESSAGES : BOOKING_CHANNEL_MESSAGES;
+  return <div className={`${className} mt-1 flex items-start gap-2 rounded-lg border p-2 text-xs font-medium leading-relaxed ${channel === 'NONE' ? 'border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300' : 'border-sky-500/25 bg-sky-500/10 text-sky-700 dark:text-sky-300'}`}><span>{messages[channel]}</span></div>;
+}
 
 export function NotificationChannelField({
   appointmentId,
@@ -14,12 +53,14 @@ export function NotificationChannelField({
   onChange,
   onEditingChange,
   onSave,
+  purpose = 'booking',
 }: {
   appointmentId?: string;
   value?: NotificationChannel;
   onChange?: (value: NotificationChannel) => void;
   onEditingChange?: (isEditing: boolean) => void;
   onSave?: (value: NotificationChannel) => Promise<{ success: boolean } | void>;
+  purpose?: 'booking' | 'cancellation' | 'reschedule';
 }) {
   const current = value || 'EMAIL';
   const [channel, setChannel] = useState<NotificationChannel>(current);
@@ -77,6 +118,10 @@ export function NotificationChannelField({
           {channel === 'EMAIL' ? 'Email' : channel === 'SMS' ? 'SMS' : channel === 'BOTH' ? 'Email & SMS' : 'None'}
         </div>
       )}
+      <div className={`flex items-start gap-2 rounded-lg border p-2 text-xs font-medium leading-relaxed ${channel === 'NONE' ? 'border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300' : 'border-sky-500/25 bg-sky-500/10 text-sky-700 dark:text-sky-300'}`}>
+        {channel === 'NONE' ? <AlertTriangle className="mt-0.5 size-3.5 shrink-0" /> : <Info className="mt-0.5 size-3.5 shrink-0" />}
+        <span>{(purpose === 'cancellation' ? CANCELLATION_CHANNEL_MESSAGES : purpose === 'reschedule' ? RESCHEDULE_CHANNEL_MESSAGES : BOOKING_CHANNEL_MESSAGES)[channel]}</span>
+      </div>
     </div>
   );
 }

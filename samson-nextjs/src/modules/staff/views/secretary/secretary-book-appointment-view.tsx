@@ -45,6 +45,8 @@ import {
   Users,
   ArrowLeft,
   Clock,
+  AlertTriangle,
+  Info,
   FileText,
   Pencil,
   X,
@@ -64,6 +66,13 @@ function getDaysOfWeek(dateStr: string) {
   return days;
 }
 
+const BOOKING_CHANNEL_MESSAGES = {
+  NONE: 'No confirmation message or reminders will be sent to the patient.',
+  SMS: 'The patient will receive appointment confirmations and reminders via SMS only.',
+  EMAIL: 'The patient will receive appointment confirmations and reminders via email only.',
+  BOTH: 'The patient will receive appointment confirmations and reminders via both SMS and email.',
+} as const;
+
 
 export function SecretaryBookAppointmentView() {
   const view = useSecretaryBookAppointment();
@@ -75,6 +84,8 @@ export function SecretaryBookAppointmentView() {
   const weekRequestIdRef = React.useRef(0);
   const [mobileView, setMobileView] = React.useState<'timeline' | 'detail'>('timeline');
   const [isBookingOpen, setIsBookingOpen] = React.useState(false);
+  const [bookingAttempted, setBookingAttempted] = React.useState(false);
+  const [bookingValidationMessage, setBookingValidationMessage] = React.useState('');
   const [isDentistsOpen, setIsDentistsOpen] = React.useState(true);
   const [isCalendarCollapsed, setIsCalendarCollapsed] = React.useState(false);
   const [showNotesColumn, setShowNotesColumn] = React.useState(true);
@@ -103,6 +114,39 @@ export function SecretaryBookAppointmentView() {
   const [noteDate, setNoteDate] = React.useState(view.selectedDate || '');
   const [isSavingNote, setIsSavingNote] = React.useState(false);
   const [weekNotes, setWeekNotes] = React.useState<any[]>([]);
+
+  const requiredFieldClass = (missing: boolean) => bookingAttempted
+    ? missing
+      ? 'border-destructive ring-1 ring-destructive/30'
+      : 'border-emerald-500 ring-1 ring-emerald-500/20'
+    : 'border-card-border';
+
+  const focusFirstMissingBookingField = () => {
+    const requiredFields = [
+      { key: 'service', label: 'Service', missing: !view.selectedService },
+      { key: 'dentist', label: 'Dentist', missing: !view.selectedDoctor },
+      { key: 'date', label: 'Date', missing: !view.selectedDate },
+      { key: 'start-time', label: 'Start time', missing: !view.selectedTime },
+      { key: 'end-time', label: 'End time', missing: !view.selectedEndTime },
+      { key: 'first-name', label: 'First name', missing: !view.firstName },
+      { key: 'last-name', label: 'Last name', missing: !view.lastName },
+      { key: 'phone', label: 'Phone number', missing: !view.phoneNumber },
+    ];
+    const missingFields = requiredFields.filter((field) => field.missing);
+    const missingField = missingFields[0];
+
+    if (!missingField) return true;
+    setBookingValidationMessage('Please fill in the highlighted fields before booking.');
+    const field = document.querySelector<HTMLElement>(`[data-booking-field="${missingField.key}"]`);
+    field?.focus();
+    return false;
+  };
+
+  React.useEffect(() => {
+    if (bookingAttempted && view.isReadyToSubmit) {
+      setBookingValidationMessage('');
+    }
+  }, [bookingAttempted, view.isReadyToSubmit]);
 
   React.useEffect(() => {
     setNoteDate(view.selectedDate);
@@ -569,19 +613,16 @@ export function SecretaryBookAppointmentView() {
             onAddNote={view.addNote}
             onDeleteNote={view.deleteNote}
             showNotesColumn={showNotesColumn}
-            onSlotClick={({ doctorId, date, startTime }) => {
-              // Week view columns are days (multiple dentists) — doctor chosen in booking form
-              // Pre-fill form from clicked slot
+            onSlotClick={viewMode === 'day' ? ({ doctorId, date, startTime }) => {
               if (date) view.selectDate(date);
               if (doctorId) view.selectDoctor(doctorId);
               if (startTime) view.setSelectedTime(startTime);
-              // Close appointment detail and note panel if open, open booking panel
               view.setSelectedAppointmentDetails(null);
               setSelectedNote(null);
               setIsAddNoteOpen(false);
               void view.loadActionResources();
               setIsBookingOpen(true);
-            }}
+            } : undefined}
           />
         </div>
       </div>
@@ -962,9 +1003,10 @@ export function SecretaryBookAppointmentView() {
                     <span className="text-xs text-muted-foreground">Service <span className="text-destructive">*</span></span>
                     <div className="relative flex items-center">
                       <select
+                        data-booking-field="service"
                         value={view.selectedService}
                         onChange={(e) => view.selectService(e.target.value)}
-                        className="w-full px-4 pr-10 py-2.5 appearance-none rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
+                        className={`w-full px-4 pr-10 py-2.5 appearance-none rounded-xl border bg-card text-sm ${view.selectedService ? 'text-foreground' : 'text-muted-foreground'} focus:outline-none focus:ring-2 focus:ring-primary-ring ${requiredFieldClass(!view.selectedService)}`}
                       >
                         <option value="">Select Service...</option>
                         {view.services.map((svc) => (
@@ -979,9 +1021,10 @@ export function SecretaryBookAppointmentView() {
                     <span className="text-xs text-muted-foreground">Dentist <span className="text-destructive">*</span></span>
                     <div className="relative flex items-center">
                       <select
+                        data-booking-field="dentist"
                         value={view.selectedDoctor}
                         onChange={(e) => view.selectDoctor(e.target.value)}
-                        className="w-full px-4 pr-10 py-2.5 appearance-none rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
+                        className={`w-full px-4 pr-10 py-2.5 appearance-none rounded-xl border bg-card text-sm ${view.selectedDoctor ? 'text-foreground' : 'text-muted-foreground'} focus:outline-none focus:ring-2 focus:ring-primary-ring ${requiredFieldClass(!view.selectedDoctor)}`}
                       >
                         <option value="">Select Dentist...</option>
                         {view.doctorsList.map((doc) => (
@@ -995,10 +1038,11 @@ export function SecretaryBookAppointmentView() {
                   <div className="flex flex-col gap-0.5">
                     <span className="text-xs text-muted-foreground">Date <span className="text-destructive">*</span></span>
                     <input
+                      data-booking-field="date"
                       type="date"
                       value={view.selectedDate}
                       onChange={(e) => view.selectDate(e.target.value)}
-                      className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
+                      className={`w-full px-4 py-2.5 rounded-xl border bg-card text-sm ${view.selectedDate ? 'text-foreground' : 'text-muted-foreground'} focus:outline-none focus:ring-2 focus:ring-primary-ring ${requiredFieldClass(!view.selectedDate)}`}
                     />
                   </div>
                   {/* Start Time + End Time */}
@@ -1012,10 +1056,11 @@ export function SecretaryBookAppointmentView() {
                             <NativeTimePopoverPicker
                               value={view.selectedTime}
                               onChange={(val) => view.setSelectedTime(val)}
-                              placeholder="Select Start Time"
+                              placeholder="Not selected"
                               minTime={bounds.minTime}
                               maxTime={bounds.maxTime}
                               unavailableRanges={bounds.unavailableRanges}
+                              className={requiredFieldClass(!view.selectedTime)}
                             />
                           </div>
                           <div className="flex flex-col gap-0.5">
@@ -1023,10 +1068,11 @@ export function SecretaryBookAppointmentView() {
                             <NativeTimePopoverPicker
                               value={view.selectedEndTime}
                               onChange={(val) => view.setSelectedEndTime(val)}
-                              placeholder="Select End Time"
+                              placeholder="Not selected"
                               minTime={bounds.minTime}
                               maxTime={bounds.maxTime}
                               unavailableRanges={bounds.unavailableRanges}
+                              className={requiredFieldClass(!view.selectedEndTime)}
                             />
                           </div>
                         </div>
@@ -1063,17 +1109,19 @@ export function SecretaryBookAppointmentView() {
                   <div className="flex flex-col gap-0.5">
                     <span className="text-xs text-muted-foreground">First Name <span className="text-destructive">*</span></span>
                     <input
+                      data-booking-field="first-name"
                       type="text"
                       value={view.firstName}
                       onChange={(e) => view.setFirstName(e.target.value)}
                       placeholder="First name"
-                      className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
+                      className={`w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring ${requiredFieldClass(!view.firstName)}`}
                     />
                   </div>
                   {/* Middle Name */}
                   <div className="flex flex-col gap-0.5">
                     <span className="text-xs text-muted-foreground">Middle Name</span>
                     <input
+                      data-booking-field="last-name"
                       type="text"
                       value={view.middleName}
                       onChange={(e) => view.setMiddleName(e.target.value)}
@@ -1085,11 +1133,12 @@ export function SecretaryBookAppointmentView() {
                   <div className="flex flex-col gap-0.5">
                     <span className="text-xs text-muted-foreground">Last Name <span className="text-destructive">*</span></span>
                     <input
+                      data-booking-field="phone"
                       type="text"
                       value={view.lastName}
                       onChange={(e) => view.setLastName(e.target.value)}
                       placeholder="Last name"
-                      className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
+                      className={`w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring ${requiredFieldClass(!view.lastName)}`}
                     />
                   </div>
                   {/* Suffix */}
@@ -1120,7 +1169,7 @@ export function SecretaryBookAppointmentView() {
                       value={view.phoneNumber}
                       onChange={(e) => view.setPhoneNumber(e.target.value)}
                       placeholder="Phone number"
-                      className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
+                      className={`w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring ${requiredFieldClass(!view.phoneNumber)}`}
                     />
                   </div>
                   {/* Email */}
@@ -1151,6 +1200,12 @@ export function SecretaryBookAppointmentView() {
                       </select>
                       <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
                     </div>
+                    <p className={`mt-1 flex items-start gap-2 rounded-lg border p-2 text-xs font-medium leading-relaxed ${view.confirmationChannel === 'NONE' ? 'border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300' : 'border-sky-500/25 bg-sky-500/10 text-sky-700 dark:text-sky-300'}`}>
+                      {view.confirmationChannel === 'NONE'
+                        ? <AlertTriangle className="mt-0.5 size-3.5 shrink-0" />
+                        : <Info className="mt-0.5 size-3.5 shrink-0" />}
+                      {BOOKING_CHANNEL_MESSAGES[view.confirmationChannel]}
+                    </p>
                   </div>
                   {/* Patient Note */}
                   <div className="flex flex-col gap-0.5">
@@ -1171,6 +1226,11 @@ export function SecretaryBookAppointmentView() {
                   {view.inlineError}
                 </div>
               )}
+              {bookingValidationMessage && (
+                <div role="alert" className="mx-1 mb-3 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-xs font-medium text-amber-700 dark:text-amber-300">
+                  {bookingValidationMessage}
+                </div>
+              )}
          </SidebarContent>
             <SidebarFooter>
               <div className="flex gap-2">
@@ -1184,10 +1244,18 @@ export function SecretaryBookAppointmentView() {
                 </Button>
                 <Button
                   onClick={async () => {
-                    await view.submit();
-                    setIsBookingOpen(false);
+                    setBookingAttempted(true);
+                    if (!focusFirstMissingBookingField() || !view.isReadyToSubmit) return;
+                    setBookingValidationMessage('');
+                    const wasBooked = await view.submit();
+                    if (wasBooked) {
+                      view.resetForm();
+                      setBookingAttempted(false);
+                      setBookingValidationMessage('');
+                      setIsBookingOpen(false);
+                    }
                   }}
-                  disabled={view.isSubmitting || !view.isReadyToSubmit}
+                  disabled={view.isSubmitting}
                   className="flex-1 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold h-auto"
                 >
                   {view.isSubmitting ? 'Booking...' : 'Book'}

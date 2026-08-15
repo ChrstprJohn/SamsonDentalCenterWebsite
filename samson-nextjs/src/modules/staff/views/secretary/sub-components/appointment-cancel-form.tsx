@@ -75,15 +75,7 @@ export function AppointmentCancelForm(props: AppointmentCancelFormProps) {
       }}
       className="flex flex-col gap-4 pt-1"
     >
-      {/* Cancellation Warning Notice */}
-      <div className="p-3 border bg-red-500/5 border-red-500/20 rounded-2xl text-left">
-        <span className="text-[10px] font-semibold uppercase tracking-wider text-red-500">Cancellation Notice</span>
-        <div className="text-[11px] text-muted-foreground mt-1 leading-relaxed">
-          Canceling this appointment will remove it from the schedule and notify the patient.
-        </div>
-      </div>
-
-      {props.onConfirmationChannelChange && <NotificationChannelField appointmentId={props.appointmentId} value={props.confirmationChannel} onChange={props.onConfirmationChannelChange} />}
+      {props.onConfirmationChannelChange && <NotificationChannelField appointmentId={props.appointmentId} value={props.confirmationChannel} onChange={props.onConfirmationChannelChange} purpose="cancellation" />}
 
       <div className="flex flex-col gap-1.5">
         <div className="flex flex-col gap-0.5">

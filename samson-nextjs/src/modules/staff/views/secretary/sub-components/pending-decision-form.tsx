@@ -102,6 +102,11 @@ export function PendingDecisionForm(props: PendingDecisionFormProps) {
               <Textarea value={props.customReason} onChange={(event) => props.onCustomReasonChange(event.target.value)} placeholder="Enter your custom justification reason..." rows={2} className="text-xs mt-1" />
             )}
           </div>
+          {props.stagedStatus === 'REJECTED' && (
+            <div className="rounded-lg border border-sky-500/25 bg-sky-500/10 p-2.5 text-xs font-medium leading-relaxed text-sky-700 dark:text-sky-300">
+              The patient will be notified by email when this request is rejected or dropped.
+            </div>
+          )}
         </div>
       )}
       <Button
