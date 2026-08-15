@@ -93,21 +93,17 @@ export function AppointmentBannerSection() {
         </div>
       </div>
 
-      {/* Background picker — dev helper, remove when you've chosen */}
-      <div className="absolute bottom-4 right-6 z-20 flex items-center gap-2">
+      {/* Background indicator picker */}
+      <div className="absolute bottom-4 left-1/2 z-20 flex -translate-x-1/2 items-center justify-center gap-2 sm:!left-auto sm:right-6 sm:!translate-x-0">
         {BG_IMAGES.map((src, i) => (
           <button
             key={i}
             onClick={() => setSelected(i)}
             title={`BG ${i + 1}`}
-            className={`w-10 h-10 rounded-md overflow-hidden border-2 transition-all duration-200 cursor-pointer ${
-              i === selected ? 'border-[#D94E4E] scale-110' : 'border-white/20 opacity-60 hover:opacity-100'
+            aria-label={`Show appointment banner image ${i + 1}`}
+            className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+              i === selected ? 'w-7 bg-[#D94E4E]' : 'w-3 bg-white/50 hover:bg-white/90'
             }`}
-            style={{
-              backgroundImage: `url('${src}')`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-            }}
           />
         ))}
       </div>

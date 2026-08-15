@@ -115,7 +115,7 @@ export function HeroSectionPreview({ onBookClick, serviceCount = 0 }: HeroSectio
         </div>
 
         {/* Background indicator picker */}
-        <div className="absolute bottom-6 left-1/2 z-20 flex -translate-x-1/2 items-center justify-center gap-2">
+        <div className="absolute bottom-6 left-1/2 z-20 flex -translate-x-1/2 items-center justify-center gap-2 sm:!left-auto sm:right-6 sm:!translate-x-0">
           {HERO_BG_IMAGES.map((img, i) => (
             <button
               key={img.id}
@@ -133,7 +133,7 @@ export function HeroSectionPreview({ onBookClick, serviceCount = 0 }: HeroSectio
         <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-12 text-center sm:text-left text-white mt-16 sm:mt-10 lg:mt-2 flex flex-col items-center sm:items-start">
           {!mounted ? (
             <h1
-              className="font-serif text-[clamp(32px,5.5vw+8px,65px)] min-[768px]:max-[1100px]:text-[clamp(46px,5.5vw,60px)] max-[430px]:text-[clamp(42px,11vw,54px)] max-[320px]:text-[clamp(11px,4.5vw,14px)] font-semibold tracking-tight leading-[1.1] max-w-4xl"
+              className="font-serif text-[clamp(32px,5.5vw+8px,65px)] min-[768px]:max-[1100px]:text-[clamp(46px,5.5vw,60px)] max-[430px]:text-[clamp(40px,10.5vw,52px)] max-[320px]:text-[clamp(11px,4.5vw,14px)] font-semibold tracking-tight leading-[1.1] max-w-4xl"
               style={{ fontWeight: '600', fontStyle: 'normal' }}
             >
               <span className="block">Unlock a World of</span>
@@ -158,7 +158,7 @@ export function HeroSectionPreview({ onBookClick, serviceCount = 0 }: HeroSectio
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1.2, delay: 0.2, ease: 'easeOut' }}
-              className="font-serif text-[clamp(32px,5.5vw+8px,65px)] min-[768px]:max-[1100px]:text-[clamp(46px,5.5vw,60px)] max-[430px]:text-[clamp(42px,11vw,54px)] max-[320px]:text-[clamp(11px,4.5vw,14px)] font-semibold tracking-tight leading-[1.1] max-w-4xl"
+              className="font-serif text-[clamp(32px,5.5vw+8px,65px)] min-[768px]:max-[1100px]:text-[clamp(46px,5.5vw,60px)] max-[430px]:text-[clamp(40px,10.5vw,52px)] max-[320px]:text-[clamp(11px,4.5vw,14px)] font-semibold tracking-tight leading-[1.1] max-w-4xl"
               style={{ fontWeight: '600', fontStyle: 'normal' }}
             >
               <span className="block">Unlock a World of</span>
