@@ -7,18 +7,18 @@ import { formatTimeString } from '@/shared/utils/date.util';
 
 export function ContactInfoPanel({ config }: { config: ClinicConfigResponseDto }) {
   const dayLabels: Record<string, string> = {
-    monday: 'Mon',
-    tuesday: 'Tue',
-    wednesday: 'Wed',
-    thursday: 'Thu',
-    friday: 'Fri',
-    saturday: 'Sat',
-    sunday: 'Sun',
+    monday: 'M',
+    tuesday: 'T',
+    wednesday: 'W',
+    thursday: 'Th',
+    friday: 'F',
+    saturday: 'Sa',
+    sunday: 'Su',
   };
   const openDays = Object.entries(config.operatingHours).filter(([, hours]) => hours.isOpen);
   const firstOpenDay = openDays[0]?.[1];
   const consultationHours = firstOpenDay?.openTime && firstOpenDay.closeTime
-    ? `${openDays.map(([day]) => dayLabels[day]).join(' - ')}: ${formatTimeString(firstOpenDay.openTime)} - ${formatTimeString(firstOpenDay.closeTime)}`
+    ? `${openDays.map(([day]) => dayLabels[day]).join('-')}: ${formatTimeString(firstOpenDay.openTime)} - ${formatTimeString(firstOpenDay.closeTime)}`
     : 'Currently closed';
 
   return (
@@ -34,15 +34,11 @@ export function ContactInfoPanel({ config }: { config: ClinicConfigResponseDto }
           Reserve a time slot with our master clinicians for a detailed anatomical diagnostics overview. Our reservation concierges will follow up shortly to curate your bespoke visit.
         </p>
         <div className="mt-10 space-y-6">
-          <ContactLine icon={<Phone className="w-4 h-4" />} label="Direct Desk" value={config.phone} />
+          <ContactLine icon={<Phone className="w-4 h-4" />} label="Phone" value={config.phone} />
           {config.landline && <ContactLine icon={<Phone className="w-4 h-4" />} label="Landline" value={config.landline} />}
-          <ContactLine icon={<MapPin className="w-4 h-4" />} label="Oasis Address" value={config.address} />
-          <ContactLine icon={<Clock className="w-4 h-4" />} label="Consultation Hours" value={consultationHours} />
+          <ContactLine icon={<MapPin className="w-4 h-4" />} label="Address" value={config.address} />
+          <ContactLine icon={<Clock className="w-4 h-4" />} label="Hours" value={consultationHours} />
         </div>
-      </div>
-      <div className="mt-12 lg:mt-0 pt-8 border-t border-gray-100 flex items-center gap-6">
-        <span className="text-[9px] uppercase font-bold tracking-[0.25em] text-gray-400 font-sans">Accredited Member:</span>
-        <span className="text-xs font-serif italic text-[#1D1E1E] tracking-wider">American Academy of Cosmetic Dentistry</span>
       </div>
     </div>
   );

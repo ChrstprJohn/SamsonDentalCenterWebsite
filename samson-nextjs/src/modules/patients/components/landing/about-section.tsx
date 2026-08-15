@@ -39,9 +39,9 @@ export function AboutSection() {
             <div className="relative aspect-square sm:aspect-[4/3] lg:aspect-[4/5] overflow-hidden border border-white/5 bg-[#1D1E1E]">
               <picture>
                 <img
-                  src="https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?q=80&w=800&auto=format&fit=crop"
+                  src="/hero-bg/HeroBg11.png"
                   alt="Precision natural cosmetic veneers dental artist checking color shades"
-                  className="w-full h-full object-cover object-center filter sepia-[0.1]"
+                  className="w-full h-full object-cover object-right filter sepia-[0.1]"
                 />
               </picture>
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />

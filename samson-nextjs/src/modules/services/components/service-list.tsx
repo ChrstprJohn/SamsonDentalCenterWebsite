@@ -31,9 +31,10 @@ export function ServiceList({ services, selectedId, onSelect }: ServiceListProps
       data-lenis-prevent
     >
       <div className="flex flex-col">
-        {services.map((svc) => (
+        {services.map((svc, index) => (
           <ServiceCard
             key={svc.id}
+            index={index}
             service={svc as any}
             isSelected={selectedId === svc.id}
             onSelect={onSelect as any}

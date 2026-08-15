@@ -85,12 +85,12 @@ export function NavbarV1({
     <>
       <header
         id="navbar"
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out ${
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out py-7 ${
           isMobileOpen
-            ? 'bg-transparent backdrop-blur-none border-b border-transparent py-6'
+            ? 'bg-transparent backdrop-blur-none border-b border-transparent'
             : scrolled
-            ? 'bg-[#1D1E1E]/90 backdrop-blur-sm border-b border-white/5 shadow-md py-5'
-            : 'bg-[#1D1E1E]/15 backdrop-blur-[3px] border-b border-white/5 py-6.5'
+            ? 'bg-[#1D1E1E]/90 backdrop-blur-sm border-b border-white/5 shadow-md'
+            : 'bg-[#1D1E1E]/15 backdrop-blur-[3px] border-b border-white/5'
         }`}
       >
         <div className="max-w-7xl mx-auto px-6 sm:px-12 flex items-center justify-between">
@@ -106,7 +106,7 @@ export function NavbarV1({
               <img
                 src={logoUrl}
                 alt={clinicName}
-                className="h-16 sm:h-17 md:h-18 w-auto max-w-none object-contain origin-left drop-shadow-sm transition-all duration-300 group-hover:scale-105"
+                className="h-16 sm:h-20 max-w-[280px] w-auto object-contain origin-left drop-shadow-sm transition-all duration-300 group-hover:scale-105"
               />
             </Link>
           </div>

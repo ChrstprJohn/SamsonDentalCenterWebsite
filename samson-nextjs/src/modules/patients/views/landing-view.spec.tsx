@@ -11,6 +11,7 @@ vi.mock('../hooks/landing/use-landing-view', () => ({
   useLandingView: vi.fn(),
 }));
 
+vi.mock('../components/landing/hero-section-preview', () => ({ HeroSectionPreview: () => <div data-testid="hero-section-preview" /> }));
 vi.mock('../components/landing/hero-section-v1', () => ({ HeroSectionV1: () => <div data-testid="hero-section-v1" /> }));
 vi.mock('../components/landing/hero-section-v2', () => ({ HeroSectionV2: () => <div data-testid="hero-section-v2" /> }));
 vi.mock('../components/landing/services-section', () => ({
@@ -22,6 +23,7 @@ vi.mock('../components/landing/services-section', () => ({
 }));
 vi.mock('../components/landing/about-section', () => ({ AboutSection: () => <div data-testid="about-section" /> }));
 vi.mock('../components/landing/gallery-section', () => ({ GallerySection: () => <div data-testid="gallery-section" /> }));
+vi.mock('../components/landing/testimonials-section', () => ({ TestimonialsSection: () => <div data-testid="testimonials-section" /> }));
 vi.mock('../components/landing/contact-section', () => ({ ContactSection: () => <div data-testid="contact-section" /> }));
 
 describe('LandingView', () => {
@@ -38,7 +40,7 @@ describe('LandingView', () => {
 
     render(<LandingView services={[]} config={mockConfig} />);
 
-    expect(screen.getByTestId('hero-section-v1')).toBeDefined();
+    expect(screen.getByTestId('hero-section-preview')).toBeDefined();
     expect(screen.getByTestId('services-section')).toBeDefined();
     expect(screen.getByTestId('about-section')).toBeDefined();
     expect(screen.getByTestId('gallery-section')).toBeDefined();

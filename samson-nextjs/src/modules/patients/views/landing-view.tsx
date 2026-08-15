@@ -13,6 +13,7 @@ import { AboutSection } from '../components/landing/about-section';
 import { GallerySection } from '../components/landing/gallery-section';
 import { TestimonialsSection } from '../components/landing/testimonials-section';
 import { ContactSection } from '../components/landing/contact-section';
+import { AppointmentBannerSection } from '../components/landing/appointment-banner-section';
 
 interface LandingViewProps {
   services: ServiceResponseDto[];
@@ -93,6 +94,7 @@ export function LandingView({ services, config }: LandingViewProps) {
       <GallerySection />
       <TestimonialsSection />
       <ContactSection config={config} />
+      <AppointmentBannerSection />
     </div>
   );
 }

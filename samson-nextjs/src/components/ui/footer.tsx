@@ -80,15 +80,7 @@ export function Footer({ config }: FooterProps) {
           <p className="text-[14px] text-[#BAC1C1]/75 leading-relaxed font-light max-w-sm mt-2">
             Sculpting radiant smiles with architectural precision. Experience top-tier biological restorations, premium cosmetic veneers, and expert preventive care in a calming wellness sanctuary.
           </p>
-          <div className="mt-4 w-full max-w-sm h-52 rounded-lg overflow-hidden border border-white/10 opacity-85 hover:opacity-100 transition-opacity">
-            <iframe
-              src={`https://maps.google.com/maps?q=${encodeURIComponent(`${clinicName}, ${address}`)}&output=embed`}
-              className="w-full h-full border-0 grayscale"
-              allowFullScreen={false}
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-            />
-          </div>
+
         </div>
 
         {/* Column 3: Treatments (Deep Link Silos for SEO) */}
@@ -155,28 +147,7 @@ export function Footer({ config }: FooterProps) {
             </a>
           </address>
           
-          <div className="mt-5 border-t border-white/5 pt-5">
-              <p className="text-xs font-semibold uppercase tracking-widest text-white">Follow us</p>
-              {socialLinks.length > 0 ? (
-              <div className="mt-3 flex flex-wrap gap-2">
-                {socialLinks.map((link) => (
-                  <a
-                    key={`${link.platform}-${link.url}`}
-                    href={link.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-[#D94E4E]"
-                    aria-label={`Visit ${clinicName} on ${link.platform}`}
-                  >
-                    <SocialIcon platform={link.platform} />
-                    {link.platform}
-                  </a>
-                ))}
-              </div>
-              ) : (
-                <p className="mt-2 text-xs text-white/45">Our social profiles will be available soon.</p>
-              )}
-            </div>
+
         </div>
 
         {/* Column 5: Operating Hours */}
@@ -217,6 +188,24 @@ export function Footer({ config }: FooterProps) {
             </Link>
           </div>
         </div>
+
+        {/* Social Links - right side */}
+        {socialLinks.length > 0 && (
+          <div className="flex items-center gap-2">
+            {socialLinks.map((link) => (
+              <a
+                key={`${link.platform}-${link.url}`}
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-white/5 text-white/50 hover:bg-[#D94E4E] hover:text-white transition-colors"
+                aria-label={`Visit ${clinicName} on ${link.platform}`}
+              >
+                <SocialIcon platform={link.platform} />
+              </a>
+            ))}
+          </div>
+        )}
 
       </div>
     </footer>

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, ChevronLeft, ChevronRight, Image as ImageIcon } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { TrustAndStats } from './trust-and-stats';
 
 interface HeroSectionProps {
@@ -10,6 +10,12 @@ interface HeroSectionProps {
 }
 
 const HERO_BG_IMAGES = [
+  {
+    id: 12,
+    name: 'HeroImage12',
+    src: '/hero-bg/HeroImage12.png',
+    title: 'Background Option 12',
+  },
   {
     id: 6,
     name: 'HeroBg6',
@@ -44,13 +50,6 @@ export function HeroSectionPreview({ onBookClick }: HeroSectionProps) {
     setMounted(true);
   }, []);
 
-  const nextBg = () => {
-    setCurrentBgIndex((prev) => (prev + 1) % HERO_BG_IMAGES.length);
-  };
-
-  const prevBg = () => {
-    setCurrentBgIndex((prev) => (prev - 1 + HERO_BG_IMAGES.length) % HERO_BG_IMAGES.length);
-  };
 
   const currentBg = HERO_BG_IMAGES[currentBgIndex];
 
@@ -75,7 +74,7 @@ export function HeroSectionPreview({ onBookClick }: HeroSectionProps) {
               <img
                 src={currentBg.src}
                 alt={currentBg.title}
-                className="w-full h-full object-cover object-center filter brightness-[0.95] saturate-[0.9] contrast-[1.02]"
+                className="w-full h-full object-cover object-left sm:object-center filter brightness-[0.95] saturate-[0.9] contrast-[1.02]"
               />
             </motion.div>
           </AnimatePresence>
@@ -90,65 +89,24 @@ export function HeroSectionPreview({ onBookClick }: HeroSectionProps) {
           <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-[#1D1E1E] z-0" />
         </div>
 
-        {/* Floating Switcher Bar / Controller */}
-        <div className="absolute top-24 sm:top-28 z-30 bg-black/60 backdrop-blur-md border border-white/20 px-4 py-2 rounded-full flex items-center gap-3 text-white text-xs shadow-2xl">
-          <div className="flex items-center gap-1.5 font-medium text-amber-300">
-            <ImageIcon className="w-3.5 h-3.5" />
-            <span>Preview Mode:</span>
-          </div>
-          
-          <div className="flex items-center gap-1">
-            {HERO_BG_IMAGES.map((img, idx) => (
-              <button
-                key={img.id}
-                onClick={() => setCurrentBgIndex(idx)}
-                className={`px-2.5 py-1 rounded-full text-xs font-semibold transition-all ${
-                  currentBgIndex === idx
-                    ? 'bg-white text-black shadow-sm'
-                    : 'bg-white/10 text-white/80 hover:bg-white/20'
-                }`}
-              >
-                Bg {img.id}
-              </button>
-            ))}
-          </div>
-
-          <div className="h-4 w-px bg-white/20 mx-1 hidden sm:block" />
-
-          <div className="flex items-center gap-1">
+        {/* Background thumbnail picker */}
+        <div className="absolute bottom-6 right-6 z-20 flex items-center gap-2">
+          {HERO_BG_IMAGES.map((img, i) => (
             <button
-              onClick={prevBg}
-              className="p-1 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
-              title="Previous Background"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            <button
-              onClick={nextBg}
-              className="p-1 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
-              title="Next Background"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
+              key={img.id}
+              onClick={() => setCurrentBgIndex(i)}
+              title={img.title}
+              className={`w-10 h-10 rounded-md overflow-hidden border-2 transition-all duration-200 cursor-pointer ${
+                i === currentBgIndex ? 'border-[#D94E4E] scale-110' : 'border-white/20 opacity-60 hover:opacity-100'
+              }`}
+              style={{
+                backgroundImage: `url('${img.src}')`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+              }}
+            />
+          ))}
         </div>
-
-        {/* Left / Right Quick Arrow Navigation */}
-        <button
-          onClick={prevBg}
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-black/40 hover:bg-black/70 text-white/70 hover:text-white border border-white/10 backdrop-blur-sm transition-all hidden md:flex items-center justify-center cursor-pointer"
-          aria-label="Previous image"
-        >
-          <ChevronLeft className="w-6 h-6" />
-        </button>
-
-        <button
-          onClick={nextBg}
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-black/40 hover:bg-black/70 text-white/70 hover:text-white border border-white/10 backdrop-blur-sm transition-all hidden md:flex items-center justify-center cursor-pointer"
-          aria-label="Next image"
-        >
-          <ChevronRight className="w-6 h-6" />
-        </button>
 
         {/* Content Container */}
         <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-12 text-center sm:text-left text-white mt-16 sm:mt-10 lg:mt-2 flex flex-col items-center sm:items-start">

@@ -123,18 +123,6 @@ export function ServiceForm({
             </div>
 
             <div className="flex flex-col gap-0.5">
-              <span className="text-xs text-muted-foreground">Base Price ($) <span className="text-red-500 font-bold ml-0.5">*</span></span>
-              <input
-                type="number"
-                step="0.01"
-                required
-                {...register('price')}
-                className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
-              />
-              {errors.price && <span className="text-[10px] text-red-600 font-semibold">{errors.price.message}</span>}
-            </div>
-
-            <div className="flex flex-col gap-0.5">
               <span className="text-xs text-muted-foreground">Description</span>
               <textarea
                 rows={3}
