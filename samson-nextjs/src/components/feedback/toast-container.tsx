@@ -50,21 +50,30 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       <div className="pointer-events-none fixed bottom-4 right-4 z-50 flex w-[calc(100%-2rem)] max-w-sm flex-col gap-3">
         {toasts.map((toast) => {
           const Icon = toast.type === 'success' ? CheckCircle2 : toast.type === 'error' ? AlertCircle : Info;
-          const color = toast.type === 'success' ? 'border-emerald-700 bg-emerald-600' : toast.type === 'error' ? 'border-rose-700 bg-rose-600' : 'border-blue-700 bg-blue-600';
+          const color = toast.type === 'success'
+            ? 'border-slate-200 bg-white text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100'
+            : toast.type === 'error'
+              ? 'border-slate-200 bg-white text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100'
+              : 'border-slate-200 bg-white text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100';
+          const iconColor = toast.type === 'success'
+            ? 'text-emerald-600 dark:text-emerald-400'
+            : toast.type === 'error'
+              ? 'text-rose-600 dark:text-rose-400'
+              : 'text-blue-600 dark:text-blue-400';
           return (
           <div
             key={toast.id}
             onMouseEnter={() => pauseToast(toast.id)}
             onMouseLeave={() => resumeToast(toast.id)}
-            className={`pointer-events-auto flex items-start gap-3 rounded-xl border p-4 text-white shadow-xl transition-all duration-300 ${color}`}
+            className={`pointer-events-auto flex items-start gap-3 rounded-xl border p-4 shadow-lg transition-all duration-300 ${color}`}
           >
-            <Icon className="mt-0.5 size-5 shrink-0" />
+            <Icon className={`mt-0.5 size-5 shrink-0 ${iconColor}`} />
             <span className="flex-1 text-sm font-medium leading-5">{toast.message}</span>
             <button
               type="button"
               onClick={() => removeToast(toast.id)}
               aria-label="Close notification"
-              className="-mr-1 -mt-1 cursor-pointer rounded-md p-1 text-white/80 transition-colors hover:bg-white/15 hover:text-white"
+              className="-mr-1 -mt-1 cursor-pointer rounded-md p-1 opacity-70 transition-colors hover:bg-black/5 hover:opacity-100 dark:hover:bg-white/10"
             >
               <X className="size-4" />
             </button>
