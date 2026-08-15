@@ -51,7 +51,9 @@ export function ClinicSettingsPage({ initialConfig, initialTimeBlocks = [] }: Cl
         ? {
             clinicName: config.clinicName,
             websiteLogoUrl: emptyToNull(config.websiteLogoUrl || ''),
+            websiteLogoDarkUrl: emptyToNull(config.websiteLogoDarkUrl || ''),
             emailLogoUrl: emptyToNull(config.emailLogoUrl || ''),
+            emailLogoDarkUrl: emptyToNull(config.emailLogoDarkUrl || ''),
             address: config.address,
             mapUrl: emptyToNull(config.mapUrl || ''),
             phone: config.phone,
@@ -124,14 +126,67 @@ export function ClinicSettingsPage({ initialConfig, initialTimeBlocks = [] }: Cl
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input label="Clinic name" required value={config.clinicName} className={inputClass} onChange={(event) => updateConfigField('clinicName', event.target.value)} />
-            <Input label="Website logo URL" type="url" placeholder="https://.../logo.png" value={config.websiteLogoUrl || ''} className={inputClass} onChange={(event) => updateConfigField('websiteLogoUrl', event.target.value)} />
-            <Input label="Email logo URL" type="url" placeholder="https://.../email-logo.png" value={config.emailLogoUrl || ''} className={inputClass} onChange={(event) => updateConfigField('emailLogoUrl', event.target.value)} />
             <Input label="Phone number" required type="tel" value={config.phone} className={inputClass} onChange={(event) => updateConfigField('phone', event.target.value)} />
             <Input label="Landline" type="tel" placeholder="(074) 123 4567" value={config.landline || ''} className={inputClass} onChange={(event) => updateConfigField('landline', event.target.value)} />
             <Input label="Public email" required type="email" value={config.email} className={inputClass} onChange={(event) => updateConfigField('email', event.target.value)} />
             <div className="flex flex-col gap-1.5">
               <Input label="Website URL" type="url" placeholder="https://example.com" value={config.websiteUrl || ''} className={inputClass} onChange={(event) => updateConfigField('websiteUrl', event.target.value)} />
               <p className="text-[11px] text-text-muted">Save your final public domain here for future links. It does not redirect this booking site.</p>
+            </div>
+          </div>
+
+          {/* Logo upload cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Website Logo Card */}
+            <div className="flex flex-col gap-3 rounded-2xl border border-card-border p-4 bg-muted/30">
+              <div className="flex flex-col gap-0.5">
+                <span className="text-xs font-bold text-text-primary">Website logo</span>
+                <span className="text-[11px] text-text-muted">Used in the navigation bar and footer.</span>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="flex flex-col gap-2">
+                  <div className="h-16 rounded-xl border border-card-border bg-white flex items-center justify-center overflow-hidden">
+                    {config.websiteLogoUrl
+                      ? <img src={config.websiteLogoUrl} alt="Website logo light" className="max-h-full max-w-full object-contain p-2" />
+                      : <span className="text-[10px] text-text-muted">No image</span>}
+                  </div>
+                  <Input label="Light mode URL" type="url" placeholder="https://.../logo.png" value={config.websiteLogoUrl || ''} className={inputClass} onChange={(event) => updateConfigField('websiteLogoUrl', event.target.value)} />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <div className="h-16 rounded-xl border border-card-border bg-zinc-900 flex items-center justify-center overflow-hidden">
+                    {config.websiteLogoDarkUrl
+                      ? <img src={config.websiteLogoDarkUrl} alt="Website logo dark" className="max-h-full max-w-full object-contain p-2" />
+                      : <span className="text-[10px] text-zinc-500">No image</span>}
+                  </div>
+                  <Input label="Dark mode URL" type="url" placeholder="https://.../logo-dark.png" value={config.websiteLogoDarkUrl || ''} className={inputClass} onChange={(event) => updateConfigField('websiteLogoDarkUrl', event.target.value)} />
+                </div>
+              </div>
+            </div>
+
+            {/* Email Logo Card */}
+            <div className="flex flex-col gap-3 rounded-2xl border border-card-border p-4 bg-muted/30">
+              <div className="flex flex-col gap-0.5">
+                <span className="text-xs font-bold text-text-primary">Email logo</span>
+                <span className="text-[11px] text-text-muted">Used in transactional email headers.</span>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="flex flex-col gap-2">
+                  <div className="h-16 rounded-xl border border-card-border bg-white flex items-center justify-center overflow-hidden">
+                    {config.emailLogoUrl
+                      ? <img src={config.emailLogoUrl} alt="Email logo light" className="max-h-full max-w-full object-contain p-2" />
+                      : <span className="text-[10px] text-text-muted">No image</span>}
+                  </div>
+                  <Input label="Light mode URL" type="url" placeholder="https://.../email-logo.png" value={config.emailLogoUrl || ''} className={inputClass} onChange={(event) => updateConfigField('emailLogoUrl', event.target.value)} />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <div className="h-16 rounded-xl border border-card-border bg-zinc-900 flex items-center justify-center overflow-hidden">
+                    {config.emailLogoDarkUrl
+                      ? <img src={config.emailLogoDarkUrl} alt="Email logo dark" className="max-h-full max-w-full object-contain p-2" />
+                      : <span className="text-[10px] text-zinc-500">No image</span>}
+                  </div>
+                  <Input label="Dark mode URL" type="url" placeholder="https://.../email-logo-dark.png" value={config.emailLogoDarkUrl || ''} className={inputClass} onChange={(event) => updateConfigField('emailLogoDarkUrl', event.target.value)} />
+                </div>
+              </div>
             </div>
           </div>
 

@@ -10,7 +10,9 @@ export const updateClinicConfigCommand = (supabase: SupabaseClient) => {
     if (data.maxReschedules !== undefined) dbPayload.max_reschedules = data.maxReschedules;
     if (data.clinicName !== undefined) dbPayload.clinic_name = data.clinicName;
     if (data.websiteLogoUrl !== undefined) dbPayload.website_logo_url = data.websiteLogoUrl;
+    if (data.websiteLogoDarkUrl !== undefined) dbPayload.website_logo_dark_url = data.websiteLogoDarkUrl;
     if (data.emailLogoUrl !== undefined) dbPayload.email_logo_url = data.emailLogoUrl;
+    if (data.emailLogoDarkUrl !== undefined) dbPayload.email_logo_dark_url = data.emailLogoDarkUrl;
     if (data.address !== undefined) dbPayload.address = data.address;
     if (data.mapUrl !== undefined) dbPayload.map_url = data.mapUrl;
     if (data.phone !== undefined) dbPayload.phone = data.phone;

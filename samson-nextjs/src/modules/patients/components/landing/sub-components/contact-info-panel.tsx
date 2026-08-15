@@ -5,20 +5,25 @@ import type React from 'react';
 import type { ClinicConfigResponseDto } from '@/modules/clinic-config/dtos/settings/get-clinic-config.dto';
 import { formatTimeString } from '@/shared/utils/date.util';
 
+function formatLocalPhone(phone: string): string {
+  // Replace +63 country code with leading 0 (e.g. +63 917 564 4048 → 0917 564 4048)
+  return phone.replace(/^\+63\s?/, '0');
+}
+
 export function ContactInfoPanel({ config }: { config: ClinicConfigResponseDto }) {
   const dayLabels: Record<string, string> = {
     monday: 'M',
     tuesday: 'T',
     wednesday: 'W',
-    thursday: 'Th',
+    thursday: 'TH',
     friday: 'F',
-    saturday: 'Sa',
-    sunday: 'Su',
+    saturday: 'SA',
+    sunday: 'SU',
   };
   const openDays = Object.entries(config.operatingHours).filter(([, hours]) => hours.isOpen);
   const firstOpenDay = openDays[0]?.[1];
   const consultationHours = firstOpenDay?.openTime && firstOpenDay.closeTime
-    ? `${openDays.map(([day]) => dayLabels[day]).join('-')}: ${formatTimeString(firstOpenDay.openTime)} - ${formatTimeString(firstOpenDay.closeTime)}`
+    ? `${openDays.map(([day]) => dayLabels[day]).join('-')} • ${formatTimeString(firstOpenDay.openTime)} - ${formatTimeString(firstOpenDay.closeTime)}`
     : 'Currently closed';
 
   return (
@@ -34,8 +39,8 @@ export function ContactInfoPanel({ config }: { config: ClinicConfigResponseDto }
           Reserve a time slot with our master clinicians for a detailed anatomical diagnostics overview. Our reservation concierges will follow up shortly to curate your bespoke visit.
         </p>
         <div className="mt-10 space-y-6">
-          <ContactLine icon={<Phone className="w-4 h-4" />} label="Phone" value={config.phone} />
-          {config.landline && <ContactLine icon={<Phone className="w-4 h-4" />} label="Landline" value={config.landline} />}
+          <ContactLine icon={<Phone className="w-4 h-4" />} label="Phone" value={formatLocalPhone(config.phone)} />
+          {config.landline && <ContactLine icon={<Phone className="w-4 h-4" />} label="Landline" value={formatLocalPhone(config.landline)} />}
           <ContactLine icon={<MapPin className="w-4 h-4" />} label="Address" value={config.address} />
           <ContactLine icon={<Clock className="w-4 h-4" />} label="Hours" value={consultationHours} />
         </div>
