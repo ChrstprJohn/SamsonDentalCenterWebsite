@@ -114,14 +114,14 @@ export function NavbarV1({
             <Link
               href="/"
               onClick={() => setIsMobileOpen(false)}
-              className={`relative flex items-center h-10 group focus:outline-none transition-colors duration-300 ${
+              className={`relative flex items-center h-16 sm:h-20 group focus:outline-none transition-colors duration-300 ${
                 isDarkNav ? 'text-white' : 'text-[#1D1E1E]'
               }`}
             >
               <img
                 src={logoUrl}
                 alt={clinicName}
-              className="h-10 max-w-[240px] w-auto object-contain origin-left drop-shadow-sm transition-all duration-300 group-hover:scale-105"
+                className="h-16 sm:h-20 max-w-[280px] w-auto object-contain origin-left drop-shadow-sm transition-all duration-300 group-hover:scale-105"
               />
             </Link>
           </div>
