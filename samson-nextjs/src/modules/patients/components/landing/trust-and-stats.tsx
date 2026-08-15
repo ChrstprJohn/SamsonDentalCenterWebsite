@@ -2,15 +2,16 @@ import React from 'react';
 
 interface TrustAndStatsProps {
   variant?: 'v1' | 'v2';
+  serviceCount?: number;
 }
 
-export function TrustAndStats({ variant = 'v1' }: TrustAndStatsProps) {
+export function TrustAndStats({ variant = 'v1', serviceCount = 0 }: TrustAndStatsProps) {
   const stats = [
     { value: '60+', label: 'Years of Pure Dental Expertise' },
-    { value: '4.9★', label: 'Google Rating (2.5k+ Reviews)' },
-    { value: '15k+', label: 'Radiant Smiles Formed' },
+    { value: '4.3★', label: 'Google Rating' },
     { value: '100%', label: 'Board-Certified Specialists' },
-    { value: 'Elite', label: 'In-House Ceramic Smile Lab' },
+    { value: `${serviceCount}+`, label: 'Signature Dental Services' },
+    { value: 'Online', label: 'Easy Appointment Booking' },
   ];
 
   const isV2 = variant === 'v2';

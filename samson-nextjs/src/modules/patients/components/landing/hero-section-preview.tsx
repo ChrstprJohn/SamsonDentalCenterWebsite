@@ -7,6 +7,7 @@ import { TrustAndStats } from './trust-and-stats';
 
 interface HeroSectionProps {
   onBookClick: () => void;
+  serviceCount?: number;
 }
 
 const HERO_BG_IMAGES = [
@@ -42,12 +43,20 @@ const HERO_BG_IMAGES = [
   },
 ];
 
-export function HeroSectionPreview({ onBookClick }: HeroSectionProps) {
+export function HeroSectionPreview({ onBookClick, serviceCount = 0 }: HeroSectionProps) {
   const [mounted, setMounted] = useState(false);
   const [currentBgIndex, setCurrentBgIndex] = useState(0);
 
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    const rotationTimer = window.setInterval(() => {
+      setCurrentBgIndex((index) => (index + 1) % HERO_BG_IMAGES.length);
+    }, 6000);
+
+    return () => window.clearInterval(rotationTimer);
   }, []);
 
 
@@ -192,7 +201,7 @@ export function HeroSectionPreview({ onBookClick }: HeroSectionProps) {
       </section>
 
       {/* Trust & Stats Marquee / Grid Section */}
-      <TrustAndStats />
+      <TrustAndStats serviceCount={serviceCount} />
     </>
   );
 }

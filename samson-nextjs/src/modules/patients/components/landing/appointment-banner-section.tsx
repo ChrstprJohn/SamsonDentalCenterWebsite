@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
 
 const BG_IMAGES = [
   '/hero-bg/HeroImage12.png',
@@ -18,6 +19,14 @@ const ACTIVE_BG_INDEX = 0;
 export function AppointmentBannerSection() {
   const [selected, setSelected] = useState(ACTIVE_BG_INDEX);
 
+  useEffect(() => {
+    const rotationTimer = window.setInterval(() => {
+      setSelected((index) => (index + 1) % BG_IMAGES.length);
+    }, 6000);
+
+    return () => window.clearInterval(rotationTimer);
+  }, []);
+
   return (
     <section
       id="appointment-banner"
@@ -25,11 +34,18 @@ export function AppointmentBannerSection() {
       aria-label="Schedule an appointment"
     >
       {/* Background */}
-      <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: `url('${BG_IMAGES[selected]}')` }}
-        aria-hidden="true"
-      />
+      <AnimatePresence initial={false} mode="wait">
+        <motion.div
+          key={BG_IMAGES[selected]}
+          initial={{ opacity: 0, scale: 1.05 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.7, ease: 'easeInOut' }}
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: `url('${BG_IMAGES[selected]}')` }}
+          aria-hidden="true"
+        />
+      </AnimatePresence>
 
       {/* Dark overlay — stronger on left */}
       <div
