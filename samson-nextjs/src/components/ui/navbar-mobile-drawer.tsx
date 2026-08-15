@@ -31,23 +31,22 @@ export function NavbarMobileDrawer({
       id="mobile-navigation-overlay"
     >
       <div className="flex flex-col gap-8 font-sans text-center text-base uppercase tracking-[0.2em] font-medium w-full max-w-xs mx-auto">
-        {isMainPage &&
-          NAV_ITEMS.map((item) => {
-            const isActive = activeSection === item.href.replace('#', '');
-            return (
-              <a
-                key={item.label}
-                href={item.href}
-                onClick={(e) => onNavClick(e, item.href)}
-                className={`py-2.5 transition-colors border-b border-gray-100/60 pb-1 text-[14px] pt-[5px] ${
-                  isActive ? 'text-[#D94E4E]' : 'text-[#1D1E1E]/85 hover:text-[#D94E4E]'
-                }`}
-                style={{ fontWeight: isActive ? '600' : '500' }}
-              >
-                {item.label}
-              </a>
-            );
-          })}
+        {NAV_ITEMS.map((item) => {
+          const isActive = isMainPage && activeSection === item.href.replace('#', '');
+          return (
+            <a
+              key={item.label}
+              href={isMainPage ? item.href : `/${item.href}`}
+              onClick={(e) => onNavClick(e, item.href)}
+              className={`py-2.5 transition-colors border-b border-gray-100/60 pb-1 text-[14px] pt-[5px] ${
+                isActive ? 'text-[#D94E4E]' : 'text-[#1D1E1E]/85 hover:text-[#D94E4E]'
+              }`}
+              style={{ fontWeight: isActive ? '600' : '500' }}
+            >
+              {item.label}
+            </a>
+          );
+        })}
         <div className="flex flex-col gap-4 pt-6 mt-4">
           <div className="flex flex-col gap-4 items-center">
             <Link href="/book" onClick={onClose} className="w-full">

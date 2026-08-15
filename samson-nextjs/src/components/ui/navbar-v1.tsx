@@ -59,9 +59,13 @@ export function NavbarV1({
   }, [isMainPage]);
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    if (!isMainPage) return;
-    e.preventDefault();
     setIsMobileOpen(false);
+    if (!isMainPage) {
+      // If not on landing page, navigate to homepage anchor
+      router.push(`/${href}`);
+      return;
+    }
+    e.preventDefault();
     const targetId = href.replace('#', '');
     const element = document.getElementById(targetId);
     if (element) {
@@ -92,8 +96,8 @@ export function NavbarV1({
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out py-7 ${
           isMobileOpen
             ? 'bg-transparent backdrop-blur-none border-b border-transparent'
-            : scrolled
-            ? 'bg-[#1D1E1E]/90 backdrop-blur-sm border-b border-white/5 shadow-md'
+            : scrolled || !isMainPage
+            ? 'bg-[#1D1E1E]/95 backdrop-blur-md border-b border-white/5 shadow-md'
             : 'bg-[#1D1E1E]/15 backdrop-blur-[3px] border-b border-white/5'
         }`}
       >
@@ -116,39 +120,37 @@ export function NavbarV1({
           </div>
 
           {/* Center: Desktop Nav */}
-          {isMainPage && (
-            <nav className="hidden lg:flex items-center justify-center gap-2 font-sans text-[13px] tracking-[0.1em] font-medium uppercase">
-              {NAV_ITEMS.map((item) => {
-                const isActive = activeSection === item.href.replace('#', '');
-                return (
-                  <a
-                    key={item.label}
-                    href={item.href}
-                    onClick={(e) => handleNavClick(e, item.href)}
-                    className={`transition-colors duration-300 relative px-4 py-2.5 ${
-                      isDarkNav
-                        ? isActive ? 'text-[#D94E4E]' : 'text-white hover:text-[#D94E4E]'
-                        : isActive ? 'text-[#D94E4E]' : 'text-[#1D1E1E]/75 hover:text-[#D94E4E]'
-                    }`}
-                    style={{ fontWeight: isActive ? '600' : '500' }}
-                  >
-                    <span className="relative z-10">{item.label}</span>
-                    {isActive && (
-                      <motion.div
-                        layoutId="activeNavHighlight"
-                        className="absolute bottom-0 left-4 right-4 h-[2px] bg-[#D94E4E]"
-                        transition={{ type: 'spring', stiffness: 350, damping: 30 }}
-                      />
-                    )}
-                  </a>
-                );
-              })}
-            </nav>
-          )}
+          <nav className="hidden lg:flex items-center justify-center gap-2 font-sans text-[13px] tracking-[0.1em] font-medium uppercase">
+            {NAV_ITEMS.map((item) => {
+              const isActive = isMainPage && activeSection === item.href.replace('#', '');
+              return (
+                <a
+                  key={item.label}
+                  href={isMainPage ? item.href : `/${item.href}`}
+                  onClick={(e) => handleNavClick(e, item.href)}
+                  className={`transition-colors duration-300 relative px-4 py-2.5 ${
+                    isDarkNav
+                      ? isActive ? 'text-[#D94E4E]' : 'text-white hover:text-[#D94E4E]'
+                      : isActive ? 'text-[#D94E4E]' : 'text-[#1D1E1E]/75 hover:text-[#D94E4E]'
+                  }`}
+                  style={{ fontWeight: isActive ? '600' : '500' }}
+                >
+                  <span className="relative z-10">{item.label}</span>
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeNavHighlight"
+                      className="absolute bottom-0 left-4 right-4 h-[2px] bg-[#D94E4E]"
+                      transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+                    />
+                  )}
+                </a>
+              );
+            })}
+          </nav>
 
           {/* Right: Actions Block */}
           <div className="flex-1 flex items-center justify-end gap-4 sm:gap-6">
-            <div className="hidden md:flex items-center gap-5">
+            <div className="hidden lg:flex items-center gap-5">
               <Link href="/book" onClick={() => setIsMobileOpen(false)}>
                 <button
                   className={`px-4 py-2 rounded-full text-[11px] font-semibold uppercase tracking-widest transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] shadow-xs cursor-pointer flex items-center gap-1.5 ${
