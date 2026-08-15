@@ -41,7 +41,7 @@ export const onPostCareReviewSmsSubscriber = {
       return;
     }
 
-    const message = `Hi ${name}, thank you for visiting Samson Dental Center today! We hope your treatment went great. Leave a review: https://samsondental.com/review`;
+    const message = `Hi ${name}, thank you for visiting Samson Dental Center today! We hope your treatment went great. Leave a review: https://samsondental.com/review?ref=${appointmentId}`;
     console.info(`[Post-Care SMS Dispatched] To: ${phone} | Message: "${message}"`);
 
     await supabaseAdmin

@@ -52,7 +52,7 @@ branding,
 }: PostCareEmailProps) => {
   const previewText = 'We hope your visit went smoothly. Please share how your experience was.';
   const b = branding ?? resolveEmailBranding(undefined, baseUrl);
-  const feedbackUrl = `${baseUrl}/feedback?ref=${appointmentId}`;
+  const feedbackUrl = `${baseUrl}/review?ref=${appointmentId}`;
 
   return (
     <Html lang="en">

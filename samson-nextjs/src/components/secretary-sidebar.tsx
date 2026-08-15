@@ -90,6 +90,10 @@ const data = {
           title: "Email Templates",
           url: "/secretary-v2/email-designs",
         },
+        {
+          title: "Patient Reviews",
+          url: "/secretary-v2/reviews",
+        },
       ],
     },
     {
