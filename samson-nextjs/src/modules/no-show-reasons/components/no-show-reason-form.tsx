@@ -64,15 +64,23 @@ export function NoShowReasonForm({ appointmentId }: { appointmentId: string }) {
 
   if (submitted) {
     return (
-      <div className="text-center flex flex-col items-center gap-4 py-8">
-        <div className="w-16 h-16 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center">
+      <div className="flex flex-col items-center gap-6 py-4">
+        <div className="w-16 h-16 rounded-full bg-amber-100 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center">
           <CheckCircle2 className="h-8 w-8" />
         </div>
-        <h2 className="text-2xl font-bold text-text-primary">Thank you for letting us know!</h2>
-        <p className="text-sm text-text-muted">We appreciate you taking the time to share what happened.</p>
-        <p className="text-xs font-semibold text-text-secondary">
-          Redirecting to homepage in {secondsLeft}s
-        </p>
+        <div className="flex flex-col gap-2 text-center">
+          <h2 className="text-2xl font-bold tracking-tight text-black dark:text-white">Thank you for letting us know!</h2>
+          <p className="text-sm text-gray-700 max-w-md">We appreciate you taking the time to share what happened.</p>
+        </div>
+
+        <div className="w-full border border-slate-200 dark:border-white/10 rounded-2xl p-4 bg-slate-50 dark:bg-slate-900/30 text-xs flex flex-col gap-2.5 text-left">
+          <div className="flex justify-between gap-4">
+            <span className="text-gray-500 shrink-0">Reason</span>
+            <span className="font-semibold text-black dark:text-white text-right">{reason}</span>
+          </div>
+        </div>
+
+        <p className="text-xs font-semibold text-gray-500">Redirecting to homepage in {secondsLeft}s</p>
         <div className="flex flex-col gap-2 w-full">
           <Button
             onClick={() => router.push('/book')}
