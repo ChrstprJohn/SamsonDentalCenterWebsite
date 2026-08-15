@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { Bell, CheckCheck, ChevronLeft, ChevronRight, CircleAlert, ExternalLink, MailWarning, MessageSquare, RefreshCw, Search } from 'lucide-react';
+import { Bell, CheckCheck, ChevronLeft, ChevronRight, CircleAlert, ExternalLink, MailWarning, MessageSquare, RefreshCw, Search, Star, CalendarX } from 'lucide-react';
 import { NotificationResponseDto } from '../dtos/management/notification-response.dto';
 import { markAllReadAction } from '../actions/management/mark-all-read.action';
 import { markReadAction } from '../actions/management/mark-read.action';
@@ -29,6 +29,10 @@ function getNotificationIcon(type: string) {
       return <MessageSquare className="size-4 text-sky-600" />;
     case 'FAILED_EMAIL_ALERT':
       return <MailWarning className="size-4 text-amber-600" />;
+    case 'REVIEW_SUBMITTED':
+      return <Star className="size-4 text-violet-600" />;
+    case 'NO_SHOW_REASON_SUBMITTED':
+      return <CalendarX className="size-4 text-red-600" />;
     default:
       return <CircleAlert className="size-4 text-primary" />;
   }
@@ -64,6 +68,14 @@ export function NotificationsListView({ initialPage, initialUnreadCount }: Notif
   const requestId = useRef(0);
 
   const PAGE_SIZE = 25;
+
+  // Sync on server refresh (realtime INSERT triggers router.refresh in the layout's RealtimeListener).
+  useEffect(() => {
+    setNotifications(initialPage.items);
+    setTotal(initialPage.total);
+    setHasMore(initialPage.hasMore);
+    setUnreadCount(initialUnreadCount);
+  }, [initialPage, initialUnreadCount]);
 
   const fetchNotifications = useCallback(async (mode: 'reset' | 'next' | 'prev') => {
     const id = ++requestId.current;

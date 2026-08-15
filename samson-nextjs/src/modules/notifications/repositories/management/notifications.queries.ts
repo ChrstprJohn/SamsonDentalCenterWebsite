@@ -3,7 +3,7 @@ import { notificationResponseSchema, NotificationResponseDto } from '../../dtos/
 import { decodeCursor, encodeCursor, type PageResult } from '@/shared/pagination/page-result';
 
 // Guest-only business: only these notification types are shown.
-export const KEPT_NOTIFICATION_TYPES = ['NEW_INQUIRY', 'NEW_MESSAGE', 'FAILED_EMAIL_ALERT'];
+export const KEPT_NOTIFICATION_TYPES = ['NEW_INQUIRY', 'NEW_MESSAGE', 'FAILED_EMAIL_ALERT', 'REVIEW_SUBMITTED', 'NO_SHOW_REASON_SUBMITTED'];
 
 export const getUnreadNotifications = (supabase: SupabaseClient) => async (
   userId: string | null,

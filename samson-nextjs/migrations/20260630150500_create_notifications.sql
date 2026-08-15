@@ -300,7 +300,7 @@ BEGIN
   ) VALUES (
     'NEW_INQUIRY',
     'STANDARD',
-    'New Inquiry Queue',
+    'New Appointment Request',
     CONCAT('New inquiry from ', NEW.first_name, ' ', NEW.last_name, ' regarding ', COALESCE(v_service_name, 'Dental Service'), '.'),
     CONCAT('/secretary-v2/pending?id=', NEW.id),
     NEW.id::text

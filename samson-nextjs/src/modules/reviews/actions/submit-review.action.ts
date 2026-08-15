@@ -2,6 +2,7 @@
 
 import { createAdminClient } from '@/shared/database/server';
 import { ActionResponse } from '@/shared/utils/action-response';
+import { createNotificationUseCase } from '@/modules/notifications/use-cases/management/create-notification.use-case';
 
 export type SubmitReviewInput = {
   appointmentId: string;
@@ -62,6 +63,18 @@ export async function submitReviewAction(
     if (error) {
       return { success: false, error: `Failed to save your review: ${error.message}` };
     }
+
+    // Notify secretary of the new review.
+    await createNotificationUseCase(supabase)({
+      recipientRole: 'SECRETARY',
+      recipientId: null,
+      type: 'REVIEW_SUBMITTED',
+      priority: 'STANDARD',
+      title: 'New Review',
+      message: `Patient left a ${rating}-star review${comment ? `: "${comment.slice(0, 120)}"` : '.'}`,
+      linkUrl: '/secretary-v2/reviews',
+      entityId: appointmentId,
+    });
 
     return { success: true, data: { appointmentId, rating } };
   } catch (error: any) {

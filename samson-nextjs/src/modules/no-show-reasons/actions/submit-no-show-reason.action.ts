@@ -2,6 +2,7 @@
 
 import { createAdminClient } from '@/shared/database/server';
 import { ActionResponse } from '@/shared/utils/action-response';
+import { createNotificationUseCase } from '@/modules/notifications/use-cases/management/create-notification.use-case';
 
 export type SubmitNoShowReasonInput = {
   appointmentId: string;
@@ -45,6 +46,18 @@ export async function submitNoShowReasonAction(
     if (error) {
       return { success: false, error: `Failed to save your reason: ${error.message}` };
     }
+
+    // Notify secretary of the submitted no-show reason.
+    await createNotificationUseCase(supabase)({
+      recipientRole: 'SECRETARY',
+      recipientId: null,
+      type: 'NO_SHOW_REASON_SUBMITTED',
+      priority: 'STANDARD',
+      title: 'No-Show Reason',
+      message: `Patient submitted a no-show reason: "${reason.slice(0, 120)}"`,
+      linkUrl: '/secretary-v2/no-show-reasons',
+      entityId: appointmentId,
+    });
 
     return { success: true, data: { appointmentId } };
   } catch (error: any) {

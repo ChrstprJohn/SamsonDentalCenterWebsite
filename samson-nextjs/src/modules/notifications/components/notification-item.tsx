@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { MessageSquare, MailWarning, CircleAlert, Check, Calendar } from 'lucide-react';
+import { MessageSquare, MailWarning, CircleAlert, Check, Calendar, Star, CalendarX } from 'lucide-react';
 import { NotificationResponseDto } from '../dtos/management/notification-response.dto';
 
 interface NotificationItemProps {
@@ -24,6 +24,10 @@ export function NotificationItem({ notification, onMarkRead }: NotificationItemP
         return <MessageSquare className="w-4 h-4 text-sky-400" />;
       case 'FAILED_EMAIL_ALERT':
         return <MailWarning className="w-4 h-4 text-amber-400" />;
+      case 'REVIEW_SUBMITTED':
+        return <Star className="w-4 h-4 text-violet-400" />;
+      case 'NO_SHOW_REASON_SUBMITTED':
+        return <CalendarX className="w-4 h-4 text-red-400" />;
       default:
         return <CircleAlert className="w-4 h-4 text-slate-400" />;
     }
