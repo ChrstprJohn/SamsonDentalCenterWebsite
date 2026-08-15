@@ -280,8 +280,9 @@ export function NoShowResolutionModal({ view }: { view: any }) {
 
           {/* Notification Channel Block - Only visible on Mark Completed */}
           {resolution === 'COMPLETED' && (
-            <div className="flex flex-col gap-1.5">
-              <div className="flex items-center justify-between mb-1">
+            <>
+              <div className="flex flex-col gap-1.5">
+                <div className="flex items-center justify-between mb-1">
                 <div className="flex flex-col gap-0.5">
                   <span className="text-sm font-medium text-text-primary">Notification Channel <span className="text-destructive">*</span></span>
                   <span className="text-xs text-text-secondary">Which channel should be used to notify the patient?</span>
@@ -300,27 +301,28 @@ export function NoShowResolutionModal({ view }: { view: any }) {
                     </Button>
                   </div>
                 )}
-              </div>
-
-              {isEditingChannel ? (
-                <Select
-                  value={draftChannel}
-                  onChange={(e) => setDraftChannel(e.target.value as any)}
-                  className="text-sm w-full"
-                  options={[
-                    { value: 'EMAIL', label: 'Email' },
-                    { value: 'SMS', label: 'SMS' },
-                    { value: 'BOTH', label: 'Email & SMS' },
-                    { value: 'NONE', label: 'None' },
-                  ]}
-                />
-              ) : (
-                <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-text-muted border-card-border cursor-default">
-                  {channel === 'EMAIL' ? 'Email' : channel === 'SMS' ? 'SMS' : channel === 'BOTH' ? 'Email & SMS' : 'None'}
                 </div>
-              )}
-            </div>
-            <NotificationChannelMessage channel={channel} purpose="completion" />
+
+                {isEditingChannel ? (
+                  <Select
+                    value={draftChannel}
+                    onChange={(e) => setDraftChannel(e.target.value as any)}
+                    className="text-sm w-full"
+                    options={[
+                      { value: 'EMAIL', label: 'Email' },
+                      { value: 'SMS', label: 'SMS' },
+                      { value: 'BOTH', label: 'Email & SMS' },
+                      { value: 'NONE', label: 'None' },
+                    ]}
+                  />
+                ) : (
+                  <div className="w-full px-4 py-2.5 rounded-xl border bg-muted/50 text-sm text-text-muted border-card-border cursor-default">
+                    {channel === 'EMAIL' ? 'Email' : channel === 'SMS' ? 'SMS' : channel === 'BOTH' ? 'Email & SMS' : 'None'}
+                  </div>
+                )}
+              </div>
+              <NotificationChannelMessage channel={channel} purpose="completion" />
+            </>
           )}
 
           {resolution !== 'RESCHEDULE' && (
