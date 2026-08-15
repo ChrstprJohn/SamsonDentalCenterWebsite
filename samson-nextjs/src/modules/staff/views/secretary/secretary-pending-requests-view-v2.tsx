@@ -20,6 +20,7 @@ import {
   ChevronLeft,
   ChevronRight,
   ClipboardList,
+  FileText,
   Mail,
   MoreHorizontal,
   Pencil,
@@ -568,10 +569,10 @@ export function SecretaryPendingRequestsViewV2({ deepLinkId }: { deepLinkId?: st
                     setMobileView('quickLogs');
                   }}
                   className="gap-1.5 text-xs h-8"
-                  title="Open Staff Notes & Logs"
+                  title="Open Notes"
                 >
-                  <ClipboardList className="size-3.5" />
-                  <span>Notes & Logs</span>
+                  <FileText className="size-3.5" />
+                  <span>Notes</span>
                 </Button>
               )}
             </div>

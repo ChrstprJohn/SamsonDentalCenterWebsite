@@ -11,6 +11,7 @@ import { getCalendarNotesAction } from '@/modules/appointments/actions/calendar-
 import { getStaffAppointmentByIdAction } from '@/modules/appointments/actions/clinic/get-staff-appointment-by-id.action';
 import { updateAppointmentStatusAction } from '@/modules/appointments/actions/status/update-appointment-status.action';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
 import { calculateEndTime } from '@/shared/utils/date.util';
 import { getDailyScheduleBounds, formatTimeRange } from '@/shared/utils/schedule-bounds.util';
 import type { ClinicConfigResponseDto } from '@/modules/clinic-config/dtos/settings/get-clinic-config.dto';
@@ -77,6 +78,7 @@ export function SecretaryBookAppointmentView() {
   const [isBookingOpen, setIsBookingOpen] = React.useState(false);
   const [isDentistsOpen, setIsDentistsOpen] = React.useState(true);
   const [isCalendarCollapsed, setIsCalendarCollapsed] = React.useState(false);
+  const [showNotesColumn, setShowNotesColumn] = React.useState(true);
 
   const [isRescheduleOpen, setIsRescheduleOpen] = React.useState(false);
   const [isCancelOpen, setIsCancelOpen] = React.useState(false);
@@ -468,6 +470,14 @@ export function SecretaryBookAppointmentView() {
                 </select>
               </div>
             )}
+            <div className="flex items-center gap-1.5">
+              <span className="text-sm text-muted-foreground">Notes</span>
+              <Switch
+                checked={showNotesColumn}
+                onCheckedChange={setShowNotesColumn}
+                className="scale-75 origin-left"
+              />
+            </div>
             <div className="flex bg-muted p-0.5 rounded-lg text-xs font-medium">
               <button
                 onClick={() => handleSelectViewMode('day')}
@@ -559,6 +569,7 @@ export function SecretaryBookAppointmentView() {
             operatingHours={view.operatingHours}
             onAddNote={view.addNote}
             onDeleteNote={view.deleteNote}
+            showNotesColumn={showNotesColumn}
             onSlotClick={({ doctorId, date, startTime }) => {
               // Week view columns are days (multiple dentists) — doctor chosen in booking form
               // Pre-fill form from clicked slot
@@ -1211,7 +1222,7 @@ export function SecretaryBookAppointmentView() {
                     <Plus className="size-4" />
                   </button>
                 </TooltipTrigger>
-                <TooltipContent side="right">Book New Appointment</TooltipContent>
+                <TooltipContent side="right">Book Appt</TooltipContent>
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -1227,7 +1238,7 @@ export function SecretaryBookAppointmentView() {
                     <FileText className="size-4" />
                   </button>
                 </TooltipTrigger>
-                <TooltipContent side="right">Add Scratch Note</TooltipContent>
+                <TooltipContent side="right">Add Note</TooltipContent>
               </Tooltip>
             </div>
           </div>
@@ -1329,26 +1340,31 @@ export function SecretaryBookAppointmentView() {
                 </Collapsible>
               </SidebarGroup>
             </SidebarContent>
-            <SidebarFooter>
-              <SidebarMenu>
-                <SidebarMenuItem>
-                  <SidebarMenuButton onClick={() => { view.resetForm(); setSelectedNote(null); setIsAddNoteOpen(false); void view.loadActionResources(); setIsBookingOpen(true); }}>
-                    <Plus className="size-4 mr-2" />
-                    <span>Book New Appointment</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton onClick={() => {
+            <SidebarFooter className="p-3 border-t border-border">
+              <div className="flex gap-2 w-full">
+                <Button
+                  onClick={() => { view.resetForm(); setSelectedNote(null); setIsAddNoteOpen(false); void view.loadActionResources(); setIsBookingOpen(true); }}
+                  size="sm"
+                  className="flex-1 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold h-9 rounded-xl gap-1.5 shadow-sm"
+                >
+                  <Plus className="size-3.5" />
+                  <span>Book Appt</span>
+                </Button>
+                <Button
+                  onClick={() => {
                     view.setSelectedAppointmentDetails(null);
                     setSelectedNote(null);
                     setIsBookingOpen(false);
                     setIsAddNoteOpen(true);
-                  }}>
-                    <FileText className="size-4 mr-2" />
-                    <span>Add Scratch Note</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              </SidebarMenu>
+                  }}
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 bg-card hover:bg-muted border-card-border text-foreground text-xs font-semibold h-9 rounded-xl gap-1.5 shadow-sm"
+                >
+                  <FileText className="size-3.5" />
+                  <span>Add Note</span>
+                </Button>
+              </div>
             </SidebarFooter>
           </>
         )}

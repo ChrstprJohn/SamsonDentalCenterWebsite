@@ -1,8 +1,9 @@
 'use client';
 
-import { ArrowLeft, ClipboardList, AlertTriangle, Clock, Stethoscope, RefreshCw, Phone, Voicemail, MessageSquare, Mail, Plus, X } from 'lucide-react';
+import React, { useState } from 'react';
+import { ArrowLeft, FileText, Pin, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { useCoordinationHub } from '../../../hooks/secretary/use-coordination-hub';
-import type { CreateCoordinationLogActionType } from '@/modules/appointments/dtos/coordination/coordination-log-response.dto';
 
 interface CoordinationHubProps {
   inquiryId?: string | null;
@@ -12,50 +13,46 @@ interface CoordinationHubProps {
   onBack?: () => void;
 }
 
-interface QuickAction {
-  type: CreateCoordinationLogActionType;
-  label: string;
-  icon: React.ReactNode;
-  msg: string;
-  classes: string;
-}
-
-const CALENDAR_ACTIONS: QuickAction[] = [
-  { type: 'SCHEDULE_CONFLICT', label: 'Calendar Conflict', icon: <AlertTriangle className="size-3.5" />, msg: 'Offline calendar conflict detected for requested slot', classes: 'bg-amber-50 text-amber-700 hover:bg-amber-100 border-amber-200' },
-  { type: 'OUTSIDE_HOURS', label: 'Outside Hours', icon: <Clock className="size-3.5" />, msg: 'Requested time falls outside clinic operating hours', classes: 'bg-orange-50 text-orange-700 hover:bg-orange-100 border-orange-200' },
-  { type: 'DR_UNAVAILABLE', label: 'Dr. Unavailable', icon: <Stethoscope className="size-3.5" />, msg: 'Required dentist is not available on requested date', classes: 'bg-red-50 text-red-700 hover:bg-red-100 border-red-200' },
-  { type: 'NEEDS_RESCHEDULE', label: 'Needs Resched', icon: <RefreshCw className="size-3.5" />, msg: 'Slot invalid — rescheduling to different day/time', classes: 'bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200' },
-];
-
-const COMMS_ACTIONS: QuickAction[] = [
-  { type: 'CALLED_NO_ANSWER', label: 'Called: No Answer', icon: <Phone className="size-3.5" />, msg: 'Called patient — no answer', classes: 'bg-slate-100 text-slate-700 hover:bg-slate-200 border-slate-200' },
-  { type: 'LEFT_VOICEMAIL', label: 'Left Voicemail', icon: <Voicemail className="size-3.5" />, msg: 'Left voicemail requesting callback', classes: 'bg-slate-100 text-slate-700 hover:bg-slate-200 border-slate-200' },
-  { type: 'SMS_SENT', label: 'SMS Sent', icon: <MessageSquare className="size-3.5" />, msg: 'SMS sent to patient — awaiting reply', classes: 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-emerald-200' },
-  { type: 'EMAIL_SENT', label: 'Email Sent', icon: <Mail className="size-3.5" />, msg: 'Email sent with schedule proposal', classes: 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border-indigo-200' },
-];
-
-const TIMELINE_COLORS: Record<string, string> = {
-  SCHEDULE_CONFLICT: 'border-l-amber-400 bg-amber-50/40',
-  OUTSIDE_HOURS: 'border-l-orange-400 bg-orange-50/40',
-  DR_UNAVAILABLE: 'border-l-red-400 bg-red-50/40',
-  WAITING_ON_DOCTOR: 'border-l-purple-400 bg-purple-50/40',
-  NEEDS_RESCHEDULE: 'border-l-blue-400 bg-blue-50/40',
-  CALLED_NO_ANSWER: 'border-l-slate-300 bg-slate-50/40',
-  LEFT_VOICEMAIL: 'border-l-slate-300 bg-slate-50/40',
-  SMS_SENT: 'border-l-emerald-400 bg-emerald-50/40',
-  EMAIL_SENT: 'border-l-indigo-400 bg-indigo-50/40',
-  CUSTOM_NOTE: 'border-l-card-border/50 bg-secondary-bg/30',
+const parseNoteParts = (rawNote: string) => {
+  let title = '';
+  let body = '';
+  if (rawNote.includes('\n\n')) {
+    const parts = rawNote.split(/\n\n([\s\S]*)/);
+    title = parts[0]?.trim() || '';
+    body = parts[1]?.trim() || '';
+  } else if (rawNote.includes('\n')) {
+    const parts = rawNote.split(/\n([\s\S]*)/);
+    title = parts[0]?.trim() || '';
+    body = parts[1]?.trim() || '';
+  } else {
+    body = rawNote || '';
+  }
+  return { title, body };
 };
-
-function formatTime(iso: string): string {
-  const d = new Date(iso);
-  return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
-}
 
 export function CoordinationHub({ inquiryId, appointmentId, hideHeader, hideActions, onBack }: CoordinationHubProps) {
   const targetId = appointmentId || inquiryId || null;
   const targetType = appointmentId ? 'appointment' : 'inquiry';
-  const { logs, isLoading, error, customNote, setCustomNote, addLog, removeLog, addCustomNote } = useCoordinationHub(targetId, targetType);
+  const { logs, isLoading, error, addLog, removeLog } = useCoordinationHub(targetId, targetType);
+
+  const [noteTitle, setNoteTitle] = useState('');
+  const [noteContent, setNoteContent] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSaveNote = async () => {
+    if (!noteTitle.trim() && !noteContent.trim()) return;
+    setIsSaving(true);
+    try {
+      const combined = noteTitle.trim()
+        ? (noteContent.trim() ? `${noteTitle.trim()}\n\n${noteContent.trim()}` : noteTitle.trim())
+        : noteContent.trim();
+      await addLog('CUSTOM_NOTE', combined);
+      setNoteTitle('');
+      setNoteContent('');
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <div className="flex flex-col h-full overflow-hidden border-r border-card-border/40 bg-sidebar">
@@ -63,12 +60,12 @@ export function CoordinationHub({ inquiryId, appointmentId, hideHeader, hideActi
         <div className="p-4 border-b border-card-border/40 shrink-0 h-14 flex items-center">
           <div className="flex items-center gap-2 min-w-0 flex-1">
             {onBack && (
-              <button onClick={onBack} className="p-1 -ml-1 text-muted-foreground hover:text-foreground shrink-0" title="Close Staff Notes & Logs">
+              <button onClick={onBack} className="p-1 -ml-1 text-muted-foreground hover:text-foreground shrink-0" title="Close Notes">
                 <ArrowLeft className="size-5" />
               </button>
             )}
             <div className="text-base font-medium text-foreground truncate">
-              Staff Notes &amp; Logs
+              Notes
             </div>
           </div>
         </div>
@@ -83,90 +80,133 @@ export function CoordinationHub({ inquiryId, appointmentId, hideHeader, hideActi
             )}
 
             {!hideActions && (
-              <div>
-                <div className="text-xs text-muted-foreground mb-2">Schedule Conflicts</div>
-                <div className="flex flex-wrap gap-1.5">
-                  {CALENDAR_ACTIONS.map((action) => (
-                    <button
-                      key={action.type}
-                      onClick={() => addLog(action.type, action.msg)}
-                      className={`inline-flex items-center gap-1 text-xs px-3 py-1.5 rounded-full border font-medium transition-colors ${action.classes}`}
-                    >
-                      {action.icon} {action.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {!hideActions && (
-              <div className="border-t border-card-border/40 pt-4">
-                <div className="text-xs text-muted-foreground mb-2">Contact Attempts</div>
-                <div className="flex flex-wrap gap-1.5">
-                  {COMMS_ACTIONS.map((action) => (
-                    <button
-                      key={action.type}
-                      onClick={() => addLog(action.type, action.msg)}
-                      className={`inline-flex items-center gap-1 text-xs px-3 py-1.5 rounded-full border font-medium transition-colors ${action.classes}`}
-                    >
-                      {action.icon} {action.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {!hideActions && (
-              <div className="border-t border-card-border/40 pt-4">
-                <div className="text-xs text-muted-foreground mb-2">Write Custom Note</div>
-                <div className="flex gap-2">
+              <div className="flex flex-col gap-3">
+                <span className="text-sm font-medium text-foreground">Add Custom Note</span>
+                <div className="flex flex-col gap-1.5">
+                  <span className="text-xs font-medium text-muted-foreground">
+                    Title <span className="text-muted-foreground/60">(optional)</span>
+                  </span>
                   <input
-                    value={customNote}
-                    onChange={(e) => setCustomNote(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addCustomNote(); } }}
-                    placeholder="e.g. Patient preferred morning slot on Thursday"
-                    className="flex-1 text-sm px-4 py-2.5 rounded-xl border border-card-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring transition"
+                    type="text"
+                    value={noteTitle}
+                    onChange={(e) => setNoteTitle(e.target.value)}
+                    placeholder="e.g. Call Back / Follow Up"
+                    className="w-full min-w-0 px-3.5 py-2 rounded-xl border bg-card text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
                   />
-                  <button
-                    onClick={addCustomNote}
-                    disabled={!customNote.trim()}
-                    className="size-[42px] flex items-center justify-center rounded-xl bg-slate-900 text-white hover:bg-slate-800 disabled:opacity-40 transition shrink-0"
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <span className="text-xs font-medium text-muted-foreground">
+                    Note Description <span className="text-muted-foreground/60">(optional)</span>
+                  </span>
+                  <textarea
+                    value={noteContent}
+                    onChange={(e) => setNoteContent(e.target.value)}
+                    placeholder="e.g. Patient preferred morning slot on Thursday, call back pending..."
+                    rows={4}
+                    className="w-full min-w-0 px-3.5 py-2.5 rounded-xl border bg-card text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border resize-none break-words [overflow-wrap:anywhere]"
+                  />
+                  <span className="text-[11px] text-muted-foreground text-right">{noteContent.length}/500</span>
+                  <Button
+                    onClick={handleSaveNote}
+                    disabled={(!noteContent.trim() && !noteTitle.trim()) || isSaving}
+                    size="sm"
+                    className="w-full bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold h-8"
                   >
-                    <Plus className="size-5" />
-                  </button>
+                    {isSaving ? 'Saving...' : 'Save Note'}
+                  </Button>
                 </div>
               </div>
             )}
 
             <div className={!hideActions ? 'border-t border-card-border/40 pt-4' : ''}>
-              <div className="text-xs text-muted-foreground mb-2">Notes History</div>
+              <div className="text-sm font-medium text-foreground mb-3">
+                {targetType === 'appointment' ? 'Notes on this appointment' : 'Notes on this request'}
+              </div>
               {isLoading ? (
-                <div className="py-6 text-center text-xs text-muted-foreground">Loading timeline...</div>
+                <div className="py-6 text-center text-xs text-muted-foreground">Loading notes...</div>
               ) : logs.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-8 text-center">
                   <div className="size-10 rounded-full bg-muted/30 flex items-center justify-center mb-2.5">
-                    <ClipboardList className="size-5 text-muted-foreground/60" />
+                    <FileText className="size-5 text-muted-foreground/60" />
                   </div>
-                  <span className="text-xs font-medium text-foreground">No notes yet</span>
-                  <p className="text-[11px] text-muted-foreground mt-0.5 max-w-[200px]">Tap a quick action or write a custom note to get started.</p>
+                  <span className="text-xs font-medium text-foreground">
+                    No notes on this {targetType === 'appointment' ? 'appointment' : 'request'}
+                  </span>
+                  <p className="text-[11px] text-muted-foreground mt-0.5 max-w-[200px]">Add a custom note above to get started.</p>
                 </div>
               ) : (
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-2.5">
                   {logs.map((log) => {
-                    const borderColor = TIMELINE_COLORS[log.actionType] || 'border-l-card-border/50 bg-secondary-bg/30';
+                    const { title, body } = parseNoteParts(log.message || '');
+                    const createdDate = (() => {
+                      try {
+                        const d = new Date(log.createdAt);
+                        const datePart = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                        const timePart = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+                        return `${datePart} · ${timePart}`;
+                      } catch {
+                        return log.createdAt;
+                      }
+                    })();
+
                     return (
-                      <div key={log.id} className={`group relative border-l-2 rounded-lg p-3 pr-8 ${borderColor}`}>
-                        <div className="text-xs text-muted-foreground mb-1">
-                          {formatTime(log.createdAt)} - Secretary
-                        </div>
-                        <div className="text-sm text-foreground leading-relaxed">{log.message}</div>
-                        <button
-                          onClick={() => removeLog(log.id)}
-                          className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-rose-500 transition p-0.5"
-                          title="Delete entry"
+                      <div
+                        key={log.id}
+                        className="group relative w-full flex flex-col text-left text-xs transition-all select-none shrink-0 overflow-hidden rounded-none shadow-sm hover:shadow-md border border-amber-300/60"
+                        style={{
+                          minHeight: '85px',
+                          background: '#fde047',
+                          boxShadow: '0 2px 6px 0 rgba(120,100,0,0.12), 0 1px 2px 0 rgba(120,100,0,0.06)',
+                        }}
+                        title={log.message}
+                      >
+                        {/* Sticky note top bar / fold line */}
+                        <div
+                          className="flex items-center justify-between px-2.5 pt-1.5 pb-1 shrink-0"
+                          style={{ borderBottom: '1px solid rgba(161,120,0,0.20)' }}
                         >
-                          <X className="size-3.5" />
-                        </button>
+                          <div
+                            className="truncate text-sm leading-none capitalize font-normal"
+                            style={{ color: '#92400e' }}
+                            title={title}
+                          >
+                            {title || <span style={{ color: '#a16207', fontWeight: 400, fontStyle: 'italic', textTransform: 'none', letterSpacing: 0 }}>Untitled note</span>}
+                          </div>
+                          <div className="flex items-center gap-1 shrink-0 ml-1">
+                            <button
+                              onClick={(e) => { e.stopPropagation(); removeLog(log.id); }}
+                              className="opacity-0 group-hover:opacity-100 hover:text-rose-700 text-amber-800 transition p-0.5"
+                              title="Delete note"
+                            >
+                              <X className="size-3.5" />
+                            </button>
+                            <Pin
+                              className="size-3 rotate-45"
+                              style={{ color: '#a16207', opacity: 0.7 }}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Date & time row */}
+                        <div className="px-2.5 pt-1 shrink-0">
+                          <span className="text-[10px] font-medium leading-none" style={{ color: '#a16207', opacity: 0.85 }}>
+                            {createdDate}
+                          </span>
+                        </div>
+
+                        {/* Note Content Body */}
+                        <div className="flex-1 px-2.5 pt-1 pb-2 overflow-hidden">
+                          {body ? (
+                            <p className="text-[11px] font-normal leading-snug break-words [overflow-wrap:anywhere]" style={{ color: '#78350f' }}>
+                              {body}
+                            </p>
+                          ) : (
+                            <p className="text-[11px] italic leading-snug" style={{ color: '#b45309', opacity: 0.6 }}>
+                              No description added
+                            </p>
+                          )}
+                        </div>
                       </div>
                     );
                   })}

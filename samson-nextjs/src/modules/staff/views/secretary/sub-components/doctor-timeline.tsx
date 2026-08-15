@@ -49,6 +49,7 @@ interface DoctorTimelineProps {
   operatingHours?: ClinicConfigResponseDto['operatingHours'] | null;
   /** Stable color index per doctor id, from the full (unfiltered) doctor list. */
   doctorColorIndex?: Record<string, number>;
+  showNotesColumn?: boolean;
 }
 
 export function DoctorTimeline({
@@ -67,6 +68,7 @@ export function DoctorTimeline({
   selectedDate,
   operatingHours,
   doctorColorIndex,
+  showNotesColumn = true,
 }: DoctorTimelineProps) {
   const isMobile = useIsMobile();
   const rightColWidth = isMobile ? '0px' : '35px';
@@ -282,10 +284,11 @@ export function DoctorTimeline({
       let left = '0%';
       let width = '100%';
 
+      const notesColOffset = showNotesColumn ? 1 : 0;
       if (viewMode === 'week') {
         const dayIdx = daysOfWeek.findIndex((d) => d.dateStr === app.date);
         if (dayIdx === -1) return null;
-        col = dayIdx + 3; // +3 accounts for: col1=time-left, col2=notes, col3+=days
+        col = dayIdx + 2 + notesColOffset; // accounts for: col1=time-left, (optional col2=notes), col(2/3)+=days
 
         const activeDoctors = perDayDoctorIds[app.date] || [];
         const activeCount = activeDoctors.length;
@@ -295,7 +298,7 @@ export function DoctorTimeline({
           left = `${(activeIdx * 100) / activeCount}%`;
         }
       } else {
-        col = docIndex + 3; // +3 accounts for: col1=time-left, col2=notes, col3+=doctors
+        col = docIndex + 2 + notesColOffset; // accounts for: col1=time-left, (optional col2=notes), col(2/3)+=doctors
       }
 
       return {
@@ -313,7 +316,7 @@ export function DoctorTimeline({
       };
     })
       .filter((x): x is NonNullable<typeof x> => x !== null);
-  }, [appointments, doctors, doctorColorIndex, viewMode, daysOfWeek, startTimeMins, endTimeMins, totalMinutes, perDayDoctorIds]);
+  }, [appointments, doctors, doctorColorIndex, viewMode, daysOfWeek, startTimeMins, endTimeMins, totalMinutes, perDayDoctorIds, showNotesColumn]);
 
   const placedNotes = useMemo(() => {
     return notes
@@ -362,10 +365,10 @@ export function DoctorTimeline({
     );
   }
 
-  // +1 for the dedicated notes column
+  const notesColOffset = showNotesColumn ? 1 : 0;
   const columnsCount = viewMode === 'week' ? 5 : doctors.length;
-  // Total grid columns: 1 time-left + 1 notes + columnsCount doc/day + 1 time-right
-  const totalGridCols = columnsCount + 3;
+  // Total grid columns: 1 time-left + (optional 1 notes) + columnsCount doc/day + 1 time-right
+  const totalGridCols = columnsCount + 2 + notesColOffset;
 
   return (
     <div className="flex flex-col flex-1 min-h-0 bg-card overflow-hidden relative">
@@ -375,8 +378,12 @@ export function DoctorTimeline({
           className="grid relative"
           style={{
             gridTemplateColumns: viewMode === 'week'
-              ? `35px minmax(140px, 1fr) ${dayFrUnits.map(f => `minmax(140px, ${f}fr)`).join(' ')} ${rightColWidth}`
-              : `35px minmax(180px, 1fr) repeat(${doctors.length}, minmax(180px, 1fr)) ${rightColWidth}`,
+              ? (showNotesColumn
+                  ? `35px minmax(140px, 1fr) ${dayFrUnits.map(f => `minmax(140px, ${f}fr)`).join(' ')} ${rightColWidth}`
+                  : `35px ${dayFrUnits.map(f => `minmax(140px, ${f}fr)`).join(' ')} ${rightColWidth}`)
+              : (showNotesColumn
+                  ? `35px minmax(180px, 1fr) repeat(${doctors.length}, minmax(180px, 1fr)) ${rightColWidth}`
+                  : `35px repeat(${doctors.length}, minmax(180px, 1fr)) ${rightColWidth}`),
             gridTemplateRows: `auto repeat(${totalSlots}, 10px)`,
           }}
         >
@@ -388,14 +395,15 @@ export function DoctorTimeline({
             &nbsp;
           </div>
 
-          {/* Header Row — col 2: Notes column */}
-          <div
-            className="sticky top-0 bg-card border-r border-r-slate-300 border-b border-border px-4 py-2 text-center text-xs font-bold text-text-primary z-20 flex items-center justify-center gap-1.5"
-            style={{ gridColumn: 2, gridRow: 1 }}
-          >
-            <FileText className="size-3.5 text-muted-foreground shrink-0" />
-            <span>Notes ({placedNotes.length})</span>
-          </div>
+          {/* Header Row — col 2: Notes column (optional) */}
+          {showNotesColumn && (
+            <div
+              className="sticky top-0 bg-card border-r border-r-slate-300 border-b border-border px-4 py-2 text-center text-xs font-bold text-text-primary z-20 flex items-center justify-center gap-1.5"
+              style={{ gridColumn: 2, gridRow: 1 }}
+            >
+              <span>Notes ({placedNotes.length})</span>
+            </div>
+          )}
 
           {viewMode === 'week' ? (
             daysOfWeek.map((day, index) => {
@@ -406,7 +414,7 @@ export function DoctorTimeline({
                 <div
                   key={day.dateStr}
                   className={`sticky top-0 border-r border-r-slate-300 border-b border-border px-4 py-2 text-center text-sm font-normal truncate z-20 ${closed ? 'bg-muted/40 text-muted-foreground' : 'bg-card text-sidebar-foreground'}`}
-                  style={{ gridColumn: index + 3, gridRow: 1 }}
+                  style={{ gridColumn: index + 2 + notesColOffset, gridRow: 1 }}
                 >
                   {closed ? `${day.shortLabel} · Closed` : `${day.shortLabel} (${count})`}
                 </div>
@@ -420,7 +428,7 @@ export function DoctorTimeline({
                 <div
                   key={doctor.id}
                   className="sticky top-0 bg-card border-r border-r-slate-300 border-b border-border px-4 py-2 text-center text-xs font-bold text-text-primary z-20"
-                  style={{ gridColumn: index + 3, gridRow: 1 }}
+                  style={{ gridColumn: index + 2 + notesColOffset, gridRow: 1 }}
                 >
                   <span className="inline-flex items-center justify-center gap-1.5 truncate">
                     <span className={`size-2 rounded-full shrink-0 ${color.accent}`} />
@@ -461,15 +469,17 @@ export function DoctorTimeline({
                   ) : ''}
                 </div>
 
-                {/* Notes column background cell — col 2 */}
-                <div
-                  className={`border-r border-r-slate-300 transition-colors ${
-                    isLineRow ? 'border-b border-border' : 'border-b border-border/25'
-                  } ${isHourMark ? 'bg-muted/10' : 'bg-transparent'}`}
-                  style={{ gridColumn: 2, gridRow: rowIndex + 2 }}
-                />
+                {/* Notes column background cell — col 2 (optional) */}
+                {showNotesColumn && (
+                  <div
+                    className={`border-r border-r-slate-300 transition-colors ${
+                      isLineRow ? 'border-b border-border' : 'border-b border-border/25'
+                    } ${isHourMark ? 'bg-muted/10' : 'bg-transparent'}`}
+                    style={{ gridColumn: 2, gridRow: rowIndex + 2 }}
+                  />
+                )}
 
-                {/* Empty columns behind appointment cards — doctor/day cols start at col 3 */}
+                {/* Empty columns behind appointment cards */}
                 {(viewMode === 'week' ? daysOfWeek : doctors).map((item, colIndex) => {
                   const doctorId = viewMode === 'day' ? (item as any).id : '';
                   const date = viewMode === 'week' ? (item as any).dateStr : selectedDate;
@@ -491,7 +501,7 @@ export function DoctorTimeline({
                       className={`border-r border-r-slate-300 transition-colors ${
                         isLineRow ? 'border-b border-border' : 'border-b border-border/25'
                       } ${closed ? 'bg-muted/30' : (outOfHours ? 'bg-muted/20' : (cellIsBreakTime ? 'bg-muted/40' : (isHourMark ? 'bg-muted/10' : 'bg-transparent')))} ${onSlotClick && !closed && !outOfHours ? 'cursor-crosshair' : ''}`}
-                      style={{ gridColumn: colIndex + 3, gridRow: rowIndex + 2 }}
+                      style={{ gridColumn: colIndex + 2 + notesColOffset, gridRow: rowIndex + 2 }}
                       onClick={(e) => {
                         if (!onSlotClick) return;
                         // Non-bookable blocks: break time, closed days, pre-open padding
@@ -545,7 +555,7 @@ export function DoctorTimeline({
                     key={`${day.dateStr}-${range.start}`}
                     className="pointer-events-none z-0 flex flex-col items-center justify-center gap-0.5 border-2 border-dashed border-gray-400/80"
                     style={{
-                      gridColumn: dayIdx + 3,
+                      gridColumn: dayIdx + 2 + notesColOffset,
                       gridRow: `${startRow} / ${endRow}`,
                       backgroundImage: 'repeating-linear-gradient(45deg, #f3f4f6 0 10px, #e5e7eb 10px 20px)',
                     }}
@@ -569,7 +579,7 @@ export function DoctorTimeline({
                   key={range.start}
                   className="pointer-events-none z-0 flex flex-col items-center justify-center gap-0.5 border-2 border-dashed border-gray-400/80"
                   style={{
-                    gridColumn: `3 / ${columnsCount + 3}`,
+                    gridColumn: `${2 + notesColOffset} / ${columnsCount + 2 + notesColOffset}`,
                     gridRow: `${startRow} / ${endRow}`,
                     backgroundImage: 'repeating-linear-gradient(45deg, #f3f4f6 0 10px, #e5e7eb 10px 20px)',
                   }}
@@ -592,7 +602,7 @@ export function DoctorTimeline({
                   key={`closed-${day.dateStr}`}
                   className="pointer-events-none z-0 flex flex-col items-center justify-center gap-0.5 border-2 border-dashed border-gray-400/80"
                   style={{
-                    gridColumn: dayIdx + 3,
+                    gridColumn: dayIdx + 2 + notesColOffset,
                     gridRow: `2 / ${totalSlots + 2}`,
                     backgroundImage: 'repeating-linear-gradient(45deg, #f3f4f6 0 10px, #e5e7eb 10px 20px)',
                   }}
@@ -616,7 +626,7 @@ export function DoctorTimeline({
                 key={`${day.dateStr}-${s.label}`}
                 className="pointer-events-none z-0 flex flex-col items-center justify-center gap-0.5 border-2 border-dashed border-gray-400/80"
                 style={{
-                  gridColumn: dayIdx + 3,
+                  gridColumn: dayIdx + 2 + notesColOffset,
                   gridRow: `${s.startRow} / ${s.endRow}`,
                   backgroundImage: 'repeating-linear-gradient(45deg, #f3f4f6 0 10px, #e5e7eb 10px 20px)',
                 }}
@@ -627,110 +637,122 @@ export function DoctorTimeline({
             ));
           })}
 
-          {/* Dedicated Notes Column (col 2) — stacked flow layout so notes never overlap */}
-          <div
-            className="z-10 flex flex-col gap-1.5 p-1.5 overflow-y-auto w-full"
-            style={{
-              gridColumn: 2,
-              gridRow: `2 / span ${totalSlots}`,
-              alignContent: 'start',
-            }}
-          >
-            {placedNotes.map(({ note }) => {
-              const isSelected = selectedNoteId === note.id;
+          {/* Dedicated Notes Column (col 2) — stacked flow layout so notes never overlap (optional) */}
+          {showNotesColumn && (
+            <div
+              className="z-10 flex flex-col gap-1.5 p-1.5 overflow-y-auto w-full"
+              style={{
+                gridColumn: 2,
+                gridRow: `2 / span ${totalSlots}`,
+                alignContent: 'start',
+              }}
+            >
+              {placedNotes.map(({ note }) => {
+                const isSelected = selectedNoteId === note.id;
 
-              // Parse title and body from note content (split on first double-newline or newline if present)
-              const rawNote = note.note || '';
-              let title = '';
-              let body = '';
-              if (rawNote.includes('\n\n')) {
-                const parts = rawNote.split(/\n\n([\s\S]*)/);
-                title = parts[0]?.trim() || '';
-                body = parts[1]?.trim() || '';
-              } else if (rawNote.includes('\n')) {
-                const parts = rawNote.split(/\n([\s\S]*)/);
-                title = parts[0]?.trim() || '';
-                body = parts[1]?.trim() || '';
-              } else {
-                body = rawNote;
-              }
+                // Parse title and body from note content (split on first double-newline or newline if present)
+                const rawNote = note.note || '';
+                let title = '';
+                let body = '';
+                if (rawNote.includes('\n\n')) {
+                  const parts = rawNote.split(/\n\n([\s\S]*)/);
+                  title = parts[0]?.trim() || '';
+                  body = parts[1]?.trim() || '';
+                } else if (rawNote.includes('\n')) {
+                  const parts = rawNote.split(/\n([\s\S]*)/);
+                  title = parts[0]?.trim() || '';
+                  body = parts[1]?.trim() || '';
+                } else {
+                  body = rawNote;
+                }
 
-              const displayTitle = title;
-              const displayBody = body;
+                const displayTitle = title;
+                const displayBody = body;
 
-              return (
-                <div
-                  key={`note-${note.id}`}
-                  onClick={() => onSelectNote?.(note)}
-                  className={`w-full flex flex-col text-left text-xs transition-all cursor-pointer select-none shrink-0 overflow-hidden rounded-none ${
-                    isSelected
-                      ? 'ring-2 ring-amber-600/90 shadow-md scale-[1.01]'
-                      : 'hover:shadow-md shadow-sm border border-amber-300/60'
-                  }`}
-                  style={{
-                    height: '90px',
-                    background: '#fde047',
-                    boxShadow: isSelected
-                      ? '0 6px 16px 0 rgba(120,100,0,0.25), 0 2px 4px 0 rgba(120,100,0,0.12)'
-                      : '0 2px 6px 0 rgba(120,100,0,0.12), 0 1px 2px 0 rgba(120,100,0,0.06)',
-                  }}
-                  title={rawNote}
-                >
-                  {/* Sticky note top bar / fold line */}
+                return (
                   <div
-                    className="flex items-center justify-between px-2 pt-1.5 pb-1 shrink-0"
-                    style={{ borderBottom: '1px solid rgba(161,120,0,0.20)' }}
+                    key={`note-${note.id}`}
+                    onClick={() => onSelectNote?.(note)}
+                    className={`w-full flex flex-col text-left text-xs transition-all cursor-pointer select-none shrink-0 overflow-hidden rounded-none ${
+                      isSelected
+                        ? 'ring-2 ring-amber-600/90 shadow-md scale-[1.01]'
+                        : 'hover:shadow-md shadow-sm border border-amber-300/60'
+                    }`}
+                    style={{
+                      height: '90px',
+                      background: '#fde047',
+                      boxShadow: isSelected
+                        ? '0 6px 16px 0 rgba(120,100,0,0.25), 0 2px 4px 0 rgba(120,100,0,0.12)'
+                        : '0 2px 6px 0 rgba(120,100,0,0.12), 0 1px 2px 0 rgba(120,100,0,0.06)',
+                    }}
+                    title={rawNote}
                   >
+                    {/* Sticky note top bar / fold line */}
                     <div
-                      className={`truncate text-sm leading-none capitalize ${isSelected ? 'font-medium' : 'font-normal'}`}
-                      style={{ color: '#92400e' }}
-                      title={displayTitle}
+                      className="flex items-center justify-between px-2 pt-1.5 pb-1 shrink-0"
+                      style={{ borderBottom: '1px solid rgba(161,120,0,0.20)' }}
                     >
-                      {displayTitle || <span style={{ color: '#a16207', fontWeight: 400, fontStyle: 'italic', textTransform: 'none', letterSpacing: 0 }}>Untitled note</span>}
+                      <div
+                        className={`truncate text-sm leading-none capitalize ${isSelected ? 'font-medium' : 'font-normal'}`}
+                        style={{ color: '#92400e' }}
+                        title={displayTitle}
+                      >
+                        {displayTitle || <span style={{ color: '#a16207', fontWeight: 400, fontStyle: 'italic', textTransform: 'none', letterSpacing: 0 }}>Untitled note</span>}
+                      </div>
+                      {/* Decorative pin — display only, no action */}
+                      <Pin
+                        className="ml-1 shrink-0 size-3 rotate-45"
+                        style={{ color: '#a16207', opacity: 0.7 }}
+                      />
                     </div>
-                    {/* Decorative pin — display only, no action */}
-                    <Pin
-                      className="ml-1 shrink-0 size-3 rotate-45"
-                      style={{ color: '#a16207', opacity: 0.7 }}
-                    />
-                  </div>
 
-                  {/* Date & time row — shows the note's scheduled date */}
-                  <div className="px-2 pt-1 shrink-0">
-                    <span className="text-[10px] font-medium leading-none" style={{ color: '#a16207', opacity: 0.85 }}>
-                      {(() => {
-                        if (!note.date) return '';
-                        const [y, m, d] = note.date.split('-').map(Number);
-                        const dateObj = new Date(y, m - 1, d);
-                        const dateFormatted = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-                        if (note.startTime) {
-                          return `${dateFormatted} · ${formatClinicTime(note.startTime)}`;
-                        }
-                        return dateFormatted;
-                      })()}
-                    </span>
-                  </div>
+                    {/* Date & time row — shows the note's date and time */}
+                    <div className="px-2 pt-1 shrink-0">
+                      <span className="text-[10px] font-medium leading-none" style={{ color: '#a16207', opacity: 0.85 }}>
+                        {(() => {
+                          if (note.createdAt) {
+                            try {
+                              const d = new Date(note.createdAt);
+                              const datePart = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                              const timePart = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+                              return `${datePart} · ${timePart}`;
+                            } catch {
+                              // fallback
+                            }
+                          }
+                          if (!note.date) return '';
+                          const [y, m, d] = note.date.split('-').map(Number);
+                          const dateObj = new Date(y, m - 1, d);
+                          const dateFormatted = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                          if (note.startTime) {
+                            return `${dateFormatted} · ${formatClinicTime(note.startTime)}`;
+                          }
+                          return dateFormatted;
+                        })()}
+                      </span>
+                    </div>
 
-                  {/* Note Content Body — always rendered, fallback if empty */}
-                  <div className="flex-1 px-2 pt-0.5 overflow-hidden">
-                    {displayBody ? (
-                      <p className="text-[11px] line-clamp-2 font-normal leading-snug break-words [overflow-wrap:anywhere]" style={{ color: '#78350f' }}>
-                        {displayBody}
-                      </p>
-                    ) : (
-                      <p className="text-[11px] italic leading-snug" style={{ color: '#b45309', opacity: 0.6 }}>
-                        No description added
-                      </p>
-                    )}
+                    {/* Note Content Body — always rendered, fallback if empty */}
+                    <div className="flex-1 px-2 pt-0.5 overflow-hidden">
+                      {displayBody ? (
+                        <p className="text-[11px] line-clamp-2 font-normal leading-snug break-words [overflow-wrap:anywhere]" style={{ color: '#78350f' }}>
+                          {displayBody}
+                        </p>
+                      ) : (
+                        <p className="text-[11px] italic leading-snug" style={{ color: '#b45309', opacity: 0.6 }}>
+                          No description added
+                        </p>
+                      )}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          )}
 
-          {/* Appointment card overlay — one layer per doctor/day column (cols 3+) */}
+          {/* Appointment card overlay — one layer per doctor/day column */}
           {(viewMode === 'week' ? daysOfWeek : doctors).map((item, colIndex) => {
-            const col = colIndex + 3;
+            const col = colIndex + 2 + notesColOffset;
             const colCards = placedAppointments.filter(c => c.col === col);
             if (colCards.length === 0) return null;
 

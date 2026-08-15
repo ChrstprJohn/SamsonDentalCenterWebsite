@@ -6,7 +6,7 @@ import { getStaffAppointmentByIdAction } from '@/modules/appointments/actions/cl
 import { AppointmentDetailPane } from './sub-components/appointment-detail-pane';
 import { AppointmentsTable } from './sub-components/appointments-table';
 import { CoordinationHub } from './sub-components/coordination-hub';
-import { ArrowLeft, CalendarDays, CheckCircle2, AlertCircle, Clock, ClipboardList, RotateCw, SlidersHorizontal, X } from 'lucide-react';
+import { ArrowLeft, CalendarDays, CheckCircle2, AlertCircle, Clock, ClipboardList, FileText, RotateCw, SlidersHorizontal, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select } from '@/components/ui/select';
 import { SidebarHeader, SidebarInput, SidebarTrigger } from '@/components/ui/sidebar';
@@ -376,10 +376,10 @@ export function SecretaryAppointmentsView() {
                   setMobileView('quickLogs');
                 }}
                 className="gap-1.5 text-xs h-8"
-                title="Open Staff Notes & Logs"
+                title="Open Notes"
               >
-                <ClipboardList className="size-3.5" />
-                <span>Notes & Logs</span>
+                <FileText className="size-3.5" />
+                <span>Notes</span>
               </Button>
             )}
           </div>
