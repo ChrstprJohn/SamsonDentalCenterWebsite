@@ -90,7 +90,7 @@ export function NoShowReasonForm({ appointmentId }: { appointmentId: string }) {
           <CalendarX2 className="h-6 w-6" />
         </div>
         <div className="flex flex-col gap-1">
-          <h1 className="text-2xl font-extrabold tracking-tight text-text-primary">Couldn&apos;t make it to your visit?</h1>
+          <h1 className="text-2xl font-extrabold tracking-tight text-text-primary">Missed your appointment?</h1>
           <p className="text-sm text-text-muted max-w-md">
             Please share what happened so we can better accommodate your schedule for future visits.
           </p>
