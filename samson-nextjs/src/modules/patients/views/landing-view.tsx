@@ -6,6 +6,7 @@ import type { ClinicConfigResponseDto } from '@/modules/clinic-config/dtos/setti
 import { useLandingView } from '../hooks/landing/use-landing-view';
 import { HeroSectionV1 } from '../components/landing/hero-section-v1';
 import { HeroSectionV2 } from '../components/landing/hero-section-v2';
+import { HeroSectionPreview } from '../components/landing/hero-section-preview';
 import { ServicesSection } from '../components/landing/services-section';
 import { JourneySection } from '../components/landing/journey-section';
 import { AboutSection } from '../components/landing/about-section';
@@ -80,7 +81,7 @@ export function LandingView({ services, config }: LandingViewProps) {
 
   return (
     <div className="flex flex-col w-full bg-[#FDFDFD] text-[#1D1E1E]">
-      <HeroSectionV1 onBookClick={() => handleBookingCTA()} />
+      <HeroSectionPreview onBookClick={() => handleBookingCTA()} />
       {!config.isBookingOpen && (
         <div className="bg-amber-50 px-6 py-3 text-center text-sm text-amber-900" role="status">
           {config.maintenanceMessage || `Online booking is temporarily unavailable. Please contact ${config.clinicName} directly.`}

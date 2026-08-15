@@ -82,24 +82,26 @@ export function NavbarV1({}: NavbarProps) {
         }`}
       >
         <div className="max-w-7xl mx-auto px-6 sm:px-12 flex items-center justify-between">
-          {/* Logo */}
-          <Link
-            href="/"
-            onClick={() => setIsMobileOpen(false)}
-            className={`flex items-center gap-3 group focus:outline-none transition-colors duration-300 ${
-              isDarkNav ? 'text-white' : 'text-[#1D1E1E]'
-            }`}
-          >
-            <img
-              src="/images/SamsonLogo-transparent.png"
-              alt="Samson Dental Center"
-              className="h-11 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
-            />
-          </Link>
+          {/* Left: Logo */}
+          <div className="flex-1 flex items-center justify-start">
+            <Link
+              href="/"
+              onClick={() => setIsMobileOpen(false)}
+              className={`flex items-center gap-3 group focus:outline-none transition-colors duration-300 ${
+                isDarkNav ? 'text-white' : 'text-[#1D1E1E]'
+              }`}
+            >
+              <img
+                src="/images/SamsonLogo-transparent.png"
+                alt="Samson Dental Center"
+                className="h-11 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+              />
+            </Link>
+          </div>
 
-          {/* Desktop Nav */}
+          {/* Center: Desktop Nav */}
           {isMainPage && (
-            <nav className="hidden lg:flex items-center gap-2 font-sans text-[13px] tracking-[0.1em] font-medium uppercase">
+            <nav className="hidden lg:flex items-center justify-center gap-2 font-sans text-[13px] tracking-[0.1em] font-medium uppercase">
               {NAV_ITEMS.map((item) => {
                 const isActive = activeSection === item.href.replace('#', '');
                 return (
@@ -128,8 +130,8 @@ export function NavbarV1({}: NavbarProps) {
             </nav>
           )}
 
-          {/* Actions Block */}
-          <div className="flex items-center gap-4 sm:gap-6">
+          {/* Right: Actions Block */}
+          <div className="flex-1 flex items-center justify-end gap-4 sm:gap-6">
             <div className="hidden md:flex items-center gap-5">
               <Link href="/book" onClick={() => setIsMobileOpen(false)}>
                 <button
