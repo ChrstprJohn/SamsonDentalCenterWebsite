@@ -600,12 +600,14 @@ export function SecretaryBookAppointmentView() {
                 </button>
                 <div className="flex flex-col min-w-0">
                   <div className="text-base font-medium text-foreground truncate">
-                    {isRescheduleOpen ? 'Reschedule Appointment' : 'Appointment Details'}
+                    {isRescheduleOpen ? 'Reschedule Appointment' : isCancelOpen ? 'Cancel Appointment' : 'Appointment Details'}
                   </div>
                   <span className="text-[11px] text-muted-foreground truncate">
                     {isRescheduleOpen
                       ? 'Update date, time, dentist, or service details.'
-                      : 'View and manage appointment details.'}
+                      : isCancelOpen
+                        ? 'Review the cancellation details before confirming.'
+                        : 'View and manage appointment details.'}
                   </span>
                 </div>
               </div>
