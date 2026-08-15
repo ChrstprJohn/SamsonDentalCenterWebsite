@@ -10,59 +10,20 @@ interface ServicesSectionProps {
   onSelectService: (service: ServiceResponseDto) => void;
 }
 
-const CARD_SERVICES = [
-  {
-    nr: '01',
-    title: 'Complex Diagnostics',
-    image: 'https://lavadental.lv/cms/api/media/file/Complex%20diagnostics-1290x300.avif',
-  },
-  {
-    nr: '02',
-    title: 'Professional Hygiene',
-    image: 'https://lavadental.lv/cms/api/media/file/Hygien-600x820.avif',
-  },
-  {
-    nr: '03',
-    title: 'Veneers',
-    image: 'https://lavadental.lv/cms/api/media/file/Veneers-600x820.avif',
-  },
-  {
-    nr: '04',
-    title: 'Dental Implants',
-    image: 'https://lavadental.lv/cms/api/media/file/Implants-600x820.avif',
-  },
-  {
-    nr: '05',
-    title: 'ALL-ON-X',
-    image: 'https://lavadental.lv/cms/api/media/file/Aligners-600x820.avif',
-  },
-];
+const CARD_COUNT = 5;
 
-const LIST_SERVICES = [
-  { nr: '06', title: 'Sedation & Anaesthesia' },
-  { nr: '07', title: 'Therapy' },
-  { nr: '08', title: 'Endodontics' },
-  { nr: '09', title: 'Surgery' },
-  { nr: '10', title: 'Aligners' },
+// ponytail: stock placeholders only until services get image_url set in DB
+const FALLBACK_IMAGES = [
+  'https://lavadental.lv/cms/api/media/file/Complex%20diagnostics-1290x300.avif',
+  'https://lavadental.lv/cms/api/media/file/Hygien-600x820.avif',
+  'https://lavadental.lv/cms/api/media/file/Veneers-600x820.avif',
+  'https://lavadental.lv/cms/api/media/file/Implants-600x820.avif',
+  'https://lavadental.lv/cms/api/media/file/Aligners-600x820.avif',
 ];
 
 export function ServicesSection({ services, onSelectService }: ServicesSectionProps) {
-  const handleItemClick = (title: string) => {
-    const matched = services.find(
-      (s) =>
-        s.name.toLowerCase().includes(title.toLowerCase()) ||
-        title.toLowerCase().includes(s.name.toLowerCase())
-    );
-
-    if (matched) {
-      onSelectService(matched);
-    } else if (services.length > 0) {
-      onSelectService({
-        ...services[0],
-        name: title,
-      });
-    }
-  };
+  const cardServices = services.slice(0, CARD_COUNT);
+  const listServices = services.slice(CARD_COUNT);
 
   return (
     <section id="services" className="bg-[#FDFDFD] relative overflow-hidden w-full">
@@ -86,8 +47,15 @@ export function ServicesSection({ services, onSelectService }: ServicesSectionPr
 
           {/* First Block: Gorgeous Bento Grid (01 to 05) overlap section */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 relative z-10">
-            {CARD_SERVICES.map((svc, idx) => (
-              <ServiceCard key={svc.nr} {...svc} index={idx} onClick={() => handleItemClick(svc.title)} />
+            {cardServices.map((svc, idx) => (
+              <ServiceCard
+                key={svc.id}
+                nr={String(idx + 1).padStart(2, '0')}
+                title={svc.name}
+                image={svc.imageUrl || FALLBACK_IMAGES[idx % FALLBACK_IMAGES.length]}
+                index={idx}
+                onClick={() => onSelectService(svc)}
+              />
             ))}
           </div>
         </div>
@@ -99,8 +67,13 @@ export function ServicesSection({ services, onSelectService }: ServicesSectionPr
         <NoiseOverlay />
         <div className="max-w-7xl mx-auto px-6 sm:px-12 relative z-10">
           <div className="divide-y divide-[#D94E4E]/10">
-            {LIST_SERVICES.map((svc) => (
-              <ServiceListRow key={svc.nr} {...svc} onClick={() => handleItemClick(svc.title)} />
+            {listServices.map((svc, idx) => (
+              <ServiceListRow
+                key={svc.id}
+                nr={String(cardServices.length + idx + 1).padStart(2, '0')}
+                title={svc.name}
+                onClick={() => onSelectService(svc)}
+              />
             ))}
           </div>
         </div>

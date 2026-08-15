@@ -3,9 +3,6 @@
 import React from 'react';
 import type { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
 import type { ClinicConfigResponseDto } from '@/modules/clinic-config/dtos/settings/get-clinic-config.dto';
-import { Modal } from '@/components/ui/modal';
-import { Button } from '@/components/ui/button';
-
 import { useLandingView } from '../hooks/landing/use-landing-view';
 import { HeroSectionV1 } from '../components/landing/hero-section-v1';
 import { HeroSectionV2 } from '../components/landing/hero-section-v2';
@@ -89,50 +86,12 @@ export function LandingView({ services, config }: LandingViewProps) {
           {config.maintenanceMessage || `Online booking is temporarily unavailable. Please contact ${config.clinicName} directly.`}
         </div>
       )}
-      <ServicesSection services={activeServices} onSelectService={setSelectedService} />
+      <ServicesSection services={activeServices} onSelectService={(svc) => handleBookingCTA(svc.id)} />
       <AboutSection />
       {/* <JourneySection /> */}
       <GallerySection />
       <TestimonialsSection />
       <ContactSection config={config} />
-
-      {/* 🔍 Services Detail Popup Modal */}
-      <Modal
-        isOpen={selectedService !== null}
-        onClose={() => setSelectedService(null)}
-        title={selectedService?.name || ''}
-        size="md"
-      >
-        {selectedService && (
-          <div className="flex flex-col gap-6 text-text-secondary py-2">
-            <p className="text-sm md:text-base leading-relaxed text-text-muted">
-              {selectedService.description || 'Full comprehensive treatment administered by our certified medical dental practitioners.'}
-            </p>
-
-            <div className="grid grid-cols-2 gap-4 bg-secondary-bg p-4 rounded-2xl text-sm border border-card-border">
-              <div className="flex flex-col gap-0.5">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-text-muted">Treatment Duration</span>
-                <span className="font-semibold text-text-primary">⏳ {selectedService.durationMinutes} mins</span>
-              </div>
-              <div className="flex flex-col gap-0.5">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-text-muted">Estimated Price</span>
-                <span className="font-bold text-accent-blue-text">
-                  {selectedService.price !== null ? `$${selectedService.price}` : 'Contact for pricing'}
-                </span>
-              </div>
-            </div>
-
-            <div className="flex gap-3 justify-end border-t border-card-border pt-4">
-              <Button variant="secondary" onClick={() => setSelectedService(null)}>
-                Close
-              </Button>
-              <Button onClick={() => handleBookingCTA(selectedService.id)}>
-                Book This Service
-              </Button>
-            </div>
-          </div>
-        )}
-      </Modal>
     </div>
   );
 }

@@ -96,7 +96,7 @@ export function useUserBooking(
 
   // Auto-select service if passed in query param
   useEffect(() => {
-    const serviceId = searchParams.get('service');
+    const serviceId = searchParams.get('serviceId') || searchParams.get('service');
     if (serviceId && services.length > 0 && !state.selectedService) {
       const found = services.find((s) => s.id === serviceId);
       if (found) {

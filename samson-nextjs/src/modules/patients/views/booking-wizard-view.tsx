@@ -54,13 +54,34 @@ export function BookingWizardView({ services, config, initialServiceId }: Bookin
     return `${hour}:${String(minutes).padStart(2, '0')} ${period}`;
   };
 
+  // Auto-scroll to selected service if initialServiceId is present
+  useEffect(() => {
+    if (initialServiceId && step === 1) {
+      const scrollTimer = setTimeout(() => {
+        if (typeof window !== 'undefined') {
+          const el = document.getElementById(`service-card-${initialServiceId}`);
+          if (el) {
+            if ((window as any).lenis) {
+              (window as any).lenis.scrollTo(el, { offset: -120 });
+            } else {
+              el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+          }
+        }
+      }, 200);
+      return () => clearTimeout(scrollTimer);
+    }
+  }, [initialServiceId, step]);
+
   // Recalculate page dimensions and scroll to top when changing steps or filter
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      window.scrollTo(0, 0);
-      if ((window as any).lenis) {
-        (window as any).lenis.scrollTo(0, { immediate: true });
-        (window as any).lenis.resize();
+      if (!initialServiceId || step !== 1) {
+        window.scrollTo(0, 0);
+        if ((window as any).lenis) {
+          (window as any).lenis.scrollTo(0, { immediate: true });
+          (window as any).lenis.resize();
+        }
       }
 
       // Fire multiple resizes as Framer Motion transitions run
@@ -74,7 +95,7 @@ export function BookingWizardView({ services, config, initialServiceId }: Bookin
         clearTimeout(t3);
       };
     }
-  }, [step, filterType, contactSection.targetDate]);
+  }, [step, filterType, contactSection.targetDate, initialServiceId]);
 
   if (!config.isBookingOpen) {
     return (
@@ -318,6 +339,7 @@ export function BookingWizardView({ services, config, initialServiceId }: Bookin
                       return (
                         <div
                           key={srv.id}
+                          id={`service-card-${srv.id}`}
                           onClick={() => handleCardClick(srv.id)}
                           className={`relative p-5 border text-left cursor-pointer transition-all duration-300 flex flex-col justify-between gap-3 ${
                             isSelected
