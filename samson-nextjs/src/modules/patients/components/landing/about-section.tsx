@@ -50,10 +50,10 @@ export function AboutSection() {
             {/* Overlay architectural detail badge (Sharp border matching services) */}
             <div className="absolute -bottom-6 -right-4 sm:right-6 bg-[#1D1E1E] text-white p-6 max-w-xs border border border-white/10 font-sans">
               <p className="font-serif text-2xl font-light tracking-tight leading-none text-[#D94E4E]">
-                15+ Years
+                Since 1964
               </p>
               <p className="text-[10px] tracking-widest font-semibold uppercase mt-2 text-white/80">
-                of biological dentistry excellence
+                Trusted dental care
               </p>
             </div>
           </div>
@@ -61,33 +61,33 @@ export function AboutSection() {
           {/* Content Column */}
           <div className="lg:col-span-6">
             <span className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-4 font-sans">
-              Redefined Sanctuary
+              About Samson Dental Center
             </span>
             <h2 className="font-sans text-[clamp(22px,2vw+12px,36px)] font-normal tracking-[-0.04em] text-[#1D1E1E] leading-[1.1]">
-              Dental craftsmanship without anxiety.
+              Quality dental care in the heart of Baguio.
             </h2>
 
             <div className="mt-8 space-y-6 text-[#4F5454] font-light leading-relaxed text-sm sm:text-[15px] font-sans">
               <p>
-                We dismiss the traditional noisy clinical blueprint. Our studio functions as an upscale boutique wellness retreat, removing standard sensory triggers through ultra-quiet instruments and specialized calming aroma diffusion.
+                Samson Dental Center is a dental clinic located on the 5th Floor of S Building along Upper Session Road in Baguio City. The clinic welcomes patients by appointment and provides a convenient location for professional dental care in the city center.
               </p>
               <p className="font-medium text-[#1D1E1E] italic border-l-2 border-[#D94E4E] pl-4">
-                &ldquo;Each veneer, crown, and realignment is designed in meticulous alignment with natural symmetry principles found in classic design.&rdquo;
+                &ldquo;Our team is here to make every visit clear, comfortable, and centered on your individual dental needs.&rdquo;
               </p>
               <p>
-                Led by expert cosmetic specialists, we integrate state-of-the-art diagnostic imaging with microscopic accuracy to construct restorations that maintain structural longevity and organic beauty.
+                For appointments and inquiries, contact Samson Dental Center directly or submit an appointment request through this website. The clinic is open Monday through Saturday, from 9:00 AM to 12:00 PM and 1:00 PM to 5:00 PM.
               </p>
             </div>
 
             {/* Unique Features */}
             <div className="mt-10 grid grid-cols-2 gap-6 pt-8 border-t border-gray-100 font-sans">
               <div>
-                <h4 className="text-[#1D1E1E] text-sm font-semibold tracking-wider uppercase">Aroma Diffusion</h4>
-                <p className="text-[12px] text-gray-500 mt-1.5 leading-relaxed font-light">Scent-infused air systems optimized to actively regulate elevated heart rate metrics.</p>
+                <h4 className="text-[#1D1E1E] text-sm font-semibold tracking-wider uppercase">Central Location</h4>
+                <p className="text-[12px] text-gray-500 mt-1.5 leading-relaxed font-light">Find us at 5th Floor S Building, Upper Session Road, Baguio City.</p>
               </div>
               <div>
-                <h4 className="text-[#1D1E1E] text-sm font-semibold tracking-wider uppercase">Ultra-Quiet Tech</h4>
-                <p className="text-[12px] text-gray-500 mt-1.5 leading-relaxed font-light">Noise-reduction instruments producing 70% lower acoustic frequencies.</p>
+                <h4 className="text-[#1D1E1E] text-sm font-semibold tracking-wider uppercase">By Appointment</h4>
+                <p className="text-[12px] text-gray-500 mt-1.5 leading-relaxed font-light">Call ahead or send an appointment request so our team can assist you.</p>
               </div>
             </div>
           </div>

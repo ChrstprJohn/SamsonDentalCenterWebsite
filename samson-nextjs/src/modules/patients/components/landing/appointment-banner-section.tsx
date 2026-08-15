@@ -64,9 +64,9 @@ export function AppointmentBannerSection() {
 
           {/* CTA */}
           <Link href="/book">
-            <button className="group inline-flex items-center gap-2.5 bg-white text-[#141515] hover:bg-[#D94E4E] hover:text-white px-6 py-3 rounded-full text-[11px] font-semibold uppercase tracking-widest transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] shadow-md cursor-pointer mt-2">
+            <button className="group inline-flex items-center gap-3 bg-white text-[#141515] hover:bg-[#D94E4E] hover:text-white px-7 py-3.5 rounded-full text-[12px] font-semibold uppercase tracking-widest transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] shadow-md cursor-pointer mt-2">
               Request Appointment
-              <ArrowRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-1" />
+              <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
             </button>
           </Link>
 

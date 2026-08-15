@@ -2,79 +2,41 @@ import React from 'react';
 
 export const metadata = {
   title: 'Terms of Service | Samson Dental Center',
-  description: 'Understand the terms and agreements governing your dental care appointment reservations and patient portal access at Samson Dental Center.',
+  description: 'Terms for using the Samson Dental Center appointment-request service.',
 };
+
+const sections = [
+  ['Using the appointment service', 'This website lets you submit a request for a dental appointment. By using the booking wizard, you agree to provide information that is accurate and belongs to you, and to use the service only for a genuine appointment request.'],
+  ['Appointment requests and confirmation', 'A submitted request is not a confirmed appointment. The clinic reviews the selected service, preferred date, preferred time, and your contact details before confirming availability. Samson Dental Center may contact you to confirm, clarify, or propose another schedule.'],
+  ['Your information and communication', 'You are responsible for providing a working email address and mobile number. The clinic may use those details to respond to your request and coordinate the visit. If your contact details change, please contact the clinic directly.'],
+  ['Preferred schedules', 'The date and time selected in the wizard are preferences, not a promise that the slot is available. Clinic schedules, service duration, staff availability, and other operational requirements may affect the final appointment time.'],
+  ['Changes, cancellations, and no-shows', 'If you need to change or cancel a request or confirmed visit, contact Samson Dental Center as soon as possible. The clinic may release a slot or require additional coordination when a patient repeatedly misses appointments or submits requests that cannot be verified.'],
+  ['Medical information and emergencies', 'Website content and appointment descriptions are general information and do not replace an examination or professional dental advice. Do not use the booking form for emergencies. Seek appropriate emergency care and contact local emergency services when necessary.'],
+  ['Acceptable use', 'Do not misuse the booking wizard, submit false or automated requests, attempt to disrupt the service, or access information that does not belong to you. We may limit or refuse requests that appear abusive, fraudulent, or unsafe.'],
+  ['Changes to these terms', 'Samson Dental Center may update these terms when the booking service or clinic procedures change. The latest version will be posted on this page with its updated date. Continued use of the appointment-request service after an update means you accept the revised terms.'],
+];
 
 export default function TermsPage() {
   return (
-    <div className="bg-[#FDFDFD] text-[#141515] min-h-screen pt-28 pb-20 md:pt-36 md:pb-28 font-sans relative overflow-hidden">
-      <article className="relative z-10 max-w-4xl mx-auto px-6 sm:px-12 leading-relaxed">
-        <div className="text-center mb-12 sm:mb-16">
-          <span className="text-[11px] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-3 font-sans">
-            Legal & Compliance
-          </span>
-          <h1 className="font-sans text-3xl sm:text-4xl md:text-5xl font-normal tracking-[-0.03em] text-[#141515] leading-tight mb-4">
-            Terms of Service
-          </h1>
-          <p className="text-xs sm:text-sm text-gray-500 font-light">
-            Last updated: May 31, 2026
-          </p>
-        </div>
-
-        <div className="flex flex-col gap-12 mt-8 divide-y divide-gray-100">
-          <section className="pt-8 first:pt-0">
-            <h2 className="text-xl sm:text-2xl font-normal text-[#141515] mb-3 flex items-center gap-3 font-sans">
-              <span className="font-josefin text-gray-400 text-lg font-normal">01</span>
-              <span>Agreement to Terms</span>
-            </h2>
-            <p className="text-sm sm:text-base font-light text-gray-600 leading-relaxed">
-              By accessing or using the Samson Dental Center portal, scheduling appointment slots, or obtaining dental services, you agree to comply with and be bound by these Terms of Service. If you do not agree, please do not use our online services.
-            </p>
-          </section>
-
-          <section className="pt-8">
-            <h2 className="text-xl sm:text-2xl font-normal text-[#141515] mb-3 flex items-center gap-3 font-sans">
-              <span className="font-josefin text-gray-400 text-lg font-normal">02</span>
-              <span>Account Registration & Security</span>
-            </h2>
-            <p className="text-sm sm:text-base font-light text-gray-600 leading-relaxed">
-              To book appointment slots, patients are required to register and authenticate their identity via a verified email or OTP. You are entirely responsible for keeping your login credentials confidential and for all actions taken under your account.
-            </p>
-          </section>
-
-          <section className="pt-8">
-            <h2 className="text-xl sm:text-2xl font-normal text-[#141515] mb-3 flex items-center gap-3 font-sans">
-              <span className="font-josefin text-gray-400 text-lg font-normal">03</span>
-              <span>Appointment Booking & Cancellation</span>
-            </h2>
-            <ul className="list-disc pl-5 text-sm sm:text-base font-light text-gray-600 flex flex-col gap-2.5 mt-2">
-              <li><strong className="text-[#141515] font-medium">Slot Holds</strong>: Real-time slot holds are reserved for up to 10 minutes prior to final booking validation.</li>
-              <li><strong className="text-[#141515] font-medium">Rescheduling Limits</strong>: Unless modified by a system administrator, online rescheduling is limited to 1 occurrence per appointment. Further adjustments require direct communication with clinic staff.</li>
-              <li><strong className="text-[#141515] font-medium">Cancellation Policy</strong>: Cancellations must be made at least 24 hours in advance and require entering a valid reason for registration logs.</li>
-            </ul>
-          </section>
-
-          <section className="pt-8">
-            <h2 className="text-xl sm:text-2xl font-normal text-[#141515] mb-3 flex items-center gap-3 font-sans">
-              <span className="font-josefin text-gray-400 text-lg font-normal">04</span>
-              <span>Medical Disclaimer</span>
-            </h2>
-            <p className="text-sm sm:text-base font-light text-gray-600 leading-relaxed">
-              The content provided on this website, including services info and descriptions, is for educational and scheduling purposes only. It is not intended to replace direct professional clinical diagnosis, consultation, or therapeutic advice.
-            </p>
-          </section>
-
-          <section className="pt-8">
-            <h2 className="text-xl sm:text-2xl font-normal text-[#141515] mb-3 flex items-center gap-3 font-sans">
-              <span className="font-josefin text-gray-400 text-lg font-normal">05</span>
-              <span>Patient Conduct</span>
-            </h2>
-            <p className="text-sm sm:text-base font-light text-gray-600 leading-relaxed">
-              We hold a strict zero-tolerance policy against any form of abusive, fraudulent, or automated booking actions. Abuse validation scans are triggered automatically upon submission to secure clinic rosters.
-            </p>
-          </section>
+    <main className="min-h-screen bg-[#FDFDFD] px-6 pb-24 pt-28 font-sans text-[#141515] sm:px-12 md:pt-36">
+      <article className="mx-auto max-w-5xl">
+        <header className="mb-16 flex flex-col gap-6 md:flex-row md:items-end md:justify-between sm:mb-24">
+          <div className="max-w-full md:max-w-[450px] lg:max-w-[580px]">
+            <span className="mb-4 block text-[clamp(9px,0.2vw+9px,11px)] font-semibold uppercase tracking-[0.25em] text-[#D94E4E]">Legal & Compliance</span>
+            <h1 className="font-sans text-[clamp(20px,2vw+10px,32px)] font-normal leading-[1.05] tracking-[-0.04em]">Terms of Service</h1>
+            <p className="mt-5 text-xs text-gray-400">Last updated: August 15, 2026</p>
+          </div>
+          <p className="max-w-sm pt-2 text-[clamp(12px,0.3vw+11px,14px)] font-normal leading-[1.65] text-gray-500">The guidelines for using Samson Dental Center’s online appointment-request service, including requests, confirmations, communication, cancellations, and responsible use of the booking wizard.</p>
+        </header>
+        <div className="divide-y divide-gray-200 border-y border-gray-200">
+          {sections.map(([title, content]) => (
+            <section key={title} className="grid gap-5 py-9 md:grid-cols-[0.7fr_1.3fr] md:gap-16">
+              <h2 className="font-sans text-[clamp(18px,1vw+14px,24px)] font-normal leading-[1.15] tracking-[-0.03em]">{title}</h2>
+              <p className="text-[clamp(13px,0.3vw+12px,15px)] leading-[1.75] text-gray-600">{content}</p>
+            </section>
+          ))}
         </div>
       </article>
-    </div>
+    </main>
   );
 }

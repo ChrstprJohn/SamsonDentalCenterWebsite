@@ -28,17 +28,17 @@ export function TestimonialMarqueeRow({ items, rowId, reverse = false }: Testimo
 
 function TestimonialCard({ item }: { item: TestimonialItem }) {
   return (
-    <div className="w-[260px] sm:w-[320px] shrink-0 mx-2.5 flex flex-col justify-between border border-gray-200/60 bg-[#F9F9F6] p-5 sm:p-6 rounded-none hover:border-[#D94E4E]/30 transition-all duration-300 font-sans whitespace-normal cursor-pointer shadow-sm">
+    <div className="w-[260px] sm:w-[320px] shrink-0 mx-2.5 flex flex-col justify-between border border-gray-200/60 bg-[#F9F9F6] p-5 sm:p-6 rounded-none hover:border-[#D94E4E]/30 transition-all duration-300 font-josefin whitespace-normal cursor-pointer shadow-sm">
       <div>
         <div className="text-[#D94E4E] mb-2.5 opacity-80">
           <Quote className="w-3.5 h-3.5 rotate-180" />
         </div>
-        <p className="text-gray-600 font-light text-xs sm:text-[13px] leading-relaxed italic">
+        <p className="text-gray-600 font-normal text-[clamp(12px,0.3vw+11px,14px)] leading-[1.65] italic">
           &ldquo;{item.text}&rdquo;
         </p>
       </div>
 
-      <div className="mt-4 pt-4 border-t border-gray-200/50 flex items-center justify-between text-[11px]">
+      <div className="mt-4 pt-4 border-t border-gray-200/50 flex items-center justify-between text-[clamp(12px,0.3vw+11px,14px)]">
         <div className="flex items-center">
           <img
             src={item.avatar}
@@ -46,13 +46,13 @@ function TestimonialCard({ item }: { item: TestimonialItem }) {
             className="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover shrink-0 mr-2.5 border border-gray-100"
           />
           <div>
-            <h4 className="text-[#1D1E1E] font-semibold text-xs sm:text-[13px] leading-none">{item.name}</h4>
-            <p className="text-gray-400 font-medium text-[8px] sm:text-[9px] tracking-wider uppercase mt-1 leading-none">
+            <h4 className="text-[#1D1E1E] font-semibold text-[clamp(12px,0.3vw+11px,14px)] leading-none">{item.name}</h4>
+            <p className="text-gray-400 font-medium text-[clamp(9px,0.2vw+9px,11px)] tracking-wider uppercase mt-1 leading-none">
               {item.pathway}
             </p>
           </div>
         </div>
-        <span className="text-[#D94E4E] font-semibold tracking-wider text-[9px] sm:text-[10px]">
+        <span className="text-[#D94E4E] font-semibold tracking-wider text-[clamp(9px,0.2vw+9px,11px)]">
           {item.rating}
         </span>
       </div>

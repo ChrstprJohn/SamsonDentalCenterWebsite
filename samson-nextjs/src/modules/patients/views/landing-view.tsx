@@ -12,6 +12,7 @@ import { JourneySection } from '../components/landing/journey-section';
 import { AboutSection } from '../components/landing/about-section';
 import { GallerySection } from '../components/landing/gallery-section';
 import { TestimonialsSection } from '../components/landing/testimonials-section';
+import { FaqSection } from '../components/landing/faq-section';
 import { ContactSection } from '../components/landing/contact-section';
 import { AppointmentBannerSection } from '../components/landing/appointment-banner-section';
 
@@ -93,6 +94,7 @@ export function LandingView({ services, config }: LandingViewProps) {
       {/* <JourneySection /> */}
       <GallerySection />
       <TestimonialsSection />
+      <FaqSection config={config} />
       <ContactSection config={config} />
       <AppointmentBannerSection />
     </div>

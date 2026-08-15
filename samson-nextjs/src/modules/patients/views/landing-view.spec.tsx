@@ -24,6 +24,7 @@ vi.mock('../components/landing/services-section', () => ({
 vi.mock('../components/landing/about-section', () => ({ AboutSection: () => <div data-testid="about-section" /> }));
 vi.mock('../components/landing/gallery-section', () => ({ GallerySection: () => <div data-testid="gallery-section" /> }));
 vi.mock('../components/landing/testimonials-section', () => ({ TestimonialsSection: () => <div data-testid="testimonials-section" /> }));
+vi.mock('../components/landing/faq-section', () => ({ FaqSection: () => <div data-testid="faq-section" /> }));
 vi.mock('../components/landing/contact-section', () => ({ ContactSection: () => <div data-testid="contact-section" /> }));
 
 describe('LandingView', () => {
@@ -44,6 +45,7 @@ describe('LandingView', () => {
     expect(screen.getByTestId('services-section')).toBeDefined();
     expect(screen.getByTestId('about-section')).toBeDefined();
     expect(screen.getByTestId('gallery-section')).toBeDefined();
+    expect(screen.getByTestId('faq-section')).toBeDefined();
     expect(screen.getByTestId('contact-section')).toBeDefined();
 
     screen.getByText('Select Service').click();

@@ -1,0 +1,70 @@
+'use client';
+
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import type { ClinicConfigResponseDto } from '@/modules/clinic-config/dtos/settings/get-clinic-config.dto';
+
+const faqs = [
+  {
+    question: 'How do I book an appointment?',
+    answer: '',
+  },
+  {
+    question: 'What should I expect during my first visit?',
+    answer: 'Your first visit begins with a conversation about your goals, followed by a personalized assessment. Your practitioner will then walk you through recommended next steps.',
+  },
+  {
+    question: 'How long does a typical appointment take?',
+    answer: 'Appointment times vary by service. The estimated duration is shown when you select a service, so you can plan your visit with confidence.',
+  },
+  {
+    question: 'Can I reschedule or cancel my appointment?',
+    answer: 'Yes. Please contact the clinic as soon as possible if you need to change your appointment, and our team will help find the best alternative.',
+  },
+  {
+    question: 'Do you offer guidance for anxious patients?',
+    answer: 'Absolutely. Comfort is part of every visit. Tell us what you need when booking so our team can tailor your experience and answer any questions beforehand.',
+  },
+];
+
+export function FaqSection({ config }: { config: ClinicConfigResponseDto }) {
+  const formattedPhone = config.phone.replace(/^\+63\s?/, '0');
+  const formattedLandline = config.landline?.replace(/^\+63\s?/, '0');
+  const faqItems = faqs.map((faq) => faq.question === 'How do I book an appointment?'
+    ? { ...faq, answer: `You can contact us directly at ${formattedPhone}, or submit an appointment request through our website. Our team will follow up to confirm your visit.` }
+    : faq);
+
+  return (
+    <section id="faq" className="border-t border-gray-100 bg-[#FDFDFD] py-24 sm:py-32">
+      <div className="mx-auto max-w-7xl px-6 sm:px-12">
+        <div className="mb-16 flex flex-col gap-6 sm:mb-24 md:flex-row md:items-end md:justify-between">
+          <div className="max-w-full md:max-w-[450px] lg:max-w-[580px]">
+          <span className="mb-4 block font-sans text-[clamp(9px,0.2vw+9px,11px)] font-semibold uppercase tracking-[0.25em] text-[#D94E4E]">
+            Helpful details
+          </span>
+          <h2 className="font-sans text-[clamp(20px,2vw+10px,32px)] font-normal leading-[1.05] tracking-[-0.04em] text-[#1D1E1E]">
+            Everything you need to feel prepared for your visit.
+          </h2>
+          </div>
+          <p className="max-w-sm pt-2 font-sans text-[clamp(12px,0.3vw+11px,14px)] font-normal leading-[1.65] text-gray-500">
+            Find clear answers about booking, preparation, appointment times, and what to expect from your visit. We want every detail to feel simple, transparent, and comfortable before you arrive.
+          </p>
+        </div>
+
+        <Accordion type="single" collapsible defaultValue="faq-0" className="w-full">
+          {faqItems.map((faq, index) => (
+            <AccordionItem key={faq.question} value={`faq-${index}`} className="border-[#1D1E1E]/15">
+              <AccordionTrigger className="px-0 py-6 text-left font-sans text-[clamp(16px,0.6vw+13px,20px)] font-normal leading-[1.2] tracking-[-0.02em] text-[#1D1E1E] hover:bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D94E4E]/40">
+                {faq.question}
+              </AccordionTrigger>
+              <AccordionContent className="px-0 pb-6 font-sans text-[clamp(14px,0.4vw+12px,16px)] leading-[1.65] text-gray-500">
+                {faq.question === 'How do I book an appointment?'
+                  ? <>You can contact us directly at <strong className="font-semibold text-[#1D1E1E]">{formattedPhone}</strong>{formattedLandline && <> or <strong className="font-semibold text-[#1D1E1E]">{formattedLandline}</strong></>}, or submit an appointment request through our website. Our team will follow up to confirm your visit.</>
+                  : faq.answer}
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+      </div>
+    </section>
+  );
+}
