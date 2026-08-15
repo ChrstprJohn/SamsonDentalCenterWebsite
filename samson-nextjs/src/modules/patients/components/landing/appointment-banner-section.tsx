@@ -30,7 +30,7 @@ export function AppointmentBannerSection() {
   return (
     <section
       id="appointment-banner"
-      className="relative w-full min-h-[480px] flex items-center overflow-hidden"
+      className="relative w-full min-h-[480px] flex items-center overflow-hidden bg-[#141515]"
       aria-label="Schedule an appointment"
     >
       {/* Background */}
@@ -41,10 +41,14 @@ export function AppointmentBannerSection() {
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.7, ease: 'easeInOut' }}
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url('${BG_IMAGES[selected]}')` }}
-          aria-hidden="true"
-        />
+          className="absolute inset-0 w-full h-full"
+        >
+          <img
+            src={BG_IMAGES[selected]}
+            alt=""
+            className="w-full h-full object-cover object-center filter brightness-[0.95] saturate-[0.9] contrast-[1.02]"
+          />
+        </motion.div>
       </AnimatePresence>
 
       {/* Dark overlay — stronger on left */}

@@ -57,7 +57,7 @@ const marqueeRow2 = [...row2Data, ...row2Data, ...row2Data];
 
 export function TestimonialsSection() {
   return (
-    <section id="testimonials" className="py-24 sm:py-32 bg-[#FDFDFD] relative w-full border-t border-gray-100 overflow-hidden">
+    <section id="testimonials" className="py-16 sm:py-32 bg-[#FDFDFD] relative w-full border-t border-gray-100 overflow-hidden">
       
       {/* Inline styles for the reverse marquee animation */}
       <style>{`
@@ -73,19 +73,19 @@ export function TestimonialsSection() {
         }
       `}</style>
 
-      <div className="max-w-7xl mx-auto px-6 sm:px-12 flex flex-col gap-16 sm:gap-20">
+      <div className="max-w-7xl mx-auto px-6 sm:px-12 flex flex-col gap-10 sm:gap-20">
         
         {/* Header Layout matching other sections */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6">
           <div className="max-w-full md:max-w-[450px] lg:max-w-[580px]">
             <span className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-4 font-sans">
               Client Chronicles
             </span>
-            <h2 className="font-sans text-[clamp(20px,2vw+10px,32px)] font-normal tracking-[-0.04em] text-[#1D1E1E] leading-[1.05]">
+            <h2 className="font-sans text-[18px] sm:text-[clamp(20px,2vw+10px,32px)] font-normal tracking-[-0.04em] text-[#1D1E1E] leading-[1.05]">
               Real feedback from patients who experienced our redefined sanctuary.
             </h2>
           </div>
-          <p className="text-[clamp(12px,0.3vw+11px,14px)] font-normal text-gray-500 max-w-sm leading-[1.65] font-sans pt-2">
+          <p className="text-[12px] sm:text-[clamp(12px,0.3vw+11px,14px)] font-normal text-gray-500 max-w-sm leading-[1.65] font-sans pt-1 sm:pt-2">
             Read about the transformations and clinical comfort curated by our specialist practitioners for each unique anatomical smile design.
           </p>
         </div>

@@ -24,6 +24,14 @@ const faqs = [
     question: 'Do you offer guidance for anxious patients?',
     answer: 'Absolutely. Comfort is part of every visit. Tell us what you need when booking so our team can tailor your experience and answer any questions beforehand.',
   },
+  {
+    question: 'Where is Samson Dental Center located?',
+    answer: 'You can find our current clinic address, contact details, and directions in the Contact section below. Please reach out if you need help finding us before your visit.',
+  },
+  {
+    question: 'Do I need to prepare anything before my appointment?',
+    answer: 'Bring any relevant dental records, medication details, and questions you would like to discuss. Arriving a few minutes early also gives you time to complete any necessary information.',
+  },
 ];
 
 export function FaqSection({ config }: { config: ClinicConfigResponseDto }) {
@@ -34,18 +42,18 @@ export function FaqSection({ config }: { config: ClinicConfigResponseDto }) {
     : faq);
 
   return (
-    <section id="faq" className="border-t border-gray-100 bg-[#FDFDFD] py-24 sm:py-32">
+    <section id="faq" className="border-t border-gray-100 bg-[#FDFDFD] py-16 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 sm:px-12">
-        <div className="mb-16 flex flex-col gap-6 sm:mb-24 md:flex-row md:items-end md:justify-between">
+        <div className="mb-10 flex flex-col gap-4 sm:mb-24 sm:gap-6 md:flex-row md:items-end md:justify-between">
           <div className="max-w-full md:max-w-[450px] lg:max-w-[580px]">
           <span className="mb-4 block font-sans text-[clamp(9px,0.2vw+9px,11px)] font-semibold uppercase tracking-[0.25em] text-[#D94E4E]">
             Helpful details
           </span>
-          <h2 className="font-sans text-[clamp(20px,2vw+10px,32px)] font-normal leading-[1.05] tracking-[-0.04em] text-[#1D1E1E]">
+          <h2 className="font-sans text-[18px] sm:text-[clamp(20px,2vw+10px,32px)] font-normal leading-[1.05] tracking-[-0.04em] text-[#1D1E1E]">
             Everything you need to feel prepared for your visit.
           </h2>
           </div>
-          <p className="max-w-sm pt-2 font-sans text-[clamp(12px,0.3vw+11px,14px)] font-normal leading-[1.65] text-gray-500">
+          <p className="max-w-sm pt-1 font-sans text-[12px] sm:pt-2 sm:text-[clamp(12px,0.3vw+11px,14px)] font-normal leading-[1.65] text-gray-500">
             Find clear answers about booking, preparation, appointment times, and what to expect from your visit. We want every detail to feel simple, transparent, and comfortable before you arrive.
           </p>
         </div>
@@ -53,10 +61,10 @@ export function FaqSection({ config }: { config: ClinicConfigResponseDto }) {
         <Accordion type="single" collapsible defaultValue="faq-0" className="w-full">
           {faqItems.map((faq, index) => (
             <AccordionItem key={faq.question} value={`faq-${index}`} className="border-[#1D1E1E]/15">
-              <AccordionTrigger className="px-0 py-6 text-left font-sans text-[clamp(16px,0.6vw+13px,20px)] font-normal leading-[1.2] tracking-[-0.02em] text-[#1D1E1E] hover:bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D94E4E]/40">
+              <AccordionTrigger className="px-0 py-4 text-left font-sans text-[14px] sm:py-6 sm:text-[clamp(16px,0.6vw+13px,20px)] font-normal leading-[1.2] tracking-[-0.02em] text-[#1D1E1E] hover:bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D94E4E]/40">
                 {faq.question}
               </AccordionTrigger>
-              <AccordionContent className="px-0 pb-6 font-sans text-[clamp(14px,0.4vw+12px,16px)] leading-[1.65] text-gray-500">
+              <AccordionContent className="px-0 pb-4 font-sans text-[12px] sm:pb-6 sm:text-[clamp(14px,0.4vw+12px,16px)] leading-[1.6] text-gray-500">
                 {faq.question === 'How do I book an appointment?'
                   ? <>You can contact us directly at <strong className="font-semibold text-[#1D1E1E]">{formattedPhone}</strong>{formattedLandline && <> or <strong className="font-semibold text-[#1D1E1E]">{formattedLandline}</strong></>}, or submit an appointment request through our website. Our team will follow up to confirm your visit.</>
                   : faq.answer}

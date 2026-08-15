@@ -29,11 +29,12 @@ const doctorsData = [
 
 export function AboutSection() {
   return (
-    <section id="about" className="py-20 sm:py-28 bg-[#FDFDFD] relative w-full">
-      <div className="max-w-7xl mx-auto px-6 sm:px-12 space-y-24">
+    <>
+    <section id="about" className="py-12 sm:py-28 bg-[#FDFDFD] relative w-full">
+      <div className="max-w-7xl mx-auto px-6 sm:px-12 space-y-14 sm:space-y-24">
         
         {/* Row 1: Image Left, Text Right */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 lg:gap-20 items-center">
           {/* Visual Column */}
           <div className="lg:col-span-6 relative">
             <div className="relative aspect-square sm:aspect-[4/3] lg:aspect-[4/5] overflow-hidden border border-white/5 bg-[#1D1E1E]">
@@ -48,8 +49,8 @@ export function AboutSection() {
             </div>
 
             {/* Overlay architectural detail badge (Sharp border matching services) */}
-            <div className="absolute -bottom-6 -right-4 sm:right-6 bg-[#1D1E1E] text-white p-6 max-w-xs border border border-white/10 font-sans">
-              <p className="font-serif text-2xl font-light tracking-tight leading-none text-[#D94E4E]">
+            <div className="absolute -bottom-5 -right-3 sm:-bottom-6 sm:right-6 bg-[#1D1E1E] text-white p-4 sm:p-6 max-w-xs border border border-white/10 font-sans">
+              <p className="font-serif text-xl sm:text-2xl font-light tracking-tight leading-none text-[#D94E4E]">
                 Since 1964
               </p>
               <p className="text-[10px] tracking-widest font-semibold uppercase mt-2 text-white/80">
@@ -61,13 +62,13 @@ export function AboutSection() {
           {/* Content Column */}
           <div className="lg:col-span-6">
             <span className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-4 font-sans">
-              About Samson Dental Center
+              About Us
             </span>
-            <h2 className="font-sans text-[clamp(22px,2vw+12px,36px)] font-normal tracking-[-0.04em] text-[#1D1E1E] leading-[1.1]">
+            <h2 className="font-sans text-[18px] sm:text-[clamp(22px,2vw+12px,36px)] font-normal tracking-[-0.04em] text-[#1D1E1E] leading-[1.1]">
               Quality dental care in the heart of Baguio.
             </h2>
 
-            <div className="mt-8 space-y-6 text-[#4F5454] font-light leading-relaxed text-sm sm:text-[15px] font-sans">
+            <div className="mt-4 sm:mt-8 space-y-3 sm:space-y-6 text-[#4F5454] font-light leading-relaxed text-[12px] sm:text-[15px] font-sans">
               <p>
                 Samson Dental Center is a dental clinic located on the 5th Floor of S Building along Upper Session Road in Baguio City. The clinic welcomes patients by appointment and provides a convenient location for professional dental care in the city center.
               </p>
@@ -80,7 +81,7 @@ export function AboutSection() {
             </div>
 
             {/* Unique Features */}
-            <div className="mt-10 grid grid-cols-2 gap-6 pt-8 border-t border-gray-100 font-sans">
+            <div className="mt-7 sm:mt-10 grid grid-cols-2 gap-4 sm:gap-6 pt-6 sm:pt-8 border-t border-gray-100 font-sans">
               <div>
                 <h4 className="text-[#1D1E1E] text-sm font-semibold tracking-wider uppercase">Central Location</h4>
                 <p className="text-[12px] text-gray-500 mt-1.5 leading-relaxed font-light">Find us at 5th Floor S Building, Upper Session Road, Baguio City.</p>
@@ -93,20 +94,26 @@ export function AboutSection() {
           </div>
         </div>
 
-        {/* Row 2: Doctor Cards Container */}
-        <div className="pt-20 border-t border-gray-100 font-sans">
+      </div>
+    </section>
+
+    {/* Dentist section */}
+    <section id="dentist" className="scroll-mt-28 bg-[#FDFDFD] py-12 sm:py-28">
+      <div className="max-w-7xl mx-auto px-6 sm:px-12 font-sans">
+        {/* Doctor Cards Container */}
+        <div className="pt-1 sm:pt-4 border-t border-gray-100">
           
           {/* Header Layout matching Services & Gallery */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 sm:mb-16 gap-4 sm:gap-6">
             <div className="max-w-full md:max-w-[450px] lg:max-w-[580px]">
               <span className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-4 font-sans">
-                Our Specialists
+                Dentists
               </span>
-              <h3 className="font-sans text-[clamp(20px,2vw+10px,32px)] font-normal tracking-[-0.04em] text-[#1D1E1E] leading-[1.05]">
-                Meet our master clinical dental practitioners.
+              <h3 className="font-sans text-[17px] sm:text-[clamp(20px,2vw+10px,32px)] font-normal tracking-[-0.04em] text-[#1D1E1E] leading-[1.05]">
+                Meet our dentists.
               </h3>
             </div>
-            <p className="text-[clamp(12px,0.3vw+11px,14px)] font-normal text-gray-500 max-w-sm leading-[1.65] font-sans pt-2">
+            <p className="text-[12px] sm:text-[clamp(12px,0.3vw+11px,14px)] font-normal text-gray-500 max-w-sm leading-[1.65] font-sans pt-1 sm:pt-2">
               Our board-certified prosthetic and surgical specialists integrate advanced diagnostics with sub-micron restorative engineering to guarantee biological excellence.
             </p>
           </div>
@@ -117,8 +124,8 @@ export function AboutSection() {
             ))}
           </div>
         </div>
-
       </div>
     </section>
+    </>
   );
 }

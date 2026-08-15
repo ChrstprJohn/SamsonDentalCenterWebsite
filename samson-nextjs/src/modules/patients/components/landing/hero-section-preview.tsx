@@ -62,6 +62,22 @@ export function HeroSectionPreview({ onBookClick, serviceCount = 0 }: HeroSectio
 
   const currentBg = HERO_BG_IMAGES[currentBgIndex];
 
+  const handleExploreServices = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
+    const target = document.getElementById('services');
+    if (!target) return;
+
+    const offset = 80;
+    if (typeof window !== 'undefined' && (window as any).lenis) {
+      (window as any).lenis.scrollTo(target, { offset: -offset, duration: 1.2 });
+      return;
+    }
+
+    const bodyRect = document.body.getBoundingClientRect().top;
+    const targetPosition = target.getBoundingClientRect().top - bodyRect;
+    window.scrollTo({ top: targetPosition - offset, behavior: 'smooth' });
+  };
+
   return (
     <>
       <section
@@ -83,7 +99,7 @@ export function HeroSectionPreview({ onBookClick, serviceCount = 0 }: HeroSectio
               <img
                 src={currentBg.src}
                 alt={currentBg.title}
-                className="w-full h-full object-cover object-left sm:object-center filter brightness-[0.95] saturate-[0.9] contrast-[1.02]"
+                className="w-full h-full object-cover object-center filter brightness-[0.95] saturate-[0.9] contrast-[1.02]"
               />
             </motion.div>
           </AnimatePresence>
@@ -98,21 +114,17 @@ export function HeroSectionPreview({ onBookClick, serviceCount = 0 }: HeroSectio
           <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-[#1D1E1E] z-0" />
         </div>
 
-        {/* Background thumbnail picker */}
-        <div className="absolute bottom-6 right-6 z-20 flex items-center gap-2">
+        {/* Background indicator picker */}
+        <div className="absolute bottom-6 left-1/2 z-20 flex -translate-x-1/2 items-center justify-center gap-2">
           {HERO_BG_IMAGES.map((img, i) => (
             <button
               key={img.id}
               onClick={() => setCurrentBgIndex(i)}
               title={img.title}
-              className={`w-10 h-10 rounded-md overflow-hidden border-2 transition-all duration-200 cursor-pointer ${
-                i === currentBgIndex ? 'border-[#D94E4E] scale-110' : 'border-white/20 opacity-60 hover:opacity-100'
+              aria-label={`Show hero image ${i + 1}`}
+              className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                i === currentBgIndex ? 'w-7 bg-[#D94E4E]' : 'w-3 bg-white/50 hover:bg-white/90'
               }`}
-              style={{
-                backgroundImage: `url('${img.src}')`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-              }}
             />
           ))}
         </div>
@@ -121,7 +133,7 @@ export function HeroSectionPreview({ onBookClick, serviceCount = 0 }: HeroSectio
         <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-12 text-center sm:text-left text-white mt-16 sm:mt-10 lg:mt-2 flex flex-col items-center sm:items-start">
           {!mounted ? (
             <h1
-              className="font-serif text-[clamp(32px,5.5vw+8px,65px)] font-semibold tracking-tight leading-[1.1] max-w-4xl"
+              className="font-serif text-[clamp(32px,5.5vw+8px,65px)] min-[768px]:max-[1100px]:text-[clamp(46px,5.5vw,60px)] max-[430px]:text-[clamp(42px,11vw,54px)] max-[320px]:text-[clamp(11px,4.5vw,14px)] font-semibold tracking-tight leading-[1.1] max-w-4xl"
               style={{ fontWeight: '600', fontStyle: 'normal' }}
             >
               <span className="block">Unlock a World of</span>
@@ -146,7 +158,7 @@ export function HeroSectionPreview({ onBookClick, serviceCount = 0 }: HeroSectio
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1.2, delay: 0.2, ease: 'easeOut' }}
-              className="font-serif text-[clamp(32px,5.5vw+8px,65px)] font-semibold tracking-tight leading-[1.1] max-w-4xl"
+              className="font-serif text-[clamp(32px,5.5vw+8px,65px)] min-[768px]:max-[1100px]:text-[clamp(46px,5.5vw,60px)] max-[430px]:text-[clamp(42px,11vw,54px)] max-[320px]:text-[clamp(11px,4.5vw,14px)] font-semibold tracking-tight leading-[1.1] max-w-4xl"
               style={{ fontWeight: '600', fontStyle: 'normal' }}
             >
               <span className="block">Unlock a World of</span>
@@ -172,7 +184,7 @@ export function HeroSectionPreview({ onBookClick, serviceCount = 0 }: HeroSectio
             initial={{ opacity: 0, y: 35 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.2, delay: 0.4, ease: 'easeOut' }}
-            className="mt-4 sm:mt-5 lg:mt-[38px] text-[clamp(13px,0.4vw+11px,16px)] leading-[26px] sm:leading-relaxed lg:leading-[32.5px] lg:font-normal lg:not-italic text-white/95 max-w-2xl font-light tracking-wide drop-shadow-sm"
+            className="mt-4 sm:mt-5 lg:mt-[38px] text-[clamp(13px,0.4vw+11px,16px)] min-[768px]:max-[1100px]:text-[15px] min-[768px]:max-[1100px]:max-w-lg min-[768px]:max-[1100px]:line-clamp-2 max-[430px]:text-[15px] max-[320px]:text-[10px] leading-[26px] max-[320px]:leading-[18px] sm:leading-relaxed lg:leading-[32.5px] lg:font-normal lg:not-italic text-white/95 max-w-2xl font-light tracking-wide drop-shadow-sm"
           >
             Exceptional Dental Care Powered by Expertise, Innovation and Advanced Technology. Trusted by companies and individuals for over 60 years.
           </motion.p>
@@ -181,18 +193,19 @@ export function HeroSectionPreview({ onBookClick, serviceCount = 0 }: HeroSectio
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.2, delay: 0.6, ease: 'easeOut' }}
-            className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-4 text-[clamp(11px,0.2vw+11px,14px)] font-sans font-semibold uppercase tracking-widest"
+            className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-4 text-[clamp(11px,0.2vw+11px,14px)] max-[430px]:text-[12px] font-sans font-semibold uppercase tracking-widest"
           >
             <button
               onClick={onBookClick}
-              className="w-full sm:w-auto px-8 py-4 bg-white text-[#141515] rounded-full hover:bg-gray-100 transition-all duration-300 shadow-md flex items-center justify-center gap-2 cursor-pointer text-[clamp(11px,0.2vw+11px,14px)] font-sans font-semibold uppercase tracking-widest"
+              className="w-full sm:w-auto px-8 py-4 bg-white text-[#141515] rounded-full hover:bg-gray-100 transition-all duration-300 shadow-md flex items-center justify-center gap-2 cursor-pointer text-[clamp(11px,0.2vw+11px,14px)] max-[430px]:text-[12px] font-sans font-semibold uppercase tracking-widest"
             >
               Request Appointment
               <ArrowRight className="w-4 h-4 text-[#141515]" />
             </button>
             <a
               href="#services"
-              className="w-full sm:w-auto px-8 py-4 bg-transparent text-white border border-white/20 rounded-full hover:bg-white/10 transition-all duration-300 backdrop-blur-xs flex items-center justify-center text-[clamp(11px,0.2vw+11px,14px)] font-sans font-semibold uppercase tracking-widest"
+              onClick={handleExploreServices}
+              className="w-full sm:w-auto px-8 py-4 bg-transparent text-white border border-white/20 rounded-full hover:bg-white/10 transition-all duration-300 backdrop-blur-xs flex items-center justify-center text-[clamp(11px,0.2vw+11px,14px)] max-[430px]:text-[12px] font-sans font-semibold uppercase tracking-widest"
             >
               Explore Services
             </a>
@@ -205,3 +218,4 @@ export function HeroSectionPreview({ onBookClick, serviceCount = 0 }: HeroSectio
     </>
   );
 }
+

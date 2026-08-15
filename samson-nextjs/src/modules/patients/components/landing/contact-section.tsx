@@ -14,14 +14,14 @@ export function ContactSection({ config }: ContactSectionProps) {
   const mapEmbedUrl = `https://www.google.com/maps?q=${encodedAddress}&output=embed`;
 
   return (
-    <section id="contact" className="py-24 sm:py-32 bg-[#FDFDFD] relative w-full border-t border-gray-100">
+    <section id="contact" className="py-16 sm:py-32 bg-[#FDFDFD] relative w-full border-t border-gray-100">
       <div className="max-w-7xl mx-auto px-6 sm:px-12">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-16 lg:gap-24 items-start">
           {/* Left: Contact Info */}
           <ContactInfoPanel config={config} />
 
           {/* Right: Google Map */}
-          <div className="w-full h-[420px] overflow-hidden border border-gray-100 shadow-sm group">
+          <div className="w-full h-[300px] sm:h-[420px] overflow-hidden border border-gray-100 shadow-sm group">
             <iframe
               title="Clinic Location"
               src={mapEmbedUrl}
