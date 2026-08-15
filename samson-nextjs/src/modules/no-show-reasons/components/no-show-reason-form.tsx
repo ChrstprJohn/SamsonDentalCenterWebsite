@@ -73,16 +73,16 @@ export function NoShowReasonForm({ appointmentId }: { appointmentId: string }) {
         <p className="text-xs font-semibold text-text-secondary">
           Redirecting to homepage in {secondsLeft}s
         </p>
-        <div className="flex flex-col gap-2 w-full sm:w-auto sm:flex-row">
+        <div className="flex flex-col gap-2 w-full">
           <Button
             onClick={() => router.push('/book')}
-            className="w-full sm:w-auto bg-foreground text-background border-foreground hover:bg-foreground/90 hover:text-background"
+            className="w-full bg-foreground text-background border-foreground hover:bg-foreground/90 hover:text-background"
           >
             Request New Appointment
           </Button>
           <Button
             onClick={() => router.push('/')}
-            className="w-full sm:w-auto bg-foreground text-background border-foreground hover:bg-foreground/90 hover:text-background"
+            className="w-full bg-foreground text-background border-foreground hover:bg-foreground/90 hover:text-background"
           >
             Go to Homepage
           </Button>
