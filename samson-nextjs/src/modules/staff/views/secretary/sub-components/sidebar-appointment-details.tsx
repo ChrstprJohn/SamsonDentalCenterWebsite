@@ -439,7 +439,8 @@ export function SidebarAppointmentDetails({
         )}
 
         {isEditingGuestInfo && (
-          <p className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center mb-3">
+          <p className="flex items-center justify-center gap-2 text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center mb-3">
+            <AlertCircle className="size-3.5 shrink-0" />
             Please finish editing or save guest information before taking action.
           </p>
         )}

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { X, ArrowLeft, UserRound, MessageSquare, Mail, RotateCw, Pencil, Check, ChevronDown } from 'lucide-react';
+import { AlertTriangle, X, ArrowLeft, UserRound, MessageSquare, Mail, RotateCw, Pencil, Check, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select } from '@/components/ui/select';
@@ -460,12 +460,14 @@ export function CheckInDetailPane({ view, onClose }: { view: any; onClose: () =>
       {paneType !== 'reschedule' && (
         <div className="shrink-0 border-t border-border px-4 py-3">
           {isEditingGuestInfo && (
-            <p className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center mb-3">
+            <p className="flex items-center justify-center gap-2 text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center mb-3">
+              <AlertTriangle className="size-3.5 shrink-0" />
               Please finish editing or save guest information before taking action.
             </p>
           )}
           {paneType === 'checkout' && isEditingCheckoutChannel && (
-            <p className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center mb-3">
+            <p className="flex items-center justify-center gap-2 text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center mb-3">
+              <AlertTriangle className="size-3.5 shrink-0" />
               Please finish editing or save notification channel before completing checkout.
             </p>
           )}
@@ -1615,7 +1617,8 @@ function InlineCheckoutForm({ appointment, view, onCancel }: { appointment: any;
       <NotificationChannelMessage channel={channel} purpose="completion" />
 
       {isEditingChannel && (
-        <p className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center">
+        <p className="flex items-center justify-center gap-2 text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center">
+          <AlertTriangle className="size-3.5 shrink-0" />
           Please finish editing or save your channel changes before completing checkout.
         </p>
       )}

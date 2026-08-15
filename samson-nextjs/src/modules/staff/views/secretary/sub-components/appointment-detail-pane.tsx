@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Calendar, X, Check, Pencil, CalendarDays, RotateCw } from 'lucide-react';
+import { AlertTriangle, Calendar, X, Check, Pencil, CalendarDays, RotateCw } from 'lucide-react';
 import type { AppointmentDto } from '@/modules/appointments/dtos/shared/appointment.dto';
 import type { AppointmentDirectoryTab } from '@/modules/staff/hooks/secretary/use-secretary-appointments';
 import { SharedAppointmentDetail } from '@/modules/appointments/components/sub-components/shared-appointment-detail';
@@ -214,7 +214,8 @@ function AppointmentDetails({
         <div className={`shrink-0 border-t border-border px-4 py-3 ${compact ? 'bg-sidebar' : 'bg-card'}`}>
           <div className="flex flex-col gap-2">
             {isEditingChannel && (
-              <p className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center">
+              <p className="flex items-center justify-center gap-2 text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center">
+                <AlertTriangle className="size-3.5 shrink-0" />
                 Please finish editing or save notification channel before taking action.
               </p>
             )}
@@ -257,7 +258,8 @@ function AppointmentDetails({
         <div className={`shrink-0 border-t border-border px-4 py-3 ${compact ? 'bg-sidebar' : 'bg-card'}`}>
           <div className="flex flex-col gap-2">
             {isEditingChannel && (
-              <p className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center">
+              <p className="flex items-center justify-center gap-2 text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center">
+                <AlertTriangle className="size-3.5 shrink-0" />
                 Please finish editing or save notification channel before taking action.
               </p>
             )}
@@ -379,7 +381,8 @@ function AppointmentDetails({
                 return (
                   <div className="flex flex-col gap-2">
                     {isEditingChannel && (
-                      <p className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center">
+                    <p className="flex items-center justify-center gap-2 text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center">
+                      <AlertTriangle className="size-3.5 shrink-0" />
                         Please finish editing or save notification channel before taking action.
                       </p>
                     )}
@@ -560,7 +563,8 @@ function AppointmentDetails({
           return (
             <div className={`shrink-0 border-t border-border ${compact ? 'p-3 bg-sidebar' : 'p-4 bg-card'}`}>
               {isEditingChannel && (
-                <p className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center mb-3">
+                <p className="flex items-center justify-center gap-2 text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center mb-3">
+                  <AlertTriangle className="size-3.5 shrink-0" />
                   Please finish editing or save notification channel before taking action.
                 </p>
               )}
@@ -870,7 +874,8 @@ function NeedsAttentionResolvePane({
         <div className={`shrink-0 border-t border-border px-4 py-3 ${bg}`}>
           <div className="flex flex-col gap-2">
             {isEditingRescheduleChannel && (
-              <p className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center">
+                  <p className="flex items-center justify-center gap-2 text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center">
+                    <AlertTriangle className="size-3.5 shrink-0" />
                 Please finish editing or save notification channel before confirming.
               </p>
             )}
@@ -1040,7 +1045,8 @@ function NeedsAttentionResolvePane({
       <div className={`shrink-0 border-t border-border px-4 py-3 ${bg}`}>
         <div className="flex flex-col gap-2">
           {isEditingChannel && (
-            <p className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center">
+            <p className="flex items-center justify-center gap-2 text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center">
+              <AlertTriangle className="size-3.5 shrink-0" />
               Please finish editing or save channel changes before confirming.
             </p>
           )}

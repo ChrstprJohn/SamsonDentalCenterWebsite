@@ -26,6 +26,7 @@ import { Switch } from '@/components/ui/switch';
 import type { OutboxLogResponseDto } from '@/modules/emails/dtos/logs/outbox-log-response.dto';
 import { useToast } from '@/components/feedback/toast-container';
 import { RenderedEmailFrame } from '@/components/emails/email-renderer';
+import { NotificationChannelMessage } from './notification-channel-field';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -540,6 +541,7 @@ export function AppointmentNotificationsTab({ appointment, view, compact, onEdit
             </div>
           )}
         </div>
+        <NotificationChannelMessage channel={currentChannel} purpose="booking" />
       </div>
 
       <hr className="border-card-border/40" />

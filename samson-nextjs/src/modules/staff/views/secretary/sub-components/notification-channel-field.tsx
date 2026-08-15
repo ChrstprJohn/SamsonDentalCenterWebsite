@@ -44,7 +44,10 @@ const NO_SHOW_CHANNEL_MESSAGES: Record<NotificationChannel, string> = {
 
 export function NotificationChannelMessage({ channel, purpose = 'booking', className = '' }: { channel: NotificationChannel; purpose?: 'booking' | 'cancellation' | 'reschedule' | 'completion' | 'no-show'; className?: string }) {
   const messages = purpose === 'cancellation' ? CANCELLATION_CHANNEL_MESSAGES : purpose === 'reschedule' ? RESCHEDULE_CHANNEL_MESSAGES : purpose === 'completion' ? COMPLETION_CHANNEL_MESSAGES : purpose === 'no-show' ? NO_SHOW_CHANNEL_MESSAGES : BOOKING_CHANNEL_MESSAGES;
-  return <div className={`${className} mt-1 flex items-start gap-2 rounded-lg border p-2 text-xs font-medium leading-relaxed ${channel === 'NONE' ? 'border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300' : 'border-sky-500/25 bg-sky-500/10 text-sky-700 dark:text-sky-300'}`}><span>{messages[channel]}</span></div>;
+  return <div className={`${className} mt-1 flex items-start gap-2 rounded-lg border p-2 text-xs font-medium leading-relaxed ${channel === 'NONE' ? 'border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300' : 'border-sky-500/25 bg-sky-500/10 text-sky-700 dark:text-sky-300'}`}>
+    {channel === 'NONE' ? <AlertTriangle className="mt-0.5 size-3.5 shrink-0" /> : <Info className="mt-0.5 size-3.5 shrink-0" />}
+    <span>{messages[channel]}</span>
+  </div>;
 }
 
 export function NotificationChannelField({

@@ -7,7 +7,7 @@ import type { AppointmentDto } from '@/modules/appointments/dtos/shared/appointm
 import { formatClinicTime, formatShortDate, formatTimeString } from '@/shared/utils/date.util';
 import { getPatientDetailsForStaffAction } from '@/modules/patients/actions/profile/get-patient-details-for-staff.action';
 import { updateGuestContactAction } from '@/modules/appointments/actions/booking/update-guest-contact.action';
-import { UserRound, Pencil, X, Check } from 'lucide-react';
+import { AlertTriangle, UserRound, Pencil, X, Check } from 'lucide-react';
 
 /**
  * SharedAppointmentDetail - Core appointment details overview content.
@@ -248,7 +248,8 @@ export function SharedAppointmentDetail({ appointment, extraSections, actionsBar
       {actionsBar && (
         <div className={`shrink-0 border-t border-border ${compact ? 'p-3 bg-sidebar' : 'p-4 bg-card'}`}>
           {isEditingGuestInfo && (
-            <p className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center mb-3">
+            <p className="flex items-center justify-center gap-2 text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center mb-3">
+              <AlertTriangle className="size-3.5 shrink-0" />
               Please finish editing or save guest information before taking action.
             </p>
           )}
