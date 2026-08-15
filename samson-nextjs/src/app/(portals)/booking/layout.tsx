@@ -1,6 +1,7 @@
 import React from 'react';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/shared/database/server';
+import { getClinicConfigAction } from '@/modules/clinic-config/actions/settings/get-clinic-config.action';
 import { Navbar } from '@/components/ui/navbar';
 import type { AuthHeaderUser } from '@/modules/patients/hooks/auth/header/use-auth-header';
 
@@ -34,9 +35,20 @@ export default async function BookingLayout({
     avatarUrl: user.user_metadata?.avatar_url || user.user_metadata?.avatarUrl || null,
   };
 
+  // Fetch clinic config
+  let clinicConfig = null;
+  try {
+    const response = await getClinicConfigAction();
+    if (response && 'data' in response && response.data) {
+      clinicConfig = response.data;
+    }
+  } catch (err) {
+    console.error('Failed to load clinic config in booking layout:', err);
+  }
+
   return (
     <div className="flex flex-col min-h-screen bg-background transition-colors duration-300">
-      <Navbar user={headerUser} />
+      <Navbar user={headerUser} config={clinicConfig} />
       
       {/* Main content layout (no sidebar) */}
       <div className="flex-1 w-full pt-[100px] flex flex-col">

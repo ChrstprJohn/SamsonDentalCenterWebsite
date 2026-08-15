@@ -9,8 +9,13 @@ import { AuthenticatedUserHeader } from '@/modules/patients/components/auth/auth
 import type { AuthHeaderUser } from '@/modules/patients/hooks/auth/header/use-auth-header';
 import { NavbarMobileDrawer } from './navbar-mobile-drawer';
 
+import type { ClinicConfigResponseDto } from '@/modules/clinic-config/dtos/settings/get-clinic-config.dto';
+
 interface NavbarProps {
-  user: AuthHeaderUser | null;
+  user?: AuthHeaderUser | null;
+  config?: ClinicConfigResponseDto | null;
+  logoUrl?: string | null;
+  clinicName?: string;
 }
 
 export const NAV_ITEMS = [
@@ -21,7 +26,7 @@ export const NAV_ITEMS = [
   { label: 'Contact', href: '#contact' },
 ] as const;
 
-export function NavbarV2({ user }: NavbarProps) {
+export function NavbarV2({ user, config, logoUrl: propLogoUrl, clinicName: propClinicName }: NavbarProps) {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
@@ -66,6 +71,9 @@ export function NavbarV2({ user }: NavbarProps) {
 
   const isDarkNav = !scrolled && !isMobileOpen;
 
+  const logoUrl = propLogoUrl ?? config?.websiteLogoUrl ?? null;
+  const clinicName = propClinicName ?? config?.clinicName ?? 'Samson Dental Center';
+
   return (
     <>
       <header
@@ -87,17 +95,27 @@ export function NavbarV2({ user }: NavbarProps) {
               isDarkNav ? 'text-white' : 'text-[#1D1E1E]'
             }`}
           >
-            <span className="w-9 h-9 rounded-full border border-current flex items-center justify-center font-serif text-[18px] italic font-normal tracking-none transition-transform group-hover:rotate-12 duration-300">
-              S
-            </span>
-            <div className="flex flex-col text-left items-start">
-              <span className="font-serif text-[16px] lg:text-[18px] tracking-[0.2em] font-bold leading-none uppercase font-sans">
-                Samson
-              </span>
-              <span className="text-[8px] lg:text-[9px] tracking-[0.3em] uppercase opacity-75 font-sans font-bold leading-none mt-1">
-                Dental Center
-              </span>
-            </div>
+            {logoUrl ? (
+              <img
+                src={logoUrl}
+                alt={clinicName}
+                className="h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+              />
+            ) : (
+              <>
+                <span className="w-9 h-9 rounded-full border border-current flex items-center justify-center font-serif text-[18px] italic font-normal tracking-none transition-transform group-hover:rotate-12 duration-300">
+                  {clinicName.charAt(0).toUpperCase()}
+                </span>
+                <div className="flex flex-col text-left items-start">
+                  <span className="font-serif text-[16px] lg:text-[18px] tracking-[0.2em] font-bold leading-none uppercase font-sans">
+                    {clinicName.split(' ')[0] || clinicName}
+                  </span>
+                  <span className="text-[8px] lg:text-[9px] tracking-[0.3em] uppercase opacity-75 font-sans font-bold leading-none mt-1">
+                    {clinicName.split(' ').slice(1).join(' ') || 'Dental Center'}
+                  </span>
+                </div>
+              </>
+            )}
           </Link>
 
           {/* Center: Navigation Links */}

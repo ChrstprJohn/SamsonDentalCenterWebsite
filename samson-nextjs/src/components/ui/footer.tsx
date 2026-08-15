@@ -64,13 +64,13 @@ export function Footer({ config }: FooterProps) {
         <div className="md:col-span-2 flex flex-col gap-6 pr-0 md:pr-8">
           <div className="flex items-center gap-3">
             {logoUrl ? (
-              <img src={logoUrl} alt={clinicName} className="max-w-[180px] max-h-12 object-contain object-left" />
+              <img src={logoUrl} alt={clinicName} className="h-16 sm:h-20 max-w-[280px] w-auto object-contain object-left drop-shadow-sm" />
             ) : (
               <>
-                <span className="w-9 h-9 rounded-[15.6px] border border-current flex items-center justify-center font-serif text-[18px] italic font-normal text-white select-none">
+                <span className="w-11 h-11 rounded-[15.6px] border border-current flex items-center justify-center font-serif text-[22px] italic font-normal text-white select-none">
                   {clinicName.charAt(0).toUpperCase()}
                 </span>
-                <span className="font-serif text-[21px] lg:text-[23px] tracking-[0.12em] font-bold leading-none uppercase text-white">
+                <span className="font-serif text-[24px] lg:text-[26px] tracking-[0.12em] font-bold leading-none uppercase text-white">
                   {clinicName}
                 </span>
               </>

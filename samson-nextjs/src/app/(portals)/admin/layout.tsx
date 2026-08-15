@@ -56,7 +56,7 @@ export default async function AdminPortalLayout({
   if (!isAuthorized) {
     return (
       <div className="flex flex-col min-h-screen bg-background transition-colors duration-300">
-        <Navbar user={headerUser} />
+        <Navbar user={headerUser} config={clinicConfig} />
         <main className="flex-1 flex flex-col items-center justify-center p-6 text-center gap-6 pt-[120px]">
           <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center text-3xl text-red-500">
             ⚠️
@@ -64,7 +64,7 @@ export default async function AdminPortalLayout({
           <div className="flex flex-col gap-2 max-w-md">
             <h1 className="text-2xl font-bold text-text-primary">Access Denied</h1>
             <p className="text-xs text-text-muted leading-relaxed">
-              Your account lacks the root administrative credentials to access the Clinic Administration & System Configuration Portal. Please contact standard roster administrators if you require administrative clearance.
+              Your patient account lacks necessary administrative credentials to access the Clinic Administration portal. Please contact a system administrator if you require elevated clearance.
             </p>
           </div>
           <Link href="/user">
@@ -78,7 +78,7 @@ export default async function AdminPortalLayout({
 
   return (
     <div className="flex flex-col min-h-screen bg-background transition-colors duration-300">
-      <Navbar user={headerUser} />
+      <Navbar user={headerUser} config={clinicConfig} />
       
       {/* Sidebar + Main content layout */}
       <div className="flex-1 max-w-7xl mx-auto w-full px-6 py-10 pt-[100px] grid grid-cols-1 lg:grid-cols-12 gap-8">

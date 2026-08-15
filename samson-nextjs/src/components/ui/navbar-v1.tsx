@@ -8,8 +8,13 @@ import { Menu, X, ArrowRight } from 'lucide-react';
 import type { AuthHeaderUser } from '@/modules/patients/hooks/auth/header/use-auth-header';
 import { NavbarMobileDrawer } from './navbar-mobile-drawer';
 
+import type { ClinicConfigResponseDto } from '@/modules/clinic-config/dtos/settings/get-clinic-config.dto';
+
 interface NavbarProps {
-  user: AuthHeaderUser | null;
+  user?: AuthHeaderUser | null;
+  config?: ClinicConfigResponseDto | null;
+  logoUrl?: string | null;
+  clinicName?: string;
 }
 
 export const NAV_ITEMS = [
@@ -20,7 +25,11 @@ export const NAV_ITEMS = [
   { label: 'Contact', href: '#contact' },
 ] as const;
 
-export function NavbarV1({}: NavbarProps) {
+export function NavbarV1({
+  config,
+  logoUrl: propLogoUrl,
+  clinicName: propClinicName,
+}: NavbarProps) {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
@@ -69,32 +78,35 @@ export function NavbarV1({}: NavbarProps) {
 
   const isDarkNav = !isMobileOpen;
 
+  const logoUrl = propLogoUrl ?? config?.websiteLogoUrl ?? '/images/SamsonLogo-transparent.png';
+  const clinicName = propClinicName ?? config?.clinicName ?? 'Samson Dental Center';
+
   return (
     <>
       <header
         id="navbar"
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out ${
           isMobileOpen
-            ? 'bg-transparent backdrop-blur-none border-b border-transparent py-5'
+            ? 'bg-transparent backdrop-blur-none border-b border-transparent py-6'
             : scrolled
-            ? 'bg-[#1D1E1E]/90 backdrop-blur-sm border-b border-white/5 shadow-md py-4'
-            : 'bg-[#1D1E1E]/15 backdrop-blur-[3px] border-b border-white/5 py-5'
+            ? 'bg-[#1D1E1E]/90 backdrop-blur-sm border-b border-white/5 shadow-md py-5'
+            : 'bg-[#1D1E1E]/15 backdrop-blur-[3px] border-b border-white/5 py-6.5'
         }`}
       >
         <div className="max-w-7xl mx-auto px-6 sm:px-12 flex items-center justify-between">
           {/* Left: Logo */}
-          <div className="flex-1 flex items-center justify-start">
+          <div className="flex-1 flex items-center justify-start relative">
             <Link
               href="/"
               onClick={() => setIsMobileOpen(false)}
-              className={`flex items-center gap-3 group focus:outline-none transition-colors duration-300 ${
+              className={`relative flex items-center h-12 group focus:outline-none transition-colors duration-300 ${
                 isDarkNav ? 'text-white' : 'text-[#1D1E1E]'
               }`}
             >
               <img
-                src="/images/SamsonLogo-transparent.png"
-                alt="Samson Dental Center"
-                className="h-11 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+                src={logoUrl}
+                alt={clinicName}
+                className="h-16 sm:h-17 md:h-18 w-auto max-w-none object-contain origin-left drop-shadow-sm transition-all duration-300 group-hover:scale-105"
               />
             </Link>
           </div>

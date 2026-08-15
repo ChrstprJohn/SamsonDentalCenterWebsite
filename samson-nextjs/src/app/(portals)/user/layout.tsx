@@ -50,7 +50,7 @@ export default async function UserPortalLayout({
 
   return (
     <div className="flex flex-col min-h-screen bg-background transition-colors duration-300">
-      <Navbar user={headerUser} />
+      <Navbar user={headerUser} config={clinicConfig} />
       
       {/* Sidebar + Main content layout */}
       <div className="flex-1 max-w-7xl mx-auto w-full px-6 py-10 pt-[100px] grid grid-cols-1 lg:grid-cols-12 gap-8">
