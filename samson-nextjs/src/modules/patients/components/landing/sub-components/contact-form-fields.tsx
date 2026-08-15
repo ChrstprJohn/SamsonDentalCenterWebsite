@@ -98,6 +98,9 @@ export function ContactFields({
 }) {
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.contactEmail.trim());
   const isPhoneValid = /^09\d{9}$/.test(phone.trim().replace(/\D/g, ''));
+  const formattedPhone = phone.replace(/\D/g, '').slice(0, 11).replace(/(\d{3})(\d{0,4})(\d{0,4})/, (_, prefix, middle, suffix) =>
+    [prefix, middle, suffix].filter(Boolean).join(' ')
+  );
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -115,10 +118,10 @@ export function ContactFields({
       <TextField
         label="Phone Number *"
         type="tel"
-        value={phone}
-        onChange={setPhone}
+        value={formattedPhone}
+        onChange={(value) => setPhone(value.replace(/\D/g, '').slice(0, 11))}
         required
-        placeholder="09XX XXX XXXX"
+        placeholder="093 0323 1312"
         touched={touched}
         isValid={isPhoneValid}
         errorMessage="Please enter a valid phone number."

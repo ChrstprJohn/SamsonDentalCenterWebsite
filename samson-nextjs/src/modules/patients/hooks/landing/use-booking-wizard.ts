@@ -45,7 +45,6 @@ export function useBookingWizard({ services, config, initialServiceId }: UseBook
   const [submittedReference, setSubmittedReference] = useState<string | null>(null);
   const { addToast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const router = useRouter();
 
   const contactSection = useContactSection({
     services,
@@ -155,21 +154,6 @@ export function useBookingWizard({ services, config, initialServiceId }: UseBook
     }
   };
 
-  // Auto redirect countdown timer after successful submission
-  useEffect(() => {
-    if (redirectCountdown === null) return;
-    if (redirectCountdown <= 0) {
-      router.push('/');
-      return;
-    }
-
-    const timer = setInterval(() => {
-      setRedirectCountdown((prev) => (prev !== null ? prev - 1 : null));
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [redirectCountdown, router]);
-
   const handleFinalSubmit = async (data: {
     phone: string;
     pathway: string;
@@ -237,6 +221,23 @@ export function useBookingWizard({ services, config, initialServiceId }: UseBook
       return false;
     }
   };
+
+  const router = useRouter();
+
+  // Auto redirect countdown timer after successful submission
+  useEffect(() => {
+    if (redirectCountdown === null) return;
+    if (redirectCountdown <= 0) {
+      router.push('/');
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setRedirectCountdown((prev) => (prev !== null ? prev - 1 : null));
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [redirectCountdown, router]);
 
   return {
     step,

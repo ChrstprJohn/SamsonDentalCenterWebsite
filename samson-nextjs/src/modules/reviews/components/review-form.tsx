@@ -80,7 +80,7 @@ export function ReviewForm({ appointmentId }: { appointmentId: string }) {
 
   if (submitted) {
     return (
-      <div className="flex flex-col items-center gap-6 py-4">
+      <div className="flex w-full max-w-[340px] mx-auto flex-col items-center gap-6 py-4 sm:max-w-none">
         <div className="w-16 h-16 rounded-full bg-amber-100 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center">
           <CheckCircle2 className="h-8 w-8" />
         </div>
