@@ -122,7 +122,7 @@ export function HeroSectionPreview({ onBookClick, serviceCount = 0 }: HeroSectio
               onClick={() => setCurrentBgIndex(i)}
               title={img.title}
               aria-label={`Show hero image ${i + 1}`}
-              className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+              className={`h-1 rounded-full transition-all duration-300 cursor-pointer ${
                 i === currentBgIndex ? 'w-7 bg-[#D94E4E]' : 'w-3 bg-white/50 hover:bg-white/90'
               }`}
             />

@@ -101,7 +101,7 @@ export function AppointmentBannerSection() {
             onClick={() => setSelected(i)}
             title={`BG ${i + 1}`}
             aria-label={`Show appointment banner image ${i + 1}`}
-            className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+            className={`h-1 rounded-full transition-all duration-300 cursor-pointer ${
               i === selected ? 'w-7 bg-[#D94E4E]' : 'w-3 bg-white/50 hover:bg-white/90'
             }`}
           />

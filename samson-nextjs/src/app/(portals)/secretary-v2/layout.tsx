@@ -7,6 +7,11 @@ import type { AuthHeaderUser } from '@/modules/patients/hooks/auth/header/use-au
 import { RealtimeListener } from '@/modules/notifications/exports';
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { SecretarySidebar } from '@/components/secretary-sidebar';
+import { getClinicConfigAction } from '@/modules/clinic-config/actions/settings/get-clinic-config.action';
+import { createClient } from '@/shared/database/server';
+import { getUnreadCount } from '@/modules/notifications/exports';
+import { getClinicAppointmentsAction } from '@/modules/appointments/actions/clinic/get-clinic-appointments.action';
+import { getChatThreadsAction } from '@/modules/appointments/actions/chat/get-chat-threads.action';
 
 export const dynamic = 'force-dynamic';
 
@@ -68,11 +73,28 @@ export default async function SecretaryPortalV2Layout({
     email: headerUser.email,
     avatar: headerUser.avatarUrl || "/avatars/placeholder.jpg",
   };
+  const clinicConfig = await getClinicConfigAction();
+  let notificationCount = 0;
+  let appointmentRequestCount = 0;
+  let chatUnreadCount = 0;
+  try {
+    const supabase = await createClient();
+    notificationCount = await getUnreadCount(supabase)(userId, 'SECRETARY');
+    const [pendingResult, chatResult] = await Promise.all([
+      getClinicAppointmentsAction({ status: 'PENDING' }),
+      getChatThreadsAction({ limit: 100, offset: 0 }),
+    ]);
+    if (pendingResult && 'data' in pendingResult && pendingResult.data) appointmentRequestCount = pendingResult.data.length;
+    if (chatResult && 'data' in chatResult && chatResult.data) chatUnreadCount = chatResult.data.length;
+  } catch (err) {
+    console.error('Failed to load secretary notification count:', err);
+  }
+  const logoUrl = clinicConfig && 'data' in clinicConfig ? clinicConfig.data?.websiteLogoUrl ?? null : null;
 
   return (
     <SidebarProvider defaultOpen={true} className="h-svh overflow-hidden">
       <RealtimeListener userId={userId} />
-      <SecretarySidebar userProfile={sidebarUser} />
+      <SecretarySidebar userProfile={sidebarUser} logoUrl={logoUrl} notificationCount={notificationCount} appointmentRequestCount={appointmentRequestCount} chatUnreadCount={chatUnreadCount} />
 
       <SidebarInset className="min-h-0 overflow-hidden">
         {children}

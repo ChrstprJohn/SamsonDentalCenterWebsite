@@ -3,88 +3,41 @@
 import * as React from "react"
 
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  useSidebar,
 } from "@/components/ui/sidebar"
-import { ChevronsUpDownIcon, PlusIcon } from "lucide-react"
 
 export function TeamSwitcherSecretary({
   teams,
+  logoUrl,
 }: {
   teams: {
     name: string
     logo: React.ReactNode
     plan: string
   }[]
+  logoUrl?: string | null
 }) {
-  const { isMobile } = useSidebar()
-  const [activeTeam, setActiveTeam] = React.useState(teams[0])
-
-  if (!activeTeam) {
+  if (!teams[0]) {
     return null
   }
 
   return (
     <SidebarMenu>
       <SidebarMenuItem>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <SidebarMenuButton
-              size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-            >
-              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                {activeTeam.logo}
-              </div>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{activeTeam.name}</span>
-                <span className="truncate text-xs">{activeTeam.plan}</span>
-              </div>
-              <ChevronsUpDownIcon className="ml-auto" />
-            </SidebarMenuButton>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            className="w-fit"
-            align="start"
-            side={isMobile ? "bottom" : "right"}
-            sideOffset={4}
-          >
-            <DropdownMenuLabel className="text-xs text-muted-foreground">
-              Teams
-            </DropdownMenuLabel>
-            {teams.map((team, index) => (
-              <DropdownMenuItem
-                key={team.name}
-                onClick={() => setActiveTeam(team)}
-                className="gap-2 p-2"
-              >
-                <div className="flex size-6 items-center justify-center rounded-md border">
-                  {team.logo}
-                </div>
-                {team.name}
-                <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
-              </DropdownMenuItem>
-            ))}
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="gap-2 p-2">
-              <div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
-                <PlusIcon className="size-4" />
-              </div>
-              <div className="font-medium text-muted-foreground">Add team</div>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <SidebarMenuButton size="lg" className="cursor-default hover:bg-transparent">
+          <div className="flex h-20 min-w-8 shrink-0 items-center justify-center text-sidebar-foreground group-data-[collapsible=icon]:size-8">
+            <span className="hidden size-8 items-center justify-center rounded-full border border-current font-serif text-lg italic font-normal leading-none group-data-[collapsible=icon]:flex">S</span>
+            {logoUrl ? (
+              <img src={logoUrl} alt="Samson Dental Center" className="block h-20 w-auto max-w-[280px] object-contain group-data-[collapsible=icon]:hidden" />
+            ) : (
+              <span role="img" aria-label="Samson Dental Center" className="relative block h-20 w-[140px] overflow-hidden group-data-[collapsible=icon]:hidden">
+                <img src="/images/SAMSONLOGO.png" alt="" className="absolute right-0 top-0 h-20 w-auto max-w-none object-contain" />
+              </span>
+            )}
+          </div>
+        </SidebarMenuButton>
       </SidebarMenuItem>
     </SidebarMenu>
   )

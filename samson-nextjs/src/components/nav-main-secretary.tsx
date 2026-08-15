@@ -23,6 +23,9 @@ export function NavMainSecretary({
   items,
   label = "Operations",
   isPending = false,
+  notificationCount = 0,
+  appointmentRequestCount = 0,
+  chatUnreadCount = 0,
   onNavigate,
 }: {
   items: {
@@ -37,6 +40,9 @@ export function NavMainSecretary({
   }[]
   label?: string
   isPending?: boolean
+  notificationCount?: number
+  appointmentRequestCount?: number
+  chatUnreadCount?: number
   onNavigate?: (url: string, e: React.MouseEvent) => void
 }) {
   const pathname = usePathname()
@@ -58,12 +64,18 @@ export function NavMainSecretary({
           const isGroupOpen = item.isActive || hasActiveSubItem
 
           if (!hasSubItems) {
+            const itemCount = item.title === "Notifications" ? notificationCount : 0
+            const hasCount = itemCount > 0
             return (
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton asChild tooltip={item.title} isActive={pathname === item.url}>
                   <Link href={item.url} onClick={handleLinkClick(item.url)}>
-                    {item.icon}
+                    <span className="relative shrink-0">
+                      {item.icon}
+                      {hasCount && <span className="absolute -right-2 -top-2 hidden min-w-4 items-center justify-center rounded-full bg-red-600 px-1 text-[9px] font-bold leading-4 text-white group-data-[collapsible=icon]:flex">{itemCount > 9 ? '9+' : itemCount}</span>}
+                    </span>
                     <span>{item.title}</span>
+                    {hasCount && <span className="ml-auto rounded-full bg-red-600 px-2 py-0.5 text-[10px] font-bold leading-4 text-white group-data-[collapsible=icon]:hidden">{itemCount > 9 ? '9+' : itemCount}</span>}
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

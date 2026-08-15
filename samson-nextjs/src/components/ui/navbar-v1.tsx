@@ -100,7 +100,7 @@ export function NavbarV1({
     <>
       <header
         id="navbar"
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out py-7 ${
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out py-2.5 ${
           isMobileOpen
             ? 'bg-transparent backdrop-blur-none border-b border-transparent'
             : scrolled || !isMainPage
@@ -114,14 +114,14 @@ export function NavbarV1({
             <Link
               href="/"
               onClick={() => setIsMobileOpen(false)}
-              className={`relative flex items-center h-12 group focus:outline-none transition-colors duration-300 ${
+              className={`relative flex items-center h-10 group focus:outline-none transition-colors duration-300 ${
                 isDarkNav ? 'text-white' : 'text-[#1D1E1E]'
               }`}
             >
               <img
                 src={logoUrl}
                 alt={clinicName}
-                className="h-16 sm:h-20 max-w-[280px] w-auto object-contain origin-left drop-shadow-sm transition-all duration-300 group-hover:scale-105"
+              className="h-10 max-w-[240px] w-auto object-contain origin-left drop-shadow-sm transition-all duration-300 group-hover:scale-105"
               />
             </Link>
           </div>

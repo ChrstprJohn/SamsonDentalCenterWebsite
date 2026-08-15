@@ -124,14 +124,18 @@ const data = {
 }
 
 interface SecretarySidebarProps extends React.ComponentProps<typeof Sidebar> {
+  logoUrl?: string | null;
   userProfile?: {
     name: string;
     email: string;
     avatar: string;
   };
+  notificationCount?: number;
+  appointmentRequestCount?: number;
+  chatUnreadCount?: number;
 }
 
-export function SecretarySidebar({ userProfile, ...props }: SecretarySidebarProps) {
+export function SecretarySidebar({ userProfile, logoUrl, notificationCount = 0, appointmentRequestCount = 0, chatUnreadCount = 0, ...props }: SecretarySidebarProps) {
   const router = useRouter()
   const { setOpen } = useSidebar()
   const [isPending, startTransition] = React.useTransition()
@@ -170,10 +174,10 @@ export function SecretarySidebar({ userProfile, ...props }: SecretarySidebarProp
         </div>
       )}
       <SidebarHeader>
-        <TeamSwitcherSecretary teams={data.teams} />
+        <TeamSwitcherSecretary teams={data.teams} logoUrl={logoUrl} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMainSecretary items={data.navMain} isPending={isPending} onNavigate={handleNavigate} />
+        <NavMainSecretary items={data.navMain} notificationCount={notificationCount} appointmentRequestCount={appointmentRequestCount} chatUnreadCount={chatUnreadCount} isPending={isPending} onNavigate={handleNavigate} />
         {data.projects && data.projects.length > 0 && (
           <NavProjectsSecretary projects={data.projects} label="Roster & Schedules" isPending={isPending} onNavigate={handleNavigate} />
         )}
