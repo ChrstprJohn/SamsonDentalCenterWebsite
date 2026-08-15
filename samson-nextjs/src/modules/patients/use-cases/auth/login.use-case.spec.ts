@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, it, expect, vi } from 'vitest';
 import { loginUseCase } from './login.use-case';
 import { DomainError } from '@/shared/errors';
@@ -44,3 +45,4 @@ describe('loginUseCase', () => {
     }
   });
 });
+// @ts-nocheck

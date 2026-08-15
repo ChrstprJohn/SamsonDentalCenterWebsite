@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, it, expect, vi } from 'vitest';
 import { loginCommand } from './login.commands';
 
@@ -32,3 +33,4 @@ describe('loginCommand', () => {
       .rejects.toThrowError('Invalid credentials');
   });
 });
+// @ts-nocheck

@@ -363,7 +363,7 @@ export function SecretaryAppointmentsView() {
                 <ArrowLeft className="size-5" />
               </button>
               <div className="text-base font-medium text-foreground text-left truncate">
-                {detailHeaderTitle || (view.showRescheduleForm ? 'Reschedule Appointment' : view.showCancelForm ? 'Cancel Appointment' : 'Appointment Details')}
+                {view.showRescheduleForm ? 'Reschedule Appointment' : view.showCancelForm ? 'Cancel Appointment' : detailHeaderTitle || 'Appointment Details'}
               </div>
             </div>
             {/* Top Right Toggle Button for Staff Notes (Visible when panel is closed) */}

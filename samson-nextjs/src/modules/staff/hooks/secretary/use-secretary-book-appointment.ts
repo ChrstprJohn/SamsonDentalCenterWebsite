@@ -13,6 +13,7 @@ import { getCalendarNotesAction } from '@/modules/appointments/actions/calendar-
 import { createCalendarNoteAction } from '@/modules/appointments/actions/calendar-notes/create-calendar-note.action';
 import { updateCalendarNoteAction } from '@/modules/appointments/actions/calendar-notes/update-calendar-note.action';
 import { deleteCalendarNoteAction } from '@/modules/appointments/actions/calendar-notes/delete-calendar-note.action';
+import { useToast } from '@/components/feedback/toast-container';
 import type { CalendarNoteResponseDto } from '@/modules/appointments/dtos/calendar-notes/calendar-note-response.dto';
 import type { UpdateCalendarNoteDto } from '@/modules/appointments/dtos/calendar-notes/update-calendar-note.dto';
 
@@ -64,7 +65,6 @@ export function useSecretaryBookAppointment() {
   const [isLoadingServices, setIsLoadingServices] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [inlineError, setInlineError] = useState('');
-  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [booked, setBooked] = useState(false);
   const [confirmationChannel, setConfirmationChannel] = useState<'EMAIL' | 'SMS' | 'NONE' | 'BOTH'>('NONE');
   const actionResourcesLoadedRef = useRef(false);
@@ -73,11 +73,7 @@ export function useSecretaryBookAppointment() {
   const detailRequestIdRef = useRef(0);
   const [timelineVersion, setTimelineVersion] = useState(0);
 
-  useEffect(() => {
-    if (!toast) return;
-    const timer = setTimeout(() => setToast(null), 3000);
-    return () => clearTimeout(timer);
-  }, [toast]);
+  const { addToast } = useToast();
 
   const loadActionResources = useCallback(async () => {
     if (actionResourcesLoadedRef.current) return;
@@ -346,15 +342,15 @@ export function useSecretaryBookAppointment() {
       const res = await createManualBookingAction(payload as any);
       if (res.success) {
         setBooked(true);
-        setToast({ message: 'Appointment booked successfully!', type: 'success' });
+        addToast('Appointment booked successfully!', 'success');
         await loadTimelineData(selectedDate, true); // silent — don't flash overlay
       } else {
         setInlineError(res.error || 'Booking failed');
-        setToast({ message: res.error || 'Booking failed', type: 'error' });
+        addToast(res.error || 'Booking failed', 'error');
       }
     } catch (err: any) {
       setInlineError(err.message || 'Unexpected error');
-      setToast({ message: err.message || 'Unexpected error', type: 'error' });
+      addToast(err.message || 'Unexpected error', 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -370,7 +366,7 @@ export function useSecretaryBookAppointment() {
     setCurrentMonth, selectedDate, selectDate, selectedDoctor, selectDoctor,
     selectedTime, setSelectedTime, selectedEndTime, setSelectedEndTime, selectTimeslot, patientNote, setPatientNote, isLoadingServices,
     isLoadingDoctors: false, isLoadingSlots: false, isSubmitting,
-    inlineError, toast, booked, isReadyToSubmit, bookedPatientLabel, resetForm, submit,
+    inlineError, booked, isReadyToSubmit, bookedPatientLabel, resetForm, submit,
     setInlineError,
     confirmationChannel, setConfirmationChannel,
     doctorsList, appointments, isLoadingAppointments, selectedAppointmentDetails, setSelectedAppointmentDetails,

@@ -15,7 +15,6 @@ import { Switch } from '@/components/ui/switch';
 import { calculateEndTime } from '@/shared/utils/date.util';
 import { getDailyScheduleBounds, formatTimeRange } from '@/shared/utils/schedule-bounds.util';
 import type { ClinicConfigResponseDto } from '@/modules/clinic-config/dtos/settings/get-clinic-config.dto';
-import { InquiryToast } from './sub-components/inquiry-toast';
 import {
   Sidebar,
   SidebarContent,
@@ -1369,7 +1368,6 @@ export function SecretaryBookAppointmentView() {
           </>
         )}
       </Sidebar>
-      <InquiryToast toast={view.toast} />
     </div>
   );
 }

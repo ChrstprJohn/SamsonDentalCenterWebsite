@@ -413,7 +413,10 @@ function AppointmentDetails({
                           variant="outline"
                           className="flex-1 h-[42px] border-destructive/50 text-destructive hover:bg-destructive/10"
                           disabled={isActionBusy}
-                          onClick={() => view.setShowCancelForm(true)}
+                          onClick={() => {
+                            view.setConfirmationChannel((appointment.confirmationChannel as any) || (appointment as any).confirmation_channel || 'EMAIL');
+                            view.setShowCancelForm(true);
+                          }}
                         >
                           Cancel
                         </Button>
@@ -578,7 +581,14 @@ function AppointmentDetails({
                   </Button>
                 )}
                 {canCancel && (
-                  <Button variant="outline" className="flex-1 h-[42px] border-destructive/50 text-destructive hover:bg-destructive/10" onClick={() => view.setShowCancelForm(true)}>
+                  <Button
+                    variant="outline"
+                    className="flex-1 h-[42px] border-destructive/50 text-destructive hover:bg-destructive/10"
+                    onClick={() => {
+                      view.setConfirmationChannel((appointment.confirmationChannel as any) || (appointment as any).confirmation_channel || 'EMAIL');
+                      view.setShowCancelForm(true);
+                    }}
+                  >
                     Cancel
                   </Button>
                 )}

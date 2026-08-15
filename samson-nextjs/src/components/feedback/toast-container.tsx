@@ -1,6 +1,7 @@
 'use client';
 
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useRef } from 'react';
+import { AlertCircle, CheckCircle2, Info, X } from 'lucide-react';
 
 interface Toast {
   id: string;
@@ -16,39 +17,60 @@ const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
+  const timers = useRef(new Map<string, ReturnType<typeof setTimeout>>());
+
+  const removeToast = useCallback((id: string) => {
+    const timer = timers.current.get(id);
+    if (timer) clearTimeout(timer);
+    timers.current.delete(id);
+    setToasts((prev) => prev.filter((toast) => toast.id !== id));
+  }, []);
 
   const addToast = useCallback((message: string, type: 'success' | 'error' | 'info' = 'info') => {
     const id = Math.random().toString(36).substring(2, 9);
     setToasts((prev) => [...prev, { id, message, type }]);
-    setTimeout(() => {
-      setToasts((prev) => prev.filter((t) => t.id !== id));
-    }, 4000);
-  }, []);
+    timers.current.set(id, setTimeout(() => removeToast(id), 4000));
+  }, [removeToast]);
+
+  const pauseToast = (id: string) => {
+    const timer = timers.current.get(id);
+    if (timer) {
+      clearTimeout(timer);
+      timers.current.delete(id);
+    }
+  };
+
+  const resumeToast = (id: string) => {
+    if (!timers.current.has(id)) timers.current.set(id, setTimeout(() => removeToast(id), 4000));
+  };
 
   return (
     <ToastContext.Provider value={{ addToast }}>
       {children}
-      <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none">
-        {toasts.map((toast) => (
+      <div className="pointer-events-none fixed bottom-4 right-4 z-50 flex w-[calc(100%-2rem)] max-w-sm flex-col gap-3">
+        {toasts.map((toast) => {
+          const Icon = toast.type === 'success' ? CheckCircle2 : toast.type === 'error' ? AlertCircle : Info;
+          const color = toast.type === 'success' ? 'border-emerald-700 bg-emerald-600' : toast.type === 'error' ? 'border-rose-700 bg-rose-600' : 'border-blue-700 bg-blue-600';
+          return (
           <div
             key={toast.id}
-            className={`pointer-events-auto flex items-center justify-between p-4 rounded-xl border shadow-lg backdrop-blur-md transition-all duration-300 ${
-              toast.type === 'success'
-                ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400'
-                : toast.type === 'error'
-                ? 'bg-rose-500/10 border-rose-500/20 text-rose-600 dark:text-rose-400'
-                : 'bg-blue-500/10 border-blue-500/20 text-blue-600 dark:text-blue-400'
-            }`}
+            onMouseEnter={() => pauseToast(toast.id)}
+            onMouseLeave={() => resumeToast(toast.id)}
+            className={`pointer-events-auto flex items-start gap-3 rounded-xl border p-4 text-white shadow-xl transition-all duration-300 ${color}`}
           >
-            <span className="text-xs font-semibold">{toast.message}</span>
+            <Icon className="mt-0.5 size-5 shrink-0" />
+            <span className="flex-1 text-sm font-medium leading-5">{toast.message}</span>
             <button
-              onClick={() => setToasts((prev) => prev.filter((t) => t.id !== toast.id))}
-              className="ml-3 text-slate-400 hover:text-slate-200 cursor-pointer"
+              type="button"
+              onClick={() => removeToast(toast.id)}
+              aria-label="Close notification"
+              className="-mr-1 -mt-1 cursor-pointer rounded-md p-1 text-white/80 transition-colors hover:bg-white/15 hover:text-white"
             >
-              &times;
+              <X className="size-4" />
             </button>
           </div>
-        ))}
+          );
+        })}
       </div>
     </ToastContext.Provider>
   );

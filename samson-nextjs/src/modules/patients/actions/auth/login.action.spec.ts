@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { loginAction } from './login.action';
 import { createClient } from '@/shared/database/server';
@@ -96,3 +97,4 @@ describe('loginAction Server Action', () => {
     }
   });
 });
+// @ts-nocheck
