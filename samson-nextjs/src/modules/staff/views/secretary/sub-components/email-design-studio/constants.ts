@@ -327,7 +327,7 @@ export const DEFAULT_COPY: Record<EmailDesignId, DraftCopy> = {
     headerLabel: 'Missed Appointment',
     headline: 'You missed your appointment with Samson Dental Center',
     intro: 'You missed your appointment with Samson Dental Center. Below are the details of your missed visit:',
-    ctaLabel: 'Share Quick Feedback',
+    ctaLabel: 'Tell us why',
     primaryInstruction: '',
     secondaryInstruction: '',
     footerText: 'Samson Dental Center • Caring for Your Smile',

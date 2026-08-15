@@ -124,11 +124,11 @@ branding,
 
           {/* Optional reason CTA */}
           <Text style={pStyle}>
-            Have a moment?{' '}
+            Let us know why you couldn&apos;t make it, it helps us improve.{' '}
             <Link href={reasonUrl} style={linkStyle}>
-              Share quick feedback
+              Tell us why
             </Link>{' '}
-            to help us improve our service (optional).
+            (optional)
           </Text>
 
           {/* What's Next checklist */}

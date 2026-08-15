@@ -94,6 +94,10 @@ const data = {
           title: "Patient Reviews",
           url: "/secretary-v2/reviews",
         },
+        {
+          title: "No-Show Reasons",
+          url: "/secretary-v2/no-show-reasons",
+        },
       ],
     },
     {

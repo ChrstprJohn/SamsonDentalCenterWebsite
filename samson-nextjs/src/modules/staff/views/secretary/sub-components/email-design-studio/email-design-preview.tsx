@@ -290,9 +290,9 @@ export function EmailDesignPreview({
         {/* No-show — optional feedback CTA */}
         {isNoShow && copy.showCta && copy.ctaLabel && (
           <p style={p}>
-            Have a moment?{' '}
-            <a href={noShowReasonUrl} style={link}>Share quick feedback</a>{' '}
-            to help us improve our service (optional).
+            Let us know why you couldn&apos;t make it, it helps us improve.{' '}
+            <a href={noShowReasonUrl} style={link}>Tell us why</a>{' '}
+            (optional).
           </p>
         )}
 
