@@ -18,6 +18,11 @@ export async function submitReviewAction(
       return { success: false, error: 'Please pick a rating between 1 and 5 stars.' };
     }
 
+    const comment = (input.comment || '').trim();
+    if (!comment) {
+      return { success: false, error: 'Please choose a comment or write your own.' };
+    }
+
     const appointmentId = (input.appointmentId || '').trim();
     if (!appointmentId) {
       return { success: false, error: 'Review link is invalid. Please use the link from your email.' };
@@ -51,7 +56,7 @@ export async function submitReviewAction(
     const { error } = await supabase.from('reviews').insert({
       appointment_id: appointmentId,
       rating,
-      comment: (input.comment || '').trim() || null,
+      comment,
     });
 
     if (error) {

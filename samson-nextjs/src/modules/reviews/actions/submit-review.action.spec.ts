@@ -50,6 +50,14 @@ describe('submitReviewAction (Unit Test)', () => {
     expect(mocks.insert).not.toHaveBeenCalled();
   });
 
+  it('requires a comment', async () => {
+    const result = await submitReviewAction({ appointmentId: 'apt-1', rating: 5, comment: '   ' });
+
+    if (result.success) throw new Error('expected failure');
+    expect(result.error).toContain('comment');
+    expect(mocks.insert).not.toHaveBeenCalled();
+  });
+
   it('rejects unknown appointment refs', async () => {
     mocks.chain.from.mockReturnValue({
       select: vi.fn().mockReturnThis(),
@@ -58,7 +66,7 @@ describe('submitReviewAction (Unit Test)', () => {
       insert: mocks.insert,
     });
 
-    const result = await submitReviewAction({ appointmentId: 'nope', rating: 4 });
+    const result = await submitReviewAction({ appointmentId: 'nope', rating: 4, comment: 'Great visit' });
 
     if (result.success) throw new Error('expected failure');
     expect(result.error).toContain('invalid');
@@ -72,7 +80,7 @@ describe('submitReviewAction (Unit Test)', () => {
       insert: mocks.insert,
     });
 
-    const result = await submitReviewAction({ appointmentId: 'apt-1', rating: 4 });
+    const result = await submitReviewAction({ appointmentId: 'apt-1', rating: 4, comment: 'Great visit' });
 
     if (result.success) throw new Error('expected failure');
     expect(result.error).toContain('already submitted');
