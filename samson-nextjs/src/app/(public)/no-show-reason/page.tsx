@@ -76,11 +76,18 @@ export default async function NoShowReasonPage({ searchParams }: { searchParams:
             {context.patientName} — thank you! You have already shared what happened.
           </p>
           <p className="text-sm text-text-secondary leading-relaxed max-w-md">{existingReason}</p>
-          <Link href="/">
-            <Button className="bg-foreground text-background border-foreground hover:bg-foreground/90 hover:text-background">
-              Go to Homepage
-            </Button>
-          </Link>
+          <div className="flex flex-col gap-2 w-full">
+            <Link href="/book" className="w-full">
+              <Button className="w-full bg-foreground text-background border-foreground hover:bg-foreground/90 hover:text-background">
+                Request New Appointment
+              </Button>
+            </Link>
+            <Link href="/" className="w-full">
+              <Button className="w-full bg-foreground text-background border-foreground hover:bg-foreground/90 hover:text-background">
+                Go to Homepage
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
     );
