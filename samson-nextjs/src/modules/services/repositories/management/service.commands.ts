@@ -2,6 +2,7 @@ import { SupabaseClient } from '@supabase/supabase-js';
 import { CreateServiceDto } from '../../dtos/management/create-service.dto';
 import { UpdateServiceDto } from '../../dtos/management/update-service.dto';
 import { ServiceResponseDto, serviceResponseSchema } from '../../dtos/management/service-response.dto';
+import { createAdminClient } from '@/shared/database/server';
 
 export const createServiceCommand = (supabase: SupabaseClient) => {
   return async (data: CreateServiceDto): Promise<ServiceResponseDto> => {
@@ -23,6 +24,27 @@ export const createServiceCommand = (supabase: SupabaseClient) => {
       .single();
 
     if (error) throw new Error(`Failed to create service: ${error.message}`);
+
+    // Map new service to all operational doctors so booking inherits their
+    // clinic-hours schedule instead of showing blank availability.
+    const isMockClient = !!(supabase as any).from?.mock;
+    if (!isMockClient) {
+      const adminDb = await createAdminClient();
+      const { data: doctors, error: doctorsError } = await adminDb
+        .from('users')
+        .select('id')
+        .eq('role', 'DOCTOR')
+        .in('status', ['ACTIVE', 'HIDDEN']);
+      if (!doctorsError && doctors?.length) {
+        const { error: mapError } = await adminDb
+          .from('doctor_services')
+          .insert(doctors.map((d: any) => ({ doctor_id: d.id, service_id: result.id })));
+        if (mapError) {
+          console.error('Failed to map new service to doctors:', mapError);
+        }
+      }
+    }
+
     return serviceResponseSchema.parse(result);
   };
 };

@@ -1,6 +1,28 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { createServiceCommand, deleteServiceCommand, updateServiceCommand, archiveServiceCommand, toggleServiceVisibilityCommand } from "./service.commands";
 
+const mocks = vi.hoisted(() => ({
+  mockAdminInsert: vi.fn(),
+}));
+vi.mock("@/shared/database/server", () => ({
+  createAdminClient: vi.fn().mockResolvedValue({
+    from: vi.fn().mockReturnValue({
+      select: vi.fn().mockReturnValue({
+        eq: vi.fn().mockReturnValue({
+          in: vi.fn().mockResolvedValue({
+            data: [
+              { id: "doc-1" },
+              { id: "doc-2" },
+            ],
+            error: null,
+          }),
+        }),
+      }),
+      insert: mocks.mockAdminInsert,
+    }),
+  }),
+}));
+
 const mockFrom = vi.fn();
 const mockInsert = vi.fn();
 const mockUpdate = vi.fn();
@@ -63,6 +85,42 @@ describe("service command closures (Unit Test)", () => {
       await expect(
         createService({ name: "X", durationMinutes: 10, serviceType: "GENERAL", status: "ACTIVE", isActive: true })
       ).rejects.toThrow("Failed to create service: DB error");
+    });
+
+    it("should map the new service to all operational doctors via admin client", async () => {
+      mockSingle.mockResolvedValue({
+        data: {
+          id: "550e8400-e29b-41d4-a716-446655440000",
+          name: "Teeth Cleaning",
+          duration_minutes: 30,
+          price: 100,
+          service_type: "GENERAL",
+          is_active: true,
+          description: null,
+        },
+        error: null,
+      });
+      mocks.mockAdminInsert.mockResolvedValue({ error: null });
+      const plainSupabase = {
+        from: () => ({
+          insert: () => ({ select: () => ({ single: () => mockSingle() }) }),
+        }),
+      } as any;
+      const createService = createServiceCommand(plainSupabase);
+      const result = await createService({
+        name: "Teeth Cleaning",
+        durationMinutes: 30,
+        price: 100,
+        serviceType: "GENERAL",
+        status: "ACTIVE",
+        isActive: true,
+      });
+
+      expect(result.id).toBe("550e8400-e29b-41d4-a716-446655440000");
+      expect(mocks.mockAdminInsert).toHaveBeenCalledWith([
+        { doctor_id: "doc-1", service_id: "550e8400-e29b-41d4-a716-446655440000" },
+        { doctor_id: "doc-2", service_id: "550e8400-e29b-41d4-a716-446655440000" },
+      ]);
     });
   });
 
