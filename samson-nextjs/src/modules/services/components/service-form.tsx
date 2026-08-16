@@ -98,28 +98,15 @@ export function ServiceForm({
               {errors.name && <span className="text-[10px] text-red-600 font-semibold">{errors.name.message}</span>}
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <div className="flex flex-col gap-0.5">
-                <span className="text-xs text-muted-foreground">Category Type</span>
-                <select
-                  {...register('serviceType')}
-                  className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border font-medium"
-                >
-                  <option value="GENERAL">GENERAL</option>
-                  <option value="SPECIALIZED">SPECIALIZED</option>
-                </select>
-              </div>
-
-              <div className="flex flex-col gap-0.5">
-                <span className="text-xs text-muted-foreground">Duration (Minutes) <span className="text-red-500 font-bold ml-0.5">*</span></span>
-                <input
-                  type="number"
-                  required
-                  {...register('durationMinutes')}
-                  className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
-                />
-                {errors.durationMinutes && <span className="text-[10px] text-red-600 font-semibold">{errors.durationMinutes.message}</span>}
-              </div>
+            <div className="flex flex-col gap-0.5">
+              <span className="text-xs text-muted-foreground">Category Type</span>
+              <select
+                {...register('serviceType')}
+                className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border font-medium"
+              >
+                <option value="GENERAL">GENERAL</option>
+                <option value="SPECIALIZED">SPECIALIZED</option>
+              </select>
             </div>
 
             <div className="flex flex-col gap-0.5">

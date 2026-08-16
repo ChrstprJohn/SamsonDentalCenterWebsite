@@ -35,14 +35,6 @@ export function ServiceDetailPanel({
     );
   }
 
-  const formatPrice = (price: number | null) => {
-    if (price === null || price === undefined) return 'Contact for pricing';
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(price);
-  };
-
   const getBadgeVariant = (status: string) => {
     if (status === 'ACTIVE') return 'success';
     if (status === 'HIDDEN') return 'warning';
@@ -112,10 +104,7 @@ export function ServiceDetailPanel({
 
             <div className="grid grid-cols-2 gap-3">
               <ServiceField label="Category Type" value={service.serviceType || 'GENERAL'} />
-              <ServiceField label="Duration" value={`${service.durationMinutes} minutes`} />
             </div>
-
-            <ServiceField label="Base Price" value={formatPrice(service.price)} />
 
             <div className="flex flex-col gap-0.5">
               <span className="text-xs text-muted-foreground">Description</span>
