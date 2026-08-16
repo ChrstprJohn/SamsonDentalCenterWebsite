@@ -109,6 +109,7 @@ export type Database = {
           email_reminder_24h_sent: boolean
           email_reminder_48h_sent: boolean
           end_time: string
+          follow_up_48h_sent: boolean
           id: string
           patient_id: string | null
           payment_receipt_sent: boolean
@@ -134,6 +135,7 @@ export type Database = {
           email_reminder_24h_sent?: boolean
           email_reminder_48h_sent?: boolean
           end_time: string
+          follow_up_48h_sent?: boolean
           id?: string
           patient_id?: string | null
           payment_receipt_sent?: boolean
@@ -159,6 +161,7 @@ export type Database = {
           email_reminder_24h_sent?: boolean
           email_reminder_48h_sent?: boolean
           end_time?: string
+          follow_up_48h_sent?: boolean
           id?: string
           patient_id?: string | null
           payment_receipt_sent?: boolean

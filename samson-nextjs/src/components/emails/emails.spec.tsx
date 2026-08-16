@@ -7,6 +7,7 @@ import AppointmentRequestReceivedEmail from './appointment-request-received-emai
 import AppointmentConfirmedEmail from './appointment-confirmed-email';
 
 import PostCareEmail from './post-care-email';
+import CheckoutFollowUpEmail from './checkout-follow-up-email';
 import RequestRejectedEmail from './request-rejected-email';
 import NoShowEmail from './no-show-email';
 
@@ -101,6 +102,22 @@ describe('Email Templates Rendering', () => {
     expect(html).toContain('Alice Guest');
     expect(html).toContain('Dental Cleaning');
     expect(html).toContain('APT-SAMPLE-123');
+  });
+
+  it('renders CheckoutFollowUpEmail without crashing', async () => {
+    const html = await render(
+      React.createElement(CheckoutFollowUpEmail, {
+        patientName: 'Alice Guest',
+        serviceName: 'Dental Cleaning',
+        doctorName: 'Dr. Adrian Samson',
+        dateStr: 'Monday, June 22, 2026',
+        appointmentId: 'APT-SAMPLE-789',
+      })
+    );
+    expect(html).toContain('Alice Guest');
+    expect(html).toContain('Kamusta');
+    expect(html).toContain('Dental Cleaning');
+    expect(html).toContain('APT-SAMPLE-789');
   });
 
   it('renders RequestRejectedEmail without crashing', async () => {

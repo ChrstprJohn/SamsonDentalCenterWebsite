@@ -33,6 +33,7 @@ export function EmailDesignPreview({
   const isReminder = design.id === 'reminder-24h' || design.id === 'reminder-48h';
   const isRescheduled = design.id === 'rescheduled';
   const isPostCare = design.id === 'post-care';
+  const isFollowUp = design.id === 'checkout-follow-up';
   const isNoShow = design.id === 'no-show';
   const isStaffReply = design.id === 'staff-reply';
   const isBookingRequestReceived = design.id === 'booking-request-received';
@@ -42,11 +43,12 @@ export function EmailDesignPreview({
   const chatUrl = `${baseUrl}/manage?token=${sample.appointmentId || 'APT-SAMPLE'}&openChat=true`;
   const feedbackUrl = `${baseUrl}/feedback?ref=${sample.appointmentId || 'APT-SAMPLE'}`;
   const noShowReasonUrl = `${baseUrl}/no-show-reason?ref=${sample.appointmentId || 'APT-SAMPLE'}`;
+  const wellbeingUrl = `${baseUrl}/wellbeing?ref=${sample.appointmentId || 'APT-SAMPLE'}`;
   const ctaHref = isPostCare ? feedbackUrl : isNoShow ? noShowReasonUrl : chatUrl;
   const referenceCode = sample.referenceCode || formatRefId(sample.appointmentId);
 
-  const statusLabel = isConfirmed || isReminder || isRescheduled ? 'Confirmed / Approved' : isPostCare ? 'Completed' : isNoShow ? 'Missed' : isBookingRequestReceived ? 'Pending Review' : isRequestRejected ? 'Rejected' : isCancelled ? 'Cancelled' : null;
-  const statusColor = (isCancelled || isRequestRejected || isNoShow) ? '#dc2626' : isPostCare ? '#0f766e' : '#2563eb';
+  const statusLabel = isConfirmed || isReminder || isRescheduled ? 'Confirmed / Approved' : isPostCare ? 'Completed' : isFollowUp ? 'Completed' : isNoShow ? 'Missed' : isBookingRequestReceived ? 'Pending Review' : isRequestRejected ? 'Rejected' : isCancelled ? 'Cancelled' : null;
+  const statusColor = (isCancelled || isRequestRejected || isNoShow) ? '#dc2626' : (isPostCare || isFollowUp) ? '#0f766e' : '#2563eb';
 
   const showDetails = copy.showSummary && !isCancelled && !isStaffReply && !isRequestRejected && !isNoShow;
 
@@ -118,6 +120,9 @@ export function EmailDesignPreview({
               <p style={{ ...p, margin: '0 0 8px', fontWeight: 700 }}>Your new appointment details:</p>
             )}
             {isPostCare && (
+              <p style={{ ...p, margin: '0 0 8px', fontWeight: 700 }}>Your recent visit:</p>
+            )}
+            {isFollowUp && (
               <p style={{ ...p, margin: '0 0 8px', fontWeight: 700 }}>Your recent visit:</p>
             )}
             {statusLabel && (
@@ -382,6 +387,14 @@ export function EmailDesignPreview({
           </p>
         )}
 
+        {/* Follow-up wellbeing CTA */}
+        {isFollowUp && copy.showCta && copy.ctaLabel && (
+          <p style={p}>
+            How are you feeling today? Take a moment to let us know —{' '}
+            <a href={wellbeingUrl} style={link}>Tell us how you&apos;re feeling</a>. Your response helps our team support your recovery.
+          </p>
+        )}
+
         {/* Post-care — after your visit bullets */}
         {isPostCare && (
           <div style={{ margin: '0 0 20px', paddingLeft: 0 }}>
@@ -398,8 +411,29 @@ export function EmailDesignPreview({
           </div>
         )}
 
+        {/* Follow-up — check in on you bullets */}
+        {isFollowUp && (
+          <div style={{ margin: '0 0 20px', paddingLeft: 0 }}>
+            <p style={{ ...p, margin: '0 0 8px', fontWeight: 700 }}>Quick Reminders</p>
+            <ul style={{ margin: '0 0 16px', paddingLeft: 20, listStyle: 'disc', color: '#1a1a1a', fontSize: 14, lineHeight: 1.75 }}>
+              <li style={{ marginBottom: 6 }}>Follow all post-treatment care instructions from your doctor.</li>
+              <li style={{ marginBottom: 6 }}>Concerns or questions? Call/text us at{' '}
+                <a href={b.phoneHref} style={link}>{b.phone}</a>.
+              </li>
+              <li>
+                <span style={{ color: '#dc2626', fontWeight: 600 }}>Note: Replies to this email are unmonitored.</span>
+              </li>
+              <li style={{ marginTop: 6 }}>
+                If you are experiencing a severe emergency, call us immediately at{' '}
+                <a href={b.phoneHref} style={link}>{b.phone}</a>{' '}
+                or visit the nearest emergency room.
+              </li>
+            </ul>
+          </div>
+        )}
+
         {/* Appreciation / care paragraph — skipped for confirmed, rescheduled, reminders & post-care (kept short) */}
-        {!isConfirmed && !isRescheduled && !isReminder && !isPostCare && !isCancelled && !isStaffReply && !isRequestRejected && !isNoShow && (
+        {!isConfirmed && !isRescheduled && !isReminder && !isPostCare && !isFollowUp && !isCancelled && !isStaffReply && !isRequestRejected && !isNoShow && (
           <p style={p}>
             {isBookingRequestReceived
               ? 'We appreciate your patience while we review your request. Our team will reach out to you shortly to confirm the details of your appointment.'
@@ -452,7 +486,7 @@ export function EmailDesignPreview({
         )}
 
         {/* Single consolidated contact block — chat link + phone if chat available, phone-only if not */}
-        {!isConfirmed && !isCancelled && !isRescheduled && !isReminder && !isPostCare && !isStaffReply && !isBookingRequestReceived && !isRequestRejected && !isNoShow && (
+        {!isConfirmed && !isCancelled && !isRescheduled && !isReminder && !isPostCare && !isFollowUp && !isStaffReply && !isBookingRequestReceived && !isRequestRejected && !isNoShow && (
           <p style={p}>
             {copy.showCta && !isPostCare
               ? <>
@@ -482,6 +516,8 @@ export function EmailDesignPreview({
             ? `Thank you for choosing ${b.clinicName}.`
             : isPostCare
             ? `Thank you for choosing ${b.clinicName}. We hope to see you again soon.`
+            : isFollowUp
+            ? `We hope you are feeling well. Thank you for trusting ${b.clinicName} with your care.`
             : isNoShow
             ? `We hope to see you at ${b.clinicName} soon. Please reach out if there is anything we can do.`
             : isStaffReply

@@ -8,6 +8,7 @@ import AppointmentCancelledEmail from './appointment-cancelled-email';
 import AppointmentRescheduledEmail from './appointment-rescheduled-email';
 import StaffReplyEmail from './staff-reply-email';
 import PostCareEmail from './post-care-email';
+import CheckoutFollowUpEmail from './checkout-follow-up-email';
 import NoShowEmail from './no-show-email';
 import AppointmentRequestReceivedEmail from './appointment-request-received-email';
 import RequestRejectedEmail from './request-rejected-email';
@@ -142,6 +143,17 @@ export function RenderedEmailFrame({ eventType, payload }: RenderedEmailFramePro
   } else if (eventType === 'APPOINTMENT_COMPLETED_POST_CARE' || eventType === 'APPOINTMENT_COMPLETED_POST_CARE_SMS') {
     element = (
       <PostCareEmail
+        patientName={patientName}
+        serviceName={serviceName}
+        doctorName={doctorName}
+        dateStr={dateStr}
+        appointmentId={appointmentId}
+        baseUrl={baseUrl}
+      />
+    );
+  } else if (eventType === 'APPOINTMENT_CHECKOUT_FOLLOW_UP') {
+    element = (
+      <CheckoutFollowUpEmail
         patientName={patientName}
         serviceName={serviceName}
         doctorName={doctorName}

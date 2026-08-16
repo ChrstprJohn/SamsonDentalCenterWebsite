@@ -10,6 +10,7 @@ export const APPOINTMENT_SUMMARY_SELECT = `
   confirmation_channel, email_confirmation_sent, sms_confirmation_sent,
   email_reminder_48h_sent, sms_reminder_48h_sent, email_reminder_24h_sent,
   sms_reminder_24h_sent, email_checkout_sent, sms_checkout_sent,
+  follow_up_48h_sent,
   email_cancel_sent, sms_cancel_sent, email_reschedule_sent,
   sms_reschedule_sent, no_show_resolved_at,
   no_show_resolution, created_at, updated_at,

@@ -9,7 +9,7 @@ import { authorizeRole } from '@/shared/auth/auth.util';
 
 export interface ResendNotificationInput {
   appointmentId: string;
-  eventType: 'APPOINTMENT_BOOKED' | 'APPOINTMENT_REMINDER_48H' | 'APPOINTMENT_REMINDER_24H' | 'APPOINTMENT_CHECKOUT' | 'APPOINTMENT_INQUIRY_RECEIVED' | 'CANCEL_BOOKING' | 'RESCHEDULE_BOOKING' | 'APPOINTMENT_NO_SHOW';
+  eventType: 'APPOINTMENT_BOOKED' | 'APPOINTMENT_REMINDER_48H' | 'APPOINTMENT_REMINDER_24H' | 'APPOINTMENT_CHECKOUT' | 'APPOINTMENT_INQUIRY_RECEIVED' | 'CANCEL_BOOKING' | 'RESCHEDULE_BOOKING' | 'APPOINTMENT_NO_SHOW' | 'APPOINTMENT_CHECKOUT_FOLLOW_UP';
   targetChannel?: 'EMAIL' | 'SMS' | 'BOTH';
 }
 
@@ -24,6 +24,7 @@ const resendNotificationSchema = z.object({
     'CANCEL_BOOKING',
     'RESCHEDULE_BOOKING',
     'APPOINTMENT_NO_SHOW',
+    'APPOINTMENT_CHECKOUT_FOLLOW_UP',
   ]),
   targetChannel: z.enum(['EMAIL', 'SMS', 'BOTH']).optional(),
 });
@@ -128,6 +129,8 @@ export async function resendNotificationAction(input: ResendNotificationInput) {
     } else if (parsed.eventType === 'APPOINTMENT_CHECKOUT') {
       if (shouldSendEmail) updatePayload.email_checkout_sent = true;
       if (shouldSendSms) updatePayload.sms_checkout_sent = true;
+    } else if (parsed.eventType === 'APPOINTMENT_CHECKOUT_FOLLOW_UP') {
+      if (shouldSendEmail) updatePayload.follow_up_48h_sent = true;
     } else if (parsed.eventType === 'CANCEL_BOOKING') {
       if (shouldSendEmail) updatePayload.email_cancel_sent = true;
       if (shouldSendSms) updatePayload.sms_cancel_sent = true;
@@ -172,6 +175,9 @@ export async function resendNotificationAction(input: ResendNotificationInput) {
         payload = { appointmentId: parsed.appointmentId, email: recipientEmail };
       } else if (parsed.eventType === 'APPOINTMENT_CHECKOUT') {
         eventType = 'APPOINTMENT_COMPLETED_POST_CARE';
+        payload = { appointmentId: parsed.appointmentId, email: recipientEmail };
+      } else if (parsed.eventType === 'APPOINTMENT_CHECKOUT_FOLLOW_UP') {
+        eventType = 'APPOINTMENT_CHECKOUT_FOLLOW_UP';
         payload = { appointmentId: parsed.appointmentId, email: recipientEmail };
       } else if (parsed.eventType === 'APPOINTMENT_NO_SHOW') {
         eventType = 'APPOINTMENT_NO_SHOW';
@@ -228,8 +234,8 @@ export async function resendNotificationAction(input: ResendNotificationInput) {
       await globalOutboxDispatcher(supabaseAdmin, true, emailEventId)();
     }
 
-    // Dispatch SMS Event
-    if (shouldSendSms && recipientPhone) {
+    // Dispatch SMS Event (follow-up is email-only — skip SMS for it)
+    if (shouldSendSms && recipientPhone && parsed.eventType !== 'APPOINTMENT_CHECKOUT_FOLLOW_UP') {
       const smsEventType = parsed.eventType === 'APPOINTMENT_CHECKOUT'
         ? 'APPOINTMENT_COMPLETED_POST_CARE_SMS'
         : parsed.eventType === 'APPOINTMENT_NO_SHOW'

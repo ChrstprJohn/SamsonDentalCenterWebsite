@@ -15,6 +15,7 @@ import { onAppointmentReminder48hSubscriber } from '@/modules/emails/subscribers
 import { onAppointmentReminder24hSmsSubscriber } from '@/modules/emails/subscribers/on-appointment-reminder-24h-sms.subscriber';
 import { onAppointmentReminder48hSmsSubscriber } from '@/modules/emails/subscribers/on-appointment-reminder-48h-sms.subscriber';
 import { onPostCareReviewSubscriber } from '@/modules/emails/subscribers/on-post-care-review.subscriber';
+import { onCheckoutFollowUpSubscriber } from '@/modules/emails/subscribers/on-checkout-follow-up.subscriber';
 import { onPostCareReviewSmsSubscriber } from '@/modules/emails/subscribers/on-post-care-review-sms.subscriber';
 import { onNoShowSubscriber } from '@/modules/emails/subscribers/on-no-show.subscriber';
 import { onNoShowSmsSubscriber } from '@/modules/emails/subscribers/on-no-show-sms.subscriber';
@@ -61,6 +62,9 @@ export const bootstrapEventSubscribers = () => {
   // Post-Care Review Request (Email & SMS)
   registerSubscriber('APPOINTMENT_COMPLETED_POST_CARE', onPostCareReviewSubscriber.handle);
   registerSubscriber('APPOINTMENT_COMPLETED_POST_CARE_SMS', onPostCareReviewSmsSubscriber.handle);
+
+  // 48h Checkout Follow-Up (Kamusta wellbeing check-in, email only)
+  registerSubscriber('APPOINTMENT_CHECKOUT_FOLLOW_UP', onCheckoutFollowUpSubscriber.handle);
 
   // Missed Appointment No-show (Email & SMS)
   registerSubscriber('APPOINTMENT_NO_SHOW', onNoShowSubscriber.handle);

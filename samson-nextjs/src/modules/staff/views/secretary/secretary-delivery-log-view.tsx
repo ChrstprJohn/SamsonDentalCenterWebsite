@@ -46,6 +46,7 @@ const EVENT_NAME_MAP: Record<string, string> = {
   'APPOINTMENT_CHECKOUT': 'Checkout / Thank You',
   'APPOINTMENT_COMPLETED_POST_CARE': 'Checkout / Thank You',
   'APPOINTMENT_COMPLETED_POST_CARE_SMS': 'Checkout / Thank You',
+  'APPOINTMENT_CHECKOUT_FOLLOW_UP': '48h Follow-Up (Kamusta)',
   'APPOINTMENT_NO_SHOW': 'Missed Appointment (No-show)',
   'APPOINTMENT_NO_SHOW_SMS': 'Missed Appointment (No-show)',
   'REJECT_INQUIRY': 'Inquiry Rejected / Declined',

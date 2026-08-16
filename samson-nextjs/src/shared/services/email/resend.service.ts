@@ -11,6 +11,7 @@ import AppointmentRescheduledEmail from '@/components/emails/appointment-resched
 import StaffReplyEmail from '@/components/emails/staff-reply-email';
 import AppointmentReminderEmail from '@/components/emails/appointment-reminder-email';
 import PostCareEmail from '@/components/emails/post-care-email';
+import CheckoutFollowUpEmail from '@/components/emails/checkout-follow-up-email';
 import RequestRejectedEmail from '@/components/emails/request-rejected-email';
 import NoShowEmail from '@/components/emails/no-show-email';
 import { EmailBranding, resolveEmailBranding } from '@/components/emails/email-branding';
@@ -99,6 +100,14 @@ type EmailTemplates = {
     baseUrl: string;
   };
   'post_care': {
+    patientName: string;
+    serviceName?: string;
+    doctorName?: string;
+    dateStr?: string;
+    appointmentId?: string;
+    baseUrl?: string;
+  };
+  'checkout_follow_up': {
     patientName: string;
     serviceName?: string;
     doctorName?: string;
@@ -277,6 +286,19 @@ export const ResendService = {
       case 'post_care': {
         const reqPayload = payload as EmailTemplates['post_care'];
         html = await render(React.createElement(PostCareEmail, {
+          patientName: reqPayload.patientName,
+          serviceName: reqPayload.serviceName,
+          doctorName: reqPayload.doctorName,
+          dateStr: reqPayload.dateStr,
+          appointmentId: reqPayload.appointmentId,
+          baseUrl: reqPayload.baseUrl,
+          branding: branding || undefined,
+        }));
+        break;
+      }
+      case 'checkout_follow_up': {
+        const reqPayload = payload as EmailTemplates['checkout_follow_up'];
+        html = await render(React.createElement(CheckoutFollowUpEmail, {
           patientName: reqPayload.patientName,
           serviceName: reqPayload.serviceName,
           doctorName: reqPayload.doctorName,

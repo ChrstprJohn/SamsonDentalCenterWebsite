@@ -1313,6 +1313,7 @@ function MessageLogContent({ appointment, view }: { appointment: any; view: any 
     smsReminder24hSent: Boolean(appointment.smsReminder24hSent || appointment.sms_reminder_24h_sent),
     emailCheckoutSent: Boolean(appointment.emailCheckoutSent || appointment.email_checkout_sent),
     smsCheckoutSent: Boolean(appointment.smsCheckoutSent || appointment.sms_checkout_sent),
+    emailFollowUp48hSent: Boolean(appointment.followUp48hSent || appointment.follow_up_48h_sent),
   });
 
   useEffect(() => {
@@ -1327,10 +1328,11 @@ function MessageLogContent({ appointment, view }: { appointment: any; view: any 
       smsReminder24hSent: Boolean(appointment.smsReminder24hSent || appointment.sms_reminder_24h_sent),
       emailCheckoutSent: Boolean(appointment.emailCheckoutSent || appointment.email_checkout_sent),
       smsCheckoutSent: Boolean(appointment.smsCheckoutSent || appointment.sms_checkout_sent),
+      emailFollowUp48hSent: Boolean(appointment.followUp48hSent || appointment.follow_up_48h_sent),
     });
   }, [appointment]);
 
-  const handleResend = async (eventType: 'APPOINTMENT_BOOKED' | 'APPOINTMENT_REMINDER_48H' | 'APPOINTMENT_REMINDER_24H' | 'APPOINTMENT_CHECKOUT', targetChannel: 'EMAIL' | 'SMS') => {
+  const handleResend = async (eventType: 'APPOINTMENT_BOOKED' | 'APPOINTMENT_REMINDER_48H' | 'APPOINTMENT_REMINDER_24H' | 'APPOINTMENT_CHECKOUT' | 'APPOINTMENT_CHECKOUT_FOLLOW_UP', targetChannel: 'EMAIL' | 'SMS') => {
     const key = `${eventType}_${targetChannel}`;
     setResending(key);
     const res = await resendNotificationAction({ appointmentId: appointment.id, eventType, targetChannel });
@@ -1347,6 +1349,8 @@ function MessageLogContent({ appointment, view }: { appointment: any; view: any 
       } else if (eventType === 'APPOINTMENT_CHECKOUT') {
         if (targetChannel === 'EMAIL') { (appointment as any).emailCheckoutSent = true; (appointment as any).email_checkout_sent = true; }
         if (targetChannel === 'SMS') { (appointment as any).smsCheckoutSent = true; (appointment as any).sms_checkout_sent = true; }
+      } else if (eventType === 'APPOINTMENT_CHECKOUT_FOLLOW_UP') {
+        if (targetChannel === 'EMAIL') { (appointment as any).followUp48hSent = true; (appointment as any).follow_up_48h_sent = true; }
       }
 
       setCommState((prev) => {
@@ -1363,6 +1367,8 @@ function MessageLogContent({ appointment, view }: { appointment: any; view: any 
         } else if (eventType === 'APPOINTMENT_CHECKOUT') {
           if (targetChannel === 'EMAIL') updates.emailCheckoutSent = true;
           if (targetChannel === 'SMS') updates.smsCheckoutSent = true;
+        } else if (eventType === 'APPOINTMENT_CHECKOUT_FOLLOW_UP') {
+          if (targetChannel === 'EMAIL') updates.emailFollowUp48hSent = true;
         }
         return { ...prev, ...updates };
       });
@@ -1396,7 +1402,7 @@ function MessageLogContent({ appointment, view }: { appointment: any; view: any 
   const commEntries: {
     key: string;
     label: string;
-    eventType: 'APPOINTMENT_BOOKED' | 'APPOINTMENT_REMINDER_48H' | 'APPOINTMENT_REMINDER_24H' | 'APPOINTMENT_CHECKOUT';
+    eventType: 'APPOINTMENT_BOOKED' | 'APPOINTMENT_REMINDER_48H' | 'APPOINTMENT_REMINDER_24H' | 'APPOINTMENT_CHECKOUT' | 'APPOINTMENT_CHECKOUT_FOLLOW_UP';
     emailSent: boolean;
     smsSent: boolean;
   }[] = [
@@ -1404,6 +1410,7 @@ function MessageLogContent({ appointment, view }: { appointment: any; view: any 
     { key: 'reminder48h', label: '48-Hour Reminder', eventType: 'APPOINTMENT_REMINDER_48H', emailSent: commState.emailReminder48hSent, smsSent: commState.smsReminder48hSent },
     { key: 'reminder24h', label: '24-Hour Reminder', eventType: 'APPOINTMENT_REMINDER_24H', emailSent: commState.emailReminder24hSent, smsSent: commState.smsReminder24hSent },
     { key: 'checkout', label: 'Checkout / Thank You', eventType: 'APPOINTMENT_CHECKOUT', emailSent: commState.emailCheckoutSent, smsSent: commState.smsCheckoutSent },
+    { key: 'followup48h', label: '48h Follow-Up', eventType: 'APPOINTMENT_CHECKOUT_FOLLOW_UP', emailSent: commState.emailFollowUp48hSent, smsSent: false },
   ];
 
   return (
@@ -1477,7 +1484,7 @@ function MessageLogContent({ appointment, view }: { appointment: any; view: any 
               <div key={entry.key} className="space-y-1.5">
                 <span className="text-xs text-muted-foreground">{entry.label}</span>
                 <div className="flex flex-col gap-2">
-                  {hasSms && (
+                  {hasSms && entry.eventType !== 'APPOINTMENT_CHECKOUT_FOLLOW_UP' && (
                     <div className="flex items-center justify-between p-2.5 bg-secondary-bg/20 border border-card-border/60 rounded-xl">
                       <div className="flex items-center gap-2 min-w-0">
                         <MessageSquare className="size-3.5 text-muted-foreground shrink-0" />

@@ -58,6 +58,7 @@ const EVENT_NAME_MAP: Record<string, string> = {
   'STAFF_REPLIED_TO_CHAT': 'Staff Reply (Email)',
   'APPOINTMENT_COMPLETED_POST_CARE': 'Post-Care Review (Email)',
   'APPOINTMENT_COMPLETED_POST_CARE_SMS': 'Post-Care (SMS)',
+  'APPOINTMENT_CHECKOUT_FOLLOW_UP': '48h Follow-Up (Email)',
   'APPOINTMENT_NO_SHOW': 'Missed Appointment (Email)',
   'APPOINTMENT_NO_SHOW_SMS': 'Missed Appointment (SMS)',
   'PATIENT_REGISTERED': 'Registration OTP (Email)',

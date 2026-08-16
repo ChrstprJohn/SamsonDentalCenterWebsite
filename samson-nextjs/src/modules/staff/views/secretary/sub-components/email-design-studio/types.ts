@@ -6,6 +6,7 @@ export type EmailDesignId =
   | 'rescheduled'
   | 'staff-reply'
   | 'post-care'
+  | 'checkout-follow-up'
   | 'booking-request-received'
   | 'request-rejected'
   | 'no-show';

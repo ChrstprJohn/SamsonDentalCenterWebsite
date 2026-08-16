@@ -16,6 +16,7 @@ async function handleProcess(req: NextRequest) {
     bootstrapEventSubscribers();
     const supabaseAdmin = await createAdminClient();
     await supabaseAdmin.rpc('scan_and_queue_appointment_reminders');
+    await supabaseAdmin.rpc('scan_and_queue_checkout_follow_ups');
     await globalOutboxDispatcher(supabaseAdmin)();
     return Response.json({ success: true, message: 'Outbox processed successfully.' });
   } catch (error: any) {

@@ -48,6 +48,16 @@ const data = {
       title: "Check-In / Out",
       url: "/secretary-v2/check-in",
       icon: <UserCheck className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
+      items: [
+        {
+          title: "Board",
+          url: "/secretary-v2/check-in",
+        },
+        {
+          title: "Follow-Up",
+          url: "/secretary-v2/check-in/follow-up",
+        },
+      ],
     },
     {
       title: "Appointment Requests",
