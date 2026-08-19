@@ -10,7 +10,7 @@ export function TrustAndStats({ variant = 'v1', serviceCount = 0 }: TrustAndStat
     { value: '60+', label: 'Years of Pure Dental Expertise' },
     { value: '4.3★', label: 'Google Rating' },
     { value: '100%', label: 'Board-Certified Specialists' },
-    { value: `${serviceCount}+`, label: 'Signature Dental Services' },
+    { value: `${serviceCount}+`, label: 'Dental Services Offered' },
     { value: 'Online', label: 'Easy Appointment Booking' },
   ];
 
