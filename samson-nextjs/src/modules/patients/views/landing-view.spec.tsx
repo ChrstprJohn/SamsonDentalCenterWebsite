@@ -39,7 +39,7 @@ describe('LandingView', () => {
       handleBookingCTA,
     });
 
-    render(<LandingView services={[]} config={mockConfig} />);
+    render(<LandingView services={[]} config={mockConfig} reviews={[]} />);
 
     expect(screen.getByTestId('hero-section-preview')).toBeDefined();
     expect(screen.getByTestId('services-section')).toBeDefined();

@@ -15,10 +15,12 @@ import { TestimonialsSection } from '../components/landing/testimonials-section'
 import { FaqSection } from '../components/landing/faq-section';
 import { ContactSection } from '../components/landing/contact-section';
 import { AppointmentBannerSection } from '../components/landing/appointment-banner-section';
+import type { LandingReview } from '@/modules/reviews/queries/get-featured-landing-reviews.query';
 
 interface LandingViewProps {
   services: ServiceResponseDto[];
   config: ClinicConfigResponseDto;
+  reviews: LandingReview[];
 }
 
 const DEFAULT_SERVICES: ServiceResponseDto[] = [
@@ -72,7 +74,7 @@ const DEFAULT_SERVICES: ServiceResponseDto[] = [
   },
 ];
 
-export function LandingView({ services, config }: LandingViewProps) {
+export function LandingView({ services, config, reviews }: LandingViewProps) {
   const activeServices = services.length > 0 ? services : DEFAULT_SERVICES;
 
   const {
@@ -88,7 +90,7 @@ export function LandingView({ services, config }: LandingViewProps) {
       <AboutSection />
       {/* <JourneySection /> */}
       <GallerySection />
-      <TestimonialsSection />
+      <TestimonialsSection reviews={reviews} />
       <FaqSection config={config} />
       <ContactSection config={config} />
       <AppointmentBannerSection />

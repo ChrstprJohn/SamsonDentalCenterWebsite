@@ -23,6 +23,10 @@ vi.mock('@/shared/database/server', () => ({
   createAdminClient: vi.fn().mockResolvedValue(mocks.chain),
 }));
 
+vi.mock('@/modules/notifications/use-cases/management/create-notification.use-case', () => ({
+  createNotificationUseCase: vi.fn(() => vi.fn().mockResolvedValue(undefined)),
+}));
+
 describe('submitReviewAction (Unit Test)', () => {
   beforeEach(() => {
     mocks.insert.mockClear();
@@ -40,6 +44,7 @@ describe('submitReviewAction (Unit Test)', () => {
       appointment_id: 'apt-1',
       rating: 5,
       comment: 'Great visit',
+      is_featured_on_landing: false,
     });
   });
 

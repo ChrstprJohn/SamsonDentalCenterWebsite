@@ -58,6 +58,8 @@ export async function submitReviewAction(
       appointment_id: appointmentId,
       rating,
       comment,
+      // New patient reviews must be manually enabled by a secretary first.
+      is_featured_on_landing: false,
     });
 
     if (error) {

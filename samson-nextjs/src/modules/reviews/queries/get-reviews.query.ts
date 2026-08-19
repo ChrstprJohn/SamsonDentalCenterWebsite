@@ -9,6 +9,8 @@ export type ReviewListItem = {
   patientName: string;
   serviceName: string | null;
   appointmentDate: string | null;
+  isFeaturedOnLanding: boolean;
+  source: 'Patient' | 'Google';
 };
 
 export const getReviewsQuery = (supabase: SupabaseClient) => {
@@ -20,6 +22,7 @@ export const getReviewsQuery = (supabase: SupabaseClient) => {
         rating,
         comment,
         created_at,
+        is_featured_on_landing,
         appointment_id,
         appointment:appointments(
           id,
@@ -50,6 +53,8 @@ export const getReviewsQuery = (supabase: SupabaseClient) => {
         patientName,
         serviceName: appt?.service?.name ?? null,
         appointmentDate: appt?.date ?? null,
+        isFeaturedOnLanding: row.is_featured_on_landing ?? false,
+        source: 'Patient',
       };
     });
   };

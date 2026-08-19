@@ -4,6 +4,8 @@ import { getClinicConfigAction } from '@/modules/clinic-config/actions/settings/
 import { LandingView } from '@/modules/patients/views/landing-view';
 import type { ClinicConfigResponseDto } from '@/modules/clinic-config/dtos/settings/get-clinic-config.dto';
 import type { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
+import { createAdminClient } from '@/shared/database/server';
+import { getFeaturedLandingReviewsQuery, type LandingReview } from '@/modules/reviews/queries/get-featured-landing-reviews.query';
 
 const DEFAULT_CONFIG: ClinicConfigResponseDto = {
   isBookingOpen: true,
@@ -38,6 +40,7 @@ const DEFAULT_CONFIG: ClinicConfigResponseDto = {
 export default async function HomePage() {
   let services: ServiceResponseDto[] = [];
   let config = DEFAULT_CONFIG;
+  let reviews: LandingReview[] = [];
 
   // 1. Fetch Active Services
   try {
@@ -59,10 +62,18 @@ export default async function HomePage() {
     console.error('Failed to load clinic config on landing page:', err);
   }
 
+  try {
+    const supabase = await createAdminClient();
+    reviews = await getFeaturedLandingReviewsQuery(supabase)();
+  } catch (err) {
+    console.error('Failed to load landing page reviews:', err);
+  }
+
   return (
     <LandingView
       services={services}
       config={config}
+      reviews={reviews}
     />
   );
 }

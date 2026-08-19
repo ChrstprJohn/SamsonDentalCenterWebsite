@@ -2,6 +2,7 @@ import React from 'react';
 import { createClient } from '@/shared/database/server';
 import { authorizeRole } from '@/shared/auth/auth.util';
 import { getReviewsQuery } from '@/modules/reviews/queries/get-reviews.query';
+import { getExternalReviewsQuery } from '@/modules/reviews/queries/get-external-reviews.query';
 import { ReviewsAdminView } from '@/modules/reviews/components/reviews-admin-view';
 
 export const dynamic = 'force-dynamic';
@@ -11,7 +12,7 @@ export default async function SecretaryReviewsPage() {
 
   const supabase = await createClient();
   const getReviews = getReviewsQuery(supabase);
-  const reviews = await getReviews();
+  const [reviews, externalReviews] = await Promise.all([getReviews(), getExternalReviewsQuery(supabase)()]);
 
   return (
     <div
@@ -21,9 +22,9 @@ export default async function SecretaryReviewsPage() {
     >
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-text-primary">Patient Reviews</h1>
-        <p className="text-xs text-text-muted">Star ratings and comments collected from the post-care review link.</p>
+        <p className="text-xs text-text-muted">Patient submissions and imported Google reviews. Use the Landing page toggle to choose what is public.</p>
       </div>
-      <ReviewsAdminView initialReviews={reviews} />
+      <ReviewsAdminView initialReviews={[...reviews, ...externalReviews]} />
     </div>
   );
 }
