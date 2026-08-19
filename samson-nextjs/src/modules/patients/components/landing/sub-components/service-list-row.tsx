@@ -12,6 +12,7 @@ export function ServiceListRow({ nr, title, onClick }: ServiceListRowProps) {
   return (
     <div
       onClick={onClick}
+      title="Click to book this service"
       className="group relative flex items-center justify-between py-6 sm:py-8 transition-colors duration-300 hover:bg-[#1C1D1D]/70 px-4 sm:px-6 rounded-2xl cursor-pointer overflow-hidden"
     >
       <NoiseOverlay className="opacity-0 group-hover:opacity-[0.06] transition-opacity duration-300" />

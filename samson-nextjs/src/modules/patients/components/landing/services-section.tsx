@@ -12,15 +12,6 @@ interface ServicesSectionProps {
 
 const CARD_COUNT = 5;
 
-// ponytail: stock placeholders only until services get image_url set in DB
-const FALLBACK_IMAGES = [
-  'https://lavadental.lv/cms/api/media/file/Complex%20diagnostics-1290x300.avif',
-  'https://lavadental.lv/cms/api/media/file/Hygien-600x820.avif',
-  'https://lavadental.lv/cms/api/media/file/Veneers-600x820.avif',
-  'https://lavadental.lv/cms/api/media/file/Implants-600x820.avif',
-  'https://lavadental.lv/cms/api/media/file/Aligners-600x820.avif',
-];
-
 export function ServicesSection({ services, onSelectService }: ServicesSectionProps) {
   const cardServices = services.slice(0, CARD_COUNT);
   const listServices = services.slice(CARD_COUNT);
@@ -52,7 +43,7 @@ export function ServicesSection({ services, onSelectService }: ServicesSectionPr
                 key={svc.id}
                 nr={String(idx + 1).padStart(2, '0')}
                 title={svc.name}
-                image={svc.imageUrl || FALLBACK_IMAGES[idx % FALLBACK_IMAGES.length]}
+                image={svc.imageUrl}
                 index={idx}
                 onClick={() => onSelectService(svc)}
               />

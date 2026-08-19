@@ -5,7 +5,7 @@ import { MoveRight } from 'lucide-react';
 interface ServiceCardProps {
   nr: string;
   title: string;
-  image: string;
+  image?: string;
   index: number;
   onClick: () => void;
 }
@@ -18,12 +18,14 @@ export function ServiceCard({ nr, title, image, index, onClick }: ServiceCardPro
     : 'h-[240px] xs:h-[275px] sm:h-[315px] md:h-[250px] lg:h-[365px]';
 
   return (
-    <div onClick={onClick} className={`group relative ${height} rounded-none overflow-hidden block ${colSpan} bg-[#1D1E1E] cursor-pointer`}>
-      <img
-        src={image}
-        alt={title}
-        className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-[1.025] transition-transform duration-700 ease-out filter brightness-[0.9] saturate-[0.95] contrast-[1.01]"
-      />
+    <div onClick={onClick} title="Click to book this service" className={`group relative ${height} rounded-none overflow-hidden block ${colSpan} bg-[#1D1E1E] cursor-pointer`}>
+      {image && (
+        <img
+          src={image}
+          alt={title}
+          className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-[1.025] transition-transform duration-700 ease-out filter brightness-[0.9] saturate-[0.95] contrast-[1.01]"
+        />
+      )}
       <div className="absolute inset-0 bg-[#1D1E1E]/5 z-5 transition-opacity duration-350 group-hover:opacity-10" />
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent z-10" />
       <span className="absolute top-3 left-3 sm:top-5 sm:left-5 md:top-4 md:left-4 lg:top-6 lg:left-6 text-white font-josefin font-normal text-base md:text-base lg:text-xl z-15">
