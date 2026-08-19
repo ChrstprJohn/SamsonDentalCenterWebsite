@@ -49,7 +49,7 @@ const EVENT_LABELS: Record<string, string> = {
   CANCEL_BOOKING: 'Cancelled (Email)',
   APPOINTMENT_COMPLETED_POST_CARE: 'Post-Care Review (Email)',
   APPOINTMENT_COMPLETED_POST_CARE_SMS: 'Post-Care (SMS)',
-  APPOINTMENT_CHECKOUT_FOLLOW_UP: '48h Follow-Up (Email)',
+  APPOINTMENT_CHECKOUT_FOLLOW_UP: '48h Aftercare Email',
 };
 
 function isMissingStaffRpc(error: { code?: string } | null): boolean {

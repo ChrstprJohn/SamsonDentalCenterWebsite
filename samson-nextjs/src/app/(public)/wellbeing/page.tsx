@@ -14,10 +14,13 @@ export default async function WellbeingPage({ searchParams }: { searchParams: Pr
   const appointmentId = (ref || '').trim();
 
   let clinicPhone: string | null = null;
+  let clinicLandline: string | null = null;
   try {
     const configResponse = await getClinicConfigAction();
     if (configResponse && 'data' in configResponse && configResponse.data) {
-      clinicPhone = (configResponse.data as ClinicConfigResponseDto).phone ?? null;
+      const data = configResponse.data as ClinicConfigResponseDto;
+      clinicPhone = data.phone ?? null;
+      clinicLandline = data.landline ?? null;
     }
   } catch (err) {
     console.error('Failed to load clinic phone on wellbeing page:', err);
@@ -68,10 +71,13 @@ export default async function WellbeingPage({ searchParams }: { searchParams: Pr
   }
 
   return (
-    <div className="w-full max-w-xl mx-auto px-6 py-16 flex flex-col items-center">
+    <div
+      className="w-full max-w-xl mx-auto px-6 py-16 flex flex-col items-center"
+      data-lenis-prevent
+    >
       <div className="w-full overflow-hidden rounded-3xl border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-slate-950/40 backdrop-blur-2xl shadow-2xl flex flex-col">
         <div className="px-8 py-10">
-          <WellbeingForm appointmentId={appointmentId} patientName={context.patientName} clinicPhone={clinicPhone} />
+          <WellbeingForm appointmentId={appointmentId} patientName={context.patientName} clinicPhone={clinicPhone} clinicLandline={clinicLandline} />
         </div>
       </div>
     </div>

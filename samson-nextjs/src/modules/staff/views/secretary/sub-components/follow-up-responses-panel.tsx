@@ -2,12 +2,13 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { CheckCircle2, MessageSquare, Phone, Mail, Plus, X } from 'lucide-react';
+import { CheckCircle2, MessageSquare, Phone, Mail, Plus, X, ChevronDown, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/feedback/toast-container';
-import { formatTimeAgo } from '@/shared/utils/date.util';
+import { formatTimeAgo, formatShortDate } from '@/shared/utils/date.util';
 import { updateWellbeingStatusAction } from '@/modules/wellbeing/actions/update-wellbeing-status.action';
 import { createManualWellbeingResponseAction } from '@/modules/wellbeing/actions/create-manual-wellbeing-response.action';
 
@@ -20,6 +21,7 @@ export type FollowUpResponseRow = {
   status: string;
   source: string;
   updatedAt: string | null;
+  patientName: string | null;
   appointment?: {
     date: string;
     patientName: string;
@@ -45,6 +47,23 @@ const FEELING_LABEL: Record<string, { label: string; className: string }> = {
 
 const SYMPTOM_OPTIONS = ['Pain', 'Swelling', 'Bleeding', 'Fever', 'Nausea', 'Other'] as const;
 
+const SOURCE_OPTIONS = [
+  { v: 'PHONE' as const, label: '📞 Phone' },
+  { v: 'TEXT' as const, label: '💬 Text' },
+  { v: 'EMAIL' as const, label: '✉️ Email' },
+];
+
+type Details = { medsTaken?: boolean; medsManageable?: boolean; symptoms?: string[]; callBack?: 'YES' | 'NO' };
+
+function redFlagScore(r: FollowUpResponseRow): number {
+  const details = (r.details || {}) as Details;
+  const flags =
+    (r.feeling === 'NOT_SO_GOOD' ? 1 : 0) +
+    (details.callBack === 'YES' ? 1 : 0) +
+    (details.medsTaken === false || details.medsManageable === false ? 1 : 0);
+  return r.status === 'UNRESOLVED' ? 1 + flags : 0;
+}
+
 export function FollowUpResponsesPanel({
   responses,
   appointmentOptions,
@@ -56,14 +75,22 @@ export function FollowUpResponsesPanel({
   const { addToast } = useToast();
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [filter, setFilter] = useState<'ALL' | 'UNRESOLVED'>('UNRESOLVED');
 
   const [showModal, setShowModal] = useState(false);
   const [appointmentId, setAppointmentId] = useState('');
-  const [source, setSource] = useState<'PHONE' | 'EMAIL'>('PHONE');
+  const [patientName, setPatientName] = useState('');
+  const [source, setSource] = useState<'PHONE' | 'TEXT' | 'EMAIL'>('PHONE');
   const [feeling, setFeeling] = useState('');
   const [symptoms, setSymptoms] = useState<string[]>([]);
   const [note, setNote] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const unresolved = responses.filter((r) => r.status === 'UNRESOLVED').length;
+  const visible = responses
+    .filter((r) => filter === 'ALL' || r.status === 'UNRESOLVED')
+    .sort((a, b) => redFlagScore(b) - redFlagScore(a) || b.createdAt.localeCompare(a.createdAt));
 
   const handleSetStatus = async (id: string, status: ResponseStatus) => {
     setUpdatingId(id);
@@ -78,8 +105,8 @@ export function FollowUpResponsesPanel({
   };
 
   const handleCreate = async () => {
-    if (!appointmentId) {
-      addToast('Select an appointment first.', 'error');
+    if (!appointmentId && !patientName.trim()) {
+      addToast('Link an appointment or enter the patient name.', 'error');
       return;
     }
     if (!feeling) {
@@ -88,7 +115,8 @@ export function FollowUpResponsesPanel({
     }
     setIsSubmitting(true);
     const res = await createManualWellbeingResponseAction({
-      appointmentId,
+      appointmentId: appointmentId || undefined,
+      patientName: appointmentId ? undefined : patientName.trim(),
       feeling: feeling as 'FEELING_GREAT' | 'OKAY' | 'NOT_SO_GOOD',
       note,
       symptoms: symptoms.length > 0 ? symptoms : undefined,
@@ -99,9 +127,10 @@ export function FollowUpResponsesPanel({
       addToast(res.error, 'error');
       return;
     }
-    addToast('Response added.', 'success');
+    addToast('Check-in logged.', 'success');
     setShowModal(false);
     setAppointmentId('');
+    setPatientName('');
     setFeeling('');
     setSymptoms([]);
     setNote('');
@@ -113,45 +142,90 @@ export function FollowUpResponsesPanel({
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <MessageSquare className="size-4 text-muted-foreground/60" />
-          <h2 className="text-sm font-semibold text-foreground">Responses</h2>
+          <h2 className="text-sm font-semibold text-foreground">Aftercare Check-Ins</h2>
           <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-muted/40 text-muted-foreground">{responses.length}</span>
+          {unresolved > 0 && (
+            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400">
+              {unresolved} need attention
+            </span>
+          )}
         </div>
         <Button size="sm" variant="outline" onClick={() => setShowModal(true)} className="gap-1">
-          <Plus className="size-3.5" /> Add Response
+          <Plus className="size-3.5" /> Log Check-In
         </Button>
       </div>
-      <p className="text-xs text-muted-foreground">Patient wellbeing answers to the check-in email.</p>
+      <p className="text-xs text-muted-foreground">
+        Aftercare contact across email form, calls, and texts. Routine replies auto-resolve; log only contacts that need attention.
+      </p>
 
-      {responses.length === 0 ? (
+      {responses.length > 0 && (
+        <div className="flex gap-1.5">
+          {([
+            { v: 'UNRESOLVED' as const, label: 'Needs attention' },
+            { v: 'ALL' as const, label: 'All' },
+          ]).map((t) => (
+            <button
+              key={t.v}
+              type="button"
+              onClick={() => setFilter(t.v)}
+              className={`cursor-pointer text-[11px] font-semibold px-2.5 py-1 rounded-full border transition-colors ${
+                filter === t.v
+                  ? 'bg-primary text-primary-foreground border-primary'
+                  : 'bg-card text-muted-foreground border-card-border hover:text-foreground'
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {visible.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-10 text-center">
           <div className="mb-3 flex size-11 items-center justify-center rounded-full bg-muted/30">
             <MessageSquare className="size-5 text-muted-foreground/60" />
           </div>
-          <p className="text-sm font-medium text-foreground">No responses yet.</p>
+          <p className="text-sm font-medium text-foreground">
+            {responses.length === 0 ? 'No aftercare check-ins yet.' : 'Nothing needs attention.'}
+          </p>
           <p className="mt-1 text-xs text-muted-foreground">
-            Responses appear here when patients answer the wellbeing form, or add one manually for calls and emails.
+            {responses.length === 0
+              ? 'Check-ins appear here when patients answer the wellbeing form, or log one manually for calls and texts.'
+              : 'Routine replies are auto-resolved. Nice work.'}
           </p>
         </div>
       ) : (
         <div className="flex flex-col">
-          {responses.map((r) => {
+          {visible.map((r) => {
             const statusStyle = STATUS_STYLE[r.status as ResponseStatus] || {
               label: r.status,
               className: 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400',
             };
             const feeling = FEELING_LABEL[r.feeling ?? ''] || { label: r.feeling || '—', className: 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400' };
-            const details = (r.details || {}) as { medsTaken?: boolean; medsManageable?: boolean; symptoms?: string[]; callBack?: 'YES' | 'NO' };
+            const details = (r.details || {}) as Details;
             const symptoms = details.symptoms || [];
             const note = r.note && r.note.length > 140 ? `${r.note.slice(0, 140)}…` : r.note;
+            const name = r.appointment?.patientName || r.patientName || 'Patient';
+            const expanded = expandedId === r.id;
             return (
-              <div key={r.id} className="py-2.5 border-b border-card-border/40 last:border-b-0 hover:bg-muted/20 transition-colors rounded-lg">
+              <div
+                key={r.id}
+                className="py-2.5 border-b border-card-border/40 last:border-b-0 hover:bg-muted/20 transition-colors rounded-lg cursor-pointer"
+                onClick={() => setExpandedId(expanded ? null : r.id)}
+              >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex flex-col gap-1">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-xs font-medium text-foreground">{r.appointment?.patientName || 'Patient'}</span>
+                      <ChevronRight className={`size-3.5 text-muted-foreground/60 shrink-0 transition-transform ${expanded ? 'rotate-90' : ''}`} />
+                      <span className="text-xs font-medium text-foreground">{name}</span>
                       {r.source === 'PHONE' && (
                         <span className="inline-flex items-center gap-1 text-[10px] font-medium text-muted-foreground">
                           <Phone className="size-3" /> Called
+                        </span>
+                      )}
+                      {r.source === 'TEXT' && (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-medium text-muted-foreground">
+                          💬 Texted
                         </span>
                       )}
                       {r.source === 'EMAIL' && (
@@ -187,7 +261,7 @@ export function FollowUpResponsesPanel({
                     )}
                   </div>
                   <div className="flex flex-col items-end gap-1 shrink-0">
-                    <div className="relative">
+                    <div className="relative" onClick={(e) => e.stopPropagation()}>
                       <button
                         type="button"
                         onClick={() => setOpenMenuId(openMenuId === r.id ? null : r.id)}
@@ -222,7 +296,10 @@ export function FollowUpResponsesPanel({
                     {r.status === 'UNRESOLVED' && (
                       <button
                         type="button"
-                        onClick={() => handleSetStatus(r.id, 'NO_ACTION_NEEDED')}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSetStatus(r.id, 'NO_ACTION_NEEDED');
+                        }}
                         disabled={updatingId === r.id}
                         className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-600 dark:text-emerald-400 hover:underline cursor-pointer disabled:opacity-50"
                       >
@@ -234,6 +311,40 @@ export function FollowUpResponsesPanel({
                     </span>
                   </div>
                 </div>
+                {expanded && (
+                  <div className="mt-3 ml-5 pl-3 border-l border-card-border/60 flex flex-col gap-2">
+                    {r.appointment && (
+                      <p className="text-[11px] text-muted-foreground">
+                        Appointment: {formatShortDate(r.appointment.date)}
+                        {r.appointment.serviceName ? ` · ${r.appointment.serviceName}` : ''}
+                      </p>
+                    )}
+                    {!r.appointment && (
+                      <p className="text-[11px] text-muted-foreground">Not linked to an appointment.</p>
+                    )}
+                    {r.note && <p className="text-xs text-foreground leading-relaxed">{r.note}</p>}
+                    {symptoms.length > 0 && (
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        {symptoms.map((s) => (
+                          <span key={s} className="text-[10px] px-1.5 py-0.5 rounded-full bg-muted/40 text-muted-foreground">{s}</span>
+                        ))}
+                      </div>
+                    )}
+                    {(details.medsTaken === false || details.medsManageable === false) && (
+                      <p className="text-[11px] font-medium text-amber-700 dark:text-amber-400">
+                        {details.medsTaken === false ? 'Did not take prescribed meds. ' : ''}
+                        {details.medsManageable === false ? 'Meds not manageable. ' : ''}
+                      </p>
+                    )}
+                    {details.callBack === 'YES' && (
+                      <p className="text-[11px] font-medium text-rose-700 dark:text-rose-400">Patient requested a callback.</p>
+                    )}
+                    <p className="text-[10px] text-muted-foreground/70 font-mono">
+                      Logged {new Date(r.createdAt).toLocaleString()}
+                      {r.updatedAt ? ` · status updated ${new Date(r.updatedAt).toLocaleString()}` : ''}
+                    </p>
+                  </div>
+                )}
               </div>
             );
           })}
@@ -244,7 +355,7 @@ export function FollowUpResponsesPanel({
         <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
           <div className="w-full max-w-md rounded-2xl border border-card-border bg-card p-6 flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between gap-2">
-              <h3 className="text-sm font-semibold text-foreground">Add Response (Call / Email)</h3>
+              <h3 className="text-sm font-semibold text-foreground">Log Check-In (Call / Text / Email)</h3>
               <button
                 type="button"
                 onClick={() => setShowModal(false)}
@@ -256,22 +367,31 @@ export function FollowUpResponsesPanel({
             </div>
 
             <Select
-              label="Patient"
+              label="Appointment (optional)"
               value={appointmentId}
-              onChange={(e) => setAppointmentId(e.target.value)}
+              onChange={(e) => {
+                setAppointmentId(e.target.value);
+                if (e.target.value) setPatientName('');
+              }}
               options={[{ value: '', label: 'Select a completed appointment…' }, ...appointmentOptions.map((o) => ({ value: o.id, label: o.label }))]}
             />
             {appointmentOptions.length === 0 && (
               <p className="text-[11px] text-muted-foreground -mt-2">No completed appointments found.</p>
             )}
+            {!appointmentId && (
+              <Input
+                label="Patient name"
+                value={patientName}
+                onChange={(e) => setPatientName(e.target.value)}
+                placeholder="Required if no appointment linked"
+                maxLength={120}
+              />
+            )}
 
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-semibold text-text-secondary">Source</label>
               <div className="flex gap-2">
-                {[
-                  { v: 'PHONE' as const, label: '📞 Phone' },
-                  { v: 'EMAIL' as const, label: '✉️ Email' },
-                ].map((opt) => (
+                {SOURCE_OPTIONS.map((opt) => (
                   <button
                     key={opt.v}
                     type="button"
@@ -342,9 +462,9 @@ export function FollowUpResponsesPanel({
               <Button
                 className="flex-1"
                 onClick={handleCreate}
-                disabled={isSubmitting || !appointmentId || !feeling}
+                disabled={isSubmitting || (!appointmentId && !patientName.trim()) || !feeling}
               >
-                {isSubmitting ? 'Saving...' : 'Add Response'}
+                {isSubmitting ? 'Saving...' : 'Log Check-In'}
               </Button>
             </div>
           </div>

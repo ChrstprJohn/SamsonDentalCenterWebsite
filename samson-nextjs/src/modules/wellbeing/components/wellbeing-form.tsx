@@ -16,89 +16,30 @@ const MOOD_OPTIONS = [
 
 type MoodValue = (typeof MOOD_OPTIONS)[number]['value'];
 
-const SYMPTOM_OPTIONS = ['Moderate-to-severe pain', 'Swelling', 'Bleeding', 'Fever', 'Nausea', 'Other'] as const;
-
-const CONCERN_CHIPS = ['Pain', 'Swelling', 'Bleeding', 'Fever', 'Nausea', 'Medication question', 'Other'] as const;
-
-function toggleChip(chip: string, current: string): string {
-  const parts = current.split(', ').filter(Boolean);
-  const idx = parts.indexOf(chip);
-  if (idx === -1) {
-    parts.unshift(chip);
-  } else {
-    parts.splice(idx, 1);
-  }
-  return parts.join(', ');
-}
-
-function ConcernChips({ value, onChange }: { value: string; onChange: (value: string) => void }) {
-  const active = value.split(', ');
-  return (
-    <div className="flex flex-wrap gap-2">
-      {CONCERN_CHIPS.map((chip) => (
-        <button
-          key={chip}
-          type="button"
-          onClick={() => onChange(toggleChip(chip, value))}
-          className={`cursor-pointer rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
-            active.includes(chip)
-              ? 'bg-teal-600 text-white border-teal-600'
-              : 'bg-card text-text-secondary border-card-border hover:border-teal-500/50 hover:text-text-primary'
-          }`}
-        >
-          {chip}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-function YesNoPicker({ value, onChange }: { value: boolean | null; onChange: (value: boolean) => void }) {
-  return (
-    <div className="flex gap-2" role="radiogroup">
-      {[{ v: true, label: 'Yes' }, { v: false, label: 'No' }].map((opt) => (
-        <button
-          key={opt.label}
-          type="button"
-          role="radio"
-          aria-checked={value === opt.v}
-          onClick={() => onChange(opt.v)}
-          className={`cursor-pointer flex-1 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-colors ${
-            value === opt.v
-              ? 'bg-teal-600 text-white border-teal-600'
-              : 'bg-card text-text-secondary border-card-border hover:border-teal-500/50 hover:text-text-primary'
-          }`}
-        >
-          {opt.label}
-        </button>
-      ))}
-    </div>
-  );
-}
+const SYMPTOM_OPTIONS = ['Moderate-to-severe pain', 'Swelling', 'Bleeding', 'Fever', 'Nausea'] as const;
 
 export function WellbeingForm({
   appointmentId,
   patientName,
   clinicPhone,
+  clinicLandline,
 }: {
   appointmentId: string;
   patientName: string;
   clinicPhone?: string | null;
+  clinicLandline?: string | null;
 }) {
   const { addToast } = useToast();
   const [feeling, setFeeling] = useState<MoodValue | null>(null);
   const [noteGreat, setNoteGreat] = useState('');
-  const [noteOkay, setNoteOkay] = useState('');
-  const [noteBad, setNoteBad] = useState('');
-  const [medsTaken, setMedsTaken] = useState<boolean | null>(null);
-  const [medsManageable, setMedsManageable] = useState<boolean | null>(null);
+  const [noteConcern, setNoteConcern] = useState('');
   const [symptoms, setSymptoms] = useState<string[]>([]);
   const [callBack, setCallBack] = useState<'YES' | 'NO' | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
-  const note = feeling === 'FEELING_GREAT' ? noteGreat : feeling === 'OKAY' ? noteOkay : noteBad;
+  const note = feeling === 'FEELING_GREAT' ? noteGreat : noteConcern;
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -113,8 +54,6 @@ export function WellbeingForm({
       appointmentId,
       feeling,
       note,
-      medsTaken: medsTaken ?? undefined,
-      medsManageable: medsManageable ?? undefined,
       symptoms: symptoms.length ? symptoms : undefined,
       callBack: callBack ?? undefined,
     });
@@ -135,7 +74,8 @@ export function WellbeingForm({
         <div className="flex flex-col gap-2">
           <h2 className="text-2xl font-bold tracking-tight text-black dark:text-white">Thank you for letting us know!</h2>
           <p className="text-sm text-gray-700 max-w-md">
-            {patientName}, your response has been received. If you need anything, please don&apos;t hesitate to call or text us.
+            {patientName}, your response has been received. If you need anything, call or text us
+            {clinicPhone ? <> at <strong className="font-semibold text-gray-900">{clinicPhone}</strong></> : ''}.
           </p>
         </div>
         <Button
@@ -155,12 +95,12 @@ export function WellbeingForm({
           <HeartHandshake className="h-6 w-6" />
         </div>
         <div className="flex flex-col gap-1">
-          <h1 className="text-2xl font-extrabold tracking-tight text-text-primary">Kamusta, {patientName}?</h1>
+          <h1 className="text-2xl font-extrabold tracking-tight text-text-primary">Hello, {patientName}!</h1>
           <p className="text-sm text-text-muted max-w-md">
-            It&apos;s been 2 days since your visit at our clinic. We hope your recovery is going smoothly!
+            It&apos;s been 2 days since your visit — we hope your recovery is going well.
           </p>
           <p className="text-sm text-text-muted max-w-md">
-            Your comfort and wellbeing matter to us. Please take 30 seconds to let us know how you are feeling today.
+            Take 30 seconds to let us know how you&apos;re feeling today.
           </p>
         </div>
       </div>
@@ -201,7 +141,7 @@ export function WellbeingForm({
         {feeling === 'FEELING_GREAT' && (
           <div className="flex flex-col gap-4">
             <div className="rounded-2xl border border-teal-200 dark:border-teal-500/20 bg-teal-50 dark:bg-teal-500/10 p-4 text-sm text-teal-900 dark:text-teal-100">
-              That&apos;s wonderful news! We&apos;re happy to hear you&apos;re feeling good.
+              That&apos;s great to hear! Happy you&apos;re feeling good.
             </div>
             <div className="flex flex-col gap-2">
               <label className="text-sm font-semibold text-text-primary">
@@ -214,47 +154,25 @@ export function WellbeingForm({
                 rows={4}
                 maxLength={2000}
               />
-              <ConcernChips value={noteGreat} onChange={setNoteGreat} />
             </div>
           </div>
         )}
 
-        {feeling === 'OKAY' && (
+        {(feeling === 'OKAY' || feeling === 'NOT_SO_GOOD') && (
           <div className="flex flex-col gap-4">
-            <div className="rounded-2xl border border-teal-200 dark:border-teal-500/20 bg-teal-50 dark:bg-teal-500/10 p-4 text-sm text-teal-900 dark:text-teal-100">
-              Some mild discomfort can be normal after a procedure, but we want to make sure you stay comfortable.
-            </div>
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-semibold text-text-primary">Are you currently taking your prescribed medications?</label>
-              <YesNoPicker value={medsTaken} onChange={setMedsTaken} />
-            </div>
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-semibold text-text-primary">Is the discomfort manageable with medication?</label>
-              <YesNoPicker value={medsManageable} onChange={setMedsManageable} />
-            </div>
+            {feeling === 'OKAY' ? (
+              <div className="rounded-2xl border border-teal-200 dark:border-teal-500/20 bg-teal-50 dark:bg-teal-500/10 p-4 text-sm text-teal-900 dark:text-teal-100">
+                Mild discomfort can be normal after a procedure.
+              </div>
+            ) : (
+              <div className="rounded-2xl border border-red-200 dark:border-red-500/20 bg-red-50 dark:bg-red-500/10 p-4 text-sm text-red-900 dark:text-red-100">
+                Sorry you&apos;re not feeling well — your safety is our priority.
+              </div>
+            )}
             <div className="flex flex-col gap-2">
               <label className="text-sm font-semibold text-text-primary">
-                Any specific concerns or questions? <span className="font-normal text-text-muted">(optional)</span>
+                What symptoms are you experiencing? <span className="font-normal text-text-muted">Select all that apply</span>
               </label>
-              <Textarea
-                value={noteOkay}
-                onChange={(e) => setNoteOkay(e.target.value)}
-                placeholder="Tell us anything we should know..."
-                rows={4}
-                maxLength={2000}
-              />
-              <ConcernChips value={noteOkay} onChange={setNoteOkay} />
-            </div>
-          </div>
-        )}
-
-        {feeling === 'NOT_SO_GOOD' && (
-          <div className="flex flex-col gap-4">
-            <div className="rounded-2xl border border-red-200 dark:border-red-500/20 bg-red-50 dark:bg-red-500/10 p-4 text-sm text-red-900 dark:text-red-100">
-              We&apos;re sorry to hear you&apos;re not feeling well. Your safety is our priority.
-            </div>
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-semibold text-text-primary">What symptoms are you experiencing?</label>
               <div className="flex flex-wrap gap-2">
                 {SYMPTOM_OPTIONS.map((symptom) => (
                   <button
@@ -281,8 +199,8 @@ export function WellbeingForm({
                 Please describe what you are feeling in detail: <span className="font-normal text-text-muted">(optional)</span>
               </label>
               <Textarea
-                value={noteBad}
-                onChange={(e) => setNoteBad(e.target.value)}
+                value={noteConcern}
+                onChange={(e) => setNoteConcern(e.target.value)}
                 placeholder="Tell us more about what you're experiencing..."
                 rows={4}
                 maxLength={2000}
@@ -325,16 +243,22 @@ export function WellbeingForm({
 
         <div className="rounded-2xl border border-card-border bg-card p-4">
           <p className="text-xs text-text-muted leading-relaxed">
-            <span className="font-semibold text-text-primary">Important Note:</span> If you are experiencing a severe medical
-            emergency, sudden uncontrolled bleeding, or difficulty breathing, please do not wait for a form response.{' '}
-            {clinicPhone ? (
+            <span className="font-semibold text-text-primary">Emergency?</span> If you&apos;re experiencing uncontrolled
+            bleeding, difficulty breathing, or another severe emergency, don&apos;t wait for a form response —{' '}
+            {clinicPhone || clinicLandline ? (
               <>
-                Contact our clinic directly at <strong className="font-semibold text-text-primary">{clinicPhone}</strong> or
-                visit the nearest emergency room immediately.
+                call us at{' '}
+                <strong className="font-semibold text-text-primary">{clinicPhone || clinicLandline}</strong>
+                {clinicPhone && clinicLandline && (
+                  <>
+                    {' '}or <strong className="font-semibold text-text-primary">{clinicLandline}</strong>
+                  </>
+                )}{' '}
+                or visit the nearest emergency room.
               </>
             ) : (
               <>
-                Contact our clinic directly or visit the nearest emergency room immediately.{' '}
+                call us or visit the nearest emergency room.{' '}
                 <Link href="/contact" className="font-semibold text-text-primary underline">
                   Contact the clinic
                 </Link>

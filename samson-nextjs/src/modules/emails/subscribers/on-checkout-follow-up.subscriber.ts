@@ -6,7 +6,7 @@ import { getBaseUrl } from '@/shared/utils/get-base-url.util';
 export const onCheckoutFollowUpSubscriber = {
   /**
    * Handles APPOINTMENT_CHECKOUT_FOLLOW_UP outbox event.
-   * Sends the 48-hour "Kamusta" wellbeing check-in email to the patient
+   * Sends the 48-hour "Kamusta" aftercare email to the patient
    * if confirmation channel allows EMAIL.
    */
   async handle(payload: Record<string, any>): Promise<void> {

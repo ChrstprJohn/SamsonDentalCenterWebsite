@@ -65,7 +65,7 @@ export const EMAIL_DESIGNS: EmailDesignDefinition[] = [
   },
   {
     id: 'checkout-follow-up',
-    label: '48h Follow-Up (Kamusta)',
+    label: '48h Aftercare Email',
     category: 'Follow-up',
     description: 'Sent 48 hours after checkout to check on patient wellbeing.',
     event: 'APPOINTMENT_CHECKOUT_FOLLOW_UP',
@@ -301,10 +301,10 @@ export const DEFAULT_COPY: Record<EmailDesignId, DraftCopy> = {
   },
   'checkout-follow-up': {
     subject: 'How are you feeling?',
-    preheader: 'Kamusta! We want to check in on how you are feeling after your visit.',
-    headerLabel: 'Wellbeing Check-In',
-    headline: 'Kamusta, how are you feeling?',
-    intro: "It's been 2 days since your visit at Samson Dental Center. We hope your recovery is going smoothly! Your comfort and wellbeing matter to us. Please take 30 seconds to let us know how you are feeling today.",
+    preheader: 'Hello! We want to check in on how you are feeling after your visit.',
+    headerLabel: 'Aftercare Check-In',
+    headline: 'Hello, how are you feeling?',
+    intro: "It's been 2 days since your visit at Samson Dental Center — we hope your recovery is going well. Take 30 seconds to let us know how you're feeling today.",
     ctaLabel: 'Tell Us How You Feel',
     primaryInstruction: '',
     secondaryInstruction: '',

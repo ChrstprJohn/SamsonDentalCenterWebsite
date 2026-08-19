@@ -50,7 +50,7 @@ export const CheckoutFollowUpEmail = ({
   baseUrl = 'http://localhost:3000',
   branding,
 }: CheckoutFollowUpEmailProps) => {
-  const previewText = 'Kamusta, how are you feeling after your visit?';
+  const previewText = 'Hello, how are you feeling after your visit?';
   const b = branding ?? resolveEmailBranding(undefined, baseUrl);
   const wellbeingUrl = `${baseUrl}/wellbeing?ref=${appointmentId}`;
 
@@ -73,12 +73,12 @@ export const CheckoutFollowUpEmail = ({
 
           {/* Greeting */}
           <Text style={pStyle}>
-            Kamusta, <span style={boldStyle}>{patientName}</span>!
+            Hello, <span style={boldStyle}>{patientName}</span>!
           </Text>
 
           {/* Intro */}
           <Text style={pStyle}>
-            {`It's been 2 days since your visit at ${b.clinicName}. We hope your recovery is going smoothly! Your comfort and wellbeing matter to us. Please take 30 seconds to let us know how you are feeling today.`}
+            {`It's been 2 days since your visit at ${b.clinicName} — we hope your recovery is going well. Take 30 seconds to let us know how you're feeling today.`}
           </Text>
 
           {/* Summary Details */}

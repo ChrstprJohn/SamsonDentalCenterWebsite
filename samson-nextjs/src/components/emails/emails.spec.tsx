@@ -115,7 +115,7 @@ describe('Email Templates Rendering', () => {
       })
     );
     expect(html).toContain('Alice Guest');
-    expect(html).toContain('Kamusta');
+    expect(html).toContain('Hello');
     expect(html).toContain('Dental Cleaning');
     expect(html).toContain('APT-SAMPLE-789');
   });

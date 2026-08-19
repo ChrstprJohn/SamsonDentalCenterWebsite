@@ -32,7 +32,7 @@ const EVENT_NAME_MAP: Record<string, string> = {
   'RESCHEDULE_BOOKING': 'Appointment Rescheduled',
   'CANCEL_BOOKING': 'Appointment Cancelled',
   'STAFF_REPLIED_TO_CHAT': 'Staff Reply Notification',
-  'APPOINTMENT_CHECKOUT_FOLLOW_UP': '48h Follow-Up (Kamusta)',
+  'APPOINTMENT_CHECKOUT_FOLLOW_UP': '48h Aftercare Email',
   'APPOINTMENT_MANUALLY_BOOKED_SMS': 'Manual Booking SMS',
   'PATIENT_REGISTERED': 'Patient Registration OTP',
   'PASSWORD_RESET_REQUESTED': 'Password Reset OTP',

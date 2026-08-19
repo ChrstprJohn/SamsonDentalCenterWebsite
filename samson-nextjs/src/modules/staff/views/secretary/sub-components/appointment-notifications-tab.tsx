@@ -56,7 +56,7 @@ const EVENT_NAME_MAP: Record<string, string> = {
   'APPOINTMENT_CHECKOUT': 'Checkout / Thank You',
   'APPOINTMENT_COMPLETED_POST_CARE': 'Checkout / Thank You',
   'APPOINTMENT_COMPLETED_POST_CARE_SMS': 'Checkout / Thank You',
-  'APPOINTMENT_CHECKOUT_FOLLOW_UP': '48h Follow-Up (Kamusta)',
+  'APPOINTMENT_CHECKOUT_FOLLOW_UP': '48h Aftercare Email',
   'APPOINTMENT_NO_SHOW': 'Missed Appointment (No-show)',
   'APPOINTMENT_NO_SHOW_SMS': 'Missed Appointment (No-show)',
   'PATIENT_REGISTERED': 'Registration OTP',
@@ -306,7 +306,7 @@ export function AppointmentNotificationsTab({ appointment, view, compact, onEdit
     { eventType: 'RESCHEDULE_BOOKING', label: 'Reschedule Notice' },
     { eventType: 'CANCEL_BOOKING', label: 'Cancellation Notice' },
     { eventType: 'APPOINTMENT_CHECKOUT', label: 'Checkout / Thank You' },
-    { eventType: 'APPOINTMENT_CHECKOUT_FOLLOW_UP', label: '48h Follow-Up', emailOnly: true },
+    { eventType: 'APPOINTMENT_CHECKOUT_FOLLOW_UP', label: '48h Aftercare Email', emailOnly: true },
     { eventType: 'APPOINTMENT_NO_SHOW', label: 'Missed Appointment (No-show)' },
   ];
 

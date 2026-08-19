@@ -63,7 +63,7 @@ export const bootstrapEventSubscribers = () => {
   registerSubscriber('APPOINTMENT_COMPLETED_POST_CARE', onPostCareReviewSubscriber.handle);
   registerSubscriber('APPOINTMENT_COMPLETED_POST_CARE_SMS', onPostCareReviewSmsSubscriber.handle);
 
-  // 48h Checkout Follow-Up (Kamusta wellbeing check-in, email only)
+  // 48h Aftercare Email (Kamusta wellbeing check-in, email only)
   registerSubscriber('APPOINTMENT_CHECKOUT_FOLLOW_UP', onCheckoutFollowUpSubscriber.handle);
 
   // Missed Appointment No-show (Email & SMS)

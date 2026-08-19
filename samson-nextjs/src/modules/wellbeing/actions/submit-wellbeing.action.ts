@@ -9,8 +9,6 @@ const wellbeingSchema = z.object({
   appointmentId: z.string().uuid(),
   feeling: z.enum(['FEELING_GREAT', 'OKAY', 'NOT_SO_GOOD']),
   note: z.string().trim().max(2000).optional().or(z.literal('')),
-  medsTaken: z.boolean().optional(),
-  medsManageable: z.boolean().optional(),
   symptoms: z.array(z.string()).max(10).optional(),
   callBack: z.enum(['YES', 'NO']).optional(),
 });
@@ -25,10 +23,15 @@ export async function submitWellbeingAction(
     const note = (parsed.note || '').trim() || null;
 
     const details: Record<string, unknown> = {};
-    if (parsed.medsTaken !== undefined) details.medsTaken = parsed.medsTaken;
-    if (parsed.medsManageable !== undefined) details.medsManageable = parsed.medsManageable;
     if (parsed.symptoms && parsed.symptoms.length > 0) details.symptoms = parsed.symptoms;
     if (parsed.callBack !== undefined) details.callBack = parsed.callBack;
+
+    // Routine reply (doing great / okay, no symptoms, no callback request)
+    // auto-resolves — no secretary action needed.
+    const isRoutine =
+      parsed.feeling !== 'NOT_SO_GOOD' &&
+      !(parsed.symptoms && parsed.symptoms.length > 0) &&
+      parsed.callBack !== 'YES';
 
     const supabase = await createAdminClient();
 
@@ -47,10 +50,16 @@ export async function submitWellbeingAction(
       feeling: parsed.feeling,
       note,
       details: Object.keys(details).length > 0 ? details : null,
+      status: isRoutine ? 'NO_ACTION_NEEDED' : 'UNRESOLVED',
     });
 
     if (error) {
       return { success: false, error: `Failed to save your response: ${error.message}` };
+    }
+
+    // ponytail: routine replies auto-resolve — notify only when a human must act
+    if (isRoutine) {
+      return { success: true, data: { appointmentId: parsed.appointmentId, feeling: parsed.feeling } };
     }
 
     await createNotificationUseCase(supabase)({
@@ -58,8 +67,8 @@ export async function submitWellbeingAction(
       recipientId: null,
       type: 'WELLBEING_CHECK_IN_SUBMITTED',
       priority: 'STANDARD',
-      title: 'Wellbeing Check-In',
-      message: `Patient replied to the 48h follow-up: feeling ${parsed.feeling.replace(/_/g, ' ').toLowerCase()}${parsed.symptoms?.length ? ` — symptoms: ${parsed.symptoms.join(', ').toLowerCase()}` : ''}${note ? ` — "${note.slice(0, 120)}"` : ''}`,
+      title: 'Aftercare Check-In',
+      message: `Patient replied to the 48h aftercare email: feeling ${parsed.feeling.replace(/_/g, ' ').toLowerCase()}${parsed.symptoms?.length ? ` — symptoms: ${parsed.symptoms.join(', ').toLowerCase()}` : ''}${note ? ` — "${note.slice(0, 120)}"` : ''}`,
       linkUrl: '/secretary-v2/check-in/follow-up',
       entityId: parsed.appointmentId,
     });

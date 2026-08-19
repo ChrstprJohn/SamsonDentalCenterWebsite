@@ -1410,7 +1410,7 @@ function MessageLogContent({ appointment, view }: { appointment: any; view: any 
     { key: 'reminder48h', label: '48-Hour Reminder', eventType: 'APPOINTMENT_REMINDER_48H', emailSent: commState.emailReminder48hSent, smsSent: commState.smsReminder48hSent },
     { key: 'reminder24h', label: '24-Hour Reminder', eventType: 'APPOINTMENT_REMINDER_24H', emailSent: commState.emailReminder24hSent, smsSent: commState.smsReminder24hSent },
     { key: 'checkout', label: 'Checkout / Thank You', eventType: 'APPOINTMENT_CHECKOUT', emailSent: commState.emailCheckoutSent, smsSent: commState.smsCheckoutSent },
-    { key: 'followup48h', label: '48h Follow-Up', eventType: 'APPOINTMENT_CHECKOUT_FOLLOW_UP', emailSent: commState.emailFollowUp48hSent, smsSent: false },
+    { key: 'followup48h', label: '48h Aftercare Email', eventType: 'APPOINTMENT_CHECKOUT_FOLLOW_UP', emailSent: commState.emailFollowUp48hSent, smsSent: false },
   ];
 
   return (

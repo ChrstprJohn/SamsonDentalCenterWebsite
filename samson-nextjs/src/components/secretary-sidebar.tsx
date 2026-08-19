@@ -54,7 +54,7 @@ const data = {
           url: "/secretary-v2/check-in",
         },
         {
-          title: "Follow-Up",
+          title: "Aftercare Check-Ins",
           url: "/secretary-v2/check-in/follow-up",
         },
       ],
