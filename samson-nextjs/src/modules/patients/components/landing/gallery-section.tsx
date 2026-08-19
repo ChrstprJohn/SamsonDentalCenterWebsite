@@ -9,7 +9,7 @@ export function GallerySection() {
   const gallery = useGallerySection();
 
   return (
-    <section id="gallery" className="relative overflow-hidden z-20 py-16 sm:py-32 bg-[#FDFDFD]">
+    <section id="gallery" className="relative overflow-hidden z-20 pt-16 pb-8 sm:pt-32 sm:pb-20 bg-[#FDFDFD]">
       <div className="absolute inset-0 pointer-events-none z-0">
         <div className="absolute inset-x-0 top-0 bg-[#1D1E1E] h-[42%]" />
       </div>

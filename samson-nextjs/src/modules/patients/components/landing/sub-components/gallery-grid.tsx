@@ -2,7 +2,7 @@
 
 import { motion, type MotionValue } from 'framer-motion';
 import { GalleryCard } from './gallery-card';
-import { repeatedPortfolioItems } from './gallery-data';
+import { galleryItems } from './gallery-data';
 
 interface GalleryGridProps {
   galleryRef: React.RefObject<HTMLDivElement | null>;
@@ -37,10 +37,9 @@ export function GalleryGrid({ galleryRef, translateFirst, translateSecond, trans
 }
 
 function buildColumns() {
-  const visible = repeatedPortfolioItems.slice(0, 18);
   return [0, 1, 2].map((colIndex) =>
-    visible
+    galleryItems
       .map((item, index) => ({ item, index, aspectClass: item.tags.length >= 2 ? 'aspect-[960/1270]' : 'aspect-[960/635]' }))
-      .filter((_, index) => index % 3 === colIndex)
+      .filter((entry) => entry.index % 3 === colIndex)
   );
 }
