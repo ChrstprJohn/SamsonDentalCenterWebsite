@@ -488,6 +488,7 @@ export type Database = {
           is_active: boolean
           name: string
           price: number | null
+          ranking: number | null
           service_type: Database["public"]["Enums"]["service_type"]
           updated_at: string
         }
@@ -499,6 +500,7 @@ export type Database = {
           is_active?: boolean
           name: string
           price?: number | null
+          ranking?: number | null
           service_type?: Database["public"]["Enums"]["service_type"]
           updated_at?: string
         }
@@ -510,6 +512,7 @@ export type Database = {
           is_active?: boolean
           name?: string
           price?: number | null
+          ranking?: number | null
           service_type?: Database["public"]["Enums"]["service_type"]
           updated_at?: string
         }

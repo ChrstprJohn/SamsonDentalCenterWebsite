@@ -32,6 +32,7 @@ export function useServiceForm({ service, onSuccess }: UseServiceFormProps = {})
       status: (service?.status as any) || 'ACTIVE',
       isActive: service?.isActive ?? true,
       imageUrl: service?.imageUrl || null,
+      ranking: service?.ranking ?? null,
     },
   });
 
@@ -46,6 +47,7 @@ export function useServiceForm({ service, onSuccess }: UseServiceFormProps = {})
         status: (service.status as any) || 'ACTIVE',
         isActive: service.isActive,
         imageUrl: service.imageUrl || null,
+        ranking: service.ranking ?? null,
       });
     } else {
       form.reset({
@@ -57,6 +59,7 @@ export function useServiceForm({ service, onSuccess }: UseServiceFormProps = {})
         status: 'ACTIVE',
         isActive: true,
         imageUrl: null,
+        ranking: null,
       });
     }
   }, [service, form]);
@@ -87,6 +90,7 @@ export function useServiceForm({ service, onSuccess }: UseServiceFormProps = {})
         status: values.status,
         isActive: values.status === 'ACTIVE',
         imageUrl,
+        ranking: values.ranking ?? null,
       };
 
       let result;

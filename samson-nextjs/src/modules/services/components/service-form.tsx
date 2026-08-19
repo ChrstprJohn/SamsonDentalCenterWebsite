@@ -117,6 +117,19 @@ export function ServiceForm({
                 className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground leading-relaxed focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
               />
             </div>
+
+            <div className="flex flex-col gap-0.5">
+              <span className="text-xs text-muted-foreground">
+                Display Ranking <span className="text-muted-foreground/60">(optional — lower number shows first)</span>
+              </span>
+              <input
+                type="number"
+                min={0}
+                placeholder="e.g. 1, 2, 3"
+                {...register('ranking')}
+                className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
+              />
+            </div>
           </div>
         </div>
 

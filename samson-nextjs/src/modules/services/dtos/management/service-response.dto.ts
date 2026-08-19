@@ -9,6 +9,7 @@ export const serviceDbSchema = z.object({
   service_type: z.enum(["GENERAL", "SPECIALIZED"]).default("GENERAL"),
   is_active: z.boolean().default(true),
   image_url: z.string().nullable().optional(),
+  ranking: z.number().int().nullable().optional(),
   status: z.enum(["ACTIVE", "HIDDEN", "ARCHIVED"]).default("ACTIVE").optional(),
   created_at: z.string().optional(),
   updated_at: z.string().optional(),
@@ -30,6 +31,7 @@ export const serviceResponseSchema = serviceDbSchema.transform((record) => {
   if (record.image_url !== undefined) {
     result.imageUrl = record.image_url;
   }
+  result.ranking = record.ranking ?? null;
   return result as {
     id: string;
     name: string;
@@ -40,6 +42,7 @@ export const serviceResponseSchema = serviceDbSchema.transform((record) => {
     isActive: boolean;
     status: "ACTIVE" | "HIDDEN" | "ARCHIVED";
     imageUrl?: string | null;
+    ranking?: number | null;
     createdAt?: string;
     updatedAt?: string;
   };

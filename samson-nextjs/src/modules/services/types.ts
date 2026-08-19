@@ -11,6 +11,7 @@ export interface Service {
   isActive: boolean;
   status: ServiceStatus;
   imageUrl?: string | null;
+  ranking?: number | null;
   createdAt?: string;
   updatedAt?: string;
 }

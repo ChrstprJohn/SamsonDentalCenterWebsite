@@ -3,7 +3,7 @@ import { ServiceResponseDto, serviceResponseSchema } from '../../dtos/management
 
 export const getServicesQuery = (supabase: SupabaseClient) => {
   return async (includeInactive: boolean | 'ALL' | 'BOOKABLE' = false): Promise<ServiceResponseDto[]> => {
-    let query = supabase.from("services").select("*").order("name");
+    let query = supabase.from("services").select("*").order("ranking", { ascending: true, nullsFirst: false }).order("name");
     
     if (includeInactive === 'BOOKABLE') {
       query = query.neq("status", "ARCHIVED");

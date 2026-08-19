@@ -16,6 +16,7 @@ export const createServiceCommand = (supabase: SupabaseClient) => {
       is_active: status === 'ACTIVE',
       image_url: data.imageUrl,
       status: status,
+      ranking: data.ranking ?? null,
     };
     const { data: result, error } = await supabase
       .from("services")
@@ -66,6 +67,7 @@ export const updateServiceCommand = (supabase: SupabaseClient) => {
       dbPayload.status = updates.isActive ? 'ACTIVE' : 'HIDDEN';
     }
     if (updates.imageUrl !== undefined) dbPayload.image_url = updates.imageUrl;
+    if (updates.ranking !== undefined) dbPayload.ranking = updates.ranking;
 
     const { data: result, error } = await supabase
       .from("services")

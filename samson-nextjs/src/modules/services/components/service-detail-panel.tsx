@@ -104,6 +104,10 @@ export function ServiceDetailPanel({
 
             <div className="grid grid-cols-2 gap-3">
               <ServiceField label="Category Type" value={service.serviceType || 'GENERAL'} />
+              <ServiceField
+                label="Display Ranking"
+                value={service.ranking != null ? String(service.ranking) : 'Alphabetical'}
+              />
             </div>
 
             <div className="flex flex-col gap-0.5">

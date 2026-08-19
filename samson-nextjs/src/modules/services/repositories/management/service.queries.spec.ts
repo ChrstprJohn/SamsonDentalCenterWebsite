@@ -17,7 +17,7 @@ describe("service query closures (Unit Test)", () => {
 
     mockFrom.mockReturnValue({ select: mockSelect });
     mockSelect.mockReturnValue({ order: mockOrder });
-    mockOrder.mockReturnValue({ eq: mockEq });
+    mockOrder.mockReturnValue({ order: mockOrder, eq: mockEq });
     mockEq.mockReturnValue({ eq: mockEq });
   });
 
@@ -64,8 +64,13 @@ describe("service query closures (Unit Test)", () => {
           price: null,
         },
       ];
-      // When includeInactive=true, the eq filter is NOT applied, so mockOrder resolves directly
-      mockOrder.mockResolvedValue({ data: fakeData, error: null });
+      // When includeInactive=true, the eq filter is NOT applied, so the second order resolves directly
+      mockOrder.mockImplementation(() => ({
+        order: mockOrder,
+        eq: mockEq,
+        data: fakeData,
+        error: null,
+      }));
 
       const getServices = getServicesQuery(mockSupabase);
       const result = await getServices(true);

@@ -9,6 +9,7 @@ export const createServiceSchema = z.object({
   status: z.enum(["ACTIVE", "HIDDEN", "ARCHIVED"]).default("ACTIVE"),
   isActive: z.boolean().default(true),
   imageUrl: z.string().url().optional().nullable(),
+  ranking: z.number().int().nonnegative().optional().nullable(),
 });
 
 export type CreateServiceDto = z.infer<typeof createServiceSchema>;
