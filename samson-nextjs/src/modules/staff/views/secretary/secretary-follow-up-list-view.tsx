@@ -42,17 +42,21 @@ type ResponseRow = {
   source: string;
   updatedAt: string | null;
   patientName: string | null;
+  patientPhone?: string | null;
   appointment?: {
+    id: string;
     date: string;
     patientName: string;
     serviceName: string | null;
+    doctorName: string | null;
+    phone: string | null;
   } | null;
 };
 
 async function loadResponses(): Promise<ResponseRow[]> {
   const supabase = await createAdminClient();
 
-  const { data: responses } = await supabase
+  const { data: responses, error: respError } = await supabase
     .from('checkout_follow_up_responses')
     .select(`
       id,
@@ -65,14 +69,20 @@ async function loadResponses(): Promise<ResponseRow[]> {
       updated_at,
       created_at,
       appointment:appointments(
+        id,
         date,
         service:services(name),
-        patient:users!appointments_patient_id_fkey(first_name, last_name),
-        guest_contacts!guest_contacts_appointment_id_fkey(first_name, last_name)
+        doctor:users!appointments_doctor_id_fkey(first_name, last_name),
+        patient:users!appointments_patient_id_fkey(first_name, last_name, phone_number),
+        guest_contacts!guest_contacts_appointment_id_fkey(first_name, last_name, phone_number)
       )
     `)
     .order('created_at', { ascending: false })
     .limit(100);
+
+  if (respError) {
+    console.error('[Aftercare Check-Ins] Error loading responses:', respError);
+  }
 
   return (responses || []).map((r: any) => {
     const a = r.appointment;
@@ -82,6 +92,11 @@ async function loadResponses(): Promise<ResponseRow[]> {
       : a?.patient
         ? `${a.patient.first_name} ${a.patient.last_name}`
         : r.patient_name || null;
+    const phone = gc?.phone_number || a?.patient?.phone_number || null;
+    const doctorName = a?.doctor
+      ? `Dr. ${a.doctor.first_name} ${a.doctor.last_name}`
+      : null;
+
     return {
       id: r.id,
       feeling: r.feeling ?? null,
@@ -92,8 +107,16 @@ async function loadResponses(): Promise<ResponseRow[]> {
       source: (r as any).source || 'FORM',
       updatedAt: (r as any).updated_at || null,
       patientName,
+      patientPhone: phone,
       appointment: a
-        ? { date: a.date, patientName, serviceName: (a.service as any)?.name ?? null }
+        ? {
+            id: a.id,
+            date: a.date,
+            patientName,
+            serviceName: (a.service as any)?.name ?? null,
+            doctorName,
+            phone,
+          }
         : null,
     };
   });
@@ -135,43 +158,5 @@ export async function SecretaryFollowUpListView() {
     loadManualEntryAppointments(),
   ]);
 
-  const replied = responses.length;
-
-  return (
-    <div
-      className="flex flex-col gap-6 flex-1 min-h-0 p-6 md:p-8 overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
-      style={{ scrollbarWidth: 'thin' }}
-      data-lenis-prevent
-    >
-      <div className="flex flex-col gap-1">
-        <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-text-primary">48h Aftercare</h1>
-        <p className="text-xs text-text-muted">
-          The aftercare email goes out 48 hours after checkout; log any follow-up contact that needs attention.
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div className="rounded-2xl border border-card-border bg-card p-4 flex items-center gap-3">
-          <div className="flex size-9 items-center justify-center rounded-full bg-muted/30">
-            <Send className="size-4 text-muted-foreground/60" />
-          </div>
-          <div className="flex flex-col">
-            <span className="text-xl font-extrabold text-foreground">{rows.length}</span>
-            <span className="text-xs text-muted-foreground">48h aftercare email sent</span>
-          </div>
-        </div>
-        <div className="rounded-2xl border border-card-border bg-card p-4 flex items-center gap-3">
-          <div className="flex size-9 items-center justify-center rounded-full bg-muted/30">
-            <MessageSquare className="size-4 text-muted-foreground/60" />
-          </div>
-          <div className="flex flex-col">
-            <span className="text-xl font-extrabold text-foreground">{replied}</span>
-            <span className="text-xs text-muted-foreground">responses</span>
-          </div>
-        </div>
-      </div>
-
-      <FollowUpResponsesPanel responses={responses} appointmentOptions={appointmentOptions} />
-    </div>
-  );
+  return <FollowUpResponsesPanel responses={responses} appointmentOptions={appointmentOptions} />;
 }

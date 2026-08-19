@@ -28,6 +28,7 @@ import {
   UserCheck,
   Paintbrush,
   Bell,
+  HeartHandshake,
 } from "lucide-react"
 
 const data = {
@@ -48,16 +49,11 @@ const data = {
       title: "Check-In / Out",
       url: "/secretary-v2/check-in",
       icon: <UserCheck className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
-      items: [
-        {
-          title: "Board",
-          url: "/secretary-v2/check-in",
-        },
-        {
-          title: "Aftercare Check-Ins",
-          url: "/secretary-v2/check-in/follow-up",
-        },
-      ],
+    },
+    {
+      title: "Patient Follow-Ups",
+      url: "/secretary-v2/check-in/follow-up",
+      icon: <HeartHandshake className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
     },
     {
       title: "Appointment Requests",
