@@ -1,6 +1,7 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
+import { Loader2 } from 'lucide-react';
 import type { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
 import { ServiceCard } from './sub-components/service-card';
 import { NoiseOverlay, ServiceListRow } from './sub-components/service-list-row';
@@ -13,8 +14,16 @@ interface ServicesSectionProps {
 const CARD_COUNT = 5;
 
 export function ServicesSection({ services, onSelectService }: ServicesSectionProps) {
+  const [pendingId, setPendingId] = useState<string | null>(null);
   const cardServices = services.slice(0, CARD_COUNT);
   const listServices = services.slice(CARD_COUNT);
+
+  const handleSelect = (svc: ServiceResponseDto) => {
+    if (pendingId) return;
+    setPendingId(svc.id);
+    // ponytail: 800ms artificial delay so loading shows; client nav is instant otherwise
+    setTimeout(() => onSelectService(svc), 800);
+  };
 
   return (
     <section id="services" className="bg-[#FDFDFD] relative overflow-hidden w-full">
@@ -47,7 +56,7 @@ export function ServicesSection({ services, onSelectService }: ServicesSectionPr
                 title={svc.name}
                 image={svc.imageUrl ?? undefined}
                 index={idx}
-                onClick={() => onSelectService(svc)}
+                onClick={() => handleSelect(svc)}
               />
             ))}
           </div>
@@ -65,12 +74,18 @@ export function ServicesSection({ services, onSelectService }: ServicesSectionPr
                 key={svc.id}
                 nr={String(cardServices.length + idx + 1).padStart(2, '0')}
                 title={svc.name}
-                onClick={() => onSelectService(svc)}
+                onClick={() => handleSelect(svc)}
               />
             ))}
           </div>
         </div>
       </div>
+      {pendingId && (
+        <div className="fixed inset-0 z-50 bg-[#1D1E1E]/85 backdrop-blur-md flex flex-col items-center justify-center gap-4">
+          <Loader2 className="w-10 h-10 text-[#D94E4E] animate-spin" />
+          <p className="text-white text-sm tracking-wide">Taking you to booking...</p>
+        </div>
+      )}
     </section>
   );
 }
