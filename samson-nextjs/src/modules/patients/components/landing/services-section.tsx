@@ -38,11 +38,11 @@ export function ServicesSection({ services, onSelectService }: ServicesSectionPr
               </span>
               <h2 className="font-sans text-[18px] sm:text-[clamp(20px,2vw+10px,32px)] font-normal leading-[1.05] tracking-[-0.04em] text-[#1D1E1E]">
                 Explore the range of services
-                <br />
+                <br className="hidden lg:block" />
                 we offer at our clinic.
               </h2>
             </div>
-<p className="max-w-sm pt-1 font-sans text-[12px] sm:pt-2 sm:text-[clamp(12px,0.3vw+11px,14px)] font-normal leading-[1.65] text-gray-500">
+<p className="max-w-sm pt-1 font-sans text-[12px] sm:pt-2 md:max-w-[280px] lg:max-w-sm sm:text-[clamp(12px,0.3vw+11px,14px)] font-normal leading-[1.65] text-gray-500">
                 We offer a complete range of dental treatments, from routine cleanings to advanced procedures, so you can find the service that is right for you.
               </p>
           </div>

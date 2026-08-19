@@ -34,7 +34,7 @@ export function JourneySection() {
 function JourneyHeader() {
   return (
     <div className="w-full relative z-30 pt-8 sm:pt-12 flex flex-col md:flex-row md:items-end justify-between gap-6 mb-6 md:mb-10">
-      <div className="max-w-xl">
+      <div className="max-w-full md:max-w-[450px] lg:max-w-[580px]">
         <span className="text-[10px] tracking-[0.34em] text-[#D94E4E] uppercase font-bold block mb-4">
           Sanctuary Journey
         </span>
@@ -42,7 +42,7 @@ function JourneyHeader() {
           Your smile starts here
         </h2>
       </div>
-      <p className="text-sm font-light text-white/70 max-w-sm leading-relaxed">
+      <p className="text-sm font-light text-white/70 max-w-sm md:max-w-[280px] lg:max-w-sm leading-relaxed">
         Follow our structured clinical pathway designed to deliver flawless personal care, absolute sensory calming, and microscopic cosmetic precision.
       </p>
     </div>

@@ -51,11 +51,11 @@ export function FaqSection({ config }: { config: ClinicConfigResponseDto }) {
           </span>
           <h2 className="font-sans text-[18px] sm:text-[clamp(20px,2vw+10px,32px)] font-normal leading-[1.05] tracking-[-0.04em] text-[#1D1E1E]">
             Everything you need to know before,
-            <br />
+            <br className="hidden lg:block" />
             during, and after your visit.
           </h2>
           </div>
-          <p className="max-w-sm pt-1 font-sans text-[12px] sm:pt-2 sm:text-[clamp(12px,0.3vw+11px,14px)] font-normal leading-[1.65] text-gray-500">
+          <p className="max-w-sm pt-1 font-sans text-[12px] sm:pt-2 md:max-w-[280px] lg:max-w-sm sm:text-[clamp(12px,0.3vw+11px,14px)] font-normal leading-[1.65] text-gray-500">
             Clear answers to the questions we hear most often, from booking and preparation to what happens during and after your visit.
           </p>
         </div>

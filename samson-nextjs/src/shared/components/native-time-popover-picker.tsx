@@ -213,9 +213,9 @@ export function NativeTimePopoverPicker({
       {/* Trigger Input Field */}
       <div
         onClick={togglePopover}
-        className={`w-full bg-card border border-card-border px-4 py-2.5 rounded-xl text-xs sm:text-sm font-normal flex items-center justify-between cursor-pointer hover:border-primary-ring transition-colors ${
+        className={`w-full bg-card border border-card-border px-4 py-2.5 ${triggerClassName || 'rounded-xl'} text-xs sm:text-sm font-normal flex items-center justify-between cursor-pointer hover:border-primary-ring transition-colors ${
           disabled ? 'opacity-50 cursor-not-allowed bg-gray-50' : ''
-        } ${triggerClassName}`}
+        }`}
       >
         <span className={value ? 'text-foreground' : 'text-muted-foreground font-medium'}>
           {getDisplayLabel(value)}

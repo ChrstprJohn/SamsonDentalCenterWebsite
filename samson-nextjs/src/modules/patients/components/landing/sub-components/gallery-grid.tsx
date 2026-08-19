@@ -14,11 +14,14 @@ interface GalleryGridProps {
 
 export function GalleryGrid({ galleryRef, translateFirst, translateSecond, translateThird, onSelect }: GalleryGridProps) {
   const columns = buildColumns();
+  // The right mobile column is one landscape card shorter; include the first
+  // desktop-only item to keep the bottom edge balanced.
+  const mobileColumns = [columns[0], [...columns[1], columns[2][0]]];
 
   return (
     <div ref={galleryRef} className="w-full relative overflow-hidden">
       <div className="grid grid-cols-2 md:hidden gap-1">
-        {columns.slice(0, 2).map((column, colIndex) => (
+        {mobileColumns.map((column, colIndex) => (
           <div key={colIndex} className="flex flex-col gap-1">
             {column.map((entry) => <GalleryCard key={`m-${entry.index}`} {...entry} onSelect={onSelect} />)}
           </div>

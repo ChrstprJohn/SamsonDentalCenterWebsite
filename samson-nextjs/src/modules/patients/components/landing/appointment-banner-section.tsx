@@ -72,7 +72,7 @@ export function AppointmentBannerSection() {
 
       {/* Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-12 w-full py-20">
-        <div className="max-w-lg flex flex-col gap-6">
+        <div className="max-w-full md:max-w-[450px] lg:max-w-[580px] flex flex-col gap-6">
 
           {/* Eyebrow — same pattern as other sections */}
           <span className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold font-sans">

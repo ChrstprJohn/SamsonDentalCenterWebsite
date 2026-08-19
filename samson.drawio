@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="iUVGdKB-r_UgXYGPvOGr" name="Page-1">
-        <mxGraphModel dx="1439" dy="1226" grid="1" gridSize="17" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="4681" pageHeight="3300" background="#ffffff" math="0" shadow="1">
+        <mxGraphModel dx="1228" dy="882" grid="1" gridSize="17" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="4681" pageHeight="3300" background="#ffffff" math="0" shadow="1">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -2215,10 +2215,10 @@
                     <mxGeometry x="1190" y="1275" width="170" height="85" as="geometry"/>
                 </mxCell>
                 <mxCell id="860" value="" style="rounded=0;whiteSpace=wrap;html=1;shadow=1;glass=0;labelBackgroundColor=none;sketch=0;fillColor=#d0cee2;strokeColor=#56517e;" parent="1" vertex="1">
-                    <mxGeometry x="1020" y="1343" width="170" height="136" as="geometry"/>
+                    <mxGeometry x="1020" y="1539.5" width="170" height="136" as="geometry"/>
                 </mxCell>
                 <mxCell id="861" value="&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;John Doe&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;Adjusment&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;9:00am - 10:30am&amp;nbsp;&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=1;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#000000;fontStyle=1" parent="1" vertex="1">
-                    <mxGeometry x="1020" y="1360" width="170" height="102" as="geometry"/>
+                    <mxGeometry x="1020" y="1556.5" width="170" height="102" as="geometry"/>
                 </mxCell>
                 <mxCell id="862" value="" style="rounded=0;whiteSpace=wrap;html=1;shadow=1;glass=0;labelBackgroundColor=none;sketch=0;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
                     <mxGeometry x="748" y="1481" width="170" height="87" as="geometry"/>
@@ -2506,10 +2506,10 @@
                 <mxCell id="962" value="Pending&lt;br&gt;&lt;br&gt;R" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=1;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#000000;fontStyle=1" parent="1" vertex="1">
                     <mxGeometry x="569.5" y="2635" width="153" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="963" value="" style="rounded=0;whiteSpace=wrap;html=1;shadow=1;glass=0;labelBackgroundColor=none;sketch=0;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+                <mxCell id="963" value="" style="rounded=0;whiteSpace=wrap;html=1;shadow=1;glass=0;labelBackgroundColor=none;sketch=0;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
                     <mxGeometry x="-263.5" y="3230" width="170" height="87" as="geometry"/>
                 </mxCell>
-                <mxCell id="964" value="Submit" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=1;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#000000;fontStyle=1" vertex="1" parent="1">
+                <mxCell id="964" value="Submit" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=1;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#000000;fontStyle=1" parent="1" vertex="1">
                     <mxGeometry x="-255" y="3258.5" width="153" height="30" as="geometry"/>
                 </mxCell>
             </root>

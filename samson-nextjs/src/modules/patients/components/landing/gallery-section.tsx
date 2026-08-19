@@ -9,7 +9,7 @@ export function GallerySection() {
   const gallery = useGallerySection();
 
   return (
-    <section id="gallery" className="relative overflow-hidden z-20 pt-16 pb-8 sm:pt-32 sm:pb-20 bg-[#FDFDFD]">
+    <section id="gallery" className="relative overflow-hidden z-20 pt-16 sm:pt-32 bg-[#FDFDFD]">
       <div className="absolute inset-0 pointer-events-none z-0">
         <div className="absolute inset-x-0 top-0 bg-[#1D1E1E] h-[42%]" />
       </div>
@@ -42,11 +42,11 @@ function GalleryHeader() {
         </span>
         <h2 className="font-sans text-[18px] sm:text-[clamp(20px,2vw+10px,32px)] font-normal leading-[1.05] tracking-[-0.04em] text-white">
           A compilation of our work and
-          <br />
+          <br className="hidden lg:block" />
           the results we deliver.
         </h2>
       </div>
-      <p className="max-w-sm pt-1 font-sans text-[12px] sm:pt-2 sm:text-[clamp(12px,0.3vw+11px,14px)] font-normal leading-[1.65] text-white/70">
+      <p className="max-w-sm pt-1 font-sans text-[12px] sm:pt-2 md:max-w-[280px] lg:max-w-sm sm:text-[clamp(12px,0.3vw+11px,14px)] font-normal leading-[1.65] text-white/70">
         We showcase real cases treated at our clinic, highlighting the quality of our dental care and the outcomes our patients achieve.
       </p>
     </div>

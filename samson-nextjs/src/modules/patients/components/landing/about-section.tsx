@@ -77,11 +77,11 @@ export function AboutSection() {
             {/* Unique Features */}
             <div className="mt-7 sm:mt-10 grid grid-cols-2 gap-4 sm:gap-6 pt-6 sm:pt-8 border-t border-gray-100 font-sans">
               <div>
-                <h4 className="text-[#1D1E1E] text-sm font-semibold tracking-wider uppercase">Central Location</h4>
+                <h4 className="text-[#1D1E1E] text-sm font-semibold">Central Location</h4>
                 <p className="text-[12px] text-gray-500 mt-1.5 leading-relaxed font-light">Find us at 5th Floor S Building, Upper Session Road, Baguio City.</p>
               </div>
               <div>
-                <h4 className="text-[#1D1E1E] text-sm font-semibold tracking-wider uppercase">By Appointment</h4>
+                <h4 className="text-[#1D1E1E] text-sm font-semibold">By Appointment</h4>
                 <p className="text-[12px] text-gray-500 mt-1.5 leading-relaxed font-light">Call ahead or send an appointment request so our team can assist you.</p>
               </div>
             </div>
@@ -105,11 +105,11 @@ export function AboutSection() {
               </span>
               <h3 className="font-sans text-[17px] sm:text-[clamp(20px,2vw+10px,32px)] font-normal tracking-[-0.04em] text-[#1D1E1E] leading-[1.05]">
                 Meet our dentists, the specialists
-                <br />
+                <br className="hidden lg:block" />
                 behind your smile.
               </h3>
             </div>
-            <p className="text-[12px] sm:text-[clamp(12px,0.3vw+11px,14px)] font-normal text-gray-500 max-w-sm leading-[1.65] font-sans pt-1 sm:pt-2">
+            <p className="text-[12px] sm:text-[clamp(12px,0.3vw+11px,14px)] font-normal text-gray-500 max-w-sm md:max-w-[280px] lg:max-w-sm leading-[1.65] font-sans pt-1 sm:pt-2">
               Your smile is in good hands with our dentists, from everyday checkups to advanced treatments, with every visit clear and comfortable.
             </p>
           </div>

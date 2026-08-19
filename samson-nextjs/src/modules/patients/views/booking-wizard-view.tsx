@@ -191,7 +191,7 @@ export function BookingWizardView({ services, config, initialServiceId }: Bookin
       {/* Custom Integrated Header Navbar matching Homepage Navbar Height & Padding */}
       {!contactSection.submittedLocal && (
         <header className="sticky top-0 z-40 h-[76px] bg-white/95 backdrop-blur-md border-b border-gray-200/80 px-6 sm:px-12 py-2.5 flex items-center shadow-xs">
-        <div className="max-w-7xl mx-auto w-full flex items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto grid w-full grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-4">
           {/* Left: Slightly Larger Return Link */}
           <Link
             href="/"
@@ -202,7 +202,7 @@ export function BookingWizardView({ services, config, initialServiceId }: Bookin
           </Link>
 
           {/* Center: Centered Stepper Navigation Pills with boxed number badge */}
-          <div className="flex-1 flex justify-center">
+          <div className="justify-self-center">
             <div className="flex items-center gap-1 sm:gap-4 font-sans text-[10px] sm:text-[13px] tracking-[0.04em] sm:tracking-[0.1em] font-medium uppercase text-gray-700">
               <button
                 type="button"
@@ -287,8 +287,8 @@ export function BookingWizardView({ services, config, initialServiceId }: Bookin
             </div>
           </div>
 
-          {/* Right Spacer to balance centering */}
-          <div className="w-[90px] hidden sm:block pointer-events-none" />
+          {/* Empty matching grid track keeps the stepper centered in the viewport. */}
+          <div aria-hidden="true" />
         </div>
         </header>
       )}
@@ -457,7 +457,7 @@ export function BookingWizardView({ services, config, initialServiceId }: Bookin
                       disabled={!isSelectedDayOpen}
                     />
                     {isSelectedDayOpen && selectedDayHours?.openTime && selectedDayHours.closeTime && (
-                      <div className="mt-2.5 p-2.5 rounded-xl border border-sky-500/20 bg-sky-500/10 text-sky-700 dark:text-sky-300 text-xs flex items-start gap-2 font-medium">
+                      <div className="mt-2.5 p-2.5 rounded-none border border-sky-500/20 bg-sky-500/10 text-sky-700 dark:text-sky-300 text-xs flex items-start gap-2 font-medium">
                         <Clock className="w-3.5 h-3.5 shrink-0 text-sky-600 dark:text-sky-400 mt-0.5" />
                         <div className="flex flex-col gap-1">
                           <span className="font-semibold">Clinic Hours</span>

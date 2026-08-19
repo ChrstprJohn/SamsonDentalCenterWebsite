@@ -28,7 +28,7 @@ export function ContactInfoPanel({ config }: { config: ClinicConfigResponseDto }
 
   return (
     <div className="flex flex-col justify-between">
-      <div>
+      <div className="max-w-full md:max-w-[450px] lg:max-w-[580px]">
         <span className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-4 font-sans">
           Our Contact
         </span>

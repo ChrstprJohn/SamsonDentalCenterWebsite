@@ -47,6 +47,7 @@ export function PreferenceFields({
         maxTime={maxTime}
         unavailableRanges={unavailableRanges}
         disabled={disabled}
+        triggerClassName="rounded-none"
       />
     </div>
   );
@@ -98,7 +99,7 @@ export function ContactFields({
 }) {
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.contactEmail.trim());
   const isPhoneValid = /^09\d{9}$/.test(phone.trim().replace(/\D/g, ''));
-  const formattedPhone = phone.replace(/\D/g, '').slice(0, 11).replace(/(\d{3})(\d{0,4})(\d{0,4})/, (_, prefix, middle, suffix) =>
+  const formattedPhone = phone.replace(/\D/g, '').slice(0, 11).replace(/(\d{4})(\d{0,3})(\d{0,4})/, (_, prefix, middle, suffix) =>
     [prefix, middle, suffix].filter(Boolean).join(' ')
   );
 
@@ -121,7 +122,7 @@ export function ContactFields({
         value={formattedPhone}
         onChange={(value) => setPhone(value.replace(/\D/g, '').slice(0, 11))}
         required
-        placeholder="093 0323 1312"
+        placeholder="0930 323 1312"
         touched={touched}
         isValid={isPhoneValid}
         errorMessage="Please enter a valid phone number."
