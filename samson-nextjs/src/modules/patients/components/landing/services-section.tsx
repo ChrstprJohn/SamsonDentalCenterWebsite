@@ -27,13 +27,15 @@ export function ServicesSection({ services, onSelectService }: ServicesSectionPr
               <span className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-4 font-sans">
                 Our Services
               </span>
-              <h2 className="font-sans text-[clamp(20px,2vw+10px,32px)] font-normal tracking-[-0.04em] text-[#141515] leading-[1.05]">
-                Advanced biological dentistry designed to restore pristine harmony and structural balance.
+              <h2 className="font-sans text-[18px] sm:text-[clamp(20px,2vw+10px,32px)] font-normal leading-[1.05] tracking-[-0.04em] text-[#1D1E1E]">
+                Explore the range of services
+                <br />
+                we offer at our clinic.
               </h2>
             </div>
-            <p className="text-[clamp(12px,0.3vw+11px,14px)] font-normal text-gray-500 max-w-sm leading-[1.65] font-sans pt-2">
-              Experience the art and science of premium aesthetic treatments through our personalized therapeutic procedures, demonstrating pristine biological harmony and clinical perfection.
-            </p>
+<p className="max-w-sm pt-1 font-sans text-[12px] sm:pt-2 sm:text-[clamp(12px,0.3vw+11px,14px)] font-normal leading-[1.65] text-gray-500">
+                We offer a complete range of dental treatments, from routine cleanings to advanced procedures, so you can find the service that is right for you.
+              </p>
           </div>
 
           {/* First Block: Gorgeous Bento Grid (01 to 05) overlap section */}
@@ -43,7 +45,7 @@ export function ServicesSection({ services, onSelectService }: ServicesSectionPr
                 key={svc.id}
                 nr={String(idx + 1).padStart(2, '0')}
                 title={svc.name}
-                image={svc.imageUrl}
+                image={svc.imageUrl ?? undefined}
                 index={idx}
                 onClick={() => onSelectService(svc)}
               />

@@ -84,11 +84,6 @@ export function LandingView({ services, config }: LandingViewProps) {
   return (
     <div className="flex flex-col w-full bg-[#FDFDFD] text-[#1D1E1E]">
       <HeroSectionPreview onBookClick={() => handleBookingCTA()} serviceCount={activeServices.length} />
-      {!config.isBookingOpen && (
-        <div className="bg-amber-50 px-6 py-3 text-center text-sm text-amber-900" role="status">
-          {config.maintenanceMessage || `Online booking is temporarily unavailable. Please contact ${config.clinicName} directly.`}
-        </div>
-      )}
       <ServicesSection services={activeServices} onSelectService={(svc) => handleBookingCTA(svc.id)} />
       <AboutSection />
       {/* <JourneySection /> */}

@@ -9,21 +9,18 @@ const doctorsData = [
     role: 'Lead Prosthodontist & Smile Designer',
     image: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=600&auto=format&fit=crop',
     bio: 'Specializes in microscopic veneers, full-mouth biological reconstructions, and cranial symmetry harmonization.',
-    schedule: 'Mon, Wed, Fri',
   },
   {
     name: 'Dr. Andrea Santos',
     role: 'Micro-Endodontic Specialist',
     image: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=600&auto=format&fit=crop',
     bio: 'Expert in dental operating microscopes, root tubule disinfection, and highly precise root canal therapy.',
-    schedule: 'Tue, Thu, Sat',
   },
   {
     name: 'Dr. Marcus Reyes',
     role: 'Periodontal Surgeon & Implantologist',
     image: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?q=80&w=600&auto=format&fit=crop',
     bio: 'Dedicated to advanced bone tissue regeneration, computer-guided implant placement, and biological recovery.',
-    schedule: 'Mon, Tue, Thu, Fri',
   },
 ];
 
@@ -107,14 +104,16 @@ export function AboutSection() {
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 sm:mb-16 gap-4 sm:gap-6">
             <div className="max-w-full md:max-w-[450px] lg:max-w-[580px]">
               <span className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-4 font-sans">
-                Dentists
+                Our Dentist
               </span>
               <h3 className="font-sans text-[17px] sm:text-[clamp(20px,2vw+10px,32px)] font-normal tracking-[-0.04em] text-[#1D1E1E] leading-[1.05]">
-                Meet our dentists.
+                Meet our dentists, the specialists
+                <br />
+                behind your smile.
               </h3>
             </div>
             <p className="text-[12px] sm:text-[clamp(12px,0.3vw+11px,14px)] font-normal text-gray-500 max-w-sm leading-[1.65] font-sans pt-1 sm:pt-2">
-              Our board-certified prosthetic and surgical specialists integrate advanced diagnostics with sub-micron restorative engineering to guarantee biological excellence.
+              Your smile is in good hands with our dentists, from everyday checkups to advanced treatments, with every visit clear and comfortable.
             </p>
           </div>
 

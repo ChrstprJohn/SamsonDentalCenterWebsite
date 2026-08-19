@@ -1,12 +1,11 @@
 'use client';
 
-import { Quote } from 'lucide-react';
+import { Quote, Star } from 'lucide-react';
 
 interface TestimonialItem {
   name: string;
   pathway: string;
   text: string;
-  rating: string;
   avatar: string;
 }
 
@@ -28,33 +27,38 @@ export function TestimonialMarqueeRow({ items, rowId, reverse = false }: Testimo
 
 function TestimonialCard({ item }: { item: TestimonialItem }) {
   return (
-    <div className="w-[260px] sm:w-[320px] shrink-0 mx-2.5 flex flex-col justify-between border border-gray-200/60 bg-[#F9F9F6] p-5 sm:p-6 rounded-none hover:border-[#D94E4E]/30 transition-all duration-300 font-josefin whitespace-normal cursor-pointer shadow-sm">
+    <div className="w-[330px] sm:w-[420px] shrink-0 mx-2.5 flex flex-col justify-between border border-gray-200/60 bg-white p-6 sm:p-7 rounded-none hover:border-[#D94E4E]/30 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 font-josefin whitespace-normal cursor-pointer shadow-md">
       <div>
-        <div className="text-[#D94E4E] mb-2.5 opacity-80">
-          <Quote className="w-3.5 h-3.5 rotate-180" />
+        <div className="text-[#D94E4E] mb-3 opacity-80">
+          <Quote className="w-4 h-4 rotate-180" />
         </div>
-        <p className="text-gray-600 font-normal text-[clamp(12px,0.3vw+11px,14px)] leading-[1.65] italic">
+        <p className="text-gray-700 font-normal text-[clamp(13px,0.3vw+12px,15px)] leading-[1.65] italic">
           &ldquo;{item.text}&rdquo;
         </p>
       </div>
 
-      <div className="mt-4 pt-4 border-t border-gray-200/50 flex items-center justify-between text-[clamp(12px,0.3vw+11px,14px)]">
+      <div className="mt-5 pt-5 border-t border-gray-200/50 flex items-center justify-between text-[clamp(13px,0.3vw+12px,15px)]">
         <div className="flex items-center">
           <img
             src={item.avatar}
             alt={item.name}
-            className="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover shrink-0 mr-2.5 border border-gray-100"
+            className="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover shrink-0 mr-3 border border-gray-100"
           />
           <div>
-            <h4 className="text-[#1D1E1E] font-semibold text-[clamp(12px,0.3vw+11px,14px)] leading-none">{item.name}</h4>
-            <p className="text-gray-400 font-medium text-[clamp(9px,0.2vw+9px,11px)] tracking-wider uppercase mt-1 leading-none">
+            <h4 className="text-[#1D1E1E] font-semibold text-[clamp(13px,0.3vw+12px,15px)] leading-none">{item.name}</h4>
+            <p className="text-gray-400 font-medium text-[clamp(10px,0.2vw+10px,12px)] mt-1 leading-none">
               {item.pathway}
             </p>
           </div>
         </div>
-        <span className="text-[#D94E4E] font-semibold tracking-wider text-[clamp(9px,0.2vw+9px,11px)]">
-          {item.rating}
-        </span>
+        <div className="flex items-center gap-1.5 shrink-0 self-center">
+          <span className="text-[#1D1E1E] font-semibold text-[clamp(11px,0.2vw+10px,13px)] leading-none">5.0</span>
+          <div className="flex items-center gap-0.5">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400 -mt-px" />
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -27,12 +27,7 @@ export function ContactSection({ config }: ContactSectionProps) {
               src={mapEmbedUrl}
               width="100%"
               height="100%"
-              style={{
-                border: 0,
-                filter: 'grayscale(100%) contrast(1.05) brightness(0.97)',
-                transition: 'filter 0.4s ease',
-              }}
-              className="group-hover:![filter:grayscale(20%)_contrast(1)_brightness(1)]"
+              style={{ border: 0 }}
               allowFullScreen
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"

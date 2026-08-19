@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { repeatedPortfolioItems } from './gallery-data';
+import type { PortfolioItem } from './gallery-data';
 
 interface GalleryLightboxProps {
   selectedIndex: number | null;
@@ -10,7 +11,7 @@ interface GalleryLightboxProps {
 }
 
 export function GalleryLightbox({ selectedIndex, onSelect }: GalleryLightboxProps) {
-  const item = selectedIndex === null ? null : repeatedPortfolioItems[selectedIndex];
+  const item: PortfolioItem | null = selectedIndex === null ? null : repeatedPortfolioItems[selectedIndex];
 
   return (
     <AnimatePresence>
@@ -22,11 +23,11 @@ export function GalleryLightbox({ selectedIndex, onSelect }: GalleryLightboxProp
           </button>
           <div className="relative w-full max-w-5xl h-full max-h-[80vh] flex flex-col justify-center items-center z-10 pointer-events-none">
             <motion.div key={selectedIndex} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.3 }} className="relative w-full h-full flex flex-col items-center justify-center pointer-events-auto">
-              {item.type === 'video' ? (
+              {item.src && (item.type === 'video' ? (
                 <video src={item.src} autoPlay muted loop playsInline controls className="max-w-full max-h-full rounded-2xl object-contain shadow-2xl border border-white/10 bg-black" />
               ) : (
                 <img src={item.src} alt={item.title} className="max-w-full max-h-full rounded-2xl object-contain shadow-2xl border border-white/10" />
-              )}
+              ))}
               <GalleryCaption item={item} />
             </motion.div>
           </div>

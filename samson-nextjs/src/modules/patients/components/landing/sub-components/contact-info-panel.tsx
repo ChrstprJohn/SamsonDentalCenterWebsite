@@ -30,13 +30,13 @@ export function ContactInfoPanel({ config }: { config: ClinicConfigResponseDto }
     <div className="flex flex-col justify-between">
       <div>
         <span className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-4 font-sans">
-          Reservations
+          Our Contact
         </span>
         <h2 className="font-sans text-[18px] sm:text-[clamp(20px,2vw+10px,32px)] font-normal tracking-[-0.04em] text-[#1D1E1E] leading-[1.05]">
-          Inquire Consultation
+          Need immediate help?
         </h2>
-        <p className="mt-4 sm:mt-6 text-[12px] sm:text-[clamp(12px,0.3vw+11px,14px)] font-normal text-gray-500 max-w-sm leading-[1.65] font-sans">
-          Reserve a time slot with our master clinicians for a detailed anatomical diagnostics overview. Our reservation concierges will follow up shortly to curate your bespoke visit.
+        <p className="max-w-sm pt-1 font-sans text-[12px] sm:pt-2 sm:text-[clamp(12px,0.3vw+11px,14px)] font-normal leading-[1.65] text-gray-500">
+          Contact us at {formatLocalPhone(config.phone)}{config.landline && <> or {formatLocalPhone(config.landline)}</>}, or visit our clinic directly. Our team is ready to assist you.
         </p>
         <div className="mt-7 sm:mt-10 space-y-5 sm:space-y-6">
           <ContactLine icon={<Phone className="w-4 h-4" />} label="Phone" value={formatLocalPhone(config.phone)} />
@@ -56,7 +56,7 @@ function ContactLine({ icon, label, value }: { icon: React.ReactNode; label: str
         {icon}
       </div>
       <div>
-        <p className="text-[10px] tracking-widest uppercase font-semibold text-gray-400 font-sans">{label}</p>
+        <p className="text-[11px] sm:text-xs tracking-widest uppercase font-semibold text-gray-500 font-sans">{label}</p>
         <p className="text-[13px] sm:text-sm font-medium text-gray-900 mt-1 font-sans">{value}</p>
       </div>
     </div>

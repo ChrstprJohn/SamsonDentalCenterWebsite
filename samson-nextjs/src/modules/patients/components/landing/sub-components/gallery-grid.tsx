@@ -40,7 +40,7 @@ function buildColumns() {
   const visible = repeatedPortfolioItems.slice(0, 18);
   return [0, 1, 2].map((colIndex) =>
     visible
-      .map((item, index) => ({ item, index, aspectClass: index % 5 === 0 ? 'aspect-[960/1270]' : 'aspect-[960/635]' }))
+      .map((item, index) => ({ item, index, aspectClass: item.tags.length >= 2 ? 'aspect-[960/1270]' : 'aspect-[960/635]' }))
       .filter((_, index) => index % 3 === colIndex)
   );
 }

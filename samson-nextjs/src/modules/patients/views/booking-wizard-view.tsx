@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Check, ChevronRight, CheckCircle2, Link2, Clock } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, ChevronRight, CheckCircle2, Link2, Clock, Phone, Mail, Ban } from 'lucide-react';
 import Link from 'next/link';
 import type { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
 import type { ClinicConfigResponseDto } from '@/modules/clinic-config/dtos/settings/get-clinic-config.dto';
@@ -99,12 +99,28 @@ export function BookingWizardView({ services, config, initialServiceId }: Bookin
 
   if (!config.isBookingOpen) {
     return (
-      <main className="min-h-screen bg-[#FDFDFD] px-6 py-24 text-center text-[#1D1E1E]">
-        <div className="mx-auto max-w-xl border border-amber-200 bg-amber-50 p-8">
-          <h1 className="text-2xl font-semibold">Online Booking Is Currently Closed</h1>
-          <p className="mt-3 text-sm text-gray-700">{config.maintenanceMessage || `Please contact ${config.clinicName} directly to arrange your appointment.`}</p>
-          <p className="mt-5 text-sm font-medium">{config.phone}</p>
-          <Link href="/" className="mt-6 inline-block bg-[#1D1E1E] px-6 py-3 text-sm font-semibold tracking-wider text-white">Return to Home</Link>
+      <main className="min-h-screen bg-[#FDFDFD] px-6 py-24 flex items-center justify-center text-[#1D1E1E]">
+        <div className="mx-auto w-full max-w-md border border-gray-100 bg-white shadow-xl p-8 sm:p-10 text-center">
+          <span className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[#D94E4E]/10 text-[#D94E4E] mb-6"><Ban className="w-7 h-7" /></span>
+          <h1 className="text-2xl font-semibold tracking-tight">Online appointment requests are currently unavailable</h1>
+          <p className="mt-3 text-sm text-gray-500">Sorry for the inconvenience. To schedule an appointment, please reach us through any of the following:</p>
+          <div className="mt-6 space-y-3 text-sm font-sans">
+            <p className="flex items-center justify-center gap-2">
+              <Phone className="w-4 h-4 text-[#D94E4E]" />
+              <a href={`tel:${config.phone}`} className="hover:text-[#D94E4E] transition-colors">{config.phone.replace(/^\+63\s*/, '0')}</a>
+            </p>
+            {config.landline && (
+              <p className="flex items-center justify-center gap-2">
+                <Phone className="w-4 h-4 text-[#D94E4E]" />
+                <a href={`tel:${config.landline}`} className="hover:text-[#D94E4E] transition-colors">{config.landline}</a>
+              </p>
+            )}
+            <p className="flex items-center justify-center gap-2">
+              <Mail className="w-4 h-4 text-[#D94E4E]" />
+              <a href={`mailto:${config.email}`} className="hover:text-[#D94E4E] transition-colors">{config.email}</a>
+            </p>
+          </div>
+          <Link href="/" className="mt-8 inline-block w-full bg-[#1D1E1E] px-6 py-3 text-sm font-semibold tracking-wider text-white hover:bg-[#D94E4E] transition-colors">Return to Home</Link>
         </div>
       </main>
     );

@@ -4,6 +4,7 @@ import { getServicesQuery } from '@/modules/services/repositories/management/ser
 import { createClient } from '@/shared/database/server';
 import { getClinicConfigAction } from '@/modules/clinic-config/actions/settings/get-clinic-config.action';
 import { BookingView } from '@/modules/appointments/views/booking-view';
+import { Phone, Mail, Ban } from 'lucide-react';
 import type { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
 import { getPatientProfileAction } from '@/modules/patients/actions/profile/get-patient-profile.action';
 import { getUserDependentsAction } from '@/modules/patients/actions/dependents/get-user-dependents.action';
@@ -71,21 +72,37 @@ export default async function BookingPage({ searchParams }: { searchParams: Prom
   }
 
   const isBookingOpen = clinicConfig?.isBookingOpen ?? true;
-  const maintenanceMessage = clinicConfig?.maintenanceMessage || 'Online booking is temporarily disabled. Please contact the clinic directly to schedule an appointment.';
 
   if (!isBookingOpen) {
     return (
       <main className="flex-1 flex items-center justify-center p-6 bg-gradient-to-br from-background to-secondary-bg min-h-[80vh]">
-        <div className="w-full max-w-xl p-10 rounded-3xl border border-card-border bg-card/75 backdrop-blur-2xl shadow-2xl text-center flex flex-col gap-6">
-          <div className="w-16 h-16 mx-auto rounded-full bg-amber-500/10 flex items-center justify-center text-3xl">
-            🛑
+        <div className="w-full max-w-md p-8 sm:p-10 rounded-3xl border border-card-border bg-card/75 backdrop-blur-2xl shadow-2xl text-center flex flex-col gap-6">
+          <div className="w-14 h-14 mx-auto rounded-full bg-[#D94E4E]/10 flex items-center justify-center text-[#D94E4E]">
+            <Ban className="w-7 h-7" />
           </div>
           <div className="flex flex-col gap-3">
-            <h1 className="text-2xl font-bold text-text-primary">Booking Currently Closed</h1>
-            <p className="text-text-secondary">
-              {maintenanceMessage}
-            </p>
+            <h1 className="text-2xl font-bold text-text-primary">Online appointment requests are currently unavailable</h1>
+            <p className="text-sm text-text-secondary">Sorry for the inconvenience. To schedule an appointment, please reach us through any of the following:</p>
           </div>
+          <div className="flex flex-col gap-3 text-sm">
+            <a href={`tel:${clinicConfig?.phone}`} className="flex items-center justify-center gap-2 rounded-xl border border-card-border bg-card px-4 py-3 text-text-primary hover:border-[#D94E4E]/50 hover:text-[#D94E4E] transition-colors">
+              <Phone className="w-4 h-4 text-[#D94E4E]" />
+              {clinicConfig?.phone.replace(/^\+63\s*/, '0')}
+            </a>
+            {clinicConfig?.landline && (
+              <a href={`tel:${clinicConfig.landline}`} className="flex items-center justify-center gap-2 rounded-xl border border-card-border bg-card px-4 py-3 text-text-primary hover:border-[#D94E4E]/50 hover:text-[#D94E4E] transition-colors">
+                <Phone className="w-4 h-4 text-[#D94E4E]" />
+                {clinicConfig.landline}
+              </a>
+            )}
+            <a href={`mailto:${clinicConfig?.email}`} className="flex items-center justify-center gap-2 rounded-xl border border-card-border bg-card px-4 py-3 text-text-primary hover:border-[#D94E4E]/50 hover:text-[#D94E4E] transition-colors">
+              <Mail className="w-4 h-4 text-[#D94E4E]" />
+              {clinicConfig?.email}
+            </a>
+          </div>
+          <a href="/" className="inline-block w-full rounded-xl bg-text-primary px-6 py-3 text-sm font-semibold tracking-wider text-background hover:bg-[#D94E4E] transition-colors">
+            Return to Home
+          </a>
         </div>
       </main>
     );

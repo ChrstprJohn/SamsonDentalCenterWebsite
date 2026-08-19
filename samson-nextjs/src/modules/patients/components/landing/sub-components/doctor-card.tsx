@@ -5,13 +5,12 @@ interface DoctorCardProps {
   role: string;
   image: string;
   bio: string;
-  schedule: string;
 }
 
-export function DoctorCard({ name, role, image, bio, schedule }: DoctorCardProps) {
+export function DoctorCard({ name, role, image, bio }: DoctorCardProps) {
   return (
     <div className="group flex flex-col border border-gray-100 bg-white hover:border-[#D94E4E]/30 transition-all duration-300 overflow-hidden">
-      <div className="relative aspect-[4/3] sm:aspect-square overflow-hidden bg-gray-50">
+      <div className="relative aspect-[4/3] overflow-hidden bg-gray-50">
         <picture>
           <img
             src={image}
@@ -27,14 +26,8 @@ export function DoctorCard({ name, role, image, bio, schedule }: DoctorCardProps
           <h4 className="text-gray-900 font-semibold text-[15px] sm:text-lg leading-tight transition-colors group-hover:text-[#D94E4E]">
             {name}
           </h4>
-          <p className="text-[#D94E4E] font-medium text-[10px] sm:text-xs tracking-wider uppercase">{role}</p>
+          <p className="text-[#D94E4E] font-medium text-[12px] sm:text-sm">{role}</p>
           <p className="text-gray-500 font-light text-[12px] sm:text-sm mt-1.5 sm:mt-2 leading-relaxed">{bio}</p>
-        </div>
-        <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-gray-100 flex items-center justify-between text-[10px] sm:text-xs font-sans">
-          <span className="text-gray-400 font-medium uppercase tracking-wider">Practice Days</span>
-          <span className="text-[#1D1E1E] font-semibold bg-gray-50 px-2.5 py-1 rounded-[1px] border border-gray-100">
-            {schedule}
-          </span>
         </div>
       </div>
     </div>
