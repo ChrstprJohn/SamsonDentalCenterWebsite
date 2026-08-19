@@ -55,22 +55,29 @@ export function BookingWizardView({ services, config, initialServiceId }: Bookin
   };
 
   // Auto-scroll to selected service if initialServiceId is present
+  // Must wait past smooth-scroll's mount scroll-to-top timers (+80/+300ms) or the
+  // scroll gets yanked back to top; retry until the element and lenis are ready.
   useEffect(() => {
-    if (initialServiceId && step === 1) {
-      const scrollTimer = setTimeout(() => {
-        if (typeof window !== 'undefined') {
-          const el = document.getElementById(`service-card-${initialServiceId}`);
-          if (el) {
-            if ((window as any).lenis) {
-              (window as any).lenis.scrollTo(el, { offset: -120 });
-            } else {
-              el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-          }
-        }
-      }, 200);
-      return () => clearTimeout(scrollTimer);
-    }
+    if (!initialServiceId || step !== 1) return;
+    const start = Date.now();
+    const scrollToCard = () => {
+      const el = document.getElementById(`service-card-${initialServiceId}`);
+      if (!el) return false;
+      if ((window as any).lenis) {
+        (window as any).lenis.scrollTo(el, { offset: -120 });
+      } else {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return true;
+    };
+    const timer = setInterval(() => {
+      if (Date.now() - start >= 400 && scrollToCard()) {
+        clearInterval(timer);
+      } else if (Date.now() - start >= 4000) {
+        clearInterval(timer); // give up after 4s
+      }
+    }, 150);
+    return () => clearInterval(timer);
   }, [initialServiceId, step]);
 
   // Recalculate page dimensions and scroll to top when changing steps or filter
