@@ -35,18 +35,18 @@ export function GallerySection() {
 
 function GalleryHeader() {
   return (
-    <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 sm:mb-24 gap-6">
+    <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 sm:mb-20 md:mb-24 gap-4 sm:gap-6">
       <div className="max-w-full md:max-w-[450px] lg:max-w-[580px]">
-        <span className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-4 font-sans">
+        <span className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-2 sm:mb-3 font-sans">
           Clinic Gallery
         </span>
-        <h2 className="font-sans text-[18px] sm:text-[clamp(20px,2vw+10px,32px)] font-normal leading-[1.05] tracking-[-0.04em] text-white">
-          A compilation of our work and
+        <h2 className="font-sans text-[20px] sm:text-[clamp(22px,2vw+10px,32px)] font-normal leading-[1.3] sm:leading-[1.2] md:leading-[1.15] tracking-[-0.03em] text-white">
+          A compilation of our work and{' '}
           <br className="hidden lg:block" />
           the results we deliver.
         </h2>
       </div>
-      <p className="max-w-sm pt-1 font-sans text-[12px] sm:pt-2 md:max-w-[280px] lg:max-w-sm sm:text-[clamp(12px,0.3vw+11px,14px)] font-normal leading-[1.65] text-white/70">
+      <p className="max-w-sm pt-2 sm:pt-2 md:max-w-[280px] lg:max-w-sm font-sans text-[13px] sm:text-[clamp(12px,0.3vw+11px,14px)] font-normal leading-relaxed text-white/70">
         We showcase real cases treated at our clinic, highlighting the quality of our dental care and the outcomes our patients achieve.
       </p>
     </div>

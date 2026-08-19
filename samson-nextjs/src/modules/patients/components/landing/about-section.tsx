@@ -100,16 +100,16 @@ export function AboutSection() {
           {/* Header Layout matching Services & Gallery */}
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 sm:mb-16 gap-4 sm:gap-6">
             <div className="max-w-full md:max-w-[450px] lg:max-w-[580px]">
-              <span className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-4 font-sans">
+              <span className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-2 sm:mb-3 font-sans">
                 Our Dentist
               </span>
-              <h3 className="font-sans text-[17px] sm:text-[clamp(20px,2vw+10px,32px)] font-normal tracking-[-0.04em] text-[#1D1E1E] leading-[1.05]">
-                Meet our dentists, the specialists
+              <h3 className="font-sans text-[20px] sm:text-[clamp(22px,2vw+10px,32px)] font-normal tracking-[-0.03em] text-[#1D1E1E] leading-[1.3] sm:leading-[1.2] md:leading-[1.15]">
+                Meet our dentists, the specialists{' '}
                 <br className="hidden lg:block" />
                 behind your smile.
               </h3>
             </div>
-            <p className="text-[12px] sm:text-[clamp(12px,0.3vw+11px,14px)] font-normal text-gray-500 max-w-sm md:max-w-[280px] lg:max-w-sm leading-[1.65] font-sans pt-1 sm:pt-2">
+            <p className="text-[13px] sm:text-[clamp(12px,0.3vw+11px,14px)] font-normal text-gray-500 max-w-sm md:max-w-[280px] lg:max-w-sm leading-relaxed font-sans pt-2 sm:pt-2">
               Your smile is in good hands with our dentists, from everyday checkups to advanced treatments, with every visit clear and comfortable.
             </p>
           </div>

@@ -44,18 +44,18 @@ export function FaqSection({ config }: { config: ClinicConfigResponseDto }) {
   return (
     <section id="faq" className="border-t border-gray-100 bg-[#FDFDFD] py-16 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 sm:px-12">
-        <div className="mb-10 flex flex-col gap-4 sm:mb-24 sm:gap-6 md:flex-row md:items-end md:justify-between">
+        <div className="mb-10 flex flex-col gap-4 sm:mb-20 md:mb-24 sm:gap-6 md:flex-row md:items-end md:justify-between">
           <div className="max-w-full md:max-w-[450px] lg:max-w-[580px]">
-          <span className="mb-4 block font-sans text-[clamp(9px,0.2vw+9px,11px)] font-semibold uppercase tracking-[0.25em] text-[#D94E4E]">
+          <span className="mb-2 sm:mb-3 block font-sans text-[clamp(9px,0.2vw+9px,11px)] font-semibold uppercase tracking-[0.25em] text-[#D94E4E]">
             Frequently Asked
           </span>
-          <h2 className="font-sans text-[18px] sm:text-[clamp(20px,2vw+10px,32px)] font-normal leading-[1.05] tracking-[-0.04em] text-[#1D1E1E]">
-            Everything you need to know before,
+          <h2 className="font-sans text-[20px] sm:text-[clamp(22px,2vw+10px,32px)] font-normal leading-[1.3] sm:leading-[1.2] md:leading-[1.15] tracking-[-0.03em] text-[#1D1E1E]">
+            Everything you need to know before,{' '}
             <br className="hidden lg:block" />
             during, and after your visit.
           </h2>
           </div>
-          <p className="max-w-sm pt-1 font-sans text-[12px] sm:pt-2 md:max-w-[280px] lg:max-w-sm sm:text-[clamp(12px,0.3vw+11px,14px)] font-normal leading-[1.65] text-gray-500">
+          <p className="max-w-sm pt-2 sm:pt-2 md:max-w-[280px] lg:max-w-sm font-sans text-[13px] sm:text-[clamp(12px,0.3vw+11px,14px)] font-normal leading-relaxed text-gray-500">
             Clear answers to the questions we hear most often, from booking and preparation to what happens during and after your visit.
           </p>
         </div>

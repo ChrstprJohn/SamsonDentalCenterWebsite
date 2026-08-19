@@ -29,13 +29,13 @@ export function ContactInfoPanel({ config }: { config: ClinicConfigResponseDto }
   return (
     <div className="flex flex-col justify-between">
       <div className="max-w-full md:max-w-[450px] lg:max-w-[580px]">
-        <span className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-4 font-sans">
+        <span className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-2 sm:mb-3 font-sans">
           Our Contact
         </span>
-        <h2 className="font-sans text-[18px] sm:text-[clamp(20px,2vw+10px,32px)] font-normal tracking-[-0.04em] text-[#1D1E1E] leading-[1.05]">
+        <h2 className="font-sans text-[20px] sm:text-[clamp(22px,2vw+10px,32px)] font-normal tracking-[-0.03em] text-[#1D1E1E] leading-[1.3] sm:leading-[1.2] md:leading-[1.15]">
           Need immediate help?
         </h2>
-        <p className="max-w-sm pt-1 font-sans text-[12px] sm:pt-2 sm:text-[clamp(12px,0.3vw+11px,14px)] font-normal leading-[1.65] text-gray-500">
+        <p className="max-w-sm pt-2 sm:pt-2 font-sans text-[13px] sm:text-[clamp(12px,0.3vw+11px,14px)] font-normal leading-relaxed text-gray-500">
           Contact us at {formatLocalPhone(config.phone)}{config.landline && <> or {formatLocalPhone(config.landline)}</>}, or visit our clinic directly. Our team is ready to assist you.
         </p>
         <div className="mt-7 sm:mt-10 space-y-5 sm:space-y-6">
