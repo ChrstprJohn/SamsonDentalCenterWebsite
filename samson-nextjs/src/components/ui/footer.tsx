@@ -127,7 +127,7 @@ export function Footer({ config }: FooterProps) {
               className="flex items-center gap-2.5 hover:text-white transition-colors group"
             >
               <Phone className="w-4 h-4 text-[#D94E4E] shrink-0 group-hover:scale-110 transition-transform" />
-              <span>{phone}</span>
+              <span>{phone.replace(/^\+63\s?/, '0')}</span>
             </a>
             {landline && (
               <a
@@ -135,7 +135,7 @@ export function Footer({ config }: FooterProps) {
                 className="flex items-center gap-2.5 hover:text-white transition-colors group"
               >
                 <Phone className="w-4 h-4 text-[#D94E4E] shrink-0 group-hover:scale-110 transition-transform" />
-                <span>{landline}</span>
+                <span>{landline.replace(/^\+63\s?/, '0')}</span>
               </a>
             )}
             <a 

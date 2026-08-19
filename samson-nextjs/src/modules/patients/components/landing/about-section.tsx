@@ -7,19 +7,16 @@ const doctorsData = [
   {
     name: 'Dr. Christopher Samson',
     role: 'Lead Prosthodontist & Smile Designer',
-    image: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=600&auto=format&fit=crop',
     bio: 'Specializes in microscopic veneers, full-mouth biological reconstructions, and cranial symmetry harmonization.',
   },
   {
     name: 'Dr. Andrea Santos',
     role: 'Micro-Endodontic Specialist',
-    image: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=600&auto=format&fit=crop',
     bio: 'Expert in dental operating microscopes, root tubule disinfection, and highly precise root canal therapy.',
   },
   {
     name: 'Dr. Marcus Reyes',
     role: 'Periodontal Surgeon & Implantologist',
-    image: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?q=80&w=600&auto=format&fit=crop',
     bio: 'Dedicated to advanced bone tissue regeneration, computer-guided implant placement, and biological recovery.',
   },
 ];
