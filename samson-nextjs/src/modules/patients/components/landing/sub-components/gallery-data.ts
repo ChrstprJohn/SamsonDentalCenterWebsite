@@ -31,7 +31,7 @@ export const repeatedPortfolioItems = Array.from({ length: 50 }, (_, index) => {
 // 15 visible slots (18 minus dropped 10, 15, 17); src assigned by visible order so all 13 assets show.
 export const galleryItems = (() => {
   const order = Array.from({ length: 18 }, (_, i) => i).filter((i) => ![10, 15, 17].includes(i));
-  return order.map((idx, n) => ({
+  const items = order.map((idx, n) => ({
     ...repeatedPortfolioItems[idx],
     id: idx + 1,
     src:
@@ -43,6 +43,16 @@ export const galleryItems = (() => {
             ? '/new-assets/new-assets (7).jpg'
             : assetSrcs[n % assetSrcs.length],
   }));
+  return [
+    ...items,
+    ...[1, 2, 4, 3, 7, 9].map((n, i) => ({
+      id: items.length + i + 1,
+      type: 'image',
+      tags: [i % 2 === 0 ? 'Veneers' : 'Dental implants', i % 2 === 0 ? 'ALL-ON-X' : 'Endodontics'],
+      title: 'Additional Gallery Case',
+      src: `/img/Img (${n}).jpg`,
+    })),
+  ];
 })();
 
 export type PortfolioItem = (typeof repeatedPortfolioItems)[number] & { src?: string };

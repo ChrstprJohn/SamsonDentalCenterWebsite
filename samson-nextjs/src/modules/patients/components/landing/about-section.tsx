@@ -21,6 +21,55 @@ const doctorsData = [
   },
 ];
 
+const carouselImages = [2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13].map((n) => `/img/Img (${n}).jpg`);
+
+function WideImageCarousel() {
+  return (
+    <>
+    <div className="py-16 sm:py-32 bg-[#FDFDFD] relative w-full overflow-hidden">
+    <div className="max-w-7xl mx-auto px-6 sm:px-12 flex flex-col gap-10 sm:gap-20">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6">
+        <div className="max-w-full md:max-w-[450px] lg:max-w-[580px]">
+          <span className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-2 sm:mb-3 font-sans">
+            Inside the Clinic
+          </span>
+          <h3 className="font-sans text-[20px] sm:text-[clamp(22px,2vw+10px,32px)] font-normal leading-[1.3] sm:leading-[1.2] md:leading-[1.15] tracking-[-0.03em] text-[#1D1E1E]">
+            A look around Samson Dental Center.
+          </h3>
+        </div>
+        <p className="max-w-sm pt-2 sm:pt-2 md:max-w-[280px] lg:max-w-sm font-sans text-[13px] sm:text-[clamp(12px,0.3vw+11px,14px)] font-normal leading-relaxed text-gray-500">
+          Our clinic, our team, and the space where your smile is cared for.
+        </p>
+      </div>
+
+      <div className="relative w-full overflow-hidden">
+        <style>{`#about-marquee { animation-duration: 45s; } #about-marquee img:nth-child(odd) { margin-top: 2rem; } #about-marquee img:nth-child(even) { margin-bottom: 2rem; }`}</style>
+        <div className="absolute inset-y-0 left-0 w-[5%] sm:w-[8%] bg-gradient-to-r from-[#FDFDFD] to-transparent z-10 pointer-events-none" />
+        <div className="absolute inset-y-0 right-0 w-[5%] sm:w-[8%] bg-gradient-to-l from-[#FDFDFD] to-transparent z-10 pointer-events-none" />
+        <div
+          id="about-marquee"
+          className="animate-marquee gap-2 sm:gap-3"
+          style={{
+            maskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)',
+            WebkitMaskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)',
+          }}
+        >
+          {[...carouselImages, ...carouselImages].map((src, i) => (
+            <img
+              key={i}
+              src={src}
+              alt={`Clinic gallery ${(i % carouselImages.length) + 1}`}
+              className="h-48 sm:h-64 w-auto object-cover shrink-0"
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+    </>
+  );
+}
+
 export function AboutSection() {
   return (
     <>
@@ -90,6 +139,9 @@ export function AboutSection() {
 
       </div>
     </section>
+
+    {/* Wide image carousel */}
+    <WideImageCarousel />
 
     {/* Dentist section — hidden for now
     <section id="dentist" className="scroll-mt-28 bg-[#FDFDFD] py-12 sm:py-28">
