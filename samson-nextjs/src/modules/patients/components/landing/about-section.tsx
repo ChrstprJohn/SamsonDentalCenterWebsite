@@ -91,13 +91,11 @@ export function AboutSection() {
       </div>
     </section>
 
-    {/* Dentist section */}
+    {/* Dentist section — hidden for now
     <section id="dentist" className="scroll-mt-28 bg-[#FDFDFD] py-12 sm:py-28">
       <div className="max-w-7xl mx-auto px-6 sm:px-12 font-sans">
-        {/* Doctor Cards Container */}
-        <div className="pt-1 sm:pt-4 border-t border-gray-100">
+        <div className="pt-1 sm:pt-4">
           
-          {/* Header Layout matching Services & Gallery */}
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 sm:mb-16 gap-4 sm:gap-6">
             <div className="max-w-full md:max-w-[450px] lg:max-w-[580px]">
               <span className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-2 sm:mb-3 font-sans">
@@ -122,6 +120,7 @@ export function AboutSection() {
         </div>
       </div>
     </section>
+    */}
     </>
   );
 }

@@ -12,13 +12,16 @@ export const portfolioItems = [
 ] as const;
 
 const cleanedAssetSrcs: Record<number, string> = {
+  1: '/assets/Assets (1).jpg',
   2: '/assets/Assets (2)-combined.jpg',
-  8: '/assets/Assets (8)-combined.jpg',
+  4: '/new-assets/new-assets (1).jpg',
+  8: '/new-assets/new-assets (8).jpg',
   9: '/assets/Assets (9)-combined.jpg',
+  10: '/new-assets/new-asset (10).png',
 };
 
 const assetSrcs = [2, 13, 4, 5, 6, 7, 8, 9, 10, 12, 11, 1, 14]
-  .map((n) => cleanedAssetSrcs[n] ?? `/assets/Assets (${n}).jpg`);
+  .map((n) => (n === 2 ? '/assets/Assets (2)-combined.jpg' : cleanedAssetSrcs[n] ?? `/assets/Assets (${n}).jpg`));
 
 export const repeatedPortfolioItems = Array.from({ length: 50 }, (_, index) => {
   const baseItem = portfolioItems[index % portfolioItems.length];
@@ -31,7 +34,14 @@ export const galleryItems = (() => {
   return order.map((idx, n) => ({
     ...repeatedPortfolioItems[idx],
     id: idx + 1,
-    src: n === order.length - 1 ? cleanedAssetSrcs[8] : assetSrcs[n % assetSrcs.length],
+    src:
+      n === order.length - 3
+        ? '/assets/Assets (14).jpg'
+        : n === order.length - 2
+          ? '/new-assets/new-assets (6).jpg'
+          : n === order.length - 1
+            ? '/new-assets/new-assets (7).jpg'
+            : assetSrcs[n % assetSrcs.length],
   }));
 })();
 
