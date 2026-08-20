@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Loader2 } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Loader2, X } from 'lucide-react';
 import type { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
 import { ServiceList } from './sub-components/service-list';
 import { ServiceListRow, NoiseOverlay } from './sub-components/service-list-row';
@@ -15,12 +16,14 @@ const CARD_COUNT = 5;
 
 export function ServicesSection({ services, onSelectService }: ServicesSectionProps) {
   const [pendingId, setPendingId] = useState<string | null>(null);
+  const [selectedService, setSelectedService] = useState<ServiceResponseDto | null>(null);
   const cardServices = services.slice(0, CARD_COUNT);
   const listServices = services.slice(CARD_COUNT);
 
   const handleSelect = (svc: ServiceResponseDto) => {
     if (pendingId) return;
     setPendingId(svc.id);
+    setSelectedService(null);
     // ponytail: 800ms artificial delay so loading shows; client nav is instant otherwise
     setTimeout(() => onSelectService(svc), 800);
   };
@@ -49,7 +52,7 @@ export function ServicesSection({ services, onSelectService }: ServicesSectionPr
 
           {/* First Block: Plain list (01 to 05) */}
           <div className="relative z-10">
-            <ServiceList services={cardServices} onSelect={handleSelect} />
+            <ServiceList services={cardServices} onSelect={setSelectedService} />
           </div>
         </div>
       </div>
@@ -64,12 +67,57 @@ export function ServicesSection({ services, onSelectService }: ServicesSectionPr
                 key={svc.id}
                 nr={String(cardServices.length + idx + 1).padStart(2, '0')}
                 title={svc.name}
-                onClick={() => handleSelect(svc)}
+                onClick={() => setSelectedService(svc)}
               />
             ))}
           </div>
         </div>
       </div>
+      <AnimatePresence>
+        {selectedService && (
+          <motion.div
+            onClick={() => setSelectedService(null)}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-40 flex items-center justify-center bg-[#070808]/90 backdrop-blur-sm p-4 sm:p-8"
+          >
+            <motion.div
+              onClick={(event) => event.stopPropagation()}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.3 }}
+              className="relative w-full max-w-md bg-[#FDFDFD] p-6 sm:p-8"
+            >
+              <button
+                onClick={() => setSelectedService(null)}
+                aria-label="Close"
+                className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center text-[#1D1E1E]/50 hover:text-[#D94E4E] transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+              <span className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-2 sm:mb-3 font-sans">
+                Our Services
+              </span>
+              <h3 className="font-sans text-[18px] sm:text-[22px] font-normal tracking-[-0.03em] text-[#1D1E1E] leading-[1.2]">
+                {selectedService.name}
+              </h3>
+              {selectedService.description && (
+                <div className="mt-3 font-sans text-[13px] leading-relaxed text-gray-500">
+                  {renderDescription(selectedService.description)}
+                </div>
+              )}
+              <button
+                onClick={() => handleSelect(selectedService)}
+                className="mt-6 w-full py-3.5 bg-[#1D1E1E] text-white text-xs font-semibold tracking-widest uppercase hover:bg-[#D94E4E] transition-all duration-300 cursor-pointer"
+              >
+                Request Appointment
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       {pendingId && (
         <div className="fixed inset-0 z-50 bg-[#1D1E1E]/85 backdrop-blur-md flex flex-col items-center justify-center gap-4">
           <Loader2 className="w-10 h-10 text-[#D94E4E] animate-spin" />
@@ -78,4 +126,28 @@ export function ServicesSection({ services, onSelectService }: ServicesSectionPr
       )}
     </section>
   );
+}
+
+function renderDescription(desc: string) {
+  const lines = desc.split('\n').map((l) => l.trim()).filter(Boolean);
+  let bulleted = false;
+  return lines.map((line, i) => {
+    if (line.endsWith(':')) {
+      bulleted = true;
+      return (
+        <p key={i} className="mt-3 pt-3 border-t border-gray-100 text-[11px] font-semibold uppercase tracking-widest text-[#1D1E1E]">
+          {line !== 'Includes:' ? line : ''}
+        </p>
+      );
+    }
+    if (bulleted) {
+      return (
+        <p key={i} className="flex items-start gap-2 mt-1.5">
+          <span className="mt-[7px] w-1 h-1 rounded-full bg-[#D94E4E] shrink-0" />
+          {line}
+        </p>
+      );
+    }
+    return <p key={i}>{line}</p>;
+  });
 }

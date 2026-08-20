@@ -31,12 +31,12 @@ describe('LandingView', () => {
   const mockConfig = { id: 'c1', name: 'Test Clinic', address: '123 Test St', phone: '123', email: 'test@test.com', workingHours: [] } as any;
 
   it('should render all sections correctly and trigger handleBookingCTA on service select', () => {
-    const handleBookingCTA = vi.fn();
+    const requestAppt = vi.fn();
     (useLandingView as any).mockReturnValue({
       selectedService: null,
       setSelectedService: vi.fn(),
       contactForm: {},
-      handleBookingCTA,
+      requestAppt,
     });
 
     render(<LandingView services={[]} config={mockConfig} reviews={[]} />);
@@ -49,6 +49,6 @@ describe('LandingView', () => {
     expect(screen.getByTestId('contact-section')).toBeDefined();
 
     screen.getByText('Select Service').click();
-    expect(handleBookingCTA).toHaveBeenCalledWith('s1');
+    expect(requestAppt).toHaveBeenCalledWith('s1');
   });
 });

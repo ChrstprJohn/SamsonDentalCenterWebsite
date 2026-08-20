@@ -386,7 +386,7 @@ export function BookingWizardView({ services, config, initialServiceId }: Bookin
                             </h3>
                             <div className="border-t border-gray-100/80 my-2 sm:my-2.5" />
                             <p className="text-[12px] sm:text-[13px] text-gray-500 font-sans font-normal leading-[1.55] sm:leading-[1.65]">
-                              {srv.description || 'Full comprehensive treatment administered by certified medical practitioners.'}
+                              {renderDescription(srv.description)}
                             </p>
                           </div>
                         </div>
@@ -675,6 +675,13 @@ export function BookingWizardView({ services, config, initialServiceId }: Bookin
       )}
     </div>
   );
+}
+
+function renderDescription(desc: string) {
+  if (!desc) return '';
+  const includesIdx = desc.indexOf('Includes:');
+  if (includesIdx === -1) return desc;
+  return desc.slice(0, includesIdx).trim();
 }
 
 function SocialIcon({ platform }: { platform: string }) {

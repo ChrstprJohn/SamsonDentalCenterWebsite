@@ -34,7 +34,8 @@ function WideImageCarousel() {
             Inside the Clinic
           </span>
           <h3 className="font-sans text-[20px] sm:text-[clamp(22px,2vw+10px,32px)] font-normal leading-[1.3] sm:leading-[1.2] md:leading-[1.15] tracking-[-0.03em] text-[#1D1E1E]">
-            A look around Samson Dental Center.
+            A look around <br className="hidden lg:block" />
+            Samson Dental Center.
           </h3>
         </div>
         <p className="max-w-sm pt-2 sm:pt-2 md:max-w-[280px] lg:max-w-sm font-sans text-[13px] sm:text-[clamp(12px,0.3vw+11px,14px)] font-normal leading-relaxed text-gray-500">

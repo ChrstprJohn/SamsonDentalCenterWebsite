@@ -54,7 +54,7 @@ describe('useLandingView', () => {
     );
 
     act(() => {
-      result.current.handleBookingCTA('s-1');
+      result.current.requestAppt('s-1');
     });
 
     expect(mockPush).toHaveBeenCalledWith('/book?serviceId=s-1');
@@ -66,7 +66,7 @@ describe('useLandingView', () => {
     );
 
     act(() => {
-      result.current.handleBookingCTA();
+      result.current.requestAppt();
     });
 
     expect(mockPush).toHaveBeenCalledWith('/book');

@@ -82,13 +82,13 @@ export function LandingView({ services, config, reviews }: LandingViewProps) {
   const {
     selectedService,
     setSelectedService,
-    handleBookingCTA,
+    requestAppt,
   } = useLandingView({ services: activeServices });
 
   return (
     <div className="flex flex-col w-full bg-[#FDFDFD] text-[#1D1E1E]">
-      <HeroSectionPreview onBookClick={() => handleBookingCTA()} serviceCount={activeServices.length} />
-      <ServicesSection services={activeServices} onSelectService={(svc) => handleBookingCTA(svc.id)} />
+      <HeroSectionPreview onBookClick={() => requestAppt()} serviceCount={activeServices.length} />
+      <ServicesSection services={activeServices} onSelectService={(svc) => requestAppt(svc.id)} />
       <AboutSection />
       <WhyChooseUsSection />
       <CompaniesSection />

@@ -136,9 +136,9 @@ export function HeroSectionPreview({ onBookClick, serviceCount = 0 }: HeroSectio
               className="font-serif text-[clamp(32px,5.5vw+8px,65px)] min-[768px]:max-[1100px]:text-[clamp(46px,5.5vw,60px)] max-[430px]:text-[clamp(40px,10.5vw,52px)] max-[320px]:text-[clamp(11px,4.5vw,14px)] font-semibold tracking-tight leading-[1.1] max-w-4xl"
               style={{ fontWeight: '600', fontStyle: 'normal' }}
             >
-              <span className="block">Unlock a World of</span>
-              <span className="relative inline-block italic mt-1 sm:mt-2 lg:mt-[8px] lg:font-semibold text-white" id="hero-radiant-smiles">
-                Radiant Smiles
+              <span className="block">Trusted Care</span>
+              <span className="relative inline-block italic mt-1 sm:mt-2 lg:mt-[8px] lg:font-semibold text-white" id="hero-exceptional-smiles">
+                Smiles That Last
                 <svg
                   className="absolute left-1/2 sm:left-0 -translate-x-1/2 sm:translate-x-0 -bottom-2 sm:-bottom-4 w-full h-2 sm:h-3 text-[#D94E4E] overflow-visible"
                   viewBox="0 0 100 8"
@@ -161,9 +161,9 @@ export function HeroSectionPreview({ onBookClick, serviceCount = 0 }: HeroSectio
               className="font-serif text-[clamp(32px,5.5vw+8px,65px)] min-[768px]:max-[1100px]:text-[clamp(46px,5.5vw,60px)] max-[430px]:text-[clamp(40px,10.5vw,52px)] max-[320px]:text-[clamp(11px,4.5vw,14px)] font-semibold tracking-tight leading-[1.1] max-w-4xl"
               style={{ fontWeight: '600', fontStyle: 'normal' }}
             >
-              <span className="block">Unlock a World of</span>
-              <span className="relative inline-block italic mt-1 sm:mt-2 lg:mt-[8px] lg:font-semibold text-white" id="hero-radiant-smiles">
-                Radiant Smiles
+              <span className="block">Trusted Care</span>
+              <span className="relative inline-block italic mt-1 sm:mt-2 lg:mt-[8px] lg:font-semibold text-white" id="hero-exceptional-smiles">
+                Smiles That Last
                 <svg
                   className="absolute left-1/2 sm:left-0 -translate-x-1/2 sm:translate-x-0 -bottom-2 sm:-bottom-4 w-full h-2 sm:h-3 text-[#D94E4E] overflow-visible"
                   viewBox="0 0 100 8"
@@ -186,7 +186,7 @@ export function HeroSectionPreview({ onBookClick, serviceCount = 0 }: HeroSectio
             transition={{ duration: 1.2, delay: 0.4, ease: 'easeOut' }}
             className="mt-4 sm:mt-5 lg:mt-[38px] text-[clamp(13px,0.4vw+11px,16px)] min-[768px]:max-[1100px]:text-[15px] min-[768px]:max-[1100px]:max-w-lg min-[768px]:max-[1100px]:line-clamp-2 max-[430px]:text-[15px] max-[320px]:text-[10px] leading-[26px] max-[320px]:leading-[18px] sm:leading-relaxed lg:leading-[32.5px] lg:font-normal lg:not-italic text-white/95 max-w-2xl font-light tracking-wide drop-shadow-sm"
           >
-            Exceptional Dental Care Powered by Expertise, Innovation and Advanced Technology. Trusted by companies and individuals for over 60 years.
+            Since 1964, Samson Dental Center has been the preferred choice for companies and families seeking trusted, highly competent dental care.
           </motion.p>
 
           <motion.div

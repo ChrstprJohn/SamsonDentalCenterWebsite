@@ -81,7 +81,7 @@ export function useLandingView({ services }: UseLandingViewProps) {
   const router = useRouter();
 
   // Redirect to dedicated 2-Step Booking Wizard page
-  const handleBookingCTA = (serviceId?: string) => {
+  const requestAppt = (serviceId?: string) => {
     setSelectedService(null);
     if (serviceId) {
       router.push(`/book?serviceId=${encodeURIComponent(serviceId)}`);
@@ -180,6 +180,6 @@ export function useLandingView({ services }: UseLandingViewProps) {
       isContactSubmitting,
       handleRealInquirySubmit,
     },
-    handleBookingCTA,
+    requestAppt,
   };
 }
