@@ -68,13 +68,13 @@ export function WhyChooseUsSection() {
           {reasons.map(({ icon: Icon, title, text }) => (
             <div
               key={title}
-              className="group border border-gray-100 bg-white p-6 sm:p-8 transition-colors duration-300 hover:border-[#D94E4E]/30"
+              className="group border border-gray-100 bg-white p-4 sm:p-8 transition-colors duration-300 hover:border-[#D94E4E]/30"
             >
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#1D1E1E]/5 group-hover:bg-[#D94E4E] rounded-full flex items-center justify-center text-[#1D1E1E] group-hover:text-white transition-all duration-300">
-                <Icon className="w-5 h-5" />
+              <div className="w-9 h-9 sm:w-12 sm:h-12 bg-[#1D1E1E]/5 group-hover:bg-[#D94E4E] rounded-full flex items-center justify-center text-[#1D1E1E] group-hover:text-white transition-all duration-300">
+                <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
-              <h3 className="mt-5 text-[#1D1E1E] text-base font-semibold font-sans">{title}</h3>
-              <p className="mt-2 text-[13px] text-gray-500 leading-relaxed font-light font-sans">{text}</p>
+              <h3 className="mt-3 sm:mt-5 text-[#1D1E1E] text-[15px] sm:text-base font-semibold font-sans">{title}</h3>
+              <p className="mt-1.5 sm:mt-2 text-[12px] sm:text-[13px] text-gray-500 leading-relaxed font-light font-sans">{text}</p>
             </div>
           ))}
         </div>

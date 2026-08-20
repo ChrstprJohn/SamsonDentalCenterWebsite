@@ -49,12 +49,14 @@ export function CompaniesSection() {
               <span className="relative flex items-center justify-center w-3.5 h-3.5 shrink-0 mt-1">
                 <span className="w-3.5 h-3.5 rounded-full border-2 border-[#D94E4E] bg-[#FDFDFD] group-hover:bg-[#D94E4E] z-30 transition-colors duration-300" />
               </span>
-              <span className="font-sans text-[13px] sm:text-[15px] tracking-[0.1em] text-gray-500 font-semibold whitespace-nowrap shrink-0">
-                {years}
-              </span>
-              <span className="font-sans text-[15px] sm:text-[17px] font-medium text-[#1D1E1E] leading-relaxed ml-auto">
-                {name}
-              </span>
+              <div className="flex flex-col lg:flex-row lg:items-baseline gap-0.5 lg:gap-5 min-w-0 lg:flex-1">
+                <span className="font-sans text-[12px] lg:text-[15px] tracking-[0.1em] text-gray-500 font-medium whitespace-nowrap lg:w-[110px] lg:shrink-0">
+                  {years}
+                </span>
+                <span className="font-sans text-[15px] lg:text-[17px] font-semibold lg:font-medium text-[#1D1E1E] leading-relaxed lg:ml-auto lg:text-right">
+                  {name}
+                </span>
+              </div>
             </div>
           ))}
         </div>
