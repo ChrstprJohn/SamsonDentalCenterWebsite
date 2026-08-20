@@ -13,10 +13,8 @@ interface GalleryGridProps {
 }
 
 export function GalleryGrid({ galleryRef, translateFirst, translateSecond, translateThird, onSelect }: GalleryGridProps) {
-  const columns = buildColumns();
-  // The right mobile column is one landscape card shorter; include the first
-  // desktop-only item to keep the bottom edge balanced.
-  const mobileColumns = [columns[0], [...columns[1], columns[2][0]]];
+  const columns = buildColumns(3);
+  const mobileColumns = buildColumns(2);
 
   return (
     <div ref={galleryRef} className="w-full relative overflow-hidden">
@@ -39,10 +37,10 @@ export function GalleryGrid({ galleryRef, translateFirst, translateSecond, trans
   );
 }
 
-function buildColumns() {
-  return [0, 1, 2].map((colIndex) =>
+function buildColumns(columnCount: number) {
+  return Array.from({ length: columnCount }, (_, colIndex) =>
     galleryItems
       .map((item, index) => ({ item, index, aspectClass: item.tags.length >= 2 ? 'aspect-[960/1270]' : 'aspect-[960/635]' }))
-      .filter((entry) => entry.index % 3 === colIndex)
+      .filter((entry) => entry.index % columnCount === colIndex)
   );
 }
