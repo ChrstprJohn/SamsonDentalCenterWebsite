@@ -15,6 +15,7 @@ import { CompaniesSection } from '../components/landing/companies-section';
 import { GallerySection } from '../components/landing/gallery-section';
 import { TestimonialsSection } from '../components/landing/testimonials-section';
 import { FaqSection } from '../components/landing/faq-section';
+import { ChatSection } from '../components/landing/chat-section';
 import { ContactSection } from '../components/landing/contact-section';
 import { AppointmentBannerSection } from '../components/landing/appointment-banner-section';
 import type { LandingReview } from '@/modules/reviews/queries/get-featured-landing-reviews.query';
@@ -98,6 +99,7 @@ export function LandingView({ services, config, reviews }: LandingViewProps) {
       <FaqSection config={config} />
       <ContactSection config={config} />
       <AppointmentBannerSection />
+      <ChatSection config={config} services={activeServices} />
     </div>
   );
 }
