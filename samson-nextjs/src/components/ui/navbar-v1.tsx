@@ -26,6 +26,7 @@ export const NAV_ITEMS = [
 ] as const;
 
 export const ABOUT_MENU_ITEMS = [
+  { label: 'Why Choose Us', href: '#why-choose-us' },
   { label: 'Gallery', href: '#gallery' },
   { label: 'Testimonials', href: '#testimonials' },
 ] as const;
@@ -47,7 +48,7 @@ export function NavbarV1({
       setScrolled(window.scrollY > 80);
 
       if (!isMainPage) return;
-      const sectionIds = ['home', 'services', 'about', 'gallery', 'testimonials', 'faq', 'contact'];
+      const sectionIds = ['home', 'services', 'about', 'why-choose-us', 'gallery', 'testimonials', 'faq', 'contact'];
       const scrollPosition = window.scrollY + 250;
       for (let i = sectionIds.length - 1; i >= 0; i--) {
         const id = sectionIds[i];
@@ -130,7 +131,7 @@ export function NavbarV1({
             {NAV_ITEMS.map((item) => {
               const isActive = isMainPage && activeSection === item.href.replace('#', '');
               const isAbout = item.label === 'About Us';
-              const isAboutGroupActive = isAbout && ['about', 'dentist', 'gallery', 'testimonials'].includes(activeSection);
+              const isAboutGroupActive = isAbout && ['about', 'why-choose-us', 'dentist', 'gallery', 'testimonials'].includes(activeSection);
               if (isAbout) {
                 return (
                   <div key={item.label} className="relative group">

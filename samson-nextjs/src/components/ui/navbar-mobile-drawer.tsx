@@ -33,7 +33,7 @@ export function NavbarMobileDrawer({
       <div className="flex flex-col gap-6 font-sans text-center text-base uppercase tracking-[0.2em] font-medium w-full max-w-xs mx-auto">
         {[...NAV_ITEMS.slice(0, 2), ...ABOUT_MENU_ITEMS, ...NAV_ITEMS.slice(3)].map((item) => {
           const isActive = isMainPage && activeSection === item.href.replace('#', '');
-          const isAboutGroupActive = item.label === 'About Us' && ['about', 'dentist', 'gallery', 'testimonials'].includes(activeSection);
+          const isAboutGroupActive = item.label === 'About Us' && ['about', 'why-choose-us', 'dentist', 'gallery', 'testimonials'].includes(activeSection);
           return (
             <div key={item.label} className="flex flex-col border-b border-gray-100/60">
               <a href={isMainPage ? item.href : `/${item.href}`} onClick={(e) => onNavClick(e, item.href)} className={`py-2.5 text-[14px] transition-colors ${isAboutGroupActive || isActive ? 'text-[#D94E4E]' : 'text-[#1D1E1E]/85 hover:text-[#D94E4E]'}`} style={{ fontWeight: isAboutGroupActive || isActive ? '600' : '500' }}>{item.label}</a>

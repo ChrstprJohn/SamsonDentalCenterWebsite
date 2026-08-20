@@ -10,6 +10,8 @@ import { HeroSectionPreview } from '../components/landing/hero-section-preview';
 import { ServicesSection } from '../components/landing/services-section';
 import { JourneySection } from '../components/landing/journey-section';
 import { AboutSection } from '../components/landing/about-section';
+import { WhyChooseUsSection } from '../components/landing/why-choose-us-section';
+import { CompaniesSection } from '../components/landing/companies-section';
 import { GallerySection } from '../components/landing/gallery-section';
 import { TestimonialsSection } from '../components/landing/testimonials-section';
 import { FaqSection } from '../components/landing/faq-section';
@@ -88,6 +90,8 @@ export function LandingView({ services, config, reviews }: LandingViewProps) {
       <HeroSectionPreview onBookClick={() => handleBookingCTA()} serviceCount={activeServices.length} />
       <ServicesSection services={activeServices} onSelectService={(svc) => handleBookingCTA(svc.id)} />
       <AboutSection />
+      <WhyChooseUsSection />
+      <CompaniesSection />
       {/* <JourneySection /> */}
       <GallerySection />
       <TestimonialsSection reviews={reviews} />
