@@ -26,7 +26,6 @@ export const NAV_ITEMS = [
 ] as const;
 
 export const ABOUT_MENU_ITEMS = [
-  { label: 'Dentist', href: '#dentist' },
   { label: 'Gallery', href: '#gallery' },
   { label: 'Testimonials', href: '#testimonials' },
 ] as const;
@@ -48,7 +47,7 @@ export function NavbarV1({
       setScrolled(window.scrollY > 80);
 
       if (!isMainPage) return;
-      const sectionIds = ['home', 'services', 'about', 'dentist', 'gallery', 'testimonials', 'faq', 'contact'];
+      const sectionIds = ['home', 'services', 'about', 'gallery', 'testimonials', 'faq', 'contact'];
       const scrollPosition = window.scrollY + 250;
       for (let i = sectionIds.length - 1; i >= 0; i--) {
         const id = sectionIds[i];

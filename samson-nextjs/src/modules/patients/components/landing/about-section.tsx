@@ -77,12 +77,12 @@ export function AboutSection() {
             {/* Unique Features */}
             <div className="mt-7 sm:mt-10 grid grid-cols-2 gap-4 sm:gap-6 pt-6 sm:pt-8 border-t border-gray-100 font-sans">
               <div>
-                <h4 className="text-[#1D1E1E] text-sm font-semibold">Central Location</h4>
-                <p className="text-[12px] text-gray-500 mt-1.5 leading-relaxed font-light">Find us at 5th Floor S Building, Upper Session Road, Baguio City.</p>
+                <h4 className="text-[#1D1E1E] text-base font-semibold">Central Location</h4>
+                <p className="text-[13px] text-gray-500 mt-1.5 leading-relaxed font-light">Find us at 5th Floor S Building, Upper Session Road, Baguio City.</p>
               </div>
               <div>
-                <h4 className="text-[#1D1E1E] text-sm font-semibold">By Appointment</h4>
-                <p className="text-[12px] text-gray-500 mt-1.5 leading-relaxed font-light">Call ahead or send an appointment request so our team can assist you.</p>
+                <h4 className="text-[#1D1E1E] text-base font-semibold">By Appointment</h4>
+                <p className="text-[13px] text-gray-500 mt-1.5 leading-relaxed font-light">Call ahead or send an appointment request so our team can assist you.</p>
               </div>
             </div>
           </div>
