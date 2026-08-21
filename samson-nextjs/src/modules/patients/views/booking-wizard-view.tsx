@@ -677,7 +677,7 @@ export function BookingWizardView({ services, config, initialServiceId }: Bookin
   );
 }
 
-function renderDescription(desc: string) {
+function renderDescription(desc: string | null) {
   if (!desc) return '';
   const includesIdx = desc.indexOf('Includes:');
   if (includesIdx === -1) return desc;

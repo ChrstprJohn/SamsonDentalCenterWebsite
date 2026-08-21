@@ -11,6 +11,14 @@ export const portfolioItems = [
   { id: 10, type: 'image', tags: ['Professional hygiene', 'Veneers'], title: 'Professional Hygiene & Veneer Finish' },
 ] as const;
 
+export type PortfolioItem = {
+  id: number;
+  src?: string;
+  type: 'image';
+  tags: readonly string[];
+  title: string;
+};
+
 const cleanedAssetSrcs: Record<number, string> = {
   1: '/assets/Assets (1).jpg',
   2: '/assets/Assets (2)-combined.jpg',
@@ -29,7 +37,7 @@ export const repeatedPortfolioItems = Array.from({ length: 50 }, (_, index) => {
 });
 
 // 15 visible slots (18 minus dropped 10, 15, 17); src assigned by visible order so all 13 assets show.
-export const galleryItems = (() => {
+export const galleryItems: PortfolioItem[] = (() => {
   const order = Array.from({ length: 18 }, (_, i) => i).filter((i) => ![10, 15, 17].includes(i));
   const items = order.map((idx, n) => ({
     ...repeatedPortfolioItems[idx],
@@ -47,12 +55,10 @@ export const galleryItems = (() => {
     ...items,
     ...[1, 2, 4, 3, 7, 9].map((n, i) => ({
       id: items.length + i + 1,
-      type: 'image',
+      type: 'image' as const,
       tags: [i % 2 === 0 ? 'Veneers' : 'Dental implants', i % 2 === 0 ? 'ALL-ON-X' : 'Endodontics'],
       title: 'Additional Gallery Case',
       src: `/img/Img (${n}).jpg`,
     })),
   ];
 })();
-
-export type PortfolioItem = (typeof repeatedPortfolioItems)[number] & { src?: string };
