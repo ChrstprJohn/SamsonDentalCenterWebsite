@@ -275,7 +275,7 @@ async function getAssistantReply(
   config: ClinicConfigResponseDto,
   services: ServiceResponseDto[],
 ) {
-  const webhookUrl = process.env.NEXT_PUBLIC_N8N_CHAT_WEBHOOK;
+  const webhookUrl = process.env.NEXT_PUBLIC_N8N_CHAT_WEBHOOK_URL;
 
   if (webhookUrl) {
     try {
