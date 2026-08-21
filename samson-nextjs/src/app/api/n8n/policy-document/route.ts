@@ -66,29 +66,15 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Combine extracted text across all policy documents with clear section headers
-    const combinedText = validDocs
-      .map((doc) => `--- DOCUMENT: ${doc.file_name} ---\n${doc.extracted_text.trim()}`)
+    // Combine extracted text across documents as pure raw text
+    const rawText = validDocs
+      .map((doc) => doc.extracted_text.trim())
       .join('\n\n');
 
     return Response.json(
       {
-        success: true,
-        count: validDocs.length,
-        text: combinedText,
-        document: {
-          id: validDocs[0].id,
-          fileName: validDocs[0].file_name,
-          createdAt: validDocs[0].created_at,
-          updatedAt: validDocs[0].updated_at,
-        },
-        documents: validDocs.map((doc) => ({
-          id: doc.id,
-          fileName: doc.file_name,
-          text: doc.extracted_text,
-          createdAt: doc.created_at,
-          updatedAt: doc.updated_at,
-        })),
+        title: validDocs[0].file_name,
+        text: rawText,
       },
       { headers: { 'Cache-Control': 'no-store' } },
     );
