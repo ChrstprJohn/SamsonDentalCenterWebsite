@@ -29,6 +29,7 @@ import {
   Paintbrush,
   Bell,
   HeartHandshake,
+  FileText,
 } from "lucide-react"
 
 const data = {
@@ -69,6 +70,11 @@ const data = {
       title: "Appointments Directory",
       url: "/secretary-v2/appointments",
       icon: <CalendarRange className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
+    },
+    {
+      title: "Documents",
+      url: "/secretary-v2/documents",
+      icon: <FileText className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
     },
     {
       title: "Notifications",
