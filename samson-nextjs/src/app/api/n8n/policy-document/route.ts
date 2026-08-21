@@ -32,15 +32,13 @@ export async function GET(req: NextRequest) {
       .order('created_at', { ascending: false });
 
     if (fileName) {
-      query = query.eq('file_name', fileName);
-    } else {
-      query = query.or('file_name.ilike.*policy*,file_name.ilike.*privacy*');
+      query = query.ilike('file_name', `%${fileName}%`);
     }
 
     const { data: documents, error } = await query;
 
     if (error) {
-      throw new Error(`Failed to fetch policy document: ${error.message}`);
+      throw new Error(`Failed to fetch policy documents: ${error.message}`);
     }
 
     interface DocumentRecord {
@@ -61,8 +59,8 @@ export async function GET(req: NextRequest) {
         {
           success: false,
           error: fileName
-            ? `Processed policy document "${fileName}" not found`
-            : 'No processed policy document found. Upload a PDF with "policy" or "privacy" in its file name.',
+            ? `Processed document matching "${fileName}" not found`
+            : 'No processed documents with extracted text found. Please upload and process documents in the Secretary Documents panel.',
         },
         { status: 404 },
       );
