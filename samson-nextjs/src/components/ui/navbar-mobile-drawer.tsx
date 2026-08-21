@@ -30,17 +30,17 @@ export function NavbarMobileDrawer({
       className="fixed inset-0 w-screen h-screen bg-[#FDFDFD] z-40 px-8 flex flex-col justify-center items-center shadow-2xl lg:hidden overflow-y-auto"
       id="mobile-navigation-overlay"
     >
-      <div className="flex flex-col gap-6 font-sans text-center text-base uppercase tracking-[0.2em] font-medium w-full max-w-xs mx-auto">
+      <div className="flex flex-col gap-3.5 font-sans text-center text-base uppercase tracking-[0.2em] font-medium w-full max-w-xs mx-auto pt-16">
         {[...NAV_ITEMS.slice(0, 2), ...ABOUT_MENU_ITEMS, ...NAV_ITEMS.slice(3)].map((item) => {
           const isActive = isMainPage && activeSection === item.href.replace('#', '');
           const isAboutGroupActive = item.label === 'About Us' && ['about', 'why-choose-us', 'dentist', 'gallery', 'testimonials'].includes(activeSection);
           return (
             <div key={item.label} className="flex flex-col border-b border-gray-100/60">
-              <a href={isMainPage ? item.href : `/${item.href}`} onClick={(e) => onNavClick(e, item.href)} className={`py-2.5 text-[14px] transition-colors ${isAboutGroupActive || isActive ? 'text-[#D94E4E]' : 'text-[#1D1E1E]/85 hover:text-[#D94E4E]'}`} style={{ fontWeight: isAboutGroupActive || isActive ? '600' : '500' }}>{item.label}</a>
+              <a href={isMainPage ? item.href : `/${item.href}`} onClick={(e) => onNavClick(e, item.href)} className={`py-2 text-[14px] transition-colors ${isAboutGroupActive || isActive ? 'text-[#D94E4E]' : 'text-[#1D1E1E]/85 hover:text-[#D94E4E]'}`} style={{ fontWeight: isAboutGroupActive || isActive ? '600' : '500' }}>{item.label}</a>
             </div>
           );
         })}
-        <div className="flex flex-col gap-4 pt-6 mt-4">
+        <div className="flex flex-col gap-4 pt-5 mt-2">
           <div className="flex flex-col gap-4 items-center">
             <Link href="/book" onClick={onClose} className="w-full">
               <button className="w-full px-6 py-3.5 bg-[#141515] text-white rounded-full text-[14px] font-semibold hover:bg-[#D94E4E] tracking-[0.2em] transition-all cursor-pointer flex items-center justify-center gap-2">

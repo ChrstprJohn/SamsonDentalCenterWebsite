@@ -13,18 +13,18 @@ export function ServiceListRow({ nr, title, onClick }: ServiceListRowProps) {
     <div
       onClick={onClick}
       title="Click to book this service"
-      className="group relative flex items-center justify-between py-5 sm:py-7 transition-colors duration-300 hover:bg-[#1C1D1D]/70 px-4 sm:px-6 rounded-2xl cursor-pointer overflow-hidden"
+      className="group relative flex items-center justify-between py-6 sm:py-8 transition-colors duration-300 hover:bg-[#1C1D1D]/70 px-4 sm:px-6 rounded-2xl cursor-pointer overflow-hidden"
     >
       <NoiseOverlay className="opacity-0 group-hover:opacity-[0.06] transition-opacity duration-300" />
-      <span className="relative z-10 text-sm sm:text-base md:text-base lg:text-lg font-josefin font-normal text-white/75 group-hover:text-white transition-colors w-10 sm:w-14 md:w-16 lg:w-16 text-left">
+      <span className="relative z-10 text-lg sm:text-xl md:text-2xl lg:text-3xl font-sans font-normal text-white/75 group-hover:text-white transition-colors w-10 sm:w-14 md:w-16 lg:w-16 text-left shrink-0">
         {nr}
       </span>
-      <h4 className="relative z-10 font-josefin text-base sm:text-lg md:text-lg lg:text-2xl font-normal tracking-tight text-white/90 group-hover:text-white transition-colors flex-1 text-center leading-[1.2]">
+      <h4 className="relative z-10 font-sans text-lg sm:text-xl md:text-2xl lg:text-3xl font-normal tracking-tight text-white/90 group-hover:text-white transition-colors flex-1 text-center leading-[1.2] px-2 sm:px-3 max-w-[280px] sm:max-w-md md:max-w-xl mx-auto">
         <ServiceTitle title={title} />
       </h4>
-      <div className="relative z-10 w-10 sm:w-14 md:w-16 lg:w-16 flex justify-end">
-        <div className="w-8 h-8 sm:w-9 sm:h-9 md:w-9 md:h-9 lg:w-10 lg:h-10 bg-white/5 group-hover:bg-[#D94E4E] rounded-full border border-white/10 flex items-center justify-center text-white/80 group-hover:text-white transition-all duration-300">
-          <MoveRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-4 lg:h-4 transition-transform duration-500 ease-out rotate-[-45deg] group-hover:rotate-0" />
+      <div className="relative z-10 w-10 sm:w-14 md:w-16 lg:w-16 flex justify-end shrink-0">
+        <div className="w-9 h-9 sm:w-10 sm:h-10 md:w-10 md:h-10 lg:w-11 lg:h-11 bg-white/5 group-hover:bg-[#D94E4E] rounded-full border border-white/10 flex items-center justify-center text-white/80 group-hover:text-white transition-all duration-300 shadow-2xs">
+          <MoveRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 lg:w-5 lg:h-5 transition-transform duration-500 ease-out rotate-[-45deg] group-hover:rotate-0" />
         </div>
       </div>
     </div>
@@ -43,10 +43,34 @@ export function NoiseOverlay({ className = 'opacity-[0.06]' }: { className?: str
 }
 
 function ServiceTitle({ title }: { title: string }) {
-  const words = title.split(' ');
-  if (words.length === 2) return <>{words[0]}<br />{words[1]}</>;
-  if (words.length === 3 && (words[1] === '&' || words[1].toLowerCase() === 'and')) {
-    return <>{words[0]} {words[1]}<br />{words[2]}</>;
+  const words = title.trim().split(/\s+/);
+  if (words.length <= 1) return <>{title}</>;
+  if (words.length === 2) {
+    return (
+      <>
+        <span className="block sm:inline">{words[0]}</span>
+        <span className="hidden sm:inline"> </span>
+        <span className="block sm:inline">{words[1]}</span>
+      </>
+    );
   }
-  return title;
+
+  // Format into chunks of 2 words per line on mobile for clean wrap
+  const pairs: string[] = [];
+  for (let i = 0; i < words.length; i += 2) {
+    pairs.push(words.slice(i, i + 2).join(' '));
+  }
+
+  return (
+    <>
+      <span className="sm:hidden">
+        {pairs.map((pair, i) => (
+          <span key={i} className="block">
+            {pair}
+          </span>
+        ))}
+      </span>
+      <span className="hidden sm:inline">{title}</span>
+    </>
+  );
 }

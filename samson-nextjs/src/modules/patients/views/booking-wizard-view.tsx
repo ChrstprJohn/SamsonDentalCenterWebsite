@@ -192,13 +192,14 @@ export function BookingWizardView({ services, config, initialServiceId }: Bookin
       {!contactSection.submittedLocal && (
         <header className="sticky top-0 z-40 h-[76px] bg-white/95 backdrop-blur-md border-b border-gray-200/80 px-6 sm:px-12 py-2.5 flex items-center shadow-xs">
         <div className="max-w-7xl mx-auto grid w-full grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-4">
-          {/* Left: Slightly Larger Return Link */}
+          {/* Left: Visible Return Link / Back Button */}
           <Link
             href="/"
-            aria-label="Return home"
-            className="inline-flex items-center font-sans text-xs sm:text-sm font-medium text-gray-700 hover:text-[#D94E4E] transition-colors"
+            aria-label="Back to home"
+            className="inline-flex items-center gap-1.5 font-sans text-xs sm:text-sm font-semibold text-gray-800 hover:text-[#D94E4E] transition-colors p-1.5 -ml-1.5 rounded-lg hover:bg-gray-100/80"
           >
-            <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <ArrowLeft className="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2.2]" />
+            <span>Back</span>
           </Link>
 
           {/* Center: Centered Stepper Navigation Pills with boxed number badge */}

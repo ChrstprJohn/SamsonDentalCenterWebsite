@@ -35,6 +35,10 @@ export function NavbarV2({ user, config, logoUrl: propLogoUrl, clinicName: propC
   const isMainPage = pathname === '/';
 
   useEffect(() => {
+    window.dispatchEvent(new CustomEvent('mobile-nav-toggle', { detail: { isOpen: isMobileOpen } }));
+  }, [isMobileOpen]);
+
+  useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 80);
 

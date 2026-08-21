@@ -39,8 +39,18 @@ export function ChatSection({ config, services }: ChatSectionProps) {
   const [isWelcomeTyping, setIsWelcomeTyping] = useState(false);
   const [showPrompt, setShowPrompt] = useState(true);
   const [promptIndex, setPromptIndex] = useState(0);
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const hasOpenedChatRef = useRef(false);
+
+  useEffect(() => {
+    const handleNavToggle = (e: Event) => {
+      const customEvent = e as CustomEvent<{ isOpen?: boolean }>;
+      setIsMobileNavOpen(Boolean(customEvent.detail?.isOpen));
+    };
+    window.addEventListener('mobile-nav-toggle', handleNavToggle);
+    return () => window.removeEventListener('mobile-nav-toggle', handleNavToggle);
+  }, []);
 
   useEffect(() => {
     const scrollToBottom = () => {
@@ -117,7 +127,14 @@ export function ChatSection({ config, services }: ChatSectionProps) {
   };
 
   return (
-    <div id="chat" className={`fixed z-40 ${isOpen ? 'bottom-2 right-3 sm:bottom-4 sm:right-6' : 'bottom-5 right-5 sm:bottom-8 sm:right-8'}`}>
+    <div
+      id="chat"
+      className={`fixed z-40 transition-opacity duration-300 ${
+        isMobileNavOpen ? 'hidden' : ''
+      } ${
+        isOpen ? 'bottom-2 right-3 sm:bottom-4 sm:right-6' : 'bottom-5 right-5 sm:bottom-8 sm:right-8'
+      }`}
+    >
       {showPrompt && !isOpen && (
         <button
           type="button"
@@ -134,30 +151,35 @@ export function ChatSection({ config, services }: ChatSectionProps) {
 
       {isOpen && (
         <div
-          className="absolute bottom-0 right-0 flex h-[80vh] min-h-[360px] max-h-[600px] w-[calc(100vw-1.5rem)] max-w-[410px] flex-col overflow-hidden rounded-2xl border border-[#1D1E1E]/10 bg-white shadow-[0_20px_60px_rgba(29,30,30,0.2)] overscroll-contain"
+          className="absolute bottom-0 right-0 flex h-[80vh] min-h-[380px] max-h-[600px] w-[calc(100vw-1.5rem)] max-w-[400px] flex-col overflow-hidden rounded-3xl bg-[#1D1E1E] shadow-[0_20px_60px_rgba(0,0,0,0.35)] overscroll-contain"
           onWheel={(e) => e.stopPropagation()}
         >
-          <div className="flex shrink-0 items-center justify-between border-b border-white/10 bg-[#1D1E1E] px-4 py-4 text-white sm:px-5">
+          <div className="flex shrink-0 items-center justify-between bg-[#1D1E1E] px-4 py-3.5 text-white sm:px-5">
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#D94E4E] text-white">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#D94E4E] text-white shadow-xs">
                 <Bot className="h-5 w-5" />
               </div>
               <div>
-                <p className="font-sans text-sm font-semibold">Samson Dental AI Assistant</p>
-                <p className="mt-0.5 flex items-center gap-1.5 font-sans text-[10px] tracking-[0.08em] text-white/55">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                <p className="font-sans text-sm font-semibold tracking-tight">Samson AI Assistant</p>
+                <p className="mt-0.5 flex items-center gap-1.5 font-sans text-[10px] tracking-[0.08em] text-white/60">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
                   Online
                 </p>
               </div>
             </div>
-            <button type="button" onClick={() => setIsOpen(false)} aria-label="Close chat" className="rounded-full p-1.5 text-white/60 transition-colors hover:bg-white/10 hover:text-white">
+            <button
+              type="button"
+              onClick={() => setIsOpen(false)}
+              aria-label="Close chat"
+              className="rounded-full p-1.5 text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+            >
               <X className="h-5 w-5" />
             </button>
           </div>
 
-          <div className="flex min-h-0 flex-1 flex-col bg-[#F8F8F6]">
+          <div className="flex min-h-0 flex-1 flex-col bg-[#F9F9F8]">
             <div
-              className="min-h-0 flex-1 space-y-3.5 overflow-y-auto px-4 py-5 overscroll-contain scrollbar-thin scrollbar-thumb-gray-300 sm:px-5"
+              className="min-h-0 flex-1 space-y-3.5 overflow-y-auto px-4 py-4 overscroll-contain scrollbar-thin scrollbar-thumb-gray-300/60 sm:px-5"
               aria-live="polite"
               onWheel={(e) => e.stopPropagation()}
             >
@@ -167,10 +189,10 @@ export function ChatSection({ config, services }: ChatSectionProps) {
                 return (
                   <div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                     <div
-                      className={`max-w-[90%] rounded-2xl px-4 py-3 font-sans text-[13px] leading-relaxed shadow-sm sm:max-w-[85%] sm:text-sm ${
+                      className={`max-w-[90%] rounded-2xl px-4 py-3 font-sans text-[13px] leading-relaxed sm:max-w-[85%] sm:text-sm ${
                         message.role === 'user'
-                          ? 'rounded-br-sm bg-[#D94E4E] text-white'
-                          : 'rounded-bl-sm border border-[#1D1E1E]/5 bg-white text-[#1D1E1E]/80'
+                          ? 'rounded-br-xs bg-[#D94E4E] text-white shadow-xs'
+                          : 'rounded-bl-xs bg-white text-[#1D1E1E]/90 shadow-xs'
                       }`}
                     >
                       {message.role === 'user' ? (
@@ -185,10 +207,10 @@ export function ChatSection({ config, services }: ChatSectionProps) {
 
               {(isTyping || isWelcomeTyping) && (
                 <div className="flex justify-start">
-                  <div className="flex items-center gap-2 rounded-2xl rounded-bl-sm border border-[#1D1E1E]/5 bg-white px-4 py-3 text-gray-400 shadow-sm" aria-label="Assistant is processing">
+                  <div className="flex items-center gap-2 rounded-2xl rounded-bl-xs bg-white px-4 py-3 text-gray-400 shadow-xs" aria-label="Assistant is processing">
                     <Loader2 className="h-4 w-4 animate-spin text-[#D94E4E]" />
                     <span className="font-sans text-xs">
-                      {isWelcomeTyping ? 'Samson is typing...' : 'Processing your request... One second!'}
+                      {isWelcomeTyping ? 'Samson is typing...' : 'Processing your request...'}
                     </span>
                   </div>
                 </div>
@@ -197,32 +219,30 @@ export function ChatSection({ config, services }: ChatSectionProps) {
               <div ref={messagesEndRef} className="h-px" />
             </div>
 
-            <div className="shrink-0 border-t border-[#1D1E1E]/10 bg-white px-4 py-2 text-center">
-              <p className="font-sans text-[11px] font-medium text-[#1D1E1E]/70 sm:text-xs">
+            <div className="shrink-0 bg-white/80 backdrop-blur-xs px-4 py-1.5 text-center">
+              <p className="font-sans text-[11px] font-medium text-[#1D1E1E]/60 sm:text-xs">
                 For urgent concerns, call{' '}
-                <a href={`tel:${config.phone}`} className="font-bold text-[#D94E4E] underline-offset-2 hover:underline">
+                <a href={`tel:${config.phone}`} className="font-semibold text-[#D94E4E] underline-offset-2 hover:underline">
                   {localPhone}
                 </a>
               </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="shrink-0 border-t border-[#1D1E1E]/10 bg-white px-3 pb-3 pt-2 sm:px-4 sm:pb-3.5 sm:pt-2">
-              <div className="flex items-center gap-2">
-                <div className="min-w-0 flex-1 rounded-xl border border-[#1D1E1E]/10 bg-[#F8F8F6] px-2 focus-within:border-[#D94E4E]/50">
+            <form onSubmit={handleSubmit} className="shrink-0 bg-white px-3.5 pb-3.5 pt-2 sm:px-4 sm:pb-4 sm:pt-2">
+              <div className="flex items-center gap-2 rounded-2xl bg-[#F4F4F2] p-1 pl-3 focus-within:bg-[#EFEFEA] transition-colors">
                 <input
                   value={input}
                   onChange={(event) => setInput(event.target.value)}
                   disabled={isTyping}
-                  placeholder="e.g. How can I book an appointment?"
+                  placeholder="e.g., What services do you offer?"
                   aria-label="Type your question"
-                  className="h-9 w-full bg-transparent px-2 font-sans text-[13px] text-[#1D1E1E] outline-none placeholder:text-gray-400 disabled:cursor-not-allowed"
+                  className="h-9 w-full bg-transparent font-sans text-[13px] text-[#1D1E1E] outline-none placeholder:text-gray-400 disabled:cursor-not-allowed"
                 />
-                </div>
                 <button
                   type="submit"
                   disabled={!input.trim() || isTyping}
                   aria-label="Send message"
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#D94E4E] text-white transition-colors hover:bg-[#1D1E1E] disabled:cursor-not-allowed disabled:opacity-35"
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#1D1E1E] text-white transition-all hover:bg-black disabled:cursor-not-allowed disabled:opacity-30 active:scale-95 shadow-xs"
                 >
                   <Send className="h-4 w-4" />
                 </button>
