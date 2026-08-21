@@ -29,8 +29,7 @@ export async function GET(req: NextRequest) {
       .eq('upload_status', 'completed')
       .not('extracted_text', 'is', null)
       .neq('extracted_text', '')
-      .order('created_at', { ascending: false })
-      .limit(1);
+      .order('created_at', { ascending: false });
 
     if (fileName) {
       query = query.eq('file_name', fileName);
@@ -38,13 +37,26 @@ export async function GET(req: NextRequest) {
       query = query.or('file_name.ilike.*policy*,file_name.ilike.*privacy*');
     }
 
-    const { data: document, error } = await query.maybeSingle();
+    const { data: documents, error } = await query;
 
     if (error) {
       throw new Error(`Failed to fetch policy document: ${error.message}`);
     }
 
-    if (!document || typeof document.extracted_text !== 'string' || !document.extracted_text.trim()) {
+    interface DocumentRecord {
+      id: string;
+      file_name: string;
+      extracted_text: string | null;
+      created_at: string;
+      updated_at: string;
+    }
+
+    const validDocs = ((documents || []) as DocumentRecord[]).filter(
+      (doc): doc is DocumentRecord & { extracted_text: string } =>
+        typeof doc.extracted_text === 'string' && doc.extracted_text.trim().length > 0,
+    );
+
+    if (validDocs.length === 0) {
       return Response.json(
         {
           success: false,
@@ -56,16 +68,29 @@ export async function GET(req: NextRequest) {
       );
     }
 
+    // Combine extracted text across all policy documents with clear section headers
+    const combinedText = validDocs
+      .map((doc) => `--- DOCUMENT: ${doc.file_name} ---\n${doc.extracted_text.trim()}`)
+      .join('\n\n');
+
     return Response.json(
       {
         success: true,
-        text: document.extracted_text,
+        count: validDocs.length,
+        text: combinedText,
         document: {
-          id: document.id,
-          fileName: document.file_name,
-          createdAt: document.created_at,
-          updatedAt: document.updated_at,
+          id: validDocs[0].id,
+          fileName: validDocs[0].file_name,
+          createdAt: validDocs[0].created_at,
+          updatedAt: validDocs[0].updated_at,
         },
+        documents: validDocs.map((doc) => ({
+          id: doc.id,
+          fileName: doc.file_name,
+          text: doc.extracted_text,
+          createdAt: doc.created_at,
+          updatedAt: doc.updated_at,
+        })),
       },
       { headers: { 'Cache-Control': 'no-store' } },
     );

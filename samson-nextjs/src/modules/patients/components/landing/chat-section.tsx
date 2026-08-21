@@ -1,7 +1,7 @@
 'use client';
 
 import { FormEvent, useEffect, useRef, useState } from 'react';
-import { Bot, ChevronDown, CircleHelp, Loader2, Send, X } from 'lucide-react';
+import { Bot, ExternalLink, Globe, Loader2, MapPin, Send, X } from 'lucide-react';
 import type { ClinicConfigResponseDto } from '@/modules/clinic-config/dtos/settings/get-clinic-config.dto';
 import type { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
 
@@ -16,13 +16,6 @@ type ChatMessage = {
   content: string;
 };
 
-const COMMON_QUESTIONS = [
-  'How do I book an appointment?',
-  'What services do you offer?',
-  'Where are you located?',
-  'What should I expect on my first visit?',
-] as const;
-
 const CHAT_PROMPTS = [
   'Need help with your visit?',
   'Looking for the right service?',
@@ -36,6 +29,7 @@ const INITIAL_MESSAGE =
 
 export function ChatSection({ config, services }: ChatSectionProps) {
   const localPhone = formatLocalPhone(config.phone);
+  const [sessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`);
   const [messages, setMessages] = useState<ChatMessage[]>([
     { id: 'welcome', role: 'assistant', content: INITIAL_MESSAGE },
   ]);
@@ -45,17 +39,20 @@ export function ChatSection({ config, services }: ChatSectionProps) {
   const [isWelcomeTyping, setIsWelcomeTyping] = useState(false);
   const [showPrompt, setShowPrompt] = useState(true);
   const [promptIndex, setPromptIndex] = useState(0);
-  const [isFaqOpen, setIsFaqOpen] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const hasOpenedChatRef = useRef(false);
-  const hasUserMessages = messages.some((message) => message.role === 'user');
 
   useEffect(() => {
-    const element = messagesEndRef.current;
-    if (element && typeof element.scrollIntoView === 'function') {
-      element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
-  }, [messages, isTyping, isWelcomeTyping]);
+    const scrollToBottom = () => {
+      if (messagesEndRef.current) {
+        messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      }
+    };
+
+    scrollToBottom();
+    const timeoutId = setTimeout(scrollToBottom, 100);
+    return () => clearTimeout(timeoutId);
+  }, [messages, isTyping, isWelcomeTyping, isOpen]);
 
   useEffect(() => {
     if (!isOpen || hasOpenedChatRef.current) return;
@@ -104,7 +101,7 @@ export function ChatSection({ config, services }: ChatSectionProps) {
     setIsTyping(true);
 
     try {
-      const reply = await getAssistantReply(trimmedMessage, messages, config, services);
+      const reply = await getAssistantReply(trimmedMessage, sessionId, messages, config, services);
       setMessages((current) => [
         ...current,
         { id: createMessageId(), role: 'assistant', content: reply },
@@ -120,7 +117,7 @@ export function ChatSection({ config, services }: ChatSectionProps) {
   };
 
   return (
-    <div id="chat" className="fixed bottom-5 right-5 z-40 sm:bottom-8 sm:right-8">
+    <div id="chat" className={`fixed z-40 ${isOpen ? 'bottom-2 right-3 sm:bottom-4 sm:right-6' : 'bottom-5 right-5 sm:bottom-8 sm:right-8'}`}>
       {showPrompt && !isOpen && (
         <button
           type="button"
@@ -136,10 +133,13 @@ export function ChatSection({ config, services }: ChatSectionProps) {
       )}
 
       {isOpen && (
-        <div className="absolute bottom-0 right-0 flex h-[80vh] min-h-[320px] max-h-[600px] w-[calc(100vw-2rem)] max-w-[390px] flex-col overflow-hidden rounded-2xl border border-[#1D1E1E]/10 bg-white shadow-[0_20px_60px_rgba(29,30,30,0.2)]">
+        <div
+          className="absolute bottom-0 right-0 flex h-[80vh] min-h-[360px] max-h-[600px] w-[calc(100vw-1.5rem)] max-w-[410px] flex-col overflow-hidden rounded-2xl border border-[#1D1E1E]/10 bg-white shadow-[0_20px_60px_rgba(29,30,30,0.2)] overscroll-contain"
+          onWheel={(e) => e.stopPropagation()}
+        >
           <div className="flex shrink-0 items-center justify-between border-b border-white/10 bg-[#1D1E1E] px-4 py-4 text-white sm:px-5">
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center bg-[#D94E4E] text-white">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#D94E4E] text-white">
                 <Bot className="h-5 w-5" />
               </div>
               <div>
@@ -156,20 +156,28 @@ export function ChatSection({ config, services }: ChatSectionProps) {
           </div>
 
           <div className="flex min-h-0 flex-1 flex-col bg-[#F8F8F6]">
-            <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 py-5 sm:px-5" aria-live="polite">
+            <div
+              className="min-h-0 flex-1 space-y-3.5 overflow-y-auto px-4 py-5 overscroll-contain scrollbar-thin scrollbar-thumb-gray-300 sm:px-5"
+              aria-live="polite"
+              onWheel={(e) => e.stopPropagation()}
+            >
               {messages.map((message) => {
                 if (message.id === 'welcome' && isWelcomeTyping) return null;
 
                 return (
                   <div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                     <div
-                      className={`max-w-[88%] rounded-2xl px-4 py-3 font-sans text-[13px] leading-relaxed shadow-sm sm:max-w-[82%] sm:text-sm ${
+                      className={`max-w-[90%] rounded-2xl px-4 py-3 font-sans text-[13px] leading-relaxed shadow-sm sm:max-w-[85%] sm:text-sm ${
                         message.role === 'user'
                           ? 'rounded-br-sm bg-[#D94E4E] text-white'
-                          : 'rounded-bl-sm border border-[#1D1E1E]/5 bg-white text-[#1D1E1E]/75'
+                          : 'rounded-bl-sm border border-[#1D1E1E]/5 bg-white text-[#1D1E1E]/80'
                       }`}
                     >
-                      {message.content}
+                      {message.role === 'user' ? (
+                        <p className="whitespace-pre-wrap">{message.content}</p>
+                      ) : (
+                        <FormattedAssistantMessage content={message.content} />
+                      )}
                     </div>
                   </div>
                 );
@@ -177,51 +185,28 @@ export function ChatSection({ config, services }: ChatSectionProps) {
 
               {(isTyping || isWelcomeTyping) && (
                 <div className="flex justify-start">
-                  <div className="flex items-center gap-2 rounded-2xl rounded-bl-sm border border-[#1D1E1E]/5 bg-white px-4 py-3 text-gray-400 shadow-sm" aria-label="Assistant is typing">
+                  <div className="flex items-center gap-2 rounded-2xl rounded-bl-sm border border-[#1D1E1E]/5 bg-white px-4 py-3 text-gray-400 shadow-sm" aria-label="Assistant is processing">
                     <Loader2 className="h-4 w-4 animate-spin text-[#D94E4E]" />
-                    <span className="font-sans text-xs">Samson is typing...</span>
+                    <span className="font-sans text-xs">
+                      {isWelcomeTyping ? 'Samson is typing...' : 'Processing your request... One second!'}
+                    </span>
                   </div>
                 </div>
               )}
-              {hasUserMessages && !isTyping && !isWelcomeTyping && (
-                <p className="mx-auto max-w-[300px] px-2 text-center font-sans text-[10px] leading-relaxed text-[#1D1E1E]/55 sm:text-[11px]">
-                  This is for informational purposes only. For medical advice or diagnosis, consult a professional.
-                </p>
-              )}
-              <div ref={messagesEndRef} />
+
+              <div ref={messagesEndRef} className="h-px" />
             </div>
 
-            <div className="shrink-0 border-t border-[#1D1E1E]/10 bg-white px-3 pb-0 pt-3 sm:px-4 sm:pb-0 sm:pt-4">
-              <button
-                type="button"
-                onClick={() => setIsFaqOpen((current) => !current)}
-                aria-expanded={isFaqOpen}
-                className="mb-2 flex w-full items-center justify-between font-sans text-[10px] font-semibold uppercase tracking-[0.14em] text-[#1D1E1E]/60"
-              >
-                <span className="flex items-center gap-1.5">
-                  <CircleHelp className="h-3.5 w-3.5 text-[#D94E4E]" />
-                  Frequently Asked
-                </span>
-                <ChevronDown className={`h-4 w-4 text-[#1D1E1E]/60 transition-transform duration-200 ${isFaqOpen ? 'rotate-180' : ''}`} />
-              </button>
-              {isFaqOpen && (
-                <div className="grid grid-cols-2 gap-1.5">
-                  {COMMON_QUESTIONS.map((question) => (
-                    <button
-                      key={question}
-                      type="button"
-                      onClick={() => void sendMessage(question)}
-                      disabled={isTyping}
-                      className="rounded-lg border border-[#1D1E1E]/10 bg-[#F8F8F6] px-3 py-2.5 text-left font-sans text-[11px] font-medium leading-[1.35] text-[#1D1E1E]/75 transition-colors hover:border-[#D94E4E]/40 hover:bg-[#D94E4E] hover:text-white disabled:cursor-not-allowed disabled:opacity-50 sm:text-xs"
-                    >
-                      {question}
-                    </button>
-                  ))}
-                </div>
-              )}
+            <div className="shrink-0 border-t border-[#1D1E1E]/10 bg-white px-4 py-2 text-center">
+              <p className="font-sans text-[11px] font-medium text-[#1D1E1E]/70 sm:text-xs">
+                For urgent concerns, call{' '}
+                <a href={`tel:${config.phone}`} className="font-bold text-[#D94E4E] underline-offset-2 hover:underline">
+                  {localPhone}
+                </a>
+              </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="shrink-0 bg-white px-3 pb-3 pt-2 sm:px-4 sm:pb-4 sm:pt-3">
+            <form onSubmit={handleSubmit} className="shrink-0 border-t border-[#1D1E1E]/10 bg-white px-3 pb-3 pt-2 sm:px-4 sm:pb-3.5 sm:pt-2">
               <div className="flex items-center gap-2">
                 <div className="min-w-0 flex-1 rounded-xl border border-[#1D1E1E]/10 bg-[#F8F8F6] px-2 focus-within:border-[#D94E4E]/50">
                 <input
@@ -242,10 +227,6 @@ export function ChatSection({ config, services }: ChatSectionProps) {
                   <Send className="h-4 w-4" />
                 </button>
               </div>
-              <p className="mt-2.5 px-1 font-sans text-xs font-semibold leading-relaxed text-[#1D1E1E]/80">
-                For urgent concerns, call{' '}
-                <span className="font-bold text-[#D94E4E]">{localPhone}</span>.
-              </p>
             </form>
           </div>
         </div>
@@ -271,29 +252,46 @@ export function ChatSection({ config, services }: ChatSectionProps) {
 
 async function getAssistantReply(
   message: string,
+  sessionId: string,
   history: ChatMessage[],
   config: ClinicConfigResponseDto,
   services: ServiceResponseDto[],
 ) {
-  const webhookUrl = process.env.NEXT_PUBLIC_N8N_CHAT_WEBHOOK_URL;
+  try {
+    const response = await fetch('/api/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ sessionId, message, history }),
+    });
 
-  if (webhookUrl) {
-    try {
-      const response = await fetch(webhookUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message, history }),
-      });
-
-      if (!response.ok) throw new Error('Chat webhook request failed');
-
+    if (response.ok) {
       const data = await response.json();
-      return data.reply ?? data.message ?? data.output ?? data.text ?? 'Thanks for reaching out. Our team will be happy to help.';
-    } catch {
-      return 'I’m having trouble connecting right now. Please call the clinic directly and our team will help you.';
+      const reply =
+        (typeof data === 'string' ? data : null) ??
+        data.reply ??
+        data.message ??
+        data.output ??
+        data.text ??
+        data.response ??
+        (Array.isArray(data) && data[0]
+          ? (typeof data[0] === 'string'
+              ? data[0]
+              : data[0].reply ?? data[0].output ?? data[0].text ?? data[0].message ?? data[0].response)
+          : null);
+
+      if (reply && typeof reply === 'string' && reply.trim()) {
+        return reply;
+      }
+    } else {
+      console.error('Chat API response not ok:', response.status, await response.text().catch(() => ''));
     }
+  } catch (error) {
+    console.error('Chat request failed:', error);
   }
 
+  // Fallback to local mock reply if webhook is unavailable or returns an error
   await new Promise((resolve) => window.setTimeout(resolve, 700));
   return getMockReply(message, config, services);
 }
@@ -326,6 +324,197 @@ function getMockReply(message: string, config: ClinicConfigResponseDto, services
   }
 
   return `Thanks for your question. I can help with appointments, services, location, first visits, and rescheduling. You can also call us at ${localPhone}.`;
+}
+
+interface AssistantStructuredJson {
+  type?: 'services' | 'clinic_info' | 'schedule' | 'pricing' | 'policy' | 'general_message' | string;
+  message?: string;
+  sections?: Array<{
+    title?: string;
+    items?: Array<{
+      name?: string;
+      description?: string;
+      price?: string | null;
+    } | string>;
+  }>;
+  clinic_info?: {
+    address?: string;
+    maps_url?: string;
+    phone?: string;
+    landline?: string;
+    email?: string;
+    website?: string;
+    hours?: string;
+    booking_status?: string;
+  } | null;
+  follow_up?: string;
+}
+
+function FormattedAssistantMessage({ content }: { content: string }) {
+  // 1. Attempt to extract and parse JSON (handles leading text, trailing text, or codeblock fences)
+  let parsedJson: AssistantStructuredJson | null = null;
+  try {
+    const trimmed = content.trim();
+    // Try exact or codeblock wrapped JSON first
+    const codeblockCleaned = trimmed.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
+    if (codeblockCleaned.startsWith('{') && codeblockCleaned.endsWith('}')) {
+      parsedJson = JSON.parse(codeblockCleaned);
+    } else {
+      // Find the first '{' and the last '}' in case the AI generated pre-text or post-text
+      const firstBrace = trimmed.indexOf('{');
+      const lastBrace = trimmed.lastIndexOf('}');
+      if (firstBrace !== -1 && lastBrace > firstBrace) {
+        const potentialJson = trimmed.slice(firstBrace, lastBrace + 1);
+        parsedJson = JSON.parse(potentialJson);
+      }
+    }
+  } catch {
+    parsedJson = null;
+  }
+
+  // 2. If valid structured JSON is provided, render clean, natural conversational chat UI
+  if (parsedJson && (parsedJson.message || parsedJson.sections || parsedJson.clinic_info)) {
+    return (
+      <div className="space-y-3 text-[13px] leading-relaxed text-[#1D1E1E]/90 sm:text-sm">
+        {/* Main message */}
+        {parsedJson.message && <p>{parsedJson.message}</p>}
+
+        {/* Sections */}
+        {Array.isArray(parsedJson.sections) &&
+          parsedJson.sections.map((section, sIdx) => {
+            if (!section) return null;
+            return (
+              <div key={sIdx} className="space-y-1.5 pt-0.5">
+                {section.title && (
+                  <p className="font-semibold text-[#1D1E1E]">{section.title}:</p>
+                )}
+                {Array.isArray(section.items) && (
+                  <ul className="space-y-1.5 pl-1">
+                    {section.items.map((item, iIdx) => {
+                      if (typeof item === 'string') {
+                        return (
+                          <li key={iIdx} className="flex items-start gap-2">
+                            <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#1D1E1E]/40" />
+                            <span className="flex-1">{item}</span>
+                          </li>
+                        );
+                      }
+                      return (
+                        <li key={iIdx} className="flex items-start gap-2">
+                          <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#1D1E1E]/40" />
+                          <div className="flex-1">
+                            <strong className="font-semibold text-[#1D1E1E]">{item.name}</strong>
+                            {item.description && <span> – {item.description}</span>}
+                            {item.price && <span className="font-medium text-[#1D1E1E]"> ({item.price})</span>}
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </div>
+            );
+          })}
+
+        {/* Clinic Info in natural chat format (no card) */}
+        {parsedJson.clinic_info && (
+          <div className="space-y-1.5 pt-1">
+            <p className="font-semibold text-[#1D1E1E]">Clinic Details:</p>
+            <ul className="space-y-1 pl-1">
+              {parsedJson.clinic_info.address && (
+                <li className="flex items-start gap-2">
+                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#1D1E1E]/40" />
+                  <div className="flex-1">
+                    <strong className="font-medium text-[#1D1E1E]">Address: </strong>
+                    <span>{parsedJson.clinic_info.address}</span>
+                    {parsedJson.clinic_info.maps_url && (
+                      <span className="block mt-0.5">
+                        <a
+                          href={parsedJson.clinic_info.maps_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-medium text-[#D94E4E] underline hover:text-[#b83838]"
+                        >
+                          View on Google Maps
+                        </a>
+                      </span>
+                    )}
+                  </div>
+                </li>
+              )}
+              {parsedJson.clinic_info.phone && (
+                <li className="flex items-start gap-2">
+                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#1D1E1E]/40" />
+                  <div className="flex-1">
+                    <strong className="font-medium text-[#1D1E1E]">Mobile: </strong>
+                    <span>{parsedJson.clinic_info.phone}</span>
+                  </div>
+                </li>
+              )}
+              {parsedJson.clinic_info.landline && (
+                <li className="flex items-start gap-2">
+                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#1D1E1E]/40" />
+                  <div className="flex-1">
+                    <strong className="font-medium text-[#1D1E1E]">Landline: </strong>
+                    <span>{parsedJson.clinic_info.landline}</span>
+                  </div>
+                </li>
+              )}
+              {parsedJson.clinic_info.email && (
+                <li className="flex items-start gap-2">
+                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#1D1E1E]/40" />
+                  <div className="flex-1">
+                    <strong className="font-medium text-[#1D1E1E]">Email: </strong>
+                    <span>{parsedJson.clinic_info.email}</span>
+                  </div>
+                </li>
+              )}
+              {parsedJson.clinic_info.hours && (
+                <li className="flex items-start gap-2">
+                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#1D1E1E]/40" />
+                  <div className="flex-1">
+                    <strong className="font-medium text-[#1D1E1E]">Hours: </strong>
+                    <span>{parsedJson.clinic_info.hours}</span>
+                  </div>
+                </li>
+              )}
+              {parsedJson.clinic_info.website && (
+                <li className="flex items-start gap-2">
+                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#1D1E1E]/40" />
+                  <div className="flex-1">
+                    <a
+                      href={parsedJson.clinic_info.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-medium text-[#D94E4E] underline hover:text-[#b83838]"
+                    >
+                      Visit Samson Dental Center Website
+                    </a>
+                  </div>
+                </li>
+              )}
+            </ul>
+          </div>
+        )}
+
+        {/* Follow up */}
+        {parsedJson.follow_up && (
+          <p className="pt-0.5">{parsedJson.follow_up}</p>
+        )}
+      </div>
+    );
+  }
+
+  // 3. Fallback for plain text responses
+  return (
+    <div className="space-y-2 text-[13px] leading-relaxed sm:text-sm text-[#1D1E1E]/90">
+      {content.split('\n').map((line, idx) => {
+        const trimmedLine = line.trim();
+        if (!trimmedLine) return null;
+        return <p key={idx}>{trimmedLine}</p>;
+      })}
+    </div>
+  );
 }
 
 function formatLocalPhone(phone: string) {
