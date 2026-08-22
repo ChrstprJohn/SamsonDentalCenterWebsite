@@ -249,7 +249,7 @@ export function BookingWizardView({ services, config, initialServiceId }: Bookin
             href="/"
             onClick={handleBackClick}
             aria-label="Back to previous page"
-            className="inline-flex items-center gap-1.5 font-sans text-xs sm:text-sm font-semibold text-gray-800 hover:text-[#D94E4E] transition-colors p-1.5 -ml-1.5 rounded-lg hover:bg-gray-100/80"
+            className="justify-self-start w-fit inline-flex items-center gap-1.5 font-sans text-xs sm:text-sm font-semibold text-gray-800 hover:text-[#D94E4E] transition-colors p-1.5 -ml-1.5 rounded-lg hover:bg-gray-100/80"
           >
             <ArrowLeft className="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2.2]" />
             <span>Back</span>
