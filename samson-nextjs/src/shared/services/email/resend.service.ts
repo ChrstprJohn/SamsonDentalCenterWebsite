@@ -43,11 +43,8 @@ export interface SendEmailOptions {
   replyTo?: string | string[];
   /** Alias for replyTo */
   reply_to?: string | string[];
-  /**
-   * BCC address(es). Automatically defaults to dynamic clinic business email.
-   * Set to `false` or `null` to disable automatic BCC.
-   */
-  bcc?: string | string[] | false | null;
+  /** Optional BCC address(es) */
+  bcc?: string | string[];
   /** Optional CC address(es) */
   cc?: string | string[];
   /** Optional custom headers map */
@@ -218,24 +215,16 @@ function buildDeliveryEnvelope(
   const from = fromAddress.includes('<') ? fromAddress : `${senderName} <${fromAddress}>`;
 
   // 2. Resolve dynamic business email (from Clinic Settings or Env or Default)
-  const businessEmail = branding?.contactEmail || process.env.RESEND_BCC_EMAIL || process.env.CLINIC_BUSINESS_EMAIL || DEFAULT_BUSINESS_EMAIL;
+  const businessEmail = branding?.contactEmail || process.env.CLINIC_BUSINESS_EMAIL || DEFAULT_BUSINESS_EMAIL;
 
   // 3. Dynamic Reply-To Target
   const replyToTarget = options?.replyTo || options?.reply_to || businessEmail;
   const replyTo = Array.isArray(replyToTarget) ? replyToTarget : [replyToTarget];
 
-  // 4. Dynamic BCC Delivery (Auto-delivers copy to business inbox)
+  // 4. Optional BCC Delivery
   let bcc: string[] | undefined;
-  if (options?.bcc === false || options?.bcc === null) {
-    bcc = undefined;
-  } else if (options?.bcc) {
+  if (options?.bcc) {
     bcc = Array.isArray(options.bcc) ? options.bcc : [options.bcc];
-  } else {
-    // Default: deliver copy to business inbox if recipient is not already the business email
-    const toRecipients = (Array.isArray(to) ? to : [to]).map((e) => e.trim().toLowerCase());
-    if (!toRecipients.includes(businessEmail.trim().toLowerCase())) {
-      bcc = [businessEmail];
-    }
   }
 
   // 5. Optional Threading Headers (In-Reply-To & References)

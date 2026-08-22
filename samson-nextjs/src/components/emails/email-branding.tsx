@@ -1,6 +1,6 @@
 import React from 'react';
 import { Img, Link, Section, Text } from '@react-email/components';
-import { getLogoUrl, getLogoDarkUrl } from '@/shared/utils/get-base-url.util';
+import { getEmailLogoUrl } from '@/shared/utils/get-base-url.util';
 import type { ClinicConfigResponseDto } from '@/modules/clinic-config/dtos/settings/get-clinic-config.dto';
 
 export interface EmailBranding {
@@ -32,8 +32,8 @@ export function resolveEmailBranding(
   const clinicName = config?.clinicName || FALLBACK_CLINIC_NAME;
   const phone = config?.phone || '(02) 8123-4567';
   const websiteUrl = config?.websiteUrl || 'https://samsondentalcenter.com.ph';
-  const logoUrl = config?.emailLogoUrl || getLogoUrl(baseUrl);
-  const logoDarkUrl = config?.emailLogoDarkUrl || config?.websiteLogoDarkUrl || (baseUrl ? getLogoDarkUrl(baseUrl) : null);
+  const logoUrl = getEmailLogoUrl(baseUrl, 'light');
+  const logoDarkUrl = getEmailLogoUrl(baseUrl, 'dark');
 
   return {
     clinicName,

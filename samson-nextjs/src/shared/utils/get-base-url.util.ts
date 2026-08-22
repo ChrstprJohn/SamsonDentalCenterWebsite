@@ -32,4 +32,10 @@ export function getLogoDarkUrl(baseUrl?: string): string {
     return `${baseUrl}/images/SamsonLOGOGO-removebg-preview.png`;
   }
   return DEFAULT_LOGO_DARK_URL;
+}
+
+export function getEmailLogoUrl(baseUrl?: string, variant: 'light' | 'dark' = 'light'): string {
+  const base = baseUrl || getBaseUrl() || 'https://samsondentalcenter-website.chrbuilds.dev';
+  const cleanBase = base.replace(/\/+$/, '');
+  return `${cleanBase}/api/assets/email-logo?variant=${variant}`;
 }

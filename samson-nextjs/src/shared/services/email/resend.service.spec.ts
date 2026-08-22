@@ -142,8 +142,8 @@ describe('ResendService', () => {
     });
   });
 
-  describe('Dynamic BCC Business Copy', () => {
-    it('automatically includes dynamic business email in BCC for transactional emails', async () => {
+  describe('BCC Options', () => {
+    it('does not include BCC by default', async () => {
       await ResendService.sendEmail({
         to: 'patient@example.com',
         subject: 'Booking Confirmation',
@@ -151,42 +151,13 @@ describe('ResendService', () => {
       });
 
       expect(mockSend).toHaveBeenCalledWith(
-        expect.objectContaining({
-          bcc: ['info@samsondentalcenter.com'],
-        })
-      );
-    });
-
-    it('does not duplicate BCC if the primary recipient is the business email itself', async () => {
-      await ResendService.sendEmail({
-        to: 'info@samsondentalcenter.com',
-        subject: 'Admin Notification',
-        html: '<p>Hello Admin</p>',
-      });
-
-      expect(mockSend).toHaveBeenCalledWith(
         expect.not.objectContaining({
           bcc: expect.anything(),
         })
       );
     });
 
-    it('allows disabling BCC by passing bcc: false or bcc: null', async () => {
-      await ResendService.sendEmail({
-        to: 'patient@example.com',
-        subject: 'Confidential Note',
-        html: '<p>Private</p>',
-        bcc: false,
-      });
-
-      expect(mockSend).toHaveBeenCalledWith(
-        expect.not.objectContaining({
-          bcc: expect.anything(),
-        })
-      );
-    });
-
-    it('allows overriding BCC with custom address array', async () => {
+    it('allows providing explicit BCC address or array', async () => {
       await ResendService.sendEmail({
         to: 'patient@example.com',
         subject: 'Note',
@@ -282,7 +253,6 @@ describe('ResendService', () => {
       expect(mockSend).toHaveBeenCalledWith(
         expect.objectContaining({
           to: ['patient@example.com'],
-          bcc: ['info@samsondentalcenter.com'],
           replyTo: ['info@samsondentalcenter.com'],
         })
       );
