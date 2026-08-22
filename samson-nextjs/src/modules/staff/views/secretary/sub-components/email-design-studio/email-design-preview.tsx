@@ -171,7 +171,7 @@ export function EmailDesignPreview({
         {/* Logo */}
         <div style={{ marginBottom: 28 }}>
           <img
-            src={b.logoUrl}
+            src={isDark && b.logoDarkUrl ? b.logoDarkUrl : b.logoUrl}
             alt={b.clinicName}
             className="eml-logo"
             style={{

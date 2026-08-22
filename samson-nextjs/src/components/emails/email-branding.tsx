@@ -43,14 +43,11 @@ function resolveDirectLogoUrl(
     return envUrl;
   }
 
-  // 3. If relative path configured or static asset with valid public site url
+  // 3. If relative path configured with valid public site url
   const siteBase = baseUrl || getBaseUrl();
-  if (siteBase && siteBase.startsWith('https://') && !siteBase.includes('localhost')) {
+  if (trimmed && trimmed.startsWith('/') && siteBase && siteBase.startsWith('https://') && !siteBase.includes('localhost')) {
     const cleanBase = siteBase.replace(/\/+$/, '');
-    if (trimmed && trimmed.startsWith('/')) {
-      return `${cleanBase}${trimmed}`;
-    }
-    return `${cleanBase}/images/SAMSONLOGO.png`;
+    return `${cleanBase}${trimmed}`;
   }
 
   // 4. Default hosted public CDN storage URL
@@ -130,24 +127,38 @@ export function EmailLogoHeader({ branding }: { branding: EmailBranding }) {
 
   return (
     <Section style={{ marginBottom: '28px', textAlign: 'center' }}>
-      {/* Light Mode Logo (Visible by default) */}
+      {/* Light Mode Logo (Visible by default in light mode) */}
       <div className="light-logo" style={{ display: 'block' }}>
         <Img
           src={branding.logoUrl}
           alt={branding.clinicName}
           width="130"
-          className="eml-logo"
+          className="eml-logo light-logo"
           style={{ height: 'auto', objectFit: 'contain', margin: '0 auto', display: 'block' }}
         />
       </div>
-      {/* Dark Mode Logo (Visible on dark mode devices via media query) */}
-      <div className="dark-logo" style={{ display: 'none' }}>
+      {/* Dark Mode Logo (Hidden by default in light mode, visible on dark mode email clients) */}
+      <div
+        className="dark-logo"
+        style={{
+          display: 'none',
+          maxHeight: 0,
+          overflow: 'hidden',
+          fontSize: 0,
+          lineHeight: 0,
+        }}
+      >
         <Img
           src={branding.logoDarkUrl!}
           alt={branding.clinicName}
           width="130"
-          className="eml-logo"
-          style={{ height: 'auto', objectFit: 'contain', margin: '0 auto', display: 'block' }}
+          className="eml-logo dark-logo"
+          style={{
+            height: 'auto',
+            objectFit: 'contain',
+            margin: '0 auto',
+            display: 'none',
+          }}
         />
       </div>
     </Section>

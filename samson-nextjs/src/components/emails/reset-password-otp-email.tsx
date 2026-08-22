@@ -32,8 +32,39 @@ export const ResetPasswordOtpEmail = ({
 
   return (
     <Tailwind>
-      <Html>
-        <Head />
+      <Html lang="en">
+        <Head>
+          <meta name="color-scheme" content="light dark" />
+          <meta name="supported-color-schemes" content="light dark" />
+          <style>{`
+            :root {
+              color-scheme: light dark;
+              supported-color-schemes: light dark;
+            }
+            .dark-logo { display: none !important; }
+            .light-logo { display: block !important; }
+            @media (prefers-color-scheme: dark) {
+              .dark-logo {
+                display: block !important;
+                max-height: none !important;
+                font-size: unset !important;
+                line-height: normal !important;
+                overflow: visible !important;
+              }
+              .light-logo { display: none !important; }
+            }
+            [data-ogsc] .dark-logo, [data-ogsb] .dark-logo {
+              display: block !important;
+              max-height: none !important;
+              font-size: unset !important;
+              line-height: normal !important;
+              overflow: visible !important;
+            }
+            [data-ogsc] .light-logo, [data-ogsb] .light-logo {
+              display: none !important;
+            }
+          `}</style>
+        </Head>
         <Preview>Your {resolvedClinicName} Password Reset Code</Preview>
         <Body className="bg-slate-50 my-auto mx-auto font-sans px-2">
           <Container className="border border-solid border-[#eaeaea] rounded my-[40px] mx-auto p-[20px] max-w-[465px] bg-white">

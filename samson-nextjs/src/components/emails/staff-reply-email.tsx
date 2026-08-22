@@ -82,8 +82,24 @@ export const StaffReplyEmail = ({
           .dark-logo { display: none !important; }
           .light-logo { display: block !important; }
           @media (prefers-color-scheme: dark) {
-            .dark-logo { display: block !important; }
+            .dark-logo {
+              display: block !important;
+              max-height: none !important;
+              font-size: unset !important;
+              line-height: normal !important;
+              overflow: visible !important;
+            }
             .light-logo { display: none !important; }
+          }
+          [data-ogsc] .dark-logo, [data-ogsb] .dark-logo {
+            display: block !important;
+            max-height: none !important;
+            font-size: unset !important;
+            line-height: normal !important;
+            overflow: visible !important;
+          }
+          [data-ogsc] .light-logo, [data-ogsb] .light-logo {
+            display: none !important;
           }
           @media only screen and (max-width: 480px) {
             .eml-body { padding: 24px 20px 32px !important; }
