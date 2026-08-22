@@ -20,6 +20,10 @@ import {
   SampleData,
 } from './sub-components/email-design-studio';
 
+const DEFAULT_SENDER_EMAIL = 'noreply@samsondentalcenter-website.chrbuilds.dev';
+const DEFAULT_CLINIC_NAME = 'Samson Dental Center';
+const DEFAULT_BUSINESS_EMAIL = 'info@samsondentalcenter.com';
+
 export function SecretaryEmailDesignStudioView({ initialConfig }: { initialConfig?: ClinicConfigResponseDto | null }) {
   const [activeId, setActiveId] = useState<EmailDesignId>('appointment-confirmed');
   const [previewMode, setPreviewMode] = useState<PreviewMode>('desktop');
@@ -36,6 +40,12 @@ export function SecretaryEmailDesignStudioView({ initialConfig }: { initialConfi
 
   const shortRef = sample.referenceCode || formatRefId(sample.appointmentId) || 'SDC-8921';
   const displaySubject = `${activeCopy.subject}${shortRef ? ` [Ref: ${shortRef}]` : ''}`;
+
+  // Resolve the From (sender name + address) and Reply-To that will be used when this
+  // template email is actually sent — sourced from the dynamic clinic branding/settings.
+  const senderName = branding?.clinicName || DEFAULT_CLINIC_NAME;
+  const senderEmail = DEFAULT_SENDER_EMAIL;
+  const replyTo = branding?.contactEmail || DEFAULT_BUSINESS_EMAIL;
 
   const groupedDesigns = useMemo(
     () =>
@@ -65,6 +75,9 @@ export function SecretaryEmailDesignStudioView({ initialConfig }: { initialConfi
           onPreviewModeChange={setPreviewMode}
           themeMode={themeMode}
           onThemeModeChange={setThemeMode}
+          senderName={senderName}
+          senderEmail={senderEmail}
+          replyTo={replyTo}
         />
 
         <div

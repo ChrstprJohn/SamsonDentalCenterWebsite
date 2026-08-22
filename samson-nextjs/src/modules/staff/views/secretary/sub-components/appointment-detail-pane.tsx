@@ -154,6 +154,7 @@ function AppointmentDetails({
   const canCancel = (canModify && !isPastEnd) || (isCheckedIn && appointment.date === todayStr);
   const isNoShowCandidate = appointment.status === 'NO_SHOW' || (appointment.status === 'APPROVED' && isPastEnd);
   const isResolvedNoShow = appointment.status === 'NO_SHOW' && !!appointment.noShowResolvedAt;
+  const canReschedule = canModify || canRescheduleOnly || isCheckedIn;
   // ponytail: past-day resolve lands on v2 directory (v1 lacks SidebarProvider and crashes), Unresolved tab preselected
   const resolveTarget = appointment.date === todayStr ? `${prefix}/check-in` : `${prefix}/appointments?tab=needs-attention&appointmentId=${appointment.id}`;
 
@@ -197,7 +198,7 @@ function AppointmentDetails({
     );
   }
 
-  if (view.showRescheduleForm && (canModify || canRescheduleOnly)) {
+  if (view.showRescheduleForm && canReschedule) {
     const isFormComplete = isRescheduleFormComplete({
       serviceId: view.rescheduleServiceId || appointment.serviceId,
       doctorId: (view.rescheduleDoctor ?? view.rescheduleDoctorId) || appointment.doctorId,
@@ -375,7 +376,7 @@ function AppointmentDetails({
                   </Button>
                 );
               }
-              if (!canModify && !canRescheduleOnly && !isCheckedIn && !isNoShowCandidate) return null;
+              if (!canReschedule && !canCancel && !isCheckedIn && !isNoShowCandidate) return null;
 
               if (!view.showRescheduleForm && !view.showCancelForm) {
                 return (
@@ -401,7 +402,7 @@ function AppointmentDetails({
                           No-show resolved — audit record in History
                         </div>
                       )}
-                      {canModify && !isPastEnd && (
+                      {canReschedule && (
                         <Button
                           variant="outline"
                           className="flex-1 h-[42px]"
@@ -439,7 +440,7 @@ function AppointmentDetails({
 
               return (
                 <div className="space-y-3">
-                  {view.showRescheduleForm && (canModify || canRescheduleOnly) && (
+                  {view.showRescheduleForm && canReschedule && (
                     <>
                       <AppointmentRescheduleForm appointment={appointment} {...getRescheduleProps(view)} noFooter />
                       <div className="flex gap-2">
@@ -557,7 +558,7 @@ function AppointmentDetails({
             </div>
           );
         }
-        if (!canModify && !canRescheduleOnly && !isCheckedIn && !isNoShowCandidate) return null;
+        if (!canReschedule && !canCancel && !isCheckedIn && !isNoShowCandidate) return null;
 
         if (!view.showRescheduleForm && !view.showCancelForm) {
           return (
@@ -579,7 +580,7 @@ function AppointmentDetails({
                     No-show resolved — audit record in History
                   </div>
                 )}
-                {canModify && !isPastEnd && (
+                {canReschedule && (
                   <Button variant="outline" className="flex-1 h-[42px]" onClick={() => view.setShowRescheduleForm(true)}>
                     Reschedule
                   </Button>
@@ -609,7 +610,7 @@ function AppointmentDetails({
         return (
           <div className={`shrink-0 border-t border-border ${compact ? 'p-3 bg-sidebar' : 'p-4 bg-card'}`}>
             <div className="space-y-3">
-              {view.showRescheduleForm && (canModify || canRescheduleOnly) && (
+              {view.showRescheduleForm && canReschedule && (
                 <>
                   <AppointmentRescheduleForm appointment={appointment} {...getRescheduleProps(view)} noFooter />
                   <div className="flex gap-2">

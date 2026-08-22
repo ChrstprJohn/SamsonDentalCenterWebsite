@@ -62,12 +62,12 @@ export const onStaffReplySubscriber = {
     await ResendService.sendTemplatedEmail(
       recipientEmail,
       subject,
-      'staff_reply' as any,
+      'staff_reply',
       {
         patientName,
         chatToken,
         baseUrl,
-      } as any,
+      },
       {
         threadId: appointmentId,
       }

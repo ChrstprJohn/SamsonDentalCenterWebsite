@@ -1,6 +1,6 @@
 export const DEFAULT_LOGO_URL =
   process.env.NEXT_PUBLIC_LOGO_URL ||
-  'https://poaaoctucxhkhqizbsdb.supabase.co/storage/v1/object/public/public-assets/SamsonLOGOGO-removebg-preview.png';
+  'https://poaaoctucxhkhqizbsdb.supabase.co/storage/v1/object/public/public-assets/SAMSONLOGO.png';
 
 export const DEFAULT_LOGO_DARK_URL =
   process.env.NEXT_PUBLIC_LOGO_DARK_URL ||
@@ -18,8 +18,8 @@ export function getLogoUrl(baseUrl?: string): string {
   if (process.env.NEXT_PUBLIC_LOGO_URL) {
     return process.env.NEXT_PUBLIC_LOGO_URL;
   }
-  if (baseUrl && !baseUrl.includes('localhost')) {
-    return `${baseUrl}/images/SamsonLOGOGO-removebg-preview.png`;
+  if (baseUrl && baseUrl.startsWith('https://') && !baseUrl.includes('localhost')) {
+    return `${baseUrl.replace(/\/+$/, '')}/images/SAMSONLOGO.png`;
   }
   return DEFAULT_LOGO_URL;
 }
@@ -28,14 +28,41 @@ export function getLogoDarkUrl(baseUrl?: string): string {
   if (process.env.NEXT_PUBLIC_LOGO_DARK_URL) {
     return process.env.NEXT_PUBLIC_LOGO_DARK_URL;
   }
-  if (baseUrl && !baseUrl.includes('localhost')) {
-    return `${baseUrl}/images/SamsonLOGOGO-removebg-preview.png`;
+  if (baseUrl && baseUrl.startsWith('https://') && !baseUrl.includes('localhost')) {
+    return `${baseUrl.replace(/\/+$/, '')}/images/SAMSONLOGO.png`;
   }
   return DEFAULT_LOGO_DARK_URL;
 }
 
-export function getEmailLogoUrl(baseUrl?: string, variant: 'light' | 'dark' = 'light'): string {
-  const base = baseUrl || getBaseUrl() || 'https://samsondentalcenter-website.chrbuilds.dev';
-  const cleanBase = base.replace(/\/+$/, '');
-  return `${cleanBase}/api/assets/email-logo?variant=${variant}`;
-}
+export function getEmailLogoUrl(
+  baseUrl?: string,
+  variant: 'light' | 'dark' = 'light',
+  config?: {
+    emailLogoUrl?: string | null;
+    websiteLogoUrl?: string | null;
+    emailLogoDarkUrl?: string | null;
+    websiteLogoDarkUrl?: string | null;
+  } | null
+): string {
+  if (variant === 'dark') {
+    const darkUrl =
+      config?.emailLogoDarkUrl?.trim() ||
+      config?.websiteLogoDarkUrl?.trim() ||
+      process.env.NEXT_PUBLIC_LOGO_DARK_URL?.trim();
+    if (darkUrl && /^https?:\/\//i.test(darkUrl)) return darkUrl;
+  }
+
+  const directUrl =
+    config?.emailLogoUrl?.trim() ||
+    config?.websiteLogoUrl?.trim() ||
+    process.env.NEXT_PUBLIC_LOGO_URL?.trim();
+  if (directUrl && /^https?:\/\//i.test(directUrl)) return directUrl;
+
+  const base = baseUrl || getBaseUrl();
+  if (base && base.startsWith('https://') && !base.includes('localhost')) {
+    return `${base.replace(/\/+$/, '')}/images/SAMSONLOGO.png`;
+  }
+
+  return variant === 'dark' ? DEFAULT_LOGO_DARK_URL : DEFAULT_LOGO_URL;
+}
+

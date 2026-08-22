@@ -63,7 +63,12 @@ describe('ResendService', () => {
   });
 
   describe('Sender Address (Custom Domain)', () => {
-    it('sends from default custom domain address when no env override is present', async () => {
+    it('uses dynamic clinic name from config for sender name', async () => {
+      vi.mocked(getClinicConfigUseCase).mockReturnValue(async () => ({
+        clinicName: 'Dynamic Dental Clinic',
+        email: 'info@dynamicdental.com',
+      } as any));
+
       await ResendService.sendEmail({
         to: 'patient@example.com',
         subject: 'Test Subject',
@@ -72,14 +77,18 @@ describe('ResendService', () => {
 
       expect(mockSend).toHaveBeenCalledWith(
         expect.objectContaining({
-          from: 'Samson Dental Center <noreply@samsondentalcenter-website.chrbuilds.dev>',
+          from: 'Dynamic Dental Clinic <noreply@samsondentalcenter-website.chrbuilds.dev>',
         })
       );
     });
 
-    it('respects RESEND_SENDER_EMAIL and RESEND_SENDER_NAME environment overrides', async () => {
+    it('falls back to RESEND_SENDER_NAME environment variable when dynamic clinicName is not available', async () => {
+      vi.mocked(getClinicConfigUseCase).mockReturnValue(async () => ({
+        clinicName: '',
+        email: '',
+      } as any));
       process.env.RESEND_SENDER_EMAIL = 'custom@customdomain.com';
-      process.env.RESEND_SENDER_NAME = 'Custom Clinic';
+      process.env.RESEND_SENDER_NAME = 'Env Fallback Clinic';
 
       await ResendService.sendEmail({
         to: 'patient@example.com',
@@ -89,7 +98,7 @@ describe('ResendService', () => {
 
       expect(mockSend).toHaveBeenCalledWith(
         expect.objectContaining({
-          from: 'Custom Clinic <custom@customdomain.com>',
+          from: 'Env Fallback Clinic <custom@customdomain.com>',
         })
       );
     });

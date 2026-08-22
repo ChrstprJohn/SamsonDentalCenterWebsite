@@ -77,7 +77,11 @@ export const onNoShowSubscriber = {
 
     const baseUrl = getBaseUrl();
     const ref = formatRefId(appointmentId);
-    const subject = `You missed your appointment with Samson Dental Center${ref ? ` [Ref: ${ref}]` : ''}`;
+
+    // Load dynamic clinic name so the subject always reflects the configured clinic name
+    const branding = await ResendService.loadClinicBranding();
+    const clinicName = ResendService.resolveClinicName(branding);
+    const subject = `You missed your appointment with ${clinicName}${ref ? ` [Ref: ${ref}]` : ''}`;
 
     await ResendService.sendTemplatedEmail(
       email,

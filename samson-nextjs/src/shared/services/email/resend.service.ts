@@ -209,9 +209,9 @@ function buildDeliveryEnvelope(
   branding?: EmailBranding | null,
   templateContext?: { templateName?: string; payload?: Record<string, any> }
 ) {
-  // 1. Resolve custom domain sender address
+  // 1. Resolve custom domain sender address and sender display name
   const fromAddress = options?.from || process.env.RESEND_SENDER_EMAIL || DEFAULT_SENDER_EMAIL;
-  const senderName = options?.senderName || process.env.RESEND_SENDER_NAME || branding?.clinicName || DEFAULT_SENDER_NAME;
+  const senderName = options?.senderName || branding?.clinicName || process.env.RESEND_SENDER_NAME || DEFAULT_SENDER_NAME;
   const from = fromAddress.includes('<') ? fromAddress : `${senderName} <${fromAddress}>`;
 
   // 2. Resolve dynamic business email (from Clinic Settings or Env or Default)
@@ -296,6 +296,22 @@ export const ResendService = {
   },
 
   /**
+   * Resolves the dynamic clinic business email used as reply-to for all outbound emails.
+   * Priority: branding contactEmail → CLINIC_BUSINESS_EMAIL env → DEFAULT_BUSINESS_EMAIL constant.
+   */
+  resolveBusinessEmail(branding: EmailBranding | null): string {
+    return branding?.contactEmail || process.env.CLINIC_BUSINESS_EMAIL || DEFAULT_BUSINESS_EMAIL;
+  },
+
+  /**
+   * Resolves the dynamic clinic name used as the sender display name for all outbound emails.
+   * Priority: branding clinicName → RESEND_SENDER_NAME env → DEFAULT_SENDER_NAME constant.
+   */
+  resolveClinicName(branding: EmailBranding | null): string {
+    return branding?.clinicName || process.env.RESEND_SENDER_NAME || DEFAULT_SENDER_NAME;
+  },
+
+  /**
    * Sends a raw / custom HTML email via Resend with dynamic domain, BCC, reply-to, and headers.
    */
   async sendEmail(params: SendGenericEmailParams) {
@@ -344,9 +360,7 @@ export const ResendService = {
     // Resolve clinic branding (name, logo, phone, address, website) from Clinic Settings.
     let branding: EmailBranding | null = null;
     try {
-      if (templateName !== 'signup_otp' && templateName !== 'reset_password_otp') {
-        branding = await this.loadClinicBranding();
-      }
+      branding = await this.loadClinicBranding();
     } catch (err) {
       console.warn('Failed to load clinic branding for email, using defaults:', err);
     }
@@ -357,7 +371,9 @@ export const ResendService = {
         const otpPayload = payload as EmailTemplates['signup_otp'];
         html = await render(React.createElement(SignupOtpEmail, { 
           firstName: otpPayload.firstName, 
-          otpCode: otpPayload.otpCode 
+          otpCode: otpPayload.otpCode,
+          clinicName: branding?.clinicName,
+          branding: branding || undefined,
         }));
         break;
       }
@@ -365,7 +381,9 @@ export const ResendService = {
         const resetPayload = payload as EmailTemplates['reset_password_otp'];
         html = await render(React.createElement(ResetPasswordOtpEmail, { 
           firstName: resetPayload.firstName, 
-          otpCode: resetPayload.otpCode 
+          otpCode: resetPayload.otpCode,
+          clinicName: branding?.clinicName,
+          branding: branding || undefined,
         }));
         break;
       }
@@ -526,8 +544,26 @@ export const ResendService = {
         throw new Error(`Unknown email template: ${templateName}`);
     }
 
+    // Resolve dynamic clinic values from branding for this send.
+    // For templated emails, reply-to ALWAYS points to the clinic's business email
+    // so that patients who hit "Reply" reach the clinic — never the noreply sender.
+    // senderName ALWAYS uses the dynamic clinic name from settings.
+    const businessEmail = this.resolveBusinessEmail(branding);
+    const clinicName = this.resolveClinicName(branding);
+
+    // Build explicit options that enforce clinic reply-to and sender name.
+    // Caller-provided options are merged but replyTo and senderName are always
+    // sourced from the dynamic clinic settings unless explicitly overridden by the caller.
+    const resolvedOptions: SendEmailOptions = {
+      ...options,
+      // Always use the dynamic clinic business email as reply-to for template emails
+      replyTo: options?.replyTo ?? businessEmail,
+      // Always use the dynamic clinic name as the sender display name
+      senderName: options?.senderName ?? clinicName,
+    };
+
     // Build envelope with custom domain sender, dynamic reply_to, dynamic bcc, and threading headers
-    const envelope = buildDeliveryEnvelope(to, options, branding, {
+    const envelope = buildDeliveryEnvelope(to, resolvedOptions, branding, {
       templateName: templateName as string,
       payload: payload as Record<string, any>,
     });
@@ -539,7 +575,7 @@ export const ResendService = {
       html,
       replyTo: envelope.replyTo,
       ...(envelope.bcc && envelope.bcc.length > 0 ? { bcc: envelope.bcc } : {}),
-      ...(options?.cc ? { cc: options.cc } : {}),
+      ...(resolvedOptions.cc ? { cc: resolvedOptions.cc } : {}),
       ...(envelope.headers ? { headers: envelope.headers } : {}),
     });
 

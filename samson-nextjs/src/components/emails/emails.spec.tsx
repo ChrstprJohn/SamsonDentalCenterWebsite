@@ -215,5 +215,56 @@ describe('Email Templates Rendering', () => {
     expect(html).toContain('Missed');
     expect(html).toContain('APT-SAMPLE-456');
   });
+
+  it('resolves direct image URLs without proxy endpoint in resolveEmailBranding', async () => {
+    const { resolveEmailBranding } = await import('./email-branding');
+    const branding = resolveEmailBranding({
+      clinicName: 'Test Clinic',
+      emailLogoUrl: 'https://example.com/direct-logo.png',
+      emailLogoDarkUrl: 'https://example.com/direct-dark-logo.png',
+    });
+
+    expect(branding.logoUrl).toBe('https://example.com/direct-logo.png');
+    expect(branding.logoDarkUrl).toBe('https://example.com/direct-dark-logo.png');
+    expect(branding.logoUrl).not.toContain('/api/assets/email-logo');
+  });
+
+  it('renders direct logo URL in appointment emails', async () => {
+    const { resolveEmailBranding } = await import('./email-branding');
+    const branding = resolveEmailBranding({
+      clinicName: 'Test Clinic',
+      emailLogoUrl: 'https://example.com/direct-logo.png',
+    });
+
+    const html = await render(
+      React.createElement(AppointmentConfirmedEmail, {
+        patientName: 'Alice Guest',
+        serviceName: 'Dental Cleaning',
+        branding,
+      })
+    );
+
+    expect(html).toContain('src="https://example.com/direct-logo.png"');
+    expect(html).not.toContain('/api/assets/email-logo');
+  });
+
+  it('renders direct logo URL in OTP emails with branding', async () => {
+    const { resolveEmailBranding } = await import('./email-branding');
+    const branding = resolveEmailBranding({
+      clinicName: 'Test Clinic',
+      emailLogoUrl: 'https://example.com/direct-logo.png',
+    });
+
+    const html = await render(
+      React.createElement(ResetPasswordOtpEmail, {
+        firstName: 'Jane',
+        otpCode: '654321',
+        branding,
+      })
+    );
+
+    expect(html).toContain('src="https://example.com/direct-logo.png"');
+  });
 });
+
 

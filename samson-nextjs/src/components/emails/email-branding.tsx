@@ -1,6 +1,6 @@
 import React from 'react';
 import { Img, Link, Section, Text } from '@react-email/components';
-import { getEmailLogoUrl } from '@/shared/utils/get-base-url.util';
+import { DEFAULT_LOGO_URL, DEFAULT_LOGO_DARK_URL, getBaseUrl } from '@/shared/utils/get-base-url.util';
 import type { ClinicConfigResponseDto } from '@/modules/clinic-config/dtos/settings/get-clinic-config.dto';
 
 export interface EmailBranding {
@@ -25,15 +25,58 @@ const stripProtocol = (url: string) =>
 
 const toTelHref = (phone: string) => `tel:${phone.replace(/[^\d+]/g, '')}`;
 
+function resolveDirectLogoUrl(
+  preferredUrl?: string | null,
+  fallbackEnvUrl?: string | null,
+  baseUrl?: string,
+  defaultCdnUrl: string = DEFAULT_LOGO_URL
+): string {
+  // 1. Check direct configured URL
+  const trimmed = preferredUrl?.trim();
+  if (trimmed && /^https?:\/\//i.test(trimmed)) {
+    return trimmed;
+  }
+
+  // 2. Check environment variable override
+  const envUrl = fallbackEnvUrl?.trim();
+  if (envUrl && /^https?:\/\//i.test(envUrl)) {
+    return envUrl;
+  }
+
+  // 3. If relative path configured or static asset with valid public site url
+  const siteBase = baseUrl || getBaseUrl();
+  if (siteBase && siteBase.startsWith('https://') && !siteBase.includes('localhost')) {
+    const cleanBase = siteBase.replace(/\/+$/, '');
+    if (trimmed && trimmed.startsWith('/')) {
+      return `${cleanBase}${trimmed}`;
+    }
+    return `${cleanBase}/images/SAMSONLOGO.png`;
+  }
+
+  // 4. Default hosted public CDN storage URL
+  return defaultCdnUrl;
+}
+
 export function resolveEmailBranding(
   config?: Partial<ClinicConfigResponseDto> | null,
   baseUrl?: string
 ): EmailBranding {
-  const clinicName = config?.clinicName || FALLBACK_CLINIC_NAME;
-  const phone = config?.phone || '(02) 8123-4567';
-  const websiteUrl = config?.websiteUrl || 'https://samsondentalcenter.com.ph';
-  const logoUrl = getEmailLogoUrl(baseUrl, 'light');
-  const logoDarkUrl = getEmailLogoUrl(baseUrl, 'dark');
+  const clinicName = config?.clinicName?.trim() || process.env.RESEND_SENDER_NAME || FALLBACK_CLINIC_NAME;
+  const phone = config?.phone?.trim() || '(02) 8123-4567';
+  const websiteUrl = config?.websiteUrl?.trim() || 'https://samsondentalcenter.com.ph';
+
+  // Resolve direct public image URLs (Supabase storage or hosted public asset)
+  const logoUrl = resolveDirectLogoUrl(
+    config?.emailLogoUrl || config?.websiteLogoUrl,
+    process.env.NEXT_PUBLIC_LOGO_URL,
+    baseUrl,
+    DEFAULT_LOGO_URL
+  );
+
+  const rawDarkUrl = config?.emailLogoDarkUrl || config?.websiteLogoDarkUrl || process.env.NEXT_PUBLIC_LOGO_DARK_URL;
+  const logoDarkUrl = rawDarkUrl
+    ? resolveDirectLogoUrl(rawDarkUrl, process.env.NEXT_PUBLIC_LOGO_DARK_URL, baseUrl, DEFAULT_LOGO_DARK_URL)
+    : logoUrl;
 
   return {
     clinicName,
@@ -42,7 +85,7 @@ export function resolveEmailBranding(
     phone,
     phoneHref: config?.phone ? toTelHref(config.phone) : 'tel:028123456',
     landline: config?.landline || null,
-    contactEmail: config?.email || 'info@samsondentalcenter.com',
+    contactEmail: config?.email?.trim() || process.env.CLINIC_BUSINESS_EMAIL || 'info@samsondentalcenter.com',
     websiteUrl,
     websiteLabel: stripProtocol(websiteUrl),
     whatsappUrl: config?.whatsappUrl || null,
@@ -67,7 +110,23 @@ const pStyle: React.CSSProperties = {
  * that have dark mode enabled.
  */
 export function EmailLogoHeader({ branding }: { branding: EmailBranding }) {
-  const darkLogo = branding.logoDarkUrl || branding.logoUrl;
+  const hasDistinctDarkLogo = Boolean(
+    branding.logoDarkUrl && branding.logoDarkUrl !== branding.logoUrl
+  );
+
+  if (!hasDistinctDarkLogo) {
+    return (
+      <Section style={{ marginBottom: '28px', textAlign: 'center' }}>
+        <Img
+          src={branding.logoUrl}
+          alt={branding.clinicName}
+          width="130"
+          className="eml-logo"
+          style={{ height: 'auto', objectFit: 'contain', margin: '0 auto', display: 'block' }}
+        />
+      </Section>
+    );
+  }
 
   return (
     <Section style={{ marginBottom: '28px', textAlign: 'center' }}>
@@ -84,7 +143,7 @@ export function EmailLogoHeader({ branding }: { branding: EmailBranding }) {
       {/* Dark Mode Logo (Visible on dark mode devices via media query) */}
       <div className="dark-logo" style={{ display: 'none' }}>
         <Img
-          src={darkLogo}
+          src={branding.logoDarkUrl!}
           alt={branding.clinicName}
           width="130"
           className="eml-logo"

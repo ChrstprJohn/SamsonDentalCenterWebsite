@@ -10,25 +10,36 @@ import {
   Tailwind,
 } from '@react-email/components';
 import * as React from 'react';
+import { EmailBranding, EmailLogoHeader, resolveEmailBranding } from './email-branding';
 
 interface ResetPasswordOtpEmailProps {
   firstName: string;
   otpCode: string;
+  clinicName?: string;
+  branding?: EmailBranding;
+  baseUrl?: string;
 }
 
 export const ResetPasswordOtpEmail = ({
   firstName = 'Patient',
   otpCode = '123456',
+  clinicName,
+  branding,
+  baseUrl,
 }: ResetPasswordOtpEmailProps) => {
+  const b = branding ?? resolveEmailBranding(clinicName ? { clinicName } : undefined, baseUrl);
+  const resolvedClinicName = clinicName || b.clinicName;
+
   return (
     <Tailwind>
       <Html>
         <Head />
-        <Preview>Your Samson Dental Center Password Reset Code</Preview>
+        <Preview>Your {resolvedClinicName} Password Reset Code</Preview>
         <Body className="bg-slate-50 my-auto mx-auto font-sans px-2">
           <Container className="border border-solid border-[#eaeaea] rounded my-[40px] mx-auto p-[20px] max-w-[465px] bg-white">
-            <Heading className="text-black text-[24px] font-normal text-center p-0 my-[30px] mx-0">
-              <strong>Samson Dental Center</strong>
+            <EmailLogoHeader branding={b} />
+            <Heading className="text-black text-[22px] font-normal text-center p-0 my-[16px] mx-0">
+              <strong>{resolvedClinicName}</strong>
             </Heading>
             <Text className="text-black text-[14px] leading-[24px]">
               Hello {firstName},
@@ -45,7 +56,7 @@ export const ResetPasswordOtpEmail = ({
               If you didn't request a password reset, you can safely ignore this email. Your password will remain unchanged.
             </Text>
             <Text className="text-[#666666] text-[12px] leading-[24px] mt-8">
-              © {new Date().getFullYear()} Samson Dental Center. All rights reserved.
+              © {new Date().getFullYear()} {resolvedClinicName}. All rights reserved.
             </Text>
           </Container>
         </Body>
