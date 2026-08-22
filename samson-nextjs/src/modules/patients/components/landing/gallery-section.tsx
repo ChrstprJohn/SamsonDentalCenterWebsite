@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { motion } from 'framer-motion';
 import { useGallerySection } from '../../hooks/landing/use-gallery-section';
 import { GalleryGrid } from './sub-components/gallery-grid';
 import { GalleryLightbox } from './sub-components/gallery-lightbox';
@@ -35,7 +36,13 @@ export function GallerySection() {
 
 function GalleryHeader() {
   return (
-    <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 sm:mb-20 md:mb-24 gap-4 sm:gap-6">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-40px' }}
+      transition={{ duration: 0.6, ease: 'easeOut' }}
+      className="flex flex-col md:flex-row md:items-end justify-between mb-12 sm:mb-20 md:mb-24 gap-4 sm:gap-6"
+    >
       <div className="max-w-full md:max-w-[450px] lg:max-w-[580px]">
         <span className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-2 sm:mb-3 font-sans">
           Clinic Gallery
@@ -49,6 +56,6 @@ function GalleryHeader() {
       <p className="max-w-sm pt-2 sm:pt-2 md:max-w-[280px] lg:max-w-sm font-sans text-[13px] sm:text-[clamp(12px,0.3vw+11px,14px)] font-normal leading-relaxed text-white/70">
         We showcase real cases treated at our clinic, highlighting the quality of our dental care and the outcomes our patients achieve.
       </p>
-    </div>
+    </motion.div>
   );
 }

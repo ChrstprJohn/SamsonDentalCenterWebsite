@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { motion } from 'framer-motion';
 import { Building2 } from 'lucide-react';
 
 const companies = [
@@ -28,7 +29,13 @@ export function CompaniesSection() {
   return (
     <section id="companies" className="py-16 sm:py-32 bg-[#FDFDFD] relative w-full border-t border-gray-100">
       <div className="max-w-7xl mx-auto px-6 sm:px-12 flex flex-col gap-10 sm:gap-20">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-40px' }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+          className="flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6"
+        >
           <div className="max-w-full md:max-w-[450px] lg:max-w-[580px]">
             <span className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-2 sm:mb-3 font-sans">
               Institutional Partners
@@ -40,12 +47,19 @@ export function CompaniesSection() {
           <p className="max-w-sm pt-2 sm:pt-2 md:max-w-[280px] lg:max-w-sm font-sans text-[13px] sm:text-[clamp(12px,0.3vw+11px,14px)] font-normal leading-relaxed text-gray-500">
             Since 1965, Samson Dental Center has been the primary dental healthcare provider for top educational, financial, hospitality, and industrial organizations across Baguio City.
           </p>
-        </div>
+        </motion.div>
 
         <div className="relative">
           <div className="absolute left-[19px] sm:left-[23px] top-3 bottom-3 w-px bg-[#D94E4E]/40 z-20" />
-          {companies.map(({ years, name }) => (
-<div key={name} className="group relative flex items-start gap-3 sm:gap-5 py-3 sm:py-4 px-3 sm:px-4 transition-colors duration-300 hover:bg-[#F5F2EE]">
+          {companies.map(({ years, name }, idx) => (
+            <motion.div
+              key={name}
+              initial={{ opacity: 0, x: -10 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: '-20px' }}
+              transition={{ duration: 0.4, delay: Math.min(idx * 0.04, 0.4), ease: 'easeOut' }}
+              className="group relative flex items-start gap-3 sm:gap-5 py-3 sm:py-4 px-3 sm:px-4 transition-colors duration-300 hover:bg-[#F5F2EE]"
+            >
               <span className="relative flex items-center justify-center w-3.5 h-3.5 shrink-0 mt-1">
                 <span className="w-3.5 h-3.5 rounded-full border-2 border-[#D94E4E] bg-[#FDFDFD] group-hover:bg-[#D94E4E] z-30 transition-colors duration-300" />
               </span>
@@ -53,16 +67,22 @@ export function CompaniesSection() {
                 <span className="font-sans text-[12px] lg:text-[15px] tracking-[0.1em] text-gray-500 font-medium whitespace-nowrap lg:w-[110px] lg:shrink-0">
                   {years}
                 </span>
-                <span className="font-sans text-[15px] lg:text-[17px] font-semibold lg:font-medium text-[#1D1E1E] leading-relaxed lg:ml-auto lg:text-right">
+                <span className="font-sans text-[14px] sm:text-[16px] lg:text-[17px] font-semibold lg:font-medium text-[#1D1E1E] leading-relaxed lg:ml-auto lg:text-right">
                   {name}
                 </span>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
 
         <div className="pt-6 sm:pt-8">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 sm:gap-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-40px' }}
+            transition={{ duration: 0.6, ease: 'easeOut' }}
+            className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 sm:gap-6"
+          >
             <div className="max-w-full md:max-w-[450px] lg:max-w-[580px]">
               <h3 className="font-sans text-[16px] sm:text-[clamp(18px,1vw+12px,24px)] font-normal tracking-[-0.03em] text-[#1D1E1E] leading-[1.2]">
                 Former Subsidiary Branches
@@ -71,17 +91,24 @@ export function CompaniesSection() {
             <p className="max-w-sm pt-2 sm:pt-2 md:max-w-[280px] lg:max-w-sm font-sans text-[13px] sm:text-[clamp(12px,0.3vw+11px,14px)] font-normal leading-relaxed text-gray-500">
               Former business ventures of the Samson family that laid the groundwork for the clinic.
             </p>
-          </div>
+          </motion.div>
           <div className="mt-6 sm:mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-            {formerSubsidiaries.map((name) => (
-              <div key={name} className="group border border-gray-100 bg-white p-5 sm:p-6 flex items-center gap-4 transition-colors duration-300 hover:border-[#D94E4E]/30">
+            {formerSubsidiaries.map((name, idx) => (
+              <motion.div
+                key={name}
+                initial={{ opacity: 0, y: 15 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-20px' }}
+                transition={{ duration: 0.45, delay: idx * 0.07, ease: 'easeOut' }}
+                className="group border border-gray-100 bg-white p-5 sm:p-6 flex items-center gap-4 transition-colors duration-300 hover:border-[#D94E4E]/30"
+              >
                 <div className="w-10 h-10 sm:w-12 sm:h-12 shrink-0 bg-[#1D1E1E]/5 group-hover:bg-[#D94E4E] rounded-full flex items-center justify-center text-[#1D1E1E] group-hover:text-white transition-all duration-300">
                   <Building2 className="w-5 h-5" />
                 </div>
                 <span className="font-sans text-[13px] sm:text-[15px] font-medium text-[#1D1E1E]">
                   {name}
                 </span>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>

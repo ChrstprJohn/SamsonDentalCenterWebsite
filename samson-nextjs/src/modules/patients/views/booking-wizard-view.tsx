@@ -4,6 +4,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Check, ChevronRight, ChevronDown, CheckCircle2, Link2, Clock, Phone, Mail, Ban } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import type { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
 import type { ClinicConfigResponseDto } from '@/modules/clinic-config/dtos/settings/get-clinic-config.dto';
 import { useBookingWizard } from '../hooks/landing/use-booking-wizard';
@@ -37,9 +38,20 @@ interface BookingWizardViewProps {
 
 export function BookingWizardView({ services, config, initialServiceId }: BookingWizardViewProps) {
   const wizard = useBookingWizard({ services, config, initialServiceId });
+  const router = useRouter();
   const { step, contactSection, fields, isSubmitting, redirectCountdown, submittedReference, selectService } = wizard;
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const [formTouched, setFormTouched] = useState(false);
+
+  // ponytail: __NA is set by Next App Router only on client-side navigations; fall back to home for direct loads
+  const handleBackClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    if ((window as any).history?.state?.__NA) {
+      router.back();
+    } else {
+      router.push('/');
+    }
+  };
 
   const selectedService = services.find((s) => s.id === contactSection.pathway);
 
@@ -235,7 +247,8 @@ export function BookingWizardView({ services, config, initialServiceId }: Bookin
           {/* Left: Visible Return Link / Back Button */}
           <Link
             href="/"
-            aria-label="Back to home"
+            onClick={handleBackClick}
+            aria-label="Back to previous page"
             className="inline-flex items-center gap-1.5 font-sans text-xs sm:text-sm font-semibold text-gray-800 hover:text-[#D94E4E] transition-colors p-1.5 -ml-1.5 rounded-lg hover:bg-gray-100/80"
           >
             <ArrowLeft className="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2.2]" />
@@ -645,7 +658,7 @@ export function BookingWizardView({ services, config, initialServiceId }: Bookin
                     <CheckCircle2 className="w-6 h-6 sm:w-8 sm:h-8" />
                   </div>
                   <h2 className="font-sans text-[18px] sm:text-2xl font-normal text-gray-900 text-center leading-tight">Request Submitted Successfully!</h2>
-                  <p className="text-[12px] sm:text-sm font-light text-gray-600 leading-[1.55] sm:leading-relaxed">
+                  <p className="text-[12px] sm:text-sm font-normal text-gray-600 leading-[1.55] sm:leading-relaxed">
                     Thank you for reaching out to {clinicName}. We've received your booking request and our team is reviewing it. We'll get back to you soon to confirm your appointment.
                   </p>
 

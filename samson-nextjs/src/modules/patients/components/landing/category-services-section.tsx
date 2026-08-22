@@ -347,7 +347,7 @@ export function CategoryServicesSection({ onBook }: CategoryServicesSectionProps
                       </span>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         {svc.subOptions.map((opt) => (
-                          <div key={opt} className="flex items-center gap-2 text-[12px] sm:text-[13px] text-[#4F5454] font-light">
+                          <div key={opt} className="flex items-center gap-2 text-[12px] sm:text-[13px] text-gray-500 font-normal">
                             <span className="w-1.5 h-1.5 rounded-full bg-[#D94E4E] shrink-0" />
                             <span className="leading-snug">{opt}</span>
                           </div>

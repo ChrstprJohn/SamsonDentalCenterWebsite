@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { motion } from 'framer-motion';
 import { DoctorCard } from './sub-components/doctor-card';
 
 const doctorsData = [
@@ -28,7 +29,13 @@ function WideImageCarousel() {
     <>
     <div className="py-16 sm:py-32 bg-[#FDFDFD] relative w-full overflow-hidden">
     <div className="max-w-7xl mx-auto px-6 sm:px-12 flex flex-col gap-10 sm:gap-20">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-40px' }}
+        transition={{ duration: 0.6, ease: 'easeOut' }}
+        className="flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6"
+      >
         <div className="max-w-full md:max-w-[450px] lg:max-w-[580px]">
           <span className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-2 sm:mb-3 font-sans">
             Inside the Clinic
@@ -41,9 +48,15 @@ function WideImageCarousel() {
         <p className="max-w-sm pt-2 sm:pt-2 md:max-w-[280px] lg:max-w-sm font-sans text-[13px] sm:text-[clamp(12px,0.3vw+11px,14px)] font-normal leading-relaxed text-gray-500">
           Our clinic, our team, and the space where your smile is cared for.
         </p>
-      </div>
+      </motion.div>
 
-      <div className="relative w-full overflow-hidden">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.98 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8, delay: 0.15, ease: 'easeOut' }}
+        className="relative w-full overflow-hidden"
+      >
         <style>{`#about-marquee { animation-duration: 45s; } #about-marquee img:nth-child(odd) { margin-top: 2rem; } #about-marquee img:nth-child(even) { margin-bottom: 2rem; }`}</style>
         <div className="absolute inset-y-0 left-0 w-[5%] sm:w-[8%] bg-gradient-to-r from-[#FDFDFD] to-transparent z-10 pointer-events-none" />
         <div className="absolute inset-y-0 right-0 w-[5%] sm:w-[8%] bg-gradient-to-l from-[#FDFDFD] to-transparent z-10 pointer-events-none" />
@@ -64,7 +77,7 @@ function WideImageCarousel() {
             />
           ))}
         </div>
-      </div>
+      </motion.div>
     </div>
   </div>
     </>
@@ -80,7 +93,13 @@ export function AboutSection() {
         {/* Row 1: Image Left, Text Right */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 lg:gap-20 items-center">
           {/* Visual Column */}
-          <div className="lg:col-span-6 relative">
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-40px' }}
+            transition={{ duration: 0.7, ease: 'easeOut' }}
+            className="lg:col-span-6 relative"
+          >
             <div className="relative aspect-square sm:aspect-[4/3] lg:aspect-[4/5] overflow-hidden border border-white/5 bg-[#1D1E1E]">
               <picture>
                 <img
@@ -101,10 +120,16 @@ export function AboutSection() {
                 Trusted dental care
               </p>
             </div>
-          </div>
+          </motion.div>
 
           {/* Content Column */}
-          <div className="lg:col-span-6">
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-40px' }}
+            transition={{ duration: 0.7, delay: 0.15, ease: 'easeOut' }}
+            className="lg:col-span-6"
+          >
             <span className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-2 sm:mb-3 font-sans">
               About Us
             </span>
@@ -113,7 +138,7 @@ export function AboutSection() {
               Trusted Dental Care in Baguio City.
             </h2>
 
-            <div className="mt-4 sm:mt-8 space-y-3 sm:space-y-6 text-[#4F5454] font-light leading-relaxed text-[12px] sm:text-[15px] font-sans">
+            <div className="mt-4 sm:mt-8 space-y-3 sm:space-y-6 text-gray-500 font-normal leading-relaxed text-[12px] sm:text-[15px] font-sans">
               <p>
                 Patients in Baguio City choose our dental clinic because they know they can trust our dentists’ expertise and commitment to providing excellent care. Our patients consistently refer their families and friends to us, thanks to the exceptional, personalized service and positive experiences they have with our team.
               </p>
@@ -126,26 +151,26 @@ export function AboutSection() {
             </div>
 
             {/* Unique Features */}
-            <div className="mt-7 sm:mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 pt-6 sm:pt-8 border-t border-gray-100 font-sans">
-              <div className="p-4 rounded-xl bg-[#F8F9FA] border border-gray-100/80">
-                <h4 className="text-[#1D1E1E] text-base font-semibold flex items-center gap-2">
+            <div className="mt-7 sm:mt-10 grid grid-cols-2 gap-4 sm:gap-6 pt-6 sm:pt-8 border-t border-gray-100 font-sans">
+              <div>
+                <h4 className="text-[#1D1E1E] text-[14px] sm:text-[16px] font-semibold flex items-center gap-2">
                   Central Location
                 </h4>
-                <p className="text-[13px] text-[#2C2E2E] font-medium mt-1.5 leading-relaxed">
+                <p className="text-[12px] sm:text-[14px] text-[#2C2E2E] font-medium mt-1.5 leading-relaxed">
                   5th Floor S Building, Upper Session Road, Baguio City
                 </p>
               </div>
-              <div className="p-4 rounded-xl bg-[#F8F9FA] border border-gray-100/80">
-                <h4 className="text-[#1D1E1E] text-base font-semibold flex items-center gap-2">
+              <div>
+                <h4 className="text-[#1D1E1E] text-[14px] sm:text-[16px] font-semibold flex items-center gap-2">
                   Opening Hours
                 </h4>
-                <p className="text-[13px] text-[#2C2E2E] font-medium mt-1.5 leading-relaxed">
+                <p className="text-[12px] sm:text-[14px] text-[#1D1E1E] font-bold mt-1.5 leading-relaxed">
                   Monday – Saturday<br />
-                  <span className="text-[#595E5E] font-normal text-[12.5px]">9:00am – 12:00pm &amp; 1:00pm – 5:00pm</span>
+                  <span className="text-[12px] sm:text-[14px] font-bold text-[#1D1E1E]">9:00am – 12:00pm &amp; 1:00pm – 5:00pm</span>
                 </p>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
 
       </div>

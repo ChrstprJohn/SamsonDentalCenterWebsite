@@ -178,7 +178,7 @@ export function ContactSuccess({ firstName, lastName, phone, onReset }: { firstN
         <Check className="w-8 h-8" />
       </div>
       <h3 className="font-sans text-2xl font-light text-gray-900 mt-6">Reservation Received</h3>
-      <p className="text-sm font-light text-gray-500 max-w-md mx-auto leading-relaxed font-sans">
+      <p className="text-sm font-normal text-gray-500 max-w-md mx-auto leading-relaxed font-sans">
         Thank you, <span className="font-medium text-gray-900">{firstName} {lastName}</span>. Our reservation desk will contact you at <span className="font-medium text-gray-900">{phone}</span> within 24 working hours.
       </p>
       <button onClick={onReset} type="button" className="mt-8 px-6 py-2.5 bg-[#1D1E1E] hover:bg-[#D94E4E] text-white text-xs font-semibold rounded-none uppercase tracking-widest transition-all shadow-sm cursor-pointer">

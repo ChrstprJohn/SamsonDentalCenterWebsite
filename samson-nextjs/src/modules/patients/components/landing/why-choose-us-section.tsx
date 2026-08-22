@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import {
   Award,
   MapPin,
@@ -79,7 +80,13 @@ export function WhyChooseUsSection() {
       <div className="max-w-7xl mx-auto px-6 sm:px-12 flex flex-col gap-10 sm:gap-20">
         
         {/* Main Section Header & Intro */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-40px' }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+          className="flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6"
+        >
           <div className="max-w-full md:max-w-[450px] lg:max-w-[580px]">
             <span className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-2 sm:mb-3 font-sans">
               Why Choose Us
@@ -92,13 +99,17 @@ export function WhyChooseUsSection() {
           <p className="max-w-sm pt-2 sm:pt-2 md:max-w-[280px] lg:max-w-sm font-sans text-[13px] sm:text-[clamp(12px,0.3vw+11px,14px)] font-normal leading-relaxed text-gray-500">
             With roots dating back to 1964 and now in our third generation, Samson Dental Center unites clinical expertise, state-of-the-art facilities, and patient-first care under one roof.
           </p>
-        </div>
+        </motion.div>
 
         {/* 8 Feature Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 items-stretch">
-          {whyChooseUsFeatures.map(({ icon: Icon, title, text }) => (
-            <div
+          {whyChooseUsFeatures.map(({ icon: Icon, title, text }, idx) => (
+            <motion.div
               key={title}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-30px' }}
+              transition={{ duration: 0.45, delay: idx * 0.05, ease: 'easeOut' }}
               className="group border border-gray-100 bg-white p-5 sm:p-7 transition-all duration-300 hover:border-[#D94E4E]/30 hover:shadow-md flex flex-col justify-between h-full rounded-sm"
             >
               <div>
@@ -108,11 +119,11 @@ export function WhyChooseUsSection() {
                 <h3 className="text-[#1D1E1E] text-[15px] sm:text-[17px] font-semibold tracking-tight min-h-0 sm:min-h-[48px] flex items-center">
                   {title}
                 </h3>
-                <p className="mt-1.5 sm:mt-2 text-[12px] sm:text-[14px] text-gray-500 leading-relaxed font-light">
+                <p className="mt-1.5 sm:mt-2 text-[12px] sm:text-[14px] text-gray-500 leading-relaxed font-normal">
                   {text}
                 </p>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
 
@@ -121,7 +132,13 @@ export function WhyChooseUsSection() {
           {/* 2-Column: Left (Badge, Title, Overview & Bullets) & Right (Images Showcase) */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
             {/* Left side: Badge + Main Heading + Intro + Checklist Bullets */}
-            <div className="lg:col-span-6 flex flex-col gap-6 sm:gap-7">
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{ duration: 0.7, ease: 'easeOut' }}
+              className="lg:col-span-6 flex flex-col gap-6 sm:gap-7"
+            >
               <div>
                 <span className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-2 sm:mb-3 font-sans">
                   Our Difference
@@ -130,7 +147,7 @@ export function WhyChooseUsSection() {
                   State of the Art and Professional <br className="hidden sm:block" />
                   Dental Care Tailored to Your Needs
                 </h3>
-                <p className="mt-3 sm:mt-5 text-[12px] sm:text-[14px] text-[#4F5454] sm:text-gray-500 font-light leading-relaxed">
+                <p className="mt-3 sm:mt-5 text-[12px] sm:text-[14px] text-gray-500 font-normal leading-relaxed">
                   The work of our highly competent doctors of varying disciplines of dentistry, coupled with the use of the latest equipment and technologies ensures that each patient is treated like royalty. Our complete team functions on the sole purpose of ensuring complete patient care and satisfaction, and this dedication is what sets us apart from our counterparts.
                 </p>
               </div>
@@ -145,17 +162,23 @@ export function WhyChooseUsSection() {
                       <h5 className="text-[#1D1E1E] text-[14px] sm:text-[16px] font-semibold">
                         {title}
                       </h5>
-                      <p className="mt-1 text-[12px] sm:text-[14px] text-[#4F5454] sm:text-gray-500 font-light leading-relaxed">
+                      <p className="mt-1 text-[12px] sm:text-[14px] text-gray-500 font-normal leading-relaxed">
                         {text}
                       </p>
                     </div>
                   </div>
                 ))}
               </div>
-            </div>
+            </motion.div>
 
             {/* Right side: Image Showcase */}
-            <div className="lg:col-span-6 grid grid-cols-2 gap-3 sm:gap-4">
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{ duration: 0.7, delay: 0.15, ease: 'easeOut' }}
+              className="lg:col-span-6 grid grid-cols-2 gap-3 sm:gap-4"
+            >
               <div className="space-y-3 sm:space-y-4">
                 <div className="relative aspect-[4/5] overflow-hidden border border-gray-100 bg-[#1D1E1E]">
                   <img
@@ -188,7 +211,7 @@ export function WhyChooseUsSection() {
                   />
                 </div>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
 

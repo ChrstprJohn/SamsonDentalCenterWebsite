@@ -76,7 +76,13 @@ export function AppointmentBannerSection({ onBookClick }: AppointmentBannerSecti
 
       {/* Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-12 w-full py-20">
-        <div className="max-w-full md:max-w-[450px] lg:max-w-[580px] flex flex-col gap-6">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-40px' }}
+          transition={{ duration: 0.8, ease: 'easeOut' }}
+          className="max-w-full md:max-w-[450px] lg:max-w-[580px] flex flex-col gap-6"
+        >
 
           {/* Eyebrow — same pattern as other sections */}
           <span className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold font-sans">
@@ -113,7 +119,7 @@ export function AppointmentBannerSection({ onBookClick }: AppointmentBannerSecti
             </Link>
           )}
 
-        </div>
+        </motion.div>
       </div>
 
       {/* Background indicator picker */}

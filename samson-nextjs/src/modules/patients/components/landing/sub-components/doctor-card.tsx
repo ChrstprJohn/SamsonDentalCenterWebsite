@@ -27,7 +27,7 @@ export function DoctorCard({ name, role, image, bio }: DoctorCardProps) {
             {name}
           </h4>
           <p className="text-[#D94E4E] font-medium text-[12px] sm:text-sm">{role}</p>
-          <p className="text-gray-500 font-light text-[12px] sm:text-sm mt-1.5 sm:mt-2 leading-relaxed">{bio}</p>
+          <p className="text-gray-500 font-normal text-[12px] sm:text-sm mt-1.5 sm:mt-2 leading-relaxed">{bio}</p>
         </div>
       </div>
     </div>

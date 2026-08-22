@@ -370,6 +370,55 @@ interface AssistantStructuredJson {
   follow_up?: string;
 }
 
+function FormattedInlineText({ text }: { text?: string | null }) {
+  if (!text) return null;
+
+  // Match bold (**text** or __text__), inline code (`text`), or italic (*text*)
+  const tokens = text.split(/(\*\*[^*]+?\*\*|__[^_]+?__|`[^`]+`|(?:\*[^*]+?\*))/g);
+
+  return (
+    <>
+      {tokens.map((token, index) => {
+        if (!token) return null;
+
+        // Bold: **text** or __text__
+        if (
+          (token.startsWith('**') && token.endsWith('**') && token.length >= 4) ||
+          (token.startsWith('__') && token.endsWith('__') && token.length >= 4)
+        ) {
+          const innerContent = token.slice(2, -2);
+          return (
+            <strong key={index} className="font-semibold text-[#1D1E1E]">
+              {innerContent}
+            </strong>
+          );
+        }
+
+        // Inline Code: `text`
+        if (token.startsWith('`') && token.endsWith('`') && token.length >= 2) {
+          return (
+            <code key={index} className="rounded bg-black/5 px-1 py-0.5 font-mono text-xs text-[#1D1E1E]">
+              {token.slice(1, -1)}
+            </code>
+          );
+        }
+
+        // Italic: *text*
+        if (token.startsWith('*') && token.endsWith('*') && token.length >= 2) {
+          return (
+            <em key={index} className="italic">
+              {token.slice(1, -1)}
+            </em>
+          );
+        }
+
+        // Regular text
+        return <span key={index}>{token}</span>;
+      })}
+    </>
+  );
+}
+
 function FormattedAssistantMessage({ content }: { content: string }) {
   // 1. Attempt to extract and parse JSON (handles leading text, trailing text, or codeblock fences)
   let parsedJson: AssistantStructuredJson | null = null;
@@ -397,7 +446,11 @@ function FormattedAssistantMessage({ content }: { content: string }) {
     return (
       <div className="space-y-3 text-[13px] leading-relaxed text-[#1D1E1E]/90 sm:text-sm">
         {/* Main message */}
-        {parsedJson.message && <p>{parsedJson.message}</p>}
+        {parsedJson.message && (
+          <p>
+            <FormattedInlineText text={parsedJson.message} />
+          </p>
+        )}
 
         {/* Sections */}
         {Array.isArray(parsedJson.sections) &&
@@ -406,7 +459,9 @@ function FormattedAssistantMessage({ content }: { content: string }) {
             return (
               <div key={sIdx} className="space-y-1.5 pt-0.5">
                 {section.title && (
-                  <p className="font-semibold text-[#1D1E1E]">{section.title}:</p>
+                  <p className="font-semibold text-[#1D1E1E]">
+                    <FormattedInlineText text={section.title} />:
+                  </p>
                 )}
                 {Array.isArray(section.items) && (
                   <ul className="space-y-1.5 pl-1">
@@ -415,7 +470,9 @@ function FormattedAssistantMessage({ content }: { content: string }) {
                         return (
                           <li key={iIdx} className="flex items-start gap-2">
                             <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#1D1E1E]/40" />
-                            <span className="flex-1">{item}</span>
+                            <span className="flex-1">
+                              <FormattedInlineText text={item} />
+                            </span>
                           </li>
                         );
                       }
@@ -423,8 +480,14 @@ function FormattedAssistantMessage({ content }: { content: string }) {
                         <li key={iIdx} className="flex items-start gap-2">
                           <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#1D1E1E]/40" />
                           <div className="flex-1">
-                            <strong className="font-semibold text-[#1D1E1E]">{item.name}</strong>
-                            {item.description && <span> – {item.description}</span>}
+                            <strong className="font-semibold text-[#1D1E1E]">
+                              <FormattedInlineText text={item.name} />
+                            </strong>
+                            {item.description && (
+                              <span>
+                                {' '}– <FormattedInlineText text={item.description} />
+                              </span>
+                            )}
                             {item.price && <span className="font-medium text-[#1D1E1E]"> ({item.price})</span>}
                           </div>
                         </li>
@@ -519,7 +582,9 @@ function FormattedAssistantMessage({ content }: { content: string }) {
 
         {/* Follow up */}
         {parsedJson.follow_up && (
-          <p className="pt-0.5">{parsedJson.follow_up}</p>
+          <p className="pt-0.5">
+            <FormattedInlineText text={parsedJson.follow_up} />
+          </p>
         )}
       </div>
     );
@@ -531,7 +596,11 @@ function FormattedAssistantMessage({ content }: { content: string }) {
       {content.split('\n').map((line, idx) => {
         const trimmedLine = line.trim();
         if (!trimmedLine) return null;
-        return <p key={idx}>{trimmedLine}</p>;
+        return (
+          <p key={idx}>
+            <FormattedInlineText text={trimmedLine} />
+          </p>
+        );
       })}
     </div>
   );

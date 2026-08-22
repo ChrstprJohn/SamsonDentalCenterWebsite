@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { motion } from 'framer-motion';
 import type { ClinicConfigResponseDto } from '@/modules/clinic-config/dtos/settings/get-clinic-config.dto';
 import { ContactInfoPanel } from './sub-components/contact-info-panel';
 
@@ -18,10 +19,23 @@ export function ContactSection({ config }: ContactSectionProps) {
       <div className="max-w-7xl mx-auto px-6 sm:px-12">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-16 lg:gap-24 items-start">
           {/* Left: Contact Info */}
-          <ContactInfoPanel config={config} />
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-40px' }}
+            transition={{ duration: 0.7, ease: 'easeOut' }}
+          >
+            <ContactInfoPanel config={config} />
+          </motion.div>
 
           {/* Right: Google Map */}
-          <div className="w-full h-[300px] sm:h-[420px] overflow-hidden border border-gray-100 shadow-sm group">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.98 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true, margin: '-40px' }}
+            transition={{ duration: 0.7, delay: 0.15, ease: 'easeOut' }}
+            className="w-full h-[300px] sm:h-[420px] overflow-hidden border border-gray-100 shadow-sm group"
+          >
             <iframe
               title="Clinic Location"
               src={mapEmbedUrl}
@@ -32,7 +46,7 @@ export function ContactSection({ config }: ContactSectionProps) {
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
             />
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>

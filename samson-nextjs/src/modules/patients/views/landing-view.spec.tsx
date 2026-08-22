@@ -11,6 +11,15 @@ vi.mock('../hooks/landing/use-landing-view', () => ({
   useLandingView: vi.fn(),
 }));
 
+const mockRequestAppt = vi.fn();
+vi.mock('../contexts/booking-nav-context', () => ({
+  useBookingNav: () => ({
+    requestAppt: mockRequestAppt,
+    isNavigatingBooking: false,
+    pendingServiceName: null,
+  }),
+}));
+
 vi.mock('../components/landing/hero-section-preview', () => ({ HeroSectionPreview: () => <div data-testid="hero-section-preview" /> }));
 vi.mock('../components/landing/hero-section-v1', () => ({ HeroSectionV1: () => <div data-testid="hero-section-v1" /> }));
 vi.mock('../components/landing/hero-section-v2', () => ({ HeroSectionV2: () => <div data-testid="hero-section-v2" /> }));
@@ -22,11 +31,14 @@ vi.mock('../components/landing/mock-category-services-section', () => ({
   ),
 }));
 vi.mock('../components/landing/about-section', () => ({ AboutSection: () => <div data-testid="about-section" /> }));
+vi.mock('../components/landing/why-choose-us-section', () => ({ WhyChooseUsSection: () => <div data-testid="why-choose-us-section" /> }));
+vi.mock('../components/landing/companies-section', () => ({ CompaniesSection: () => <div data-testid="companies-section" /> }));
 vi.mock('../components/landing/gallery-section', () => ({ GallerySection: () => <div data-testid="gallery-section" /> }));
 vi.mock('../components/landing/testimonials-section', () => ({ TestimonialsSection: () => <div data-testid="testimonials-section" /> }));
 vi.mock('../components/landing/faq-section', () => ({ FaqSection: () => <div data-testid="faq-section" /> }));
 vi.mock('../components/landing/chat-section', () => ({ ChatSection: () => <div data-testid="chat-section" /> }));
 vi.mock('../components/landing/contact-section', () => ({ ContactSection: () => <div data-testid="contact-section" /> }));
+vi.mock('../components/landing/appointment-banner-section', () => ({ AppointmentBannerSection: () => <div data-testid="appointment-banner-section" /> }));
 
 describe('LandingView', () => {
   const mockConfig = { id: 'c1', name: 'Test Clinic', address: '123 Test St', phone: '123', email: 'test@test.com', workingHours: [] } as any;
@@ -45,12 +57,15 @@ describe('LandingView', () => {
     expect(screen.getByTestId('hero-section-preview')).toBeDefined();
     expect(screen.getByTestId('mock-category-services-section')).toBeDefined();
     expect(screen.getByTestId('about-section')).toBeDefined();
+    expect(screen.getByTestId('why-choose-us-section')).toBeDefined();
+    expect(screen.getByTestId('companies-section')).toBeDefined();
     expect(screen.getByTestId('gallery-section')).toBeDefined();
     expect(screen.getByTestId('faq-section')).toBeDefined();
     expect(screen.getByTestId('chat-section')).toBeDefined();
     expect(screen.getByTestId('contact-section')).toBeDefined();
+    expect(screen.getByTestId('appointment-banner-section')).toBeDefined();
 
     screen.getByText('Select Service').click();
-    expect(requestAppt).toHaveBeenCalled();
+    expect(mockRequestAppt).toHaveBeenCalled();
   });
 });
