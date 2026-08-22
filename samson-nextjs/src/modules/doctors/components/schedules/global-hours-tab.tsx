@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
 import { updateClinicConfigAction } from '@/modules/clinic-config/actions/settings/update-clinic-config.action';
 import type { ClinicConfigResponseDto } from '@/modules/clinic-config/dtos/settings/get-clinic-config.dto';
 
@@ -11,40 +12,36 @@ interface ClinicConfigItem {
 
 const DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as const;
 
+function buildNormalizedHours(operatingHours: Record<string, any>) {
+  const hours: any = {};
+  DAYS.forEach((day) => {
+    const dayData = operatingHours[day] || {};
+    hours[day] = {
+      isOpen: dayData.isOpen ?? false,
+      openTime: dayData.openTime || '08:00',
+      closeTime: dayData.closeTime || '17:00',
+      breakStartTime: dayData.breakStartTime || '12:00',
+      breakEndTime: dayData.breakEndTime || '13:00',
+    };
+  });
+  return hours;
+}
+
 interface GlobalHoursTabProps {
   clinicConfig: ClinicConfigItem;
   onSaved: (operatingHours: ClinicConfigResponseDto['operatingHours']) => void;
 }
 
 export function GlobalHoursTab({ clinicConfig, onSaved }: GlobalHoursTabProps) {
-  const [operatingHours, setOperatingHours] = useState<any>(() => {
-    const hours: any = {};
-    DAYS.forEach((day) => {
-      const dayData = clinicConfig.operatingHours[day] || {};
-      hours[day] = {
-        isOpen: dayData.isOpen ?? false,
-        openTime: dayData.openTime || '08:00',
-        closeTime: dayData.closeTime || '17:00',
-        breakStartTime: dayData.breakStartTime || '12:00',
-        breakEndTime: dayData.breakEndTime || '13:00',
-      };
-    });
-    return hours;
-  });
+  const [operatingHours, setOperatingHours] = useState<any>(() => buildNormalizedHours(clinicConfig.operatingHours));
+  const [savedHoursSnapshot, setSavedHoursSnapshot] = useState(() => JSON.stringify(buildNormalizedHours(clinicConfig.operatingHours)));
+
+  const isHoursDirty = JSON.stringify(operatingHours) !== savedHoursSnapshot;
 
   useEffect(() => {
-    const hours: any = {};
-    DAYS.forEach((day) => {
-      const dayData = clinicConfig.operatingHours[day] || {};
-      hours[day] = {
-        isOpen: dayData.isOpen ?? false,
-        openTime: dayData.openTime || '08:00',
-        closeTime: dayData.closeTime || '17:00',
-        breakStartTime: dayData.breakStartTime || '12:00',
-        breakEndTime: dayData.breakEndTime || '13:00',
-      };
-    });
+    const hours = buildNormalizedHours(clinicConfig.operatingHours);
     setOperatingHours(hours);
+    setSavedHoursSnapshot(JSON.stringify(hours));
   }, [clinicConfig]);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -101,6 +98,7 @@ export function GlobalHoursTab({ clinicConfig, onSaved }: GlobalHoursTabProps) {
       }
 
       onSaved(res.data.operatingHours);
+      setSavedHoursSnapshot(JSON.stringify(operatingHours));
       setMessage({ type: 'success', text: 'Clinic global baseline hours updated successfully!' });
     } catch (err: any) {
       setMessage({ type: 'error', text: err.message || 'Failed to save operating hours' });
@@ -110,29 +108,31 @@ export function GlobalHoursTab({ clinicConfig, onSaved }: GlobalHoursTabProps) {
   };
 
   return (
-    <div className="bg-card-bg border border-card-border/60 rounded-xl p-6 shadow-sm flex flex-col gap-6">
-      <div className="flex justify-between items-center flex-wrap gap-4">
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold text-text-primary">Clinic Weekly Hours</h2>
-          <p className="text-xs text-text-muted mt-1">
+          <h2 className="text-sm font-bold text-foreground">Clinic Weekly Hours</h2>
+          <p className="text-xs text-muted-foreground mt-0.5">
             Recurring weekly hours used for online booking. Break time is excluded from booking automatically.
           </p>
         </div>
-        <button
+        <Button
           type="button"
+          variant="outline"
+          size="sm"
           onClick={handleCopyToWeekdays}
-          className="px-3 py-1.5 bg-secondary text-secondary-foreground hover:bg-secondary-hover text-xs font-medium rounded-lg cursor-pointer transition-colors"
+          className="h-8 text-xs font-medium self-start sm:self-auto"
         >
           Copy Monday to Weekdays
-        </button>
+        </Button>
       </div>
 
       {message && (
         <div
-          className={`p-3 rounded-lg text-xs font-medium border ${
+          className={`p-3 rounded-xl text-xs font-medium border ${
             message.type === 'success'
-              ? 'bg-success-bg/10 border-success/30 text-success'
-              : 'bg-error-bg/10 border-error/30 text-error'
+              ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400'
+              : 'bg-rose-500/10 border-rose-500/20 text-rose-600 dark:text-rose-400'
           }`}
         >
           {message.text}
@@ -140,76 +140,76 @@ export function GlobalHoursTab({ clinicConfig, onSaved }: GlobalHoursTabProps) {
       )}
 
       {/* Days Table */}
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse text-sm">
+      <div className="overflow-x-auto rounded-xl border border-border">
+        <table className="w-full text-left border-collapse text-xs">
           <thead>
-            <tr className="border-b border-card-border/50 text-text-muted text-xs font-semibold uppercase">
-              <th className="py-3 px-2">Day of Week</th>
-              <th className="py-3 px-2">Status</th>
-              <th className="py-3 px-2">Work Hours</th>
-              <th className="py-3 px-2">Default Break Time</th>
+            <tr className="border-b border-border bg-muted/40 text-muted-foreground font-semibold uppercase tracking-wider text-[10px]">
+              <th className="py-3 px-4">Day of Week</th>
+              <th className="py-3 px-4">Status</th>
+              <th className="py-3 px-4">Work Hours</th>
+              <th className="py-3 px-4">Default Break Time</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-card-border/30">
+          <tbody className="divide-y divide-border">
             {DAYS.map((day) => {
               const dayData = operatingHours[day];
               return (
-                <tr key={day} className="hover:bg-card-hover/20">
-                  <td className="py-4 px-2 font-medium capitalize text-text-primary">{day}</td>
-                  <td className="py-4 px-2">
+                <tr key={day} className="hover:bg-muted/20 transition-colors">
+                  <td className="py-3 px-4 font-semibold capitalize text-foreground">{day}</td>
+                  <td className="py-3 px-4">
                     <button
                       type="button"
                       onClick={() => handleToggleOpen(day)}
-                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold cursor-pointer border transition-colors ${
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold cursor-pointer border transition-colors ${
                         dayData.isOpen
-                          ? 'bg-success-bg/10 border-success/30 text-success'
-                          : 'bg-error-bg/10 border-error/30 text-error'
+                          ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20'
+                          : 'bg-rose-500/10 border-rose-500/20 text-rose-600 dark:text-rose-400 hover:bg-rose-500/20'
                       }`}
                     >
-                      <span className={`w-1.5 h-1.5 rounded-full ${dayData.isOpen ? 'bg-success' : 'bg-error'}`} />
+                      <span className={`size-1.5 rounded-full ${dayData.isOpen ? 'bg-emerald-500' : 'bg-rose-500'}`} />
                       {dayData.isOpen ? 'OPEN' : 'CLOSED'}
                     </button>
                   </td>
-                  <td className="py-4 px-2">
+                  <td className="py-3 px-4">
                     {dayData.isOpen ? (
                       <div className="flex items-center gap-2">
                         <input
                           type="time"
                           value={dayData.openTime}
                           onChange={(e) => handleTimeChange(day, 'openTime', e.target.value)}
-                          className="bg-input-bg border border-input-border/70 rounded px-2 py-1 text-sm text-text-primary focus:outline-none focus:border-primary"
+                          className="bg-background border border-border rounded-lg px-2.5 py-1 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
                         />
-                        <span className="text-text-muted text-xs">to</span>
+                        <span className="text-muted-foreground text-[11px]">to</span>
                         <input
                           type="time"
                           value={dayData.closeTime}
                           onChange={(e) => handleTimeChange(day, 'closeTime', e.target.value)}
-                          className="bg-input-bg border border-input-border/70 rounded px-2 py-1 text-sm text-text-primary focus:outline-none focus:border-primary"
+                          className="bg-background border border-border rounded-lg px-2.5 py-1 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
                         />
                       </div>
                     ) : (
-                      <span className="text-text-muted text-xs">--:-- - --:--</span>
+                      <span className="text-muted-foreground text-xs">--:-- - --:--</span>
                     )}
                   </td>
-                  <td className="py-4 px-2">
+                  <td className="py-3 px-4">
                     {dayData.isOpen ? (
                       <div className="flex items-center gap-2">
                         <input
                           type="time"
                           value={dayData.breakStartTime || ''}
                           onChange={(e) => handleTimeChange(day, 'breakStartTime', e.target.value)}
-                          className="bg-input-bg border border-input-border/70 rounded px-2 py-1 text-sm text-text-primary focus:outline-none focus:border-primary"
+                          className="bg-background border border-border rounded-lg px-2.5 py-1 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
                         />
-                        <span className="text-text-muted text-xs">to</span>
+                        <span className="text-muted-foreground text-[11px]">to</span>
                         <input
                           type="time"
                           value={dayData.breakEndTime || ''}
                           onChange={(e) => handleTimeChange(day, 'breakEndTime', e.target.value)}
-                          className="bg-input-bg border border-input-border/70 rounded px-2 py-1 text-sm text-text-primary focus:outline-none focus:border-primary"
+                          className="bg-background border border-border rounded-lg px-2.5 py-1 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
                         />
                       </div>
                     ) : (
-                      <span className="text-text-muted text-xs">--:-- - --:--</span>
+                      <span className="text-muted-foreground text-xs">--:-- - --:--</span>
                     )}
                   </td>
                 </tr>
@@ -219,15 +219,15 @@ export function GlobalHoursTab({ clinicConfig, onSaved }: GlobalHoursTabProps) {
         </table>
       </div>
 
-      <div className="flex justify-end pt-4 border-t border-card-border/40">
-        <button
+      <div className="flex justify-end pt-2">
+        <Button
           type="button"
-          disabled={isSubmitting}
+          disabled={isSubmitting || !isHoursDirty}
           onClick={handleSave}
-          className="px-5 py-2.5 bg-primary text-primary-foreground hover:bg-primary-hover font-semibold rounded-xl text-sm cursor-pointer disabled:opacity-50 transition-colors"
+          className="h-9 text-xs bg-[#1D1E1E] text-white hover:bg-[#1D1E1E]/90 disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {isSubmitting ? 'Saving...' : 'Save Clinic Hours'}
-        </button>
+        </Button>
       </div>
     </div>
   );

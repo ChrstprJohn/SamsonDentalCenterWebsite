@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useTransition } from 'react';
-import { Trash2, CalendarX2, ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Trash2, CalendarX2, ExternalLink, ChevronLeft, ChevronRight, MessageSquareQuote, UserRound } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/feedback/toast-container';
@@ -9,14 +9,15 @@ import { formatShortDate, formatTimeAgo } from '@/shared/utils/date.util';
 import { deleteNoShowReasonAction } from '../actions/delete-no-show-reason.action';
 import type { NoShowReasonListItem } from '../queries/get-no-show-reasons.query';
 
+const PAGE_SIZE = 12;
+
 export function NoShowReasonsAdminView({ initialReasons }: { initialReasons: NoShowReasonListItem[] }) {
   const [reasons, setReasons] = React.useState(initialReasons);
+  const [pageIndex, setPageIndex] = React.useState(0);
   const [isPending, startTransition] = useTransition();
   const { addToast } = useToast();
   const router = useRouter();
 
-  const PAGE_SIZE = 25;
-  const [pageIndex, setPageIndex] = React.useState(0);
   const totalPages = Math.max(1, Math.ceil(reasons.length / PAGE_SIZE));
   const pageItems = reasons.slice(pageIndex * PAGE_SIZE, (pageIndex + 1) * PAGE_SIZE);
 
@@ -24,8 +25,7 @@ export function NoShowReasonsAdminView({ initialReasons }: { initialReasons: NoS
     startTransition(async () => {
       const result = await deleteNoShowReasonAction(id);
       if (!result.success) {
-        addToast(result.error, 'error');
-        return;
+        return addToast(result.error, 'error');
       }
       setReasons((current) => {
         const next = current.filter((r) => r.id !== id);
@@ -37,96 +37,120 @@ export function NoShowReasonsAdminView({ initialReasons }: { initialReasons: NoS
   };
 
   if (reasons.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-14 text-center">
-        <div className="mb-3 flex size-11 items-center justify-center rounded-full bg-muted/30">
-          <CalendarX2 className="size-5 text-muted-foreground/60" />
-        </div>
-        <p className="text-sm font-medium text-foreground">No no-show reasons yet</p>
-        <p className="mt-1 text-xs text-muted-foreground">
-          Patient reasons will appear here once submitted via the no-show link.
-        </p>
-      </div>
-    );
+    return <EmptyState title="No no-show reasons yet" message="Patient reasons will appear here once submitted via the missed-appointment link." />;
   }
 
   return (
-    <div className="flex flex-col">
-      {pageItems.map((item) => (
-        <div
-          key={item.id}
-          className="group grid gap-3 border-b border-card-border/40 py-3.5 pr-4 transition-colors hover:bg-muted/20 md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:gap-4"
-        >
-          <div className="flex min-w-0 items-start gap-3">
-            <div className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-full border border-border/60 bg-muted/30">
-              <CalendarX2 className="size-4 text-amber-500" />
-            </div>
-            <div className="min-w-0">
-              <p className="truncate text-sm font-bold text-foreground">{item.patientName}</p>
-              <p className="mt-0.5 line-clamp-2 text-xs leading-relaxed text-muted-foreground">{item.reason}</p>
-              <p className="mt-1 text-[11px] text-muted-foreground">
-                {[item.serviceName, item.appointmentDate ? `Appointment: ${formatShortDate(item.appointmentDate)}` : null]
-                  .filter(Boolean)
-                  .join(' · ')}
+    <div className="flex flex-col gap-5">
+      <div className="flex flex-col gap-3 border-b border-card-border/50 pb-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-2">
+          <span className="inline-flex items-center rounded-full bg-[#1D1E1E] px-3 py-1 text-xs font-semibold text-white">
+            Total Submissions: {reasons.length}
+          </span>
+        </div>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {pageItems.map((item) => (
+          <article
+            key={item.id}
+            className="flex min-h-[260px] flex-col justify-between rounded-xl border border-gray-200/70 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#D94E4E]/30 hover:shadow-md"
+          >
+            <div>
+              <div className="mb-4 flex items-start justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="flex size-9 shrink-0 items-center justify-center rounded-full border border-gray-100 bg-[#FDF0F0] text-[#D94E4E]">
+                    <UserRound className="size-4" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-bold text-[#1D1E1E]">{item.patientName}</p>
+                    <p className="mt-0.5 text-[11px] text-muted-foreground" suppressHydrationWarning>
+                      {formatTimeAgo(item.createdAt)}
+                    </p>
+                  </div>
+                </div>
+                <span className="shrink-0 rounded-full bg-amber-100 px-2 py-1 text-[10px] font-bold text-amber-800">
+                  Missed Visit
+                </span>
+              </div>
+              <MessageSquareQuote className="mb-3 size-4 text-[#D94E4E]/70" />
+              <p className="line-clamp-5 text-sm leading-relaxed text-gray-700 italic">
+                &ldquo;{item.reason || 'No written reason was provided.'}&rdquo;
               </p>
             </div>
-          </div>
-          <div className="flex items-center justify-end gap-1.5">
-            <span className="shrink-0 font-mono text-sm text-muted-foreground group-hover:hidden md:text-right" suppressHydrationWarning>
-              {formatTimeAgo(item.createdAt)}
-            </span>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => router.push(`/secretary-v2/appointments?appointmentId=${item.appointmentId}`)}
-              className="hidden h-7 gap-1 px-2 text-sm text-muted-foreground hover:text-foreground group-hover:inline-flex"
-              title="Appointment Detail"
-            >
-              <ExternalLink className="size-4" /> Open
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              disabled={isPending}
-              onClick={() => handleDelete(item.id)}
-              className="hidden h-7 w-7 p-0 text-muted-foreground hover:text-red-500 group-hover:inline-flex"
-              aria-label="Delete reason"
-              title="Delete reason"
-            >
-              <Trash2 className="size-4" />
-            </Button>
-          </div>
-        </div>
-      ))}
+
+            <div className="mt-5 border-t border-gray-100 pt-4">
+              <div className="flex items-center justify-between gap-3">
+                <p className="truncate text-[11px] text-muted-foreground">
+                  {[item.serviceName, item.appointmentDate ? `Visit: ${formatShortDate(item.appointmentDate)}` : null]
+                    .filter(Boolean)
+                    .join(' · ') || 'Missed appointment'}
+                </p>
+                <div className="flex items-center gap-1 shrink-0">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => router.push(`/secretary-v2/appointments?appointmentId=${item.appointmentId}`)}
+                    className="h-8 gap-1 px-2 text-xs text-muted-foreground hover:text-foreground"
+                    title="View Appointment"
+                  >
+                    <ExternalLink className="size-3.5" /> Appointment
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    disabled={isPending}
+                    onClick={() => handleDelete(item.id)}
+                    className="h-8 w-8 p-0 text-muted-foreground hover:text-red-500"
+                    aria-label="Delete reason"
+                    title="Delete reason"
+                  >
+                    <Trash2 className="size-4" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+
       {totalPages > 1 && (
-        <div className="flex items-center justify-between pt-3 pb-4 mb-2 border-t border-card-border/40 shrink-0">
-          <span className="text-sm text-muted-foreground">
-            Page {pageIndex + 1} of {totalPages} · Showing {pageItems.length} of {reasons.length}
+        <div className="flex items-center justify-between border-t border-card-border/50 pt-4">
+          <span className="text-xs text-muted-foreground">
+            Page {pageIndex + 1} of {totalPages} · {reasons.length} reason{reasons.length === 1 ? '' : 's'}
           </span>
-          <div className="flex items-center gap-1.5 ml-auto">
+          <div className="flex gap-2">
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setPageIndex((p) => p - 1)}
+              onClick={() => setPageIndex((page) => page - 1)}
               disabled={pageIndex === 0}
-              className="h-8 px-2.5 text-sm gap-1 text-muted-foreground hover:text-foreground"
-              title="Newer reasons"
+              className="h-8 gap-1 text-xs"
             >
-              <ChevronLeft className="size-4" /> Newer
+              <ChevronLeft className="size-3.5" /> Newer
             </Button>
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setPageIndex((p) => p + 1)}
+              onClick={() => setPageIndex((page) => page + 1)}
               disabled={pageIndex >= totalPages - 1}
-              className="h-8 px-2.5 text-sm gap-1 text-muted-foreground hover:text-foreground"
-              title="Older reasons"
+              className="h-8 gap-1 text-xs"
             >
-              Older <ChevronRight className="size-4" />
+              Older <ChevronRight className="size-3.5" />
             </Button>
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function EmptyState({ title, message }: { title: string; message: string }) {
+  return (
+    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-card-border py-14 text-center">
+      <CalendarX2 className="mb-3 size-5 text-muted-foreground/60" />
+      <p className="text-sm font-medium text-foreground">{title}</p>
+      <p className="mt-1 text-xs text-muted-foreground">{message}</p>
     </div>
   );
 }

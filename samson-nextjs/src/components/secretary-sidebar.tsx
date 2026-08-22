@@ -29,7 +29,6 @@ import {
   Paintbrush,
   Bell,
   HeartHandshake,
-  FileText,
 } from "lucide-react"
 
 const data = {
@@ -72,11 +71,6 @@ const data = {
       icon: <CalendarRange className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
     },
     {
-      title: "Documents",
-      url: "/secretary-v2/documents",
-      icon: <FileText className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
-    },
-    {
       title: "Notifications",
       url: "/secretary-v2/notifications",
       icon: <Bell className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
@@ -89,6 +83,10 @@ const data = {
         {
           title: "General Settings",
           url: "/secretary-v2/clinic-settings",
+        },
+        {
+          title: "Documents",
+          url: "/secretary-v2/documents",
         },
         {
           title: "Dentist Roster",
@@ -110,24 +108,9 @@ const data = {
           title: "No-Show Reasons",
           url: "/secretary-v2/no-show-reasons",
         },
-      ],
-    },
-    {
-      title: "System & Reports",
-      url: "#",
-      icon: <Settings className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
-      items: [
         {
           title: "Delivery Logs",
           url: "/secretary-v2/delivery-logs",
-        },
-        {
-          title: "Audit Trail",
-          url: "/secretary-v2/audits",
-        },
-        {
-          title: "My Profile",
-          url: "/secretary-v2/profile",
         },
       ],
     },
