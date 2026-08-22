@@ -84,8 +84,8 @@ export function AboutSection() {
             <div className="relative aspect-square sm:aspect-[4/3] lg:aspect-[4/5] overflow-hidden border border-white/5 bg-[#1D1E1E]">
               <picture>
                 <img
-                  src="/hero-bg/HeroBg11.png"
-                  alt="Precision natural cosmetic veneers dental artist checking color shades"
+                  src="/hero-bg/HeroBg6.png"
+                  alt="Samson Dental Center clinic care"
                   className="w-full h-full object-cover object-right filter sepia-[0.1]"
                 />
               </picture>
@@ -105,34 +105,44 @@ export function AboutSection() {
 
           {/* Content Column */}
           <div className="lg:col-span-6">
-            <span className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-4 font-sans">
+            <span className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-2 sm:mb-3 font-sans">
               About Us
             </span>
-            <h2 className="font-sans text-[18px] sm:text-[clamp(22px,2vw+12px,36px)] font-normal tracking-[-0.04em] text-[#1D1E1E] leading-[1.1]">
-              Quality dental care in the heart of Baguio.
+            <h2 className="font-sans text-[20px] sm:text-[clamp(22px,2vw+10px,32px)] font-normal leading-[1.3] sm:leading-[1.2] md:leading-[1.15] tracking-[-0.03em] text-[#1D1E1E]">
+              Welcome to Samson Dental Center. <br className="hidden sm:block" />
+              Trusted Dental Care in Baguio City.
             </h2>
 
             <div className="mt-4 sm:mt-8 space-y-3 sm:space-y-6 text-[#4F5454] font-light leading-relaxed text-[12px] sm:text-[15px] font-sans">
               <p>
-                Samson Dental Center is a dental clinic located on the 5th Floor of S Building along Upper Session Road in Baguio City. The clinic welcomes patients by appointment and provides a convenient location for professional dental care in the city center.
-              </p>
-              <p className="font-medium text-[#1D1E1E] italic border-l-2 border-[#D94E4E] pl-4">
-                &ldquo;Our team is here to make every visit clear, comfortable, and centered on your individual dental needs.&rdquo;
+                Patients in Baguio City choose our dental clinic because they know they can trust our dentists’ expertise and commitment to providing excellent care. Our patients consistently refer their families and friends to us, thanks to the exceptional, personalized service and positive experiences they have with our team.
               </p>
               <p>
-                For appointments and inquiries, contact Samson Dental Center directly or submit an appointment request through this website. The clinic is open Monday through Saturday, from 9:00 AM to 12:00 PM and 1:00 PM to 5:00 PM.
+                We take the time to carefully understand each patient’s unique dental health needs and goals. Our dentists draw on their extensive knowledge and skills to deliver high-quality, tailored treatments that improve oral health and appearance. Just as importantly, we prioritize building lifelong relationships with our patients, founded on trust, honesty, and a genuine concern for their wellbeing.
+              </p>
+              <p>
+                From preventative care to complex restorations, you can count on our dental clinic to provide the compassionate, professional service you deserve. Experience the difference our dedication to exceptional dentistry can make – contact us today to schedule your appointment.
               </p>
             </div>
 
             {/* Unique Features */}
-            <div className="mt-7 sm:mt-10 grid grid-cols-2 gap-4 sm:gap-6 pt-6 sm:pt-8 border-t border-gray-100 font-sans">
-              <div>
-                <h4 className="text-[#1D1E1E] text-base font-semibold">Central Location</h4>
-                <p className="text-[13px] text-gray-500 mt-1.5 leading-relaxed font-light">Find us at 5th Floor S Building, Upper Session Road, Baguio City.</p>
+            <div className="mt-7 sm:mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 pt-6 sm:pt-8 border-t border-gray-100 font-sans">
+              <div className="p-4 rounded-xl bg-[#F8F9FA] border border-gray-100/80">
+                <h4 className="text-[#1D1E1E] text-base font-semibold flex items-center gap-2">
+                  Central Location
+                </h4>
+                <p className="text-[13px] text-[#2C2E2E] font-medium mt-1.5 leading-relaxed">
+                  5th Floor S Building, Upper Session Road, Baguio City
+                </p>
               </div>
-              <div>
-                <h4 className="text-[#1D1E1E] text-base font-semibold">By Appointment</h4>
-                <p className="text-[13px] text-gray-500 mt-1.5 leading-relaxed font-light">Call ahead or send an appointment request so our team can assist you.</p>
+              <div className="p-4 rounded-xl bg-[#F8F9FA] border border-gray-100/80">
+                <h4 className="text-[#1D1E1E] text-base font-semibold flex items-center gap-2">
+                  Opening Hours
+                </h4>
+                <p className="text-[13px] text-[#2C2E2E] font-medium mt-1.5 leading-relaxed">
+                  Monday – Saturday<br />
+                  <span className="text-[#595E5E] font-normal text-[12.5px]">9:00am – 12:00pm &amp; 1:00pm – 5:00pm</span>
+                </p>
               </div>
             </div>
           </div>

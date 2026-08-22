@@ -10,11 +10,11 @@ const companies = [
   { years: '1970 – 2003', name: 'Retainer Dentist of Development Bank of the Philippines (DBP)' },
   { years: '1978 – 1982', name: 'First Retainer Dentist of Pines Hotel' },
   { years: '1986 – 1988', name: 'Company Retainer Dentist of Export Processing Zone Authority (EPZA)' },
+  { years: '1986 – 2019', name: 'Texas Instruments Philippines' },
   { years: '1988 – 1997', name: 'Company Retainer Dentist of Baguio Country Club' },
-  { years: '1997 – 2006', name: 'Dental Network Health Company' },
   { years: '1988 – 2008', name: 'MOOG Controls Corporation Philippines, Baguio City' },
-  { years: '1986 – Present', name: 'Texas Instrument Philippines, Baguio City' },
-  { years: '2006 – Present', name: 'Health Partners' },
+  { years: '1997 – 2006', name: 'Dental Network Health Company' },
+  { years: '2006 – 2025', name: 'Health Partners' },
 ];
 
 const formerSubsidiaries = [
