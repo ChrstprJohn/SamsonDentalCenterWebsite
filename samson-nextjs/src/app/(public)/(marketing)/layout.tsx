@@ -1,9 +1,11 @@
 import React from 'react';
 import { createClient } from '@/shared/database/server';
 import { getClinicConfigAction } from '@/modules/clinic-config/actions/settings/get-clinic-config.action';
-import { Navbar } from '@/components/ui/navbar';
-import { Footer } from '@/components/ui/footer';
+import { getServicesAction } from '@/modules/services/actions/management/get-services.action';
+import { MarketingLayoutClient } from './marketing-layout-client';
 import type { AuthHeaderUser } from '@/modules/patients/hooks/auth/header/use-auth-header';
+import type { ClinicConfigResponseDto } from '@/modules/clinic-config/dtos/settings/get-clinic-config.dto';
+import type { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
 
 export const dynamic = 'force-dynamic';
 
@@ -31,7 +33,7 @@ export default async function MarketingLayout({
   }
 
   // Fetch clinic config
-  let clinicConfig = null;
+  let clinicConfig: ClinicConfigResponseDto | null = null;
   try {
     const response = await getClinicConfigAction();
     if (response && 'data' in response && response.data) {
@@ -41,13 +43,20 @@ export default async function MarketingLayout({
     console.error('Failed to load clinic config in marketing layout:', err);
   }
 
+  // Fetch services for booking nav context
+  let services: ServiceResponseDto[] = [];
+  try {
+    const servicesResponse = await getServicesAction(false);
+    if (servicesResponse && 'data' in servicesResponse && servicesResponse.data) {
+      services = servicesResponse.data;
+    }
+  } catch (err) {
+    console.error('Failed to load services for marketing layout:', err);
+  }
+
   return (
-    <div className="flex flex-col min-h-screen">
-      <Navbar user={headerUser} config={clinicConfig} />
-      <main className="flex-1 flex flex-col">
-        {children}
-      </main>
-      <Footer config={clinicConfig} />
-    </div>
+    <MarketingLayoutClient user={headerUser} config={clinicConfig} services={services}>
+      {children}
+    </MarketingLayoutClient>
   );
 }

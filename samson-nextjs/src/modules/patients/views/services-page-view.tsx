@@ -2,11 +2,10 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, MoveRight, Loader2 } from 'lucide-react';
+import { ArrowRight, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
-import { ServiceDescription } from '../components/landing/mock-category-services-section';
+import { ServiceDescription, parseServiceDescription } from '../components/landing/mock-category-services-section';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -15,42 +14,37 @@ interface FlatServiceItem {
   id: string;
   name: string;
   description: string;
-  subOptions?: string[];
-  categoryId: string;   // slugified category label
-  category: string;     // raw label from DB, e.g. "Cosmetic Dentistry"
+  categoryId: string;
+  category: string;
 }
 
-// ---------------------------------------------------------------------------
-// subOptions are not in the DB — kept hardcoded keyed by lowercase service name
-// ---------------------------------------------------------------------------
-const SUB_OPTIONS: Record<string, string[]> = {
-  'crowns and bridges':          ['Metal', 'Porcelain', 'Zirconia'],
-  'dentures (full and partial)': ['Precision attachments', 'Flexible denture', 'Ivocap', 'Metal frameworks'],
-  'tooth whitening':             ['Chair-side', 'Take home'],
-  'veneers':                     ['Porcelain', 'Composite'],
-  'clear aligners':              ['Invisalign', 'Realigner'],
-  'tooth extraction':            ['Simple', 'Complex', 'Impacted'],
-};
+interface CategoryGroup {
+  id: string;
+  nr: string;
+  label: string;
+  description: string;
+  services: FlatServiceItem[];
+}
 
-// Desired display order for categories
-const CATEGORY_ORDER = [
-  'Consultation',
-  'Diagnostics',
-  'Preventive Dentistry',
-  'Restorative Dentistry',
-  'Prosthodontics',
-  'Endodontics',
-  'Cosmetic Dentistry',
-  'Orthodontics',
-  'Oral Surgery and Implants',
-  'Specialized Care',
+// Category display order + metadata
+const CATEGORY_META: { category: string; nr: string; description: string }[] = [
+  { category: 'Consultation',               nr: '01', description: 'Initial examinations, specialist consultations, and customized dental treatment plans.' },
+  { category: 'Diagnostics',               nr: '02', description: 'High-precision digital imaging, panoramic X-rays, and 3D dental diagnostics.' },
+  { category: 'Preventive Dentistry',      nr: '03', description: 'Prophylaxis cleanings, sealants, and fluoride therapies to protect oral health.' },
+  { category: 'Restorative Dentistry',     nr: '04', description: 'Tooth-colored composite fillings, durable inlays, and onlays for damaged teeth.' },
+  { category: 'Prosthodontics',            nr: '05', description: 'Crowns, fixed bridges, and full/partial dentures to restore chewing and aesthetics.' },
+  { category: 'Endodontics',               nr: '06', description: 'Painless root canal treatments, apicoectomies, and emergency pulp therapy.' },
+  { category: 'Cosmetic Dentistry',        nr: '07', description: 'Laser teeth whitening, porcelain veneers, and cosmetic gum contouring.' },
+  { category: 'Orthodontics',              nr: '08', description: 'Traditional metal brackets, clear aligners, and post-treatment retainers.' },
+  { category: 'Oral Surgery and Implants', nr: '09', description: 'Permanent titanium dental implants, bone grafting, and gentle extractions.' },
+  { category: 'Specialized Care',          nr: '10', description: 'Periodontal therapies, TMJ/TMD splints, anti-snoring appliances, and Botox.' },
 ];
 
 function slugify(cat: string) {
   return cat.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 }
 
-function buildFlatServices(dbServices: ServiceResponseDto[]): FlatServiceItem[] {
+function buildCategoryGroups(dbServices: ServiceResponseDto[]): CategoryGroup[] {
   const byCat: Record<string, FlatServiceItem[]> = {};
 
   for (const svc of dbServices) {
@@ -60,7 +54,6 @@ function buildFlatServices(dbServices: ServiceResponseDto[]): FlatServiceItem[] 
       id: svc.id,
       name: svc.name,
       description: svc.description ?? '',
-      subOptions: SUB_OPTIONS[svc.name.toLowerCase()],
       categoryId: catId,
       category: cat,
     };
@@ -68,171 +61,44 @@ function buildFlatServices(dbServices: ServiceResponseDto[]): FlatServiceItem[] 
     byCat[cat].push(item);
   }
 
-  // Emit in preferred order, then any extras alphabetically
-  const result: FlatServiceItem[] = [];
-  for (const label of CATEGORY_ORDER) {
-    if (byCat[label]) result.push(...byCat[label]);
+  const sortServices = (services: FlatServiceItem[]) =>
+    [...services].sort((a, b) => {
+      const aHasBullets = parseServiceDescription(a.description).bullets.length > 0 ? 1 : 0;
+      const bHasBullets = parseServiceDescription(b.description).bullets.length > 0 ? 1 : 0;
+      if (aHasBullets !== bHasBullets) return bHasBullets - aHasBullets;
+      return a.name.localeCompare(b.name);
+    });
+
+  const result: CategoryGroup[] = [];
+
+  for (const meta of CATEGORY_META) {
+    const services = byCat[meta.category];
+    if (!services || services.length === 0) continue;
+    result.push({
+      id: slugify(meta.category),
+      nr: meta.nr,
+      label: meta.category,
+      description: meta.description,
+      services: sortServices(services),
+    });
   }
-  for (const label of Object.keys(byCat).sort()) {
-    if (!CATEGORY_ORDER.includes(label)) result.push(...byCat[label]);
+
+  // Extras not in CATEGORY_META
+  let extraNr = result.length + 1;
+  for (const [label, services] of Object.entries(byCat)) {
+    if (CATEGORY_META.some((m) => m.category === label)) continue;
+    if (!services.length) continue;
+    result.push({
+      id: slugify(label),
+      nr: String(extraNr).padStart(2, '0'),
+      label,
+      description: '',
+      services: sortServices(services),
+    });
+    extraNr++;
   }
+
   return result;
-}
-
-// Build unique ordered category list from flat services
-function buildCategories(flat: FlatServiceItem[]) {
-  const seen = new Set<string>();
-  const cats: { id: string; label: string }[] = [];
-  for (const svc of flat) {
-    if (!seen.has(svc.categoryId)) {
-      seen.add(svc.categoryId);
-      cats.push({ id: svc.categoryId, label: svc.category });
-    }
-  }
-  return cats;
-}
-
-// ---------------------------------------------------------------------------
-// Hero images
-// ---------------------------------------------------------------------------
-const HERO_BG_IMAGES = [
-  '/hero-bg/HeroImage12.png',
-  '/hero-bg/HeroBg6.png',
-  '/hero-bg/HeroBg8.png',
-  '/hero-bg/HeroBg10.png',
-  '/hero-bg/HeroBg11.png',
-];
-
-// ---------------------------------------------------------------------------
-// ServicesHero
-// ---------------------------------------------------------------------------
-function ServicesHero({ onBook }: { onBook?: () => void }) {
-  const [currentBgIndex, setCurrentBgIndex] = useState(0);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-    const timer = window.setInterval(() => {
-      setCurrentBgIndex((i) => (i + 1) % HERO_BG_IMAGES.length);
-    }, 6000);
-    return () => window.clearInterval(timer);
-  }, []);
-
-  const scrollToList = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    document.getElementById('services-list')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
-
-  return (
-    <section
-      id="services-hero"
-      className="relative h-[72vh] min-h-[520px] flex items-center justify-center overflow-hidden bg-black w-full select-none"
-      aria-label="Services Hero"
-    >
-      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-        <AnimatePresence initial={false} mode="wait">
-          <motion.div
-            key={HERO_BG_IMAGES[currentBgIndex]}
-            initial={{ opacity: 0, scale: 1.05 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.7, ease: 'easeInOut' }}
-            className="absolute inset-0 w-full h-full"
-          >
-            <img
-              src={HERO_BG_IMAGES[currentBgIndex]}
-              alt=""
-              className="w-full h-full object-cover object-center filter brightness-[0.85] saturate-[0.9] contrast-[1.02]"
-            />
-          </motion.div>
-        </AnimatePresence>
-        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/20 to-[#1D1E1E] z-0" />
-      </div>
-
-      <div className="absolute bottom-6 left-1/2 z-20 flex -translate-x-1/2 items-center justify-center gap-2 sm:left-auto sm:right-6 sm:translate-x-0">
-        {HERO_BG_IMAGES.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => setCurrentBgIndex(i)}
-            aria-label={`Show hero image ${i + 1}`}
-            className={`h-1 rounded-full transition-all duration-300 cursor-pointer ${i === currentBgIndex ? 'w-7 bg-[#D94E4E]' : 'w-3 bg-white/50 hover:bg-white/90'}`}
-          />
-        ))}
-      </div>
-
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-12 text-center sm:text-left text-white mt-16 sm:mt-10 flex flex-col items-center sm:items-start">
-        {mounted && (
-          <>
-            <motion.span
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.1 }}
-              className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-4 font-sans"
-            >
-              Samson Dental Center
-            </motion.span>
-
-            <motion.h1
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1.2, delay: 0.2, ease: 'easeOut' }}
-              className="font-serif text-[clamp(32px,5.5vw+8px,65px)] font-semibold tracking-tight leading-[1.1] max-w-4xl"
-              style={{ fontWeight: '600', fontStyle: 'normal' }}
-            >
-              <span className="block">Comprehensive Dental</span>
-              <span className="relative inline-block italic mt-1 sm:mt-2 text-white">
-                Services &amp; Care
-                <svg
-                  className="absolute left-1/2 sm:left-0 -translate-x-1/2 sm:translate-x-0 -bottom-2 sm:-bottom-4 w-full h-2 sm:h-3 text-[#D94E4E] overflow-visible"
-                  viewBox="0 0 100 8"
-                  preserveAspectRatio="none"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M0,4 Q12.5,1 25,4 T50,4 T75,4 T100,4" />
-                </svg>
-              </span>
-            </motion.h1>
-
-            <motion.p
-              initial={{ opacity: 0, y: 35 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1.2, delay: 0.4, ease: 'easeOut' }}
-              className="mt-6 sm:mt-8 text-[clamp(13px,0.4vw+11px,16px)] leading-relaxed text-white/90 max-w-xl font-light tracking-wide drop-shadow-sm"
-            >
-              From routine check-ups to advanced dental procedures — explore the full range of services we offer and book your appointment today.
-            </motion.p>
-
-            <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1.2, delay: 0.6, ease: 'easeOut' }}
-              className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-4"
-            >
-              <a
-                href="#services-list"
-                onClick={scrollToList}
-                className="w-full sm:w-auto px-8 py-4 bg-white text-[#141515] rounded-full hover:bg-gray-100 transition-all duration-300 shadow-md flex items-center justify-center gap-2 cursor-pointer text-[clamp(11px,0.2vw+11px,14px)] font-sans font-semibold uppercase tracking-widest"
-              >
-                Browse Services
-                <ArrowRight className="w-4 h-4 text-[#141515]" />
-              </a>
-              <button
-                type="button"
-                onClick={onBook}
-                className="w-full sm:w-auto px-8 py-4 bg-transparent text-white border border-white/20 rounded-full hover:bg-white/10 transition-all duration-300 backdrop-blur-sm flex items-center justify-center text-[clamp(11px,0.2vw+11px,14px)] font-sans font-semibold uppercase tracking-widest cursor-pointer"
-              >
-                Book Appointment
-              </button>
-            </motion.div>
-          </>
-        )}
-      </div>
-    </section>
-  );
 }
 
 // ---------------------------------------------------------------------------
@@ -240,66 +106,80 @@ function ServicesHero({ onBook }: { onBook?: () => void }) {
 // ---------------------------------------------------------------------------
 function ServiceCard({
   item,
-  index,
   onBook,
 }: {
   item: FlatServiceItem;
-  index: number;
   onBook?: (serviceId?: string, serviceName?: string) => void;
 }) {
   return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.95 }}
-      transition={{ duration: 0.25, delay: (index % 6) * 0.03, ease: 'easeOut' }}
-      className="group border border-gray-100 bg-white p-5 sm:p-7 transition-all duration-300 hover:border-[#D94E4E]/30 hover:shadow-md flex flex-col justify-between h-full rounded-sm"
+    <div
+      id={`service-card-${item.id}`}
+      onClick={() => onBook?.(item.id, item.name)}
+      className="group relative p-4 sm:p-5 border border-gray-200 bg-white hover:border-gray-400 hover:shadow-sm text-left cursor-pointer transition-all duration-200 flex flex-col justify-between h-full rounded-none"
     >
-      <div>
-        {/* Category Tag */}
-        <div className="mb-2">
-          <span className="inline-block text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-[#D94E4E] font-sans">
-            {item.category}
-          </span>
+      <div className="flex-1 flex flex-col">
+        <h3 className="font-sans text-base sm:text-lg font-normal tracking-[-0.04em] text-[#141515] leading-[1.15] sm:leading-[1.1]">
+          {item.name}
+        </h3>
+        <div className="border-t border-gray-100/80 my-2 sm:my-2.5" />
+        <div className="flex-1">
+          <ServiceDescription
+            description={item.description}
+            className="mt-0 text-[12px] sm:text-[13px] leading-[1.55] sm:leading-[1.65]"
+          />
+        </div>
+      </div>
+      <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between">
+        <span className="text-[10px] tracking-[0.18em] text-[#D94E4E] uppercase font-semibold font-sans">
+          Request Appointment
+        </span>
+        <ArrowRight className="w-3.5 h-3.5 text-[#D94E4E] transition-transform duration-200 group-hover:translate-x-0.5" />
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// CategorySection
+// ---------------------------------------------------------------------------
+function CategorySection({
+  group,
+  onBook,
+  index,
+}: {
+  group: CategoryGroup;
+  onBook?: (serviceId?: string, serviceName?: string) => void;
+  index: number;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-60px' }}
+      transition={{ duration: 0.45, ease: 'easeOut', delay: Math.min(index * 0.04, 0.2) }}
+    >
+      {/* Category Header */}
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-10 mb-6 sm:mb-8 pb-5 border-b border-gray-200/80">
+        {/* Left: number + name */}
+        <div className="flex items-baseline gap-3 sm:gap-4 min-w-0">
+          <h2 className="font-sans text-xl sm:text-2xl font-normal tracking-[-0.03em] text-[#1D1E1E] leading-[1.2] min-w-0">
+            {group.label}
+          </h2>
         </div>
 
-        {/* Service Title */}
-        <h4 className="text-[#1D1E1E] text-[15px] sm:text-[17px] font-semibold tracking-tight min-h-0 sm:min-h-[44px] flex items-center group-hover:text-[#D94E4E] transition-colors leading-snug">
-          {item.name}
-        </h4>
-
-        {/* Description */}
-        <ServiceDescription description={item.description} className="mt-1.5 sm:mt-2 text-[12px] sm:text-[14px]" />
-
-        {/* Sub-options */}
-        {item.subOptions && item.subOptions.length > 0 && (
-          <div className="mt-4 pt-3.5 border-t border-gray-100 flex flex-col gap-2">
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 font-sans block">
-              Includes / Options:
-            </span>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {item.subOptions.map((opt) => (
-                <div key={opt} className="flex items-center gap-2 text-[12px] sm:text-[13px] text-[#4F5454] font-light">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#D94E4E] shrink-0" />
-                  <span className="leading-snug">{opt}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+        {/* Right: sub-description */}
+        {group.description && (
+          <p className="font-sans text-[12px] sm:text-[13px] text-gray-500 leading-relaxed sm:max-w-[300px] lg:max-w-sm sm:text-right sm:pt-1 shrink-0">
+            {group.description}
+          </p>
         )}
       </div>
 
-      {/* Action Footer */}
-      <div className="mt-6 pt-4 border-t border-gray-100 flex items-center justify-end">
-        <button
-          type="button"
-          onClick={() => onBook?.(item.id, item.name)}
-          className="w-9 h-9 sm:w-10 sm:h-10 bg-[#1D1E1E]/5 group-hover:bg-[#D94E4E] rounded-full border border-[#1D1E1E]/10 flex items-center justify-center text-[#1D1E1E] group-hover:text-white transition-all duration-300 shadow-2xs cursor-pointer"
-          aria-label={`Book ${item.name}`}
-        >
-          <MoveRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 transition-transform duration-500 ease-out rotate-[-45deg] group-hover:rotate-0" />
-        </button>
+      {/* Cards Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 items-stretch">
+        {group.services.map((svc) => (
+          <ServiceCard key={svc.id} item={svc} onBook={onBook} />
+        ))}
       </div>
     </motion.div>
   );
@@ -323,7 +203,7 @@ function CtaStrip({ onBook }: { onBook?: () => void }) {
             Ready to get started?
           </p>
           <h2 className="font-sans text-[clamp(20px,2vw+10px,32px)] font-normal leading-[1.2] tracking-[-0.03em] text-white">
-            Book your appointment today.
+            Request your appointment today.
           </h2>
           <p className="mt-2 text-[13px] text-white/60 max-w-sm leading-relaxed">
             Our team is ready to welcome you. Select a service above or let us guide you to the right treatment.
@@ -334,7 +214,7 @@ function CtaStrip({ onBook }: { onBook?: () => void }) {
           onClick={onBook}
           className="shrink-0 inline-flex items-center gap-2 px-8 py-4 bg-white text-[#141515] rounded-full hover:bg-gray-100 transition-all duration-300 shadow-md text-[12px] font-sans font-semibold uppercase tracking-widest cursor-pointer"
         >
-          Book Now
+          <span>Request Appointment</span>
           <ArrowRight className="w-4 h-4" />
         </button>
       </div>
@@ -351,19 +231,30 @@ interface ServicesPageViewProps {
 
 export function ServicesPageView({ dbServices }: ServicesPageViewProps) {
   const router = useRouter();
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [isNavigatingBooking, setIsNavigatingBooking] = useState(false);
   const [pendingServiceName, setPendingServiceName] = useState<string | null>(null);
 
-  const allServices = useMemo(() => buildFlatServices(dbServices), [dbServices]);
-  const categories  = useMemo(() => buildCategories(allServices), [allServices]);
+  const categoryGroups = useMemo(() => buildCategoryGroups(dbServices), [dbServices]);
 
-  const displayedServices = useMemo(() => {
-    if (selectedCategory === 'all') return allServices;
-    return allServices.filter((svc) => svc.categoryId === selectedCategory);
-  }, [allServices, selectedCategory]);
-
-  const activeLabel = categories.find((c) => c.id === selectedCategory)?.label;
+  // Ensure Lenis smooth scroll recalculates page dimensions on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const resize = () => {
+        if ((window as any).lenis) {
+          (window as any).lenis.resize();
+        }
+      };
+      resize();
+      const t1 = setTimeout(resize, 60);
+      const t2 = setTimeout(resize, 200);
+      const t3 = setTimeout(resize, 500);
+      return () => {
+        clearTimeout(t1);
+        clearTimeout(t2);
+        clearTimeout(t3);
+      };
+    }
+  }, []);
 
   const handleBook = (serviceId?: string, serviceName?: string) => {
     setIsNavigatingBooking(true);
@@ -379,100 +270,49 @@ export function ServicesPageView({ dbServices }: ServicesPageViewProps) {
 
   return (
     <div className="flex flex-col w-full bg-[#FDFDFD] text-[#1D1E1E]">
-      <ServicesHero onBook={() => handleBook()} />
+      {/* Hero Section */}
+      <section className="relative overflow-hidden bg-[#1D1E1E] text-white min-h-[340px] sm:min-h-[400px] flex items-center pt-28 pb-14 sm:pt-32 sm:pb-18 font-sans border-b border-white/10">
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+          <img
+            src="/hero-bg/HeroBg8.png"
+            alt="Dental Services"
+            className="w-full h-full object-cover object-center"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-black/35" />
+        </div>
 
-      <section id="services-list" className="relative w-full bg-[#FDFDFD] pt-16 pb-24 sm:pt-24 sm:pb-32 font-sans">
+        <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-12 w-full">
+          <div className="max-w-2xl">
+            <span className="text-[10px] sm:text-[11px] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-2 sm:mb-3 font-sans">
+              Our Services
+            </span>
+            <h1 className="font-sans text-[28px] sm:text-[clamp(32px,2.5vw+14px,44px)] font-normal leading-[1.15] tracking-[-0.03em] text-white mb-2 sm:mb-3">
+              Services &amp; Treatments
+            </h1>
+            <p className="font-sans text-[13px] sm:text-[15px] text-white/85 max-w-xl leading-relaxed">
+              Browse our complete list of dental treatments and procedures.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Services by Category */}
+      <section id="services-list" className="relative w-full bg-[#FDFDFD] pt-12 pb-20 sm:pt-16 sm:pb-28 font-sans">
         <div className="max-w-7xl mx-auto px-6 sm:px-12">
-
-          {/* Section Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
-            className="flex flex-col md:flex-row md:items-end justify-between mb-10 sm:mb-12 gap-4 sm:gap-6"
-          >
-            <div className="max-w-full md:max-w-[450px] lg:max-w-[580px]">
-              <span className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-2 sm:mb-3 font-sans">
-                Our Services
-              </span>
-              <h2 className="font-sans text-[20px] sm:text-[clamp(22px,2vw+10px,32px)] font-normal leading-[1.3] sm:leading-[1.2] md:leading-[1.15] tracking-[-0.03em] text-[#1D1E1E]">
-                Comprehensive Dental Care &amp; Treatments
-              </h2>
-            </div>
-            <p className="max-w-sm pt-2 md:max-w-[280px] lg:max-w-sm font-sans text-[13px] sm:text-[clamp(12px,0.3vw+11px,14px)] font-normal leading-relaxed text-gray-500">
-              Filter by specialty or view all procedures. Each service includes clinical descriptions, options, and direct booking.
-            </p>
-          </motion.div>
-
-          {/* Category Filter Pills */}
-          <div className="mb-10 sm:mb-12 overflow-x-auto no-scrollbar pb-2">
-            <div className="inline-flex items-center gap-2 p-1.5 bg-[#F4F4F5] rounded-xl border border-gray-200/80 min-w-full sm:min-w-0">
-              {/* All */}
-              <button
-                type="button"
-                onClick={() => setSelectedCategory('all')}
-                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold font-sans tracking-wide transition-all whitespace-nowrap cursor-pointer ${
-                  selectedCategory === 'all'
-                    ? 'bg-[#1D1E1E] text-white shadow-xs'
-                    : 'text-gray-600 hover:text-[#1D1E1E] hover:bg-white'
-                }`}
-              >
-                <span>All</span>
-                <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full ${selectedCategory === 'all' ? 'bg-white/20 text-white' : 'bg-gray-200/70 text-gray-500'}`}>
-                  {allServices.length}
-                </span>
-              </button>
-
-              {/* Per-category pills — driven entirely by DB data */}
-              {categories.map((cat) => {
-                const isActive = selectedCategory === cat.id;
-                const count = allServices.filter((s) => s.categoryId === cat.id).length;
-                return (
-                  <button
-                    key={cat.id}
-                    type="button"
-                    onClick={() => setSelectedCategory(cat.id)}
-                    className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold font-sans tracking-wide transition-all whitespace-nowrap cursor-pointer ${
-                      isActive
-                        ? 'bg-[#1D1E1E] text-white shadow-xs'
-                        : 'text-gray-600 hover:text-[#1D1E1E] hover:bg-white'
-                    }`}
-                  >
-                    <span>{cat.label}</span>
-                    <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full ${isActive ? 'bg-white/20 text-white' : 'bg-gray-200/70 text-gray-500'}`}>
-                      {count}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Results Counter */}
-          <div className="flex items-center justify-between mb-6 pb-2 border-b border-gray-100">
-            <p className="text-xs text-gray-400 font-sans">
-              Showing <span className="font-semibold text-[#1D1E1E]">{displayedServices.length}</span>{' '}
-              {displayedServices.length === 1 ? 'service' : 'services'}
-              {selectedCategory !== 'all' && activeLabel && (
-                <> in <span className="text-[#D94E4E] font-medium">{activeLabel}</span></>
-              )}
-            </p>
-          </div>
-
-          {/* Grid */}
-          <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 items-stretch">
-            <AnimatePresence mode="popLayout">
-              {displayedServices.map((svc, idx) => (
-                <ServiceCard key={svc.id} item={svc} index={idx} onBook={handleBook} />
-              ))}
-            </AnimatePresence>
-          </motion.div>
-
-          {/* Empty state */}
-          {allServices.length === 0 && (
+          {categoryGroups.length === 0 ? (
             <div className="text-center py-20 text-gray-400 font-sans text-sm">
               No services available at the moment. Please check back soon.
+            </div>
+          ) : (
+            <div className="flex flex-col gap-12 sm:gap-16">
+              {categoryGroups.map((group, i) => (
+                <CategorySection
+                  key={group.id}
+                  group={group}
+                  onBook={handleBook}
+                  index={i}
+                />
+              ))}
             </div>
           )}
         </div>
@@ -502,3 +342,4 @@ export function ServicesPageView({ dbServices }: ServicesPageViewProps) {
     </div>
   );
 }
+

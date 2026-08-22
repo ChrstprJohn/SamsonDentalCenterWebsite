@@ -1,11 +1,10 @@
 'use client';
 
 import React from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
-import { Loader2 } from 'lucide-react';
 import type { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
 import type { ClinicConfigResponseDto } from '@/modules/clinic-config/dtos/settings/get-clinic-config.dto';
 import { useLandingView } from '../hooks/landing/use-landing-view';
+import { useBookingNav } from '../contexts/booking-nav-context';
 import { HeroSectionV1 } from '../components/landing/hero-section-v1';
 import { HeroSectionV2 } from '../components/landing/hero-section-v2';
 import { HeroSectionPreview } from '../components/landing/hero-section-preview';
@@ -86,10 +85,10 @@ export function LandingView({ services, config, reviews }: LandingViewProps) {
   const {
     selectedService,
     setSelectedService,
-    isNavigatingBooking,
-    pendingServiceName,
-    requestAppt,
+    contactForm,
   } = useLandingView({ services: activeServices });
+
+  const { requestAppt } = useBookingNav();
 
   return (
     <div className="flex flex-col w-full bg-[#FDFDFD] text-[#1D1E1E]">
@@ -109,26 +108,6 @@ export function LandingView({ services, config, reviews }: LandingViewProps) {
       <ContactSection config={config} />
       <AppointmentBannerSection onBookClick={() => requestAppt()} />
       <ChatSection config={config} services={activeServices} />
-
-      {/* Booking Loading Overlay */}
-      <AnimatePresence>
-        {isNavigatingBooking && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-50 bg-[#1D1E1E]/85 backdrop-blur-md flex flex-col items-center justify-center gap-4"
-          >
-            <Loader2 className="w-10 h-10 text-[#D94E4E] animate-spin" />
-            <p className="text-white text-sm tracking-wide font-sans">
-              {pendingServiceName
-                ? `Taking you to booking for ${pendingServiceName}...`
-                : 'Taking you to booking...'}
-            </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

@@ -1,11 +1,11 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { ABOUT_MENU_ITEMS, NAV_ITEMS } from './navbar-v1';
 import type { AuthHeaderUser } from '@/modules/patients/hooks/auth/header/use-auth-header';
+import { useBookingNav } from '@/modules/patients/contexts/booking-nav-context';
 
 interface NavbarMobileDrawerProps {
   user?: AuthHeaderUser | null;
@@ -21,6 +21,7 @@ export function NavbarMobileDrawer({
   onClose,
   onNavClick,
 }: NavbarMobileDrawerProps) {
+  const { requestAppt, isNavigatingBooking } = useBookingNav();
   return (
     <motion.div
       initial={{ opacity: 0, y: '-100%' }}
@@ -42,12 +43,14 @@ export function NavbarMobileDrawer({
         })}
         <div className="flex flex-col gap-4 pt-5 mt-2">
           <div className="flex flex-col gap-4 items-center">
-            <Link href="/book" onClick={onClose} className="w-full">
-              <button className="w-full px-6 py-3.5 bg-[#141515] text-white rounded-full text-[14px] font-semibold hover:bg-[#D94E4E] tracking-[0.2em] transition-all cursor-pointer flex items-center justify-center gap-2">
-                Request Appointment
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </Link>
+            <button
+              onClick={() => { onClose(); requestAppt(); }}
+              disabled={isNavigatingBooking}
+              className={`w-full px-6 py-3.5 bg-[#141515] text-white rounded-full text-[14px] font-semibold hover:bg-[#D94E4E] tracking-[0.2em] transition-all cursor-pointer flex items-center justify-center gap-2 ${isNavigatingBooking ? 'opacity-50 cursor-wait' : ''}`}
+            >
+              Request Appointment
+              <ArrowRight className="w-4 h-4" />
+            </button>
           </div>
         </div>
       </div>

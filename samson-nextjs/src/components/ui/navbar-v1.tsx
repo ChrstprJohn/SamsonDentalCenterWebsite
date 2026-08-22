@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, ArrowRight, ChevronDown } from 'lucide-react';
 import type { AuthHeaderUser } from '@/modules/patients/hooks/auth/header/use-auth-header';
 import { NavbarMobileDrawer } from './navbar-mobile-drawer';
+import { useBookingNav } from '@/modules/patients/contexts/booking-nav-context';
 
 import type { ClinicConfigResponseDto } from '@/modules/clinic-config/dtos/settings/get-clinic-config.dto';
 
@@ -42,6 +43,9 @@ export function NavbarV1({
   const router = useRouter();
   const pathname = usePathname();
   const isMainPage = pathname === '/';
+  // Pages that have a full-bleed dark hero — navbar should start transparent on these
+  const isDarkHeroPage = isMainPage || pathname === '/services';
+  const { requestAppt, isNavigatingBooking } = useBookingNav();
 
   useEffect(() => {
     window.dispatchEvent(new CustomEvent('mobile-nav-toggle', { detail: { isOpen: isMobileOpen } }));
@@ -107,7 +111,7 @@ export function NavbarV1({
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out py-2.5 ${
           isMobileOpen
             ? 'bg-transparent backdrop-blur-none border-b border-transparent'
-            : scrolled || !isMainPage
+            : scrolled || !isDarkHeroPage
             ? 'bg-[#1D1E1E]/95 backdrop-blur-md border-b border-white/5 shadow-md'
             : 'bg-[#1D1E1E]/15 backdrop-blur-[3px] border-b border-white/5'
         }`}
@@ -177,18 +181,18 @@ export function NavbarV1({
           {/* Right: Actions Block */}
           <div className="flex-1 flex items-center justify-end gap-4 sm:gap-6">
             <div className="hidden lg:flex items-center gap-5">
-              <Link href="/book" onClick={() => setIsMobileOpen(false)}>
-                <button
-                    className={`px-5 py-2.5 rounded-full text-[12px] font-semibold uppercase tracking-widest transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] shadow-xs cursor-pointer flex items-center gap-2 ${
-                    isDarkNav
-                      ? 'bg-white text-[#141515] hover:bg-[#D94E4E] hover:text-white'
-                      : 'bg-[#141515] text-white hover:bg-[#D94E4E]'
-                  }`}
-                >
-                  Request Appointment
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </Link>
+              <button
+                onClick={() => { setIsMobileOpen(false); requestAppt(); }}
+                disabled={isNavigatingBooking}
+                className={`px-5 py-2.5 rounded-full text-[12px] font-semibold uppercase tracking-widest transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] shadow-xs cursor-pointer flex items-center gap-2 ${isNavigatingBooking ? 'opacity-50 cursor-wait' : ''} ${
+                  isDarkNav
+                    ? 'bg-white text-[#141515] hover:bg-[#D94E4E] hover:text-white'
+                    : 'bg-[#141515] text-white hover:bg-[#D94E4E]'
+                }`}
+              >
+                Request Appointment
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
             </div>
 
             {/* Mobile Menu Icon */}

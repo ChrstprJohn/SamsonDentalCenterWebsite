@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Loader2, MoveRight, X } from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight, Loader2, MoveRight, X } from 'lucide-react';
 import type { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
 
 // ---------------------------------------------------------------------------
@@ -33,7 +34,7 @@ export function parseServiceDescription(description?: string | null): {
   }
 
   const trimmed = description.trim();
-  const match = trimmed.match(/^([\s\S]*?)(?:[\s,;:-]*\b(?:bullets?|bullet\s*points?)\b\s*[,;:-]\s*|\s*\n\s*\b(?:bullets?|bullet\s*points?)\b\s*[,;:-]?\s*)([\s\S]*)$/i);
+  const match = trimmed.match(/^([\s\S]*?)(?:[\s,;:-]*\b(?:bullets?|bullet\s*points?|includes?)\b\s*[,;:-]\s*|\s*\n\s*\b(?:bullets?|bullet\s*points?|includes?)\b\s*[,;:-]?\s*|[\s,;:-]+\b(?:bullets?|bullet\s*points?)\b\s+|^\b(?:bullets?|bullet\s*points?)\b\s+)([\s\S]*)$/i);
 
   if (!match) {
     return {
@@ -47,7 +48,7 @@ export function parseServiceDescription(description?: string | null): {
 
   const bullets = rawBullets
     ? rawBullets
-        .split(/[\n,]+/)
+        .split(/[\n,;]+/)
         .map((b) => b.trim().replace(/^[-*•]\s*/, ''))
         .filter(Boolean)
     : [];
@@ -262,6 +263,25 @@ export function MockCategoryServicesSection({ onBook, dbServices }: MockCategory
                 </div>
               </div>
             ))}
+          </div>
+
+          {/* Post-list CTA: Browse All Services Catalog */}
+          <div className="mt-12 sm:mt-16 pt-8 sm:pt-10 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div className="text-center sm:text-left">
+              <span className="text-[10px] sm:text-[11px] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-1 font-sans">
+                Full Service Directory
+              </span>
+              <p className="text-white/80 text-sm sm:text-base font-normal font-sans">
+                Prefer to explore all procedures and treatments in one place?
+              </p>
+            </div>
+            <Link
+              href="/services"
+              className="inline-flex items-center justify-center gap-2.5 px-7 py-3.5 sm:py-4 rounded-full bg-white hover:bg-[#D94E4E] text-[#1D1E1E] hover:text-white font-sans text-xs sm:text-sm font-semibold tracking-wide uppercase transition-all duration-300 shadow-md group shrink-0"
+            >
+              <span>Browse All Services</span>
+              <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+            </Link>
           </div>
         </div>
       </div>

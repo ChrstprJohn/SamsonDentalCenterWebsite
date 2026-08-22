@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Check, ChevronRight, CheckCircle2, Link2, Clock, Phone, Mail, Ban } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, ChevronRight, ChevronDown, CheckCircle2, Link2, Clock, Phone, Mail, Ban } from 'lucide-react';
 import Link from 'next/link';
 import type { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
 import type { ClinicConfigResponseDto } from '@/modules/clinic-config/dtos/settings/get-clinic-config.dto';
@@ -14,6 +14,20 @@ import {
   PreferenceFields,
   NotesField,
 } from '../components/landing/sub-components/contact-form-fields';
+import { ServiceDescription, parseServiceDescription } from '../components/landing/mock-category-services-section';
+
+const CATEGORY_ORDER = [
+  'Consultation',
+  'Diagnostics',
+  'Preventive Dentistry',
+  'Restorative Dentistry',
+  'Prosthodontics',
+  'Endodontics',
+  'Cosmetic Dentistry',
+  'Orthodontics',
+  'Oral Surgery and Implants',
+  'Specialized Care',
+];
 
 interface BookingWizardViewProps {
   services: ServiceResponseDto[];
@@ -24,15 +38,41 @@ interface BookingWizardViewProps {
 export function BookingWizardView({ services, config, initialServiceId }: BookingWizardViewProps) {
   const wizard = useBookingWizard({ services, config, initialServiceId });
   const { step, contactSection, fields, isSubmitting, redirectCountdown, submittedReference, selectService } = wizard;
-  const [filterType, setFilterType] = useState<'ALL' | 'GENERAL' | 'SPECIALIZED'>('ALL');
+  const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const [formTouched, setFormTouched] = useState(false);
 
   const selectedService = services.find((s) => s.id === contactSection.pathway);
 
-  const filteredServices = services.filter((srv) => {
-    if (filterType === 'ALL') return true;
-    return srv.serviceType === filterType;
-  });
+  const availableCategories = useMemo(() => {
+    const set = new Set<string>();
+    services.forEach((s) => {
+      if (s.category) set.add(s.category);
+    });
+    const ordered: string[] = [];
+    CATEGORY_ORDER.forEach((cat) => {
+      if (set.has(cat)) ordered.push(cat);
+    });
+    Array.from(set).sort().forEach((cat) => {
+      if (!ordered.includes(cat)) ordered.push(cat);
+    });
+    return ordered;
+  }, [services]);
+
+  const filteredServices = useMemo(() => {
+    const list = selectedCategory === 'ALL'
+      ? [...services]
+      : services.filter((srv) => (srv.category ?? 'Other') === selectedCategory);
+
+    return list.sort((a, b) => {
+      const aHasBullets = parseServiceDescription(a.description).bullets.length > 0 ? 1 : 0;
+      const bHasBullets = parseServiceDescription(b.description).bullets.length > 0 ? 1 : 0;
+      if (aHasBullets !== bHasBullets) {
+        return bHasBullets - aHasBullets; // cards with bullets appear first
+      }
+      // Within each group, sort alphabetically by name
+      return a.name.localeCompare(b.name);
+    });
+  }, [services, selectedCategory]);
 
   const clinicName = config.clinicName;
   const clinicPhone = config.phone;
@@ -102,7 +142,7 @@ export function BookingWizardView({ services, config, initialServiceId }: Bookin
         clearTimeout(t3);
       };
     }
-  }, [step, filterType, contactSection.targetDate, initialServiceId]);
+  }, [step, selectedCategory, contactSection.targetDate, initialServiceId]);
 
   if (!config.isBookingOpen) {
     return (
@@ -227,7 +267,7 @@ export function BookingWizardView({ services, config, initialServiceId }: Bookin
                 >
                   {step > 1 ? <Check className="w-3.5 h-3.5 stroke-[3]" /> : '1'}
                 </span>
-                <span className={`booking-step-label ${step !== 1 ? 'booking-step-label-inactive' : ''}`}>Service</span>
+                <span className={`booking-step-label ${step === 1 ? 'inline' : 'hidden sm:inline'} ${step !== 1 ? 'booking-step-label-inactive' : ''}`}>Service</span>
               </button>
 
               <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 text-gray-400 shrink-0" />
@@ -257,7 +297,7 @@ export function BookingWizardView({ services, config, initialServiceId }: Bookin
                 >
                   {step > 2 ? <Check className="w-3.5 h-3.5 stroke-[3]" /> : '2'}
                 </span>
-                <span className={`booking-step-label ${step !== 2 ? 'booking-step-label-inactive' : ''}`}>Schedule</span>
+                <span className={`booking-step-label ${step === 2 ? 'inline' : 'hidden sm:inline'} ${step !== 2 ? 'booking-step-label-inactive' : ''}`}>Schedule</span>
               </button>
 
               <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 text-gray-400 shrink-0" />
@@ -283,7 +323,7 @@ export function BookingWizardView({ services, config, initialServiceId }: Bookin
                 >
                   3
                 </span>
-                <span className={`booking-step-label ${step !== 3 ? 'booking-step-label-inactive' : ''}`}>Patient Information</span>
+                <span className={`booking-step-label ${step === 3 ? 'inline' : 'hidden sm:inline'} ${step !== 3 ? 'booking-step-label-inactive' : ''}`}>Patient Information</span>
               </button>
             </div>
           </div>
@@ -295,8 +335,8 @@ export function BookingWizardView({ services, config, initialServiceId }: Bookin
       )}
 
       {/* Main Content Area */}
-      <main className="max-w-4xl mx-auto w-full flex-grow flex flex-col justify-center pt-1 sm:pt-2 pb-6 sm:pb-10 px-0">
-        <div className={contactSection.submittedLocal ? 'py-4' : 'p-6 sm:p-10'}>
+      <main className={`${step === 1 ? 'max-w-7xl' : 'max-w-4xl'} mx-auto w-full flex-grow flex flex-col justify-center pt-1 sm:pt-2 pb-6 sm:pb-10 px-6 sm:px-12 transition-all duration-300`}>
+        <div className={contactSection.submittedLocal ? 'py-4' : 'py-4 sm:py-8'}>
           {!contactSection.submittedLocal ? (
             <AnimatePresence mode="wait">
               {/* STEP 1: Select Service Cards + Filter Switch */}
@@ -319,45 +359,32 @@ export function BookingWizardView({ services, config, initialServiceId }: Bookin
                       </p>
                     </div>
 
-                    {/* Filter Switch (All / General / Specialized) */}
-                    <div className="inline-flex items-center bg-gray-200/70 p-1 border border-gray-300/50 text-xs font-medium self-start sm:self-auto">
-                      <button
-                        type="button"
-                        onClick={() => setFilterType('ALL')}
-                        className={`px-3 py-1 transition-colors cursor-pointer ${
-                          filterType === 'ALL'
-                            ? 'bg-white text-gray-900 shadow-xs font-semibold'
-                            : 'text-gray-600 hover:text-gray-900'
-                        }`}
-                      >
-                        All
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setFilterType('GENERAL')}
-                        className={`px-3 py-1 transition-colors cursor-pointer ${
-                          filterType === 'GENERAL'
-                            ? 'bg-white text-gray-900 shadow-xs font-semibold'
-                            : 'text-gray-600 hover:text-gray-900'
-                        }`}
-                      >
-                        General
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setFilterType('SPECIALIZED')}
-                        className={`px-3 py-1 transition-colors cursor-pointer ${
-                          filterType === 'SPECIALIZED'
-                            ? 'bg-white text-gray-900 shadow-xs font-semibold'
-                            : 'text-gray-600 hover:text-gray-900'
-                        }`}
-                      >
-                        Specialized
-                      </button>
+                    {/* Category Filter Dropdown */}
+                    <div className="flex items-center gap-2 self-start sm:self-auto w-full sm:w-auto">
+                      <div className="relative w-full sm:w-64">
+                        <select
+                          id="service-category-select"
+                          value={selectedCategory}
+                          onChange={(e) => setSelectedCategory(e.target.value)}
+                          aria-label="Filter services by category"
+                          className="w-full appearance-none bg-white border border-gray-300 hover:border-gray-400 focus:border-[#1D1E1E] focus:outline-hidden focus:ring-1 focus:ring-[#1D1E1E] py-2 pl-3 pr-8 text-xs sm:text-[13px] font-medium text-gray-800 rounded-none shadow-2xs transition-all cursor-pointer font-sans"
+                        >
+                          <option value="ALL">All Categories ({services.length})</option>
+                          {availableCategories.map((cat) => {
+                            const count = services.filter((s) => s.category === cat).length;
+                            return (
+                              <option key={cat} value={cat}>
+                                {cat} ({count})
+                              </option>
+                            );
+                          })}
+                        </select>
+                        <ChevronDown className="w-4 h-4 text-gray-500 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                      </div>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 [@media(max-width:320px)]:grid-cols-1 gap-2 sm:gap-4 pt-1">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 pt-1 items-stretch">
                     {filteredServices.map((srv) => {
                       const isSelected = contactSection.pathway === srv.id;
                       return (
@@ -365,30 +392,33 @@ export function BookingWizardView({ services, config, initialServiceId }: Bookin
                           key={srv.id}
                           id={`service-card-${srv.id}`}
                           onClick={() => handleCardClick(srv.id)}
-                          className={`relative p-3 sm:p-5 border text-left cursor-pointer transition-all duration-300 flex flex-col justify-between gap-2 sm:gap-3 ${
+                          className={`relative p-4 sm:p-5 border text-left cursor-pointer transition-all duration-300 flex flex-col justify-between h-full rounded-none ${
                             isSelected
                               ? 'border-[#1D1E1E] bg-white shadow-md ring-1 ring-[#1D1E1E]'
                               : 'border-gray-200 bg-white hover:border-gray-400 hover:shadow-sm'
                           }`}
                         >
-                          <div>
+                          <div className="flex-1 flex flex-col">
                             <div className="flex items-start justify-between gap-2 mb-2">
                               <span className="text-[10px] sm:text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.16em] sm:tracking-[0.25em] text-[#D94E4E] uppercase font-semibold font-sans">
-                                {srv.serviceType}
+                                {srv.category || srv.serviceType || 'General'}
                               </span>
                               {isSelected && (
-                                <span className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-[#1D1E1E] text-white flex items-center justify-center text-xs">
+                                <span className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-[#1D1E1E] text-white flex items-center justify-center text-xs shrink-0">
                                   <Check className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                                 </span>
                               )}
                             </div>
-                            <h3 className="font-sans text-base sm:text-xl font-normal tracking-[-0.04em] text-[#141515] leading-[1.1] sm:leading-[1.05]">
+                            <h3 className="font-sans text-base sm:text-lg font-normal tracking-[-0.04em] text-[#141515] leading-[1.15] sm:leading-[1.1]">
                               {srv.name}
                             </h3>
                             <div className="border-t border-gray-100/80 my-2 sm:my-2.5" />
-                            <p className="text-[12px] sm:text-[13px] text-gray-500 font-sans font-normal leading-[1.55] sm:leading-[1.65]">
-                              {renderDescription(srv.description)}
-                            </p>
+                            <div className="flex-1">
+                              <ServiceDescription
+                                description={srv.description}
+                                className="mt-0 text-[12px] sm:text-[13px] leading-[1.55] sm:leading-[1.65]"
+                              />
+                            </div>
                           </div>
                         </div>
                       );
@@ -678,12 +708,6 @@ export function BookingWizardView({ services, config, initialServiceId }: Bookin
   );
 }
 
-function renderDescription(desc: string | null) {
-  if (!desc) return '';
-  const includesIdx = desc.indexOf('Includes:');
-  if (includesIdx === -1) return desc;
-  return desc.slice(0, includesIdx).trim();
-}
 
 function SocialIcon({ platform }: { platform: string }) {
   const normalizedPlatform = platform.trim().toLowerCase();
