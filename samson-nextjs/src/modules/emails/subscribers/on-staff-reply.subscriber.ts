@@ -67,7 +67,10 @@ export const onStaffReplySubscriber = {
         patientName,
         chatToken,
         baseUrl,
-      } as any
+      } as any,
+      {
+        threadId: appointmentId,
+      }
     );
   },
 };

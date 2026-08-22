@@ -27,8 +27,54 @@ if (!process.env.RESEND_API_KEY) {
 
 const resend = new Resend(process.env.RESEND_API_KEY || 're_test_123');
 
+const DEFAULT_SENDER_EMAIL = 'noreply@samsondentalcenter-website.chrbuilds.dev';
+const DEFAULT_BUSINESS_EMAIL = 'info@samsondentalcenter.com';
+const DEFAULT_SENDER_NAME = 'Samson Dental Center';
+
+/**
+ * Options to customize email delivery (reply-to, bcc, sender domain, and threading headers).
+ */
+export interface SendEmailOptions {
+  /** Custom sender address (e.g. `noreply@samsondentalcenter-website.chrbuilds.dev`) */
+  from?: string;
+  /** Custom sender display name (e.g. `Samson Dental Center`) */
+  senderName?: string;
+  /** Reply-to email address. Defaults to dynamic clinic business email */
+  replyTo?: string | string[];
+  /** Alias for replyTo */
+  reply_to?: string | string[];
+  /**
+   * BCC address(es). Automatically defaults to dynamic clinic business email.
+   * Set to `false` or `null` to disable automatic BCC.
+   */
+  bcc?: string | string[] | false | null;
+  /** Optional CC address(es) */
+  cc?: string | string[];
+  /** Optional custom headers map */
+  headers?: Record<string, string>;
+  /**
+   * In-Reply-To header for email threading (e.g. `<appointment-123@domain>`).
+   * Automatically formatted with enclosing angle brackets if needed.
+   */
+  inReplyTo?: string;
+  /**
+   * References header for email threading.
+   * Can be a single Message-ID or an array of Message-IDs.
+   */
+  references?: string | string[];
+  /** Optional unique thread identifier (e.g. appointmentId or conversation UUID) */
+  threadId?: string;
+}
+
+export interface SendGenericEmailParams extends SendEmailOptions {
+  to: string | string[];
+  subject: string;
+  html?: string;
+  text?: string;
+}
+
 // Define a type mapping for all possible templates
-type EmailTemplates = {
+export type EmailTemplates = {
   'signup_otp': { firstName: string; otpCode: string };
   'reset_password_otp': { firstName: string; otpCode: string };
   'appointment_request_received': {
@@ -137,15 +183,168 @@ type EmailTemplates = {
   };
 };
 
+/**
+ * Extracts sender domain (e.g. `samsondentalcenter-website.chrbuilds.dev`)
+ * from an email string.
+ */
+function extractDomain(fromEmailOrAddress: string): string {
+  const match = fromEmailOrAddress.match(/@([a-zA-Z0-9.-]+)/);
+  return match ? match[1].replace(/>$/, '').trim() : 'samsondentalcenter-website.chrbuilds.dev';
+}
+
+/**
+ * Formats a message-id ensuring it is wrapped in angle brackets `<id@domain>`.
+ */
+function formatMessageId(id: string): string {
+  const trimmed = id.trim();
+  if (trimmed.startsWith('<') && trimmed.endsWith('>')) {
+    return trimmed;
+  }
+  return `<${trimmed}>`;
+}
+
+/**
+ * Builds standard email options (from, reply_to, bcc, and threading headers).
+ */
+function buildDeliveryEnvelope(
+  to: string | string[],
+  options?: SendEmailOptions,
+  branding?: EmailBranding | null,
+  templateContext?: { templateName?: string; payload?: Record<string, any> }
+) {
+  // 1. Resolve custom domain sender address
+  const fromAddress = options?.from || process.env.RESEND_SENDER_EMAIL || DEFAULT_SENDER_EMAIL;
+  const senderName = options?.senderName || process.env.RESEND_SENDER_NAME || branding?.clinicName || DEFAULT_SENDER_NAME;
+  const from = fromAddress.includes('<') ? fromAddress : `${senderName} <${fromAddress}>`;
+
+  // 2. Resolve dynamic business email (from Clinic Settings or Env or Default)
+  const businessEmail = branding?.contactEmail || process.env.RESEND_BCC_EMAIL || process.env.CLINIC_BUSINESS_EMAIL || DEFAULT_BUSINESS_EMAIL;
+
+  // 3. Dynamic Reply-To Target
+  const replyToTarget = options?.replyTo || options?.reply_to || businessEmail;
+  const replyTo = Array.isArray(replyToTarget) ? replyToTarget : [replyToTarget];
+
+  // 4. Dynamic BCC Delivery (Auto-delivers copy to business inbox)
+  let bcc: string[] | undefined;
+  if (options?.bcc === false || options?.bcc === null) {
+    bcc = undefined;
+  } else if (options?.bcc) {
+    bcc = Array.isArray(options.bcc) ? options.bcc : [options.bcc];
+  } else {
+    // Default: deliver copy to business inbox if recipient is not already the business email
+    const toRecipients = (Array.isArray(to) ? to : [to]).map((e) => e.trim().toLowerCase());
+    if (!toRecipients.includes(businessEmail.trim().toLowerCase())) {
+      bcc = [businessEmail];
+    }
+  }
+
+  // 5. Optional Threading Headers (In-Reply-To & References)
+  const senderDomain = extractDomain(fromAddress);
+  const headers: Record<string, string> = { ...(options?.headers || {}) };
+
+  let inReplyTo = options?.inReplyTo || headers['In-Reply-To'];
+  let references = options?.references || headers['References'];
+
+  // If a threadId is explicitly provided, generate threading headers
+  if (options?.threadId) {
+    const threadMsgId = `<thread-${options.threadId}@${senderDomain}>`;
+    if (!inReplyTo) inReplyTo = threadMsgId;
+    if (!references) references = threadMsgId;
+  }
+
+  // Auto-thread appointment follow-up emails if payload includes appointmentId
+  const payload = templateContext?.payload;
+  const templateName = templateContext?.templateName;
+  if (
+    !inReplyTo &&
+    !references &&
+    payload &&
+    typeof payload === 'object' &&
+    'appointmentId' in payload &&
+    payload.appointmentId
+  ) {
+    // Initial appointment booking request creates the root thread; subsequent emails reference it
+    const isInitialRoot = templateName === 'appointment_request_received';
+    const apptMsgId = `<appointment-${payload.appointmentId}@${senderDomain}>`;
+
+    if (!isInitialRoot) {
+      inReplyTo = apptMsgId;
+      references = apptMsgId;
+    }
+  }
+
+  if (inReplyTo) {
+    headers['In-Reply-To'] = formatMessageId(inReplyTo);
+  }
+
+  if (references) {
+    const refs = Array.isArray(references) ? references : [references];
+    headers['References'] = refs.map(formatMessageId).join(' ');
+  }
+
+  return {
+    from,
+    to: Array.isArray(to) ? to : [to],
+    replyTo,
+    bcc,
+    headers: Object.keys(headers).length > 0 ? headers : undefined,
+  };
+}
+
 export const ResendService = {
   /**
-   * Renders the requested template and sends it via Resend.
+   * Helper to load dynamic clinic branding from settings.
+   */
+  async loadClinicBranding(): Promise<EmailBranding | null> {
+    try {
+      const supabase = await createAdminClient();
+      const config = await getClinicConfigUseCase(getClinicConfigQuery(supabase))();
+      return resolveEmailBranding(config, getBaseUrl());
+    } catch (err) {
+      console.warn('Failed to load dynamic clinic branding for email, using fallback defaults:', err);
+      return resolveEmailBranding(null, getBaseUrl());
+    }
+  },
+
+  /**
+   * Sends a raw / custom HTML email via Resend with dynamic domain, BCC, reply-to, and headers.
+   */
+  async sendEmail(params: SendGenericEmailParams) {
+    if (!process.env.RESEND_API_KEY) {
+      throw new Error('RESEND_API_KEY is not configured');
+    }
+
+    const branding = await this.loadClinicBranding();
+    const envelope = buildDeliveryEnvelope(params.to, params, branding);
+
+    const { data, error } = await resend.emails.send({
+      from: envelope.from,
+      to: envelope.to,
+      subject: params.subject,
+      ...(params.html ? { html: params.html } : { html: params.text || '' }),
+      ...(params.text ? { text: params.text } : {}),
+      replyTo: envelope.replyTo,
+      ...(envelope.bcc && envelope.bcc.length > 0 ? { bcc: envelope.bcc } : {}),
+      ...(params.cc ? { cc: params.cc } : {}),
+      ...(envelope.headers ? { headers: envelope.headers } : {}),
+    } as any);
+
+    if (error) {
+      throw new Error(`Resend API Error: ${error.message}`);
+    }
+
+    return data;
+  },
+
+  /**
+   * Renders the requested template and sends it via Resend with dynamic domain, BCC, reply-to, and headers.
    */
   async sendTemplatedEmail<K extends keyof EmailTemplates>(
-     to: string,
-     subject: string,
-     templateName: K,
-     payload: EmailTemplates[K]
+    to: string,
+    subject: string,
+    templateName: K,
+    payload: EmailTemplates[K],
+    options?: SendEmailOptions
   ) {
     if (!process.env.RESEND_API_KEY) {
       throw new Error('RESEND_API_KEY is not configured');
@@ -154,13 +353,10 @@ export const ResendService = {
     let html = '';
 
     // Resolve clinic branding (name, logo, phone, address, website) from Clinic Settings.
-    // Falls back to the previous hardcoded values when config is missing.
     let branding: EmailBranding | null = null;
     try {
       if (templateName !== 'signup_otp' && templateName !== 'reset_password_otp') {
-        const supabase = await createAdminClient();
-        const config = await getClinicConfigUseCase(getClinicConfigQuery(supabase))();
-        branding = resolveEmailBranding(config, getBaseUrl());
+        branding = await this.loadClinicBranding();
       }
     } catch (err) {
       console.warn('Failed to load clinic branding for email, using defaults:', err);
@@ -170,8 +366,6 @@ export const ResendService = {
     switch (templateName) {
       case 'signup_otp': {
         const otpPayload = payload as EmailTemplates['signup_otp'];
-        // Note: render returns a Promise in newer react-email versions if using suspense, 
-        // but typically synchronous for basic templates. Await to be safe.
         html = await render(React.createElement(SignupOtpEmail, { 
           firstName: otpPayload.firstName, 
           otpCode: otpPayload.otpCode 
@@ -343,17 +537,21 @@ export const ResendService = {
         throw new Error(`Unknown email template: ${templateName}`);
     }
 
-    // Determine sender address (use onboarding or production domain)
-    // For Resend testing without a domain, you can only send to yourself, 
-    // or use onboarding@resend.dev (which Resend only allows sending to the registered account email)
-    const fromAddress = process.env.RESEND_SENDER_EMAIL || 'onboarding@resend.dev';
-    const senderName = branding?.clinicName || process.env.RESEND_SENDER_NAME || 'Samson Dental Center';
+    // Build envelope with custom domain sender, dynamic reply_to, dynamic bcc, and threading headers
+    const envelope = buildDeliveryEnvelope(to, options, branding, {
+      templateName: templateName as string,
+      payload: payload as Record<string, any>,
+    });
 
     const { data, error } = await resend.emails.send({
-      from: `${senderName} <${fromAddress}>`,
-      to: [to],
+      from: envelope.from,
+      to: envelope.to,
       subject,
       html,
+      replyTo: envelope.replyTo,
+      ...(envelope.bcc && envelope.bcc.length > 0 ? { bcc: envelope.bcc } : {}),
+      ...(options?.cc ? { cc: options.cc } : {}),
+      ...(envelope.headers ? { headers: envelope.headers } : {}),
     });
 
     if (error) {

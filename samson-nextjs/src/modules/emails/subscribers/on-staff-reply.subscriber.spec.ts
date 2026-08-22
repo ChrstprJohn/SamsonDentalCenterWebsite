@@ -48,6 +48,9 @@ describe('onStaffReplySubscriber', () => {
       expect.objectContaining({
         patientName: 'John Doe',
         chatToken: 'chat-tok',
+      }),
+      expect.objectContaining({
+        threadId: 'appt-1',
       })
     );
   });

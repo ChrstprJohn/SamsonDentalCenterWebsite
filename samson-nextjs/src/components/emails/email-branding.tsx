@@ -42,7 +42,7 @@ export function resolveEmailBranding(
     phone,
     phoneHref: config?.phone ? toTelHref(config.phone) : 'tel:028123456',
     landline: config?.landline || null,
-    contactEmail: config?.email || 'contact@samsondental.com',
+    contactEmail: config?.email || 'info@samsondentalcenter.com',
     websiteUrl,
     websiteLabel: stripProtocol(websiteUrl),
     whatsappUrl: config?.whatsappUrl || null,
