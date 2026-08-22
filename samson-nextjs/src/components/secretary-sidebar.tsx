@@ -61,11 +61,6 @@ const data = {
       icon: <ClipboardList className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
     },
     {
-      title: "Chat Inbox",
-      url: "/secretary-v2/chat",
-      icon: <MessageSquare className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
-    },
-    {
       title: "Appointments Directory",
       url: "/secretary-v2/appointments",
       icon: <CalendarRange className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />,
