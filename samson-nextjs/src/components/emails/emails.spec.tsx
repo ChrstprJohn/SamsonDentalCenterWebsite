@@ -5,7 +5,10 @@ import SignupOtpEmail from './signup-otp-email';
 import ResetPasswordOtpEmail from './reset-password-otp-email';
 import AppointmentRequestReceivedEmail from './appointment-request-received-email';
 import AppointmentConfirmedEmail from './appointment-confirmed-email';
-
+import AppointmentReminderEmail from './appointment-reminder-email';
+import AppointmentCancelledEmail from './appointment-cancelled-email';
+import AppointmentRescheduledEmail from './appointment-rescheduled-email';
+import StaffReplyEmail from './staff-reply-email';
 import PostCareEmail from './post-care-email';
 import CheckoutFollowUpEmail from './checkout-follow-up-email';
 import RequestRejectedEmail from './request-rejected-email';
@@ -50,6 +53,7 @@ describe('Email Templates Rendering', () => {
     );
     expect(html).toContain('Bob Smith');
     expect(html).toContain('Thank you for reaching out to Samson Dental Center');
+    expect(html).toContain('DA95A63C');
   });
 
   it('renders AppointmentRequestReceivedEmail without crashing (dependent booking)', async () => {
@@ -70,6 +74,7 @@ describe('Email Templates Rendering', () => {
     );
     expect(html).toContain('Maria Picardo');
     expect(html).toContain('Thank you for reaching out to Samson Dental Center');
+    expect(html).toContain('DA95A63C');
   });
 
   it('renders AppointmentConfirmedEmail without crashing', async () => {
@@ -86,7 +91,71 @@ describe('Email Templates Rendering', () => {
     expect(html).toContain('Alice Guest');
     expect(html).toContain('Teeth Whitening');
     expect(html).toContain('Dr. John Doe');
-    expect(html).toContain('da95a63c-333e-4b68-98e3-82bdf1a07bd3');
+    expect(html).toContain('DA95A63C');
+  });
+
+  it('renders AppointmentReminderEmail without crashing', async () => {
+    const html = await render(
+      React.createElement(AppointmentReminderEmail, {
+        reminderTitle: '24-hour Reminder',
+        patientName: 'Alice Guest',
+        serviceName: 'Teeth Cleaning',
+        doctorName: 'Dr. Adrian Samson',
+        dateStr: 'Monday, June 22, 2026',
+        timeRangeStr: '2:00 PM – 2:45 PM',
+        appointmentId: 'APT-SAMPLE',
+      })
+    );
+    expect(html).toContain('Alice Guest');
+    expect(html).toContain('tomorrow');
+    expect(html).toContain('APT-SAMPLE');
+  });
+
+  it('renders AppointmentCancelledEmail without crashing', async () => {
+    const html = await render(
+      React.createElement(AppointmentCancelledEmail, {
+        patientName: 'Alice Guest',
+        serviceName: 'Teeth Whitening',
+        dateStr: 'Jun 25, 2026',
+        timeRangeStr: '10:00 AM - 11:00 AM',
+        appointmentId: 'APT-SAMPLE',
+        cancellationReason: 'Clinic schedule conflict.',
+      })
+    );
+    expect(html).toContain('Alice Guest');
+    expect(html).toContain('cancelled');
+    expect(html).toContain('Clinic schedule conflict.');
+  });
+
+  it('renders AppointmentRescheduledEmail without crashing', async () => {
+    const html = await render(
+      React.createElement(AppointmentRescheduledEmail, {
+        patientName: 'Alice Guest',
+        serviceName: 'Teeth Whitening',
+        doctorName: 'Dr. John Doe',
+        oldDoctorName: 'Dr. Previous Dentist',
+        oldDateStr: 'Jun 15, 2026',
+        dateStr: 'Jun 25, 2026',
+        timeRangeStr: '10:00 AM - 11:00 AM',
+        appointmentId: 'APT-SAMPLE',
+        rescheduleReason: 'Patient request',
+      })
+    );
+    expect(html).toContain('Alice Guest');
+    expect(html).toContain('rescheduled');
+    expect(html).toContain('Previously scheduled:');
+    expect(html).toContain('Dr. Previous Dentist');
+  });
+
+  it('renders StaffReplyEmail without crashing', async () => {
+    const html = await render(
+      React.createElement(StaffReplyEmail, {
+        patientName: 'Alice Guest',
+        chatToken: 'token123',
+      })
+    );
+    expect(html).toContain('Alice Guest');
+    expect(html).toContain('sent an update');
   });
 
   it('renders PostCareEmail without crashing', async () => {
@@ -115,7 +184,6 @@ describe('Email Templates Rendering', () => {
       })
     );
     expect(html).toContain('Alice Guest');
-    expect(html).toContain('Hello');
     expect(html).toContain('Dental Cleaning');
     expect(html).toContain('APT-SAMPLE-789');
   });
@@ -148,3 +216,4 @@ describe('Email Templates Rendering', () => {
     expect(html).toContain('APT-SAMPLE-456');
   });
 });
+

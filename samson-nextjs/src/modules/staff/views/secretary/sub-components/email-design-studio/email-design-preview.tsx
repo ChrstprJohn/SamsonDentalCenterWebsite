@@ -243,6 +243,9 @@ export function EmailDesignPreview({
                 </table>
               </div>
             )}
+            {(isConfirmed || isReminder || (!isRescheduled && !isPostCare && !isFollowUp)) && (
+              <p style={{ ...p, margin: '0 0 8px', fontWeight: 700 }}>Your appointment details:</p>
+            )}
             {isRescheduled && (
               <p style={{ ...p, margin: '0 0 8px', fontWeight: 700 }}>Your new appointment details:</p>
             )}
@@ -634,7 +637,7 @@ export function EmailDesignPreview({
         {/* Follow-up wellbeing CTA */}
         {isFollowUp && copy.showCta && copy.ctaLabel && (
           <p style={p}>
-            How are you feeling today? Take a moment to let us know —{' '}
+            How are you feeling today? Take a moment to let us know:{' '}
             <a href={wellbeingUrl} style={link}>Tell us how you&apos;re feeling</a>. Your response helps our team support your recovery.
           </p>
         )}
@@ -689,11 +692,6 @@ export function EmailDesignPreview({
           </p>
         )}
 
-        {/* Request rejected — labeled reason */}
-        {isRequestRejected && (
-          <p style={p}>Rejection reason: <span style={bold}>{sample.rejectionReason || 'Unfortunately, we are unable to accommodate your request at this time.'}</span></p>
-        )}
-
         {/* Request rejected — what was requested */}
         {isRequestRejected && (
           <div style={{ margin: '0 0 20px', paddingLeft: 0 }}>
@@ -731,6 +729,11 @@ export function EmailDesignPreview({
               </table>
             </div>
           </div>
+        )}
+
+        {/* Request rejected — labeled reason */}
+        {isRequestRejected && (
+          <p style={p}>Rejection reason: <span style={bold}>{sample.rejectionReason || 'Unfortunately, we are unable to accommodate your request at this time.'}</span></p>
         )}
 
         {/* Request rejected — what you can do */}

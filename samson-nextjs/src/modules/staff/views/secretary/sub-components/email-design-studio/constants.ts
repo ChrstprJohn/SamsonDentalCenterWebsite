@@ -304,7 +304,7 @@ export const DEFAULT_COPY: Record<EmailDesignId, DraftCopy> = {
     preheader: 'Hello! We want to check in on how you are feeling after your visit.',
     headerLabel: 'Aftercare Check-In',
     headline: 'Hello, how are you feeling?',
-    intro: "It's been 2 days since your visit at Samson Dental Center — we hope your recovery is going well. Take 30 seconds to let us know how you're feeling today.",
+    intro: "It's been 2 days since your visit at Samson Dental Center, we hope your recovery is going well. Take 30 seconds to let us know how you're feeling today.",
     ctaLabel: 'Tell Us How You Feel',
     primaryInstruction: '',
     secondaryInstruction: '',

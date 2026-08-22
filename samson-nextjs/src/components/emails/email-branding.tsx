@@ -1,11 +1,12 @@
 import React from 'react';
-import { Link, Text } from '@react-email/components';
-import { getLogoUrl } from '@/shared/utils/get-base-url.util';
+import { Img, Link, Section, Text } from '@react-email/components';
+import { getLogoUrl, getLogoDarkUrl } from '@/shared/utils/get-base-url.util';
 import type { ClinicConfigResponseDto } from '@/modules/clinic-config/dtos/settings/get-clinic-config.dto';
 
 export interface EmailBranding {
   clinicName: string;
   logoUrl: string;
+  logoDarkUrl?: string | null;
   phone: string;
   phoneHref: string;
   landline: string | null;
@@ -31,9 +32,13 @@ export function resolveEmailBranding(
   const clinicName = config?.clinicName || FALLBACK_CLINIC_NAME;
   const phone = config?.phone || '(02) 8123-4567';
   const websiteUrl = config?.websiteUrl || 'https://samsondentalcenter.com.ph';
+  const logoUrl = config?.emailLogoUrl || getLogoUrl(baseUrl);
+  const logoDarkUrl = config?.emailLogoDarkUrl || config?.websiteLogoDarkUrl || (baseUrl ? getLogoDarkUrl(baseUrl) : null);
+
   return {
     clinicName,
-    logoUrl: config?.emailLogoUrl || getLogoUrl(baseUrl),
+    logoUrl,
+    logoDarkUrl,
     phone,
     phoneHref: config?.phone ? toTelHref(config.phone) : 'tel:028123456',
     landline: config?.landline || null,
@@ -52,39 +57,49 @@ const pStyle: React.CSSProperties = {
   margin: '0 0 16px',
   color: '#1a1a1a',
   fontSize: '14px',
-  lineHeight: 1.75,
+  lineHeight: 1.7,
+  fontFamily: 'Arial, Helvetica, sans-serif',
 };
 
-const linkStyle: React.CSSProperties = {
-  color: '#2563eb',
-  textDecoration: 'underline',
-  fontWeight: 600,
-};
+/**
+ * Adaptive email logo component that displays the default logo in light mode
+ * and automatically switches to the alternative dark mode logo on devices / clients
+ * that have dark mode enabled.
+ */
+export function EmailLogoHeader({ branding }: { branding: EmailBranding }) {
+  const darkLogo = branding.logoDarkUrl || branding.logoUrl;
+
+  return (
+    <Section style={{ marginBottom: '28px', textAlign: 'center' }}>
+      {/* Light Mode Logo (Visible by default) */}
+      <div className="light-logo" style={{ display: 'block' }}>
+        <Img
+          src={branding.logoUrl}
+          alt={branding.clinicName}
+          width="130"
+          className="eml-logo"
+          style={{ height: 'auto', objectFit: 'contain', margin: '0 auto', display: 'block' }}
+        />
+      </div>
+      {/* Dark Mode Logo (Visible on dark mode devices via media query) */}
+      <div className="dark-logo" style={{ display: 'none' }}>
+        <Img
+          src={darkLogo}
+          alt={branding.clinicName}
+          width="130"
+          className="eml-logo"
+          style={{ height: 'auto', objectFit: 'contain', margin: '0 auto', display: 'block' }}
+        />
+      </div>
+    </Section>
+  );
+}
 
 export function EmailSignature({ branding }: { branding: EmailBranding }) {
   return (
-    <>
-      <Text style={{ ...pStyle, marginBottom: '2px', fontWeight: 700 }}>{branding.clinicName}</Text>
-      <Text style={{ ...pStyle, color: '#64748b', marginBottom: 0 }}>
-        {branding.phone}
-        {branding.landline ? ` · ${branding.landline}` : ''} &nbsp;&middot;&nbsp;{' '}
-        <Link href={`mailto:${branding.contactEmail}`} style={linkStyle}>
-          {branding.contactEmail}
-        </Link>
-        {' '}&middot;&nbsp;{' '}
-        <Link href={branding.websiteUrl} target="_blank" rel="noreferrer" style={linkStyle}>
-          {branding.websiteLabel}
-        </Link>
-        {branding.whatsappUrl && (
-          <>
-            {' '}&middot;&nbsp;{' '}
-            <Link href={branding.whatsappUrl} target="_blank" rel="noreferrer" style={linkStyle}>
-              WhatsApp
-            </Link>
-          </>
-        )}
-      </Text>
-    </>
+    <Text style={{ ...pStyle, marginBottom: 0, fontWeight: 700, color: '#1a1a1a' }}>
+      {branding.clinicName}
+    </Text>
   );
 }
 
@@ -98,19 +113,18 @@ export function EmailLegalFooter({
   variant: 'appointment' | 'inquiry';
 }) {
   return (
-    <Text style={{ color: '#64748b', fontSize: '12px', lineHeight: 1.6, margin: 0 }}>
-      You received this email because{' '}
+    <Text style={{ color: '#64748b', fontSize: 12, lineHeight: 1.6, margin: 0, fontFamily: 'Arial, Helvetica, sans-serif' }}>
       {variant === 'inquiry'
-        ? `you submitted a booking inquiry with ${branding.clinicName}`
-        : `you have an appointment with ${branding.clinicName}`}
-      . If you believe this was sent in error, please contact our office.{' '}
+        ? `You received this email because you submitted a booking inquiry with ${branding.clinicName}.`
+        : `You received this email because you have an appointment with ${branding.clinicName}.`}
+      {' '}
       <Link href={`${baseUrl}/terms`} target="_blank" rel="noreferrer" style={{ color: '#94a3b8' }}>
         Terms of Service
-      </Link>{' '}
-      &middot;{' '}
+      </Link>
+      {' '}·{' '}
       <Link href={`${baseUrl}/privacy`} target="_blank" rel="noreferrer" style={{ color: '#94a3b8' }}>
         Privacy Policy
       </Link>
     </Text>
   );
-}
+}

@@ -3,7 +3,6 @@ import {
   Container,
   Head,
   Html,
-  Img,
   Link,
   Preview,
   Section,
@@ -11,7 +10,13 @@ import {
 } from '@react-email/components';
 import * as React from 'react';
 
-import { EmailBranding, EmailLegalFooter, EmailSignature, resolveEmailBranding } from './email-branding';
+import {
+  EmailBranding,
+  EmailLegalFooter,
+  EmailLogoHeader,
+  EmailSignature,
+  resolveEmailBranding,
+} from './email-branding';
 import { formatRefId } from '@/shared/utils/date.util';
 
 export interface NoShowEmailProps {
@@ -25,21 +30,67 @@ export interface NoShowEmailProps {
   branding?: EmailBranding;
 }
 
+const fontFamily = 'Arial, Helvetica, sans-serif';
+
 const pStyle: React.CSSProperties = {
   margin: '0 0 16px',
   color: '#1a1a1a',
-  fontSize: '14px',
-  lineHeight: 1.75,
+  fontSize: 14,
+  lineHeight: 1.7,
+  fontFamily,
 };
 
 const boldStyle: React.CSSProperties = {
   fontWeight: 700,
+  color: '#1a1a1a',
+  fontFamily,
 };
 
 const linkStyle: React.CSSProperties = {
   color: '#2563eb',
   textDecoration: 'underline',
   fontWeight: 600,
+  fontFamily,
+};
+
+const cardStyle: React.CSSProperties = {
+  margin: '0 0 16px',
+  padding: '16px 20px',
+  backgroundColor: '#f8fafc',
+  borderRadius: 10,
+  border: '1px solid #e2e8f0',
+  fontFamily,
+};
+
+const labelCellStyle: React.CSSProperties = {
+  width: 130,
+  padding: '6px 12px 6px 0',
+  verticalAlign: 'top' as const,
+  fontWeight: 700,
+  fontSize: 14,
+  color: '#1a1a1a',
+  whiteSpace: 'nowrap' as const,
+  fontFamily,
+};
+
+const valueCellStyle: React.CSSProperties = {
+  padding: '6px 0',
+  verticalAlign: 'top' as const,
+  fontSize: 14,
+  color: '#1a1a1a',
+  lineHeight: 1.6,
+  textAlign: 'right' as const,
+  fontFamily,
+};
+
+const listStyle: React.CSSProperties = {
+  margin: '0 0 16px',
+  paddingLeft: 20,
+  listStyle: 'disc',
+  color: '#1a1a1a',
+  fontSize: 14,
+  lineHeight: 1.7,
+  fontFamily,
 };
 
 export const NoShowEmail = ({
@@ -50,28 +101,47 @@ export const NoShowEmail = ({
   timeRangeStr = '2:00 PM – 2:45 PM',
   appointmentId = 'APT-SAMPLE',
   baseUrl = 'http://localhost:3000',
-branding,
+  branding,
 }: NoShowEmailProps) => {
   const b = branding ?? resolveEmailBranding(undefined, baseUrl);
   const previewText = `You missed your appointment with ${b.clinicName}. Below are the details of your missed visit.`;
   const reasonUrl = `${baseUrl}/no-show-reason?ref=${appointmentId}`;
+  const rebookUrl = `${baseUrl}/book`;
+  const displayLocation = b.locationLine
+    ? b.locationLine.replace(new RegExp(`^${b.clinicName},?\\s*`, 'i'), '').trim() || b.locationLine
+    : '';
+  const referenceCode = formatRefId(appointmentId);
 
   return (
     <Html lang="en">
-      <Head />
+      <Head>
+        <meta name="color-scheme" content="light dark" />
+        <meta name="supported-color-schemes" content="light dark" />
+        <style>{`
+          :root {
+            color-scheme: light dark;
+            supported-color-schemes: light dark;
+          }
+          .eml-body { padding: 36px 36px 44px; }
+          .eml-logo { width: 130px; }
+          .dark-logo { display: none !important; }
+          .light-logo { display: block !important; }
+          @media (prefers-color-scheme: dark) {
+            .dark-logo { display: block !important; }
+            .light-logo { display: none !important; }
+          }
+          @media only screen and (max-width: 480px) {
+            .eml-body { padding: 24px 20px 32px !important; }
+            .eml-logo { width: 100px !important; }
+          }
+        `}</style>
+      </Head>
       <Preview>{previewText}</Preview>
-      <Body style={{ backgroundColor: '#ffffff', fontFamily: 'Arial, Helvetica, sans-serif', margin: '0', padding: '0' }}>
-        <Container style={{ maxWidth: '600px', margin: '0 auto', padding: '36px 40px 48px' }}>
+      <Body style={{ backgroundColor: '#ffffff', fontFamily, margin: '0', padding: '0' }}>
+        <Container className="eml-body" style={{ maxWidth: '720px', margin: '0 auto', padding: '36px 36px 44px' }}>
 
           {/* Logo */}
-          <Section style={{ marginBottom: '28px', textAlign: 'center' }}>
-            <Img
-              src={b.logoUrl}
-              alt={b.clinicName}
-              width="130"
-              style={{ height: 'auto', objectFit: 'contain', margin: '0 auto', display: 'block' }}
-            />
-          </Section>
+          <EmailLogoHeader branding={b} />
 
           {/* Greeting */}
           <Text style={pStyle}>
@@ -84,67 +154,77 @@ branding,
           </Text>
 
           {/* Missed appointment details */}
-          <Section style={{ margin: '0 0 20px', paddingLeft: 0 }}>
-            <Text style={{ ...pStyle, margin: '0 0 8px', fontWeight: 700 }}>
-              Details of your missed visit:
-            </Text>
-            <Text style={{ ...pStyle, margin: '0 0 4px' }}>
-              <span style={boldStyle}>Status:</span>{' '}
-              <span style={{ fontWeight: 700, color: '#dc2626' }}>Missed</span>
-            </Text>
-            {doctorName && (
-              <Text style={{ ...pStyle, margin: '0 0 4px' }}>
-                <span style={boldStyle}>Doctor:</span> {doctorName}
-              </Text>
-            )}
-            {serviceName && (
-              <Text style={{ ...pStyle, margin: '0 0 4px' }}>
-                <span style={boldStyle}>Service:</span> {serviceName}
-              </Text>
-            )}
-            <Text style={{ ...pStyle, margin: '0 0 4px' }}>
-              <span style={boldStyle}>Location:</span> {b.locationLine}{b.mapUrl ? <> (<Link href={b.mapUrl} style={linkStyle}>View on Google Maps</Link>)</> : null}
-            </Text>
-            {dateStr && (
-              <Text style={{ ...pStyle, margin: '0 0 4px' }}>
-                <span style={boldStyle}>Date:</span> {dateStr}
-              </Text>
-            )}
-            {timeRangeStr && (
-              <Text style={{ ...pStyle, margin: '0 0 4px' }}>
-                <span style={boldStyle}>Time:</span> {timeRangeStr}
-              </Text>
-            )}
-            {appointmentId && (
-              <Text style={{ ...pStyle, margin: '0 0 4px' }}>
-                <span style={boldStyle}>Reference ID:</span> {formatRefId(appointmentId)}
-              </Text>
-            )}
+          <Section style={{ margin: '0 0 16px', paddingLeft: 0 }}>
+            <Text style={{ ...pStyle, margin: '0 0 8px', fontWeight: 700 }}>Details of your missed visit:</Text>
+            <div style={cardStyle}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14, fontFamily }}>
+                <tbody>
+                  <tr>
+                    <td style={labelCellStyle}>Status:</td>
+                    <td style={{ ...valueCellStyle, fontWeight: 700, color: '#dc2626' }}>Missed</td>
+                  </tr>
+                  {dateStr && (
+                    <tr>
+                      <td style={labelCellStyle}>Date:</td>
+                      <td style={valueCellStyle}>{dateStr}</td>
+                    </tr>
+                  )}
+                  {timeRangeStr && (
+                    <tr>
+                      <td style={labelCellStyle}>Time:</td>
+                      <td style={valueCellStyle}>{timeRangeStr}</td>
+                    </tr>
+                  )}
+                  {serviceName && (
+                    <tr>
+                      <td style={labelCellStyle}>Service:</td>
+                      <td style={valueCellStyle}>{serviceName}</td>
+                    </tr>
+                  )}
+                  {doctorName && (
+                    <tr>
+                      <td style={labelCellStyle}>Doctor:</td>
+                      <td style={valueCellStyle}>{doctorName}</td>
+                    </tr>
+                  )}
+                  <tr>
+                    <td style={labelCellStyle}>Location:</td>
+                    <td style={valueCellStyle}>{displayLocation}</td>
+                  </tr>
+                  {referenceCode && (
+                    <tr>
+                      <td style={labelCellStyle}>Reference ID:</td>
+                      <td style={valueCellStyle}>{referenceCode}</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </Section>
 
           {/* Optional reason CTA */}
           <Text style={pStyle}>
             Let us know why you couldn&apos;t make it, it helps us improve.{' '}
-            <Link href={reasonUrl} style={linkStyle}>
-              Tell us why
-            </Link>{' '}
-            (optional)
+            <Link href={reasonUrl} style={linkStyle}>Tell us why</Link>{' '}
+            (optional).
           </Text>
 
-          {/* What's Next checklist */}
+          {/* What's Next */}
           <Section style={{ margin: '0 0 20px', paddingLeft: 0 }}>
             <Text style={{ ...pStyle, margin: '0 0 8px', fontWeight: 700 }}>What&apos;s Next?</Text>
-            <ul style={{ margin: '0 0 16px', paddingLeft: 20, listStyle: 'disc', color: '#1a1a1a', fontSize: '14px', lineHeight: 1.75 }}>
+            <ul style={listStyle}>
               <li style={{ marginBottom: 6 }}>
                 Ready to reschedule?{' '}
-                <Link href={`${baseUrl}/book`} style={linkStyle}>Click here to request a new appointment</Link>.
+                <Link href={rebookUrl} target="_blank" rel="noreferrer" style={linkStyle}>Click here to request a new appointment</Link>.
               </li>
               <li style={{ marginBottom: 6 }}>
                 Questions? Call/text us at{' '}
-                <Link href={b.phoneHref} style={linkStyle}>{b.phone}</Link>.
+                <span style={boldStyle}>{b.phone}</span>
+                {b.landline ? <> · Landline: <span style={boldStyle}>{b.landline}</span></> : ''}.
               </li>
-              <li>
-                <span style={{ color: '#dc2626', fontWeight: 600 }}>Note: Replies to this email are unmonitored.</span>
+              <li style={{ marginBottom: 6 }}>
+                You can visit our website:{' '}
+                <Link href={b.websiteUrl} target="_blank" rel="noreferrer" style={linkStyle}>{b.websiteLabel}</Link>.
               </li>
             </ul>
           </Section>
@@ -156,13 +236,13 @@ branding,
 
           {/* Signature */}
           <Text style={{ ...pStyle, marginBottom: '4px' }}>Warm regards,</Text>
-                    <EmailSignature branding={b} />
+          <EmailSignature branding={b} />
 
           {/* Divider */}
           <hr style={{ border: 'none', borderTop: '1px solid #e2e8f0', margin: '32px 0 20px' }} />
 
           {/* Footer */}
-                    <EmailLegalFooter branding={b} baseUrl={baseUrl} variant="appointment" />
+          <EmailLegalFooter branding={b} baseUrl={baseUrl} variant="appointment" />
 
         </Container>
       </Body>
@@ -171,3 +251,4 @@ branding,
 };
 
 export default NoShowEmail;
+
