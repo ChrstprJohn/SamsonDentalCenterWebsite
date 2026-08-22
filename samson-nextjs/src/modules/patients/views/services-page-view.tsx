@@ -2,9 +2,11 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, MoveRight } from 'lucide-react';
+import { ArrowRight, MoveRight, Loader2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
+import { ServiceDescription } from '../components/landing/mock-category-services-section';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -104,7 +106,7 @@ const HERO_BG_IMAGES = [
 // ---------------------------------------------------------------------------
 // ServicesHero
 // ---------------------------------------------------------------------------
-function ServicesHero() {
+function ServicesHero({ onBook }: { onBook?: () => void }) {
   const [currentBgIndex, setCurrentBgIndex] = useState(0);
   const [mounted, setMounted] = useState(false);
 
@@ -218,12 +220,13 @@ function ServicesHero() {
                 Browse Services
                 <ArrowRight className="w-4 h-4 text-[#141515]" />
               </a>
-              <Link
-                href="/book"
-                className="w-full sm:w-auto px-8 py-4 bg-transparent text-white border border-white/20 rounded-full hover:bg-white/10 transition-all duration-300 backdrop-blur-sm flex items-center justify-center text-[clamp(11px,0.2vw+11px,14px)] font-sans font-semibold uppercase tracking-widest"
+              <button
+                type="button"
+                onClick={onBook}
+                className="w-full sm:w-auto px-8 py-4 bg-transparent text-white border border-white/20 rounded-full hover:bg-white/10 transition-all duration-300 backdrop-blur-sm flex items-center justify-center text-[clamp(11px,0.2vw+11px,14px)] font-sans font-semibold uppercase tracking-widest cursor-pointer"
               >
                 Book Appointment
-              </Link>
+              </button>
             </motion.div>
           </>
         )}
@@ -235,7 +238,15 @@ function ServicesHero() {
 // ---------------------------------------------------------------------------
 // ServiceCard
 // ---------------------------------------------------------------------------
-function ServiceCard({ item, index }: { item: FlatServiceItem; index: number }) {
+function ServiceCard({
+  item,
+  index,
+  onBook,
+}: {
+  item: FlatServiceItem;
+  index: number;
+  onBook?: (serviceId?: string, serviceName?: string) => void;
+}) {
   return (
     <motion.div
       layout
@@ -259,9 +270,7 @@ function ServiceCard({ item, index }: { item: FlatServiceItem; index: number }) 
         </h4>
 
         {/* Description */}
-        <p className="mt-1.5 sm:mt-2 text-[12px] sm:text-[14px] text-gray-500 leading-relaxed font-light">
-          {item.description}
-        </p>
+        <ServiceDescription description={item.description} className="mt-1.5 sm:mt-2 text-[12px] sm:text-[14px]" />
 
         {/* Sub-options */}
         {item.subOptions && item.subOptions.length > 0 && (
@@ -283,13 +292,14 @@ function ServiceCard({ item, index }: { item: FlatServiceItem; index: number }) 
 
       {/* Action Footer */}
       <div className="mt-6 pt-4 border-t border-gray-100 flex items-center justify-end">
-        <Link
-          href="/book"
-          className="w-9 h-9 sm:w-10 sm:h-10 bg-[#1D1E1E]/5 group-hover:bg-[#D94E4E] rounded-full border border-[#1D1E1E]/10 flex items-center justify-center text-[#1D1E1E] group-hover:text-white transition-all duration-300 shadow-2xs"
+        <button
+          type="button"
+          onClick={() => onBook?.(item.id, item.name)}
+          className="w-9 h-9 sm:w-10 sm:h-10 bg-[#1D1E1E]/5 group-hover:bg-[#D94E4E] rounded-full border border-[#1D1E1E]/10 flex items-center justify-center text-[#1D1E1E] group-hover:text-white transition-all duration-300 shadow-2xs cursor-pointer"
           aria-label={`Book ${item.name}`}
         >
           <MoveRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 transition-transform duration-500 ease-out rotate-[-45deg] group-hover:rotate-0" />
-        </Link>
+        </button>
       </div>
     </motion.div>
   );
@@ -298,7 +308,7 @@ function ServiceCard({ item, index }: { item: FlatServiceItem; index: number }) 
 // ---------------------------------------------------------------------------
 // CTA Strip
 // ---------------------------------------------------------------------------
-function CtaStrip() {
+function CtaStrip({ onBook }: { onBook?: () => void }) {
   return (
     <div className="relative overflow-hidden bg-[#1D1E1E] py-16 sm:py-20">
       <div
@@ -319,13 +329,14 @@ function CtaStrip() {
             Our team is ready to welcome you. Select a service above or let us guide you to the right treatment.
           </p>
         </div>
-        <Link
-          href="/book"
+        <button
+          type="button"
+          onClick={onBook}
           className="shrink-0 inline-flex items-center gap-2 px-8 py-4 bg-white text-[#141515] rounded-full hover:bg-gray-100 transition-all duration-300 shadow-md text-[12px] font-sans font-semibold uppercase tracking-widest cursor-pointer"
         >
           Book Now
           <ArrowRight className="w-4 h-4" />
-        </Link>
+        </button>
       </div>
     </div>
   );
@@ -339,7 +350,10 @@ interface ServicesPageViewProps {
 }
 
 export function ServicesPageView({ dbServices }: ServicesPageViewProps) {
+  const router = useRouter();
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [isNavigatingBooking, setIsNavigatingBooking] = useState(false);
+  const [pendingServiceName, setPendingServiceName] = useState<string | null>(null);
 
   const allServices = useMemo(() => buildFlatServices(dbServices), [dbServices]);
   const categories  = useMemo(() => buildCategories(allServices), [allServices]);
@@ -351,9 +365,21 @@ export function ServicesPageView({ dbServices }: ServicesPageViewProps) {
 
   const activeLabel = categories.find((c) => c.id === selectedCategory)?.label;
 
+  const handleBook = (serviceId?: string, serviceName?: string) => {
+    setIsNavigatingBooking(true);
+    setPendingServiceName(serviceName ?? null);
+    setTimeout(() => {
+      if (serviceId) {
+        router.push(`/book?serviceId=${encodeURIComponent(serviceId)}`);
+      } else {
+        router.push('/book');
+      }
+    }, 600);
+  };
+
   return (
     <div className="flex flex-col w-full bg-[#FDFDFD] text-[#1D1E1E]">
-      <ServicesHero />
+      <ServicesHero onBook={() => handleBook()} />
 
       <section id="services-list" className="relative w-full bg-[#FDFDFD] pt-16 pb-24 sm:pt-24 sm:pb-32 font-sans">
         <div className="max-w-7xl mx-auto px-6 sm:px-12">
@@ -438,7 +464,7 @@ export function ServicesPageView({ dbServices }: ServicesPageViewProps) {
           <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 items-stretch">
             <AnimatePresence mode="popLayout">
               {displayedServices.map((svc, idx) => (
-                <ServiceCard key={svc.id} item={svc} index={idx} />
+                <ServiceCard key={svc.id} item={svc} index={idx} onBook={handleBook} />
               ))}
             </AnimatePresence>
           </motion.div>
@@ -452,7 +478,27 @@ export function ServicesPageView({ dbServices }: ServicesPageViewProps) {
         </div>
       </section>
 
-      <CtaStrip />
+      <CtaStrip onBook={() => handleBook()} />
+
+      {/* Booking Loading Overlay */}
+      <AnimatePresence>
+        {isNavigatingBooking && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-50 bg-[#1D1E1E]/85 backdrop-blur-md flex flex-col items-center justify-center gap-4"
+          >
+            <Loader2 className="w-10 h-10 text-[#D94E4E] animate-spin" />
+            <p className="text-white text-sm tracking-wide font-sans">
+              {pendingServiceName
+                ? `Taking you to booking for ${pendingServiceName}...`
+                : 'Taking you to booking...'}
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

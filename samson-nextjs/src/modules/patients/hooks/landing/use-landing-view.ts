@@ -79,15 +79,29 @@ export function useLandingView({ services }: UseLandingViewProps) {
       });
 
   const router = useRouter();
+  const [isNavigatingBooking, setIsNavigatingBooking] = useState(false);
+  const [pendingServiceName, setPendingServiceName] = useState<string | null>(null);
 
-  // Redirect to dedicated 2-Step Booking Wizard page
-  const requestAppt = (serviceId?: string) => {
+  // Redirect to dedicated 2-Step Booking Wizard page with loading state
+  const requestAppt = (serviceId?: string, serviceName?: string) => {
     setSelectedService(null);
-    if (serviceId) {
-      router.push(`/book?serviceId=${encodeURIComponent(serviceId)}`);
+    setIsNavigatingBooking(true);
+    if (serviceName) {
+      setPendingServiceName(serviceName);
+    } else if (serviceId) {
+      const found = services.find((s) => s.id === serviceId);
+      setPendingServiceName(found?.name ?? null);
     } else {
-      router.push('/book');
+      setPendingServiceName(null);
     }
+
+    setTimeout(() => {
+      if (serviceId) {
+        router.push(`/book?serviceId=${encodeURIComponent(serviceId)}`);
+      } else {
+        router.push('/book');
+      }
+    }, 600);
   };
 
   const handleRealInquirySubmit = async ({
@@ -166,6 +180,8 @@ export function useLandingView({ services }: UseLandingViewProps) {
   return {
     selectedService,
     setSelectedService,
+    isNavigatingBooking,
+    pendingServiceName,
     contactForm: {
       firstName,
       setFirstName: setField('firstName'),

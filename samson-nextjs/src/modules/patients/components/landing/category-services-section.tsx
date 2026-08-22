@@ -4,6 +4,7 @@ import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MoveRight } from 'lucide-react';
+import { ServiceDescription } from './mock-category-services-section';
 
 export interface ServiceDetail {
   name: string;
@@ -336,9 +337,7 @@ export function CategoryServicesSection({ onBook }: CategoryServicesSectionProps
                   </h4>
 
                   {/* Main Service Description */}
-                  <p className="mt-1.5 sm:mt-2 text-[12px] sm:text-[14px] text-gray-500 leading-relaxed font-light">
-                    {svc.description}
-                  </p>
+                  <ServiceDescription description={svc.description} className="mt-1.5 sm:mt-2 text-[12px] sm:text-[14px]" />
 
                   {/* Sub-items (Only when subOptions exist) */}
                   {svc.subOptions && svc.subOptions.length > 0 && (

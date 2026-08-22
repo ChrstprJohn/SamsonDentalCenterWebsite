@@ -7,7 +7,7 @@ import { useToast } from '@/components/feedback/toast-container';
 import { submitInquiryAction } from '@/modules/appointments/actions/booking/submit-inquiry.action';
 import { InquiryResponseDto } from '@/modules/appointments/dtos/booking/submit-inquiry.dto';
 import { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
-import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 const mockPush = vi.fn();
 vi.mock('next/navigation', () => ({
@@ -45,7 +45,12 @@ describe('useLandingView', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.useFakeTimers();
     vi.mocked(useToast).mockReturnValue({ addToast: mockAddToast } as unknown as ReturnType<typeof useToast>);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it('should redirect to /book?serviceId=... when booking CTA is triggered with service id', () => {
@@ -54,10 +59,17 @@ describe('useLandingView', () => {
     );
 
     act(() => {
-      result.current.requestAppt('s-1');
+      result.current.requestAppt('d9b233a0-7f2a-43c2-bf72-881c00222a00');
     });
 
-    expect(mockPush).toHaveBeenCalledWith('/book?serviceId=s-1');
+    expect(result.current.isNavigatingBooking).toBe(true);
+    expect(result.current.pendingServiceName).toBe('General Dentistry');
+
+    act(() => {
+      vi.advanceTimersByTime(600);
+    });
+
+    expect(mockPush).toHaveBeenCalledWith('/book?serviceId=d9b233a0-7f2a-43c2-bf72-881c00222a00');
   });
 
   it('should redirect to /book when booking CTA is triggered without service id', () => {
@@ -67,6 +79,13 @@ describe('useLandingView', () => {
 
     act(() => {
       result.current.requestAppt();
+    });
+
+    expect(result.current.isNavigatingBooking).toBe(true);
+    expect(result.current.pendingServiceName).toBeNull();
+
+    act(() => {
+      vi.advanceTimersByTime(600);
     });
 
     expect(mockPush).toHaveBeenCalledWith('/book');

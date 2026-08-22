@@ -28,7 +28,7 @@ const cleanedAssetSrcs: Record<number, string> = {
   10: '/new-assets/new-asset (10).png',
 };
 
-const assetSrcs = [2, 13, 4, 5, 6, 7, 8, 9, 10, 12, 11, 1, 14]
+const assetSrcs = [2, 4, 6, 7, 8, 9, 10, 12, 11, 1, 14]
   .map((n) => (n === 2 ? '/assets/Assets (2)-combined.jpg' : cleanedAssetSrcs[n] ?? `/assets/Assets (${n}).jpg`));
 
 export const repeatedPortfolioItems = Array.from({ length: 50 }, (_, index) => {

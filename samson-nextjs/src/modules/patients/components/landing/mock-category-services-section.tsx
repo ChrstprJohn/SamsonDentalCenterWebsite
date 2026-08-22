@@ -24,6 +24,68 @@ export interface MockCategoryGroup {
   services: MockServiceItem[];
 }
 
+export function parseServiceDescription(description?: string | null): {
+  mainText: string;
+  bullets: string[];
+} {
+  if (!description || !description.trim()) {
+    return { mainText: '', bullets: [] };
+  }
+
+  const trimmed = description.trim();
+  const match = trimmed.match(/^([\s\S]*?)(?:[\s,;:-]*\b(?:bullets?|bullet\s*points?)\b\s*[,;:-]\s*|\s*\n\s*\b(?:bullets?|bullet\s*points?)\b\s*[,;:-]?\s*)([\s\S]*)$/i);
+
+  if (!match) {
+    return {
+      mainText: trimmed,
+      bullets: [],
+    };
+  }
+
+  const mainText = match[1].trim();
+  const rawBullets = match[2].trim();
+
+  const bullets = rawBullets
+    ? rawBullets
+        .split(/[\n,]+/)
+        .map((b) => b.trim().replace(/^[-*•]\s*/, ''))
+        .filter(Boolean)
+    : [];
+
+  return {
+    mainText,
+    bullets,
+  };
+}
+
+export function ServiceDescription({
+  description,
+  className = '',
+}: {
+  description?: string | null;
+  className?: string;
+}) {
+  const { mainText, bullets } = parseServiceDescription(description);
+
+  if (!mainText && bullets.length === 0) return null;
+
+  return (
+    <div className={`mt-3 font-sans text-[13px] leading-relaxed text-gray-500 space-y-2 ${className}`}>
+      {mainText && <p>{mainText}</p>}
+      {bullets.length > 0 && (
+        <ul className="space-y-1.5 pt-0.5">
+          {bullets.map((bullet, idx) => (
+            <li key={idx} className="flex items-start gap-2 text-[#4F5454]">
+              <span className="mt-[6.5px] w-1.5 h-1.5 rounded-full bg-[#D94E4E] shrink-0" />
+              <span className="leading-snug">{bullet}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 // ---------------------------------------------------------------------------
 // Hardcoded category metadata (order, nr, description) — services come from DB
 // ---------------------------------------------------------------------------
@@ -113,14 +175,16 @@ export function MockCategoryServicesSection({ onBook, dbServices }: MockCategory
   };
 
   const handleBooking = (service: MockServiceItem) => {
+    setSelectedCategory(null);
+    if (onBook) {
+      onBook(service.id, service.name);
+      return;
+    }
     if (pendingServiceName) return;
     setPendingServiceName(service.name);
-    setSelectedCategory(null);
     setTimeout(() => {
       setPendingServiceName(null);
-      if (onBook) {
-        onBook(service.id, service.name);
-      }
+      window.location.href = `/book?serviceId=${encodeURIComponent(service.id)}`;
     }, 600);
   };
 
@@ -261,11 +325,7 @@ export function MockCategoryServicesSection({ onBook, dbServices }: MockCategory
                             <h3 className="font-sans text-[18px] sm:text-[22px] font-normal tracking-[-0.03em] text-[#1D1E1E] leading-[1.2]">
                               {svc.name}
                             </h3>
-                            {svc.description && (
-                              <div className="mt-3 font-sans text-[13px] leading-relaxed text-gray-500">
-                                {svc.description}
-                              </div>
-                            )}
+                            <ServiceDescription description={svc.description} />
                           </div>
                           <div className="mt-6 pt-5 border-t border-gray-100">
                             <button
@@ -330,11 +390,7 @@ export function MockCategoryServicesSection({ onBook, dbServices }: MockCategory
                             <h3 className="font-sans text-[18px] font-normal tracking-[-0.03em] text-[#1D1E1E] leading-[1.2]">
                               {selectedCategory.services[activeMobileIndex].name}
                             </h3>
-                            {selectedCategory.services[activeMobileIndex].description && (
-                              <div className="mt-3 font-sans text-[13px] leading-relaxed text-gray-500">
-                                {selectedCategory.services[activeMobileIndex].description}
-                              </div>
-                            )}
+                            <ServiceDescription description={selectedCategory.services[activeMobileIndex].description} />
                           </div>
                           <div className="mt-6 pt-5 border-t border-gray-100">
                             <button

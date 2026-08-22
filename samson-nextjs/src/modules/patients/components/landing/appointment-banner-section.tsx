@@ -16,7 +16,11 @@ const BG_IMAGES = [
 // Change this index (0–4) to pick the background you want to keep
 const ACTIVE_BG_INDEX = 0;
 
-export function AppointmentBannerSection() {
+interface AppointmentBannerSectionProps {
+  onBookClick?: () => void;
+}
+
+export function AppointmentBannerSection({ onBookClick }: AppointmentBannerSectionProps = {}) {
   const [selected, setSelected] = useState(ACTIVE_BG_INDEX);
 
   useEffect(() => {
@@ -92,12 +96,22 @@ export function AppointmentBannerSection() {
           </p>
 
           {/* CTA */}
-          <Link href="/book">
-            <button className="group inline-flex items-center gap-3 bg-white text-[#141515] hover:bg-[#D94E4E] hover:text-white px-7 py-3.5 rounded-full text-[12px] font-semibold uppercase tracking-widest transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] shadow-md cursor-pointer mt-2">
+          {onBookClick ? (
+            <button
+              onClick={onBookClick}
+              className="group inline-flex items-center gap-3 bg-white text-[#141515] hover:bg-[#D94E4E] hover:text-white px-7 py-3.5 rounded-full text-[12px] font-semibold uppercase tracking-widest transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] shadow-md cursor-pointer mt-2 w-fit"
+            >
               Request Appointment
               <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
             </button>
-          </Link>
+          ) : (
+            <Link href="/book">
+              <button className="group inline-flex items-center gap-3 bg-white text-[#141515] hover:bg-[#D94E4E] hover:text-white px-7 py-3.5 rounded-full text-[12px] font-semibold uppercase tracking-widest transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] shadow-md cursor-pointer mt-2">
+                Request Appointment
+                <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+              </button>
+            </Link>
+          )}
 
         </div>
       </div>

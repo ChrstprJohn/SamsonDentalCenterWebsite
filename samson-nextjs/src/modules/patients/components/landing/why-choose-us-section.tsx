@@ -159,7 +159,7 @@ export function WhyChooseUsSection() {
               <div className="space-y-3 sm:space-y-4">
                 <div className="relative aspect-[4/5] overflow-hidden border border-gray-100 bg-[#1D1E1E]">
                   <img
-                    src="/img/Img (4).jpg"
+                    src="/img/Img (6).jpg"
                     alt="Samson Dental Care Clinic Facility"
                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                   />
