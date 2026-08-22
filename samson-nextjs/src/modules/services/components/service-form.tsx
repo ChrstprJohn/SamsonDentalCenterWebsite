@@ -29,8 +29,21 @@ export function ServiceForm({
   } = form;
 
   const titleVal = form.watch('name') || 'New Treatment Service';
-  const categoryVal = form.watch('serviceType') || 'GENERAL';
+  const categoryVal = form.watch('category') || '';
   const imgUrl = form.watch('imageUrl') || form.watch('image_url' as any) || undefined;
+
+  const CATEGORIES = [
+    'Consultation',
+    'Diagnostics',
+    'Preventive Dentistry',
+    'Restorative Dentistry',
+    'Prosthodontics',
+    'Endodontics',
+    'Cosmetic Dentistry',
+    'Orthodontics',
+    'Oral Surgery and Implants',
+    'Specialized Care',
+  ];
 
   return (
     <form onSubmit={onSubmit} className="flex flex-col flex-1 min-h-0 h-full">
@@ -52,7 +65,7 @@ export function ServiceForm({
             <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent flex flex-col items-center justify-end p-5 text-center">
               <h2 className="text-2xl font-bold text-foreground">{isEditMode ? titleVal : 'Add New Treatment Service'}</h2>
               <p className="text-xs text-muted-foreground font-medium mt-0.5">
-                {categoryVal === 'SPECIALIZED' ? 'Specialized Service' : 'General Service'}
+                {categoryVal || 'No category selected'}
               </p>
             </div>
           </div>
@@ -65,7 +78,7 @@ export function ServiceForm({
               {isEditMode ? titleVal : 'Add New Treatment Service'}
             </h2>
             <p className="text-xs text-muted-foreground font-medium mt-0.5">
-              {categoryVal === 'SPECIALIZED' ? 'Specialized Service' : 'General Service'}
+              {categoryVal || 'No category selected'}
             </p>
           </div>
         )}
@@ -99,13 +112,15 @@ export function ServiceForm({
             </div>
 
             <div className="flex flex-col gap-0.5">
-              <span className="text-xs text-muted-foreground">Category Type</span>
+              <span className="text-xs text-muted-foreground">Category <span className="text-muted-foreground/60">(shown on public services page)</span></span>
               <select
-                {...register('serviceType')}
+                {...register('category')}
                 className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border font-medium"
               >
-                <option value="GENERAL">GENERAL</option>
-                <option value="SPECIALIZED">SPECIALIZED</option>
+                <option value="">— Uncategorized —</option>
+                {CATEGORIES.map((cat) => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
               </select>
             </div>
 
@@ -118,18 +133,6 @@ export function ServiceForm({
               />
             </div>
 
-            <div className="flex flex-col gap-0.5">
-              <span className="text-xs text-muted-foreground">
-                Display Ranking <span className="text-muted-foreground/60">(optional — lower number shows first)</span>
-              </span>
-              <input
-                type="number"
-                min={0}
-                placeholder="e.g. 1, 2, 3"
-                {...register('ranking')}
-                className="w-full px-4 py-2.5 rounded-xl border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary-ring border-card-border"
-              />
-            </div>
           </div>
         </div>
 

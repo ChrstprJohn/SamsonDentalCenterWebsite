@@ -11,6 +11,7 @@ export const createServiceFormSchema = z.object({
   imageUrl: z.string().optional().nullable(),
   imageFile: z.any().optional(),
   ranking: z.coerce.number().int().min(0).optional().nullable(),
+  category: z.string().optional().nullable(),
 });
 
 export type CreateServiceFormValues = z.infer<typeof createServiceFormSchema>;

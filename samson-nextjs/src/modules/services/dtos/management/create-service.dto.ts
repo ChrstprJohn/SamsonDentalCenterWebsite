@@ -10,6 +10,7 @@ export const createServiceSchema = z.object({
   isActive: z.boolean().default(true),
   imageUrl: z.string().url().optional().nullable(),
   ranking: z.number().int().nonnegative().optional().nullable(),
+  category: z.string().optional().nullable(),
 });
 
 export type CreateServiceDto = z.infer<typeof createServiceSchema>;

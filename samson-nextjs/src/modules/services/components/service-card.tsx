@@ -12,11 +12,6 @@ interface ServiceCardProps {
 }
 
 export function ServiceCard({ service, index, isSelected, onSelect }: ServiceCardProps) {
-  const rankingLabel =
-    service.ranking != null
-      ? String(service.ranking).padStart(2, '0')
-      : 'NA';
-
   return (
     <button
       onClick={() => onSelect(service)}
@@ -26,12 +21,6 @@ export function ServiceCard({ service, index, isSelected, onSelect }: ServiceCar
           : 'text-foreground'
       }`}
     >
-      <span
-        title={service.ranking != null ? `Ranking ${service.ranking}` : 'Alphabetical order'}
-        className="size-10 shrink-0 rounded-full bg-muted-foreground/10 border-2 border-border/60 flex items-center justify-center font-mono text-xs font-semibold text-muted-foreground/80"
-      >
-        {rankingLabel}
-      </span>
       <div className="flex flex-col min-w-0 flex-1 gap-1.5">
         <div className="flex w-full items-center justify-between gap-2">
           <span className="font-semibold text-foreground truncate">{service.name}</span>
@@ -46,8 +35,8 @@ export function ServiceCard({ service, index, isSelected, onSelect }: ServiceCar
           </span>
         </div>
 
-        <span className="text-xs text-text-secondary font-medium capitalize">
-          {service.serviceType?.toLowerCase() || 'general'}
+        <span className="text-xs text-text-secondary font-medium">
+          {service.category || 'Uncategorized'}
         </span>
 
         {service.description && (

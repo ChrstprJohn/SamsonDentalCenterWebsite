@@ -12,6 +12,7 @@ export interface Service {
   status: ServiceStatus;
   imageUrl?: string | null;
   ranking?: number | null;
+  category?: string | null;
   createdAt?: string;
   updatedAt?: string;
 }

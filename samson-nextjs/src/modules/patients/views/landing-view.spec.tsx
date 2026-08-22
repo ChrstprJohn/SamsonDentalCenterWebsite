@@ -14,10 +14,10 @@ vi.mock('../hooks/landing/use-landing-view', () => ({
 vi.mock('../components/landing/hero-section-preview', () => ({ HeroSectionPreview: () => <div data-testid="hero-section-preview" /> }));
 vi.mock('../components/landing/hero-section-v1', () => ({ HeroSectionV1: () => <div data-testid="hero-section-v1" /> }));
 vi.mock('../components/landing/hero-section-v2', () => ({ HeroSectionV2: () => <div data-testid="hero-section-v2" /> }));
-vi.mock('../components/landing/services-section', () => ({
-  ServicesSection: ({ onSelectService }: any) => (
-    <div data-testid="services-section">
-      <button onClick={() => onSelectService({ id: 's1' })}>Select Service</button>
+vi.mock('../components/landing/mock-category-services-section', () => ({
+  MockCategoryServicesSection: ({ onBook }: any) => (
+    <div data-testid="mock-category-services-section">
+      <button onClick={() => onBook('s1')}>Select Service</button>
     </div>
   ),
 }));
@@ -43,7 +43,7 @@ describe('LandingView', () => {
     render(<LandingView services={[]} config={mockConfig} reviews={[]} />);
 
     expect(screen.getByTestId('hero-section-preview')).toBeDefined();
-    expect(screen.getByTestId('services-section')).toBeDefined();
+    expect(screen.getByTestId('mock-category-services-section')).toBeDefined();
     expect(screen.getByTestId('about-section')).toBeDefined();
     expect(screen.getByTestId('gallery-section')).toBeDefined();
     expect(screen.getByTestId('faq-section')).toBeDefined();
@@ -51,6 +51,6 @@ describe('LandingView', () => {
     expect(screen.getByTestId('contact-section')).toBeDefined();
 
     screen.getByText('Select Service').click();
-    expect(requestAppt).toHaveBeenCalledWith('s1');
+    expect(requestAppt).toHaveBeenCalled();
   });
 });

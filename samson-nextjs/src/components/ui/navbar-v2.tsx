@@ -154,7 +154,7 @@ export function NavbarV2({ user, config, logoUrl: propLogoUrl, clinicName: propC
               {user ? (
                 <>
                   <AuthenticatedUserHeader user={user} />
-                  <Link href="/booking">
+                  <Link href="/book">
                     <button
                       className="px-5 py-2.5 rounded-lg bg-[#0070F3] text-white hover:bg-[#0059c6] text-[11px] font-semibold uppercase tracking-widest transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] shadow-sm cursor-pointer whitespace-nowrap"
                     >

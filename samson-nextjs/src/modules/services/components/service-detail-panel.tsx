@@ -57,7 +57,7 @@ export function ServiceDetailPanel({
             <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent flex flex-col items-center justify-end p-5 text-center">
               <h2 className="text-2xl font-bold text-foreground">{service.name}</h2>
               <p className="text-xs text-muted-foreground font-medium mt-0.5">
-                {service.serviceType === 'SPECIALIZED' ? 'Specialized Service' : 'General Service'}
+                {(service as any).category || 'No category assigned'}
               </p>
             </div>
           </div>
@@ -68,7 +68,7 @@ export function ServiceDetailPanel({
             </div>
             <h2 className="text-2xl font-bold text-foreground">{service.name}</h2>
             <p className="text-xs text-muted-foreground font-medium mt-0.5">
-              {service.serviceType === 'SPECIALIZED' ? 'Specialized Service' : 'General Service'}
+              {(service as any).category || 'No category assigned'}
             </p>
           </div>
         )}
@@ -102,13 +102,7 @@ export function ServiceDetailPanel({
           <div className="flex flex-col gap-3">
             <ServiceField label="Service Title" value={service.name} />
 
-            <div className="grid grid-cols-2 gap-3">
-              <ServiceField label="Category Type" value={service.serviceType || 'GENERAL'} />
-              <ServiceField
-                label="Display Ranking"
-                value={service.ranking != null ? String(service.ranking) : 'Alphabetical'}
-              />
-            </div>
+            <ServiceField label="Category" value={(service as any).category || 'Uncategorized'} />
 
             <div className="flex flex-col gap-0.5">
               <span className="text-xs text-muted-foreground">Description</span>

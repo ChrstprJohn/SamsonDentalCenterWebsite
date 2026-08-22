@@ -11,6 +11,7 @@ export const serviceDbSchema = z.object({
   image_url: z.string().nullable().optional(),
   ranking: z.number().int().nullable().optional(),
   status: z.enum(["ACTIVE", "HIDDEN", "ARCHIVED"]).default("ACTIVE").optional(),
+  category: z.string().nullable().optional(),
   created_at: z.string().optional(),
   updated_at: z.string().optional(),
 });
@@ -25,6 +26,7 @@ export const serviceResponseSchema = serviceDbSchema.transform((record) => {
     serviceType: record.service_type,
     isActive: record.is_active,
     status: record.status || (record.is_active ? 'ACTIVE' : 'HIDDEN'),
+    category: record.category ?? null,
     createdAt: record.created_at,
     updatedAt: record.updated_at,
   };
@@ -41,6 +43,7 @@ export const serviceResponseSchema = serviceDbSchema.transform((record) => {
     serviceType: "GENERAL" | "SPECIALIZED";
     isActive: boolean;
     status: "ACTIVE" | "HIDDEN" | "ARCHIVED";
+    category?: string | null;
     imageUrl?: string | null;
     ranking?: number | null;
     createdAt?: string;

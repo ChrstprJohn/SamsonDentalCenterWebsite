@@ -12,11 +12,12 @@ export const createServiceCommand = (supabase: SupabaseClient) => {
       description: data.description,
       duration_minutes: data.durationMinutes,
       price: data.price,
-      service_type: data.serviceType,
+      service_type: 'GENERAL' as const, // always GENERAL — serviceType field is legacy
       is_active: status === 'ACTIVE',
       image_url: data.imageUrl,
       status: status,
       ranking: data.ranking ?? null,
+      category: data.category ?? null,
     };
     const { data: result, error } = await supabase
       .from("services")
@@ -68,6 +69,7 @@ export const updateServiceCommand = (supabase: SupabaseClient) => {
     }
     if (updates.imageUrl !== undefined) dbPayload.image_url = updates.imageUrl;
     if (updates.ranking !== undefined) dbPayload.ranking = updates.ranking;
+    if (updates.category !== undefined) dbPayload.category = updates.category ?? null;
 
     const { data: result, error } = await supabase
       .from("services")

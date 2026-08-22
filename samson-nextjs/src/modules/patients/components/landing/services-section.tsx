@@ -88,7 +88,7 @@ export function ServicesSection({ services, onSelectService }: ServicesSectionPr
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.3 }}
-              className="relative w-full max-w-md bg-[#FDFDFD] p-6 sm:p-8"
+              className="relative w-full max-w-lg sm:max-w-[540px] bg-[#FDFDFD] p-6 sm:p-8 md:p-9"
             >
               <button
                 onClick={() => setSelectedService(null)}
@@ -108,12 +108,15 @@ export function ServicesSection({ services, onSelectService }: ServicesSectionPr
                   {renderDescription(selectedService.description)}
                 </div>
               )}
-              <button
-                onClick={() => handleSelect(selectedService)}
-                className="mt-6 w-full py-3.5 bg-[#1D1E1E] text-white text-xs font-semibold tracking-widest uppercase hover:bg-[#D94E4E] transition-all duration-300 cursor-pointer"
-              >
-                Request Appointment
-              </button>
+              {/* Separator & Request Appointment Button */}
+              <div className="mt-6 pt-5 border-t border-gray-100">
+                <button
+                  onClick={() => handleSelect(selectedService)}
+                  className="w-full py-3.5 bg-[#1D1E1E] text-white text-xs font-semibold tracking-widest uppercase hover:bg-[#D94E4E] transition-all duration-300 cursor-pointer"
+                >
+                  Request Appointment
+                </button>
+              </div>
             </motion.div>
           </motion.div>
         )}

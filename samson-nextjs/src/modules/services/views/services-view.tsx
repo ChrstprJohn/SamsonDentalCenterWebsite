@@ -186,7 +186,7 @@ export function ServicesView({ initialServices }: ServicesViewProps) {
                     : 'Service Details'}
                 </span>
                 <span className="text-[11px] text-muted-foreground truncate">
-                  {selectedService ? (selectedService.serviceType === 'SPECIALIZED' ? 'Specialized Service' : 'General Service') : 'Create practice catalog treatment item'}
+                  {selectedService ? (selectedService.category || 'No category assigned') : 'Create practice catalog treatment item'}
                 </span>
               </div>
             </div>
