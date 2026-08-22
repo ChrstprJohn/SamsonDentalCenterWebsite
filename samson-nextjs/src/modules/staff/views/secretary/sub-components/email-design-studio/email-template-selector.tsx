@@ -26,7 +26,7 @@ export function EmailTemplateSelector({
         style={{ scrollbarWidth: 'thin' }}
         className="flex-1 min-h-0 !overflow-y-auto space-y-4 p-3 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
       >
-        {Object.entries(groupedDesigns).map(([category, designs]) => (
+        {Object.entries(groupedDesigns).filter(([category]) => category !== 'Conversation').map(([category, designs]) => (
           <div key={category}>
             <div className="px-1 pb-2 text-[11px] font-semibold text-muted-foreground">{category}</div>
             <div className="space-y-2">

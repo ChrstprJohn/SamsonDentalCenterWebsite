@@ -5,13 +5,9 @@ import {
   DesignTokens,
   DraftCopy,
   EmailDesignDefinition,
+  EmailThemeMode,
   SampleData,
 } from './types';
-
-const p: React.CSSProperties = { margin: '0 0 16px', color: '#1a1a1a', fontSize: 14, lineHeight: 1.75 };
-const bold: React.CSSProperties = { fontWeight: 700 };
-const link: React.CSSProperties = { color: '#2563eb', textDecoration: 'underline', fontWeight: 600 };
-const muted: React.CSSProperties = { color: '#64748b', fontSize: 12, lineHeight: 1.6 };
 
 export interface EmailDesignPreviewProps {
   design: EmailDesignDefinition;
@@ -19,6 +15,7 @@ export interface EmailDesignPreviewProps {
   copy: DraftCopy;
   sample: SampleData;
   branding?: EmailBranding;
+  themeMode?: EmailThemeMode;
 }
 
 export function EmailDesignPreview({
@@ -27,7 +24,37 @@ export function EmailDesignPreview({
   copy,
   sample,
   branding,
+  themeMode = 'light',
 }: EmailDesignPreviewProps) {
+  const isDark = themeMode === 'dark';
+
+  const fontFamily = 'Arial, Helvetica, sans-serif';
+
+  const p: React.CSSProperties = {
+    margin: '0 0 16px',
+    color: isDark ? '#f4f4f5' : '#1a1a1a',
+    fontSize: 14,
+    lineHeight: 1.7,
+    fontFamily,
+  };
+  const bold: React.CSSProperties = {
+    fontWeight: 700,
+    color: isDark ? '#ffffff' : '#1a1a1a',
+    fontFamily,
+  };
+  const link: React.CSSProperties = {
+    color: isDark ? '#60a5fa' : '#2563eb',
+    textDecoration: 'underline',
+    fontWeight: 600,
+    fontFamily,
+  };
+  const muted: React.CSSProperties = {
+    color: isDark ? '#a1a1aa' : '#64748b',
+    fontSize: 12,
+    lineHeight: 1.6,
+    fontFamily,
+  };
+
   const isCancelled = design.id === 'cancelled';
   const isConfirmed = design.id === 'appointment-confirmed';
   const isReminder = design.id === 'reminder-24h' || design.id === 'reminder-48h';
@@ -40,31 +67,106 @@ export function EmailDesignPreview({
   const isRequestRejected = design.id === 'request-rejected';
   const baseUrl = sample.baseUrl || 'http://localhost:3000';
   const b = branding ?? resolveEmailBranding(undefined, baseUrl);
-  const chatUrl = `${baseUrl}/manage?token=${sample.appointmentId || 'APT-SAMPLE'}&openChat=true`;
   const feedbackUrl = `${baseUrl}/feedback?ref=${sample.appointmentId || 'APT-SAMPLE'}`;
   const noShowReasonUrl = `${baseUrl}/no-show-reason?ref=${sample.appointmentId || 'APT-SAMPLE'}`;
   const wellbeingUrl = `${baseUrl}/wellbeing?ref=${sample.appointmentId || 'APT-SAMPLE'}`;
-  const ctaHref = isPostCare ? feedbackUrl : isNoShow ? noShowReasonUrl : chatUrl;
+  const ctaHref = isPostCare ? feedbackUrl : isNoShow ? noShowReasonUrl : b.websiteUrl;
   const referenceCode = sample.referenceCode || formatRefId(sample.appointmentId);
+  const displayLocation = b.locationLine
+    ? b.locationLine.replace(new RegExp(`^${b.clinicName},?\\s*`, 'i'), '').trim() || b.locationLine
+    : '';
 
-  const statusLabel = isConfirmed || isReminder || isRescheduled ? 'Confirmed / Approved' : isPostCare ? 'Completed' : isFollowUp ? 'Completed' : isNoShow ? 'Missed' : isBookingRequestReceived ? 'Pending Review' : isRequestRejected ? 'Rejected' : isCancelled ? 'Cancelled' : null;
-  const statusColor = (isCancelled || isRequestRejected || isNoShow) ? '#dc2626' : (isPostCare || isFollowUp) ? '#0f766e' : '#2563eb';
+  const statusLabel =
+    isConfirmed || isReminder || isRescheduled
+      ? 'Confirmed / Approved'
+      : isPostCare
+      ? 'Completed'
+      : isFollowUp
+      ? 'Completed'
+      : isNoShow
+      ? 'Missed'
+      : isBookingRequestReceived
+      ? 'Pending Review'
+      : isRequestRejected
+      ? 'Rejected'
+      : isCancelled
+      ? 'Cancelled'
+      : null;
+
+  const statusColor =
+    isCancelled || isRequestRejected || isNoShow
+      ? isDark
+        ? '#f87171'
+        : '#dc2626'
+      : isPostCare || isFollowUp
+      ? isDark
+        ? '#2dd4bf'
+        : '#0f766e'
+      : isDark
+      ? '#60a5fa'
+      : '#2563eb';
 
   const showDetails = copy.showSummary && !isCancelled && !isStaffReply && !isRequestRejected && !isNoShow;
 
+  const containerCard: React.CSSProperties = {
+    margin: '0 0 20px',
+    padding: '16px 20px',
+    backgroundColor: isDark ? '#27272a' : '#f8fafc',
+    borderRadius: 10,
+    border: isDark ? '1px solid #3f3f46' : '1px solid #e2e8f0',
+    fontFamily,
+  };
+
+  const labelCell: React.CSSProperties = {
+    width: 130,
+    padding: '6px 12px 6px 0',
+    verticalAlign: 'top',
+    fontWeight: 700,
+    fontSize: 14,
+    color: isDark ? '#ffffff' : '#1a1a1a',
+    whiteSpace: 'nowrap',
+    fontFamily,
+  };
+
+  const valueCell: React.CSSProperties = {
+    padding: '6px 0',
+    verticalAlign: 'top',
+    fontSize: 14,
+    color: isDark ? '#f4f4f5' : '#1a1a1a',
+    lineHeight: 1.6,
+    textAlign: 'right',
+    fontFamily,
+  };
+
+  const listStyle: React.CSSProperties = {
+    margin: '0 0 16px',
+    paddingLeft: 20,
+    listStyle: 'disc',
+    color: isDark ? '#f4f4f5' : '#1a1a1a',
+    fontSize: 14,
+    lineHeight: 1.7,
+    fontFamily,
+  };
+
   return (
-    <div style={{ background: '#ffffff', fontFamily: 'Arial, Helvetica, sans-serif', minHeight: '100%' }}>
+    <div
+      style={{
+        background: isDark ? '#18181b' : '#ffffff',
+        color: isDark ? '#f4f4f5' : '#1a1a1a',
+        fontFamily,
+        minHeight: '100%',
+        transition: 'background-color 0.2s ease, color 0.2s ease',
+      }}
+    >
       <style>{`
-        .eml-body { padding: 36px 40px 48px; }
+        .eml-body { padding: 36px 36px 44px; }
         .eml-logo { width: 130px; }
-        .eml-p { font-size: 14px; line-height: 1.75; }
         @media only screen and (max-width: 480px) {
-          .eml-body { padding: 24px 20px 36px !important; }
+          .eml-body { padding: 24px 20px 32px !important; }
           .eml-logo { width: 100px !important; }
-          .eml-p { font-size: 15px !important; line-height: 1.8 !important; }
         }
       `}</style>
-      <div className="eml-body" style={{ maxWidth: 720, margin: '0 auto', background: '#ffffff' }}>
+      <div className="eml-body" style={{ maxWidth: 720, margin: '0 auto', background: isDark ? '#18181b' : '#ffffff', fontFamily }}>
 
         {/* Logo */}
         <div style={{ marginBottom: 28 }}>
@@ -72,48 +174,73 @@ export function EmailDesignPreview({
             src={b.logoUrl}
             alt={b.clinicName}
             className="eml-logo"
-            style={{ height: 'auto', objectFit: 'contain', display: 'block', margin: '0 auto' }}
+            style={{
+              height: 'auto',
+              objectFit: 'contain',
+              display: 'block',
+              margin: '0 auto',
+            }}
           />
         </div>
 
         {/* Greeting */}
-        <p style={p}>Dear <span style={{ fontWeight: 700 }}>{sample.patientName || 'Valued Patient'}</span>,</p>
+        <p style={p}>Dear <span style={{ fontWeight: 700, color: isDark ? '#ffffff' : '#1a1a1a' }}>{sample.patientName || 'Valued Patient'}</span>,</p>
 
         {/* Opening paragraph */}
         <p style={p}>{copy.intro}</p>
 
-        {/* Appointment details block — label: value format */}
+        {/* Appointment details block — 2-column label / details in container */}
         {showDetails && (
           <div style={{ margin: '0 0 20px', paddingLeft: 0 }}>
             {isRescheduled && (sample.oldDoctorName || sample.oldServiceName || sample.oldDateStr || sample.oldTimeRangeStr) && (
-              <div style={{ margin: '0 0 16px', padding: '12px 16px', backgroundColor: '#f8fafc', borderRadius: 8, border: '1px solid #e2e8f0' }}>
-                <p style={{ ...p, margin: '0 0 6px', fontWeight: 700, color: '#64748b', fontSize: 13 }}>
+              <div style={containerCard}>
+                <p style={{ ...p, margin: '0 0 8px', fontWeight: 700, color: isDark ? '#cbd5e1' : '#64748b' }}>
                   Previously scheduled:
                 </p>
-                {sample.oldDoctorName && (
-                  <p style={{ ...p, margin: '0 0 3px', fontSize: 13, color: '#64748b' }}>
-                    <span style={bold}>Doctor:</span>{' '}
-                    <span style={{ textDecoration: 'line-through' }}>{sample.oldDoctorName}</span>
-                  </p>
-                )}
-                {sample.oldServiceName && (
-                  <p style={{ ...p, margin: '0 0 3px', fontSize: 13, color: '#64748b' }}>
-                    <span style={bold}>Service:</span>{' '}
-                    <span style={{ textDecoration: 'line-through' }}>{sample.oldServiceName}</span>
-                  </p>
-                )}
-                {sample.oldDateStr && (
-                  <p style={{ ...p, margin: '0 0 3px', fontSize: 13, color: '#64748b' }}>
-                    <span style={bold}>Date:</span>{' '}
-                    <span style={{ textDecoration: 'line-through' }}>{sample.oldDateStr}</span>
-                  </p>
-                )}
-                {sample.oldTimeRangeStr && (
-                  <p style={{ ...p, margin: '0 0 3px', fontSize: 13, color: '#64748b' }}>
-                    <span style={bold}>Time:</span>{' '}
-                    <span style={{ textDecoration: 'line-through' }}>{sample.oldTimeRangeStr}</span>
-                  </p>
-                )}
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14, fontFamily }}>
+                  <tbody>
+                    {sample.oldDateStr && (
+                      <tr>
+                        <td style={{ ...labelCell, width: 120, color: isDark ? '#a1a1aa' : '#64748b', padding: '4px 12px 4px 0' }}>
+                          Date:
+                        </td>
+                        <td style={{ ...valueCell, color: isDark ? '#a1a1aa' : '#64748b', textDecoration: 'line-through', padding: '4px 0' }}>
+                          {sample.oldDateStr}
+                        </td>
+                      </tr>
+                    )}
+                    {sample.oldTimeRangeStr && (
+                      <tr>
+                        <td style={{ ...labelCell, width: 120, color: isDark ? '#a1a1aa' : '#64748b', padding: '4px 12px 4px 0' }}>
+                          Time:
+                        </td>
+                        <td style={{ ...valueCell, color: isDark ? '#a1a1aa' : '#64748b', textDecoration: 'line-through', padding: '4px 0' }}>
+                          {sample.oldTimeRangeStr}
+                        </td>
+                      </tr>
+                    )}
+                    {sample.oldServiceName && (
+                      <tr>
+                        <td style={{ ...labelCell, width: 120, color: isDark ? '#a1a1aa' : '#64748b', padding: '4px 12px 4px 0' }}>
+                          Service:
+                        </td>
+                        <td style={{ ...valueCell, color: isDark ? '#a1a1aa' : '#64748b', textDecoration: 'line-through', padding: '4px 0' }}>
+                          {sample.oldServiceName}
+                        </td>
+                      </tr>
+                    )}
+                    {sample.oldDoctorName && (
+                      <tr>
+                        <td style={{ ...labelCell, width: 120, color: isDark ? '#a1a1aa' : '#64748b', padding: '4px 12px 4px 0' }}>
+                          Doctor:
+                        </td>
+                        <td style={{ ...valueCell, color: isDark ? '#a1a1aa' : '#64748b', textDecoration: 'line-through', padding: '4px 0' }}>
+                          {sample.oldDoctorName}
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
               </div>
             )}
             {isRescheduled && (
@@ -125,34 +252,59 @@ export function EmailDesignPreview({
             {isFollowUp && (
               <p style={{ ...p, margin: '0 0 8px', fontWeight: 700 }}>Your recent visit:</p>
             )}
-            {statusLabel && (
-              <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Status:</span>{' '}
-                <span style={{ fontWeight: 700, color: statusColor }}>{statusLabel}</span>
-                {isBookingRequestReceived && (
-                  <span style={{ fontWeight: 400, fontSize: 12, color: '#94a3b8', marginLeft: 6 }}>(preview only — actual status is NEW or CONVERTED)</span>
-                )}
-              </p>
-            )}
-            {sample.doctorName && (
-              <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Doctor:</span> {sample.doctorName}</p>
-            )}
-            {sample.serviceName && (
-              <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Service:</span> {sample.serviceName}</p>
-            )}
-            <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Location:</span> {b.locationLine}
-              {!isConfirmed && !isRescheduled && !isReminder && !isPostCare && (b.mapUrl || sample.googleMapsUrl) && (
-                <> (<a href={(b.mapUrl || sample.googleMapsUrl)} target="_blank" rel="noreferrer" style={link}>View on Google Maps</a>)</>
-              )}
-            </p>
-            {sample.dateStr && (
-              <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Date:</span> {sample.dateStr}</p>
-            )}
-            {sample.timeRangeStr && (
-              <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Time:</span> {sample.timeRangeStr}</p>
-            )}
-            {referenceCode && (
-              <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Reference ID:</span> {referenceCode}</p>
-            )}
+            <div style={containerCard}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14, fontFamily }}>
+                <tbody>
+                  {statusLabel && (
+                    <tr>
+                      <td style={labelCell}>Status:</td>
+                      <td style={{ ...valueCell, fontWeight: 700, color: statusColor }}>
+                        {statusLabel}
+                        {isBookingRequestReceived && (
+                          <span style={{ fontWeight: 400, fontSize: 12, color: isDark ? '#a1a1aa' : '#94a3b8', marginLeft: 6 }}>
+                            (preview only — actual status is NEW or CONVERTED)
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  )}
+                  {sample.dateStr && (
+                    <tr>
+                      <td style={labelCell}>Date:</td>
+                      <td style={valueCell}>{sample.dateStr}</td>
+                    </tr>
+                  )}
+                  {sample.timeRangeStr && (
+                    <tr>
+                      <td style={labelCell}>Time:</td>
+                      <td style={valueCell}>{sample.timeRangeStr}</td>
+                    </tr>
+                  )}
+                  {sample.serviceName && (
+                    <tr>
+                      <td style={labelCell}>Service:</td>
+                      <td style={valueCell}>{sample.serviceName}</td>
+                    </tr>
+                  )}
+                  {sample.doctorName && (
+                    <tr>
+                      <td style={labelCell}>Doctor:</td>
+                      <td style={valueCell}>{sample.doctorName}</td>
+                    </tr>
+                  )}
+                  <tr>
+                    <td style={labelCell}>Location:</td>
+                    <td style={valueCell}>{displayLocation}</td>
+                  </tr>
+                  {referenceCode && (
+                    <tr>
+                      <td style={labelCell}>Reference ID:</td>
+                      <td style={valueCell}>{referenceCode}</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
 
@@ -164,15 +316,16 @@ export function EmailDesignPreview({
         {isRescheduled && (
           <div style={{ margin: '0 0 20px', paddingLeft: 0 }}>
             <p style={{ ...p, margin: '0 0 8px', fontWeight: 700 }}>Quick Reminders</p>
-            <ul style={{ margin: '0 0 16px', paddingLeft: 20, listStyle: 'disc', color: '#1a1a1a', fontSize: 14, lineHeight: 1.75 }}>
+            <ul style={listStyle}>
               <li style={{ marginBottom: 6 }}>Please arrive 10-15 minutes early so we can get you checked in smoothly.</li>
               <li style={{ marginBottom: 6 }}>
-                Have questions or need to reschedule?{' '}
-                <a href={ctaHref} style={link}>Click here to open clinic chat</a>, or call/text us at{' '}
-                <a href={b.phoneHref} style={link}>{b.phone}</a>.
+                Have questions or need to reschedule? Call or text us at{' '}
+                <span style={bold}>{b.phone}</span>
+                {b.landline ? <> · Landline: <span style={bold}>{b.landline}</span></> : ''}.
               </li>
-              <li>
-                <span style={{ color: '#dc2626', fontWeight: 600 }}>Note: Replies to this email are unmonitored.</span>
+              <li style={{ marginBottom: 6 }}>
+                You can visit our website:{' '}
+                <a href={b.websiteUrl} target="_blank" rel="noreferrer" style={link}>{b.websiteLabel}</a>.
               </li>
             </ul>
           </div>
@@ -181,15 +334,50 @@ export function EmailDesignPreview({
         {isBookingRequestReceived && (
           <div style={{ margin: '0 0 20px', paddingLeft: 0 }}>
             <p style={{ ...p, margin: '0 0 8px', fontWeight: 700 }}>Here is a copy of your request:</p>
-            <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Status:</span>{' '}
-              <span style={{ fontWeight: 700, color: '#2563eb' }}>Pending Review</span>
-            </p>
-            {sample.serviceName && <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Service:</span> {sample.serviceName}</p>}
-            {sample.dateStr && <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Preferred date:</span> {sample.dateStr}</p>}
-            {sample.preferredStartTimeStr && <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Preferred time:</span> {sample.preferredStartTimeStr}</p>}
-            {sample.appointmentId && <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Reference ID:</span> {sample.appointmentId}</p>}
-            <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Location:</span> {b.locationLine}</p>
-            {sample.patientNote && <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Your note:</span> {sample.patientNote}</p>}
+            <div style={containerCard}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14, fontFamily }}>
+                <tbody>
+                  <tr>
+                    <td style={labelCell}>Status:</td>
+                    <td style={{ ...valueCell, fontWeight: 700, color: isDark ? '#60a5fa' : '#2563eb' }}>Pending Review</td>
+                  </tr>
+                  {sample.dateStr && (
+                    <tr>
+                      <td style={labelCell}>Preferred date:</td>
+                      <td style={valueCell}>{sample.dateStr}</td>
+                    </tr>
+                  )}
+                  {sample.preferredStartTimeStr && (
+                    <tr>
+                      <td style={labelCell}>Preferred time:</td>
+                      <td style={valueCell}>{sample.preferredStartTimeStr}</td>
+                    </tr>
+                  )}
+                  {sample.serviceName && (
+                    <tr>
+                      <td style={labelCell}>Service:</td>
+                      <td style={valueCell}>{sample.serviceName}</td>
+                    </tr>
+                  )}
+                  <tr>
+                    <td style={labelCell}>Location:</td>
+                    <td style={valueCell}>{displayLocation}</td>
+                  </tr>
+                  {sample.appointmentId && (
+                    <tr>
+                      <td style={labelCell}>Reference ID:</td>
+                      <td style={valueCell}>{sample.appointmentId}</td>
+                    </tr>
+                  )}
+                  {sample.patientNote && (
+                    <tr>
+                      <td style={labelCell}>Your note:</td>
+                      <td style={valueCell}>{sample.patientNote}</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
 
@@ -197,7 +385,7 @@ export function EmailDesignPreview({
         {isBookingRequestReceived && (
           <div style={{ margin: '0 0 20px', paddingLeft: 0 }}>
             <p style={{ ...p, margin: '0 0 8px', fontWeight: 700 }}>What happens next?</p>
-            <ul style={{ margin: '0 0 16px', paddingLeft: 20, listStyle: 'disc', color: '#1a1a1a', fontSize: 14, lineHeight: 1.75 }}>
+            <ul style={listStyle}>
               <li style={{ marginBottom: 6 }}>Our staff reviews your request.</li>
               <li style={{ marginBottom: 6 }}>Confirmation is sent by email or text.</li>
               <li>No action needed from you — we&apos;ll be in touch.</li>
@@ -209,13 +397,15 @@ export function EmailDesignPreview({
         {isBookingRequestReceived && (
           <div style={{ margin: '0 0 20px', paddingLeft: 0 }}>
             <p style={{ ...p, margin: '0 0 8px', fontWeight: 700 }}>Need Help?</p>
-            <ul style={{ margin: '0 0 16px', paddingLeft: 20, listStyle: 'disc', color: '#1a1a1a', fontSize: 14, lineHeight: 1.75 }}>
+            <ul style={listStyle}>
               <li style={{ marginBottom: 6 }}>
                 Questions? Call/text us at{' '}
-                <a href={b.phoneHref} style={link}>{b.phone}</a>.
+                <span style={bold}>{b.phone}</span>
+                {b.landline ? <> · Landline: <span style={bold}>{b.landline}</span></> : ''}.
               </li>
-              <li>
-                <span style={{ color: '#dc2626', fontWeight: 600 }}>Note: Replies to this email are unmonitored.</span>
+              <li style={{ marginBottom: 6 }}>
+                You can visit our website:{' '}
+                <a href={b.websiteUrl} target="_blank" rel="noreferrer" style={link}>{b.websiteLabel}</a>.
               </li>
             </ul>
           </div>
@@ -226,18 +416,40 @@ export function EmailDesignPreview({
           <>
             <div style={{ margin: '0 0 16px', paddingLeft: 0 }}>
               <p style={{ ...p, margin: '0 0 8px', fontWeight: 700 }}>Your cancelled appointment:</p>
-              {sample.serviceName && (
-                <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Service:</span> {sample.serviceName}</p>
-              )}
-              {sample.dateStr && (
-                <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Date:</span> {sample.dateStr}</p>
-              )}
-              {sample.timeRangeStr && (
-                <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Time:</span> {sample.timeRangeStr}</p>
-              )}
-              {referenceCode && (
-                <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Reference ID:</span> {referenceCode}</p>
-              )}
+              <div style={containerCard}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14, fontFamily }}>
+                  <tbody>
+                    {sample.dateStr && (
+                      <tr>
+                        <td style={labelCell}>Date:</td>
+                        <td style={valueCell}>{sample.dateStr}</td>
+                      </tr>
+                    )}
+                    {sample.timeRangeStr && (
+                      <tr>
+                        <td style={labelCell}>Time:</td>
+                        <td style={valueCell}>{sample.timeRangeStr}</td>
+                      </tr>
+                    )}
+                    {sample.serviceName && (
+                      <tr>
+                        <td style={labelCell}>Service:</td>
+                        <td style={valueCell}>{sample.serviceName}</td>
+                      </tr>
+                    )}
+                    <tr>
+                      <td style={labelCell}>Location:</td>
+                      <td style={valueCell}>{displayLocation}</td>
+                    </tr>
+                    {referenceCode && (
+                      <tr>
+                        <td style={labelCell}>Reference ID:</td>
+                        <td style={valueCell}>{referenceCode}</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
             {sample.cancellationReason && (
               <p style={p}>Cancellation reason: <span style={bold}>{sample.cancellationReason}</span></p>
@@ -249,10 +461,15 @@ export function EmailDesignPreview({
         {isCancelled && (
           <div style={{ margin: '0 0 20px', paddingLeft: 0 }}>
             <p style={{ ...p, margin: '0 0 8px', fontWeight: 700 }}>Need Help?</p>
-            <ul style={{ margin: '0 0 16px', paddingLeft: 20, listStyle: 'disc', color: '#1a1a1a', fontSize: 14, lineHeight: 1.75 }}>
+            <ul style={listStyle}>
               <li style={{ marginBottom: 6 }}>
                 Questions? Call/text us at{' '}
-                <a href={b.phoneHref} style={link}>{b.phone}</a>.
+                <span style={bold}>{b.phone}</span>
+                {b.landline ? <> · Landline: <span style={bold}>{b.landline}</span></> : ''}.
+              </li>
+              <li style={{ marginBottom: 6 }}>
+                You can visit our website:{' '}
+                <a href={b.websiteUrl} target="_blank" rel="noreferrer" style={link}>{b.websiteLabel}</a>.
               </li>
               {sample.rebookUrl && (
                 <li style={{ marginBottom: 6 }}>
@@ -260,9 +477,6 @@ export function EmailDesignPreview({
                   <a href={sample.rebookUrl} target="_blank" rel="noreferrer" style={link}>Click here to make a new request</a>.
                 </li>
               )}
-              <li>
-                <span style={{ color: '#dc2626', fontWeight: 600 }}>Note: Replies to this email are unmonitored.</span>
-              </li>
             </ul>
           </div>
         )}
@@ -271,24 +485,50 @@ export function EmailDesignPreview({
         {isNoShow && (
           <div style={{ margin: '0 0 16px', paddingLeft: 0 }}>
             <p style={{ ...p, margin: '0 0 8px', fontWeight: 700 }}>Details of your missed visit:</p>
-            <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Status:</span>{' '}
-              <span style={{ fontWeight: 700, color: '#dc2626' }}>Missed</span>
-            </p>
-            {sample.doctorName && (
-              <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Doctor:</span> {sample.doctorName}</p>
-            )}
-            {sample.serviceName && (
-              <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Service:</span> {sample.serviceName}</p>
-            )}
-            {sample.dateStr && (
-              <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Date:</span> {sample.dateStr}</p>
-            )}
-            {sample.timeRangeStr && (
-              <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Time:</span> {sample.timeRangeStr}</p>
-            )}
-            {referenceCode && (
-              <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Reference ID:</span> {referenceCode}</p>
-            )}
+            <div style={containerCard}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14, fontFamily }}>
+                <tbody>
+                  <tr>
+                    <td style={labelCell}>Status:</td>
+                    <td style={{ ...valueCell, fontWeight: 700, color: isDark ? '#f87171' : '#dc2626' }}>Missed</td>
+                  </tr>
+                  {sample.dateStr && (
+                    <tr>
+                      <td style={labelCell}>Date:</td>
+                      <td style={valueCell}>{sample.dateStr}</td>
+                    </tr>
+                  )}
+                  {sample.timeRangeStr && (
+                    <tr>
+                      <td style={labelCell}>Time:</td>
+                      <td style={valueCell}>{sample.timeRangeStr}</td>
+                    </tr>
+                  )}
+                  {sample.serviceName && (
+                    <tr>
+                      <td style={labelCell}>Service:</td>
+                      <td style={valueCell}>{sample.serviceName}</td>
+                    </tr>
+                  )}
+                  {sample.doctorName && (
+                    <tr>
+                      <td style={labelCell}>Doctor:</td>
+                      <td style={valueCell}>{sample.doctorName}</td>
+                    </tr>
+                  )}
+                  <tr>
+                    <td style={labelCell}>Location:</td>
+                    <td style={valueCell}>{displayLocation}</td>
+                  </tr>
+                  {referenceCode && (
+                    <tr>
+                      <td style={labelCell}>Reference ID:</td>
+                      <td style={valueCell}>{referenceCode}</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
 
@@ -305,7 +545,7 @@ export function EmailDesignPreview({
         {isNoShow && (
           <div style={{ margin: '0 0 20px', paddingLeft: 0 }}>
             <p style={{ ...p, margin: '0 0 8px', fontWeight: 700 }}>What&apos;s Next?</p>
-            <ul style={{ margin: '0 0 16px', paddingLeft: 20, listStyle: 'disc', color: '#1a1a1a', fontSize: 14, lineHeight: 1.75 }}>
+            <ul style={listStyle}>
               {sample.rebookUrl && (
                 <li style={{ marginBottom: 6 }}>
                   Ready to reschedule?{' '}
@@ -314,21 +554,22 @@ export function EmailDesignPreview({
               )}
               <li style={{ marginBottom: 6 }}>
                 Questions? Call/text us at{' '}
-                <a href={b.phoneHref} style={link}>{b.phone}</a>.
+                <span style={bold}>{b.phone}</span>
+                {b.landline ? <> · Landline: <span style={bold}>{b.landline}</span></> : ''}.
               </li>
-              <li>
-                <span style={{ color: '#dc2626', fontWeight: 600 }}>Note: Replies to this email are unmonitored.</span>
+              <li style={{ marginBottom: 6 }}>
+                You can visit our website:{' '}
+                <a href={b.websiteUrl} target="_blank" rel="noreferrer" style={link}>{b.websiteLabel}</a>.
               </li>
             </ul>
           </div>
         )}
 
-        {/* Staff reply — primary CTA paragraph */}
-        {isStaffReply && copy.showCta && (
+        {/* Staff reply — primary paragraph */}
+        {isStaffReply && (
           <p style={p}>
-            Please{' '}
-            <a href={ctaHref} style={link}>click here to open your clinic chat</a>{' '}
-            to view the message and continue the conversation.
+            If you have questions or need further assistance regarding your appointment, please don&apos;t hesitate to call or text us at{' '}
+            <span style={bold}>{b.phone}</span>{b.landline ? <> · Landline: <span style={bold}>{b.landline}</span></> : ''}.
           </p>
         )}
 
@@ -336,13 +577,15 @@ export function EmailDesignPreview({
         {isStaffReply && (
           <div style={{ margin: '0 0 20px', paddingLeft: 0 }}>
             <p style={{ ...p, margin: '0 0 8px', fontWeight: 700 }}>Need Help?</p>
-            <ul style={{ margin: '0 0 16px', paddingLeft: 20, listStyle: 'disc', color: '#1a1a1a', fontSize: 14, lineHeight: 1.75 }}>
+            <ul style={listStyle}>
               <li style={{ marginBottom: 6 }}>
                 Questions? Call/text us at{' '}
-                <a href={b.phoneHref} style={link}>{b.phone}</a>.
+                <span style={bold}>{b.phone}</span>
+                {b.landline ? <> · Landline: <span style={bold}>{b.landline}</span></> : ''}.
               </li>
-              <li>
-                <span style={{ color: '#dc2626', fontWeight: 600 }}>Note: Replies to this email are unmonitored.</span>
+              <li style={{ marginBottom: 6 }}>
+                You can visit our website:{' '}
+                <a href={b.websiteUrl} target="_blank" rel="noreferrer" style={link}>{b.websiteLabel}</a>.
               </li>
             </ul>
           </div>
@@ -357,15 +600,16 @@ export function EmailDesignPreview({
         {(isConfirmed || isReminder) && (
           <div style={{ margin: '0 0 20px', paddingLeft: 0 }}>
             <p style={{ ...p, margin: '0 0 8px', fontWeight: 700 }}>Quick Reminders</p>
-            <ul style={{ margin: '0 0 16px', paddingLeft: 20, listStyle: 'disc', color: '#1a1a1a', fontSize: 14, lineHeight: 1.75 }}>
+            <ul style={listStyle}>
               <li style={{ marginBottom: 6 }}>Please arrive 10-15 minutes early so we can get you checked in smoothly.</li>
               <li style={{ marginBottom: 6 }}>
-                Have questions or need to reschedule?{' '}
-                <a href={ctaHref} style={link}>Click here to open clinic chat</a>, or call/text us at{' '}
-                <a href={b.phoneHref} style={link}>{b.phone}</a>.
+                Have questions or need to reschedule? Call or text us at{' '}
+                <span style={bold}>{b.phone}</span>
+                {b.landline ? <> · Landline: <span style={bold}>{b.landline}</span></> : ''}.
               </li>
-              <li>
-                <span style={{ color: '#dc2626', fontWeight: 600 }}>Note: Replies to this email are unmonitored.</span>
+              <li style={{ marginBottom: 6 }}>
+                You can visit our website:{' '}
+                <a href={b.websiteUrl} target="_blank" rel="noreferrer" style={link}>{b.websiteLabel}</a>.
               </li>
             </ul>
           </div>
@@ -382,8 +626,8 @@ export function EmailDesignPreview({
         {/* Post-care feedback CTA */}
         {isPostCare && copy.showCta && copy.ctaLabel && (
           <p style={p}>
-            If you have a free moment, we would love to hear how your visit went —{' '}
-            <a href={ctaHref} style={link}>click here to share your feedback</a>. Your feedback helps us improve our service.
+            If you have a free moment, we would love to hear how your visit went.{' '}
+            <a href={ctaHref} style={link}>Click here to share your feedback.</a> Your feedback helps us improve our service.
           </p>
         )}
 
@@ -399,13 +643,16 @@ export function EmailDesignPreview({
         {isPostCare && (
           <div style={{ margin: '0 0 20px', paddingLeft: 0 }}>
             <p style={{ ...p, margin: '0 0 8px', fontWeight: 700 }}>Quick Reminders</p>
-            <ul style={{ margin: '0 0 16px', paddingLeft: 20, listStyle: 'disc', color: '#1a1a1a', fontSize: 14, lineHeight: 1.75 }}>
+            <ul style={listStyle}>
               <li style={{ marginBottom: 6 }}>Follow all post-treatment care instructions from your doctor.</li>
-              <li style={{ marginBottom: 6 }}>Concerns or questions? Call/text us at{' '}
-                <a href={b.phoneHref} style={link}>{b.phone}</a>.
+              <li style={{ marginBottom: 6 }}>
+                Concerns or questions? Call/text us at{' '}
+                <span style={bold}>{b.phone}</span>
+                {b.landline ? <> · Landline: <span style={bold}>{b.landline}</span></> : ''}.
               </li>
-              <li>
-                <span style={{ color: '#dc2626', fontWeight: 600 }}>Note: Replies to this email are unmonitored.</span>
+              <li style={{ marginBottom: 6 }}>
+                You can visit our website:{' '}
+                <a href={b.websiteUrl} target="_blank" rel="noreferrer" style={link}>{b.websiteLabel}</a>.
               </li>
             </ul>
           </div>
@@ -415,51 +662,74 @@ export function EmailDesignPreview({
         {isFollowUp && (
           <div style={{ margin: '0 0 20px', paddingLeft: 0 }}>
             <p style={{ ...p, margin: '0 0 8px', fontWeight: 700 }}>Quick Reminders</p>
-            <ul style={{ margin: '0 0 16px', paddingLeft: 20, listStyle: 'disc', color: '#1a1a1a', fontSize: 14, lineHeight: 1.75 }}>
+            <ul style={listStyle}>
               <li style={{ marginBottom: 6 }}>Follow all post-treatment care instructions from your doctor.</li>
-              <li style={{ marginBottom: 6 }}>Concerns or questions? Call/text us at{' '}
-                <a href={b.phoneHref} style={link}>{b.phone}</a>.
+              <li style={{ marginBottom: 6 }}>
+                Concerns or questions? Call/text us at{' '}
+                <span style={bold}>{b.phone}</span>
+                {b.landline ? <> · Landline: <span style={bold}>{b.landline}</span></> : ''}.
               </li>
-              <li>
-                <span style={{ color: '#dc2626', fontWeight: 600 }}>Note: Replies to this email are unmonitored.</span>
+              <li style={{ marginBottom: 6 }}>
+                You can visit our website:{' '}
+                <a href={b.websiteUrl} target="_blank" rel="noreferrer" style={link}>{b.websiteLabel}</a>.
               </li>
               <li style={{ marginTop: 6 }}>
                 If you are experiencing a severe emergency, call us immediately at{' '}
-                <a href={b.phoneHref} style={link}>{b.phone}</a>{' '}
+                <span style={bold}>{b.phone}</span>{' '}
                 or visit the nearest emergency room.
               </li>
             </ul>
           </div>
         )}
 
-        {/* Appreciation / care paragraph — skipped for confirmed, rescheduled, reminders & post-care (kept short) */}
-        {!isConfirmed && !isRescheduled && !isReminder && !isPostCare && !isFollowUp && !isCancelled && !isStaffReply && !isRequestRejected && !isNoShow && (
+        {/* Appreciation / care paragraph */}
+        {!isConfirmed && !isRescheduled && !isReminder && !isPostCare && !isFollowUp && !isCancelled && !isStaffReply && !isRequestRejected && !isNoShow && !isBookingRequestReceived && (
           <p style={p}>
-            {isBookingRequestReceived
-              ? 'We appreciate your patience while we review your request. Our team will reach out to you shortly to confirm the details of your appointment.'
-              : 'Your health is our top priority, and we greatly appreciate your trust in our care. If you have any specific concerns or requests for your appointment, please feel free to let us know.'
-            }
+            Your health is our top priority, and we greatly appreciate your trust in our care. If you have any specific concerns or requests for your appointment, please feel free to let us know.
           </p>
         )}
 
-        {/* Request rejected — apology + labeled reason */}
+        {/* Request rejected — labeled reason */}
         {isRequestRejected && (
-          <>
-            <p style={p}>We sincerely apologize for any inconvenience this may cause.</p>
-            <p style={p}>Rejection reason: <span style={bold}>{sample.rejectionReason || 'Unfortunately, we are unable to accommodate your request at this time.'}</span></p>
-          </>
+          <p style={p}>Rejection reason: <span style={bold}>{sample.rejectionReason || 'Unfortunately, we are unable to accommodate your request at this time.'}</span></p>
         )}
 
         {/* Request rejected — what was requested */}
         {isRequestRejected && (
           <div style={{ margin: '0 0 20px', paddingLeft: 0 }}>
             <p style={{ ...p, margin: '0 0 8px', fontWeight: 700 }}>Your request:</p>
-            <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Status:</span>{' '}
-              <span style={{ fontWeight: 700, color: '#dc2626' }}>Rejected</span>
-            </p>
-            {sample.serviceName && <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Service:</span> {sample.serviceName}</p>}
-            {sample.dateStr && <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Preferred date:</span> {sample.dateStr}</p>}
-            {sample.preferredStartTimeStr && <p style={{ ...p, margin: '0 0 4px' }}><span style={bold}>Preferred time:</span> {sample.preferredStartTimeStr}</p>}
+            <div style={containerCard}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14, fontFamily }}>
+                <tbody>
+                  <tr>
+                    <td style={labelCell}>Status:</td>
+                    <td style={{ ...valueCell, fontWeight: 700, color: isDark ? '#f87171' : '#dc2626' }}>Rejected</td>
+                  </tr>
+                  {sample.dateStr && (
+                    <tr>
+                      <td style={labelCell}>Preferred date:</td>
+                      <td style={valueCell}>{sample.dateStr}</td>
+                    </tr>
+                  )}
+                  {sample.preferredStartTimeStr && (
+                    <tr>
+                      <td style={labelCell}>Preferred time:</td>
+                      <td style={valueCell}>{sample.preferredStartTimeStr}</td>
+                    </tr>
+                  )}
+                  {sample.serviceName && (
+                    <tr>
+                      <td style={labelCell}>Service:</td>
+                      <td style={valueCell}>{sample.serviceName}</td>
+                    </tr>
+                  )}
+                  <tr>
+                    <td style={labelCell}>Location:</td>
+                    <td style={valueCell}>{displayLocation}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
 
@@ -467,10 +737,15 @@ export function EmailDesignPreview({
         {isRequestRejected && (
           <div style={{ margin: '0 0 20px', paddingLeft: 0 }}>
             <p style={{ ...p, margin: '0 0 8px', fontWeight: 700 }}>Need Help?</p>
-            <ul style={{ margin: '0 0 16px', paddingLeft: 20, listStyle: 'disc', color: '#1a1a1a', fontSize: 14, lineHeight: 1.75 }}>
+            <ul style={listStyle}>
               <li style={{ marginBottom: 6 }}>
                 Request a different date or time — call/text us at{' '}
-                <a href={b.phoneHref} style={link}>{b.phone}</a>.
+                <span style={bold}>{b.phone}</span>
+                {b.landline ? <> · Landline: <span style={bold}>{b.landline}</span></> : ''}.
+              </li>
+              <li style={{ marginBottom: 6 }}>
+                You can visit our website:{' '}
+                <a href={b.websiteUrl} target="_blank" rel="noreferrer" style={link}>{b.websiteLabel}</a>.
               </li>
               {sample.rebookUrl && (
                 <li style={{ marginBottom: 6 }}>
@@ -478,25 +753,17 @@ export function EmailDesignPreview({
                   <a href={sample.rebookUrl} target="_blank" rel="noreferrer" style={link}>Click here to make a new request</a>.
                 </li>
               )}
-              <li>
-                <span style={{ color: '#dc2626', fontWeight: 600 }}>Note: Replies to this email are unmonitored.</span>
-              </li>
             </ul>
           </div>
         )}
 
-        {/* Single consolidated contact block — chat link + phone if chat available, phone-only if not */}
+        {/* Single consolidated contact block */}
         {!isConfirmed && !isCancelled && !isRescheduled && !isReminder && !isPostCare && !isFollowUp && !isStaffReply && !isBookingRequestReceived && !isRequestRejected && !isNoShow && (
           <p style={p}>
-            {copy.showCta && !isPostCare
-              ? <>
-                  If you have any questions{!isStaffReply && !isPostCare ? ', need to reschedule,' : ''} or need further assistance, please don&apos;t hesitate to reach out. You can{' '}
-                  <a href={ctaHref} style={link}>click here to open the clinic chat</a>{' '}
-                  or call or text us at <a href={b.phoneHref} style={link}>{b.phone}</a>.{' '}
-                  <span style={{ color: '#dc2626', fontWeight: 600 }}>Please note that replies to this email are not monitored.</span>
-                </>
-              : <>If you have any questions or would like to reschedule a future appointment, please don&apos;t hesitate to call or text us at{' '}<a href={b.phoneHref} style={link}>{b.phone}</a>.{' '}<span style={{ color: '#dc2626', fontWeight: 600 }}>Please note that replies to this email are not monitored.</span></>
-            }
+            If you have any questions{!isPostCare ? ', need to reschedule,' : ''} or need further assistance, please don&apos;t hesitate to call or text us at{' '}
+            <span style={bold}>{b.phone}</span>
+            {b.landline ? <> · Landline: <span style={bold}>{b.landline}</span></> : ''}, or you can visit our website at{' '}
+            <a href={b.websiteUrl} target="_blank" rel="noreferrer" style={link}>{b.websiteLabel}</a>.
           </p>
         )}
 
@@ -528,14 +795,10 @@ export function EmailDesignPreview({
 
         {/* Signature */}
         <p style={{ ...p, marginBottom: 4 }}>Warm regards,</p>
-        <p style={{ ...p, marginBottom: 2, ...bold }}>{b.clinicName}</p>
-        <p style={{ ...p, color: '#64748b', marginBottom: 0 }}>
-          {b.phone}{b.landline ? ` · ${b.landline}` : ''} &nbsp;·&nbsp;{' '}
-          <a href={b.websiteUrl} target="_blank" rel="noreferrer" style={{ color: '#2563eb' }}>{b.websiteLabel}</a>{b.whatsappUrl ? <> &nbsp;·&nbsp; <a href={b.whatsappUrl} target="_blank" rel="noreferrer" style={{ color: '#2563eb' }}>WhatsApp</a></> : null}
-        </p>
+        <p style={{ ...p, marginBottom: 0, ...bold }}>{b.clinicName}</p>
 
         {/* Divider */}
-        <hr style={{ border: 'none', borderTop: '1px solid #e2e8f0', margin: '32px 0 20px' }} />
+        <hr style={{ border: 'none', borderTop: isDark ? '1px solid #27272a' : '1px solid #e2e8f0', margin: '32px 0 20px' }} />
 
         {/* Legal footer */}
         {copy.showFooter && (
@@ -544,9 +807,9 @@ export function EmailDesignPreview({
               ? `You received this email because you submitted a booking inquiry with ${b.clinicName}.`
               : `You received this email because you have an appointment with ${b.clinicName}.`}
             {' '}
-            <a href={`${baseUrl}/terms`} target="_blank" rel="noreferrer" style={{ color: '#94a3b8' }}>Terms of Service</a>
+            <a href={`${baseUrl}/terms`} target="_blank" rel="noreferrer" style={{ color: isDark ? '#71717a' : '#94a3b8' }}>Terms of Service</a>
             {' '}·{' '}
-            <a href={`${baseUrl}/privacy`} target="_blank" rel="noreferrer" style={{ color: '#94a3b8' }}>Privacy Policy</a>
+            <a href={`${baseUrl}/privacy`} target="_blank" rel="noreferrer" style={{ color: isDark ? '#71717a' : '#94a3b8' }}>Privacy Policy</a>
           </p>
         )}
       </div>

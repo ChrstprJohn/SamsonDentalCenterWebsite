@@ -15,6 +15,7 @@ import {
   EmailDesignPreview,
   EmailPreviewHeader,
   EmailTemplateSelector,
+  EmailThemeMode,
   PreviewMode,
   SampleData,
 } from './sub-components/email-design-studio';
@@ -22,6 +23,7 @@ import {
 export function SecretaryEmailDesignStudioView({ initialConfig }: { initialConfig?: ClinicConfigResponseDto | null }) {
   const [activeId, setActiveId] = useState<EmailDesignId>('appointment-confirmed');
   const [previewMode, setPreviewMode] = useState<PreviewMode>('desktop');
+  const [themeMode, setThemeMode] = useState<EmailThemeMode>('light');
   const [sample, setSample] = useState<SampleData>(DEFAULT_SAMPLE_DATA);
 
   const branding = useMemo(
@@ -61,12 +63,14 @@ export function SecretaryEmailDesignStudioView({ initialConfig }: { initialConfi
           designLabel={activeDesign.label}
           previewMode={previewMode}
           onPreviewModeChange={setPreviewMode}
+          themeMode={themeMode}
+          onThemeModeChange={setThemeMode}
         />
 
         <div
           data-lenis-prevent
           style={{ scrollbarWidth: 'thin' }}
-          className="flex-1 min-h-0 !overflow-y-auto bg-background p-4 md:p-6 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
+          className="flex-1 min-h-0 !overflow-y-auto bg-muted/20 p-4 md:p-6 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
         >
           <div className="pb-4 xl:hidden">
             <Select
@@ -78,10 +82,19 @@ export function SecretaryEmailDesignStudioView({ initialConfig }: { initialConfi
           </div>
 
           <div
-            className="mx-auto transition-all duration-300 bg-white"
+            className={`mx-auto transition-all duration-300 rounded-xl overflow-hidden shadow-sm border ${
+              themeMode === 'dark' ? 'bg-[#18181b] border-zinc-800' : 'bg-white border-slate-200/80'
+            }`}
             style={{ width: previewMode === 'mobile' ? 410 : '100%', maxWidth: previewMode === 'mobile' ? 410 : 800 }}
           >
-            <EmailDesignPreview design={activeDesign} tokens={DEFAULT_TOKENS} copy={activeCopy} sample={sample} branding={branding} />
+            <EmailDesignPreview
+              design={activeDesign}
+              tokens={DEFAULT_TOKENS}
+              copy={activeCopy}
+              sample={sample}
+              branding={branding}
+              themeMode={themeMode}
+            />
           </div>
         </div>
       </main>

@@ -12,6 +12,7 @@ export type EmailDesignId =
   | 'no-show';
 
 export type PreviewMode = 'desktop' | 'mobile';
+export type EmailThemeMode = 'light' | 'dark';
 
 export type SampleDataField =
   | 'patientName'
