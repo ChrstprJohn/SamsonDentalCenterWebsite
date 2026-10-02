@@ -87,7 +87,7 @@ The gallery showcases the clinic, team, facilities, equipment, patient care, and
 
 Initial examinations, specialist consultations, and customized dental treatment plans.
 
-- **General Consultation:** Comprehensive oral examination, clinical assessment, and personalized treatment planning
+- **General Consultation:** Comprehensive oral examination, clinical assessment, and personalized treatment planning.
 
 ### Diagnostics
 
