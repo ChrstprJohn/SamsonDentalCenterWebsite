@@ -93,4 +93,4 @@ Initial examinations, specialist consultations, and customized dental treatment 
 
 High-precision digital imaging, panoramic X-rays, and 3D dental diagnostics.
 
-- **CBCT (Cone Beam CT Scan):** 3D volumetric imaging for implant planning and complex surgical navigation
+- **CBCT (Cone Beam CT Scan):** 3D volumetric imaging for implant planning and complex surgical navigation.
