@@ -1,108 +1,96 @@
-- **Digital Oral Scanning and Smile Designing:** Intraoral 3D scanning and aesthetic smile simulation
-- **Panoramic and Cephalometric Digital X-ray:** Full-mouth and orthodontic imaging
-- **Periapical Digital X-ray:** Close-up imaging for decay, root conditions, and bone levels
+# Samson Dental Center
 
-### Preventive Dentistry
+**Website:** <https://samsondentalcenter-website.chrbuilds.dev/>  
+**Location:** 5th Floor S Building, Upper Session Road, Baguio City  
+**Phone:** 0917 564 4048  
+**Landline:** (074) 442 2380  
+**Email:** samsondentalcenter64@gmail.com
 
-Preventive treatments designed to protect teeth and gums.
+> Website reference compiled from the live site on October 2, 2026.
 
-- **Fluoride Treatments:** Enamel-strengthening treatment to help prevent cavities and reduce sensitivity
-- **Oral Prophylaxis:** Ultrasonic scaling and polishing to remove plaque, tartar, and stains
-- **Sealants:** Protective resin coatings for the chewing surfaces of back teeth
+## Overview
 
-### Restorative Dentistry
+Samson Dental Center is a multi-generational dental clinic in Baguio City with roots dating back to 1964. The clinic presents itself as a full-service dental provider focused on preventive care, restorative dentistry, cosmetic treatments, orthodontics, oral surgery, implants, diagnostics, and specialized care.
 
-Treatments for damaged, decayed, or worn teeth.
+The site emphasizes:
 
-- **Dental Fillings:** Tooth-colored composite restorations
-- **Inlays and Onlays:** Laboratory-made restorations for moderate tooth damage
+- More than 60 years of dental expertise
+- 4.3-star Google rating
+- Board-certified dental specialists
+- 28+ dental services
+- Online appointment requests
+- Patient-centered, gentle, and anxiety-aware care
+- Modern diagnostic and treatment equipment
 
-### Prosthodontics
+## Main Navigation
 
-Restorations that replace or rebuild missing and damaged teeth.
-
-- **Crowns and Bridges:** Available in metal, porcelain, and zirconia
-- **Dentures (Full and Partial):** Options include precision attachments, flexible dentures, Ivocap, and metal frameworks
-
-### Endodontics
-
-Treatments for infected or compromised dental pulp.
-
-- **Apicoectomy:** Microsurgical removal of persistent infection at the root tip
-- **Pulpotomy / Pulpectomy:** Vital pulp therapy or emergency pulp removal
-- **Root Canal Treatment:** Disinfection and preservation of the natural tooth
-
-### Cosmetic Dentistry
-
-Treatments to improve tooth color, shape, symmetry, and gum display.
-
-- **Veneers:** Porcelain or composite custom-made shells
-- **Laser Crown Lengthening:** Laser gum recontouring for cosmetic balance or restorations
-- **Tooth Whitening:** Chair-side or take-home whitening options
-
-### Orthodontics
-
-Treatments for tooth alignment and bite correction.
-
-- **Clear Aligners:** Transparent trays, including Invisalign and realigner options
-- **Retainers and Space Maintainers:** Fixed or removable appliances
-- **Traditional Metal Braces:** Brackets and archwires for comprehensive correction
-
-### Oral Surgery and Implants
-
-Surgical treatments, extractions, bone regeneration, and tooth replacement.
-
-- **Tooth Extraction:** Simple, complex, and impacted extractions
-- **Bone Grafting and Sinus Implants:** Procedures to improve jawbone volume for implants
-- **Dental Implants:** Titanium fixtures that act as permanent artificial tooth roots
-
-### Specialized Care
-
-Additional periodontal, jaw-joint, sleep, and aesthetic treatments.
-
-- **Botox for Gummy Smile:** Neuromodulator treatment to relax the upper lip
-- **Periodontal Treatments for Gum Disease:** Deep scaling, root planing, and antimicrobial care
-- **Sleep Appliance (Anti-Snoring Device):** Custom oral appliance to help maintain open airways
-- **TMJ / TMD Therapy:** Diagnosis and treatment options including custom splints
-
-## Featured Treatment Links
-
-- [Cosmetic Veneers](https://samsondentalcenter-website.chrbuilds.dev/services/veneers)
-- [Dental Implants](https://samsondentalcenter-website.chrbuilds.dev/services/implants)
-- [Orthodontic Aligners](https://samsondentalcenter-website.chrbuilds.dev/services/aligners)
-- [Professional Hygiene](https://samsondentalcenter-website.chrbuilds.dev/services/hygiene)
-- [Complex Diagnostics](https://samsondentalcenter-website.chrbuilds.dev/services/diagnostics)
-
-## Testimonials
-
-The homepage includes Google review excerpts describing the clinic as professional, friendly, clean, accommodating, comfortable, and suitable for families and children. Reviews shown on the site are generally rated 5.0, with one displayed 4.0 review.
-
-## Frequently Asked Questions
-
-### How do I book an appointment?
-
-Call **0917 564 4048** or **(074) 442 2380**, or submit an appointment request through the website. The clinic team follows up to confirm the visit.
-
-The site also includes questions about:
-
-- What to expect during a first visit
-- Typical appointment duration
-- Rescheduling or cancelling an appointment
-- Guidance for anxious patients
-- Clinic location
-- Preparation before an appointment
-
-## Contact and Social Links
-
-- [Google Maps location](https://www.google.com/maps/place/Samson+Dental+Center/@16.4059164,120.5968889,17z/)
-- [Facebook](https://www.facebook.com/samsondentalcenter)
-- [Instagram](https://www.instagram.com/samsondental)
-- [Privacy Policy](https://samsondentalcenter-website.chrbuilds.dev/privacy)
-- [Terms of Service](https://samsondentalcenter-website.chrbuilds.dev/terms)
-
-## Primary Calls to Action
-
+- Home
+- Services
+- About Us
+- Why Choose Us
+- Gallery
+- Testimonials
+- FAQ
+- Contact
 - Request Appointment
-- Explore Services
-- Browse All Services
-- Contact the Clinic
+
+## Homepage Content
+
+### Hero
+
+**Headline:** Unlock a World of Radiant Smiles
+
+The homepage introduces Samson Dental Center as a long-established clinic committed to advancements in dental expertise, facilities, and equipment. Visitors can request an appointment or explore services.
+
+### About the Clinic
+
+The clinic describes its care as personalized, professional, and built around long-term patient relationships. It serves patients in Baguio City and provides care ranging from preventive dentistry to complex restorations.
+
+### Clinic Details
+
+- **Address:** 5th Floor S Building, Upper Session Road, Baguio City
+- **Regular hours:** Monday–Saturday, 9:00 AM–12:00 PM and 1:00 PM–5:00 PM
+- **Footer hours:** Monday–Saturday, 9:00 AM–5:00 PM; Sunday closed
+
+### Why Choose Samson Dental Center
+
+- **Multi-Generational Expertise:** More than six decades of clinical practice
+- **Central & Accessible Location:** Upper Session Road in central Baguio City
+- **Transparent & Fair Pricing:** Treatment estimates provided up front
+- **Minimal Wait Times:** Punctual appointments and efficient care
+- **Emergency Dental Care:** Support for toothaches, chipped teeth, and sudden pain
+- **Modern Technology:** Digital tools and equipment for diagnostics and treatment
+- **Gentle & Anxiety-Free:** Supportive care for nervous patients and children
+- **Complete Family Care:** Routine checkups through complex treatment under one roof
+
+### Institutional Experience
+
+The site lists institutional dental relationships and retainers dating from 1965 onward, including Saint Louis Boys High School, Baguio Benguet Incorporated, Philippine National Bank, Development Bank of the Philippines, Pines Hotel, EPZA, Texas Instruments Philippines, Baguio Country Club, MOOG Controls Corporation Philippines, Dental Network Health Company, and Health Partners.
+
+### Clinic Gallery
+
+The gallery showcases the clinic, team, facilities, equipment, patient care, and treatment results. Featured case categories include:
+
+- Implant and veneer restorations
+- Full-arch ALL-ON-X rehabilitation
+- Full-smile veneer treatments
+- Professional hygiene and veneer finishing
+- Porcelain veneer transformations
+- Combined veneer and functional therapy
+- Endodontic and veneer restorations
+- Advanced implantology and endodontics
+- Custom-shaded anterior veneers
+
+## Services
+
+### Consultation
+
+Initial examinations, specialist consultations, and customized dental treatment plans.
+
+- **General Consultation:** Comprehensive oral examination, clinical assessment, and personalized treatment planning
+
+### Diagnostics
+
+High-precision digital imaging, panoramic X-rays, and 3D dental diagnostics.
+
+- **CBCT (Cone Beam CT Scan):** 3D volumetric imaging for implant planning and complex surgical navigation
