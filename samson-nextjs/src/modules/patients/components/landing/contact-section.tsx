@@ -15,7 +15,7 @@ export function ContactSection({ config }: ContactSectionProps) {
   const mapEmbedUrl = `https://www.google.com/maps?q=${encodedAddress}&output=embed`;
 
   return (
-    <section id="contact" className="py-16 sm:py-32 bg-[#FDFDFD] relative w-full border-t border-gray-100">
+    <section id="contact" tabIndex={-1} className="scroll-mt-24 py-16 sm:py-32 bg-[#FDFDFD] relative w-full border-t border-gray-100">
       <div className="max-w-7xl mx-auto px-6 sm:px-12">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-16 lg:gap-24 items-start">
           {/* Left: Contact Info */}

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { TrustAndStats } from './trust-and-stats';
+import { useBookingNav } from '../../contexts/booking-nav-context';
 
 interface HeroSectionProps {
   onBookClick: () => void;
@@ -44,6 +45,7 @@ const HERO_BG_IMAGES = [
 ];
 
 export function HeroSectionPreview({ onBookClick, serviceCount = 0 }: HeroSectionProps) {
+  const { appointmentLabel } = useBookingNav();
   const [mounted, setMounted] = useState(false);
   const [currentBgIndex, setCurrentBgIndex] = useState(0);
 
@@ -204,7 +206,7 @@ export function HeroSectionPreview({ onBookClick, serviceCount = 0 }: HeroSectio
               onClick={onBookClick}
               className="w-full sm:w-auto px-8 py-4 bg-white text-[#141515] rounded-full hover:bg-gray-100 transition-all duration-300 shadow-md flex items-center justify-center gap-2 cursor-pointer text-[clamp(11px,0.2vw+11px,14px)] max-[430px]:text-[12px] font-sans font-semibold uppercase tracking-widest"
             >
-              Request Appointment
+              {appointmentLabel}
               <ArrowRight className="w-4 h-4 text-[#141515]" />
             </button>
             <a

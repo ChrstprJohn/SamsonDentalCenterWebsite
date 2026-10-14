@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowRight, ChevronLeft, ChevronRight, Loader2, MoveRight, X } from 'lucide-react';
 import type { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
+import { useBookingNav } from '../../contexts/booking-nav-context';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -161,6 +162,7 @@ interface MockCategoryServicesSectionProps {
 }
 
 export function MockCategoryServicesSection({ onBook, dbServices }: MockCategoryServicesSectionProps) {
+  const { isBookingOpen, requestAppt } = useBookingNav();
   const [pendingServiceName, setPendingServiceName] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<MockCategoryGroup | null>(null);
   const [desktopPage, setDesktopPage] = useState(0);
@@ -168,17 +170,22 @@ export function MockCategoryServicesSection({ onBook, dbServices }: MockCategory
 
   const router = useRouter();
   const consultation = dbServices.find(service => service.category === 'Consultation');
-  const consultationHref = consultation ? `/book?serviceId=${encodeURIComponent(consultation.id)}` : '/book?category=Consultation';
+  const consultationHref = !isBookingOpen ? '/#contact' : consultation ? `/book?serviceId=${encodeURIComponent(consultation.id)}` : '/book?category=Consultation';
   const categories = buildCategories(dbServices);
   const topCategories = categories.slice(0, CARD_COUNT);
   const bottomCategories = categories.slice(CARD_COUNT);
 
   const handleOpenCategory = (cat: MockCategoryGroup) => {
+    if (!isBookingOpen) return;
     router.push(`/book?category=${encodeURIComponent(cat.category)}`);
   };
 
   const handleBooking = (service: MockServiceItem) => {
     setSelectedCategory(null);
+    if (!isBookingOpen) {
+      requestAppt(service.id, service.name);
+      return;
+    }
     if (onBook) {
       onBook(service.id, service.name);
       return;
@@ -215,7 +222,7 @@ export function MockCategoryServicesSection({ onBook, dbServices }: MockCategory
               </h2>
             </div>
             <p className="max-w-sm pt-2 sm:pt-2 md:max-w-[280px] lg:max-w-sm font-sans text-[clamp(1rem,0.95rem+0.2vw,1.0625rem)] font-normal leading-relaxed text-gray-500">
-              Select any dental category below to explore its specific treatments, clinical options, and direct booking details.
+              {isBookingOpen ? 'Select any dental category below to explore its treatments and clinical options.' : 'Explore our dental services below. To arrange a visit, contact our clinic.'}
             </p>
           </motion.div>
 
@@ -228,9 +235,14 @@ export function MockCategoryServicesSection({ onBook, dbServices }: MockCategory
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-20px' }}
                 transition={{ duration: 0.45, delay: idx * 0.06, ease: 'easeOut' }}
-                onClick={() => handleOpenCategory(cat)}
-                title={`Click to view ${cat.category} services`}
-                className="group flex items-center justify-between py-6 sm:py-8 px-4 sm:px-6 cursor-pointer transition-colors duration-300 hover:bg-[#1D1E1E]/[0.03]"
+                onClick={isBookingOpen ? () => handleOpenCategory(cat) : undefined}
+                title={isBookingOpen ? `Click to view ${cat.category} services` : undefined}
+                role={isBookingOpen ? 'button' : undefined}
+                tabIndex={isBookingOpen ? 0 : undefined}
+                onKeyDown={isBookingOpen ? (event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); handleOpenCategory(cat); } } : undefined}
+                aria-disabled={!isBookingOpen || undefined}
+                style={{ cursor: isBookingOpen ? 'pointer' : 'not-allowed' }}
+                className={`flex items-center justify-between py-6 sm:py-8 px-4 sm:px-6 transition-colors duration-300 ${isBookingOpen ? 'group cursor-pointer hover:bg-[#1D1E1E]/[0.03]' : ''}`}
               >
                 <span className="font-sans text-[clamp(1.125rem,0.875rem+1vw,1.75rem)] font-normal text-[#1D1E1E]/60 group-hover:text-[#D94E4E] transition-colors w-10 sm:w-14 md:w-16 lg:w-16 text-left shrink-0">
                   {cat.nr}
@@ -261,9 +273,14 @@ export function MockCategoryServicesSection({ onBook, dbServices }: MockCategory
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-20px' }}
                 transition={{ duration: 0.45, delay: idx * 0.06, ease: 'easeOut' }}
-                onClick={() => handleOpenCategory(cat)}
-                title={`Click to view ${cat.category} services`}
-                className="group relative flex items-center justify-between py-6 sm:py-8 transition-colors duration-300 hover:bg-[#1C1D1D]/70 px-4 sm:px-6 rounded-2xl cursor-pointer overflow-hidden"
+                onClick={isBookingOpen ? () => handleOpenCategory(cat) : undefined}
+                title={isBookingOpen ? `Click to view ${cat.category} services` : undefined}
+                role={isBookingOpen ? 'button' : undefined}
+                tabIndex={isBookingOpen ? 0 : undefined}
+                onKeyDown={isBookingOpen ? (event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); handleOpenCategory(cat); } } : undefined}
+                aria-disabled={!isBookingOpen || undefined}
+                style={{ cursor: isBookingOpen ? 'pointer' : 'not-allowed' }}
+                className={`relative flex items-center justify-between py-6 sm:py-8 transition-colors duration-300 px-4 sm:px-6 rounded-2xl overflow-hidden ${isBookingOpen ? 'group cursor-pointer hover:bg-[#1C1D1D]/70' : ''}`}
               >
                 <NoiseOverlay className="opacity-0 group-hover:opacity-[0.06] transition-opacity duration-300" />
                 <span className="relative z-10 text-[clamp(1.125rem,0.875rem+1vw,1.75rem)] font-sans font-normal text-white/75 group-hover:text-white transition-colors w-10 sm:w-14 md:w-16 lg:w-16 text-left shrink-0">
@@ -291,17 +308,19 @@ export function MockCategoryServicesSection({ onBook, dbServices }: MockCategory
           >
             <div className="text-left">
               <span className="text-[clamp(0.75rem,0.7rem+0.2vw,0.8125rem)] font-semibold tracking-[0.2em] text-[#D94E4E] uppercase block mb-1 font-sans">
-                Need guidance?
+                Not sure which service you need?
               </span>
               <p className="text-[clamp(1rem,0.95rem+0.2vw,1.0625rem)] text-white/75 font-normal leading-relaxed font-sans max-w-md sm:max-w-lg">
-                Find the right dental care for you.
+                {isBookingOpen
+                  ? 'Request a consultation to discuss your concerns and find out which treatment suits your needs.'
+                  : 'Call or email our clinic to discuss your concerns and arrange a consultation.'}
               </p>
             </div>
             <Link
               href={consultationHref}
               className="inline-flex items-center justify-center gap-2 sm:gap-2.5 px-5 sm:px-7 py-3 sm:py-3.5 rounded-full bg-white hover:bg-[#D94E4E] text-[#1D1E1E] hover:text-white font-sans text-xs sm:text-sm font-semibold tracking-wider uppercase transition-all duration-300 shadow-md group shrink-0 w-full sm:w-auto"
             >
-              <span className="whitespace-nowrap">Book a Consultation</span>
+              <span className="whitespace-nowrap">{isBookingOpen ? 'Request a Consultation' : 'Contact the Clinic'}</span>
               <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
             </Link>
           </motion.div>
@@ -375,7 +394,7 @@ export function MockCategoryServicesSection({ onBook, dbServices }: MockCategory
                               onClick={() => handleBooking(svc)}
                               className="w-full py-3.5 bg-[#1D1E1E] text-white text-xs font-semibold tracking-widest uppercase hover:bg-[#D94E4E] transition-all duration-300 cursor-pointer"
                             >
-                              Request Appointment
+                              {isBookingOpen ? 'Request Appointment' : 'Contact Us About This Service'}
                             </button>
                           </div>
                         </motion.div>
@@ -440,7 +459,7 @@ export function MockCategoryServicesSection({ onBook, dbServices }: MockCategory
                               onClick={() => handleBooking(selectedCategory.services[activeMobileIndex])}
                               className="w-full py-3.5 bg-[#1D1E1E] text-white text-xs font-semibold tracking-widest uppercase hover:bg-[#D94E4E] transition-all duration-300 cursor-pointer"
                             >
-                              Request Appointment
+                              {isBookingOpen ? 'Request Appointment' : 'Contact Us About This Service'}
                             </button>
                           </div>
                         </motion.div>

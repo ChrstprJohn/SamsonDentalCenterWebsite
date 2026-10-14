@@ -89,19 +89,19 @@ export function Footer({ config }: FooterProps) {
             Treatments
           </h4>
           <nav className="flex flex-col gap-3 text-sm font-light">
-            <Link href="/book?category=Cosmetic%20Dentistry" className="hover:text-white transition-colors">
+            <Link href={config?.isBookingOpen === false ? '/#services' : '/book?category=Cosmetic%20Dentistry'} className="hover:text-white transition-colors">
               Cosmetic Veneers
             </Link>
-            <Link href="/book?category=Oral%20Surgery%20and%20Implants" className="hover:text-white transition-colors">
+            <Link href={config?.isBookingOpen === false ? '/#services' : '/book?category=Oral%20Surgery%20and%20Implants'} className="hover:text-white transition-colors">
               Dental Implants
             </Link>
-            <Link href="/book?category=Orthodontics" className="hover:text-white transition-colors">
+            <Link href={config?.isBookingOpen === false ? '/#services' : '/book?category=Orthodontics'} className="hover:text-white transition-colors">
               Orthodontic Aligners
             </Link>
-            <Link href="/book?category=Preventive%20Dentistry" className="hover:text-white transition-colors">
+            <Link href={config?.isBookingOpen === false ? '/#services' : '/book?category=Preventive%20Dentistry'} className="hover:text-white transition-colors">
               Professional Hygiene
             </Link>
-            <Link href="/book?category=Diagnostics" className="hover:text-white transition-colors">
+            <Link href={config?.isBookingOpen === false ? '/#services' : '/book?category=Diagnostics'} className="hover:text-white transition-colors">
               Complex Diagnostics
             </Link>
           </nav>

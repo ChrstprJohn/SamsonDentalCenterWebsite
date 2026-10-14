@@ -184,8 +184,8 @@ export function BookingWizardView({ services, config, initialServiceId, initialC
       <main className="min-h-screen bg-[#FDFDFD] px-6 py-24 flex items-center justify-center text-[#1D1E1E]">
         <div className="mx-auto w-full max-w-md border border-gray-100 bg-white shadow-xl p-8 sm:p-10 text-center">
           <span className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[#D94E4E]/10 text-[#D94E4E] mb-6"><Ban className="w-7 h-7" /></span>
-          <h1 className="text-2xl font-semibold tracking-tight">Online appointment requests are currently unavailable</h1>
-          <p className="mt-3 text-sm text-gray-500">Sorry for the inconvenience. To schedule an appointment, please reach us through any of the following:</p>
+          <h1 className="text-2xl font-semibold tracking-tight">Contact us to schedule your visit</h1>
+          <p className="mt-3 text-sm text-gray-500">Online appointment requests are currently unavailable. Please call or email our clinic to arrange an appointment.</p>
           <div className="mt-6 space-y-3 text-sm font-sans">
             <p className="flex items-center justify-center gap-2">
               <Phone className="w-4 h-4 text-[#D94E4E]" />
@@ -202,7 +202,8 @@ export function BookingWizardView({ services, config, initialServiceId, initialC
               <a href={`mailto:${config.email}`} className="hover:text-[#D94E4E] transition-colors">{config.email}</a>
             </p>
           </div>
-          <Link href="/" className="mt-8 inline-block w-full bg-[#1D1E1E] px-6 py-3 text-sm font-semibold tracking-wider text-white hover:bg-[#D94E4E] transition-colors">Return to Home</Link>
+          <a href={`tel:${config.phone.replace(/[^+\d]/g, '')}`} className="mt-8 inline-block w-full bg-[#1D1E1E] px-6 py-3 text-sm font-semibold tracking-wider text-white hover:bg-[#D94E4E] transition-colors">Call the Clinic</a>
+          <Link href="/" className="mt-4 inline-block text-sm underline underline-offset-4">Return to Home</Link>
         </div>
       </main>
     );

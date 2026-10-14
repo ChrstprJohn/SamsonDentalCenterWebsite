@@ -62,11 +62,17 @@ export function SmoothScroll() {
         window.scrollTo(0, 0);
       }
       const resizeLenis = () => {
+        const anchor = window.location.hash ? document.getElementById(window.location.hash.slice(1)) : null;
         if ((window as any).lenis) {
           if (!isBackForward) {
-            (window as any).lenis.scrollTo(0, { immediate: true });
+            (window as any).lenis.scrollTo(anchor ?? 0, { immediate: true, offset: anchor ? -80 : 0 });
           }
           (window as any).lenis.resize();
+        } else if (anchor && !isBackForward) {
+          anchor.scrollIntoView({ block: 'start' });
+        }
+        if (anchor && !isBackForward) {
+          anchor.focus({ preventScroll: true });
         }
       };
       resizeLenis();

@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useBookingNav } from '../../contexts/booking-nav-context';
 
 const BG_IMAGES = [
   '/hero-bg/HeroImage12.png',
@@ -21,6 +22,7 @@ interface AppointmentBannerSectionProps {
 }
 
 export function AppointmentBannerSection({ onBookClick }: AppointmentBannerSectionProps = {}) {
+  const { appointmentLabel, isBookingOpen } = useBookingNav();
   const [selected, setSelected] = useState(ACTIVE_BG_INDEX);
 
   useEffect(() => {
@@ -107,13 +109,13 @@ export function AppointmentBannerSection({ onBookClick }: AppointmentBannerSecti
               onClick={onBookClick}
               className="group inline-flex items-center gap-3 bg-white text-[#141515] hover:bg-[#D94E4E] hover:text-white px-7 py-3.5 rounded-full text-[12px] font-semibold uppercase tracking-widest transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] shadow-md cursor-pointer mt-2 w-fit"
             >
-              Request Appointment
+              {appointmentLabel}
               <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
             </button>
           ) : (
-            <Link href="/book">
+            <Link href={isBookingOpen ? '/book' : '/#contact'}>
               <button className="group inline-flex items-center gap-3 bg-white text-[#141515] hover:bg-[#D94E4E] hover:text-white px-7 py-3.5 rounded-full text-[12px] font-semibold uppercase tracking-widest transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] shadow-md cursor-pointer mt-2">
-                Request Appointment
+                {appointmentLabel}
                 <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
               </button>
             </Link>

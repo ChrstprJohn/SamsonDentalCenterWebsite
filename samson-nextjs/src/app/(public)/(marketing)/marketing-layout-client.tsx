@@ -17,7 +17,7 @@ interface MarketingLayoutClientProps {
 
 export function MarketingLayoutClient({ children, user, config, services }: MarketingLayoutClientProps) {
   return (
-    <BookingNavProvider services={services}>
+    <BookingNavProvider services={services} isBookingOpen={config?.isBookingOpen ?? true}>
       <div className="flex flex-col min-h-screen">
         <Navbar user={user} config={config} />
         <main className="flex-1 flex flex-col">

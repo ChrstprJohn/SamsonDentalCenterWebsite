@@ -21,7 +21,7 @@ export function NavbarMobileDrawer({
   onClose,
   onNavClick,
 }: NavbarMobileDrawerProps) {
-  const { requestAppt, isNavigatingBooking } = useBookingNav();
+  const { requestAppt, isNavigatingBooking, appointmentLabel } = useBookingNav();
   const reducedMotion = useReducedMotion();
   return (
     <motion.div
@@ -49,7 +49,7 @@ export function NavbarMobileDrawer({
               disabled={isNavigatingBooking}
               className={`w-full px-6 py-3.5 bg-[#141515] text-white rounded-full text-[14px] font-semibold hover:bg-[#D94E4E] tracking-[0.2em] transition-all cursor-pointer flex items-center justify-center gap-2 ${isNavigatingBooking ? 'opacity-50 cursor-wait' : ''}`}
             >
-              Request Appointment
+            {appointmentLabel}
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>

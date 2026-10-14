@@ -45,7 +45,7 @@ export function NavbarV1({
   const isMainPage = pathname === '/';
   // Pages that have a full-bleed dark hero — navbar should start transparent on these
   const isDarkHeroPage = isMainPage || pathname === '/services';
-  const { requestAppt, isNavigatingBooking } = useBookingNav();
+  const { requestAppt, isNavigatingBooking, appointmentLabel } = useBookingNav();
 
   useEffect(() => {
     window.dispatchEvent(new CustomEvent('mobile-nav-toggle', { detail: { isOpen: isMobileOpen } }));
@@ -190,7 +190,7 @@ export function NavbarV1({
                     : 'bg-[#141515] text-white hover:bg-[#D94E4E]'
                 }`}
               >
-                Request Appointment
+                {appointmentLabel}
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
