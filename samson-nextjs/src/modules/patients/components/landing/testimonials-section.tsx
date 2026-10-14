@@ -29,10 +29,10 @@ export function TestimonialsSection({ reviews }: { reviews: LandingReview[] }) {
           className="flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6"
         >
           <div className="max-w-full md:max-w-[450px] lg:max-w-[580px]">
-            <span className="text-[clamp(0.75rem,0.7rem+0.2vw,0.8125rem)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-2 sm:mb-3 font-sans">Patient Testimonials</span>
-            <h2 className="font-sans text-[clamp(1.625rem,1.375rem+1vw,2.25rem)] text-balance font-normal leading-[1.3] sm:leading-[1.2] md:leading-[1.15] tracking-[-0.03em] text-[#1D1E1E]">Real feedback from patients who experienced our services.</h2>
+            <span className="text-xs tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-2 sm:mb-3 font-sans">Patient Testimonials</span>
+            <h2 className="font-sans text-[clamp(1.5rem,1.25rem+1vw,2rem)] text-balance font-normal leading-[1.25] tracking-[-0.03em] text-[#1D1E1E]">Real feedback from patients who experienced our services.</h2>
           </div>
-          <p className="max-w-sm pt-2 sm:pt-2 md:max-w-[280px] lg:max-w-sm font-sans text-[clamp(1rem,0.95rem+0.2vw,1.0625rem)] font-normal leading-relaxed text-gray-500">Read what our patients say about their experience, from the quality of treatment to the comfort of their visit.</p>
+          <p className="max-w-sm pt-2 sm:pt-2 md:max-w-[280px] lg:max-w-sm font-sans text-base font-normal leading-relaxed text-gray-500">Read what our patients say about their experience, from the quality of treatment to the comfort of their visit.</p>
         </motion.div>
         <motion.div
           initial={{ opacity: 0 }}

@@ -32,18 +32,18 @@ function TestimonialCard({ item }: { item: TestimonialItem }) {
         <div className="text-[#D94E4E] mb-3 opacity-80">
           <Quote className="w-4 h-4 rotate-180" />
         </div>
-        <p className="line-clamp-3 sm:line-clamp-4 text-gray-700 font-normal text-[clamp(1rem,0.95rem+0.2vw,1.0625rem)] leading-[1.65] italic">
+        <p className="line-clamp-3 sm:line-clamp-4 text-gray-700 font-normal text-base leading-[1.65] italic">
           &ldquo;{item.text}&rdquo;
         </p>
       </div>
 
-      <div className="mt-4 pt-4 sm:mt-5 sm:pt-5 border-t border-gray-200/50 flex flex-wrap gap-3 items-center justify-between text-[clamp(1rem,0.95rem+0.2vw,1.0625rem)]">
+      <div className="mt-4 pt-4 sm:mt-5 sm:pt-5 border-t border-gray-200/50 flex flex-wrap gap-3 items-center justify-between text-base">
         <div className="flex items-center">
           <div className="flex w-8 h-8 sm:w-9 sm:h-9 shrink-0 mr-3 items-center justify-center rounded-full border border-gray-100 bg-[#FDF0F0] text-[11px] font-semibold text-[#D94E4E]">
             {item.name.slice(0, 1).toUpperCase()}
           </div>
           <div>
-            <h4 className="text-[#1D1E1E] font-semibold text-[clamp(1rem,0.95rem+0.2vw,1.0625rem)] leading-none">{item.name}</h4>
+            <h4 className="text-[#1D1E1E] font-semibold text-base leading-none">{item.name}</h4>
             <p className="text-gray-400 font-medium text-[clamp(10px,0.2vw+10px,12px)] mt-1 leading-none">
               {item.pathway}
             </p>

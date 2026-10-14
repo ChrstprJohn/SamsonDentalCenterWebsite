@@ -92,7 +92,7 @@ export function ServiceDescription({
 // ---------------------------------------------------------------------------
 // Hardcoded category metadata (order, nr, description) — services come from DB
 // ---------------------------------------------------------------------------
-const CATEGORY_META: { id: string; nr: string; category: string; description: string }[] = [
+export const CATEGORY_META: { id: string; nr: string; category: string; description: string }[] = [
   { id: 'consultation',   nr: '01', category: 'Consultation',             description: 'Initial examinations, specialist consultations, and customized dental treatment plans.' },
   { id: 'diagnostics',    nr: '02', category: 'Diagnostics',              description: 'High-precision digital imaging, panoramic X-rays, and 3D dental diagnostics.' },
   { id: 'preventive',     nr: '03', category: 'Preventive Dentistry',     description: 'Prophylaxis cleanings, sealants, and fluoride therapies to protect oral health.' },

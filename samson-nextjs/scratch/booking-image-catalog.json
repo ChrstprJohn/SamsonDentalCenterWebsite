@@ -1,0 +1,170 @@
+[
+  {
+    "id": "d884c00a-13a8-4f81-b7fa-2fa3b488a1db",
+    "category": "Consultation",
+    "name": "General Consultation",
+    "description": "Not sure which service to choose? Book a consultation to discuss your concern with the dentist."
+  },
+  {
+    "id": "e4e079f2-8808-4ede-b97d-36e66b883aa9",
+    "category": "Orthodontics",
+    "name": "Clear Aligners",
+    "description": "Clear aligners are transparent, custom-molded plastic trays that incrementally reposition teeth to correct misalignments without traditional metal braces.Invisalignrealigner"
+  },
+  {
+    "id": "1870775c-8aab-42ef-ba84-850c6cdb91d3",
+    "category": "Prosthodontics",
+    "name": "Crowns and Bridges",
+    "description": "Crowns protect and rebuild severely damaged teeth, while bridges anchor replacement teeth into adjacent anchors to permanently restore bite function, alignment, and smiles.Metal (non-precious and precious)PorcelainZirconia"
+  },
+  {
+    "id": "b96094ee-b978-4112-adf1-e14ed7532396",
+    "category": "Prosthodontics",
+    "name": "Dentures (Full and Partial)",
+    "description": "Dentures are removable prosthetic appliances designed to replace missing teeth and surrounding tissues, restoring facial structure, speech clarity, and chewing efficiency.Precision attachmentsFlexible dentureIvocapMetal frameworks"
+  },
+  {
+    "id": "56d802cc-f672-4458-96e9-1a496c6aa46d",
+    "category": "Oral Surgery and Implants",
+    "name": "Tooth Extraction",
+    "description": "Tooth extraction is the removal of a tooth from its socket in the bone, performed to relieve pain, address severe decay, or prevent crowding issues.SimpleComplexImpacted"
+  },
+  {
+    "id": "39ca93b9-e809-4328-b5a3-cf24bb8f56ab",
+    "category": "Cosmetic Dentistry",
+    "name": "Veneers",
+    "description": "Veneers are ultra-thin, custom-made shells bonded to the front surface of teeth to instantly improve their color, shape, size, or symmetry.PorcelainComposite"
+  },
+  {
+    "id": "f78a624a-3e85-46f6-9177-a5413af91773",
+    "category": "Endodontics",
+    "name": "Apicoectomy",
+    "description": "Microsurgical procedure to remove persistent infection at the root tip and seal the canal terminus"
+  },
+  {
+    "id": "f350fa99-7ab2-440b-86b1-2c4edb12d7bd",
+    "category": "Oral Surgery and Implants",
+    "name": "Bone Grafting and Sinus Implants",
+    "description": "Advanced regenerative procedures to augment deficient jawbone volume and create a solid anchor for implants."
+  },
+  {
+    "id": "c424135c-0c15-4bb2-af88-80df73ac09b7",
+    "category": "Specialized Care",
+    "name": "Botox for Gummy Smile",
+    "description": "Minimally invasive neuromodulator injections that gently relax hyperactive upper lip muscles for a balanced smile line."
+  },
+  {
+    "id": "a4fe313d-0d9d-4031-8fa7-57f523a1d6c1",
+    "category": "Diagnostics",
+    "name": "CBCT (Cone Beam CT Scan)",
+    "description": "Advanced 3D Cone Beam Computed Tomography volumetric imaging for precise implant planning and complex surgical navigation."
+  },
+  {
+    "id": "0d81a46f-ea04-4421-8230-7a945b3bfb3a",
+    "category": "Restorative Dentistry",
+    "name": "Dental Fillings",
+    "description": "Natural tooth-colored composite restorations to repair decay, fractures, and wear seamlessly."
+  },
+  {
+    "id": "30b2ade3-d34e-4c77-b514-4e6a2ef76d33",
+    "category": "Oral Surgery and Implants",
+    "name": "Dental Implants",
+    "description": "Biocompatible titanium fixtures surgically anchored into the jawbone to serve as permanent artificial tooth roots."
+  },
+  {
+    "id": "fdebf043-f161-4498-8b54-f06d782845e1",
+    "category": "Diagnostics",
+    "name": "Digital Oral Scanning and Smile Designing",
+    "description": "Intraoral 3D optical scanning for comfortable, highly accurate digital impressions and aesthetic smile simulation."
+  },
+  {
+    "id": "c37beecf-bcf3-45a9-a94e-603b6c07e19c",
+    "category": "Preventive Dentistry",
+    "name": "Fluoride Treatments",
+    "description": "Enamel-strengthening mineral application to protect teeth against cavities and reduce sensitivity."
+  },
+  {
+    "id": "c5535b3c-8acc-4ea6-b2f1-0798b85ab0d4",
+    "category": "Restorative Dentistry",
+    "name": "Inlays and Onlays",
+    "description": "Custom-crafted laboratory restorations designed for moderate tooth damage, providing superior strength while preserving healthy enamel."
+  },
+  {
+    "id": "07bf54df-5dd8-42c2-bd71-3aeca9b69e3f",
+    "category": "Cosmetic Dentistry",
+    "name": "Laser Crown Lengthening",
+    "description": "Gentle laser recontouring of gum tissue to expose more natural tooth structure for cosmetic balance or restorations."
+  },
+  {
+    "id": "e8f51551-b279-442f-84b2-793cb072190d",
+    "category": "Preventive Dentistry",
+    "name": "Oral Prophylaxis",
+    "description": "Professional ultrasonic scaling and polishing to eliminate plaque, calculus (tartar), and surface stains for optimal gum health."
+  },
+  {
+    "id": "b31262cc-3efc-483c-a4ea-437c5d2e2207",
+    "category": "Diagnostics",
+    "name": "Panoramic and Cephalometric Digital X-ray",
+    "description": "Full-mouth panoramic scan and orthodontic skull imaging for overall jaw alignment, wisdom teeth evaluation, and structural analysis."
+  },
+  {
+    "id": "c52dfbbc-9c80-40e0-aee5-f986be2e200b",
+    "category": "Diagnostics",
+    "name": "Periapical Digital X-ray",
+    "description": "High-resolution close-up imaging of individual teeth to detect hidden decay, root conditions, and bone levels."
+  },
+  {
+    "id": "02d4dc26-b8ea-4acc-8c94-4d52e46d6be0",
+    "category": "Specialized Care",
+    "name": "Periodontal Treatments for Gum Disease",
+    "description": "Deep scaling, root planing, and therapeutic antimicrobial care to halt active gum infections and bone loss."
+  },
+  {
+    "id": "11907f10-81cb-409e-a203-79d010a40333",
+    "category": "Endodontics",
+    "name": "Pulpotomy / Pulpectomy",
+    "description": "Targeted vital pulp therapy or emergency pulp removal to relieve severe pain and preserve compromised teeth."
+  },
+  {
+    "id": "895436b0-a6be-4782-b88b-1c16c9e183ad",
+    "category": "Orthodontics",
+    "name": "Retainers and Space Maintainers",
+    "description": "Custom fixed or removable appliances to preserve teeth in their corrected positions post-treatment or hold space for growing teeth."
+  },
+  {
+    "id": "74bcfed5-023a-4ad3-87e1-326190a9c7cc",
+    "category": "Endodontics",
+    "name": "Root Canal Treatment",
+    "description": "Specialized therapy to remove infected dental pulp, thoroughly disinfect the canal system, and save the natural tooth."
+  },
+  {
+    "id": "fdee058a-d0b8-45c4-888b-4241718dd010",
+    "category": "Preventive Dentistry",
+    "name": "Sealants",
+    "description": "Protective resin coating applied to the chewing surfaces of back teeth to prevent food trapping and cavity formation."
+  },
+  {
+    "id": "316dcefc-27e9-4c16-8928-c807b2e0b8f9",
+    "category": "Specialized Care",
+    "name": "Sleep Appliance (Anti-Snoring Device)",
+    "description": "Custom-engineered nighttime oral appliance that comfortably repositions the jaw to maintain open airways and reduce snoring."
+  },
+  {
+    "id": "49eb4f2d-81e9-41cc-84c4-78d2df8562cf",
+    "category": "Specialized Care",
+    "name": "TMJ / TMD Therapy",
+    "description": "Comprehensive diagnosis and therapeutic solutions including custom splints to relieve jaw joint pain, clicking, and clenching."
+  },
+  {
+    "id": "e60c0d16-d343-4e3a-9068-3d1fa43eaced",
+    "category": "Cosmetic Dentistry",
+    "name": "Tooth Whitening",
+    "description": "Safe, clinically proven whitening treatments designed to lift stubborn deep stains and brighten your smile. Available chair-side or as a take-home kit."
+  },
+  {
+    "id": "f5d5adfa-5b1b-453f-9a82-9714a3d84100",
+    "category": "Orthodontics",
+    "name": "Traditional Metal Braces",
+    "description": "Reliable orthodontic brackets and archwires engineered for comprehensive correction of complex alignment and bite issues."
+  }
+]

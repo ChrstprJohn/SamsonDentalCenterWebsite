@@ -9,9 +9,10 @@ interface BookingNavContextType {
   isNavigatingBooking: boolean;
   pendingServiceName: string | null;
   requestAppt: (serviceId?: string, serviceName?: string) => void;
+  contactClinic: () => void;
 }
 
-const BookingNavContext = createContext<BookingNavContextType | null>(null);
+export const BookingNavContext = createContext<BookingNavContextType | null>(null);
 
 export function BookingNavProvider({ children, services = [], isBookingOpen = true }: {
   children: React.ReactNode;
@@ -23,8 +24,7 @@ export function BookingNavProvider({ children, services = [], isBookingOpen = tr
   const [isNavigatingBooking, setIsNavigatingBooking] = useState(false);
   const [pendingServiceName, setPendingServiceName] = useState<string | null>(null);
 
-  const requestAppt = useCallback((serviceId?: string, serviceName?: string) => {
-    if (!isBookingOpen) {
+  const contactClinic = useCallback(() => {
       const contact = pathname === '/' ? document.getElementById('contact') : null;
       if (contact) {
         const lenis = (window as Window & { lenis?: { scrollTo: (target: HTMLElement, options: { offset: number }) => void } }).lenis;
@@ -34,6 +34,11 @@ export function BookingNavProvider({ children, services = [], isBookingOpen = tr
       } else {
         router.push('/#contact');
       }
+  }, [router, pathname]);
+
+  const requestAppt = useCallback((serviceId?: string, serviceName?: string) => {
+    if (!isBookingOpen) {
+      contactClinic();
       return;
     }
     setIsNavigatingBooking(true);
@@ -53,10 +58,10 @@ export function BookingNavProvider({ children, services = [], isBookingOpen = tr
         router.push('/book');
       }
     }, 600);
-  }, [router, pathname, services, isBookingOpen]);
+  }, [router, services, isBookingOpen, contactClinic]);
 
   return (
-    <BookingNavContext.Provider value={{ isBookingOpen, appointmentLabel: isBookingOpen ? 'Request Appointment' : 'Contact the Clinic', isNavigatingBooking, pendingServiceName, requestAppt }}>
+    <BookingNavContext.Provider value={{ isBookingOpen, appointmentLabel: isBookingOpen ? 'Request Appointment' : 'Contact the Clinic', isNavigatingBooking, pendingServiceName, requestAppt, contactClinic }}>
       {children}
       <BookingNavLoadingOverlay isNavigatingBooking={isNavigatingBooking} pendingServiceName={pendingServiceName} />
     </BookingNavContext.Provider>

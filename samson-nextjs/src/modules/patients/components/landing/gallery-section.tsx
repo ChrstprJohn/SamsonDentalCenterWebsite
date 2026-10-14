@@ -44,16 +44,16 @@ function GalleryHeader() {
       className="flex flex-col md:flex-row md:items-end justify-between mb-12 sm:mb-20 md:mb-24 gap-4 sm:gap-6"
     >
       <div className="max-w-full md:max-w-[450px] lg:max-w-[580px]">
-        <span className="text-[clamp(0.75rem,0.7rem+0.2vw,0.8125rem)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-2 sm:mb-3 font-sans">
+        <span className="text-xs tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-2 sm:mb-3 font-sans">
           Clinic Gallery
         </span>
-        <h2 className="font-sans text-[clamp(1.625rem,1.375rem+1vw,2.25rem)] text-balance font-normal leading-[1.3] sm:leading-[1.2] md:leading-[1.15] tracking-[-0.03em] text-white">
+        <h2 className="font-sans text-[clamp(1.5rem,1.25rem+1vw,2rem)] text-balance font-normal leading-[1.25] tracking-[-0.03em] text-white">
           A compilation of our work and{' '}
           <br className="hidden lg:block" />
           the results we deliver.
         </h2>
       </div>
-      <p className="max-w-sm pt-2 sm:pt-2 md:max-w-[280px] lg:max-w-sm font-sans text-[clamp(1rem,0.95rem+0.2vw,1.0625rem)] font-normal leading-relaxed text-white/70">
+      <p className="max-w-sm pt-2 sm:pt-2 md:max-w-[280px] lg:max-w-sm font-sans text-base font-normal leading-relaxed text-white/70">
         We showcase real cases treated at our clinic, highlighting the quality of our dental care and the outcomes our patients achieve.
       </p>
     </motion.div>

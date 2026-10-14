@@ -266,14 +266,14 @@ export function BookingWizardView({ services, config, initialServiceId, initialC
     <div className="min-h-screen bg-[#FDFDFD] text-[#1D1E1E] flex flex-col justify-between">
       {/* Custom Integrated Header Navbar matching Homepage Navbar Height & Padding */}
       {!contactSection.submittedLocal && (
-        <header className="sticky top-0 z-40 h-[76px] bg-white/95 backdrop-blur-md border-b border-gray-200/80 px-6 sm:px-12 py-2.5 flex items-center shadow-xs">
-        <div className="max-w-7xl mx-auto grid w-full grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-4">
+        <header className="sticky top-0 z-40 h-[76px] bg-white/95 backdrop-blur-md border-b border-gray-200/80 py-2.5 flex items-center shadow-xs">
+        <div className={`${step === 1 ? 'max-w-7xl' : 'max-w-4xl'} mx-auto px-6 sm:px-12 grid w-full grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-4`}>
           {/* Left: Visible Return Link / Back Button */}
           <Link
             href="/"
             onClick={handleBackClick}
             aria-label="Back to previous page"
-            className="justify-self-start w-fit inline-flex items-center gap-1.5 font-sans text-[clamp(0.8125rem,0.75rem+0.25vw,0.9375rem)] font-semibold text-gray-800 hover:text-[#D94E4E] transition-colors p-1.5 -ml-1.5 rounded-lg hover:bg-gray-100/80"
+            className="justify-self-start w-fit inline-flex items-center gap-1.5 font-sans text-[clamp(0.8125rem,0.75rem+0.25vw,0.9375rem)] font-semibold text-gray-800 hover:text-[#D94E4E] transition-colors py-1.5 rounded-lg hover:bg-gray-100/80"
           >
             <ArrowLeft className="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2.2]" />
             <span>Back</span>
@@ -294,7 +294,7 @@ export function BookingWizardView({ services, config, initialServiceId, initialC
                 }`}
               >
                 <span
-                  className={`w-5 h-5 sm:w-6 sm:h-6 rounded-none flex items-center justify-center text-[clamp(0.75rem,0.7rem+0.2vw,0.8125rem)] font-bold shrink-0 leading-none transition-all ${
+                  className={`w-5 h-5 sm:w-6 sm:h-6 rounded-none flex items-center justify-center text-xs font-bold shrink-0 leading-none transition-all ${
                     step === 1
                       ? 'bg-[#1D1E1E] text-white shadow-xs'
                       : step > 1
@@ -324,7 +324,7 @@ export function BookingWizardView({ services, config, initialServiceId, initialC
                 }`}
               >
                 <span
-                  className={`w-5 h-5 sm:w-6 sm:h-6 rounded-none flex items-center justify-center text-[clamp(0.75rem,0.7rem+0.2vw,0.8125rem)] font-bold shrink-0 leading-none transition-all ${
+                  className={`w-5 h-5 sm:w-6 sm:h-6 rounded-none flex items-center justify-center text-xs font-bold shrink-0 leading-none transition-all ${
                     step === 2
                       ? 'bg-[#1D1E1E] text-white shadow-xs'
                       : step > 2
@@ -352,7 +352,7 @@ export function BookingWizardView({ services, config, initialServiceId, initialC
                 }`}
               >
                 <span
-                  className={`w-5 h-5 sm:w-6 sm:h-6 rounded-none flex items-center justify-center text-[clamp(0.75rem,0.7rem+0.2vw,0.8125rem)] font-bold shrink-0 leading-none transition-all ${
+                  className={`w-5 h-5 sm:w-6 sm:h-6 rounded-none flex items-center justify-center text-xs font-bold shrink-0 leading-none transition-all ${
                     step === 3
                       ? 'bg-[#1D1E1E] text-white shadow-xs'
                       : 'bg-gray-100 border border-gray-300 text-gray-600'
@@ -388,10 +388,10 @@ export function BookingWizardView({ services, config, initialServiceId, initialC
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200/60 pb-3">
                     <div>
-                      <h2 className="font-sans text-[clamp(1.625rem,1.375rem+1vw,2.25rem)] text-balance font-normal tracking-[-0.04em] text-[#141515] leading-[1.05]">
+                      <h2 className="font-sans text-[clamp(1.5rem,1.25rem+1vw,2rem)] text-balance font-normal tracking-[-0.04em] text-[#141515] leading-[1.25]">
                         Choose Service
                       </h2>
-                      <p className="text-[clamp(1rem,0.95rem+0.2vw,1.0625rem)] font-normal text-gray-500 leading-[1.65] font-sans mt-0.5">
+                      <p className="text-base font-normal text-gray-500 leading-[1.65] font-sans mt-0.5">
                         Choose your required dental treatment to proceed.
                       </p>
                     </div>
@@ -406,26 +406,27 @@ export function BookingWizardView({ services, config, initialServiceId, initialC
                     </button>}
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-1 pb-6 items-stretch">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-1 pb-6 items-stretch">
                     {filteredServices.map(srv => {
                       const isConsultation = srv.id === consultationService?.id;
                       const isSelected = contactSection.pathway === srv.id;
                       return <article key={srv.id} id={`service-card-${srv.id}`} className={`rounded-none border p-4 sm:p-5 transition-colors bg-white ${isSelected ? 'border-[#1D1E1E] ring-1 ring-[#1D1E1E]' : 'border-gray-200'}`}>
+                        {srv.imageUrl && <div className="mb-4 bg-gray-50"><img src={srv.imageUrl} alt="" loading="lazy" decoding="async" className="h-36 sm:h-40 w-full object-contain" /></div>}
                         <button type="button" aria-pressed={isSelected} onClick={() => handleCardClick(srv.id)} className="flex w-full items-start gap-3 text-left focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#D94E4E]">
                           <span className="min-w-0 flex-1">
-                            <span className="block text-[clamp(0.75rem,0.7rem+0.2vw,0.8125rem)] leading-relaxed text-gray-500">{srv.category || 'General'}</span>
-                            <span className="block mt-1 text-[clamp(1.125rem,1rem+0.5vw,1.375rem)] leading-snug font-medium">{isConsultation ? 'General Consultation' : srv.name}</span>
+                            <span className="block text-xs leading-relaxed text-gray-500">{srv.category || 'General'}</span>
+                            <span className="block mt-1 text-lg leading-snug font-medium">{isConsultation ? 'General Consultation' : srv.name}</span>
                           </span>
                           <span aria-hidden="true" className={`mt-1 h-5 w-5 shrink-0 rounded-full border flex items-center justify-center ${isSelected ? 'border-[#1D1E1E] bg-[#1D1E1E] text-white' : 'border-gray-300'}`}>{isSelected && <Check className="h-3 w-3" />}</span>
                         </button>
-                        {(isConsultation || srv.description) && <div className="mt-4 border-t border-gray-100 pt-3"><ServiceDescription description={isConsultation ? "Not sure which service to choose? Book a consultation to discuss your concern with the dentist." : srv.description} className="mt-0 text-[clamp(1rem,0.95rem+0.2vw,1.0625rem)] leading-relaxed" /></div>}
+                        {(isConsultation || srv.description) && <div className="mt-4 border-t border-gray-100 pt-3"><ServiceDescription description={isConsultation ? "Not sure which service to choose? Book a consultation to discuss your concern with the dentist." : srv.description} className="mt-0 !text-sm leading-relaxed" /></div>}
                       </article>;
                     })}
                   </div>
 
                   <div className="relative min-h-[76px] border-t border-gray-200 bg-[#FDFDFD] py-4 flex flex-wrap justify-end items-center gap-3" id="step-1-next-btn">
                     {!contactSection.pathway && <span className="text-xs text-gray-500 font-sans">Select a service to continue</span>}
-                    <button type="button" disabled={!contactSection.pathway} onClick={wizard.goToStep2} className="min-h-11 py-3 px-7 bg-[#1D1E1E] text-white text-[11px] sm:text-sm font-semibold tracking-widest hover:bg-[#D94E4E] disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed transition-colors flex items-center gap-2 cursor-pointer">
+                    <button type="button" disabled={!contactSection.pathway} onClick={wizard.goToStep2} className="min-h-11 py-3 px-7 bg-[#1D1E1E] text-white text-sm font-semibold tracking-widest hover:bg-[#D94E4E] disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed transition-colors flex items-center gap-2 cursor-pointer">
                       Next: Schedule Slot <ArrowRight className="w-4 h-4" />
                     </button>
                   </div>
@@ -443,10 +444,10 @@ export function BookingWizardView({ services, config, initialServiceId, initialC
                   className="space-y-6"
                 >
                   <div className="border-b border-gray-200/60 pb-3">
-                    <h2 className="font-sans text-[clamp(1.625rem,1.375rem+1vw,2.25rem)] text-balance font-normal tracking-[-0.04em] text-[#141515] leading-[1.05]">
+                    <h2 className="font-sans text-[clamp(1.5rem,1.25rem+1vw,2rem)] text-balance font-normal tracking-[-0.04em] text-[#141515] leading-[1.25]">
                       Schedule
                     </h2>
-                    <p className="text-[clamp(1rem,0.95rem+0.2vw,1.0625rem)] font-normal text-gray-500 leading-[1.65] font-sans mt-0.5">
+                    <p className="text-base font-normal text-gray-500 leading-[1.65] font-sans mt-0.5">
                       Pick your preferred target date and time for your appointment request.
                     </p>
                   </div>
@@ -500,7 +501,7 @@ export function BookingWizardView({ services, config, initialServiceId, initialC
                     <button
                       type="button"
                       onClick={wizard.goToStep1}
-                      className="py-3 px-5 border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 transition-all text-[11px] sm:text-sm font-semibold tracking-widest flex items-center gap-2 cursor-pointer"
+                      className="py-3 px-5 border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 transition-all text-sm font-semibold tracking-widest flex items-center gap-2 cursor-pointer"
                     >
                       <ArrowLeft className="w-4 h-4" /> Back To Services
                     </button>
@@ -509,7 +510,7 @@ export function BookingWizardView({ services, config, initialServiceId, initialC
                       <button
                         type="button"
                         onClick={wizard.goToStep3}
-                        className="py-3 px-7 bg-[#1D1E1E] text-white rounded-none text-[11px] sm:text-sm font-semibold tracking-widest hover:bg-[#D94E4E] transition-all duration-300 shadow-xs flex items-center gap-2 cursor-pointer"
+                        className="py-3 px-7 bg-[#1D1E1E] text-white rounded-none text-sm font-semibold tracking-widest hover:bg-[#D94E4E] transition-all duration-300 shadow-xs flex items-center gap-2 cursor-pointer"
                       >
                         Next: Patient Information <ArrowRight className="w-4 h-4" />
                       </button>
@@ -535,10 +536,10 @@ export function BookingWizardView({ services, config, initialServiceId, initialC
                   className="space-y-6"
                 >
                   <div className="border-b border-gray-200/60 pb-3">
-                    <h2 className="font-sans text-[clamp(1.625rem,1.375rem+1vw,2.25rem)] text-balance font-normal tracking-[-0.04em] text-[#141515] leading-[1.05]">
+                    <h2 className="font-sans text-[clamp(1.5rem,1.25rem+1vw,2rem)] text-balance font-normal tracking-[-0.04em] text-[#141515] leading-[1.25]">
                       Patient Information
                     </h2>
-                    <p className="text-[clamp(1rem,0.95rem+0.2vw,1.0625rem)] font-normal text-gray-500 leading-[1.65] font-sans mt-0.5">
+                    <p className="text-base font-normal text-gray-500 leading-[1.65] font-sans mt-0.5">
                       Review your request, then complete your details below.
                     </p>
                   </div>
@@ -595,7 +596,7 @@ export function BookingWizardView({ services, config, initialServiceId, initialC
                       type="button"
                       onClick={wizard.goToStep2}
                       disabled={isSubmitting}
-                      className="py-3 px-5 border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 transition-all text-[11px] sm:text-sm font-semibold tracking-widest flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                      className="py-3 px-5 border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 transition-all text-sm font-semibold tracking-widest flex items-center gap-2 cursor-pointer disabled:opacity-50"
                     >
                       <ArrowLeft className="w-4 h-4" /> Back To Schedule
                     </button>
@@ -608,7 +609,7 @@ export function BookingWizardView({ services, config, initialServiceId, initialC
                         if (contactSection.submittedLocal) window.scrollTo({ top: 0, behavior: 'smooth' });
                       }}
                       disabled={isSubmitting}
-                      className="py-3 px-7 bg-[#1D1E1E] text-white rounded-none text-[11px] sm:text-sm font-semibold tracking-widest hover:bg-[#D94E4E] transition-all duration-300 shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:pointer-events-none disabled:opacity-50"
+                      className="py-3 px-7 bg-[#1D1E1E] text-white rounded-none text-sm font-semibold tracking-widest hover:bg-[#D94E4E] transition-all duration-300 shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:pointer-events-none disabled:opacity-50"
                     >
                       {isSubmitting ? (
                         'Submitting Request...'
@@ -656,7 +657,7 @@ export function BookingWizardView({ services, config, initialServiceId, initialC
                 <div className="pt-4 border-t border-gray-200/80 flex flex-col items-center gap-3">
                   <Link
                     href="/"
-                    className="px-5 py-2.5 sm:px-6 sm:py-3 bg-[#1D1E1E] hover:bg-[#D94E4E] text-white text-[11px] sm:text-sm font-semibold tracking-widest transition-all shadow-sm inline-block"
+                    className="px-5 py-2.5 sm:px-6 sm:py-3 bg-[#1D1E1E] hover:bg-[#D94E4E] text-white text-sm font-semibold tracking-widest transition-all shadow-sm inline-block"
                   >
                     Return to Home
                   </Link>

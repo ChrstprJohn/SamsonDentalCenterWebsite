@@ -37,15 +37,15 @@ function WideImageCarousel() {
         className="flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6"
       >
         <div className="max-w-full md:max-w-[450px] lg:max-w-[580px]">
-          <span className="text-[clamp(0.75rem,0.7rem+0.2vw,0.8125rem)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-2 sm:mb-3 font-sans">
+          <span className="text-xs tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-2 sm:mb-3 font-sans">
             Inside the Clinic
           </span>
-          <h3 className="font-sans text-[clamp(1.625rem,1.375rem+1vw,2.25rem)] text-balance font-normal leading-[1.3] sm:leading-[1.2] md:leading-[1.15] tracking-[-0.03em] text-[#1D1E1E]">
+          <h3 className="font-sans text-[clamp(1.5rem,1.25rem+1vw,2rem)] text-balance font-normal leading-[1.25] tracking-[-0.03em] text-[#1D1E1E]">
             A look around <br className="hidden lg:block" />
             Samson Dental Center.
           </h3>
         </div>
-        <p className="max-w-sm pt-2 sm:pt-2 md:max-w-[280px] lg:max-w-sm font-sans text-[clamp(1rem,0.95rem+0.2vw,1.0625rem)] font-normal leading-relaxed text-gray-500">
+        <p className="max-w-sm pt-2 sm:pt-2 md:max-w-[280px] lg:max-w-sm font-sans text-base font-normal leading-relaxed text-gray-500">
           Our clinic, our team, and the space where your smile is cared for.
         </p>
       </motion.div>
@@ -130,44 +130,40 @@ export function AboutSection() {
             transition={{ duration: 0.7, delay: 0.15, ease: 'easeOut' }}
             className="lg:col-span-6"
           >
-            <span className="text-[clamp(0.75rem,0.7rem+0.2vw,0.8125rem)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-2 sm:mb-3 font-sans">
+            <span className="text-xs tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-2 sm:mb-3 font-sans">
               About Us
             </span>
-            <h2 className="font-sans text-[clamp(1.625rem,1.375rem+1vw,2.25rem)] text-balance font-normal leading-[1.3] sm:leading-[1.2] md:leading-[1.15] tracking-[-0.03em] text-[#1D1E1E]">
-              Welcome to Samson Dental Center. <br className="hidden sm:block" />
+            <h2 className="font-sans text-[clamp(1.5rem,1.25rem+1vw,2rem)] text-balance font-normal leading-[1.25] tracking-[-0.03em] text-[#1D1E1E]">
               Trusted Dental Care in Baguio City.
             </h2>
 
-            <div className="mt-4 sm:mt-8 space-y-3 sm:space-y-6 text-gray-500 font-normal leading-relaxed text-[clamp(1rem,0.95rem+0.2vw,1.0625rem)] font-sans">
+            <div className="mt-4 sm:mt-8 space-y-3 sm:space-y-6 text-gray-500 font-normal leading-relaxed text-base font-sans">
               <p>
-                Patients in Baguio City choose our dental clinic because they know they can trust our dentists’ expertise and commitment to providing excellent care. Our patients consistently refer their families and friends to us, thanks to the exceptional, personalized service and positive experiences they have with our team.
+                At Samson Dental Center, we combine our dentists’ expertise with attentive, personalized care. Patients in Baguio City trust us with their dental health and recommend our clinic to family and friends.
               </p>
               <p>
-                We take the time to carefully understand each patient’s unique dental health needs and goals. Our dentists draw on their extensive knowledge and skills to deliver high-quality, tailored treatments that improve oral health and appearance. Just as importantly, we prioritize building lifelong relationships with our patients, founded on trust, honesty, and a genuine concern for their wellbeing.
-              </p>
-              <p>
-                From preventative care to complex restorations, you can count on our dental clinic to provide the compassionate, professional service you deserve. Experience the difference our dedication to exceptional dentistry can make – contact us today to schedule your appointment.
+                We take time to understand your concerns and goals, then tailor your care—from preventive treatments to complex restorations. Our approach is built on trust, honest communication, and lasting relationships with our patients.
               </p>
             </div>
 
             {/* Unique Features */}
             <div className="mt-7 sm:mt-10 grid grid-cols-2 gap-4 sm:gap-8 pt-6 sm:pt-8 border-t border-gray-100 font-sans">
               <div>
-                <h4 className="text-[#1D1E1E] text-[clamp(1.125rem,1rem+0.5vw,1.375rem)] font-semibold flex items-center gap-2">
+                <h4 className="text-[#1D1E1E] text-lg sm:text-xl font-semibold flex items-center gap-2">
                   Central Location
                 </h4>
-                <p className="text-[clamp(1rem,0.95rem+0.2vw,1.0625rem)] text-[#2C2E2E] font-medium mt-1.5 leading-relaxed">
+                <p className="text-base text-[#2C2E2E] font-medium mt-1.5 leading-relaxed">
                   5th Floor S Building, Upper Session Road, Baguio City
                 </p>
               </div>
               <div>
-                <h4 className="text-[#1D1E1E] text-[clamp(1.125rem,1rem+0.5vw,1.375rem)] font-semibold flex items-center gap-2">
+                <h4 className="text-[#1D1E1E] text-lg sm:text-xl font-semibold flex items-center gap-2">
                   Opening Hours
                 </h4>
-                <p className="text-sm sm:text-[clamp(1rem,0.95rem+0.2vw,1.0625rem)] text-[#2C2E2E] font-medium mt-2 leading-relaxed space-y-1">
+                <p className="text-base text-[#2C2E2E] font-medium mt-2 leading-relaxed space-y-1">
                   <span className="block font-semibold">Monday – Saturday</span>
-                  <span className="block whitespace-nowrap">9:00am – 12:00pm</span>
-                  <span className="block whitespace-nowrap">1:00pm – 5:00pm</span>
+                  <span className="block whitespace-nowrap font-semibold">9:00am – 12:00pm</span>
+                  <span className="block whitespace-nowrap font-semibold">1:00pm – 5:00pm</span>
                 </p>
               </div>
             </div>
@@ -187,16 +183,16 @@ export function AboutSection() {
           
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 sm:mb-16 gap-4 sm:gap-6">
             <div className="max-w-full md:max-w-[450px] lg:max-w-[580px]">
-              <span className="text-[clamp(0.75rem,0.7rem+0.2vw,0.8125rem)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-2 sm:mb-3 font-sans">
+              <span className="text-xs tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-2 sm:mb-3 font-sans">
                 Our Dentist
               </span>
-              <h3 className="font-sans text-[clamp(1.625rem,1.375rem+1vw,2.25rem)] text-balance font-normal tracking-[-0.03em] text-[#1D1E1E] leading-[1.3] sm:leading-[1.2] md:leading-[1.15]">
+              <h3 className="font-sans text-[clamp(1.5rem,1.25rem+1vw,2rem)] text-balance font-normal tracking-[-0.03em] text-[#1D1E1E] leading-[1.25]">
                 Meet our dentists, the specialists{' '}
                 <br className="hidden lg:block" />
                 behind your smile.
               </h3>
             </div>
-            <p className="text-[clamp(1rem,0.95rem+0.2vw,1.0625rem)] font-normal text-gray-500 max-w-sm md:max-w-[280px] lg:max-w-sm leading-relaxed font-sans pt-2 sm:pt-2">
+            <p className="text-base font-normal text-gray-500 max-w-sm md:max-w-[280px] lg:max-w-sm leading-relaxed font-sans pt-2 sm:pt-2">
               Your smile is in good hands with our dentists, from everyday checkups to advanced treatments, with every visit clear and comfortable.
             </p>
           </div>

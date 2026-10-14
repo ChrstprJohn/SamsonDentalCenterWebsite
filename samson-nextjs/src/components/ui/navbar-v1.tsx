@@ -184,14 +184,14 @@ export function NavbarV1({
               <button
                 onClick={() => { setIsMobileOpen(false); requestAppt(); }}
                 disabled={isNavigatingBooking}
-                className={`px-5 py-2.5 rounded-full text-[12px] font-semibold uppercase tracking-widest transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] shadow-xs cursor-pointer flex items-center gap-2 ${isNavigatingBooking ? 'opacity-50 cursor-wait' : ''} ${
+                className={`px-5 sm:px-7 py-3 sm:py-3.5 rounded-full font-sans text-sm font-semibold uppercase tracking-wider transition-colors cursor-pointer inline-flex items-center justify-center gap-2 shrink-0 ${isNavigatingBooking ? 'opacity-50 cursor-wait' : ''} ${
                   isDarkNav
                     ? 'bg-white text-[#141515] hover:bg-[#D94E4E] hover:text-white'
                     : 'bg-[#141515] text-white hover:bg-[#D94E4E]'
                 }`}
               >
                 {appointmentLabel}
-                <ArrowRight className="w-3.5 h-3.5" />
+                <ArrowRight className="w-4 h-4" />
               </button>
             </div>
 

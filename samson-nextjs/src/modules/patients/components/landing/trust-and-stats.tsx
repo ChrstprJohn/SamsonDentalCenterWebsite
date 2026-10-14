@@ -4,15 +4,16 @@ import { motion } from 'framer-motion';
 interface TrustAndStatsProps {
   variant?: 'v1' | 'v2';
   serviceCount?: number;
+  isBookingOpen?: boolean;
 }
 
-export function TrustAndStats({ variant = 'v1', serviceCount = 0 }: TrustAndStatsProps) {
+export function TrustAndStats({ variant = 'v1', serviceCount = 0, isBookingOpen = true }: TrustAndStatsProps) {
   const stats = [
     { value: '60+', label: 'Years of Care' },
     { value: '4.3★', label: 'Google Rating' },
     { value: '100%', label: 'Certified Specialists' },
     { value: `${serviceCount}+`, label: 'Dental Services' },
-    { value: 'Online', label: 'Book Online' },
+    ...(isBookingOpen ? [{ value: 'Online', label: 'Book Online' }] : []),
   ];
 
   const isV2 = variant === 'v2';
@@ -89,7 +90,7 @@ export function TrustAndStats({ variant = 'v1', serviceCount = 0 }: TrustAndStat
  
       {/* Large/Medium Desktop View: Elegant Static Stat Grid */}
       <div className="hidden lg:block max-w-7xl mx-auto px-12 py-12" id="desktop-stats-grid">
-        <div className={`grid grid-cols-5 gap-4 divide-x ${isV2 ? 'divide-gray-200' : 'divide-[#D94E4E]/15'}`}>
+        <div className={`grid ${isBookingOpen ? 'grid-cols-5' : 'grid-cols-4'} gap-4 divide-x ${isV2 ? 'divide-gray-200' : 'divide-[#D94E4E]/15'}`}>
           {stats.map((stat, idx) => (
             <motion.div
               key={`desktop-${idx}`}

@@ -29,13 +29,13 @@ export function ContactInfoPanel({ config }: { config: ClinicConfigResponseDto }
   return (
     <div className="flex flex-col justify-between">
       <div className="max-w-full md:max-w-[450px] lg:max-w-[580px]">
-        <span className="text-[clamp(0.75rem,0.7rem+0.2vw,0.8125rem)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-2 sm:mb-3 font-sans">
+        <span className="text-xs tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-2 sm:mb-3 font-sans">
           Our Contact
         </span>
-        <h2 className="font-sans text-[clamp(1.625rem,1.375rem+1vw,2.25rem)] text-balance font-normal tracking-[-0.03em] text-[#1D1E1E] leading-[1.3] sm:leading-[1.2] md:leading-[1.15]">
+        <h2 className="font-sans text-[clamp(1.5rem,1.25rem+1vw,2rem)] text-balance font-normal tracking-[-0.03em] text-[#1D1E1E] leading-[1.25]">
           {config.isBookingOpen ? 'Need immediate help?' : 'Contact us to schedule your visit'}
         </h2>
-        <p className="max-w-sm pt-2 sm:pt-2 font-sans text-[clamp(1rem,0.95rem+0.2vw,1.0625rem)] font-normal leading-relaxed text-gray-500">
+        <p className="max-w-sm pt-2 sm:pt-2 font-sans text-base font-normal leading-relaxed text-gray-500">
           Contact us at <strong className="font-bold text-[#1D1E1E]">{formatLocalPhone(config.phone)}</strong>{config.landline && <> or <strong className="font-bold text-[#1D1E1E]">{formatLocalPhone(config.landline)}</strong></>}, or visit our clinic directly. Our team is ready to assist you.
         </p>
         <div className="mt-7 sm:mt-10 space-y-5 sm:space-y-6">
@@ -57,8 +57,8 @@ function ContactLine({ icon, label, value, href }: { icon: React.ReactNode; labe
         {icon}
       </div>
       <div>
-        <p className="text-[clamp(0.75rem,0.7rem+0.2vw,0.8125rem)] tracking-widest uppercase font-semibold text-gray-500 font-sans">{label}</p>
-        <p className="text-[clamp(1rem,0.95rem+0.2vw,1.0625rem)] font-medium text-gray-900 mt-1 font-sans [overflow-wrap:anywhere]">{href ? <a href={href} className="hover:text-[#D94E4E] underline underline-offset-4">{value}</a> : value}</p>
+        <p className="text-xs tracking-widest uppercase font-semibold text-gray-500 font-sans">{label}</p>
+        <p className="text-base font-medium text-gray-900 mt-1 font-sans [overflow-wrap:anywhere]">{href ? <a href={href} className="hover:text-[#D94E4E] underline underline-offset-4">{value}</a> : value}</p>
       </div>
     </div>
   );

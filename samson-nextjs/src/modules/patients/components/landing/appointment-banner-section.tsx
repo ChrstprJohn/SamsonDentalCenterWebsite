@@ -87,17 +87,17 @@ export function AppointmentBannerSection({ onBookClick }: AppointmentBannerSecti
         >
 
           {/* Eyebrow — same pattern as other sections */}
-          <span className="text-[clamp(0.75rem,0.7rem+0.2vw,0.8125rem)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold font-sans">
+          <span className="text-xs tracking-[0.25em] text-[#D94E4E] uppercase font-semibold font-sans">
             Book a Visit
           </span>
 
           {/* Title — same scale/weight as other section headings */}
-          <h2 className="font-sans text-[clamp(1.625rem,1.375rem+1vw,2.25rem)] text-balance font-normal tracking-[-0.04em] text-white leading-[1.05]">
+          <h2 className="font-sans text-[clamp(1.5rem,1.25rem+1vw,2rem)] text-balance font-normal tracking-[-0.04em] text-white leading-[1.25]">
             Schedule an appointment with us today!
           </h2>
 
           {/* Body */}
-          <p className="text-[clamp(1rem,0.95rem+0.2vw,1.0625rem)] font-normal text-white/65 leading-[1.65] font-sans max-w-sm">
+          <p className="text-base font-normal text-white/65 leading-[1.65] font-sans max-w-sm">
             Whether you're visiting for a routine check-up or a more advanced
             procedure, we ensure your oral health is in the best hands, helping
             you achieve a confident, healthy smile.
@@ -107,14 +107,14 @@ export function AppointmentBannerSection({ onBookClick }: AppointmentBannerSecti
           {onBookClick ? (
             <button
               onClick={onBookClick}
-              className="group inline-flex items-center gap-3 bg-white text-[#141515] hover:bg-[#D94E4E] hover:text-white px-7 py-3.5 rounded-full text-[12px] font-semibold uppercase tracking-widest transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] shadow-md cursor-pointer mt-2 w-fit"
+              className="group inline-flex items-center gap-3 bg-white text-[#141515] hover:bg-[#D94E4E] hover:text-white px-7 py-3.5 rounded-full font-sans text-sm font-semibold uppercase tracking-wider transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] shadow-md cursor-pointer mt-2 w-fit"
             >
               {appointmentLabel}
               <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
             </button>
           ) : (
             <Link href={isBookingOpen ? '/book' : '/#contact'}>
-              <button className="group inline-flex items-center gap-3 bg-white text-[#141515] hover:bg-[#D94E4E] hover:text-white px-7 py-3.5 rounded-full text-[12px] font-semibold uppercase tracking-widest transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] shadow-md cursor-pointer mt-2">
+              <button className="group inline-flex items-center gap-3 bg-white text-[#141515] hover:bg-[#D94E4E] hover:text-white px-7 py-3.5 rounded-full font-sans text-sm font-semibold uppercase tracking-wider transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] shadow-md cursor-pointer mt-2">
                 {appointmentLabel}
                 <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
               </button>

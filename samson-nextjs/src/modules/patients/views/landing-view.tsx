@@ -8,7 +8,7 @@ import { useBookingNav } from '../contexts/booking-nav-context';
 import { HeroSectionV1 } from '../components/landing/hero-section-v1';
 import { HeroSectionV2 } from '../components/landing/hero-section-v2';
 import { HeroSectionPreview } from '../components/landing/hero-section-preview';
-import { MockCategoryServicesSection } from '../components/landing/mock-category-services-section';
+import { ServiceCardsSection } from '../components/landing/service-cards-section';
 import { ServicesSection } from '../components/landing/services-section';
 import { JourneySection } from '../components/landing/journey-section';
 import { AboutSection } from '../components/landing/about-section';
@@ -93,10 +93,7 @@ export function LandingView({ services, config, reviews }: LandingViewProps) {
   return (
     <div className="flex flex-col w-full bg-[#FDFDFD] text-[#1D1E1E]">
       <HeroSectionPreview onBookClick={() => requestAppt()} serviceCount={activeServices.length} />
-      <MockCategoryServicesSection
-        onBook={(svcId, svcName) => requestAppt(svcId, svcName)}
-        dbServices={activeServices}
-      />
+      <ServiceCardsSection />
       {/* <ServicesSection services={activeServices} onSelectService={(svc) => requestAppt(svc.id)} /> */}
       <AboutSection />
       <WhyChooseUsSection />
