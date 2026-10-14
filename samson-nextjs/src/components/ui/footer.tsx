@@ -58,13 +58,13 @@ export function Footer({ config }: FooterProps) {
           backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`
         }}
       />
-      <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-12 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-12 sm:gap-16">
+      <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-12 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-[minmax(0,1.6fr)_minmax(0,0.8fr)_minmax(0,1.1fr)_minmax(0,1fr)] gap-10 sm:gap-12 xl:gap-8">
         
         {/* Column 1 & 2: Massive Brand & Trust Badges */}
-        <div className="sm:col-span-1 xl:col-span-2 flex flex-col gap-6 pr-0 xl:pr-8">
+        <div className="min-w-0 flex flex-col gap-6 pr-0 xl:pr-8">
           <div className="flex items-center gap-3">
             {logoUrl ? (
-              <img src={logoUrl} alt={clinicName} className="h-16 sm:h-20 max-w-[280px] w-auto object-contain object-left drop-shadow-sm" />
+              <img src={logoUrl} alt={clinicName} className="h-16 sm:h-20 max-w-full w-auto object-contain object-left drop-shadow-sm" />
             ) : (
               <>
                 <span className="w-11 h-11 rounded-[15.6px] border border-current flex items-center justify-center font-serif text-[22px] italic font-normal text-white select-none">
@@ -84,31 +84,31 @@ export function Footer({ config }: FooterProps) {
         </div>
 
         {/* Column 3: Treatments (Deep Link Silos for SEO) */}
-        <div className="flex flex-col gap-5">
+        <div className="min-w-0 flex flex-col gap-5">
           <h4 className="text-white text-xs font-semibold tracking-widest uppercase border-b border-white/5 pb-2.5">
             Treatments
           </h4>
           <nav className="flex flex-col gap-3 text-sm font-light">
-            <Link href="/services/veneers" className="hover:text-white transition-colors">
+            <Link href="/book?category=Cosmetic%20Dentistry" className="hover:text-white transition-colors">
               Cosmetic Veneers
             </Link>
-            <Link href="/services/implants" className="hover:text-white transition-colors">
+            <Link href="/book?category=Oral%20Surgery%20and%20Implants" className="hover:text-white transition-colors">
               Dental Implants
             </Link>
-            <Link href="/services/aligners" className="hover:text-white transition-colors">
+            <Link href="/book?category=Orthodontics" className="hover:text-white transition-colors">
               Orthodontic Aligners
             </Link>
-            <Link href="/services/hygiene" className="hover:text-white transition-colors">
+            <Link href="/book?category=Preventive%20Dentistry" className="hover:text-white transition-colors">
               Professional Hygiene
             </Link>
-            <Link href="/services/diagnostics" className="hover:text-white transition-colors">
+            <Link href="/book?category=Diagnostics" className="hover:text-white transition-colors">
               Complex Diagnostics
             </Link>
           </nav>
         </div>
 
         {/* Column 4: Local SEO NAP Block wrapped in HTML5 <address> */}
-        <div className="flex flex-col gap-5">
+        <div className="min-w-0 flex flex-col gap-5">
           <h4 className="text-white text-xs font-semibold tracking-widest uppercase border-b border-white/5 pb-2.5">
             Contact Info
           </h4>
@@ -120,7 +120,7 @@ export function Footer({ config }: FooterProps) {
               className="flex items-start gap-2.5 leading-relaxed hover:text-white transition-colors group"
             >
               <MapPin className="w-4 h-4 text-[#D94E4E] shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
-              <span>{address}</span>
+              <span className="min-w-0 [overflow-wrap:anywhere]">{address}</span>
             </a>
             <a 
               href={`tel:${phone}`} 
@@ -143,7 +143,7 @@ export function Footer({ config }: FooterProps) {
               className="flex items-center gap-2.5 hover:text-white transition-colors group"
             >
               <Mail className="w-4 h-4 text-[#D94E4E] shrink-0 group-hover:scale-110 transition-transform" />
-              <span>{email}</span>
+              <span className="min-w-0 [overflow-wrap:anywhere]">{email}</span>
             </a>
           </address>
           
@@ -151,20 +151,20 @@ export function Footer({ config }: FooterProps) {
         </div>
 
         {/* Column 5: Operating Hours */}
-        <div className="flex flex-col gap-5">
+        <div className="min-w-0 flex flex-col gap-5">
           <h4 className="text-white text-xs font-semibold tracking-widest uppercase border-b border-white/5 pb-2.5">
             Clinic Hours
           </h4>
           <div className="flex flex-col gap-2.5 text-sm font-light">
             {Object.entries(operatingHours).map(([day, val]) => (
-              <div key={day} className="flex justify-between items-center py-0.5">
+              <div key={day} className="grid grid-cols-[2.5rem_minmax(0,1fr)] items-start gap-2 py-0.5">
                 <span className="capitalize text-[#BAC1C1]/70">{DAY_NAMES[day] || day}</span>
                 {val.isOpen ? (
-                  <span className="text-white font-medium">
+                  <span className="min-w-0 text-right text-white font-medium">
                     {formatTime(val.openTime)} - {formatTime(val.closeTime)}
                   </span>
                 ) : (
-                  <span className="text-white/40">Closed</span>
+                  <span className="text-right text-white/40">Closed</span>
                 )}
               </div>
             ))}

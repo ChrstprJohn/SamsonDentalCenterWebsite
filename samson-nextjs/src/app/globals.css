@@ -245,3 +245,13 @@ body {
 .animate-accordion-up {
   animation: accordion-up 0.3s cubic-bezier(0.33, 1, 0.68, 1);
 }
+
+/* Keep the page scrollbar unobtrusive while retaining native scrolling. */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #9ca3af transparent;
+}
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #9ca3af; border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: #6b7280; }

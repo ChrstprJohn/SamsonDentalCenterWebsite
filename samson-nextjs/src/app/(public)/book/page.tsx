@@ -36,7 +36,7 @@ const DEFAULT_CONFIG: ClinicConfigResponseDto = {
 };
 
 interface BookPageProps {
-  searchParams: Promise<{ serviceId?: string }>;
+  searchParams: Promise<{ serviceId?: string; category?: string }>;
 }
 
 export default async function BookPage({ searchParams }: BookPageProps) {
@@ -67,6 +67,7 @@ export default async function BookPage({ searchParams }: BookPageProps) {
       services={services}
       config={config}
       initialServiceId={resolvedSearchParams.serviceId}
+      initialCategory={resolvedSearchParams.category}
     />
   );
 }

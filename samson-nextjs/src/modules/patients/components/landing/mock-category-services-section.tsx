@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowRight, ChevronLeft, ChevronRight, Loader2, MoveRight, X } from 'lucide-react';
 import type { ServiceResponseDto } from '@/modules/services/dtos/management/service-response.dto';
@@ -165,14 +166,15 @@ export function MockCategoryServicesSection({ onBook, dbServices }: MockCategory
   const [desktopPage, setDesktopPage] = useState(0);
   const [activeMobileIndex, setActiveMobileIndex] = useState(0);
 
+  const router = useRouter();
+  const consultation = dbServices.find(service => service.category === 'Consultation');
+  const consultationHref = consultation ? `/book?serviceId=${encodeURIComponent(consultation.id)}` : '/book?category=Consultation';
   const categories = buildCategories(dbServices);
   const topCategories = categories.slice(0, CARD_COUNT);
   const bottomCategories = categories.slice(CARD_COUNT);
 
   const handleOpenCategory = (cat: MockCategoryGroup) => {
-    setSelectedCategory(cat);
-    setDesktopPage(0);
-    setActiveMobileIndex(0);
+    router.push(`/book?category=${encodeURIComponent(cat.category)}`);
   };
 
   const handleBooking = (service: MockServiceItem) => {
@@ -203,16 +205,16 @@ export function MockCategoryServicesSection({ onBook, dbServices }: MockCategory
             className="flex flex-col md:flex-row md:items-end justify-between mb-12 sm:mb-20 md:mb-24 gap-4 sm:gap-6"
           >
             <div className="max-w-full md:max-w-[450px] lg:max-w-[580px]">
-              <span className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-2 sm:mb-3 font-sans">
+              <span className="text-[clamp(0.75rem,0.7rem+0.2vw,0.8125rem)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-2 sm:mb-3 font-sans">
                 Our Services
               </span>
-              <h2 className="font-sans text-[20px] sm:text-[clamp(22px,2vw+10px,32px)] font-normal leading-[1.3] sm:leading-[1.2] md:leading-[1.15] tracking-[-0.03em] text-[#1D1E1E]">
+              <h2 className="font-sans text-[clamp(1.625rem,1.375rem+1vw,2.25rem)] text-balance font-normal leading-[1.3] sm:leading-[1.2] md:leading-[1.15] tracking-[-0.03em] text-[#1D1E1E]">
                 Explore the range of services{' '}
                 <br className="hidden lg:block" />
                 we offer at our clinic.
               </h2>
             </div>
-            <p className="max-w-sm pt-2 sm:pt-2 md:max-w-[280px] lg:max-w-sm font-sans text-[13px] sm:text-[clamp(12px,0.3vw+11px,14px)] font-normal leading-relaxed text-gray-500">
+            <p className="max-w-sm pt-2 sm:pt-2 md:max-w-[280px] lg:max-w-sm font-sans text-[clamp(1rem,0.95rem+0.2vw,1.0625rem)] font-normal leading-relaxed text-gray-500">
               Select any dental category below to explore its specific treatments, clinical options, and direct booking details.
             </p>
           </motion.div>
@@ -230,10 +232,10 @@ export function MockCategoryServicesSection({ onBook, dbServices }: MockCategory
                 title={`Click to view ${cat.category} services`}
                 className="group flex items-center justify-between py-6 sm:py-8 px-4 sm:px-6 cursor-pointer transition-colors duration-300 hover:bg-[#1D1E1E]/[0.03]"
               >
-                <span className="font-sans text-lg sm:text-xl md:text-2xl lg:text-3xl font-normal text-[#1D1E1E]/60 group-hover:text-[#D94E4E] transition-colors w-10 sm:w-14 md:w-16 lg:w-16 text-left shrink-0">
+                <span className="font-sans text-[clamp(1.125rem,0.875rem+1vw,1.75rem)] font-normal text-[#1D1E1E]/60 group-hover:text-[#D94E4E] transition-colors w-10 sm:w-14 md:w-16 lg:w-16 text-left shrink-0">
                   {cat.nr}
                 </span>
-                <h4 className="font-sans text-lg sm:text-xl md:text-2xl lg:text-3xl font-normal tracking-tight text-[#1D1E1E] flex-1 text-center leading-[1.2] px-2 sm:px-3 max-w-[280px] sm:max-w-md md:max-w-xl mx-auto">
+                <h4 className="font-sans text-[clamp(1.125rem,0.875rem+1vw,1.75rem)] font-normal tracking-tight text-[#1D1E1E] flex-1 text-center leading-[1.2] px-2 sm:px-3 max-w-[280px] sm:max-w-md md:max-w-xl mx-auto">
                   <CategoryTitle title={cat.category} />
                 </h4>
                 <div className="w-10 sm:w-14 md:w-16 lg:w-16 flex justify-end shrink-0">
@@ -264,10 +266,10 @@ export function MockCategoryServicesSection({ onBook, dbServices }: MockCategory
                 className="group relative flex items-center justify-between py-6 sm:py-8 transition-colors duration-300 hover:bg-[#1C1D1D]/70 px-4 sm:px-6 rounded-2xl cursor-pointer overflow-hidden"
               >
                 <NoiseOverlay className="opacity-0 group-hover:opacity-[0.06] transition-opacity duration-300" />
-                <span className="relative z-10 text-lg sm:text-xl md:text-2xl lg:text-3xl font-sans font-normal text-white/75 group-hover:text-white transition-colors w-10 sm:w-14 md:w-16 lg:w-16 text-left shrink-0">
+                <span className="relative z-10 text-[clamp(1.125rem,0.875rem+1vw,1.75rem)] font-sans font-normal text-white/75 group-hover:text-white transition-colors w-10 sm:w-14 md:w-16 lg:w-16 text-left shrink-0">
                   {cat.nr}
                 </span>
-                <h4 className="relative z-10 font-sans text-lg sm:text-xl md:text-2xl lg:text-3xl font-normal tracking-tight text-white/90 group-hover:text-white transition-colors flex-1 text-center leading-[1.2] px-2 sm:px-3 max-w-[280px] sm:max-w-md md:max-w-xl mx-auto">
+                <h4 className="relative z-10 font-sans text-[clamp(1.125rem,0.875rem+1vw,1.75rem)] font-normal tracking-tight text-white/90 group-hover:text-white transition-colors flex-1 text-center leading-[1.2] px-2 sm:px-3 max-w-[280px] sm:max-w-md md:max-w-xl mx-auto">
                   <CategoryTitle title={cat.category} />
                 </h4>
                 <div className="relative z-10 w-10 sm:w-14 md:w-16 lg:w-16 flex justify-end shrink-0">
@@ -279,7 +281,7 @@ export function MockCategoryServicesSection({ onBook, dbServices }: MockCategory
             ))}
           </div>
 
-          {/* Post-list CTA: Browse All Services Catalog */}
+          {/* Post-list CTA: Book a Consultation Catalog */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -288,20 +290,18 @@ export function MockCategoryServicesSection({ onBook, dbServices }: MockCategory
             className="mt-10 sm:mt-14 pt-6 sm:pt-8 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-5 sm:gap-8"
           >
             <div className="text-left">
-              <span className="text-[11px] sm:text-xs font-semibold tracking-[0.2em] text-[#D94E4E] uppercase block mb-1 font-sans">
-                Full Service Directory
+              <span className="text-[clamp(0.75rem,0.7rem+0.2vw,0.8125rem)] font-semibold tracking-[0.2em] text-[#D94E4E] uppercase block mb-1 font-sans">
+                Need guidance?
               </span>
-              <p className="text-xs sm:text-sm md:text-[15px] text-white/75 font-normal leading-relaxed font-sans max-w-md sm:max-w-lg">
-                Explore our comprehensive directory of dental procedures,
-                <br className="hidden sm:inline" />
-                advanced treatments, and specialized care in one place.
+              <p className="text-[clamp(1rem,0.95rem+0.2vw,1.0625rem)] text-white/75 font-normal leading-relaxed font-sans max-w-md sm:max-w-lg">
+                Find the right dental care for you.
               </p>
             </div>
             <Link
-              href="/services"
+              href={consultationHref}
               className="inline-flex items-center justify-center gap-2 sm:gap-2.5 px-5 sm:px-7 py-3 sm:py-3.5 rounded-full bg-white hover:bg-[#D94E4E] text-[#1D1E1E] hover:text-white font-sans text-xs sm:text-sm font-semibold tracking-wider uppercase transition-all duration-300 shadow-md group shrink-0 w-full sm:w-auto"
             >
-              <span className="whitespace-nowrap">Browse All Services</span>
+              <span className="whitespace-nowrap">Book a Consultation</span>
               <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
             </Link>
           </motion.div>
@@ -361,10 +361,10 @@ export function MockCategoryServicesSection({ onBook, dbServices }: MockCategory
                           className="relative w-full sm:w-[calc(50%-12px)] max-w-md lg:max-w-[480px] min-h-[400px] sm:min-h-[420px] bg-[#FDFDFD] p-6 sm:p-8 md:p-9 flex flex-col justify-between shadow-2xl"
                         >
                           <div className="flex-1 flex flex-col">
-                            <span className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-2 sm:mb-3 font-sans">
+                            <span className="text-[clamp(0.75rem,0.7rem+0.2vw,0.8125rem)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-2 sm:mb-3 font-sans">
                               {selectedCategory.category}
                             </span>
-                            <h3 className="font-sans text-[18px] sm:text-[22px] font-normal tracking-[-0.03em] text-[#1D1E1E] leading-[1.2]">
+                            <h3 className="font-sans text-[clamp(1.125rem,1rem+0.5vw,1.375rem)] font-normal tracking-[-0.03em] text-[#1D1E1E] leading-[1.2]">
                               {svc.name}
                             </h3>
                             <ServiceDescription description={svc.description} />

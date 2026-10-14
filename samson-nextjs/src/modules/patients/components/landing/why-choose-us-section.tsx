@@ -88,16 +88,16 @@ export function WhyChooseUsSection() {
           className="flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6"
         >
           <div className="max-w-full md:max-w-[450px] lg:max-w-[580px]">
-            <span className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-2 sm:mb-3 font-sans">
+            <span className="text-[clamp(0.75rem,0.7rem+0.2vw,0.8125rem)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-2 sm:mb-3 font-sans">
               Why Choose Us
             </span>
-            <h2 className="font-sans text-[20px] sm:text-[clamp(22px,2vw+10px,32px)] font-normal leading-[1.3] sm:leading-[1.2] md:leading-[1.15] tracking-[-0.03em] text-[#1D1E1E]">
+            <h2 className="font-sans text-[clamp(1.625rem,1.375rem+1vw,2.25rem)] text-balance font-normal leading-[1.3] sm:leading-[1.2] md:leading-[1.15] tracking-[-0.03em] text-[#1D1E1E]">
               Pioneering dental advancements, <br className="hidden sm:block" />
               expertise, and dedicated care.
             </h2>
           </div>
-          <p className="max-w-sm pt-2 sm:pt-2 md:max-w-[280px] lg:max-w-sm font-sans text-[13px] sm:text-[clamp(12px,0.3vw+11px,14px)] font-normal leading-relaxed text-gray-500">
-            With roots dating back to 1964 and now in our third generation, Samson Dental Center unites clinical expertise, state-of-the-art facilities, and patient-first care under one roof.
+          <p className="max-w-sm pt-2 sm:pt-2 md:max-w-[280px] lg:max-w-sm font-sans text-[clamp(1rem,0.95rem+0.2vw,1.0625rem)] font-normal leading-relaxed text-gray-500">
+            With roots dating back to 1964 and now in our fourth generation, Samson Dental Center unites clinical expertise, state-of-the-art facilities, and patient-first care under one roof.
           </p>
         </motion.div>
 
@@ -116,10 +116,10 @@ export function WhyChooseUsSection() {
                 <div className="w-10 h-10 sm:w-11 sm:h-11 bg-[#1D1E1E]/5 group-hover:bg-[#D94E4E] rounded-full flex items-center justify-center text-[#1D1E1E] group-hover:text-white transition-all duration-300 mb-4 sm:mb-5">
                   <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
-                <h3 className="text-[#1D1E1E] text-[15px] sm:text-[17px] font-semibold tracking-tight min-h-0 sm:min-h-[48px] flex items-center">
+                <h3 className="text-[#1D1E1E] text-[clamp(1.125rem,1rem+0.5vw,1.375rem)] font-semibold tracking-tight min-h-0 sm:min-h-[48px] flex items-center">
                   {title}
                 </h3>
-                <p className="mt-1.5 sm:mt-2 text-[12px] sm:text-[14px] text-gray-500 leading-relaxed font-normal">
+                <p className="mt-1.5 sm:mt-2 text-[clamp(1rem,0.95rem+0.2vw,1.0625rem)] text-gray-500 leading-relaxed font-normal">
                   {text}
                 </p>
               </div>
@@ -140,29 +140,33 @@ export function WhyChooseUsSection() {
               className="lg:col-span-6 flex flex-col gap-6 sm:gap-7"
             >
               <div>
-                <span className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-2 sm:mb-3 font-sans">
+                <span className="text-[clamp(0.75rem,0.7rem+0.2vw,0.8125rem)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-2 sm:mb-3 font-sans">
                   Our Difference
                 </span>
-                <h3 className="font-sans text-[20px] sm:text-[clamp(22px,2vw+10px,32px)] font-normal leading-[1.3] sm:leading-[1.2] md:leading-[1.15] tracking-[-0.03em] text-[#1D1E1E]">
-                  State of the Art and Professional <br className="hidden sm:block" />
-                  Dental Care Tailored to Your Needs
+                <h3 className="font-sans text-[clamp(1.625rem,1.375rem+1vw,2.25rem)] text-balance font-normal leading-[1.3] sm:leading-[1.2] md:leading-[1.15] tracking-[-0.03em] text-[#1D1E1E]">
+                  <span className="sm:hidden">Expert Care for Your Smile</span>
+                  <span className="hidden sm:inline">
+                    State of the Art and Professional <br />
+                    Dental Care Tailored to Your Needs
+                  </span>
                 </h3>
-                <p className="mt-3 sm:mt-5 text-[12px] sm:text-[14px] text-gray-500 font-normal leading-relaxed">
-                  The work of our highly competent doctors of varying disciplines of dentistry, coupled with the use of the latest equipment and technologies ensures that each patient is treated like royalty. Our complete team functions on the sole purpose of ensuring complete patient care and satisfaction, and this dedication is what sets us apart from our counterparts.
+                <p className="mt-3 sm:mt-5 text-[clamp(1rem,0.95rem+0.2vw,1.0625rem)] text-gray-500 font-normal leading-relaxed">
+                  <span className="sm:hidden">Skilled dentists and modern technology, with care tailored to you.</span>
+                  <span className="hidden sm:inline">The work of our highly competent doctors of varying disciplines of dentistry, coupled with the use of the latest equipment and technologies ensures that each patient is treated like royalty. Our complete team functions on the sole purpose of ensuring complete patient care and satisfaction, and this dedication is what sets us apart from our counterparts.</span>
                 </p>
               </div>
 
-              <div className="flex flex-col gap-4 sm:gap-6 pt-2 border-t border-gray-100">
+              <div className="flex flex-col gap-4 sm:gap-6 pt-2">
                 {differentiators.map(({ title, text }) => (
                   <div key={title} className="flex items-start gap-3 sm:gap-4">
                     <div className="shrink-0 w-5 h-5 sm:w-7 sm:h-7 rounded-full bg-[#D94E4E]/10 text-[#D94E4E] flex items-center justify-center mt-0.5">
                       <Check className="w-3 h-3 sm:w-4 sm:h-4 stroke-[2.5]" />
                     </div>
                     <div>
-                      <h5 className="text-[#1D1E1E] text-[14px] sm:text-[16px] font-semibold">
+                      <h5 className="text-[#1D1E1E] text-[clamp(1.125rem,1rem+0.5vw,1.375rem)] font-semibold">
                         {title}
                       </h5>
-                      <p className="mt-1 text-[12px] sm:text-[14px] text-gray-500 font-normal leading-relaxed">
+                      <p className="mt-1 text-[clamp(1rem,0.95rem+0.2vw,1.0625rem)] text-gray-500 font-normal leading-relaxed">
                         {text}
                       </p>
                     </div>

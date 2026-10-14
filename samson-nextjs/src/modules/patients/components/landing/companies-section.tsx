@@ -37,14 +37,14 @@ export function CompaniesSection() {
           className="flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6"
         >
           <div className="max-w-full md:max-w-[450px] lg:max-w-[580px]">
-            <span className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-2 sm:mb-3 font-sans">
+            <span className="text-[clamp(0.75rem,0.7rem+0.2vw,0.8125rem)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold block mb-2 sm:mb-3 font-sans">
               Institutional Partners
             </span>
-            <h2 className="font-sans text-[20px] sm:text-[clamp(22px,2vw+10px,32px)] font-normal leading-[1.3] sm:leading-[1.2] md:leading-[1.15] tracking-[-0.03em] text-[#1D1E1E]">
+            <h2 className="font-sans text-[clamp(1.625rem,1.375rem+1vw,2.25rem)] text-balance font-normal leading-[1.3] sm:leading-[1.2] md:leading-[1.15] tracking-[-0.03em] text-[#1D1E1E]">
               Decades of Trusted Care for Leading Institutions
             </h2>
           </div>
-          <p className="max-w-sm pt-2 sm:pt-2 md:max-w-[280px] lg:max-w-sm font-sans text-[13px] sm:text-[clamp(12px,0.3vw+11px,14px)] font-normal leading-relaxed text-gray-500">
+          <p className="max-w-sm pt-2 sm:pt-2 md:max-w-[280px] lg:max-w-sm font-sans text-[clamp(1rem,0.95rem+0.2vw,1.0625rem)] font-normal leading-relaxed text-gray-500">
             Since 1965, Samson Dental Center has been the primary dental healthcare provider for top educational, financial, hospitality, and industrial organizations across Baguio City.
           </p>
         </motion.div>
@@ -67,7 +67,7 @@ export function CompaniesSection() {
                 <span className="font-sans text-[12px] lg:text-[15px] tracking-[0.1em] text-gray-500 font-medium whitespace-nowrap lg:w-[110px] lg:shrink-0">
                   {years}
                 </span>
-                <span className="font-sans text-[14px] sm:text-[16px] lg:text-[17px] font-semibold lg:font-medium text-[#1D1E1E] leading-relaxed lg:ml-auto lg:text-right">
+                <span className="font-sans text-[clamp(1.125rem,1rem+0.5vw,1.375rem)] lg:text-[17px] font-semibold lg:font-medium text-[#1D1E1E] leading-relaxed lg:ml-auto lg:text-right">
                   {name}
                 </span>
               </div>
@@ -84,11 +84,11 @@ export function CompaniesSection() {
             className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 sm:gap-6"
           >
             <div className="max-w-full md:max-w-[450px] lg:max-w-[580px]">
-              <h3 className="font-sans text-[16px] sm:text-[clamp(18px,1vw+12px,24px)] font-normal tracking-[-0.03em] text-[#1D1E1E] leading-[1.2]">
+              <h3 className="font-sans text-[clamp(1.125rem,1rem+0.5vw,1.375rem)] font-normal tracking-[-0.03em] text-[#1D1E1E] leading-[1.2]">
                 Former Subsidiary Branches
               </h3>
             </div>
-            <p className="max-w-sm pt-2 sm:pt-2 md:max-w-[280px] lg:max-w-sm font-sans text-[13px] sm:text-[clamp(12px,0.3vw+11px,14px)] font-normal leading-relaxed text-gray-500">
+            <p className="max-w-sm pt-2 sm:pt-2 md:max-w-[280px] lg:max-w-sm font-sans text-[clamp(1rem,0.95rem+0.2vw,1.0625rem)] font-normal leading-relaxed text-gray-500">
               Former business ventures of the Samson family that laid the groundwork for the clinic.
             </p>
           </motion.div>

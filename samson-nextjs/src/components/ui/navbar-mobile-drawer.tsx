@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { ABOUT_MENU_ITEMS, NAV_ITEMS } from './navbar-v1';
 import type { AuthHeaderUser } from '@/modules/patients/hooks/auth/header/use-auth-header';
@@ -22,13 +22,14 @@ export function NavbarMobileDrawer({
   onNavClick,
 }: NavbarMobileDrawerProps) {
   const { requestAppt, isNavigatingBooking } = useBookingNav();
+  const reducedMotion = useReducedMotion();
   return (
     <motion.div
-      initial={{ opacity: 0, y: '-100%' }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: '-100%' }}
-      transition={{ duration: 0.35, ease: 'easeOut' }}
-      className="fixed inset-0 w-screen h-screen bg-[#FDFDFD] z-40 px-8 flex flex-col justify-center items-center shadow-2xl lg:hidden overflow-y-auto"
+      initial={reducedMotion ? { opacity: 0 } : { clipPath: 'circle(0% at calc(100% - var(--menu-origin-x)) var(--menu-origin-y))' }}
+      animate={reducedMotion ? { opacity: 1 } : { clipPath: 'circle(150% at calc(100% - var(--menu-origin-x)) var(--menu-origin-y))' }}
+      exit={reducedMotion ? { opacity: 0 } : { clipPath: 'circle(0% at calc(100% - var(--menu-origin-x)) var(--menu-origin-y))' }}
+      transition={{ duration: reducedMotion ? 0.15 : 0.45, ease: [0.22, 1, 0.36, 1] }}
+      className="fixed inset-0 w-screen h-screen bg-[#FDFDFD] z-40 px-8 flex flex-col justify-center items-center shadow-2xl lg:hidden overflow-y-auto [--menu-origin-x:44px] [--menu-origin-y:42px] sm:[--menu-origin-x:68px] sm:[--menu-origin-y:50px]"
       id="mobile-navigation-overlay"
     >
       <div className="flex flex-col gap-3.5 font-sans text-center text-base uppercase tracking-[0.2em] font-medium w-full max-w-xs mx-auto pt-16">

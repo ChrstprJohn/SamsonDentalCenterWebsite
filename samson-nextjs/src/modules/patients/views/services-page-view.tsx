@@ -227,14 +227,18 @@ function CtaStrip({ onBook }: { onBook?: () => void }) {
 // ---------------------------------------------------------------------------
 interface ServicesPageViewProps {
   dbServices: ServiceResponseDto[];
+  initialCategory?: string;
 }
 
-export function ServicesPageView({ dbServices }: ServicesPageViewProps) {
+export function ServicesPageView({ dbServices, initialCategory }: ServicesPageViewProps) {
   const router = useRouter();
   const [isNavigatingBooking, setIsNavigatingBooking] = useState(false);
   const [pendingServiceName, setPendingServiceName] = useState<string | null>(null);
 
   const categoryGroups = useMemo(() => buildCategoryGroups(dbServices), [dbServices]);
+
+  const selectedCategory = categoryGroups.some(group => group.label === initialCategory) ? initialCategory : '';
+  const visibleGroups = selectedCategory ? categoryGroups.filter(group => group.label === selectedCategory) : categoryGroups;
 
   // Ensure Lenis smooth scroll recalculates page dimensions on mount
   useEffect(() => {
@@ -299,13 +303,23 @@ export function ServicesPageView({ dbServices }: ServicesPageViewProps) {
       {/* Services by Category */}
       <section id="services-list" className="relative w-full bg-[#FDFDFD] pt-12 pb-20 sm:pt-16 sm:pb-28 font-sans">
         <div className="max-w-7xl mx-auto px-6 sm:px-12">
+          <div className="mb-10">
+            <p id="category-filter-label" className="mb-3 font-medium">Filter by category</p>
+            <div role="group" aria-labelledby="category-filter-label" className="flex flex-wrap gap-2">
+              {[{ id: 'all', label: 'All services' }, ...categoryGroups].map(group => {
+                const value = group.id === 'all' ? '' : group.label;
+                const active = selectedCategory === value;
+                return <button key={group.id} type="button" aria-pressed={active} onClick={() => router.push(value ? `/services?category=${encodeURIComponent(value)}` : '/services', { scroll: false })} className={`min-h-11 rounded-full border px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D94E4E] ${active ? 'border-[#1D1E1E] bg-[#1D1E1E] text-white' : 'border-gray-300 bg-white text-[#1D1E1E] hover:border-[#D94E4E]'}`}>{group.label}</button>;
+              })}
+            </div>
+          </div>
           {categoryGroups.length === 0 ? (
             <div className="text-center py-20 text-gray-400 font-sans text-sm">
               No services available at the moment. Please check back soon.
             </div>
           ) : (
             <div className="flex flex-col gap-12 sm:gap-16">
-              {categoryGroups.map((group, i) => (
+              {visibleGroups.map((group, i) => (
                 <CategorySection
                   key={group.id}
                   group={group}

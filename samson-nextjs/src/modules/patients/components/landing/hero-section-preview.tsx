@@ -133,7 +133,7 @@ export function HeroSectionPreview({ onBookClick, serviceCount = 0 }: HeroSectio
         <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-12 text-center sm:text-left text-white mt-16 sm:mt-10 lg:mt-2 flex flex-col items-center sm:items-start">
           {!mounted ? (
             <h1
-              className="font-serif text-[clamp(32px,5.5vw+8px,65px)] min-[768px]:max-[1100px]:text-[clamp(46px,5.5vw,60px)] max-[430px]:text-[clamp(40px,10.5vw,52px)] max-[320px]:text-[clamp(11px,4.5vw,14px)] font-semibold tracking-tight leading-[1.1] max-w-4xl"
+              className="font-serif text-[clamp(2rem,1.25rem+3.5vw,4.0625rem)] font-semibold tracking-tight leading-[1.1] max-w-4xl text-balance"
               style={{ fontWeight: '600', fontStyle: 'normal' }}
             >
               <span className="block">Unlock a World of</span>
@@ -158,7 +158,7 @@ export function HeroSectionPreview({ onBookClick, serviceCount = 0 }: HeroSectio
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1.2, delay: 0.2, ease: 'easeOut' }}
-              className="font-serif text-[clamp(32px,5.5vw+8px,65px)] min-[768px]:max-[1100px]:text-[clamp(46px,5.5vw,60px)] max-[430px]:text-[clamp(40px,10.5vw,52px)] max-[320px]:text-[clamp(11px,4.5vw,14px)] font-semibold tracking-tight leading-[1.1] max-w-4xl"
+              className="font-serif text-[clamp(2rem,1.25rem+3.5vw,4.0625rem)] font-semibold tracking-tight leading-[1.1] max-w-4xl text-balance"
               style={{ fontWeight: '600', fontStyle: 'normal' }}
             >
               <span className="block">Unlock a World of</span>
@@ -184,9 +184,14 @@ export function HeroSectionPreview({ onBookClick, serviceCount = 0 }: HeroSectio
             initial={{ opacity: 0, y: 35 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.2, delay: 0.4, ease: 'easeOut' }}
-            className="mt-4 sm:mt-5 lg:mt-[38px] text-[clamp(13px,0.4vw+11px,16px)] min-[768px]:max-[1100px]:text-[15px] min-[768px]:max-[1100px]:max-w-lg min-[768px]:max-[1100px]:line-clamp-2 max-[430px]:text-[15px] max-[320px]:text-[10px] leading-[26px] max-[320px]:leading-[18px] sm:leading-relaxed lg:leading-[32.5px] lg:font-normal lg:not-italic text-white/95 max-w-2xl font-light tracking-wide drop-shadow-sm"
+            className="mt-6 sm:mt-8 lg:mt-[38px] text-[clamp(0.9375rem,0.875rem+0.2vw,1rem)] leading-relaxed lg:leading-[32.5px] lg:font-normal lg:not-italic text-white/95 max-w-2xl font-light tracking-wide drop-shadow-sm"
           >
-            Samson Dental Center has its roots since 1964. Now on its fourth generation of management, it has lived up to its commitment of being the pioneer on dental advancements both in expertise, facilities and equipment over the years.
+            <span className="sm:hidden">
+              Trusted dental care since 1964. Now in our fourth generation, we combine family expertise with modern dentistry.
+            </span>
+            <span className="hidden sm:inline">
+              Samson Dental Center has its roots since 1964. Now on its fourth generation of management, it has lived up to its commitment of being the pioneer on dental advancements both in expertise, facilities and equipment over the years.
+            </span>
           </motion.p>
 
           <motion.div

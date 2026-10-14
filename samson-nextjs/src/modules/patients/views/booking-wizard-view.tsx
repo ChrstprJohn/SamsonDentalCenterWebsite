@@ -34,13 +34,18 @@ interface BookingWizardViewProps {
   services: ServiceResponseDto[];
   config: ClinicConfigResponseDto;
   initialServiceId?: string;
+  initialCategory?: string;
 }
 
-export function BookingWizardView({ services, config, initialServiceId }: BookingWizardViewProps) {
+export function BookingWizardView({ services, config, initialServiceId, initialCategory }: BookingWizardViewProps) {
   const wizard = useBookingWizard({ services, config, initialServiceId });
   const router = useRouter();
   const { step, contactSection, fields, isSubmitting, redirectCountdown, submittedReference, selectService } = wizard;
-  const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
+  const [selectedCategory, setSelectedCategory] = useState<string>(() => {
+    const category = services.find(service => service.id === initialServiceId)?.category ?? initialCategory;
+    return category && category !== 'Consultation' && services.some(service => service.category === category) ? category : 'ALL';
+  });
+  const [showAllCategories, setShowAllCategories] = useState(false);
   const [formTouched, setFormTouched] = useState(false);
 
   // ponytail: __NA is set by Next App Router only on client-side navigations; fall back to home for direct loads
@@ -53,12 +58,13 @@ export function BookingWizardView({ services, config, initialServiceId }: Bookin
     }
   };
 
+  const consultationService = services.find(service => service.category === 'Consultation');
   const selectedService = services.find((s) => s.id === contactSection.pathway);
 
   const availableCategories = useMemo(() => {
     const set = new Set<string>();
     services.forEach((s) => {
-      if (s.category) set.add(s.category);
+      if (s.category && s.category !== 'Consultation') set.add(s.category);
     });
     const ordered: string[] = [];
     CATEGORY_ORDER.forEach((cat) => {
@@ -70,12 +76,18 @@ export function BookingWizardView({ services, config, initialServiceId }: Bookin
     return ordered;
   }, [services]);
 
+  const categoryFilters = ['ALL', ...availableCategories];
+  const collapsedFilters = categoryFilters.slice(0, 5);
+  if (!collapsedFilters.includes(selectedCategory) && categoryFilters.includes(selectedCategory)) {
+    collapsedFilters[collapsedFilters.length - 1] = selectedCategory;
+  }
+
   const filteredServices = useMemo(() => {
     const list = selectedCategory === 'ALL'
-      ? [...services]
-      : services.filter((srv) => (srv.category ?? 'Other') === selectedCategory);
+      ? services.filter(service => service.id !== consultationService?.id)
+      : services.filter(srv => srv.id !== consultationService?.id && (srv.category ?? 'Other') === selectedCategory);
 
-    return list.sort((a, b) => {
+    list.sort((a, b) => {
       const aHasBullets = parseServiceDescription(a.description).bullets.length > 0 ? 1 : 0;
       const bHasBullets = parseServiceDescription(b.description).bullets.length > 0 ? 1 : 0;
       if (aHasBullets !== bHasBullets) {
@@ -84,7 +96,8 @@ export function BookingWizardView({ services, config, initialServiceId }: Bookin
       // Within each group, sort alphabetically by name
       return a.name.localeCompare(b.name);
     });
-  }, [services, selectedCategory]);
+    return consultationService ? [consultationService, ...list] : list;
+  }, [services, selectedCategory, consultationService]);
 
   const clinicName = config.clinicName;
   const clinicPhone = config.phone;
@@ -154,7 +167,17 @@ export function BookingWizardView({ services, config, initialServiceId }: Bookin
         clearTimeout(t3);
       };
     }
-  }, [step, selectedCategory, contactSection.targetDate, initialServiceId]);
+  }, [step, contactSection.targetDate, initialServiceId]);
+
+  // Filtering and expanding pills change the scroll range without changing steps.
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => (window as any).lenis?.resize());
+    const timer = window.setTimeout(() => (window as any).lenis?.resize(), 300);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.clearTimeout(timer);
+    };
+  }, [selectedCategory, showAllCategories, services.length]);
 
   if (!config.isBookingOpen) {
     return (
@@ -249,7 +272,7 @@ export function BookingWizardView({ services, config, initialServiceId }: Bookin
             href="/"
             onClick={handleBackClick}
             aria-label="Back to previous page"
-            className="justify-self-start w-fit inline-flex items-center gap-1.5 font-sans text-xs sm:text-sm font-semibold text-gray-800 hover:text-[#D94E4E] transition-colors p-1.5 -ml-1.5 rounded-lg hover:bg-gray-100/80"
+            className="justify-self-start w-fit inline-flex items-center gap-1.5 font-sans text-[clamp(0.8125rem,0.75rem+0.25vw,0.9375rem)] font-semibold text-gray-800 hover:text-[#D94E4E] transition-colors p-1.5 -ml-1.5 rounded-lg hover:bg-gray-100/80"
           >
             <ArrowLeft className="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2.2]" />
             <span>Back</span>
@@ -257,11 +280,11 @@ export function BookingWizardView({ services, config, initialServiceId }: Bookin
 
           {/* Center: Centered Stepper Navigation Pills with boxed number badge */}
           <div className="justify-self-center">
-            <div className="flex items-center gap-1 sm:gap-4 font-sans text-[10px] sm:text-[13px] tracking-[0.04em] sm:tracking-[0.1em] font-medium uppercase text-gray-700">
+            <div className="flex items-center gap-1 sm:gap-4 font-sans text-[clamp(0.8125rem,0.75rem+0.25vw,0.9375rem)] tracking-[0.04em] sm:tracking-[0.1em] font-medium uppercase text-gray-700">
               <button
                 type="button"
                 onClick={() => wizard.handleStepClick(1)}
-                className={`flex items-center gap-1 sm:gap-2 py-1 transition-all cursor-pointer text-[12px] sm:text-sm ${
+                className={`flex items-center gap-1 sm:gap-2 py-1 transition-all cursor-pointer text-[clamp(0.8125rem,0.75rem+0.25vw,0.9375rem)] ${
                   step === 1
                     ? 'text-gray-900 font-semibold'
                     : step > 1
@@ -270,7 +293,7 @@ export function BookingWizardView({ services, config, initialServiceId }: Bookin
                 }`}
               >
                 <span
-                  className={`w-5 h-5 sm:w-6 sm:h-6 rounded-none flex items-center justify-center text-[10px] sm:text-xs font-bold shrink-0 leading-none transition-all ${
+                  className={`w-5 h-5 sm:w-6 sm:h-6 rounded-none flex items-center justify-center text-[clamp(0.75rem,0.7rem+0.2vw,0.8125rem)] font-bold shrink-0 leading-none transition-all ${
                     step === 1
                       ? 'bg-[#1D1E1E] text-white shadow-xs'
                       : step > 1
@@ -289,7 +312,7 @@ export function BookingWizardView({ services, config, initialServiceId }: Bookin
                 type="button"
                 onClick={() => wizard.handleStepClick(2)}
                 disabled={wizard.maxReachedStep < 2 && !contactSection.pathway}
-                className={`flex items-center gap-1 sm:gap-2 py-1 transition-all text-[12px] sm:text-sm ${
+                className={`flex items-center gap-1 sm:gap-2 py-1 transition-all text-[clamp(0.8125rem,0.75rem+0.25vw,0.9375rem)] ${
                   step === 2
                     ? 'text-gray-900 font-semibold cursor-pointer'
                     : step > 2
@@ -300,7 +323,7 @@ export function BookingWizardView({ services, config, initialServiceId }: Bookin
                 }`}
               >
                 <span
-                  className={`w-5 h-5 sm:w-6 sm:h-6 rounded-none flex items-center justify-center text-[10px] sm:text-xs font-bold shrink-0 leading-none transition-all ${
+                  className={`w-5 h-5 sm:w-6 sm:h-6 rounded-none flex items-center justify-center text-[clamp(0.75rem,0.7rem+0.2vw,0.8125rem)] font-bold shrink-0 leading-none transition-all ${
                     step === 2
                       ? 'bg-[#1D1E1E] text-white shadow-xs'
                       : step > 2
@@ -319,7 +342,7 @@ export function BookingWizardView({ services, config, initialServiceId }: Bookin
                 type="button"
                 onClick={() => wizard.handleStepClick(3)}
                 disabled={wizard.maxReachedStep < 3 && (!contactSection.targetDate || !fields.preferredStartTime)}
-                className={`flex items-center gap-1 sm:gap-2 py-1 transition-all text-[12px] sm:text-sm ${
+                className={`flex items-center gap-1 sm:gap-2 py-1 transition-all text-[clamp(0.8125rem,0.75rem+0.25vw,0.9375rem)] ${
                   step === 3
                     ? 'text-gray-900 font-semibold cursor-pointer'
                     : wizard.maxReachedStep >= 3
@@ -328,7 +351,7 @@ export function BookingWizardView({ services, config, initialServiceId }: Bookin
                 }`}
               >
                 <span
-                  className={`w-5 h-5 sm:w-6 sm:h-6 rounded-none flex items-center justify-center text-[10px] sm:text-xs font-bold shrink-0 leading-none transition-all ${
+                  className={`w-5 h-5 sm:w-6 sm:h-6 rounded-none flex items-center justify-center text-[clamp(0.75rem,0.7rem+0.2vw,0.8125rem)] font-bold shrink-0 leading-none transition-all ${
                     step === 3
                       ? 'bg-[#1D1E1E] text-white shadow-xs'
                       : 'bg-gray-100 border border-gray-300 text-gray-600'
@@ -364,92 +387,46 @@ export function BookingWizardView({ services, config, initialServiceId }: Bookin
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200/60 pb-3">
                     <div>
-                      <h2 className="font-sans text-[clamp(20px,2vw+10px,32px)] font-normal tracking-[-0.04em] text-[#141515] leading-[1.05]">
-                        Service
+                      <h2 className="font-sans text-[clamp(1.625rem,1.375rem+1vw,2.25rem)] text-balance font-normal tracking-[-0.04em] text-[#141515] leading-[1.05]">
+                        Choose Service
                       </h2>
-                      <p className="text-[clamp(12px,0.3vw+11px,14px)] font-normal text-gray-500 leading-[1.65] font-sans mt-0.5">
+                      <p className="text-[clamp(1rem,0.95rem+0.2vw,1.0625rem)] font-normal text-gray-500 leading-[1.65] font-sans mt-0.5">
                         Choose your required dental treatment to proceed.
                       </p>
                     </div>
 
-                    {/* Category Filter Dropdown */}
-                    <div className="flex items-center gap-2 self-start sm:self-auto w-full sm:w-auto">
-                      <div className="relative w-full sm:w-64">
-                        <select
-                          id="service-category-select"
-                          value={selectedCategory}
-                          onChange={(e) => setSelectedCategory(e.target.value)}
-                          aria-label="Filter services by category"
-                          className="w-full appearance-none bg-white border border-gray-300 hover:border-gray-400 focus:border-[#1D1E1E] focus:outline-hidden focus:ring-1 focus:ring-[#1D1E1E] py-2 pl-3 pr-8 text-xs sm:text-[13px] font-medium text-gray-800 rounded-none shadow-2xs transition-all cursor-pointer font-sans"
-                        >
-                          <option value="ALL">All Categories ({services.length})</option>
-                          {availableCategories.map((cat) => {
-                            const count = services.filter((s) => s.category === cat).length;
-                            return (
-                              <option key={cat} value={cat}>
-                                {cat} ({count})
-                              </option>
-                            );
-                          })}
-                        </select>
-                        <ChevronDown className="w-4 h-4 text-gray-500 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                      </div>
-                    </div>
+                  </div>
+                  <div role="group" aria-label="Filter services by category" className="flex flex-wrap gap-2 mb-6">
+                    {categoryFilters.map(category => <button key={category} type="button" aria-pressed={selectedCategory === category} onClick={() => setSelectedCategory(category)} className={`${!showAllCategories && !collapsedFilters.includes(category) ? "hidden md:inline-flex" : "inline-flex"} items-center min-h-11 rounded-full border px-4 py-2 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D94E4E] ${selectedCategory === category ? 'bg-[#1D1E1E] border-[#1D1E1E] text-white' : 'bg-white border-gray-300 text-gray-800 hover:border-gray-500'}`}>
+                      {category === 'ALL' ? 'All services' : category}
+                    </button>)}
+                    {categoryFilters.length > 5 && <button type="button" aria-expanded={showAllCategories} onClick={() => setShowAllCategories(value => !value)} className="md:hidden min-h-11 rounded-full border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-800 hover:border-gray-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D94E4E]">
+                      {showAllCategories ? 'Less' : 'More'}
+                    </button>}
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 pt-1 items-stretch">
-                    {filteredServices.map((srv) => {
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-1 pb-6 items-stretch">
+                    {filteredServices.map(srv => {
+                      const isConsultation = srv.id === consultationService?.id;
                       const isSelected = contactSection.pathway === srv.id;
-                      return (
-                        <div
-                          key={srv.id}
-                          id={`service-card-${srv.id}`}
-                          onClick={() => handleCardClick(srv.id)}
-                          className={`relative p-4 sm:p-5 border text-left cursor-pointer transition-all duration-300 flex flex-col justify-between h-full rounded-none ${
-                            isSelected
-                              ? 'border-[#1D1E1E] bg-white shadow-md ring-1 ring-[#1D1E1E]'
-                              : 'border-gray-200 bg-white hover:border-gray-400 hover:shadow-sm'
-                          }`}
-                        >
-                          <div className="flex-1 flex flex-col">
-                            <div className="flex items-start justify-between gap-2 mb-2">
-                              <span className="text-[10px] sm:text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.16em] sm:tracking-[0.25em] text-[#D94E4E] uppercase font-semibold font-sans">
-                                {srv.category || srv.serviceType || 'General'}
-                              </span>
-                              {isSelected && (
-                                <span className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-[#1D1E1E] text-white flex items-center justify-center text-xs shrink-0">
-                                  <Check className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
-                                </span>
-                              )}
-                            </div>
-                            <h3 className="font-sans text-base sm:text-lg font-normal tracking-[-0.04em] text-[#141515] leading-[1.15] sm:leading-[1.1]">
-                              {srv.name}
-                            </h3>
-                            <div className="border-t border-gray-100/80 my-2 sm:my-2.5" />
-                            <div className="flex-1">
-                              <ServiceDescription
-                                description={srv.description}
-                                className="mt-0 text-[12px] sm:text-[13px] leading-[1.55] sm:leading-[1.65]"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      );
+                      return <article key={srv.id} id={`service-card-${srv.id}`} className={`rounded-none border p-4 sm:p-5 transition-colors bg-white ${isSelected ? 'border-[#1D1E1E] ring-1 ring-[#1D1E1E]' : 'border-gray-200'}`}>
+                        <button type="button" aria-pressed={isSelected} onClick={() => handleCardClick(srv.id)} className="flex w-full items-start gap-3 text-left focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#D94E4E]">
+                          <span className="min-w-0 flex-1">
+                            <span className="block text-[clamp(0.75rem,0.7rem+0.2vw,0.8125rem)] leading-relaxed text-gray-500">{srv.category || 'General'}</span>
+                            <span className="block mt-1 text-[clamp(1.125rem,1rem+0.5vw,1.375rem)] leading-snug font-medium">{isConsultation ? 'General Consultation' : srv.name}</span>
+                          </span>
+                          <span aria-hidden="true" className={`mt-1 h-5 w-5 shrink-0 rounded-full border flex items-center justify-center ${isSelected ? 'border-[#1D1E1E] bg-[#1D1E1E] text-white' : 'border-gray-300'}`}>{isSelected && <Check className="h-3 w-3" />}</span>
+                        </button>
+                        {(isConsultation || srv.description) && <div className="mt-4 border-t border-gray-100 pt-3"><ServiceDescription description={isConsultation ? "Not sure which service to choose? Book a consultation to discuss your concern with the dentist." : srv.description} className="mt-0 text-[clamp(1rem,0.95rem+0.2vw,1.0625rem)] leading-relaxed" /></div>}
+                      </article>;
                     })}
                   </div>
 
-                  <div className="pt-4 border-t border-gray-200/60 flex justify-end items-center" id="step-1-next-btn">
-                    {contactSection.pathway ? (
-                      <button
-                        type="button"
-                        onClick={wizard.goToStep2}
-                        className="py-3 px-7 bg-[#1D1E1E] text-white rounded-none text-[11px] sm:text-sm font-semibold tracking-widest hover:bg-[#D94E4E] transition-all duration-300 shadow-xs flex items-center gap-2 cursor-pointer"
-                      >
-                        Next: Schedule Slot <ArrowRight className="w-4 h-4" />
-                      </button>
-                    ) : (
-                      <div className="text-xs text-gray-400 font-sans italic">Select a service above to proceed</div>
-                    )}
+                  <div className="relative min-h-[76px] border-t border-gray-200 bg-[#FDFDFD] py-4 flex flex-wrap justify-end items-center gap-3" id="step-1-next-btn">
+                    {!contactSection.pathway && <span className="text-xs text-gray-500 font-sans">Select a service to continue</span>}
+                    <button type="button" disabled={!contactSection.pathway} onClick={wizard.goToStep2} className="min-h-11 py-3 px-7 bg-[#1D1E1E] text-white text-[11px] sm:text-sm font-semibold tracking-widest hover:bg-[#D94E4E] disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed transition-colors flex items-center gap-2 cursor-pointer">
+                      Next: Schedule Slot <ArrowRight className="w-4 h-4" />
+                    </button>
                   </div>
                 </motion.div>
               )}
@@ -465,10 +442,10 @@ export function BookingWizardView({ services, config, initialServiceId }: Bookin
                   className="space-y-6"
                 >
                   <div className="border-b border-gray-200/60 pb-3">
-                    <h2 className="font-sans text-[clamp(20px,2vw+10px,32px)] font-normal tracking-[-0.04em] text-[#141515] leading-[1.05]">
+                    <h2 className="font-sans text-[clamp(1.625rem,1.375rem+1vw,2.25rem)] text-balance font-normal tracking-[-0.04em] text-[#141515] leading-[1.05]">
                       Schedule
                     </h2>
-                    <p className="text-[clamp(12px,0.3vw+11px,14px)] font-normal text-gray-500 leading-[1.65] font-sans mt-0.5">
+                    <p className="text-[clamp(1rem,0.95rem+0.2vw,1.0625rem)] font-normal text-gray-500 leading-[1.65] font-sans mt-0.5">
                       Pick your preferred target date and time for your appointment request.
                     </p>
                   </div>
@@ -557,10 +534,10 @@ export function BookingWizardView({ services, config, initialServiceId }: Bookin
                   className="space-y-6"
                 >
                   <div className="border-b border-gray-200/60 pb-3">
-                    <h2 className="font-sans text-[clamp(20px,2vw+10px,32px)] font-normal tracking-[-0.04em] text-[#141515] leading-[1.05]">
+                    <h2 className="font-sans text-[clamp(1.625rem,1.375rem+1vw,2.25rem)] text-balance font-normal tracking-[-0.04em] text-[#141515] leading-[1.05]">
                       Patient Information
                     </h2>
-                    <p className="text-[clamp(12px,0.3vw+11px,14px)] font-normal text-gray-500 leading-[1.65] font-sans mt-0.5">
+                    <p className="text-[clamp(1rem,0.95rem+0.2vw,1.0625rem)] font-normal text-gray-500 leading-[1.65] font-sans mt-0.5">
                       Review your request, then complete your details below.
                     </p>
                   </div>
@@ -694,29 +671,6 @@ export function BookingWizardView({ services, config, initialServiceId }: Bookin
         </div>
       </main>
 
-      {/* Footer */}
-      {!contactSection.submittedLocal && (
-        <footer className="border-t border-gray-200/40 py-5 text-center text-xs text-gray-400 font-sans">
-          <div>© {new Date().getFullYear()} {clinicName}. All rights reserved.</div>
-          <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
-            {config.socialLinks.length > 0 ? config.socialLinks.map((link) => (
-              <a
-                key={`${link.platform}-${link.url}`}
-                href={link.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 transition-colors hover:border-[#D94E4E] hover:text-[#D94E4E]"
-                aria-label={`Visit ${clinicName} on ${link.platform}`}
-              >
-                <SocialIcon platform={link.platform} />
-                {link.platform}
-              </a>
-            )) : (
-              <span className="text-gray-400">Follow us on social media — profiles coming soon.</span>
-            )}
-          </div>
-        </footer>
-      )}
     </div>
   );
 }

@@ -6,6 +6,7 @@ import Script from 'next/script';
 
 export function SmoothScroll() {
   const pathname = usePathname();
+  const animationFrame = useRef<number | null>(null);
   // ponytail: popstate flag so back/forward keeps browser scroll position instead of yanking to top
   const isBackForwardNav = useRef(false);
 
@@ -18,7 +19,7 @@ export function SmoothScroll() {
   }, []);
 
   const initLenis = () => {
-    if (typeof window === 'undefined' || !(window as any).Lenis) return;
+    if (typeof window === 'undefined' || pathname === '/book' || !(window as any).Lenis) return;
     if ((window as any).lenis) {
       (window as any).lenis.resize();
       return;
@@ -34,12 +35,11 @@ export function SmoothScroll() {
     });
     (window as any).lenis = lenis;
 
-    let rafId: number;
     function raf(time: number) {
       lenis.raf(time);
-      rafId = requestAnimationFrame(raf);
+      animationFrame.current = requestAnimationFrame(raf);
     }
-    rafId = requestAnimationFrame(raf);
+    animationFrame.current = requestAnimationFrame(raf);
   };
 
   useEffect(() => {
@@ -48,6 +48,14 @@ export function SmoothScroll() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      if (pathname === '/book') {
+        if (animationFrame.current !== null) cancelAnimationFrame(animationFrame.current);
+        animationFrame.current = null;
+        (window as any).lenis?.destroy();
+        delete (window as any).lenis;
+      } else {
+        initLenis();
+      }
       const isBackForward = isBackForwardNav.current;
       isBackForwardNav.current = false;
       if (!isBackForward) {

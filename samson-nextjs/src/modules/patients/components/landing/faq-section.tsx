@@ -53,16 +53,16 @@ export function FaqSection({ config }: { config: ClinicConfigResponseDto }) {
           className="mb-10 flex flex-col gap-4 sm:mb-20 md:mb-24 sm:gap-6 md:flex-row md:items-end md:justify-between"
         >
           <div className="max-w-full md:max-w-[450px] lg:max-w-[580px]">
-          <span className="mb-2 sm:mb-3 block font-sans text-[clamp(9px,0.2vw+9px,11px)] font-semibold uppercase tracking-[0.25em] text-[#D94E4E]">
+          <span className="mb-2 sm:mb-3 block font-sans text-[clamp(0.75rem,0.7rem+0.2vw,0.8125rem)] font-semibold uppercase tracking-[0.25em] text-[#D94E4E]">
             Frequently Asked
           </span>
-          <h2 className="font-sans text-[20px] sm:text-[clamp(22px,2vw+10px,32px)] font-normal leading-[1.3] sm:leading-[1.2] md:leading-[1.15] tracking-[-0.03em] text-[#1D1E1E]">
+          <h2 className="font-sans text-[clamp(1.625rem,1.375rem+1vw,2.25rem)] text-balance font-normal leading-[1.3] sm:leading-[1.2] md:leading-[1.15] tracking-[-0.03em] text-[#1D1E1E]">
             Everything you need to know before,{' '}
             <br className="hidden lg:block" />
             during, and after your visit.
           </h2>
           </div>
-          <p className="max-w-sm pt-2 sm:pt-2 md:max-w-[280px] lg:max-w-sm font-sans text-[13px] sm:text-[clamp(12px,0.3vw+11px,14px)] font-normal leading-relaxed text-gray-500">
+          <p className="max-w-sm pt-2 sm:pt-2 md:max-w-[280px] lg:max-w-sm font-sans text-[clamp(1rem,0.95rem+0.2vw,1.0625rem)] font-normal leading-relaxed text-gray-500">
             Clear answers to the questions we hear most often, from booking and preparation to what happens during and after your visit.
           </p>
         </motion.div>
@@ -76,12 +76,12 @@ export function FaqSection({ config }: { config: ClinicConfigResponseDto }) {
           <Accordion type="single" collapsible defaultValue="faq-0" className="w-full">
             {faqItems.map((faq, index) => (
               <AccordionItem key={faq.question} value={`faq-${index}`} className="border-[#1D1E1E]/15">
-                <AccordionTrigger className="px-0 py-6 sm:py-8 text-left font-sans text-base sm:text-lg md:text-lg lg:text-2xl font-normal leading-[1.2] tracking-tight text-[#1D1E1E] hover:bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D94E4E]/40">
+                <AccordionTrigger className="px-0 py-6 sm:py-8 text-left font-sans text-[clamp(1.125rem,1rem+0.5vw,1.375rem)] font-normal leading-[1.2] tracking-tight text-[#1D1E1E] hover:bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D94E4E]/40">
                   <span className="flex flex-1 items-center gap-4 sm:gap-10 pr-4">
                     <span className="flex-1 text-left">{faq.question}</span>
                   </span>
                 </AccordionTrigger>
-                <AccordionContent className="px-0 pb-4 font-sans text-[12px] sm:pb-6 sm:text-[clamp(14px,0.4vw+12px,16px)] leading-[1.6] text-gray-500">
+                <AccordionContent className="px-0 pb-4 font-sans sm:pb-6 text-[clamp(1rem,0.95rem+0.2vw,1.0625rem)] leading-[1.6] text-gray-500">
                   <span className="block max-w-3xl text-left">
                   {faq.question === 'How do I book an appointment?'
                     ? <>You can contact us directly at <strong className="font-semibold text-[#1D1E1E]">{formattedPhone}</strong>{formattedLandline && <> or <strong className="font-semibold text-[#1D1E1E]">{formattedLandline}</strong></>}, or submit an appointment request through our website. Our team will follow up to confirm your visit.</>

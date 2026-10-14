@@ -85,17 +85,17 @@ export function AppointmentBannerSection({ onBookClick }: AppointmentBannerSecti
         >
 
           {/* Eyebrow — same pattern as other sections */}
-          <span className="text-[clamp(9px,0.2vw+9px,11px)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold font-sans">
+          <span className="text-[clamp(0.75rem,0.7rem+0.2vw,0.8125rem)] tracking-[0.25em] text-[#D94E4E] uppercase font-semibold font-sans">
             Book a Visit
           </span>
 
           {/* Title — same scale/weight as other section headings */}
-          <h2 className="font-sans text-[clamp(20px,2vw+10px,32px)] font-normal tracking-[-0.04em] text-white leading-[1.05]">
+          <h2 className="font-sans text-[clamp(1.625rem,1.375rem+1vw,2.25rem)] text-balance font-normal tracking-[-0.04em] text-white leading-[1.05]">
             Schedule an appointment with us today!
           </h2>
 
           {/* Body */}
-          <p className="text-[clamp(12px,0.3vw+11px,14px)] font-normal text-white/65 leading-[1.65] font-sans max-w-sm">
+          <p className="text-[clamp(1rem,0.95rem+0.2vw,1.0625rem)] font-normal text-white/65 leading-[1.65] font-sans max-w-sm">
             Whether you're visiting for a routine check-up or a more advanced
             procedure, we ensure your oral health is in the best hands, helping
             you achieve a confident, healthy smile.

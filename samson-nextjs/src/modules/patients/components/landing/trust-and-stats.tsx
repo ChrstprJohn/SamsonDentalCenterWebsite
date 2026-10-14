@@ -8,11 +8,11 @@ interface TrustAndStatsProps {
 
 export function TrustAndStats({ variant = 'v1', serviceCount = 0 }: TrustAndStatsProps) {
   const stats = [
-    { value: '60+', label: 'Years of Pure Dental Expertise' },
+    { value: '60+', label: 'Years of Care' },
     { value: '4.3★', label: 'Google Rating' },
-    { value: '100%', label: 'Board-Certified Specialists' },
-    { value: `${serviceCount}+`, label: 'Dental Services Offered' },
-    { value: 'Online', label: 'Easy Appointment Booking' },
+    { value: '100%', label: 'Certified Specialists' },
+    { value: `${serviceCount}+`, label: 'Dental Services' },
+    { value: 'Online', label: 'Book Online' },
   ];
 
   const isV2 = variant === 'v2';
@@ -53,7 +53,7 @@ export function TrustAndStats({ variant = 'v1', serviceCount = 0 }: TrustAndStat
                   <span className={`${isV2 ? 'text-[#0070F3]' : 'text-[#D94E4E]'} font-serif text-[clamp(20px,2vw+12px,28px)] font-light mb-1 select-none`}>
                     {stat.value}
                   </span>
-                  <span className={`font-sans text-[clamp(8.5px,0.5vw+7px,10px)] tracking-[0.16em] ${isV2 ? 'text-[#1D1E1E]/80' : 'text-white/80'} font-medium uppercase leading-relaxed max-w-[130px] sm:max-w-[160px] whitespace-normal`}>
+                  <span className={`font-sans text-[clamp(0.75rem,0.7rem+0.2vw,0.8125rem)] tracking-[0.16em] ${isV2 ? 'text-[#1D1E1E]/80' : 'text-white/80'} font-medium uppercase leading-relaxed max-w-[130px] sm:max-w-[160px] whitespace-normal`}>
                     {stat.label}
                   </span>
                 </div>
@@ -74,7 +74,7 @@ export function TrustAndStats({ variant = 'v1', serviceCount = 0 }: TrustAndStat
                   <span className={`${isV2 ? 'text-[#0070F3]' : 'text-[#D94E4E]'} font-serif text-[clamp(20px,2vw+12px,28px)] font-light mb-1 select-none`}>
                     {stat.value}
                   </span>
-                  <span className={`font-sans text-[clamp(8.5px,0.5vw+7px,10px)] tracking-[0.16em] ${isV2 ? 'text-[#1D1E1E]/80' : 'text-white/80'} font-medium uppercase leading-relaxed max-w-[130px] sm:max-w-[160px] whitespace-normal`}>
+                  <span className={`font-sans text-[clamp(0.75rem,0.7rem+0.2vw,0.8125rem)] tracking-[0.16em] ${isV2 ? 'text-[#1D1E1E]/80' : 'text-white/80'} font-medium uppercase leading-relaxed max-w-[130px] sm:max-w-[160px] whitespace-normal`}>
                     {stat.label}
                   </span>
                 </div>
@@ -100,7 +100,7 @@ export function TrustAndStats({ variant = 'v1', serviceCount = 0 }: TrustAndStat
               className="flex flex-col items-center justify-center text-center px-4"
             >
               <span className={`${isV2 ? 'text-[#0070F3]' : 'text-[#D94E4E]'} font-serif text-[clamp(28px,2vw+16px,40px)] font-light mb-2.5`}>{stat.value}</span>
-              <span className={`font-sans text-[clamp(9.5px,0.2vw+9px,11px)] tracking-[0.16em] ${isV2 ? 'text-[#1D1E1E]/80' : 'text-white/80'} font-medium uppercase leading-relaxed max-w-[180px]`}>
+              <span className={`font-sans text-[clamp(0.75rem,0.7rem+0.2vw,0.8125rem)] tracking-[0.16em] ${isV2 ? 'text-[#1D1E1E]/80' : 'text-white/80'} font-medium uppercase leading-relaxed max-w-[180px]`}>
                 {stat.label}
               </span>
             </motion.div>
