@@ -4,7 +4,6 @@ import React, { useState, useTransition } from 'react';
 import { Globe2, ImageIcon, Plus, Save, Trash2, CalendarClock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/feedback/toast-container';
@@ -18,7 +17,7 @@ interface ClinicSettingsPageProps {
   initialTimeBlocks?: BlockedDateItem[];
 }
 
-const inputClass = 'bg-card text-text-primary';
+const inputClass = 'h-11 min-w-0 bg-card text-text-primary';
 type SettingsTab = 'profile' | 'booking' | 'availability';
 
 const tabs: { id: SettingsTab; label: string; icon: React.ReactNode; description: string }[] = [
@@ -46,7 +45,7 @@ export function ClinicSettingsPage({ initialConfig, initialTimeBlocks = [] }: Cl
     'websiteUrl', 'socialLinks',
   ];
   const bookingKeys: (keyof ClinicConfigResponseDto)[] = [
-    'isBookingOpen', 'maintenanceMessage', 'allowSameDayBooking', 'calendarRenderDays',
+    'isBookingOpen', 'allowSameDayBooking', 'calendarRenderDays',
   ];
   const isProfileDirty = profileKeys.some(
     (k) => JSON.stringify(config[k]) !== JSON.stringify(savedConfig[k])
@@ -87,7 +86,6 @@ export function ClinicSettingsPage({ initialConfig, initialTimeBlocks = [] }: Cl
           }
         : {
             isBookingOpen: config.isBookingOpen,
-            maintenanceMessage: config.isBookingOpen ? null : config.maintenanceMessage,
             allowSameDayBooking: config.allowSameDayBooking,
             calendarRenderDays: config.calendarRenderDays,
           };
@@ -267,12 +265,16 @@ export function ClinicSettingsPage({ initialConfig, initialTimeBlocks = [] }: Cl
 
             <div className="flex flex-col gap-3">
               {config.socialLinks.map((link, index) => (
-                <div key={`${link.platform}-${index}`} className="grid grid-cols-1 md:grid-cols-[0.7fr_1fr_auto] gap-3 items-end">
-                  <Input label={index === 0 ? 'Platform' : undefined} placeholder="Facebook" value={link.platform} className={inputClass} onChange={(event) => updateConfigField('socialLinks', config.socialLinks.map((item, itemIndex) => itemIndex === index ? { ...item, platform: event.target.value } : item))} />
-                  <Input label={index === 0 ? 'Profile URL' : undefined} type="url" placeholder="https://..." value={link.url} className={inputClass} onChange={(event) => updateConfigField('socialLinks', config.socialLinks.map((item, itemIndex) => itemIndex === index ? { ...item, url: event.target.value } : item))} />
-                  <Button type="button" variant="ghost" size="icon" aria-label={`Remove ${link.platform || 'social'} link`} onClick={() => updateConfigField('socialLinks', config.socialLinks.filter((_, itemIndex) => itemIndex !== index))} className="size-9 text-rose-500 hover:text-rose-600 hover:bg-rose-500/10">
-                    <Trash2 className="size-4" />
-                  </Button>
+                <div key={index} className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+                  <Input label={index === 0 ? 'Platform' : undefined} aria-label={`Social link ${index + 1} platform`} placeholder="Facebook" value={link.platform} className={inputClass} onChange={(event) => updateConfigField('socialLinks', config.socialLinks.map((item, itemIndex) => itemIndex === index ? { ...item, platform: event.target.value } : item))} />
+                  <div className="flex min-w-0 items-end gap-3">
+                    <div className="min-w-0 flex-1">
+                      <Input label={index === 0 ? 'Profile URL' : undefined} aria-label={`Social link ${index + 1} profile URL`} type="url" placeholder="https://..." value={link.url} className={inputClass} onChange={(event) => updateConfigField('socialLinks', config.socialLinks.map((item, itemIndex) => itemIndex === index ? { ...item, url: event.target.value } : item))} />
+                    </div>
+                    <Button type="button" variant="ghost" size="icon" aria-label={`Remove ${link.platform || 'social'} link`} onClick={() => updateConfigField('socialLinks', config.socialLinks.filter((_, itemIndex) => itemIndex !== index))} className="size-11 shrink-0 text-rose-500 hover:text-rose-600 hover:bg-rose-500/10">
+                      <Trash2 className="size-4" />
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -308,7 +310,7 @@ export function ClinicSettingsPage({ initialConfig, initialTimeBlocks = [] }: Cl
                     Online booking enabled
                   </Label>
                   <span className="text-[11px] text-muted-foreground">
-                    When turned off, the online booking flow displays the maintenance message below.
+                    When turned off, patients can contact the clinic to arrange an appointment.
                   </span>
                 </div>
                 <Switch
@@ -336,19 +338,6 @@ export function ClinicSettingsPage({ initialConfig, initialTimeBlocks = [] }: Cl
               </div>
             </div>
 
-            {!config.isBookingOpen && (
-              <div className="flex flex-col gap-1.5 pt-2">
-                <Textarea
-                  label="Maintenance message"
-                  required
-                  value={config.maintenanceMessage || ''}
-                  className={inputClass}
-                  onChange={(event) => updateConfigField('maintenanceMessage', event.target.value)}
-                  placeholder="Tell patients how to contact the clinic while online booking is temporarily closed."
-                />
-                <p className="text-[11px] text-muted-foreground">This message appears when patients attempt to book online.</p>
-              </div>
-            )}
           </div>
 
           <div className="flex justify-end pt-2">

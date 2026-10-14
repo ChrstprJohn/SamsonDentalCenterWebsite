@@ -163,7 +163,7 @@ export function SecretarySidebar({ userProfile, logoUrl, notificationCount = 0, 
           `}} />
         </div>
       )}
-      <SidebarHeader>
+      <SidebarHeader className="pb-0">
         <TeamSwitcherSecretary teams={data.teams} logoUrl={logoUrl} />
       </SidebarHeader>
       <SidebarContent>

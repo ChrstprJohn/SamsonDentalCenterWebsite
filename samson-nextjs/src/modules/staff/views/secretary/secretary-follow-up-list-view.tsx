@@ -1,14 +1,14 @@
 import React from 'react';
 import { createAdminClient } from '@/shared/database/server';
 import { authorizeRole } from '@/shared/auth/auth.util';
-import { formatTimeAgo, formatShortDate } from '@/shared/utils/date.util';
-import { Send, MessageSquare } from 'lucide-react';
+import { formatShortDate } from '@/shared/utils/date.util';
 import { FollowUpResponsesPanel } from './sub-components/follow-up-responses-panel';
+import { DEFAULT_FOLLOW_UP_FILTERS, followUpDateRange, followUpStatuses, type FollowUpFilters } from './sub-components/follow-up-filters';
 
 type FollowUpRow = {
   id: string;
   eventType: string;
-  payload: Record<string, any>;
+  payload: Record<string, unknown>;
   status: string;
   createdAt: string;
 };
@@ -23,10 +23,10 @@ async function loadFollowUps(): Promise<FollowUpRow[]> {
     .order('created_at', { ascending: false })
     .limit(100);
 
-  return (events || []).map((e: any) => ({
+  return (events || []).map((e: { id: string; event_type: string; payload: unknown; status: string; created_at: string }) => ({
     id: e.id,
     eventType: e.event_type,
-    payload: (e.payload || {}) as Record<string, any>,
+    payload: (e.payload || {}) as Record<string, unknown>,
     status: e.status as string,
     createdAt: e.created_at as string,
   }));
@@ -36,7 +36,7 @@ type ResponseRow = {
   id: string;
   feeling: string | null;
   note: string | null;
-  details: Record<string, any> | null;
+  details: Record<string, unknown> | null;
   createdAt: string;
   status: string;
   source: string;
@@ -53,10 +53,32 @@ type ResponseRow = {
   } | null;
 };
 
-async function loadResponses(): Promise<ResponseRow[]> {
+type PersonRow = { first_name: string | null; last_name: string | null; phone_number?: string | null };
+type AppointmentRow = {
+  id: string;
+  date: string;
+  service?: { name: string | null } | null;
+  doctor?: PersonRow | null;
+  patient: PersonRow | null;
+  guest_contacts: PersonRow | PersonRow[] | null;
+};
+type RawResponseRow = {
+  id: string;
+  feeling: string | null;
+  note: string | null;
+  details: Record<string, unknown> | null;
+  created_at: string;
+  updated_at: string | null;
+  status: string | null;
+  source: string | null;
+  patient_name: string | null;
+  appointment: AppointmentRow | null;
+};
+
+async function loadResponses(filters: FollowUpFilters): Promise<ResponseRow[]> {
   const supabase = await createAdminClient();
 
-  const { data: responses, error: respError } = await supabase
+  let query = supabase
     .from('checkout_follow_up_responses')
     .select(`
       id,
@@ -76,15 +98,19 @@ async function loadResponses(): Promise<ResponseRow[]> {
         patient:users!appointments_patient_id_fkey(first_name, last_name, phone_number),
         guest_contacts!guest_contacts_appointment_id_fkey(first_name, last_name, phone_number)
       )
-    `)
-    .order('created_at', { ascending: false })
-    .limit(100);
+    `);
+  const statuses = followUpStatuses(filters.stage);
+  if (statuses) query = query.in('status', statuses);
+  const range = followUpDateRange(filters);
+  const dateColumn = filters.dateField === 'UPDATED' ? 'updated_at' : 'created_at';
+  if (range) query = query.gte(dateColumn, range.from).lt(dateColumn, range.to);
+  const { data: responses, error: respError } = await query.order(dateColumn, { ascending: false }).limit(100);
 
   if (respError) {
     console.error('[Aftercare Check-Ins] Error loading responses:', respError);
   }
 
-  return (responses || []).map((r: any) => {
+  return ((responses || []) as RawResponseRow[]).map((r) => {
     const a = r.appointment;
     const gc = Array.isArray(a?.guest_contacts) ? a.guest_contacts[0] : a?.guest_contacts;
     const patientName = gc
@@ -103,17 +129,17 @@ async function loadResponses(): Promise<ResponseRow[]> {
       note: r.note ?? null,
       details: r.details ?? null,
       createdAt: r.created_at as string,
-      status: (r as any).status || 'UNRESOLVED',
-      source: (r as any).source || 'FORM',
-      updatedAt: (r as any).updated_at || null,
+      status: r.status || 'UNRESOLVED',
+      source: r.source || 'FORM',
+      updatedAt: r.updated_at || null,
       patientName,
       patientPhone: phone,
       appointment: a
         ? {
             id: a.id,
             date: a.date,
-            patientName,
-            serviceName: (a.service as any)?.name ?? null,
+            patientName: patientName || 'Patient',
+            serviceName: a.service?.name ?? null,
             doctorName,
             phone,
           }
@@ -138,7 +164,7 @@ async function loadManualEntryAppointments(): Promise<AppointmentOption[]> {
     .order('date', { ascending: false })
     .limit(100);
 
-  return (data || []).map((a: any) => {
+  return ((data || []) as AppointmentRow[]).map((a) => {
     const gc = Array.isArray(a.guest_contacts) ? a.guest_contacts[0] : a.guest_contacts;
     const name = gc
       ? `${gc.first_name} ${gc.last_name}`
@@ -149,14 +175,14 @@ async function loadManualEntryAppointments(): Promise<AppointmentOption[]> {
   });
 }
 
-export async function SecretaryFollowUpListView() {
+export async function SecretaryFollowUpListView({ filters = DEFAULT_FOLLOW_UP_FILTERS }: { filters?: FollowUpFilters } = {}) {
   await authorizeRole('SECRETARY');
 
-  const [rows, responses, appointmentOptions] = await Promise.all([
+  const [, responses, appointmentOptions] = await Promise.all([
     loadFollowUps(),
-    loadResponses(),
+    loadResponses(filters),
     loadManualEntryAppointments(),
   ]);
 
-  return <FollowUpResponsesPanel responses={responses} appointmentOptions={appointmentOptions} />;
+  return <FollowUpResponsesPanel responses={responses} appointmentOptions={appointmentOptions} filters={filters} />;
 }

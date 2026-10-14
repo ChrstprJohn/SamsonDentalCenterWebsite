@@ -69,19 +69,6 @@ export function ClinicConfigForm({
           />
         </div>
 
-        {!config.isBookingOpen && (
-          <div className="flex flex-col gap-1.5 animate-in fade-in slide-in-from-top-2">
-            <label className="text-xs font-semibold text-text-secondary">Scheduler Maintenance Message</label>
-            <textarea
-              required
-              value={config.maintenanceMessage || ''}
-              onChange={(e) => setConfig({ ...config, maintenanceMessage: e.target.value })}
-              placeholder="Enter custom maintenance banner text..."
-              rows={3}
-              className="px-3.5 py-2 rounded-xl border border-card-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary-ring text-text-primary"
-            />
-          </div>
-        )}
       </div>
 
       <Button type="submit" disabled={isSavingConfig} className="self-start mt-2">

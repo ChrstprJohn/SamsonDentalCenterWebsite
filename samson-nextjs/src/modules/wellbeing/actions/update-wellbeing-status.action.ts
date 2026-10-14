@@ -14,25 +14,26 @@ export type UpdateWellbeingStatusInput = z.infer<typeof updateWellbeingStatusSch
 
 export async function updateWellbeingStatusAction(
   input: UpdateWellbeingStatusInput
-): Promise<ActionResponse<{ id: string; status: string }>> {
+): Promise<ActionResponse<{ id: string; status: string; updatedAt: string }>> {
   try {
     const parsed = updateWellbeingStatusSchema.parse(input);
     await authorizeRole('SECRETARY');
 
     const supabase = await createAdminClient();
 
+    const updatedAt = new Date().toISOString();
     const { error } = await supabase
       .from('checkout_follow_up_responses')
-      .update({ status: parsed.status, updated_at: new Date().toISOString() })
+      .update({ status: parsed.status, updated_at: updatedAt })
       .eq('id', parsed.id);
 
     if (error) {
       return { success: false, error: `Failed to update status: ${error.message}` };
     }
 
-    return { success: true, data: { id: parsed.id, status: parsed.status } };
-  } catch (error: any) {
+    return { success: true, data: { id: parsed.id, status: parsed.status, updatedAt } };
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) return { success: false, error: error.issues[0].message };
-    return { success: false, error: error?.message || 'Failed to update status.' };
+    return { success: false, error: error instanceof Error ? error.message : 'Failed to update status.' };
   }
 }
